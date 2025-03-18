@@ -1,0 +1,39 @@
+/* client/src/components/WorkspacesSection.css */
+.workspaces-section {
+    display: flex;
+    /* align-items: flex-start;  Removed this */
+    /* padding: 20px; Removed this */
+    width: 100%;
+    height: 100%;
+    /* Ensure it takes full height */
+}
+
+.workspace-sidebar {
+    width: 200px;
+    background-color: #f0f0f0;
+    border-right: 1px solid #ddd;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    /* Add some spacing between sidebar items */
+}
+
+.workspace-sidebar>div {
+    /* Style the sidebar links */
+    cursor: pointer;
+    padding: 8px 12px;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+}
+
+.workspace-sidebar>div:hover {
+    background-color: #ddd;
+}
+
+.workspace-main-content {
+    flex: 1;
+    padding: 1rem;
+    overflow-y: auto;
+    /* Add scrolling for content */
+}

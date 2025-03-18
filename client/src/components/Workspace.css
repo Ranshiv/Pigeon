@@ -2,24 +2,7 @@
 .workspace-container {
     display: flex;
     height: 100%;
-    /* Take up full viewport height */
-}
-
-.sidebar {
-    width: 200px;
-    background-color: #f0f0f0;
-    border-right: 1px solid #ddd;
-    padding: 20px;
-}
-
-.sidebar-section {
-    padding: 10px;
-    cursor: pointer;
-    border-bottom: 1px solid #eee;
-}
-
-.sidebar-section:hover {
-    background-color: #e0e0e0;
+    flex-direction: column;
 }
 
 .main-content {

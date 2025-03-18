@@ -1,0 +1,31 @@
+/* client/src/components/HomeSection.css */
+.home-section {
+    padding: 20px;
+}
+
+.home-options {
+    display: flex;
+    gap: 20px;
+}
+
+.home-option {
+    border: 1px solid #ddd;
+    padding: 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 200px;
+
+}
+
+.home-option:hover {
+    background-color: #f0f0f0;
+}
+
+.home-option span:first-child {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+}

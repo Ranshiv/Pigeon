@@ -13,12 +13,24 @@
     font-weight: bold;
 }
 
-.navbar-links a {
-    color: white;
-    text-decoration: none;
-    margin-left: 20px;
+.navbar-links {
+    display: flex;
+    gap: 20px;
 }
 
-.navbar-links a:hover {
-    text-decoration: underline;
+.navbar-links span {
+    cursor: pointer;
+    padding: 5px 10px;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+}
+
+.navbar-links span:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.navbar-links .active {
+    background-color: #007bff;
+    /* Highlight active link */
+    color: white;
 }
