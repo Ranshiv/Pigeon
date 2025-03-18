@@ -1,0 +1,19 @@
+/* client/src/components/ResponseDisplay.css */
+.response-display {
+    width: 100%;
+    margin-top: 20px;
+}
+
+.response-display pre {
+    background-color: #f5f5f5;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    white-space: pre-wrap;
+    /* Wrap long lines */
+    overflow-x: auto;
+    /* Allow horizontal scrolling for very long lines */
+    font-family: 'Courier New', Courier, monospace;
+    /* Use a monospace font for code */
+    font-size: 14px;
+}
