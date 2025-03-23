@@ -1,11 +1,10 @@
 /* client/src/components/Home.css */
+/* Styles from original Home.css */
 .home-container {
     display: flex;
     flex-direction: column;
     align-items: center;
-    /* Center content horizontally */
     padding: 0;
-    /* Remove padding, as we'll add it to individual sections */
     width: 100%;
     font-family: sans-serif;
 }
@@ -16,19 +15,15 @@
     align-items: center;
     padding: 40px 20px;
     max-width: 1200px;
-    /* Limit width for better readability */
     width: 100%;
     background-color: #f0f2f5;
-    /* Light background */
     margin-bottom: 40px;
 }
 
 .hero-content {
     flex: 1;
-    /* Take up available space */
     margin-right: 40px;
-    /* Space between text and image */
-    text-align: left
+    text-align: left;
 }
 
 .hero h1 {
@@ -62,7 +57,6 @@
 .hero-image {
     flex: 1;
     max-width: 50%;
-    /* Ensure image doesn't overflow */
 }
 
 .hero-image img {
@@ -71,7 +65,6 @@
     display: block;
 }
 
-/* Features Section */
 .features {
     max-width: 1200px;
     width: 100%;
@@ -87,7 +80,6 @@
 .features-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    /* Responsive grid */
     gap: 20px;
 }
 
@@ -104,14 +96,12 @@
     color: #007bff;
 }
 
-/* Trusted By Section */
 .trusted-by {
     max-width: 1200px;
     width: 100%;
     padding: 40px 20px;
     text-align: center;
     background-color: #f0f2f5;
-    /* Light background */
     margin-bottom: 40px;
 }
 
@@ -123,12 +113,10 @@
     display: flex;
     justify-content: space-around;
     flex-wrap: wrap;
-    /* Allow logos to wrap on smaller screens */
     gap: 20px;
 }
 
 .logo {
-    /* Style for your logo placeholders */
     width: 100px;
     height: 50px;
     background-color: #ddd;
@@ -140,7 +128,6 @@
     border-radius: 4px;
 }
 
-/* CTA Section */
 .cta {
     max-width: 1200px;
     width: 100%;
@@ -156,7 +143,6 @@
     padding: 12px 24px;
     font-size: 1.2em;
     background-color: #28a745;
-    /* Green color */
     color: white;
     border: none;
     border-radius: 5px;
@@ -166,21 +152,16 @@
 
 .cta-button:hover {
     background-color: #1e7e34;
-    /* Darker green */
 }
 
-/* Mobile responsiveness */
 @media (max-width: 768px) {
     .hero {
         flex-direction: column;
-        /* Stack content vertically */
         text-align: center;
-        /* Center text */
     }
 
     .hero-content {
         margin-right: 0;
-        /* Remove margin */
         margin-bottom: 20px;
     }
 
@@ -189,15 +170,58 @@
     }
 
     .hero-subtitle {
-        font-size: 1.2em
+        font-size: 1.2em;
     }
 
     .features-grid {
         grid-template-columns: 1fr;
-        /* Single column on small screens */
     }
 
     .hero-image {
         max-width: 100%;
     }
+}
+
+/* Styles from HomeSection.css */
+.home-section {
+    padding: 20px;
+    max-width: 1200px;
+    width: 100%;
+    text-align: center;
+    /* Center the content */
+    margin-bottom: 40px;
+    /* Add some spacing */
+
+}
+
+.home-options {
+    display: flex;
+    justify-content: center;
+    /* Center the options */
+    gap: 20px;
+    flex-wrap: wrap;
+    /* Allow wrapping on smaller screens */
+}
+
+.home-option {
+    border: 1px solid #ddd;
+    padding: 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 200px;
+    background-color: white;
+    /* Explicitly set background */
+}
+
+.home-option:hover {
+    background-color: #f0f0f0;
+}
+
+.home-option span:first-child {
+    font-size: 2em;
+    margin-bottom: 0.5rem;
 }

@@ -7,8 +7,11 @@ const Navbar = () => {
     const navigate = useNavigate();
     const location = useLocation();
 
-    // Helper function to determine if a link is active
+    // Corrected isActive function: Use strict equality for '/'
     const isActive = (path) => {
+        if (path === '/') {
+            return location.pathname === '/'; // Only active for the exact home route
+        }
         return location.pathname.startsWith(path); // Use startsWith for nested routes
     };
 
@@ -19,7 +22,7 @@ const Navbar = () => {
             </div>
             <div className="navbar-links">
                 <span
-                    onClick={() => navigate('/workspace/home')}
+                    onClick={() => navigate('/')}
                     className={isActive('/workspace/home') ? 'active' : ''}
                 >
                     Home
