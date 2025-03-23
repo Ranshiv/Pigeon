@@ -9,7 +9,7 @@ import RequestForm from './RequestForm'; // Import RequestForm
 import ResponseDisplay from './ResponseDisplay'; // Import ResponseDisplay
 import './WorkspacesSection.css';
 
-const WorkspacesSection = ({ requests, response, onSend, onUpdate, onDelete }) => {
+const WorkspacesSection = ({ requests, response, onSend, onCreate, onUpdate, onDelete }) => {
     const navigate = useNavigate();
     return (
         <div className="workspaces-section">
@@ -29,7 +29,7 @@ const WorkspacesSection = ({ requests, response, onSend, onUpdate, onDelete }) =
                     <Route path="ai-agent-tools" element={<AIAgentToolsSection />} />
                     <Route
                         path="requests/new"
-                        element={<RequestForm onSubmit={onSend} onCancel={() => navigate('explore')} />}
+                        element={<RequestForm onSubmit={onCreate} onCancel={() => navigate('explore')} />}
                     />
                     <Route
                         path="requests/edit/:id"
@@ -44,7 +44,6 @@ const WorkspacesSection = ({ requests, response, onSend, onUpdate, onDelete }) =
         </div>
     );
 };
-
 const RequestDetails = ({ requests, response, onSend }) => {
     const { id } = useParams();
     const request = requests.find((r) => r._id === id);

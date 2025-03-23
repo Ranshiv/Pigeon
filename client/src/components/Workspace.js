@@ -110,7 +110,7 @@ const Workspace = () => {
             {/* Redirect /workspace to /workspace/home */}
             <Route index element={<Navigate to="/workspace/home" />} />
             <Route path="home" element={<Home />} /> {/* Use Home component */}
-            <Route path="workspaces/*" element={<WorkspacesSection requests={requests} response={response} onSend={handleRequestSend} onUpdate={handleRequestUpdate} onDelete={handleRequestDelete} />} />
+            <Route path="workspaces/*" element={<WorkspacesSection requests={requests} response={response} onSend={handleRequestSend} onCreate={handleRequestCreate} onUpdate={handleRequestUpdate} onDelete={handleRequestDelete} />} />
             <Route path="api-network/*" element={<APINetworkSection />} />
         </Routes>
     );
