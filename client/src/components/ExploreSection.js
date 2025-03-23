@@ -1,14 +1,16 @@
+// ``````javascript
 // client/src/components/ExploreSection.js (Previously RequestList.js)
 import React from 'react';
 import './ExploreSection.css'; // Update the CSS file import
-// REMOVE: import { useNavigate } from 'react-router-dom'; // No longer needed
+import { useNavigate } from 'react-router-dom';
 
 const ExploreSection = ({ requests, onSelect, onSend, onDelete, onEdit }) => {
-    // REMOVE: const navigate = useNavigate();
+    const navigate = useNavigate();
 
     return (
         <div className="explore-section">
             <h2>Explore Requests</h2>
+            <button className='add-request-button' onClick={() => navigate('requests/new')}>Add Request</button>
             <ul>
                 {requests.map((request) => (
                     <li key={request._id} className="request-item">

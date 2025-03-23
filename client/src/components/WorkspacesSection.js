@@ -1,27 +1,26 @@
 //client/src/components/WorkspacesSection.js
-import React from 'react';
-import './WorkspacesSection.css'
-import { Routes, Route, useNavigate, useParams, Navigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Routes, Route, useNavigate, useParams, Navigate } from 'react-router-dom'; // Import useParams
 import ExploreSection from './ExploreSection';
 import SpotlightSection from './SpotlightSection';
 import TrendingSection from './TrendingSection';
 import AIAgentToolsSection from './AIAgentToolsSection';
-import RequestForm from './RequestForm';
-import ResponseDisplay from './ResponseDisplay';
+import RequestForm from './RequestForm'; // Import RequestForm
+import ResponseDisplay from './ResponseDisplay'; // Import ResponseDisplay
+import './WorkspacesSection.css';
 
 const WorkspacesSection = ({ requests, response, onSend, onUpdate, onDelete }) => {
     const navigate = useNavigate();
     return (
         <div className="workspaces-section">
-            <div className='workspace-sidebar'>
+            <div className="workspace-sidebar">
                 <div onClick={() => navigate('explore')}>Explore</div>
                 <div onClick={() => navigate('spotlight')}>Spotlight</div>
                 <div onClick={() => navigate('trending')}>Trending</div>
                 <div onClick={() => navigate('ai-agent-tools')}>AI Agent Tools</div>
                 <div onClick={() => navigate('requests/new')}>Add Request</div>
-
             </div>
-            <div className='workspace-main-content'>
+            <div className="workspace-main-content">
                 <Routes>
                     <Route index element={<Navigate to="explore" />} />
                     <Route path="explore" element={<ExploreSection requests={requests} onSend={onSend} onDelete={onDelete} onSelect={(request) => navigate(`requests/${request._id}`)} onEdit={(request) => navigate(`requests/edit/${request._id}`)} />} />
@@ -45,6 +44,7 @@ const WorkspacesSection = ({ requests, response, onSend, onUpdate, onDelete }) =
         </div>
     );
 };
+
 const RequestDetails = ({ requests, response, onSend }) => {
     const { id } = useParams();
     const request = requests.find((r) => r._id === id);

@@ -7,7 +7,7 @@ import TrendingSection from './TrendingSection';
 import AIAgentToolsSection from './AIAgentToolsSection';
 import RequestForm from './RequestForm';
 import ResponseDisplay from './ResponseDisplay';
-import HomeSection from './HomeSection';
+import Home from './Home'; // Corrected import: Use Home, not HomeSection
 import WorkspacesSection from './WorkspacesSection';
 import APINetworkSection from './APINetworkSection';
 import './Workspace.css';
@@ -38,7 +38,7 @@ const Workspace = () => {
             });
             const data = await res.json();
             setResponse(data);
-            navigate(`/workspace/workspaces/requests/${request._id}`); // Corrected navigation
+            navigate(`/workspace/workspaces/requests/${request._id}`);
         } catch (err) {
             console.error('Error sending request:', err);
         }
@@ -55,7 +55,7 @@ const Workspace = () => {
                 const savedRequest = await res.json();
                 setRequests([...requests, savedRequest]);
                 fetchRequests();
-                navigate(`/workspace/workspaces/requests/${savedRequest._id}`); // Corrected
+                navigate(`/workspace/workspaces/requests/${savedRequest._id}`);
             } else {
                 const errorData = await res.json();
                 console.error('Failed to create', errorData);
@@ -78,7 +78,7 @@ const Workspace = () => {
                     req._id === updatedRequest._id ? updatedRequest : req
                 );
                 setRequests(updatedRequests);
-                navigate(`/workspace/workspaces/requests/${updatedRequest._id}`); // Corrected
+                navigate(`/workspace/workspaces/requests/${updatedRequest._id}`);
             } else {
                 const errorData = await res.json();
                 console.error('Failed to update', errorData);
@@ -95,7 +95,7 @@ const Workspace = () => {
             });
             if (res.ok) {
                 setRequests(requests.filter((req) => req._id !== requestId));
-                navigate('/workspace/workspaces/explore'); // Corrected navigation
+                navigate('/workspace/workspaces/explore');
             } else {
                 const errorData = await res.json();
                 console.error('Failed to delete', errorData);
@@ -106,14 +106,14 @@ const Workspace = () => {
     };
 
     return (
-        // Removed extra div and routes
         <Routes>
             {/* Redirect /workspace to /workspace/home */}
             <Route index element={<Navigate to="/workspace/home" />} />
-            <Route path="home" element={<HomeSection />} />
+            <Route path="home" element={<Home />} /> {/* Use Home component */}
             <Route path="workspaces/*" element={<WorkspacesSection requests={requests} response={response} onSend={handleRequestSend} onUpdate={handleRequestUpdate} onDelete={handleRequestDelete} />} />
             <Route path="api-network/*" element={<APINetworkSection />} />
         </Routes>
     );
 };
+
 export default Workspace;

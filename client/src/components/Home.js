@@ -67,7 +67,7 @@ const Home = () => {
 
             <section className="cta">
                 <h2>Ready to Simplify Your API Workflow?</h2>
-                <button className="cta-button" onClick={handleGetStartedClick}>
+                <button className="cta-button" onClick={() => navigate('/')}>
                     Try Pigeon Now
                 </button>
             </section>
