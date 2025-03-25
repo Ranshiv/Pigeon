@@ -7,23 +7,17 @@ const Navbar = () => {
     const navigate = useNavigate();
     const location = useLocation();
 
-    // Corrected isActive function: Use strict equality for '/'
-    const isActive = (path) => {
-        if (path === '/') {
-            return location.pathname === '/'; // Only active for the exact home route
-        }
-        return location.pathname.startsWith(path); // Use startsWith for nested routes
-    };
+    const isActive = (path) => location.pathname === path;
 
     return (
         <nav className="navbar">
-            <div className="navbar-brand" onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>
+            <div className="navbar-brand" onClick={() => navigate('/')}>
                 Pigeon
             </div>
             <div className="navbar-links">
                 <span
                     onClick={() => navigate('/')}
-                    className={isActive('/workspace/home') ? 'active' : ''}
+                    className={isActive('/') ? 'active' : ''}
                 >
                     Home
                 </span>
