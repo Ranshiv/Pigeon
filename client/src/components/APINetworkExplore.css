@@ -1,0 +1,54 @@
+/* client/src/components/APINetworkExplore.css */
+.api-network-explore {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    /* Spacing between sections */
+}
+
+.hero-section {
+    background-color: #f0f2f5;
+    padding: 30px;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.create-request-button {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1.1em;
+}
+
+.create-request-button:hover {
+    background-color: #0056b3;
+}
+
+.example-requests,
+.recent-requests,
+.collections-placeholder {
+    border: 1px solid #ddd;
+    padding: 20px;
+    border-radius: 8px;
+}
+
+.request-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    /* Responsive grid */
+    gap: 20px;
+}
+
+.request-item {
+    border: 1px solid #eee;
+    padding: 15px;
+    border-radius: 4px;
+}
+
+.request-item h3 {
+    margin-top: 0;
+    margin-bottom: 1rem;
+}

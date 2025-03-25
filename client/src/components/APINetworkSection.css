@@ -1,4 +1,4 @@
-/* client/src/components/APINetworkSection.css */
+/* client/src/components/APINetworkSection.css (Modified) */
 .api-network-section {
     display: flex;
     width: 100%;
@@ -12,9 +12,24 @@
     padding: 20px;
     display: flex;
     flex-direction: column;
+    gap: 8px;
+    /* Add gap for spacing */
+}
+
+.api-network-sidebar>div {
+    cursor: pointer;
+    padding: 8px 12px;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+}
+
+.api-network-sidebar>div:hover {
+    background-color: #ddd;
 }
 
 .api-network-main-content {
     flex: 1;
     padding: 1rem;
+    overflow-y: auto;
+    /* Add scrolling */
 }
