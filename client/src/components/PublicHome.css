@@ -1,0 +1,222 @@
+/* client/src/components/PublicHome.css */
+
+.public-home-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    width: 100%;
+    font-family: sans-serif;
+}
+
+.hero {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 40px 20px;
+    max-width: 1200px;
+    width: 100%;
+    background-color: #f8f9fa;
+    /* Light background */
+    margin-bottom: 40px;
+    border-radius: 8px;
+}
+
+.hero-content {
+    flex: 1;
+    margin-right: 40px;
+    text-align: left;
+}
+
+.hero h1 {
+    font-size: 2.5em;
+    margin-bottom: 0.5em;
+    color: #343a40;
+    /* Darker text */
+    line-height: 1.2;
+}
+
+.hero-subtitle {
+    font-size: 1.2em;
+    color: #6c757d;
+    /* Gray text */
+    margin-bottom: 1em;
+}
+
+.hero-button {
+    padding: 12px 24px;
+    font-size: 1.1em;
+    background-color: #007bff;
+    /* Blue button */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-decoration: none;
+    /* Remove underline from <a> */
+    display: inline-block;
+    /* Make <a> behave like a button */
+    transition: background-color 0.2s;
+}
+
+.hero-button:hover {
+    background-color: #0056b3;
+}
+
+.hero-image {
+    flex: 1;
+    max-width: 40%;
+    /* Smaller image */
+}
+
+.hero-image img {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 8px;
+    /* Rounded corners */
+}
+
+.features {
+    max-width: 1200px;
+    width: 100%;
+    padding: 40px 20px;
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.features h2 {
+    margin-bottom: 1rem;
+    color: #343a40;
+}
+
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.feature {
+    padding: 20px;
+    border: 1px solid #ced4da;
+    /* Lighter border */
+    border-radius: 8px;
+    text-align: center;
+    background-color: white;
+    /* White background */
+}
+
+.feature-icon {
+    font-size: 2em;
+    margin-bottom: 10px;
+    color: #007bff;
+    /* Blue icon */
+}
+
+.feature p {
+    color: #6c757d
+}
+
+.feature h3 {
+    color: #343a40
+}
+
+.benefits {
+    max-width: 1200px;
+    width: 100%;
+    padding: 30px 20px;
+    margin-bottom: 40px;
+    background-color: #e9ecef;
+    /* Slightly darker background */
+    border-radius: 8px;
+}
+
+.benefits h2 {
+    text-align: center;
+    margin-bottom: 1rem;
+    color: #343a40;
+}
+
+.benefits ul {
+    list-style: none;
+    /* Remove bullet points */
+    padding: 0;
+    margin: 0;
+}
+
+.benefits li {
+    margin-bottom: 0.5rem;
+    color: #495057;
+    /* Dark gray text */
+    display: flex;
+    align-items: center;
+}
+
+.benefits li strong {
+    margin-right: 0.5rem;
+    color: #343a40
+}
+
+
+.cta {
+    max-width: 1200px;
+    width: 100%;
+    padding: 40px 20px;
+    text-align: center;
+    background-color: #f0f2f5;
+
+}
+
+.cta h2 {
+    margin-bottom: 1rem;
+    color: #343a40;
+
+}
+
+.cta-button {
+    padding: 12px 24px;
+    font-size: 1.2em;
+    background-color: #28a745;
+    /* Green color */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background-color 0.2s;
+}
+
+.cta-button:hover {
+    background-color: #1e7e34;
+    /* Darker green */
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+    .hero {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .hero-content {
+        margin-right: 0;
+        margin-bottom: 20px;
+    }
+
+    .hero h1 {
+        font-size: 2em;
+    }
+
+    .hero-subtitle {
+        font-size: 1em;
+    }
+
+    .hero-image {
+        max-width: 100%;
+    }
+
+    .features-grid {
+        grid-template-columns: 1fr;
+        /* Single column on small screens */
+    }
+}

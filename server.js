@@ -1,24 +1,113 @@
-// server.js (Complete - including previous code)
+// server.js
 const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
+const passport = require('passport');
+const GoogleStrategy = require('passport-google-oauth20').Strategy;
+const session = require('express-session');
+const cookieParser = require('cookie-parser');
 require('dotenv').config();
-const fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args)); //For node-fetch
-const Request = require('./models/Request'); // Import the Request model
+const fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args));
+const Request = require('./models/Request');
 
 const app = express();
 const port = process.env.PORT || 5000;
 
-app.use(cors());
+// --- MIDDLEWARE (Correct Order) ---
+app.use(cors({
+    origin: 'http://localhost:3000', // Your frontend's URL
+    credentials: true, // Allow sending cookies
+}));
 app.use(express.json());
+app.use(cookieParser());
+app.use(session({
+    secret: process.env.SESSION_SECRET, // Use a STRONG secret from .env!
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+        secure: process.env.NODE_ENV === 'production', // HTTPS in production
+        httpOnly: true,
+        maxAge: 24 * 60 * 60 * 1000 // 24 hours
+    }
+}));
+app.use(passport.initialize());
+app.use(passport.session());
 
+// --- DATABASE CONNECTION ---
 mongoose.connect(process.env.DATABASE_URL)
     .then(() => console.log('Connected to MongoDB'))
     .catch(err => console.error('Could not connect to MongoDB', err));
 
-// --- API Endpoints ---
+// --- PASSPORT CONFIGURATION ---
+passport.use(new GoogleStrategy({
+    clientID: process.env.GOOGLE_CLIENT_ID,
+    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    callbackURL: 'http://localhost:5000/auth/google/callback', // ABSOLUTE URL
+    scope: ['profile', 'email']
+},
+    (accessToken, refreshToken, profile, cb) => {
+        // --- REPLACE THIS WITH YOUR USER MANAGEMENT LOGIC ---
+        // This example uses a simplified user object.
+        // In a real application, you would find or create a user in your database.
+        const user = {
+            id: profile.id,
+            displayName: profile.displayName,
+            email: profile.emails[0].value, // Get the first email
+        };
+        return cb(null, user);
+    }
+));
 
-// Create a new request
+passport.serializeUser((user, done) => {
+    done(null, user); // In a real app, use user.id
+});
+
+passport.deserializeUser((user, done) => {
+    done(null, user);
+});
+
+// --- AUTHENTICATION ROUTES (BEFORE other API routes) ---
+
+app.get('/auth/google',
+    (req, res, next) => {
+        console.log("Reached /auth/google route handler!"); // Debugging log
+        passport.authenticate('google', { scope: ['profile', 'email'] })(req, res, next)
+    });
+
+app.get('/auth/google/callback',
+    passport.authenticate('google', { failureRedirect: '/' }), // Redirect to public home on failure
+    (req, res) => {
+        // Successful authentication, redirect to the workspace.
+        res.redirect('http://localhost:3000/workspace');
+    }
+);
+
+app.get('/api/auth/check', (req, res) => {
+    if (req.isAuthenticated()) {
+        res.json({ isAuthenticated: true, user: req.user });
+    } else {
+        res.json({ isAuthenticated: false });
+    }
+});
+
+app.get('/api/auth/logout', (req, res) => {
+    req.logout((err) => {
+        if (err) {
+            console.error("Logout error:", err);
+            return res.status(500).json({ message: 'Logout failed' });
+        }
+        req.session.destroy((err) => {
+            if (err) {
+                console.error('Session destruction error: ', err)
+                return res.status(500).json({ message: 'Logout Failed' })
+            }
+            res.clearCookie('connect.sid'); // Clear the session cookie
+            res.json({ message: 'Logged out successfully' });
+        });
+    });
+});
+
+// --- OTHER API ROUTES ---
 app.post('/api/requests', async (req, res) => {
     try {
         const newRequest = new Request(req.body);
@@ -81,6 +170,7 @@ app.get('/api/requests', async (req, res) => {
 // Send the request and get the response
 app.post('/api/requests/:id/send', async (req, res) => {
     try {
+        // console.log("Request ID:", req.params.id); // Add this line for debugging
         const request = await Request.findById(req.params.id);
         if (!request) {
             return res.status(404).json({ message: 'Request not found' });
@@ -95,14 +185,16 @@ app.post('/api/requests/:id/send', async (req, res) => {
                 return acc;
             }, {}),
         };
-
+        // console.log("Body Type:", bodyType);
+        // console.log("Body Content:", body);
         if (body && bodyType !== 'none') {
             if (bodyType === 'json') {
                 fetchOptions.headers['Content-Type'] = 'application/json';
-                fetchOptions.body = JSON.stringify(JSON.parse(body)); // Parse and stringify to ensure valid JSON
+                fetchOptions.body = body;
             } else if (bodyType === 'x-www-form-urlencoded') {
                 fetchOptions.headers['Content-Type'] = 'application/x-www-form-urlencoded';
                 const encodedBody = new URLSearchParams(JSON.parse(body)).toString();
+
                 fetchOptions.body = encodedBody;
 
             }
@@ -113,6 +205,7 @@ app.post('/api/requests/:id/send', async (req, res) => {
         }
 
         const response = await fetch(url, fetchOptions);
+        // console.log("Fetch Response:", response);
 
         const responseHeaders = {};
         response.headers.forEach((value, name) => {
@@ -139,12 +232,6 @@ app.post('/api/requests/:id/send', async (req, res) => {
         res.status(500).json({ message: 'Error sending request', error: err.message });
     }
 });
-
-// Basic API endpoint (keep for testing)
-app.get('/api/test', (req, res) => {
-    res.json({ message: 'Backend connected!' });
-});
-
 app.listen(port, () => {
     console.log(`Server listening on port ${port}`);
 });

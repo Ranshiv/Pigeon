@@ -1,22 +1,41 @@
 // client/src/App.js
-import React from 'react';
-import { Routes, Route, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Routes, Route, useNavigate, Navigate } from 'react-router-dom'; // Import Navigate
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Home from './components/Home';
 import Workspace from './components/Workspace';
+import PublicHome from './components/PublicHome'; // Import the new PublicHome component
 import './App.css';
 
 function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    // Check authentication status on app load
+    const checkAuth = async () => {
+      try {
+        const res = await fetch('/api/auth/check');
+        const data = await res.json();
+        setIsAuthenticated(data.isAuthenticated);
+      } catch (err) {
+        console.error("Error checking auth:", err);
+        setIsAuthenticated(false); // Assume not authenticated on error
+      }
+    };
+
+    checkAuth();
+  }, []);
+
 
   return (
     <div className="App">
-      <Navbar /> {/* Only one Navbar here */}
+      <Navbar isAuthenticated={isAuthenticated} />  {/* Pass isAuthenticated to Navbar */}
       <div className="container">
         <Routes>
-          <Route path="/" element={<Home onGetStarted={() => navigate('/workspace')} />} />
-          <Route path="/workspace/*" element={<Workspace />} />
+          <Route path="/" element={isAuthenticated ? <Navigate to="/workspace" /> : <PublicHome />} />
+          <Route path="/workspace/*" element={isAuthenticated ? <Workspace /> : <Navigate to="/" />} />
           <Route path="*" element={<div>404 Not Found</div>} />
         </Routes>
       </div>
