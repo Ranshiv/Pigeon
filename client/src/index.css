@@ -1,14 +1,120 @@
-/*client/src/index.css*/
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+/* src/App.css (or index.css) - Add these styles */
+
+/* Light theme variables (default) */
+body.light-theme {
+  --background-color: #ffffff;
+  --text-color: #333333;
+  --navbar-background: #333;
+  --navbar-text: #ffffff;
+  --sidebar-background: #f0f0f0;
+  --sidebar-text: #333;
+  --button-background: #007bff;
+  --button-text: #ffffff;
+  --border-color: #ddd;
+  --hover-background: #e0e0e0;
+  --card-background: #ffffff;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+/* Dark theme variables */
+body.dark-theme {
+  --background-color: #22272e;
+  /* Dark background */
+  --text-color: #adbac7;
+  /* Light text */
+  --navbar-background: #1c2128;
+  /* Darker navbar */
+  --navbar-text: #adbac7;
+  --sidebar-background: #2d333b;
+  /* Darker sidebar */
+  --sidebar-text: #adbac7;
+  --button-background: #377df0;
+  /* Brighter blue */
+  --button-text: #ffffff;
+  --border-color: #444c56;
+  /* Darker border */
+  --hover-background: #373e47;
+  /* Darker hover */
+  --card-background: #2d333b;
+  /* Darker card */
+
 }
+
+/* Apply variables */
+body {
+  background-color: var(--background-color);
+  color: var(--text-color);
+  margin: 0;
+  font-family: sans-serif;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  /* Smooth transition */
+  min-height: 100vh;
+}
+
+.App {
+  /* ... other App styles ... */
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.container {
+  /* ... other container styles ... */
+  flex-grow: 1;
+}
+
+.navbar {
+  background-color: var(--navbar-background);
+  color: var(--navbar-text);
+  /* ... other navbar styles ... */
+}
+
+.navbar-links span:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.navbar-links .active {
+  background-color: var(--button-background);
+  color: var(--button-text);
+}
+
+.sidebar {
+  background-color: var(--sidebar-background);
+  color: var(--sidebar-text);
+  border-right: 1px solid var(--border-color);
+  /* ... other sidebar styles ... */
+}
+
+.sidebar-section:hover {
+  background-color: var(--hover-background);
+}
+
+.workspace-sidebar>div:hover,
+.api-network-sidebar>div:hover {
+  background-color: var(--hover-background);
+}
+
+/* Example component styling */
+.home-option,
+.feature,
+.request-item,
+.spotlight-item,
+.trending-item {
+  background-color: var(--card-background);
+  border: 1px solid var(--border-color);
+}
+
+.request-item:hover {
+  background-color: var(--hover-background);
+}
+
+button,
+.hero-button,
+.cta-button,
+.create-request-button,
+.send-request-button,
+.edit-request-button {
+  background-color: var(--button-background);
+  color: var(--button-text);
+}
+
+/* Add more specific component styles as needed using the variables */

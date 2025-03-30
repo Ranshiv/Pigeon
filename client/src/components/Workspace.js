@@ -5,7 +5,7 @@ import Home from './Home';
 // REMOVED: WorkspacesSection import
 import APINetworkSection from './APINetworkSection';
 import './Workspace.css';
-
+import SettingsPage from './SettingsPage';
 const Workspace = () => {
     // Moved request and response state to APINetworkSection
     const navigate = useNavigate();
@@ -23,12 +23,16 @@ const Workspace = () => {
                     API Network
                 </div>
             </div> */}
+            {/* <div className="sidebar-section" onClick={() => navigate('settings')}>
+                Settings
+            </div> */}
             <div className="main-content">
                 <Routes>
                     <Route index element={<Navigate to="/workspace/home" />} />
                     <Route path="home" element={<Home />} />
-                    <Route path="workspaces" element={<div>Workspaces (Empty for now)</div>} /> {/* Empty Workspaces */}
+                    <Route path="workspaces" element={<div>Workspaces (Empty for now)</div>} />
                     <Route path="api-network/*" element={<APINetworkSection />} />
+                    <Route path="settings" element={<SettingsPage />} /> {/* Add Settings Route */}
                 </Routes>
             </div>
         </div>

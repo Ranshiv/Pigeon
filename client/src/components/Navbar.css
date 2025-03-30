@@ -6,6 +6,16 @@
     justify-content: space-between;
     align-items: center;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    flex-wrap: wrap;
+    /* Allow navbar to wrap for small screens */
+}
+
+.navbar-left {
+    display: flex;
+    align-items: center;
+    gap: 25px;
+    flex: 1;
+    /* Allow left section to take available space */
 }
 
 .navbar-brand {
@@ -40,4 +50,263 @@
     background-color: #007bff;
     color: white;
     font-weight: bold;
+}
+
+.navbar-right {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.nav-icon {
+    font-size: 1.2em;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.nav-icon:hover {
+    color: #fca311;
+}
+
+.user-icon {
+    font-size: 1.5em;
+}
+
+.dropdown {
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
+    margin-top: 8px;
+}
+
+.dropdown-menu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background-color: #2a2a3a;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    padding: 8px 0;
+    border-radius: 5px;
+}
+
+.dropdown:hover .dropdown-menu {
+    display: block;
+}
+
+.dropdown-menu span {
+    display: block;
+    padding: 8px 16px;
+    white-space: nowrap;
+}
+
+.dropdown-menu span:hover {
+    background-color: #3a3a4a;
+}
+
+.hamburger {
+    display: none;
+    /* Hide by default */
+}
+
+/* Media Query for responsiveness */
+@media (max-width: 768px) {
+    .navbar {
+        padding: 12px 16px;
+    }
+
+    .navbar-left {
+        flex: 1;
+        justify-content: space-between;
+    }
+
+    .navbar-links {
+        display: none;
+        /* Hide links on small screens */
+        flex-direction: column;
+        gap: 10px;
+        width: 100%;
+        background-color: #1e1e2f;
+        position: absolute;
+        top: 60px;
+        /* Position below navbar */
+        left: 0;
+        padding: 16px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        border-radius: 5px;
+    }
+
+    .navbar-links.active {
+        display: flex;
+        /* Show links when active */
+    }
+
+    .navbar-right {
+        gap: 10px;
+    }
+
+    .nav-icon {
+        font-size: 1.5em;
+    }
+
+    .dropdown-menu {
+        display: none;
+    }
+
+    .dropdown:hover .dropdown-menu {
+        display: none;
+        /* Hide dropdown menu on small screens */
+    }
+
+    .hamburger {
+        display: block;
+
+        /* Show hamburger icon */
+        cursor: pointer;
+        font-size: 2em;
+
+    }
+}
+
+/* Small screen hamburger menu */
+@media (max-width: 768px) {
+    .hamburger {
+        display: block;
+        cursor: pointer;
+        font-size: 2em;
+        margin-right: 10px;
+    }
+
+    .navbar-links {
+        display: none;
+        flex-direction: column;
+        width: 80%;
+        padding: 10px;
+        margin-left: 8%;
+    }
+
+    .navbar-links.active {
+        display: flex;
+    }
+}
+/* client/src/components/Navbar.css */
+
+/* .navbar {
+    background-color: var(--navbar-background);
+    color: var(--navbar-text);
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.navbar-brand {
+    font-size: 1.5em;
+    font-weight: bold;
+    cursor: pointer;
+    /* Ensure brand is clickable } */
+
+    
+/* .navbar-links {
+    display: flex;
+    align-items: center;
+    /* Align items vertically */
+    /* gap: 15px; */
+    /* Adjust gap } */
+
+/* Style for both text links and icon containers */
+.nav-item,
+.nav-icon {
+    cursor: pointer;
+    padding: 8px 12px;
+    /* Consistent padding */
+    border-radius: 4px;
+    transition: background-color 0.2s;
+    display: flex;
+    /* Needed for aligning icons */
+    align-items: center;
+    /* Align icons vertically */
+}
+
+.nav-item:hover,
+.nav-icon:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.nav-item.active,
+.nav-icon.active {
+    background-color: var(--button-background);
+    color: var(--button-text);
+}
+
+/* Separate container for icons on the right */
+.navbar-icons {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    /* Spacing between icons */
+    margin-left: auto;
+    /* Push icons to the right */
+}
+
+.login-link {
+    color: var(--navbar-text);
+    text-decoration: none;
+    padding: 8px 12px;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+}
+
+.login-link:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Profile Menu Styling */
+.profile-menu-container {
+    position: relative;
+    /* Needed for absolute positioning of dropdown */
+}
+
+.profile-icon {
+    /* Add specific styles if needed */
+}
+
+.profile-dropdown {
+    position: absolute;
+    top: 100%;
+    /* Position below the icon */
+    right: 0;
+    /* Align to the right */
+    background-color: var(--card-background, #fff);
+    /* Use theme variable or default */
+    border: 1px solid var(--border-color, #ddd);
+    border-radius: 4px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    z-index: 10;
+    /* Ensure it's above other content */
+    min-width: 150px;
+    /* Minimum width */
+    padding: 5px 0;
+    /* Padding top/bottom */
+}
+
+.dropdown-item {
+    padding: 10px 15px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    color: var(--text-color);
+    /* Use theme text color */
+    white-space: nowrap;
+    /* Prevent text wrapping */
+}
+
+.dropdown-item:hover {
+    background-color: var(--hover-background, #f0f0f0);
+    /* Use theme variable or default */
+}
+
+.dropdown-item svg {
+    /* Style for icon within dropdown */
+    color: var(--text-color);
 }
