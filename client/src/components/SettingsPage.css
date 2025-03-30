@@ -129,4 +129,46 @@
 .setting-section form button {
     margin-top: 10px;
     /* Add space above button if needed */
+}.icon-selection {
+    margin-top: 20px;
+    /* Add space above icon selection */
+}
+
+.icon-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+    /* Responsive grid for icons */
+    gap: 15px;
+    /* Spacing between icons */
+    margin-top: 10px;
+}
+
+.profile-icon-option {
+    width: 50px;
+    /* Size of the icon previews */
+    height: 50px;
+    object-fit: contain;
+    /* Ensure icon fits well */
+    border: 2px solid transparent;
+    /* Border for selection indicator */
+    border-radius: 50%;
+    /* Make them circular */
+    cursor: pointer;
+    transition: border-color 0.2s ease, transform 0.2s ease;
+    background-color: var(--background-color);
+    /* Match background */
+    padding: 5px;
+    /* Inner padding */
+    box-sizing: border-box;
+}
+
+.profile-icon-option:hover {
+    transform: scale(1.1);
+    /* Slight zoom on hover */
+}
+
+.profile-icon-option.selected {
+    border-color: var(--button-background);
+    /* Highlight selected icon */
+    box-shadow: 0 0 5px var(--button-background);
 }

@@ -309,4 +309,29 @@
 .dropdown-item svg {
     /* Style for icon within dropdown */
     color: var(--text-color);
+}/* client/src/components/Navbar.css */
+/* ... (previous styles) ... */
+
+/* Style for the small profile image in the navbar */
+.navbar-profile-img {
+    width: 24px;
+    /* Adjust size as needed */
+    height: 24px;
+    border-radius: 50%;
+    /* Make it circular */
+    object-fit: cover;
+    /* Ensure image covers the area */
+    display: block;
+    /* Remove extra space below image */
 }
+
+/* Ensure the icon container adapts */
+.nav-icon.profile-icon {
+    padding: 6px;
+    /* Adjust padding if needed for image */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ... (rest of Navbar.css) */

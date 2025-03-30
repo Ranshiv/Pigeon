@@ -136,10 +136,18 @@ const ensureAuthenticated = (req, res, next) => {
 };
 
 // --- Profile Update Route ---
+// server.js (Modified PUT /api/user/profile route)
+
+// Define allowed icon filenames (for validation) - should match your files
+const allowedIcons = [
+    'buffalo.png', 'clown-fish.png', 'hippo.png',
+    'lion.png', 'mouse.png', 'pig.png', 'sheep.png'
+];
+
 app.put('/api/user/profile', ensureAuthenticated, async (req, res) => {
     try {
-        // Remove fontFamily from destructuring
-        const { displayName, theme, fontSize } = req.body;
+        // Include profileIcon
+        const { displayName, theme, fontSize, profileIcon } = req.body;
         const userId = req.user.id;
 
         const updateData = {};
@@ -149,14 +157,17 @@ app.put('/api/user/profile', ensureAuthenticated, async (req, res) => {
         if (theme && ['light', 'dark'].includes(theme)) {
             updateData.theme = theme;
         }
-        // Remove fontFamily update logic
-
-        // Keep fontSize update logic
-        if (fontSize && typeof fontSize === 'string') {
-            if (['14px', '16px', '18px'].includes(fontSize)) {
-                updateData.fontSize = fontSize;
+        if (fontSize && ['14px', '16px', '18px'].includes(fontSize)) {
+            updateData.fontSize = fontSize;
+        }
+        // Validate and add profileIcon
+        if (profileIcon && typeof profileIcon === 'string') {
+            if (allowedIcons.includes(profileIcon)) {
+                updateData.profileIcon = profileIcon;
             } else {
-                console.warn("Invalid font size received:", fontSize);
+                console.warn(`Invalid profileIcon received: ${profileIcon}`);
+                // Optionally return a specific error, or just ignore it
+                // return res.status(400).json({ message: 'Invalid profile icon selected' });
             }
         }
 

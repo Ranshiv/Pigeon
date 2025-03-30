@@ -1,19 +1,25 @@
-// src/components/SettingsPage.js (Simplified)
+// src/components/SettingsPage.js (Modified)
 import React, { useState, useEffect } from 'react';
 import { useTheme } from '../context/ThemeContext';
-import { useFont, fontSizeOptions } from '../context/FontContext'; // Import only fontSize related things
+import { useFont, fontSizeOptions } from '../context/FontContext';
 import './SettingsPage.css';
+
+// Define available icons (matches filenames in public/assets/icons)
+const availableIcons = [
+    'buffalo.png', 'clown-fish.png', 'hippo.png',
+    'lion.png', 'mouse.png', 'pig.png', 'sheep.png'
+];
 
 const SettingsPage = () => {
     const { theme, toggleTheme } = useTheme();
-    const { fontSize, setFontSize } = useFont(); // Use only fontSize context
+    const { fontSize, setFontSize } = useFont();
 
     const [currentUser, setCurrentUser] = useState(null);
     const [newUsername, setNewUsername] = useState('');
+    const [selectedIcon, setSelectedIcon] = useState(null); // State for selected icon filename
     const [isUsernameLoading, setIsUsernameLoading] = useState(false);
     const [isUserDataLoading, setIsUserDataLoading] = useState(true);
     const [message, setMessage] = useState('');
-    // Keep only local state for font size dropdown
     const [selectedFontSize, setSelectedFontSize] = useState(fontSize);
 
     useEffect(() => {
@@ -27,8 +33,8 @@ const SettingsPage = () => {
                     if (data.isAuthenticated) {
                         setCurrentUser(data.user);
                         setNewUsername(data.user.displayName);
+                        setSelectedIcon(data.user.profileIcon); // Initialize selected icon
 
-                        // --- Initialize theme and font size from fetched user data ---
                         const userTheme = data.user.theme || 'light';
                         const userFontSize = data.user.fontSize || fontSizeOptions['Medium'];
 
@@ -36,12 +42,10 @@ const SettingsPage = () => {
                             localStorage.setItem('theme', userTheme);
                             document.body.className = userTheme + '-theme';
                         }
-
-                        // Apply font size if different
                         if (userFontSize !== fontSize) {
-                            setFontSize(userFontSize); // Update context
+                            setFontSize(userFontSize);
                         }
-                        setSelectedFontSize(userFontSize); // Update local dropdown state
+                        setSelectedFontSize(userFontSize);
 
                     } else {
                         setMessage('Error: Not authenticated.');
@@ -60,13 +64,10 @@ const SettingsPage = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    // Update local dropdown state when context changes
     useEffect(() => {
         setSelectedFontSize(fontSize);
     }, [fontSize]);
 
-
-    // Generic profile update function
     const handleProfileUpdate = async (updateData) => {
         setMessage('');
         if (!currentUser) return false;
@@ -78,7 +79,7 @@ const SettingsPage = () => {
             });
             if (res.ok) {
                 const data = await res.json();
-                setCurrentUser(data.user);
+                setCurrentUser(data.user); // Update user state with the response
                 return true;
             } else {
                 const errorData = await res.json();
@@ -92,7 +93,6 @@ const SettingsPage = () => {
         }
     };
 
-    // Username submit handler remains the same conceptually
     const handleUsernameSubmit = async (e) => {
         e.preventDefault();
         if (!currentUser || newUsername.trim() === '' || newUsername.trim() === currentUser.displayName) {
@@ -107,22 +107,33 @@ const SettingsPage = () => {
         setIsUsernameLoading(false);
     };
 
-    // Theme change handler remains the same conceptually
     const handleThemeChange = () => {
         const newTheme = theme === 'light' ? 'dark' : 'light';
         toggleTheme();
         handleProfileUpdate({ theme: newTheme });
     };
 
-    // Font size change handler
     const handleFontSizeChange = async (e) => {
         const newSize = e.target.value;
-        setSelectedFontSize(newSize); // Update local state first
-        setFontSize(newSize); // Update context & localStorage
-        await handleProfileUpdate({ fontSize: newSize }); // Update backend
+        setSelectedFontSize(newSize);
+        setFontSize(newSize);
+        await handleProfileUpdate({ fontSize: newSize });
         setMessage('Font size updated.');
     };
 
+    // --- New Handler for Icon Selection ---
+    const handleIconSelect = async (iconFilename) => {
+        if (selectedIcon === iconFilename) return; // No change
+
+        setSelectedIcon(iconFilename); // Update local state immediately
+        const success = await handleProfileUpdate({ profileIcon: iconFilename }); // Update backend
+        if (success) {
+            setMessage('Profile icon updated successfully!');
+        } else {
+            // Revert local state if backend update failed (optional)
+            // setSelectedIcon(currentUser?.profileIcon || null);
+        }
+    };
 
     if (isUserDataLoading) {
         return <div>Loading settings...</div>;
@@ -138,8 +149,10 @@ const SettingsPage = () => {
 
             {message && <p className={`message ${message.startsWith('Error') || message.startsWith('Failed') ? 'error' : 'success'}`}>{message}</p>}
 
+            {/* Profile Section */}
             <section className="setting-section">
                 <h2>Profile</h2>
+                {/* Username Form */}
                 <form onSubmit={handleUsernameSubmit}>
                     <div className="form-group">
                         <label htmlFor="username">Display Name:</label>
@@ -157,8 +170,26 @@ const SettingsPage = () => {
                     </button>
                 </form>
                 <p>Email: {currentUser.email} (Cannot be changed via settings)</p>
+
+                {/* --- Icon Selection --- */}
+                <div className="form-group icon-selection">
+                    <label>Profile Icon:</label>
+                    <div className="icon-grid">
+                        {availableIcons.map(iconFile => (
+                            <img
+                                key={iconFile}
+                                src={`/assets/icons/${iconFile}`} // Path relative to public folder
+                                alt={iconFile.split('.')[0]} // Alt text from filename
+                                className={`profile-icon-option ${selectedIcon === iconFile ? 'selected' : ''}`}
+                                onClick={() => handleIconSelect(iconFile)}
+                                title={`Select ${iconFile.split('.')[0]}`}
+                            />
+                        ))}
+                    </div>
+                </div>
             </section>
 
+            {/* Appearance Section */}
             <section className="setting-section">
                 <h2>Appearance</h2>
                 {/* Theme Toggle */}
@@ -171,15 +202,12 @@ const SettingsPage = () => {
                         <span style={{ marginLeft: '10px' }}>(Current: {theme})</span>
                     </div>
                 </div>
-
-                {/* REMOVE Font Family Selection */}
-
                 {/* Font Size Selection */}
                 <div className="form-group">
                     <label htmlFor="fontSizeSelect">Font Size:</label>
                     <select
                         id="fontSizeSelect"
-                        value={selectedFontSize} // Use local state
+                        value={selectedFontSize}
                         onChange={handleFontSizeChange}
                     >
                         {Object.entries(fontSizeOptions).map(([label, value]) => (
@@ -191,6 +219,7 @@ const SettingsPage = () => {
                 </div>
             </section>
 
+            {/* Other Settings Section */}
             <section className="setting-section">
                 <h2>Other Settings</h2>
                 <p>(Placeholder for future settings)</p>

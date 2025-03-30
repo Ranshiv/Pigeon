@@ -6,8 +6,9 @@ const userSchema = new mongoose.Schema({
     displayName: { type: String, required: true },
     email: { type: String, required: true },
     theme: { type: String, enum: ['light', 'dark'], default: 'light' },
-    // Keep only fontSize
-    fontSize: { type: String, default: '16px' }, // Default value
+    fontSize: { type: String, default: '16px' },
+    // Add profileIcon field
+    profileIcon: { type: String, default: null }, // Store the filename, default to null
     createdAt: { type: Date, default: Date.now }
 });
 
