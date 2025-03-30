@@ -13,6 +13,7 @@ const Request = require('./models/Request');
 const app = express();
 const port = process.env.PORT || 5000;
 
+const User = require('./models/User');
 // --- MIDDLEWARE (Correct Order) ---
 app.use(cors({
     origin: 'http://localhost:3000', // Your frontend's URL
@@ -42,29 +43,50 @@ mongoose.connect(process.env.DATABASE_URL)
 passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: 'http://localhost:5000/auth/google/callback', // ABSOLUTE URL
+    callbackURL: 'http://localhost:5000/auth/google/callback',
     scope: ['profile', 'email']
 },
-    (accessToken, refreshToken, profile, cb) => {
-        // --- REPLACE THIS WITH YOUR USER MANAGEMENT LOGIC ---
-        // This example uses a simplified user object.
-        // In a real application, you would find or create a user in your database.
-        const user = {
-            id: profile.id,
-            displayName: profile.displayName,
-            email: profile.emails[0].value, // Get the first email
-        };
-        return cb(null, user);
+    async (accessToken, refreshToken, profile, cb) => { // Make the callback async
+        try {
+            // Find user by Google ID
+            let user = await User.findOne({ googleId: profile.id });
+
+            if (user) {
+                // User exists, return the user
+                return cb(null, user);
+            } else {
+                // User doesn't exist, create a new user
+                const newUser = new User({
+                    googleId: profile.id,
+                    displayName: profile.displayName,
+                    email: profile.emails[0].value,
+                    // You might want to add profile picture logic here too
+                });
+                await newUser.save();
+                return cb(null, newUser);
+            }
+        } catch (err) {
+            console.error("Error in Google Strategy:", err);
+            return cb(err, null);
+        }
     }
 ));
 
+
 passport.serializeUser((user, done) => {
-    done(null, user); // In a real app, use user.id
+    done(null, user.id); // Store only the user ID in the session
 });
 
-passport.deserializeUser((user, done) => {
-    done(null, user);
+passport.deserializeUser(async (id, done) => { // Make deserializeUser async
+    try {
+        const user = await User.findById(id);
+        done(null, user); // Find user by ID and attach to req.user
+    } catch (err) {
+        done(err, null);
+    }
 });
+
+
 
 // --- AUTHENTICATION ROUTES (BEFORE other API routes) ---
 
@@ -107,6 +129,50 @@ app.get('/api/auth/logout', (req, res) => {
     });
 });
 
+const ensureAuthenticated = (req, res, next) => {
+    if (req.isAuthenticated()) {
+        return next();
+    }
+    res.status(401).json({ message: 'Unauthorized' });
+};
+
+app.put('/api/user/profile', ensureAuthenticated, async (req, res) => {
+    try {
+        const { displayName, theme } = req.body;
+        const userId = req.user.id; // Get user ID from the authenticated session
+
+        const updateData = {};
+        if (displayName) {
+            updateData.displayName = displayName;
+        }
+        if (theme && ['light', 'dark'].includes(theme)) { // Validate theme
+            updateData.theme = theme;
+        }
+
+        if (Object.keys(updateData).length === 0) {
+            return res.status(400).json({ message: 'No valid fields to update' });
+        }
+
+        const updatedUser = await User.findByIdAndUpdate(userId, updateData, { new: true });
+
+        if (!updatedUser) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        // Important: Update the user object in the session as well
+        req.login(updatedUser, (err) => {
+            if (err) {
+                console.error("Error updating session user:", err);
+                // Still return the updated user, but log the session error
+            }
+            res.json({ message: 'Profile updated successfully', user: updatedUser });
+        });
+
+    } catch (err) {
+        console.error("Error updating profile:", err);
+        res.status(500).json({ message: 'Error updating profile', error: err.message });
+    }
+});
 // --- OTHER API ROUTES ---
 app.post('/api/requests', async (req, res) => {
     try {
