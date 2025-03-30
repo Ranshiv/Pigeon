@@ -2,12 +2,12 @@
 const mongoose = require('mongoose');
 
 const userSchema = new mongoose.Schema({
-    googleId: { type: String, required: true, unique: true }, // From Google profile.id
+    googleId: { type: String, required: true, unique: true },
     displayName: { type: String, required: true },
     email: { type: String, required: true },
-    // Add theme preference
     theme: { type: String, enum: ['light', 'dark'], default: 'light' },
-    // You can add other fields like profile picture URL, etc.
+    // Keep only fontSize
+    fontSize: { type: String, default: '16px' }, // Default value
     createdAt: { type: Date, default: Date.now }
 });
 

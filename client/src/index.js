@@ -4,14 +4,17 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
 import { BrowserRouter } from 'react-router-dom';
-import { ThemeProvider } from './context/ThemeContext'; // Import ThemeProvider
+import { ThemeProvider } from './context/ThemeContext';
+import { FontProvider } from './context/FontContext'; // Import FontProvider
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
     <BrowserRouter>
-      <ThemeProvider> {/* Wrap App with ThemeProvider */}
-        <App />
+      <ThemeProvider>
+        <FontProvider> {/* Wrap with FontProvider */}
+          <App />
+        </FontProvider>
       </ThemeProvider>
     </BrowserRouter>
   </React.StrictMode>

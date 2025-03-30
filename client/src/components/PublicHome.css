@@ -1,222 +1,247 @@
-/* client/src/components/PublicHome.css */
+/* client/src/components/PublicHome.css (Improved) */
 
 .public-home-container {
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 20px;
     width: 100%;
-    font-family: sans-serif;
+    box-sizing: border-box;
+    /* Include padding in width */
 }
 
-.hero {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 40px 20px;
-    max-width: 1200px;
-    width: 100%;
-    background-color: #f8f9fa;
-    /* Light background */
-    margin-bottom: 40px;
-    border-radius: 8px;
-}
-
-.hero-content {
-    flex: 1;
-    margin-right: 40px;
-    text-align: left;
-}
-
-.hero h1 {
-    font-size: 2.5em;
-    margin-bottom: 0.5em;
-    color: #343a40;
-    /* Darker text */
-    line-height: 1.2;
-}
-
-.hero-subtitle {
-    font-size: 1.2em;
-    color: #6c757d;
-    /* Gray text */
+/* --- General Styles --- */
+.public-home-container h2 {
+    font-size: 2em;
+    color: #333;
     margin-bottom: 1em;
+    text-align: center;
 }
 
-.hero-button {
-    padding: 12px 24px;
+.public-home-container p {
+    color: #555;
+    line-height: 1.6;
+}
+
+.public-home-container section {
+    width: 100%;
+    max-width: 1100px;
+    /* Consistent max width */
+    padding: 40px 20px;
+    margin-bottom: 40px;
+    box-sizing: border-box;
+}
+
+/* --- Button Styles --- */
+.button {
+    /* Base button style */
+    padding: 12px 25px;
     font-size: 1.1em;
-    background-color: #007bff;
-    /* Blue button */
-    color: white;
     border: none;
     border-radius: 5px;
     cursor: pointer;
     text-decoration: none;
-    /* Remove underline from <a> */
     display: inline-block;
-    /* Make <a> behave like a button */
-    transition: background-color 0.2s;
+    text-align: center;
+    transition: background-color 0.2s ease-in-out, transform 0.1s ease;
 }
 
-.hero-button:hover {
+.button:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+    /* Subtle lift effect */
+}
+
+.primary-button {
+    background-color: #007bff;
+    /* Primary blue */
+    color: white;
+}
+
+.primary-button:hover {
     background-color: #0056b3;
 }
 
-.hero-image {
-    flex: 1;
-    max-width: 40%;
-    /* Smaller image */
+.secondary-button {
+    background-color: #6c757d;
+    /* Secondary gray */
+    color: white;
 }
 
-.hero-image img {
-    width: 100%;
+.secondary-button:hover {
+    background-color: #5a6268;
+}
+
+
+/* --- Hero Section --- */
+.hero-section-public {
+    display: flex;
+    flex-wrap: wrap;
+    /* Allow wrapping on smaller screens */
+    justify-content: space-between;
+    align-items: center;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    text-align: left;
+    /* Align text left by default */
+}
+
+.hero-content-public {
+    flex: 1;
+    /* Take up space */
+    min-width: 300px;
+    /* Prevent excessive squishing */
+    padding-right: 30px;
+    /* Space between text and image */
+}
+
+.hero-content-public h1 {
+    font-size: 2.8em;
+    margin-bottom: 0.5em;
+    color: #343a40;
+    line-height: 1.2;
+}
+
+.hero-subtitle-public {
+    font-size: 1.3em;
+    color: #6c757d;
+    margin-bottom: 1.5em;
+}
+
+.hero-button-public {
+    /* Specific hero button adjustments if needed */
+}
+
+.hero-image-public {
+    flex: 0 0 45%;
+    /* Don't grow, don't shrink, base width 45% */
+    max-width: 45%;
+    text-align: center;
+    /* Center image if container is wider */
+}
+
+.hero-image-public img {
+    max-width: 100%;
     height: auto;
     display: block;
     border-radius: 8px;
-    /* Rounded corners */
+    margin: 0 auto;
+    /* Center image within its container */
 }
 
-.features {
-    max-width: 1200px;
-    width: 100%;
-    padding: 40px 20px;
-    text-align: center;
-    margin-bottom: 40px;
+/* --- Features Section --- */
+.features-section-public {
+    /* Background or styles for the section container */
 }
 
-.features h2 {
-    margin-bottom: 1rem;
-    color: #343a40;
-}
-
-.features-grid {
+.features-grid-public {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 20px;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 30px;
 }
 
-.feature {
-    padding: 20px;
-    border: 1px solid #ced4da;
-    /* Lighter border */
+.feature-card-public {
+    background-color: #fff;
+    padding: 25px;
+    border: 1px solid #e0e0e0;
     border-radius: 8px;
     text-align: center;
-    background-color: white;
-    /* White background */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
 }
 
-.feature-icon {
-    font-size: 2em;
-    margin-bottom: 10px;
+.feature-card-public:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.feature-icon-public {
     color: #007bff;
-    /* Blue icon */
+    margin-bottom: 15px;
 }
 
-.feature p {
-    color: #6c757d
+.feature-card-public h3 {
+    font-size: 1.4em;
+    color: #333;
+    margin-bottom: 10px;
 }
 
-.feature h3 {
-    color: #343a40
-}
-
-.benefits {
-    max-width: 1200px;
-    width: 100%;
-    padding: 30px 20px;
-    margin-bottom: 40px;
-    background-color: #e9ecef;
-    /* Slightly darker background */
+/* --- Benefits Section --- */
+.benefits-section-public {
+    background-color: #f0f4f8;
+    /* Slightly different background */
     border-radius: 8px;
 }
 
-.benefits h2 {
-    text-align: center;
-    margin-bottom: 1rem;
-    color: #343a40;
-}
-
-.benefits ul {
+.benefits-list-public {
     list-style: none;
-    /* Remove bullet points */
     padding: 0;
-    margin: 0;
+    margin: 0 auto;
+    /* Center the list */
+    max-width: 600px;
+    /* Limit width for readability */
 }
 
-.benefits li {
-    margin-bottom: 0.5rem;
-    color: #495057;
-    /* Dark gray text */
+.benefits-list-public li {
     display: flex;
     align-items: center;
+    margin-bottom: 15px;
+    font-size: 1.1em;
 }
 
-.benefits li strong {
-    margin-right: 0.5rem;
-    color: #343a40
+.benefit-icon-public {
+    color: #28a745;
+    /* Green checkmark */
+    margin-right: 10px;
+    flex-shrink: 0;
+    /* Prevent icon from shrinking */
 }
 
-
-.cta {
-    max-width: 1200px;
-    width: 100%;
-    padding: 40px 20px;
+/* --- CTA Section --- */
+.cta-section-public {
     text-align: center;
-    background-color: #f0f2f5;
-
+    background-color: #e9ecef;
+    border-radius: 8px;
 }
 
-.cta h2 {
-    margin-bottom: 1rem;
-    color: #343a40;
-
+.cta-section-public p {
+    margin-bottom: 1.5em;
+    font-size: 1.1em;
 }
 
-.cta-button {
-    padding: 12px 24px;
+.cta-button-public {
     font-size: 1.2em;
-    background-color: #28a745;
-    /* Green color */
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    text-decoration: none;
-    transition: background-color 0.2s;
+    /* Slightly larger CTA button */
 }
 
-.cta-button:hover {
-    background-color: #1e7e34;
-    /* Darker green */
-}
-
-/* Responsive Styles */
+/* --- Responsive Adjustments --- */
 @media (max-width: 768px) {
-    .hero {
+    .hero-section-public {
         flex-direction: column;
         text-align: center;
     }
 
-    .hero-content {
-        margin-right: 0;
-        margin-bottom: 20px;
+    .hero-content-public {
+        padding-right: 0;
+        margin-bottom: 30px;
     }
 
-    .hero h1 {
-        font-size: 2em;
+    .hero-content-public h1 {
+        font-size: 2.2em;
     }
 
-    .hero-subtitle {
-        font-size: 1em;
+    .hero-subtitle-public {
+        font-size: 1.1em;
     }
 
-    .hero-image {
-        max-width: 100%;
+    .hero-image-public {
+        flex-basis: auto;
+        /* Reset flex basis */
+        max-width: 80%;
+        /* Allow image to be wider */
     }
 
-    .features-grid {
+    .features-grid-public {
         grid-template-columns: 1fr;
-        /* Single column on small screens */
+        /* Stack features */
     }
 }

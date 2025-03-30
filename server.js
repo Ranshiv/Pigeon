@@ -128,7 +128,6 @@ app.get('/api/auth/logout', (req, res) => {
         });
     });
 });
-
 const ensureAuthenticated = (req, res, next) => {
     if (req.isAuthenticated()) {
         return next();
@@ -136,21 +135,33 @@ const ensureAuthenticated = (req, res, next) => {
     res.status(401).json({ message: 'Unauthorized' });
 };
 
+// --- Profile Update Route ---
 app.put('/api/user/profile', ensureAuthenticated, async (req, res) => {
     try {
-        const { displayName, theme } = req.body;
-        const userId = req.user.id; // Get user ID from the authenticated session
+        // Remove fontFamily from destructuring
+        const { displayName, theme, fontSize } = req.body;
+        const userId = req.user.id;
 
         const updateData = {};
-        if (displayName) {
-            updateData.displayName = displayName;
+        if (displayName && typeof displayName === 'string' && displayName.trim() !== '') {
+            updateData.displayName = displayName.trim();
         }
-        if (theme && ['light', 'dark'].includes(theme)) { // Validate theme
+        if (theme && ['light', 'dark'].includes(theme)) {
             updateData.theme = theme;
+        }
+        // Remove fontFamily update logic
+
+        // Keep fontSize update logic
+        if (fontSize && typeof fontSize === 'string') {
+            if (['14px', '16px', '18px'].includes(fontSize)) {
+                updateData.fontSize = fontSize;
+            } else {
+                console.warn("Invalid font size received:", fontSize);
+            }
         }
 
         if (Object.keys(updateData).length === 0) {
-            return res.status(400).json({ message: 'No valid fields to update' });
+            return res.status(400).json({ message: 'No valid fields provided for update' });
         }
 
         const updatedUser = await User.findByIdAndUpdate(userId, updateData, { new: true });
@@ -159,18 +170,16 @@ app.put('/api/user/profile', ensureAuthenticated, async (req, res) => {
             return res.status(404).json({ message: 'User not found' });
         }
 
-        // Important: Update the user object in the session as well
         req.login(updatedUser, (err) => {
             if (err) {
-                console.error("Error updating session user:", err);
-                // Still return the updated user, but log the session error
+                console.error("Error updating session user after profile update:", err);
             }
             res.json({ message: 'Profile updated successfully', user: updatedUser });
         });
 
     } catch (err) {
         console.error("Error updating profile:", err);
-        res.status(500).json({ message: 'Error updating profile', error: err.message });
+        res.status(500).json({ message: 'Error updating profile' });
     }
 });
 // --- OTHER API ROUTES ---

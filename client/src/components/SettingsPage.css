@@ -89,4 +89,44 @@
     background-color: #f8d7da;
     color: #721c24;
     border: 1px solid #f5c6cb;
+}/* src/components/SettingsPage.css */
+/* ... (previous styles) ... */
+
+/* Add styles for consistent form groups */
+.form-group {
+    margin-bottom: 20px;
+    /* Add space between settings */
+    display: flex;
+    flex-direction: column;
+    /* Stack label and input/select */
+}
+
+.form-group label {
+    margin-bottom: 8px;
+    /* Space between label and control */
+}
+
+.settings-page select {
+    padding: 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background-color: var(--background-color);
+    /* Use theme background */
+    color: var(--text-color);
+    /* Use theme text color */
+    max-width: 300px;
+    /* Prevent select from becoming too wide */
+}
+
+/* Optional: Style the button next to the theme label differently */
+.form-group>div {
+    /* Target the div containing the button */
+    display: flex;
+    align-items: center;
+}
+
+/* Adjust button alignment if needed within form-group */
+.setting-section form button {
+    margin-top: 10px;
+    /* Add space above button if needed */
 }
