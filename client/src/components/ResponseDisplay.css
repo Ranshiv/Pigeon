@@ -2,18 +2,165 @@
 .response-display {
     width: 100%;
     margin-top: 20px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    overflow: hidden;
+    /* Hide overflowing content */
 }
 
-.response-display pre {
-    background-color: #f5f5f5;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
+.response-meta {
+    background-color: var(--sidebar-background);
+    /* Use sidebar color for meta */
+    padding: 8px 15px;
+    font-size: 0.9em;
+    display: flex;
+    gap: 15px;
+    color: var(--sidebar-text);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.meta-item {
+    /* Style for time, size */
+}
+
+/* Status Indicator Styling */
+.status-indicator {
+    font-weight: bold;
+    padding: 2px 6px;
+    border-radius: 3px;
+    color: white;
+}
+
+.status-2xx {
+    background-color: #28a745;
+}
+
+/* Green for 2xx */
+.status-3xx {
+    background-color: #ffc107;
+    color: #333;
+}
+
+/* Yellow for 3xx */
+.status-4xx {
+    background-color: #fd7e14;
+}
+
+/* Orange for 4xx */
+.status-5xx {
+    background-color: #dc3545;
+}
+
+/* Red for 5xx */
+
+.response-tabs {
+    display: flex;
+    background-color: var(--sidebar-background);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.response-tabs button {
+    padding: 10px 15px;
+    border: none;
+    background-color: transparent;
+    color: var(--sidebar-text);
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    /* Underline for active tab */
+    margin-bottom: -1px;
+    /* Overlap border */
+    font-size: 1em;
+}
+
+.response-tabs button.active {
+    border-bottom-color: var(--button-background);
+    font-weight: bold;
+}
+
+.response-tabs button:hover:not(.active) {
+    background-color: var(--hover-background);
+}
+
+.response-content {
+    padding: 15px;
+    background-color: var(--background-color);
+    /* Match body background */
+    max-height: 400px;
+    /* Limit height and make scrollable */
+    overflow: auto;
+    /* Enable scrolling */
+}
+
+.response-content pre {
     white-space: pre-wrap;
     /* Wrap long lines */
-    overflow-x: auto;
-    /* Allow horizontal scrolling for very long lines */
+    word-wrap: break-word;
+    /* Break long words */
     font-family: 'Courier New', Courier, monospace;
-    /* Use a monospace font for code */
-    font-size: 14px;
+    font-size: 0.9em;
+    margin: 0;
+    /* Remove default margin */
+    background-color: var(--card-background);
+    /* Give pre a background */
+    padding: 10px;
+    border-radius: 4px;
+    border: 1px solid var(--border-color);
+}
+
+/* --- Styles for Headers Table --- */
+.headers-table {
+    width: 100%;
+    border-collapse: collapse;
+    /* Remove space between borders */
+    font-size: 0.9em;
+    background-color: var(--card-background);
+}
+
+.headers-table th,
+.headers-table td {
+    border: 1px solid var(--border-color);
+    padding: 8px 12px;
+    text-align: left;
+    vertical-align: top;
+    /* Align content to top */
+    word-break: break-all;
+    /* Break long header values */
+}
+
+.headers-table th {
+    background-color: var(--sidebar-background);
+    /* Header background */
+    color: var(--sidebar-text);
+    font-weight: bold;
+}
+
+.headers-table tr:nth-child(even) {
+    background-color: rgba(0, 0, 0, 0.03);
+    /* Subtle striping for light mode */
+}
+
+body.dark-theme .headers-table tr:nth-child(even) {
+    background-color: rgba(255, 255, 255, 0.05);
+    /* Subtle striping for dark mode */
+}
+
+/* Error Display */
+.error-display {
+    padding: 15px;
+}
+
+.error-display h3 {
+    color: #dc3545;
+    /* Red */
+    margin-top: 0;
+}
+
+.error-display pre {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+    padding: 10px;
+    border-radius: 4px;
+    white-space: pre-wrap;
+    word-wrap: break-word;
 }

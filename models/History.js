@@ -1,0 +1,41 @@
+// models/History.js
+const mongoose = require('mongoose');
+
+const historySchema = new mongoose.Schema({
+    // Link to the user who made the request
+    userId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true // Assuming users must be logged in to send requests
+    },
+    // Original request details (can be denormalized for history)
+    url: { type: String, required: true },
+    method: { type: String, required: true },
+    requestHeaders: { type: String }, // Store as stringified JSON
+    requestBody: { type: String },    // Store as string
+    requestBodyType: { type: String }, // Store body type
+
+    // Response details
+    responseStatus: { type: Number },
+    responseStatusText: { type: String },
+    responseHeaders: { type: String }, // Store as stringified JSON
+    responseBody: { type: String }, // Consider truncating or alternative storage for large bodies
+    isJson: { type: Boolean, default: false }, // Flag if response body was JSON
+
+    // Metadata
+    timestamp: { type: Date, default: Date.now }, // When the request was initiated
+    duration: { type: Number }, // Request duration in ms
+    size: { type: Number }, // Response size in bytes (approx)
+
+    // Optional: Link back to the saved request if it came from one
+    originalRequestId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Request',
+        required: false
+    }
+});
+
+// Index for faster querying by user and timestamp
+historySchema.index({ userId: 1, timestamp: -1 });
+
+module.exports = mongoose.model('History', historySchema);

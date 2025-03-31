@@ -14,6 +14,7 @@ const app = express();
 const port = process.env.PORT || 5000;
 
 const User = require('./models/User');
+const History = require('./models/History');
 // --- MIDDLEWARE (Correct Order) ---
 app.use(cors({
     origin: 'http://localhost:3000', // Your frontend's URL
@@ -254,68 +255,165 @@ app.get('/api/requests', async (req, res) => {
 });
 
 // Send the request and get the response
-app.post('/api/requests/:id/send', async (req, res) => {
+app.post('/api/requests/:id/send', ensureAuthenticated, async (req, res) => { // Added ensureAuthenticated
+    const startTime = Date.now();
+    let responseStatus, responseStatusText, responseHeadersObj, responseBodyText, responseSize, isJson = false; // Define vars here
+
     try {
-        // console.log("Request ID:", req.params.id); // Add this line for debugging
-        const request = await Request.findById(req.params.id);
-        if (!request) {
+        const requestDoc = await Request.findById(req.params.id);
+        if (!requestDoc) {
             return res.status(404).json({ message: 'Request not found' });
         }
 
-        const { url, method, headers, body, bodyType } = request;
+        const { url, method, headers, body, bodyType } = requestDoc;
 
+        // --- Prepare and Send Fetch Request ---
         const fetchOptions = {
             method,
             headers: headers.reduce((acc, { name, value }) => {
-                acc[name] = value;
+                if (name && value) acc[name] = value; // Avoid adding empty headers
                 return acc;
             }, {}),
+            timeout: 30000, // Example: 30 second timeout
         };
-        // console.log("Body Type:", bodyType);
-        // console.log("Body Content:", body);
+
         if (body && bodyType !== 'none') {
+            // Set Content-Type based on bodyType if not already set
+            let contentTypeHeader = Object.keys(fetchOptions.headers).find(h => h.toLowerCase() === 'content-type');
+            if (!contentTypeHeader) {
+                if (bodyType === 'json') contentTypeHeader = 'application/json';
+                else if (bodyType === 'x-www-form-urlencoded') contentTypeHeader = 'application/x-www-form-urlencoded';
+                // Add other types if needed (e.g., text/plain)
+                if (contentTypeHeader) fetchOptions.headers['Content-Type'] = contentTypeHeader;
+            }
+
             if (bodyType === 'json') {
-                fetchOptions.headers['Content-Type'] = 'application/json';
-                fetchOptions.body = body;
+                // Ensure body is valid JSON string before sending
+                try {
+                    JSON.parse(body); // Validate
+                    fetchOptions.body = body;
+                } catch (parseError) {
+                    throw new Error("Invalid JSON in request body");
+                }
             } else if (bodyType === 'x-www-form-urlencoded') {
-                fetchOptions.headers['Content-Type'] = 'application/x-www-form-urlencoded';
-                const encodedBody = new URLSearchParams(JSON.parse(body)).toString();
-
-                fetchOptions.body = encodedBody;
-
-            }
-            else {
-                // For 'raw' or other types, send the body as is (assuming it's a string)
+                try {
+                    const parsedBody = JSON.parse(body); // Assume body is stored as JSON string for key-value pairs
+                    fetchOptions.body = new URLSearchParams(parsedBody).toString();
+                } catch (parseError) {
+                    throw new Error("Invalid key-value format for x-www-form-urlencoded body (expected JSON string)");
+                }
+            } else { // raw, text, etc.
                 fetchOptions.body = body;
             }
         }
 
-        const response = await fetch(url, fetchOptions);
-        // console.log("Fetch Response:", response);
+        const externalResponse = await fetch(url, fetchOptions);
+        const duration = Date.now() - startTime;
 
-        const responseHeaders = {};
-        response.headers.forEach((value, name) => {
-            responseHeaders[name] = value;
+        // --- Process Response ---
+        responseStatus = externalResponse.status;
+        responseStatusText = externalResponse.statusText;
+        responseHeadersObj = {};
+        externalResponse.headers.forEach((value, name) => {
+            responseHeadersObj[name] = value;
         });
+        responseBodyText = await externalResponse.text();
+        responseSize = Buffer.byteLength(responseBodyText, 'utf8'); // Approximate size
 
-        const responseBody = await response.text();
-        let parsedResponseBody;
-        try {
-            parsedResponseBody = JSON.parse(responseBody)
-        } catch (error) {
-            parsedResponseBody = responseBody
+        let parsedResponseBody = responseBodyText;
+        const contentType = responseHeadersObj['content-type']?.toLowerCase() || '';
+        if (contentType.includes('application/json')) {
+            try {
+                parsedResponseBody = JSON.parse(responseBodyText);
+                isJson = true;
+            } catch (e) {
+                console.warn("Failed to parse JSON response body");
+                isJson = false; // Treat as text if parsing fails
+            }
         }
 
-        res.json({
-            status: response.status,
-            statusText: response.statusText,
-            headers: responseHeaders,
+        // --- Send Response to Frontend ---
+        const frontendResponse = {
+            status: responseStatus,
+            statusText: responseStatusText,
+            headers: responseHeadersObj,
             body: parsedResponseBody,
-        });
+            isJson: isJson, // Send flag to frontend
+            duration: duration,
+            size: responseSize
+        };
+        res.json(frontendResponse);
+
+        // --- Save History (After Sending Response) ---
+        try {
+            const historyEntry = new History({
+                userId: req.user.id, // Associate with logged-in user
+                url: url,
+                method: method,
+                requestHeaders: JSON.stringify(fetchOptions.headers), // Store headers used
+                requestBody: fetchOptions.body || '', // Store body sent
+                requestBodyType: bodyType,
+                responseStatus: responseStatus,
+                responseStatusText: responseStatusText,
+                responseHeaders: JSON.stringify(responseHeadersObj),
+                responseBody: responseBodyText, // Store raw text body
+                isJson: isJson,
+                timestamp: new Date(startTime), // Use the start time
+                duration: duration,
+                size: responseSize,
+                originalRequestId: requestDoc._id // Link to the saved request
+            });
+            await historyEntry.save();
+            console.log("History entry saved for request ID:", requestDoc._id);
+        } catch (historyError) {
+            console.error("Error saving history entry:", historyError);
+            // Log the error, but don't fail the main request
+        }
 
     } catch (err) {
-        console.error(err); // Log the error for debugging
-        res.status(500).json({ message: 'Error sending request', error: err.message });
+        const duration = Date.now() - startTime;
+        console.error("Error during external fetch or processing:", err);
+        // Send an error response to the frontend
+        res.status(500).json({
+            error: `Error sending request: ${err.message}`, // Send error message
+            status: 500, // Indicate server-side error during send
+            statusText: 'Server Error',
+            headers: {},
+            body: null,
+            duration: duration
+        });
+
+        // --- Optionally save failed attempt to History ---
+        try {
+            const historyEntry = new History({
+                userId: req.user.id,
+                url: req.params.id ? (await Request.findById(req.params.id))?.url || 'Unknown URL' : 'Unknown URL', // Attempt to get URL
+                method: req.params.id ? (await Request.findById(req.params.id))?.method || 'Unknown Method' : 'Unknown Method', // Attempt to get method
+                responseStatus: 500, // Indicate internal error
+                responseStatusText: 'Server Error During Send',
+                responseBody: `Error: ${err.message}`,
+                timestamp: new Date(startTime),
+                duration: duration,
+                originalRequestId: req.params.id || null
+            });
+            await historyEntry.save();
+            console.log("Failed history entry saved for request ID:", req.params.id);
+        } catch (failedHistoryError) {
+            console.error("Error saving FAILED history entry:", failedHistoryError);
+        }
+    }
+});
+
+// --- NEW: History Route ---
+app.get('/api/history', ensureAuthenticated, async (req, res) => {
+    try {
+        const history = await History.find({ userId: req.user.id })
+            .sort({ timestamp: -1 }) // Sort by newest first
+            .limit(50); // Limit to latest 50 entries (for now)
+        res.json(history);
+    } catch (err) {
+        console.error("Error fetching history:", err);
+        res.status(500).json({ message: 'Error fetching history', error: err.message });
     }
 });
 app.listen(port, () => {
