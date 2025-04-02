@@ -1,18 +1,17 @@
-// client/src/components/APINetworkSection.js (MAJOR CHANGES)
-import React, { useState, useEffect } from 'react'; // Add useState and useEffect
+import React, { useState, useEffect } from 'react';
 import { Routes, Route, useNavigate, useParams, Navigate } from 'react-router-dom';
 import ExploreSection from './ExploreSection';
 import SpotlightSection from './SpotlightSection';
 import TrendingSection from './TrendingSection';
 import AIAgentToolsSection from './AIAgentToolsSection';
-import RequestForm from './RequestForm'; // Import RequestForm
-import ResponseDisplay from './ResponseDisplay'; // Import ResponseDisplay
+import RequestForm from './RequestForm';
+import ResponseDisplay from './ResponseDisplay';
 import APINetworkExplore from './APINetworkExplore';
 import './APINetworkSection.css';
 
 const APINetworkSection = () => {
-    const [requests, setRequests] = useState([]); // Moved from Workspace.js
-    const [response, setResponse] = useState(null); // Moved from Workspace.js
+    const [requests, setRequests] = useState([]);
+    const [response, setResponse] = useState(null);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -36,7 +35,7 @@ const APINetworkSection = () => {
             });
             const data = await res.json();
             setResponse(data);
-            navigate(`requests/${request._id}`); // Navigate to the details view
+            navigate(`requests/${request._id}`);
         } catch (err) {
             console.error('Error sending request:', err);
         }
@@ -52,8 +51,8 @@ const APINetworkSection = () => {
             if (res.ok) {
                 const savedRequest = await res.json();
                 setRequests([...requests, savedRequest]);
-                fetchRequests(); // Re-fetch after creating
-                navigate(`requests/${savedRequest._id}`); // Navigate to details view
+                fetchRequests();
+                navigate(`requests/${savedRequest._id}`);
             } else {
                 const errorData = await res.json();
                 console.error('Failed to create', errorData);
@@ -72,12 +71,11 @@ const APINetworkSection = () => {
             });
             if (res.ok) {
                 const updatedRequest = await res.json();
-                // Update the requests array with the updated request
                 const updatedRequests = requests.map(req =>
                     req._id === updatedRequest._id ? updatedRequest : req
                 );
                 setRequests(updatedRequests);
-                navigate(`requests/${updatedRequest._id}`); // Navigate to details view
+                navigate(`requests/${updatedRequest._id}`);
             } else {
                 const errorData = await res.json();
                 console.error("Failed to update", errorData);
@@ -97,9 +95,8 @@ const APINetworkSection = () => {
                 navigate('explore');
             } else {
                 const errorData = await res.json();
-                console.error("Failed to delete", errorData)
+                console.error("Failed to delete", errorData);
             }
-
         } catch (err) {
             console.error('Error deleting request:', err);
         }
@@ -107,14 +104,6 @@ const APINetworkSection = () => {
 
     return (
         <div className="api-network-section">
-            <div className="api-network-sidebar">
-                <div onClick={() => navigate('explore')}>Explore</div>
-                <div onClick={() => navigate('spotlight')}>Spotlight</div>
-                <div onClick={() => navigate('trending')}>Trending</div>
-                <div onClick={() => navigate('ai-agent-tools')}>AI Agent Tools</div>
-                {/* Add Request button in the sidebar */}
-                <div onClick={() => navigate('requests/new')}>Add Request</div>
-            </div>
             <div className="api-network-main-content">
                 <Routes>
                     <Route index element={<Navigate to="explore" />} />
@@ -122,7 +111,6 @@ const APINetworkSection = () => {
                     <Route path="spotlight" element={<SpotlightSection />} />
                     <Route path="trending" element={<TrendingSection />} />
                     <Route path="ai-agent-tools" element={<AIAgentToolsSection />} />
-                    {/* Request-related routes are now within APINetworkSection */}
                     <Route
                         path="requests/new"
                         element={<RequestForm onSubmit={handleRequestCreate} onCancel={() => navigate('explore')} />}
@@ -140,6 +128,7 @@ const APINetworkSection = () => {
         </div>
     );
 };
+
 const RequestDetails = ({ requests, response, onSend }) => {
     const { id } = useParams();
     const request = requests.find((r) => r._id === id);
@@ -166,7 +155,6 @@ const RequestDetails = ({ requests, response, onSend }) => {
             </button>
             <button className='edit-request-button' onClick={() => navigate(`requests/edit/${request._id}`)}>Edit</button>
             {response && <ResponseDisplay response={response} />}
-
         </>
     );
 };
@@ -182,7 +170,7 @@ const EditRequestForm = ({ requests, onSubmit }) => {
 
     return (
         <RequestForm initialValues={request} onSubmit={onSubmit} onCancel={() => navigate(`requests/${id}`)} />
-    )
-}
+    );
+};
 
 export default APINetworkSection;

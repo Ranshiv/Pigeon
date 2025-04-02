@@ -1,5 +1,4 @@
-// client/src/components/Navbar.js (Modified)
-import React, { useState, useEffect } from 'react'; // Import useEffect
+import React, { useState, useEffect } from 'react';
 import './Navbar.css';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { FiSettings, FiUser, FiLogOut } from 'react-icons/fi';
@@ -8,10 +7,11 @@ const Navbar = ({ isAuthenticated }) => {
     const navigate = useNavigate();
     const location = useLocation();
     const [showProfileMenu, setShowProfileMenu] = useState(false);
-    const [userProfileIcon, setUserProfileIcon] = useState(null); // State for user's icon
+    const [showApiDropdown, setShowApiDropdown] = useState(false); // State for API Network dropdown
+    const [showWorkspaceDropdown, setShowWorkspaceDropdown] = useState(false); // State for Workspace dropdown
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false); // State for mobile menu
+    const [userProfileIcon, setUserProfileIcon] = useState(null);
 
-    // Fetch user data specifically for the Navbar (or pass currentUser down from App)
-    // This approach fetches independently, which is simpler for now.
     useEffect(() => {
         const fetchUserIcon = async () => {
             if (isAuthenticated) {
@@ -22,20 +22,19 @@ const Navbar = ({ isAuthenticated }) => {
                         if (data.user && data.user.profileIcon) {
                             setUserProfileIcon(data.user.profileIcon);
                         } else {
-                            setUserProfileIcon(null); // Reset if no icon
+                            setUserProfileIcon(null);
                         }
                     }
                 } catch (err) {
                     console.error("Navbar: Error fetching user data:", err);
                 }
             } else {
-                setUserProfileIcon(null); // Clear icon if not authenticated
+                setUserProfileIcon(null);
             }
         };
 
         fetchUserIcon();
-    }, [isAuthenticated, location]); // Re-fetch if auth state or location changes
-
+    }, [isAuthenticated, location]);
 
     const isActive = (path) => {
         if (path === '/') return location.pathname === '/';
@@ -63,15 +62,65 @@ const Navbar = ({ isAuthenticated }) => {
             <div className="navbar-brand" onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>
                 Pigeon
             </div>
-            <div className="navbar-links">
+            <div className="hamburger" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
+                ☰
+            </div>
+            <div className={`navbar-links ${isMobileMenuOpen ? 'active' : ''}`}>
                 {isAuthenticated ? (
                     <>
-                        {/* Main navigation links */}
                         <span onClick={() => navigate('/workspace/home')} className={`nav-item ${isActive('/workspace/home') ? 'active' : ''}`} title="Home"> Home </span>
-                        <span onClick={() => navigate('/workspace/workspaces')} className={`nav-item ${isActive('/workspace/workspaces') ? 'active' : ''}`} title="Workspaces"> Workspaces </span>
-                        <span onClick={() => navigate('/workspace/api-network')} className={`nav-item ${isActive('/workspace/api-network') ? 'active' : ''}`} title="API Network"> API Network </span>
 
-                        {/* Icons on the right */}
+                        {/* Workspace with Dropdown */}
+                        <div
+                            className="nav-item workspace-dropdown"
+                            onMouseEnter={() => setShowWorkspaceDropdown(true)}
+                            onMouseLeave={() => setShowWorkspaceDropdown(false)}
+                        >
+                            <span className={`nav-item ${isActive('/workspace/workspaces') ? 'active' : ''}`} title="Workspace">
+                                Workspace
+                            </span>
+                            {showWorkspaceDropdown && (
+                                <div className="dropdown-menu">
+                                    <div className="dropdown-item" onClick={() => navigate('/workspace/workspaces/my-workspace')}>
+                                        My Workspace
+                                    </div>
+                                    <div className="dropdown-item" onClick={() => navigate('/workspace/workspaces/shared')}>
+                                        Shared
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* API Network with Dropdown */}
+                        <div
+                            className="nav-item api-network-dropdown"
+                            onMouseEnter={() => setShowApiDropdown(true)}
+                            onMouseLeave={() => setShowApiDropdown(false)}
+                        >
+                            <span className={`nav-item ${isActive('/workspace/api-network') ? 'active' : ''}`} title="API Network">
+                                API Network
+                            </span>
+                            {showApiDropdown && (
+                                <div className="dropdown-menu">
+                                    <div className="dropdown-item" onClick={() => navigate('/workspace/api-network/explore')}>
+                                        Explore
+                                    </div>
+                                    <div className="dropdown-item" onClick={() => navigate('/workspace/api-network/spotlight')}>
+                                        Spotlight
+                                    </div>
+                                    <div className="dropdown-item" onClick={() => navigate('/workspace/api-network/trending')}>
+                                        Trending
+                                    </div>
+                                    <div className="dropdown-item" onClick={() => navigate('/workspace/api-network/ai-agent-tools')}>
+                                        AI Agent Tools
+                                    </div>
+                                    <div className="dropdown-item" onClick={() => navigate('/workspace/api-network/requests/new')}>
+                                        Add Request
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+
                         <div className="navbar-icons">
                             <span onClick={() => navigate('/workspace/settings')} className={`nav-icon ${isActive('/workspace/settings') ? 'active' : ''}`} title="Settings">
                                 <FiSettings size={20} />
@@ -79,7 +128,6 @@ const Navbar = ({ isAuthenticated }) => {
 
                             <div className="profile-menu-container">
                                 <span onClick={() => setShowProfileMenu(!showProfileMenu)} className="nav-icon profile-icon" title="Profile">
-                                    {/* Conditionally render selected icon or default */}
                                     {userProfileIcon ? (
                                         <img src={`/assets/icons/${userProfileIcon}`} alt="Profile" className="navbar-profile-img" />
                                     ) : (
