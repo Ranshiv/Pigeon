@@ -153,7 +153,7 @@ const RequestDetails = ({ requests, response, onSend }) => {
             <button className="send-request-button" onClick={() => onSend(request)}>
                 Send Request
             </button>
-            <button className='edit-request-button' onClick={() => navigate(`requests/edit/${request._id}`)}>Edit</button>
+            <button className='edit-request-button' onClick={() => navigate(`../requests/edit/${request._id}`)}>Edit</button>
             {response && <ResponseDisplay response={response} />}
         </>
     );
