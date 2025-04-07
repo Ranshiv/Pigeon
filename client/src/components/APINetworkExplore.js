@@ -1,10 +1,10 @@
-// client/src/components/APINetworkExplore.js (NEW)
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import './APINetworkExplore.css';
 import { useNavigate } from 'react-router-dom';
 
 const APINetworkExplore = () => {
     const navigate = useNavigate();
+    const [recentRequests, setRecentRequests] = useState([]);
 
     // Placeholder data for example requests
     const exampleRequests = [
@@ -12,20 +12,41 @@ const APINetworkExplore = () => {
         { id: 'example-2', name: 'Example POST Request', url: 'https://jsonplaceholder.typicode.com/posts', method: 'POST', body: JSON.stringify({ title: 'foo', body: 'bar', userId: 1 }) },
     ];
 
-    // Placeholder for recently used requests - In a real app, you'd store this
-    // in local storage or in the user's profile on the backend.
-    const recentRequests = [
-        { id: 'recent-1', name: 'Recently Used 1', url: '/api/recent1', method: 'GET' },
-        { id: 'recent-2', name: 'Recently Used 2', url: '/api/recent2', method: 'POST' },
+    useEffect(() => {
+        const fetchRecentHistory = async () => {
+            try {
+                const response = await fetch('http://localhost:5000/api/history', {
+                    credentials: 'include' // Important for sending cookies
+                });
+                
+                if (response.ok) {
+                    const historyData = await response.json();
+                    // Take only the last 3 requests
+                    const recentItems = historyData.slice(0, 3).map(item => ({
+                        id: item._id,
+                        name: `${item.method} ${new URL(item.url).pathname}`,
+                        url: item.url,
+                        method: item.method,
+                        timestamp: new Date(item.timestamp).toLocaleDateString()
+                    }));
+                    setRecentRequests(recentItems);
+                } else {
+                    console.error('Failed to fetch history');
+                }
+            } catch (error) {
+                console.error('Error fetching history:', error);
+            }
+        };
 
-    ];
+        fetchRecentHistory();
+    }, []);
+
     const handleRecentRequestClick = (request) => {
-        // In a real application, you would navigate to the request details page
-        alert(`Navigating to: ${request.name}`);
-        // You'd likely use: navigate(`/requests/${request.id}`);  if you had stored the actual request IDs.
+        navigate(`/workspace/api-network/requests/edit/${request.id}`);
     };
+
     const handleCreateRequestClick = () => {
-        navigate('../requests/new'); // Corrected navigation
+        navigate('../requests/new');
     };
 
     return (
@@ -39,7 +60,6 @@ const APINetworkExplore = () => {
                 <button className="create-request-button" onClick={handleCreateRequestClick}>
                     Create Request
                 </button>
-                {/* You could add an "Import" button here later */}
             </section>
 
             <section className="example-requests">
@@ -54,7 +74,6 @@ const APINetworkExplore = () => {
                             <p>
                                 <strong>Method:</strong> {request.method}
                             </p>
-                            {/* Add a "Clone" button or similar functionality */}
                         </div>
                     ))}
                 </div>
@@ -63,17 +82,26 @@ const APINetworkExplore = () => {
             <section className="recent-requests">
                 <h2>Recently Used Requests</h2>
                 <div className="request-list">
-                    {recentRequests.map(request => (
-                        <div key={request.id} className="request-item" onClick={() => handleRecentRequestClick(request)}>
-                            <h3>{request.name}</h3>
-                            <p>
-                                <strong>URL:</strong> {request.url}
-                            </p>
-                            <p>
-                                <strong>Method:</strong> {request.method}
-                            </p>
-                        </div>
-                    ))}
+                    {recentRequests.length > 0 ? (
+                        recentRequests.map(request => (
+                            <div key={request.id} 
+                                 className="request-item" 
+                                 onClick={() => handleRecentRequestClick(request)}>
+                                <h3>{request.name}</h3>
+                                <p>
+                                    <strong>URL:</strong> {request.url}
+                                </p>
+                                <p>
+                                    <strong>Method:</strong> {request.method}
+                                </p>
+                                <p className="timestamp">
+                                    <strong>Date:</strong> {request.timestamp}
+                                </p>
+                            </div>
+                        ))
+                    ) : (
+                        <p>No recent requests found</p>
+                    )}
                 </div>
             </section>
 
