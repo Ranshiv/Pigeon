@@ -16,9 +16,9 @@ const APINetworkExplore = () => {
         const fetchRecentHistory = async () => {
             try {
                 const response = await fetch('http://localhost:5000/api/history', {
-                    credentials: 'include' // Important for sending cookies
+                    credentials: 'include'
                 });
-                
+
                 if (response.ok) {
                     const historyData = await response.json();
                     // Take only the last 3 requests
@@ -40,10 +40,6 @@ const APINetworkExplore = () => {
 
         fetchRecentHistory();
     }, []);
-
-    const handleRecentRequestClick = (request) => {
-        navigate(`/workspace/api-network/requests/edit/${request.id}`);
-    };
 
     const handleCreateRequestClick = () => {
         navigate('../requests/new');
@@ -84,9 +80,7 @@ const APINetworkExplore = () => {
                 <div className="request-list">
                     {recentRequests.length > 0 ? (
                         recentRequests.map(request => (
-                            <div key={request.id} 
-                                 className="request-item" 
-                                 onClick={() => handleRecentRequestClick(request)}>
+                            <div key={request.id} className="request-item">
                                 <h3>{request.name}</h3>
                                 <p>
                                     <strong>URL:</strong> {request.url}

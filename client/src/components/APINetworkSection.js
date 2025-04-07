@@ -165,11 +165,11 @@ const EditRequestForm = ({ requests, onSubmit }) => {
     const navigate = useNavigate();
 
     if (!request) {
-        return <div>Loading..</div>;
+        return <div>Request not found</div>;
     }
 
     return (
-        <RequestForm initialValues={request} onSubmit={onSubmit} onCancel={() => navigate(`requests/${id}`)} />
+        <RequestForm initialValues={request} onSubmit={onSubmit} onCancel={() => navigate(`../requests/${id}`)} />
     );
 };
 
