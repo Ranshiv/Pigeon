@@ -9,7 +9,6 @@ const cookieParser = require('cookie-parser');
 require('dotenv').config();
 const fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args));
 const Request = require('./models/Request');
-const Collection = require('./models/Collection');
 const axios = require('axios');
 
 const app = express();
@@ -419,59 +418,7 @@ app.get('/api/history', ensureAuthenticated, async (req, res) => {
     }
 });
 
-// Collection routes
-app.post('/api/collections', ensureAuthenticated, async (req, res) => {
-    try {
-        const collection = new Collection({
-            ...req.body,
-            author: req.user._id
-        });
-        const savedCollection = await collection.save();
-        res.status(201).json(savedCollection);
-    } catch (err) {
-        res.status(400).json({ message: err.message });
-    }
-});
-
-// Get all public collections
-app.get('/api/collections', async (req, res) => {
-    try {
-        const collections = await Collection.find({ isPublic: true })
-            .populate('author', 'displayName')
-            .sort({ stars: -1 });
-        res.json(collections);
-    } catch (err) {
-        res.status(500).json({ message: err.message });
-    }
-});
-
-// Fork a collection
-app.post('/api/collections/:id/fork', ensureAuthenticated, async (req, res) => {
-    try {
-        const originalCollection = await Collection.findById(req.params.id);
-        if (!originalCollection) {
-            return res.status(404).json({ message: 'Collection not found' });
-        }
-
-        // Create new collection as a fork
-        const forkedCollection = new Collection({
-            name: `${originalCollection.name} (Fork)`,
-            description: originalCollection.description,
-            author: req.user._id,
-            requests: [...originalCollection.requests],
-            category: originalCollection.category,
-            forkedFrom: originalCollection._id,
-            stars: 0
-        });
-
-        const savedFork = await forkedCollection.save();
-        res.status(201).json(savedFork);
-    } catch (err) {
-        res.status(500).json({ message: err.message });
-    }
-});
-
-// Cache for API data to avoid frequent external requests
+// Cache for API data
 let apiCache = {
     data: [],
     lastUpdated: null
@@ -480,7 +427,9 @@ let apiCache = {
 // Function to fetch and cache APIs
 async function fetchAndCacheAPIs() {
     try {
-        // Using a curated list of popular APIs
+        console.log('Initializing API cache...');
+        
+        // Using curated list of APIs
         apiCache.data = [
             {
                 name: "GitHub REST API",
@@ -489,192 +438,77 @@ async function fetchAndCacheAPIs() {
                 url: "https://api.github.com",
                 auth: "OAuth",
                 https: true,
-                cors: "yes"
+                cors: "yes",
+                documentation: "https://docs.github.com/rest"
             },
             {
-                name: "OpenWeatherMap",
-                description: "Current and forecast weather data",
+                name: "WeatherAPI",
+                description: "Real-Time Weather API with historical weather information",
                 category: "Weather",
-                url: "https://api.openweathermap.org",
+                url: "https://api.weatherapi.com/v1",
                 auth: "apiKey",
                 https: true,
-                cors: "yes"
-            },
-            {
-                name: "Spotify Web API",
-                description: "Music catalog and playback control",
-                category: "Music",
-                url: "https://api.spotify.com",
-                auth: "OAuth",
-                https: true,
-                cors: "yes"
-            },
-            {
-                name: "Twitter API v2",
-                description: "Access Twitter data and functionality",
-                category: "Social",
-                url: "https://api.twitter.com/2",
-                auth: "OAuth",
-                https: true,
-                cors: "yes"
-            },
-            {
-                name: "Google Maps API",
-                description: "Maps, geocoding and places data",
-                category: "Mapping",
-                url: "https://maps.googleapis.com",
-                auth: "apiKey",
-                https: true,
-                cors: "yes"
+                cors: "yes",
+                documentation: "https://www.weatherapi.com/docs/"
             },
             {
                 name: "NASA API",
-                description: "Space and astronomy data",
+                description: "Access NASA space data, including Mars rover photos and astronomy pictures",
                 category: "Science",
                 url: "https://api.nasa.gov",
                 auth: "apiKey",
                 https: true,
-                cors: "yes"
+                cors: "yes",
+                documentation: "https://api.nasa.gov/"
             },
             {
                 name: "CoinGecko",
-                description: "Cryptocurrency prices and market data",
+                description: "Comprehensive cryptocurrency data API",
                 category: "Finance",
                 url: "https://api.coingecko.com/api/v3",
                 auth: "none",
                 https: true,
-                cors: "yes"
+                cors: "yes",
+                documentation: "https://www.coingecko.com/api/documentation"
             },
             {
-                name: "JSONPlaceholder",
-                description: "Fake REST API for testing and prototyping",
-                category: "Development",
-                url: "https://jsonplaceholder.typicode.com",
-                auth: "none",
+                name: "Movie Database (TMDB)",
+                description: "Movie and TV show data, including ratings, reviews, and cast information",
+                category: "Entertainment",
+                url: "https://api.themoviedb.org/3",
+                auth: "apiKey",
                 https: true,
-                cors: "yes"
+                cors: "yes",
+                documentation: "https://developers.themoviedb.org/3"
             },
             {
                 name: "Dog API",
-                description: "Dog breeds, images and facts",
+                description: "Dog breeds, images, and facts",
                 category: "Animals",
                 url: "https://dog.ceo/api",
                 auth: "none",
                 https: true,
-                cors: "yes"
+                cors: "yes",
+                documentation: "https://dog.ceo/dog-api/"
             },
             {
-                name: "News API",
-                description: "Headlines and news articles from various sources",
-                category: "News",
-                url: "https://newsapi.org",
-                auth: "apiKey",
-                https: true,
-                cors: "yes"
-            },
-            {
-                name: "OpenAI API",
-                description: "Access GPT models and AI capabilities",
-                category: "AI",
-                url: "https://api.openai.com",
-                auth: "apiKey",
-                https: true,
-                cors: "yes"
-            },
-            {
-                name: "Cloudinary API",
-                description: "Cloud-based image and video management",
-                category: "Media",
-                url: "https://api.cloudinary.com",
-                auth: "apiKey",
-                https: true,
-                cors: "yes"
-            },
-            {
-                name: "Stripe API",
-                description: "Online payment processing",
-                category: "Finance",
-                url: "https://api.stripe.com",
-                auth: "apiKey",
-                https: true,
-                cors: "yes"
-            },
-            {
-                name: "MongoDB Atlas API",
-                description: "Database management and operations",
-                category: "Database",
-                url: "https://cloud.mongodb.com/api",
-                auth: "apiKey",
-                https: true,
-                cors: "yes"
-            },
-            {
-                name: "SendGrid API",
-                description: "Email delivery and management",
-                category: "Communication",
-                url: "https://api.sendgrid.com",
-                auth: "apiKey",
-                https: true,
-                cors: "yes"
-            },
-            {
-                name: "YouTube Data API",
-                description: "Access YouTube content and features",
-                category: "Media",
-                url: "https://www.googleapis.com/youtube/v3",
-                auth: "apiKey",
-                https: true,
-                cors: "yes"
-            },
-            {
-                name: "Discord API",
-                description: "Build bots and integrate with Discord",
-                category: "Communication",
-                url: "https://discord.com/api",
+                name: "Spotify Web API",
+                description: "Music catalog, playback control, and user data",
+                category: "Music",
+                url: "https://api.spotify.com/v1",
                 auth: "OAuth",
                 https: true,
-                cors: "yes"
-            },
-            {
-                name: "LinkedIn API",
-                description: "Professional network integration",
-                category: "Social",
-                url: "https://api.linkedin.com",
-                auth: "OAuth",
-                https: true,
-                cors: "yes"
-            },
-            {
-                name: "Twilio API",
-                description: "SMS, voice, and messaging services",
-                category: "Communication",
-                url: "https://api.twilio.com",
-                auth: "apiKey",
-                https: true,
-                cors: "yes"
-            },
-            {
-                name: "ChatGPT API",
-                description: "Natural language processing and generation",
-                category: "AI",
-                url: "https://api.openai.com/v1/chat",
-                auth: "apiKey",
-                https: true,
-                cors: "yes"
+                cors: "yes",
+                documentation: "https://developer.spotify.com/documentation/web-api"
             }
         ];
         apiCache.lastUpdated = new Date();
-        console.log('API cache initialized with default APIs');
+        console.log(`API cache initialized with ${apiCache.data.length} APIs`);
     } catch (error) {
-        console.error('Error initializing APIs:', error);
-        if (!apiCache.data.length) {
-            apiCache.data = []; // Ensure we have at least an empty array
-        }
+        console.error('Error initializing API cache:', error);
     }
 }
 
-// Update cache every 24 hours
-setInterval(fetchAndCacheAPIs, 24 * 60 * 60 * 1000);
 // Initial fetch
 fetchAndCacheAPIs();
 
@@ -683,20 +517,17 @@ app.get('/api/search', async (req, res) => {
     try {
         const { query, category } = req.query;
         
-        // If query is empty, return a specific message
-        if (!query && category === 'all') {
-            return res.status(400).json({ 
-                message: 'Please enter a search term to find APIs',
-                isEmpty: true
-            });
+        // If cache is empty, initialize it
+        if (!apiCache.data || apiCache.data.length === 0) {
+            await fetchAndCacheAPIs();
         }
         
         // Search in cached APIs
-        let apiResults = apiCache.data;
+        let results = apiCache.data;
         
         if (query) {
             const searchQuery = query.toLowerCase();
-            apiResults = apiResults.filter(api => 
+            results = results.filter(api => 
                 api.name.toLowerCase().includes(searchQuery) ||
                 api.description.toLowerCase().includes(searchQuery) ||
                 api.category.toLowerCase().includes(searchQuery)
@@ -704,7 +535,7 @@ app.get('/api/search', async (req, res) => {
         }
         
         if (category && category !== 'all') {
-            apiResults = apiResults.filter(api => 
+            results = results.filter(api => 
                 api.category.toLowerCase() === category.toLowerCase()
             );
         }
@@ -712,7 +543,7 @@ app.get('/api/search', async (req, res) => {
         // Sort results by relevance (name matches first)
         if (query) {
             const searchQuery = query.toLowerCase();
-            apiResults.sort((a, b) => {
+            results.sort((a, b) => {
                 const aNameMatch = a.name.toLowerCase().includes(searchQuery);
                 const bNameMatch = b.name.toLowerCase().includes(searchQuery);
                 if (aNameMatch && !bNameMatch) return -1;
@@ -721,73 +552,14 @@ app.get('/api/search', async (req, res) => {
             });
         }
 
-        res.json(apiResults);
+        res.json(results);
     } catch (err) {
+        console.error('Search error:', err);
         res.status(500).json({ message: err.message });
     }
 });
 
-// Add request to collection
-app.post('/api/collections/:collectionId/requests', ensureAuthenticated, async (req, res) => {
-    try {
-        const collection = await Collection.findById(req.params.collectionId);
-        if (!collection) {
-            return res.status(404).json({ message: 'Collection not found' });
-        }
-
-        // Check if user owns the collection
-        if (collection.author.toString() !== req.user._id.toString()) {
-            return res.status(403).json({ message: 'Not authorized to modify this collection' });
-        }
-
-        const requestId = req.body.requestId;
-        if (!requestId) {
-            return res.status(400).json({ message: 'Request ID is required' });
-        }
-
-        // Check if request exists
-        const request = await Request.findById(requestId);
-        if (!request) {
-            return res.status(404).json({ message: 'Request not found' });
-        }
-
-        // Add request to collection if not already present
-        if (!collection.requests.includes(requestId)) {
-            collection.requests.push(requestId);
-            await collection.save();
-        }
-
-        res.json(collection);
-    } catch (err) {
-        res.status(500).json({ message: err.message });
-    }
-});
-
-// Remove request from collection
-app.delete('/api/collections/:collectionId/requests/:requestId', ensureAuthenticated, async (req, res) => {
-    try {
-        const collection = await Collection.findById(req.params.collectionId);
-        if (!collection) {
-            return res.status(404).json({ message: 'Collection not found' });
-        }
-
-        // Check if user owns the collection
-        if (collection.author.toString() !== req.user._id.toString()) {
-            return res.status(403).json({ message: 'Not authorized to modify this collection' });
-        }
-
-        collection.requests = collection.requests.filter(
-            req => req.toString() !== req.params.requestId
-        );
-        await collection.save();
-
-        res.json(collection);
-    } catch (err) {
-        res.status(500).json({ message: err.message });
-    }
-});
-
-// Get popular APIs (based on usage in the last week)
+// Get popular APIs (most used in the last week)
 app.get('/api/popular-apis', ensureAuthenticated, async (req, res) => {
     try {
         const oneWeekAgo = new Date();
@@ -801,80 +573,26 @@ app.get('/api/popular-apis', ensureAuthenticated, async (req, res) => {
             },
             {
                 $group: {
-                    _id: { url: "$url", method: "$method" },
+                    _id: {
+                        url: "$url",
+                        method: "$method"
+                    },
                     count: { $sum: 1 },
-                    lastUsed: { $max: "$timestamp" },
-                    name: { $first: "$url" },
-                    method: { $first: "$method" }
+                    lastUsed: { $max: "$timestamp" }
                 }
             },
-            { $sort: { count: -1 } },
-            { $limit: 6 }
+            {
+                $sort: { count: -1 }
+            },
+            {
+                $limit: 5
+            }
         ]);
 
         res.json(popularAPIs);
     } catch (err) {
-        res.status(500).json({ message: err.message });
-    }
-});
-
-// Get trending APIs (based on recent increased usage)
-app.get('/api/trending-apis', ensureAuthenticated, async (req, res) => {
-    try {
-        const oneDayAgo = new Date();
-        oneDayAgo.setDate(oneDayAgo.getDate() - 1);
-
-        const trendingAPIs = await History.aggregate([
-            {
-                $match: {
-                    timestamp: { $gte: oneDayAgo }
-                }
-            },
-            {
-                $group: {
-                    _id: { url: "$url", method: "$method" },
-                    count: { $sum: 1 },
-                    lastUsed: { $max: "$timestamp" },
-                    name: { $first: "$url" },
-                    method: { $first: "$method" }
-                }
-            },
-            { $sort: { lastUsed: -1, count: -1 } },
-            { $limit: 6 }
-        ]);
-
-        res.json(trendingAPIs);
-    } catch (err) {
-        res.status(500).json({ message: err.message });
-    }
-});
-
-// Get recommended collections based on user's activity
-app.get('/api/recommended-collections', ensureAuthenticated, async (req, res) => {
-    try {
-        // Get user's recent API categories from history
-        const userHistory = await History.find({ userId: req.user._id })
-            .sort({ timestamp: -1 })
-            .limit(10);
-
-        // Extract unique categories from user's APIs
-        const userCategories = [...new Set(userHistory.map(h => {
-            const urlParts = new URL(h.url).pathname.split('/');
-            return urlParts[1] || 'other';
-        }))];
-
-        // Find collections with similar categories
-        const recommendedCollections = await Collection.find({
-            isPublic: true,
-            category: { $in: userCategories }
-        })
-        .populate('author', 'displayName')
-        .sort({ stars: -1 })
-        .limit(6);
-
-        res.json(recommendedCollections);
-    } catch (err) {
-        res.status(500).json({ message: err.message });
+        console.error('Error fetching popular APIs:', err);
+        res.status(500).json({ message: 'Error fetching popular APIs' });
     }
 });
 

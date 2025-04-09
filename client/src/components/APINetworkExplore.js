@@ -19,7 +19,7 @@ const APINetworkExplore = () => {
     const [popularAPIs, setPopularAPIs] = useState([]);
     const [trendingAPIs, setTrendingAPIs] = useState([]);
     const [recommendedCollections, setRecommendedCollections] = useState([]);
-    
+
     // Updated categories to match common API categories
     const categories = [
         { id: 'all', name: 'All' },
@@ -199,9 +199,9 @@ const APINetworkExplore = () => {
             const response = await fetch(`/api/search?query=${encodeURIComponent(searchQuery)}&category=${selectedCategory}`, {
                 credentials: 'include'
             });
-            
+
             const data = await response.json();
-            
+
             if (!response.ok) {
                 if (data.isEmpty) {
                     setError('Please enter a search term to find APIs');
@@ -264,7 +264,7 @@ const APINetworkExplore = () => {
     };
 
     const filteredCollections = featuredCollections
-        .filter(collection => 
+        .filter(collection =>
             (selectedCategory === 'all' || collection.category === selectedCategory) &&
             (searchQuery === '' || collection.name.toLowerCase().includes(searchQuery.toLowerCase()))
         );
@@ -297,7 +297,7 @@ const APINetworkExplore = () => {
                 <div className="stat-card">
                     <FiThumbsUp className="stat-icon" />
                     <div className="stat-content">
-                        <span className="stat-value">{popularAPIs.length}</span>
+                        <span className="stat-value">{popularAPIs.length }</span>
                         <span className="stat-label">Popular APIs</span>
                     </div>
                 </div>
@@ -316,7 +316,7 @@ const APINetworkExplore = () => {
                     </div>
                 </div>
             </div>
-            
+
             {/* Categories */}
             <section className="categories-section">
                 <div className="category-tabs">
@@ -330,6 +330,49 @@ const APINetworkExplore = () => {
                         </button>
                     ))}
                 </div>
+            </section>
+
+            <section className="api-results-section">
+                <h2><FiGlobe className="section-icon" /> Available APIs</h2>
+                {searchLoading ? (
+                    <div className="loading">Searching for APIs...</div>
+                ) : error ? (
+                    <div className="error-message">{error}</div>
+                ) : (
+                    <div className="api-grid">
+                        {apis.map((api, index) => (
+                            <div key={index} className="api-card">
+                                <h3>{api.name}</h3>
+                                <p className="api-description">{api.description}</p>
+                                <div className="api-meta">
+                                    <span className="category-tag">{api.category}</span>
+                                    <div className="api-features">
+                                        {api.https && <span className="feature https" title="HTTPS Support">
+                                            <FiLock /> HTTPS
+                                        </span>}
+                                        <span className={`feature cors-${api.cors.toLowerCase()}`} title="CORS Support">
+                                            {api.cors === 'yes' ? <FiCheck /> : <FiX />} CORS
+                                        </span>
+                                        {api.auth && <span className="feature auth" title="Authentication Required">
+                                            <FiLock /> Auth
+                                        </span>}
+                                    </div>
+                                </div>
+                                <button
+                                    className="add-api-button"
+                                    onClick={() => handleAddToCollection(api)}
+                                >
+                                    Add to Requests
+                                </button>
+                            </div>
+                        ))}
+                        {apis.length === 0 && !searchLoading && (
+                            <div className="no-results">
+                                {searchQuery ? 'No APIs found matching your search.' : 'Start searching to discover APIs!'}
+                            </div>
+                        )}
+                    </div>
+                )}
             </section>
 
             {/* Popular on Pigeon this week */}
@@ -346,7 +389,7 @@ const APINetworkExplore = () => {
                                 <span className="method-tag">{api._id.method}</span>
                                 <span className="last-used">Last used: {new Date(api.lastUsed).toLocaleDateString()}</span>
                             </div>
-                            <button 
+                            <button
                                 className="add-api-button"
                                 onClick={() => handleAddToCollection({
                                     name: api._id.url,
@@ -375,7 +418,7 @@ const APINetworkExplore = () => {
                                 <span className="method-tag">{api._id.method}</span>
                                 <span className="last-used">Last used: {new Date(api.lastUsed).toLocaleDateString()}</span>
                             </div>
-                            <button 
+                            <button
                                 className="add-api-button"
                                 onClick={() => handleAddToCollection({
                                     name: api._id.url,
@@ -404,7 +447,7 @@ const APINetworkExplore = () => {
                                     <FiStar /> {collection.stars}
                                 </span>
                             </div>
-                            <button 
+                            <button
                                 className="fork-button"
                                 onClick={() => handleForkCollection(collection._id)}
                                 disabled={loading}
@@ -417,48 +460,7 @@ const APINetworkExplore = () => {
             </section>
 
             {/* API Search Results */}
-            <section className="api-results-section">
-                <h2><FiGlobe className="section-icon" /> Available APIs</h2>
-                {searchLoading ? (
-                    <div className="loading">Searching for APIs...</div>
-                ) : error ? (
-                    <div className="error-message">{error}</div>
-                ) : (
-                    <div className="api-grid">
-                        {apis.map((api, index) => (
-                            <div key={index} className="api-card">
-                                <h3>{api.name}</h3>
-                                <p className="api-description">{api.description}</p>
-                                <div className="api-meta">
-                                    <span className="category-tag">{api.category}</span>
-                                    <div className="api-features">
-                                        {api.https && <span className="feature https" title="HTTPS Support">
-                                            <FiLock /> HTTPS
-                                        </span>}
-                                        <span className={`feature cors-${api.cors.toLowerCase()}`} title="CORS Support">
-                                            {api.cors === 'yes' ? <FiCheck /> : <FiX />} CORS
-                                        </span>
-                                        {api.auth && <span className="feature auth" title="Authentication Required">
-                                            <FiLock /> Auth
-                                        </span>}
-                                    </div>
-                                </div>
-                                <button 
-                                    className="add-api-button"
-                                    onClick={() => handleAddToCollection(api)}
-                                >
-                                    Add to Requests
-                                </button>
-                            </div>
-                        ))}
-                        {apis.length === 0 && !searchLoading && (
-                            <div className="no-results">
-                                {searchQuery ? 'No APIs found matching your search.' : 'Start searching to discover APIs!'}
-                            </div>
-                        )}
-                    </div>
-                )}
-            </section>
+            
 
             {/* Recent Activity */}
             <section className="recent-activity">
