@@ -12,6 +12,8 @@ body,
   flex-direction: column;
   min-height: 100vh;
   box-sizing: border-box;
+  padding-top: 70px;
+  /* Add padding for fixed navbar */
 }
 
 .container {
@@ -79,6 +81,11 @@ body,
 
 /* Responsive Adjustments */
 @media (max-width: 768px) {
+  .App {
+    padding-top: 60px;
+    /* Slightly less padding for mobile */
+  }
+
   .container {
     flex-direction: column;
   }
@@ -90,36 +97,38 @@ body,
     min-width: auto;
     /* Allow left panel to shrink */
   }
-}   /* src/App.css (or index.css) - Modify body rule */
-  body {
-    background-color: var(--background-color);
-    color: var(--text-color);
-    /* Remove font-family variable */
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-    /* Set a default stack */
-    font-size: var(--app-font-size, 16px);
-    /* Keep font-size variable */
-    margin: 0;
-    transition: background-color 0.3s ease, color 0.3s ease;
-    min-height: 100vh;
-  }
+}
 
-  /* Ensure other elements inherit font-size */
-  button,
-  input,
-  select,
-  textarea,
-  p,
-  h1,
-  h2,
-  h3,
-  h4,
-  h5,
-  h6,
-  li,
-  span,
-  div {
-    font-family: inherit;
-    /* Inherit the default stack from body */
-    font-size: inherit;
-  }
+/* src/App.css (or index.css) - Modify body rule */
+body {
+  background-color: var(--background-color);
+  color: var(--text-color);
+  /* Remove font-family variable */
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  /* Set a default stack */
+  font-size: var(--app-font-size, 16px);
+  /* Keep font-size variable */
+  margin: 0;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  min-height: 100vh;
+}
+
+/* Ensure other elements inherit font-size */
+button,
+input,
+select,
+textarea,
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+li,
+span,
+div {
+  font-family: inherit;
+  /* Inherit the default stack from body */
+  font-size: inherit;
+}
