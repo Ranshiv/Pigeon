@@ -354,10 +354,11 @@
 }
 
 .hero-button-public:hover {
-    animation: pulse 1.5s infinite;
     box-shadow: 0 15px 30px rgba(0, 123, 255, 0.3);
-    transform: translateY(-7px);
+    transform: translateY(-5px);
 }
+
+/* Removed pulse animation from hover effect for smoother interaction */
 
 .hero-image-public {
     flex: 0 0 45%;
@@ -644,7 +645,7 @@
 }
 
 .benefit-card-back {
-    background: linear-gradient(135deg, #343a40 0%, #495057 100%);
+    background: var(--card-background, linear-gradient(135deg, #343a40 0%, #495057 100%));
     color: white;
     transform: rotateY(180deg);
     display: flex;
@@ -652,6 +653,12 @@
     justify-content: space-between;
     padding: 40px 20px;
     box-sizing: border-box;
+}
+
+/* Add dark theme support for the card back */
+.dark-theme .benefit-card-back {
+    background: linear-gradient(135deg, var(--dark-secondary-bg) 0%, var(--dark-card-bg) 100%);
+    border: 1px solid var(--dark-border);
 }
 
 .benefit-card-back p {
@@ -724,7 +731,10 @@
 }
 
 .benefit-card:hover .benefit-card-icon {
-    animation: pulse 1s infinite;
+    /* Remove the animation that causes abrupt movement */
+    /* animation: pulse 1s infinite; */
+    /* Replace with a smoother transform */
+    transform: scale(1.1);
 }
 
 .benefit-card h3 {
