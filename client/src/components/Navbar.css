@@ -7,7 +7,7 @@
     z-index: 1000;
     background-color: rgba(40, 40, 45, 0.75);
     /* Dark default with transparency */
-    transition: all 0.3s ease;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     -webkit-backdrop-filter: blur(10px);
     backdrop-filter: blur(10px);
     padding: 0;
@@ -21,18 +21,38 @@ body:not(.dark-theme) .navbar {
     border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 }
 
-/* Scrolled effect */
+/* Scrolled effect with smoother transition */
 .navbar.scrolled {
     background-color: rgba(28, 28, 35, 0.95);
     /* Darker when scrolled */
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    transform: translateY(-2px);
+    /* Slight shift effect when scrolling */
+    transform-origin: top;
 }
 
 /* Light theme scrolled version */
 body:not(.dark-theme) .navbar.scrolled {
-    background-color: rgba(245, 245, 250, 0.95);
+    background-color: rgba(245, 245, 250, 0.98);
     /* Lighter when scrolled */
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Animate navbar appearance on page load */
+@keyframes navbarFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.navbar {
+    animation: navbarFadeIn 0.5s ease-out forwards;
 }
 
 .navbar-container {
@@ -49,22 +69,39 @@ body:not(.dark-theme) .navbar.scrolled {
     font-size: 1.8rem;
     font-weight: 700;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
     color: #ffffff;
     text-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
     position: relative;
     padding-left: 5px;
 }
 
-/* Light theme brand */
+/* Brand hover effect with glow */
+.navbar-brand:hover {
+    opacity: 1;
+    transform: translateY(-2px);
+    text-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+}
+
+/* Light theme brand with glow effect */
 body:not(.dark-theme) .navbar-brand {
     color: #1a1a1a;
     text-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
 }
 
-.navbar-brand:hover {
-    opacity: 0.9;
-    transform: translateY(-1px);
+body:not(.dark-theme) .navbar-brand:hover {
+    text-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Add a subtle underline animation for brand - REMOVED */
+.navbar-brand::after {
+    display: none;
+    /* Hide the underline completely */
+}
+
+.navbar-brand:hover::after {
+    width: 0;
+    /* Ensure it stays hidden on hover too */
 }
 
 .navbar-menu {
@@ -72,6 +109,19 @@ body:not(.dark-theme) .navbar-brand {
     align-items: center;
     flex-grow: 1;
     justify-content: space-between;
+}
+
+/* Animate menu items on page load with staggered delay */
+@keyframes menuItemFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .navbar-start {
@@ -85,10 +135,16 @@ body:not(.dark-theme) .navbar-brand {
     display: flex;
     align-items: center;
     gap: 12px;
+    margin-left: auto;
+    /* This pushes the navbar-end to the right */
 }
 
-/* Side icon style - similar to the image provided */
+/* Apply staggered animation to menu items */
 .navbar-item {
+    animation: menuItemFadeIn 0.5s ease-out forwards;
+    animation-delay: calc(0.1s * var(--item-index, 1));
+    opacity: 0;
+    /* Start invisible */
     position: relative;
     cursor: pointer;
     padding: 8px;
@@ -96,7 +152,7 @@ body:not(.dark-theme) .navbar-brand {
     font-weight: 500;
     display: flex;
     align-items: center;
-    transition: all 0.2s ease;
+    transition: all 0.25s cubic-bezier(0.25, 1, 0.5, 1);
     border-radius: 8px;
 }
 
@@ -108,40 +164,69 @@ body:not(.dark-theme) .navbar-item {
 .navbar-item span {
     position: relative;
     padding: 5px 8px;
-    transition: all 0.25s ease;
+    transition: all 0.25s cubic-bezier(0.25, 1, 0.5, 1);
     display: flex;
     gap: 10px;
     align-items: center;
 }
 
-/* Icon style for menu items */
+/* Icon style for menu items with subtle pulsing effect on hover */
 .navbar-item svg,
 .navbar-item img {
     opacity: 0.85;
     margin-right: 8px;
-    transition: all 0.2s ease;
+    transition: all 0.25s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
-.navbar-item:hover {
-    background-color: rgba(255, 255, 255, 0.1);
+.navbar-item:not(.profile-menu-container):hover {
+    background-color: rgba(255, 255, 255, 0.12);
     color: #ffffff;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
-/* Light theme hover */
-body:not(.dark-theme) .navbar-item:hover {
-    background-color: rgba(0, 0, 0, 0.05);
-    color: #000000;
+@keyframes iconPulse {
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.1);
+    }
+
+    100% {
+        transform: scale(1);
+    }
 }
 
-.navbar-item:hover svg,
-.navbar-item:hover img {
+.navbar-item:not(.profile-menu-container):hover svg,
+.navbar-item:not(.profile-menu-container):hover img {
     opacity: 1;
+    animation: iconPulse 0.6s ease-in-out;
 }
 
-/* Active item styling */
+/* Light theme hover with improved effect */
+body:not(.dark-theme) .navbar-item:not(.profile-menu-container):hover {
+    background-color: rgba(0, 0, 0, 0.06);
+    color: #000000;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+/* Active item styling with animated indicator */
 .navbar-item span.active {
     color: #ffffff;
     font-weight: 600;
+}
+
+.navbar-item span.active::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, var(--button-background, #007bff), rgba(0, 123, 255, 0.5));
+    border-radius: 2px;
 }
 
 /* Light theme active */
@@ -149,9 +234,20 @@ body:not(.dark-theme) .navbar-item span.active {
     color: #000000;
 }
 
-/* Dropdown styling */
+/* Dropdown styling with improved animations */
 .navbar-item.has-dropdown {
     position: relative;
+}
+
+/* Add hover areas to retain hover state */
+.navbar-item.has-dropdown::after {
+    content: '';
+    position: absolute;
+    height: 20px;
+    width: 100%;
+    bottom: -20px;
+    left: 0;
+    z-index: 99;
 }
 
 .navbar-dropdown {
@@ -159,41 +255,88 @@ body:not(.dark-theme) .navbar-item span.active {
     top: calc(100% + 5px);
     left: 0;
     background-color: rgba(35, 35, 40, 0.95);
-    border-radius: 8px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    border-radius: 12px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
     min-width: 200px;
     opacity: 0;
     visibility: hidden;
-    transform: translateY(10px);
-    transition: all 0.3s ease;
+    transform: translateY(10px) scale(0.98);
+    transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
     z-index: 100;
     overflow: hidden;
     border: 1px solid rgba(255, 255, 255, 0.1);
     -webkit-backdrop-filter: blur(10px);
     backdrop-filter: blur(10px);
+    pointer-events: none;
+    /* Remove delay on hiding since we'll handle that with the overall behavior */
 }
 
-/* Light theme dropdown */
+/* Light theme dropdown with glass effect */
 body:not(.dark-theme) .navbar-dropdown {
     background-color: rgba(250, 250, 255, 0.95);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
     border: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .navbar-item.has-dropdown:hover .navbar-dropdown {
     opacity: 1;
     visibility: visible;
-    transform: translateY(0);
+    transform: translateY(0) scale(1);
+    pointer-events: auto;
+    transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+/* Add gap to create space for smoother transition between parent and dropdown */
+.navbar-dropdown::before {
+    content: '';
+    position: absolute;
+    height: 20px;
+    width: 100%;
+    top: -20px;
+    left: 0;
+}
+
+/* Ensure dropdown stays visible when hovering it */
+.navbar-dropdown:hover {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0) scale(1);
+    pointer-events: auto;
+}
+
+/* Additional class for JavaScript to help with touch devices */
+.navbar-dropdown.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0) scale(1);
+    pointer-events: auto;
+    transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+/* Staggered animation for dropdown items */
+@keyframes dropdownItemFadeIn {
+    from {
+        opacity: 0;
+        transform: translateX(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
 }
 
 .dropdown-item {
     padding: 12px 16px;
     color: rgba(255, 255, 255, 0.85);
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.25s cubic-bezier(0.25, 1, 0.5, 1);
     display: flex;
     align-items: center;
     border-left: 3px solid transparent;
+    animation: dropdownItemFadeIn 0.3s forwards;
+    animation-delay: calc(0.05s * var(--item-index, 1));
+    opacity: 0;
 }
 
 /* Light theme dropdown item */
@@ -202,56 +345,62 @@ body:not(.dark-theme) .dropdown-item {
 }
 
 .dropdown-item:hover {
-    background-color: rgba(255, 255, 255, 0.1);
+    background-color: rgba(255, 255, 255, 0.12);
     color: #ffffff;
     border-left-color: var(--button-background, #007bff);
+    padding-left: 18px;
+    /* Slight indent effect */
 }
 
 /* Light theme dropdown hover */
 body:not(.dark-theme) .dropdown-item:hover {
-    background-color: rgba(0, 0, 0, 0.05);
+    background-color: rgba(0, 0, 0, 0.06);
     color: #000000;
 }
 
-/* Profile menu styling */
+/* Profile menu styling with improved effects */
 .profile-menu-container {
     position: relative;
+    background-color: transparent !important;
+}
+
+.profile-menu-container:hover {
+    background-color: transparent !important;
+    box-shadow: none !important;
+    transform: none !important;
 }
 
 .profile-trigger {
     width: 38px;
     height: 38px;
-    border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    background-color: rgba(255, 255, 255, 0.1);
-    transition: all 0.2s ease;
-    border: 1px solid rgba(255, 255, 255, 0.15);
+    transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+    overflow: hidden;
 }
 
-/* Light theme profile trigger */
-body:not(.dark-theme) .profile-trigger {
-    background-color: rgba(0, 0, 0, 0.05);
-    border: 1px solid rgba(0, 0, 0, 0.1);
-}
-
+/* Profile trigger hover effect */
 .profile-trigger:hover {
-    background-color: rgba(255, 255, 255, 0.15);
-    transform: translateY(-1px);
+    transform: translateY(-2px);
+    background-color: transparent !important;
 }
 
-/* Light theme profile hover */
+/* Remove box shadow from light theme profile hover */
 body:not(.dark-theme) .profile-trigger:hover {
-    background-color: rgba(0, 0, 0, 0.08);
+    box-shadow: none;
 }
 
 .navbar-profile-img {
     width: 28px;
     height: 28px;
-    border-radius: 50%;
     object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.profile-trigger:hover .navbar-profile-img {
+    transform: scale(1.1);
 }
 
 .profile-dropdown {
@@ -259,50 +408,88 @@ body:not(.dark-theme) .profile-trigger:hover {
     top: calc(100% + 10px);
     right: 0;
     background-color: rgba(35, 35, 40, 0.95);
-    border-radius: 8px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    border-radius: 12px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
     min-width: 180px;
     z-index: 100;
     overflow: hidden;
     border: 1px solid rgba(255, 255, 255, 0.1);
     -webkit-backdrop-filter: blur(10px);
     backdrop-filter: blur(10px);
+    transform: translateY(10px) scale(0.98);
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+/* Visible profile dropdown */
+.profile-menu-container:hover .profile-dropdown {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0) scale(1);
+    transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
 /* Light theme profile dropdown */
 body:not(.dark-theme) .profile-dropdown {
     background-color: rgba(250, 250, 255, 0.95);
     border: 1px solid rgba(0, 0, 0, 0.05);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
 }
 
-/* Login button styling */
+/* Enhanced login button styling */
 .login-button {
     padding: 9px 22px;
-    background-color: var(--button-background, #007bff);
+    background: linear-gradient(135deg, var(--button-background, #007bff), var(--button-gradient-end, #0056b3));
     color: white;
     border-radius: 50px;
     text-decoration: none;
     font-weight: 500;
-    transition: all 0.3s ease;
+    transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
     border: none;
-    box-shadow: 0 4px 10px rgba(0, 123, 255, 0.2);
+    box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
+    margin-left: auto;
+    position: relative;
+    overflow: hidden;
+    /* This ensures the login button is pushed to the right */
+}
+
+/* Login button hover animation */
+.login-button::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 0%, transparent 70%);
+    transform: scale(0);
+    opacity: 0;
+    transition: transform 0.6s ease, opacity 0.6s ease;
 }
 
 .login-button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 15px rgba(0, 123, 255, 0.3);
-    background-color: var(--button-hover, #0069d9);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(0, 123, 255, 0.4);
+    background: linear-gradient(135deg, var(--button-hover, #0069d9), var(--button-hover-end, #004494));
 }
 
-/* Responsive hamburger icon */
+.login-button:hover::before {
+    opacity: 1;
+    transform: scale(1);
+}
+
+/* Responsive hamburger icon with animation */
 .hamburger {
     display: none;
     cursor: pointer;
     padding: 8px;
     border-radius: 6px;
-    transition: background-color 0.2s ease;
+    transition: background-color 0.25s ease;
     color: rgba(255, 255, 255, 0.85);
+    position: relative;
+    z-index: 1001;
+    /* Above the mobile menu */
 }
 
 /* Light theme hamburger */
@@ -311,15 +498,16 @@ body:not(.dark-theme) .hamburger {
 }
 
 .hamburger:hover {
-    background-color: rgba(255, 255, 255, 0.1);
+    background-color: rgba(255, 255, 255, 0.15);
+    transform: translateY(-1px);
 }
 
 /* Light theme hamburger hover */
 body:not(.dark-theme) .hamburger:hover {
-    background-color: rgba(0, 0, 0, 0.05);
+    background-color: rgba(0, 0, 0, 0.08);
 }
 
-/* Mobile responsiveness */
+/* Mobile responsiveness with improved animations */
 @media (max-width: 992px) {
     .hamburger {
         display: flex;
@@ -335,12 +523,12 @@ body:not(.dark-theme) .hamburger:hover {
         width: 85%;
         max-width: 320px;
         background-color: rgba(28, 28, 35, 0.98);
-        box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+        box-shadow: 0 0 30px rgba(0, 0, 0, 0.4);
         flex-direction: column;
         align-items: flex-start;
         justify-content: flex-start;
         padding: 80px 24px 24px;
-        transition: left 0.3s ease;
+        transition: left 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         z-index: 999;
         overflow-y: auto;
         -webkit-backdrop-filter: blur(10px);
@@ -348,15 +536,29 @@ body:not(.dark-theme) .hamburger:hover {
         border-right: 1px solid rgba(255, 255, 255, 0.05);
     }
 
+    /* Mobile menu slide in animation */
+    .navbar-menu.active {
+        left: 0;
+        animation: mobileMenuSlideIn 0.4s forwards cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes mobileMenuSlideIn {
+        from {
+            left: -100%;
+            opacity: 0.5;
+        }
+
+        to {
+            left: 0;
+            opacity: 1;
+        }
+    }
+
     /* Light theme mobile menu */
     body:not(.dark-theme) .navbar-menu {
         background-color: rgba(250, 250, 255, 0.98);
         border-right: 1px solid rgba(0, 0, 0, 0.05);
-        box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
-    }
-
-    .navbar-menu.active {
-        left: 0;
+        box-shadow: 0 0 30px rgba(0, 0, 0, 0.2);
     }
 
     .navbar-start {
@@ -380,6 +582,21 @@ body:not(.dark-theme) .hamburger:hover {
         padding: 12px 16px;
         border-radius: 8px;
         margin-bottom: 4px;
+        opacity: 0;
+        animation: mobileMenuItemFadeIn 0.5s forwards;
+        animation-delay: calc(0.1s * var(--item-index, 1));
+    }
+
+    @keyframes mobileMenuItemFadeIn {
+        from {
+            opacity: 0;
+            transform: translateX(-20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
     }
 
     .navbar-item.has-dropdown {
@@ -412,13 +629,21 @@ body:not(.dark-theme) .hamburger:hover {
         border-left: 3px solid rgba(0, 0, 0, 0.05);
     }
 
+    /* Clear ALL hover styles first */
     .navbar-item:hover {
-        background-color: rgba(255, 255, 255, 0.05);
+        background-color: transparent !important;
+        transform: none !important;
+        box-shadow: none !important;
     }
 
-    /* Light theme mobile hover */
-    body:not(.dark-theme) .navbar-item:hover {
-        background-color: rgba(0, 0, 0, 0.03);
+    /* Then apply hover ONLY to non-profile items */
+    .navbar-item:not(.profile-menu-container):hover {
+        background-color: rgba(255, 255, 255, 0.05) !important;
+    }
+
+    /* Light theme specific hover for non-profile items */
+    body:not(.dark-theme) .navbar-item:not(.profile-menu-container):hover {
+        background-color: rgba(0, 0, 0, 0.03) !important;
     }
 
     .profile-dropdown {

@@ -6,6 +6,7 @@ import Footer from './components/Footer';
 import Home from './components/Home';
 import Workspace from './components/Workspace';
 import PublicHome from './components/PublicHome'; // Import the new PublicHome component
+import CustomCursor from './components/CustomCursor'; // Import the CustomCursor component
 import './App.css';
 
 function App() {
@@ -31,6 +32,7 @@ function App() {
 
   return (
     <div className="App">
+      <CustomCursor /> {/* Add the CustomCursor component */}
       <Navbar isAuthenticated={isAuthenticated} />  {/* Pass isAuthenticated to Navbar */}
       <div className="container">
         <Routes>

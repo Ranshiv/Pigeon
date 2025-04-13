@@ -4,8 +4,8 @@ import React, { createContext, useState, useEffect, useContext } from 'react';
 const ThemeContext = createContext();
 
 export const ThemeProvider = ({ children }) => {
-    // Initialize theme from localStorage or default to 'light'
-    const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'light');
+    // Initialize theme from localStorage or default to 'dark'
+    const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'dark');
 
     useEffect(() => {
         // Apply theme class to the body element

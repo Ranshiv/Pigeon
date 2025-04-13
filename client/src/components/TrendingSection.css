@@ -11,4 +11,5 @@
     padding: 10px;
     border-bottom: 1px solid #ddd;
     cursor: pointer;
+    color: var(--text-color);
 }

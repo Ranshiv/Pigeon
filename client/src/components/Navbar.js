@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './Navbar.css';
 import { useNavigate, useLocation } from 'react-router-dom';
 import {
@@ -26,11 +26,23 @@ const Navbar = ({ isAuthenticated }) => {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [userProfileIcon, setUserProfileIcon] = useState(null);
     const [isScrolled, setIsScrolled] = useState(false);
+    const [prevScrollPos, setPrevScrollPos] = useState(0);
+    const [navbarVisible, setNavbarVisible] = useState(true);
+    const navbarRef = useRef(null);
 
-    // Add scroll event listener to detect when to change navbar background
+    // Enhanced scroll effect with smart hide/show based on scroll direction
     useEffect(() => {
         const handleScroll = () => {
-            setIsScrolled(window.scrollY > 20);
+            const currentScrollPos = window.pageYOffset;
+
+            // Set scrolled state for background effects
+            setIsScrolled(currentScrollPos > 20);
+
+            // Smart hide/show based on scroll direction
+            const visible = prevScrollPos > currentScrollPos || currentScrollPos < 10;
+
+            setNavbarVisible(visible);
+            setPrevScrollPos(currentScrollPos);
         };
 
         window.addEventListener('scroll', handleScroll);
@@ -39,7 +51,22 @@ const Navbar = ({ isAuthenticated }) => {
         return () => {
             window.removeEventListener('scroll', handleScroll);
         };
-    }, []);
+    }, [prevScrollPos]);
+
+    // Add item indexes for staggered animations
+    useEffect(() => {
+        if (navbarRef.current) {
+            const navItems = navbarRef.current.querySelectorAll('.navbar-item');
+            navItems.forEach((item, index) => {
+                item.style.setProperty('--item-index', index + 1);
+            });
+
+            const dropdownItems = navbarRef.current.querySelectorAll('.dropdown-item');
+            dropdownItems.forEach((item, index) => {
+                item.style.setProperty('--item-index', index + 1);
+            });
+        }
+    }, [isMobileMenuOpen, showApiDropdown, showWorkspaceDropdown]);
 
     useEffect(() => {
         const fetchUserIcon = async () => {
@@ -65,9 +92,15 @@ const Navbar = ({ isAuthenticated }) => {
         fetchUserIcon();
     }, [isAuthenticated, location]);
 
-    // Close mobile menu when location changes
+    // Close mobile menu when location changes with a smooth transition
     useEffect(() => {
-        setIsMobileMenuOpen(false);
+        if (isMobileMenuOpen) {
+            // Add a small delay before closing to allow for a smooth transition effect
+            const timer = setTimeout(() => {
+                setIsMobileMenuOpen(false);
+            }, 300);
+            return () => clearTimeout(timer);
+        }
     }, [location.pathname]);
 
     const isActive = (path) => {
@@ -83,7 +116,11 @@ const Navbar = ({ isAuthenticated }) => {
         try {
             const response = await fetch('/api/auth/logout');
             if (response.ok) {
-                window.location.href = '/';
+                // Add a nice transition effect before redirecting
+                document.body.classList.add('page-transition');
+                setTimeout(() => {
+                    window.location.href = '/';
+                }, 300);
             } else {
                 console.error('Logout failed:', response.status, response.statusText);
             }
@@ -92,24 +129,41 @@ const Navbar = ({ isAuthenticated }) => {
         }
     };
 
-    // Close dropdowns when clicking outside
+    // Enhanced click outside handler with smooth transitions
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (!event.target.closest('.profile-menu-container') && !event.target.closest('.has-dropdown')) {
-                setShowProfileMenu(false);
-                setShowApiDropdown(false);
-                setShowWorkspaceDropdown(false);
+                // Smooth hide transitions
+                if (showProfileMenu) setShowProfileMenu(false);
+                if (showApiDropdown) setShowApiDropdown(false);
+                if (showWorkspaceDropdown) setShowWorkspaceDropdown(false);
             }
         };
 
         document.addEventListener('mousedown', handleClickOutside);
         return () => document.removeEventListener('mousedown', handleClickOutside);
-    }, []);
+    }, [showProfileMenu, showApiDropdown, showWorkspaceDropdown]);
+
+    // Handle navigation with smooth transitions
+    const handleNavigation = (path) => {
+        // Add a subtle transition effect
+        if (path !== location.pathname) {
+            document.body.classList.add('page-transition');
+            setTimeout(() => {
+                navigate(path);
+                document.body.classList.remove('page-transition');
+            }, 200);
+        }
+    };
 
     return (
-        <nav className={`navbar ${isScrolled ? 'scrolled' : ''}`}>
+        <nav
+            className={`navbar ${isScrolled ? 'scrolled' : ''}`}
+            style={{ transform: navbarVisible ? 'translateY(0)' : 'translateY(-100%)', transition: 'transform 0.3s ease' }}
+            ref={navbarRef}
+        >
             <div className="navbar-container">
-                <div className="navbar-brand" onClick={() => navigate(isAuthenticated ? '/workspace/home' : '/')}>
+                <div className="navbar-brand" onClick={() => handleNavigation(isAuthenticated ? '/workspace/home' : '/')}>
                     Pigeon
                 </div>
 
@@ -121,7 +175,7 @@ const Navbar = ({ isAuthenticated }) => {
                     {isAuthenticated ? (
                         <>
                             <div className="navbar-start">
-                                <div className="navbar-item" onClick={() => navigate('/workspace/home')}>
+                                <div className="navbar-item" onClick={() => handleNavigation('/workspace/home')}>
                                     <span className={isActive('/workspace/home') ? 'active' : ''}>
                                         <FiHome size={18} /> Home
                                     </span>
@@ -139,10 +193,10 @@ const Navbar = ({ isAuthenticated }) => {
 
                                     {showWorkspaceDropdown && (
                                         <div className="navbar-dropdown">
-                                            <div className="dropdown-item" onClick={() => navigate('/workspace/workspaces/my-workspace')}>
+                                            <div className="dropdown-item" onClick={() => handleNavigation('/workspace/workspaces/my-workspace')}>
                                                 My Workspace
                                             </div>
-                                            <div className="dropdown-item" onClick={() => navigate('/workspace/workspaces/shared')}>
+                                            <div className="dropdown-item" onClick={() => handleNavigation('/workspace/workspaces/shared')}>
                                                 Shared
                                             </div>
                                         </div>
@@ -161,26 +215,26 @@ const Navbar = ({ isAuthenticated }) => {
 
                                     {showApiDropdown && (
                                         <div className="navbar-dropdown">
-                                            <div className="dropdown-item" onClick={() => navigate('/workspace/api-network/explore')}>
+                                            <div className="dropdown-item" onClick={() => handleNavigation('/workspace/api-network/explore')}>
                                                 <FiGlobe size={16} style={{ marginRight: '10px' }} /> Explore
                                             </div>
-                                            <div className="dropdown-item" onClick={() => navigate('/workspace/api-network/spotlight')}>
+                                            <div className="dropdown-item" onClick={() => handleNavigation('/workspace/api-network/spotlight')}>
                                                 <FiBell size={16} style={{ marginRight: '10px' }} /> Spotlight
                                             </div>
-                                            <div className="dropdown-item" onClick={() => navigate('/workspace/api-network/trending')}>
+                                            <div className="dropdown-item" onClick={() => handleNavigation('/workspace/api-network/trending')}>
                                                 <FiTrendingUp size={16} style={{ marginRight: '10px' }} /> Trending
                                             </div>
-                                            <div className="dropdown-item" onClick={() => navigate('/workspace/api-network/ai-agent-tools')}>
+                                            <div className="dropdown-item" onClick={() => handleNavigation('/workspace/api-network/ai-agent-tools')}>
                                                 <FiZap size={16} style={{ marginRight: '10px' }} /> AI Agent Tools
                                             </div>
-                                            <div className="dropdown-item" onClick={() => navigate('/workspace/api-network/requests/new')}>
+                                            <div className="dropdown-item" onClick={() => handleNavigation('/workspace/api-network/requests/new')}>
                                                 <FiPlus size={16} style={{ marginRight: '10px' }} /> Add Request
                                             </div>
                                         </div>
                                     )}
                                 </div>
 
-                                <div className="navbar-item" onClick={() => navigate('/workspace/history')}>
+                                <div className="navbar-item" onClick={() => handleNavigation('/workspace/history')}>
                                     <span className={isActive('/workspace/history') ? 'active' : ''}>
                                         <FiClock size={18} /> History
                                     </span>
@@ -190,7 +244,7 @@ const Navbar = ({ isAuthenticated }) => {
                             <div className="navbar-end">
                                 <div
                                     className="navbar-item"
-                                    onClick={() => navigate('/workspace/settings')}
+                                    onClick={() => handleNavigation('/workspace/settings')}
                                 >
                                     <span className={isActive('/workspace/settings') ? 'active' : ''}>
                                         <FiSettings size={18} />

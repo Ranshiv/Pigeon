@@ -1,7 +1,8 @@
 // client/src/components/PublicHome.js (Improved)
 import React from 'react';
 import './PublicHome.css'; // We'll update this CSS file
-import { FiZap, FiSearch, FiSave, FiCheckCircle } from 'react-icons/fi'; // Import specific icons
+import { FiZap, FiSearch, FiSave, FiCheckCircle, FiArrowRight } from 'react-icons/fi'; // Added FiArrowRight
+import { FaGithub, FaTwitter, FaLinkedin } from 'react-icons/fa'; // Import social icons
 
 const PublicHome = () => {
     // Suggestion: Find a more relevant illustration for API testing/development
@@ -45,15 +46,87 @@ const PublicHome = () => {
                 </div>
             </section>
 
-            {/* Benefits Section */}
+            {/* Benefits Section - Redesigned with modern cards */}
             <section className="benefits-section-public">
                 <h2>Why Choose Pigeon?</h2>
-                <ul className="benefits-list-public">
-                    <li><FiCheckCircle className="benefit-icon-public" /> <strong>Intuitive Interface:</strong> Easy to learn and use.</li>
-                    <li><FiCheckCircle className="benefit-icon-public" /> <strong>Core Functionality:</strong> Everything you need for effective API testing.</li>
-                    <li><FiCheckCircle className="benefit-icon-public" /> <strong>Streamlined Workflow:</strong> Save time and reduce errors.</li>
-                    <li><FiCheckCircle className="benefit-icon-public" /> <strong>Free to Use:</strong> Get started without any cost.</li>
-                </ul>
+
+                <div className="benefits-cards-container">
+                    {/* Card 1 */}
+                    <div className="benefit-card">
+                        <div className="benefit-card-content">
+                            <div className="benefit-card-front">
+                                <div className="benefit-icon-wrapper">
+                                    <FiCheckCircle className="benefit-card-icon" />
+                                </div>
+                                <h3>Intuitive Interface</h3>
+                                <p>Easy to learn and use, even for beginners</p>
+                            </div>
+                            <div className="benefit-card-back">
+                                <p>Our clean, modern interface helps you focus on what matters - testing your APIs without distractions.</p>
+                                <a href="http://localhost:5000/auth/google" className="benefit-card-cta">
+                                    Try it now <FiArrowRight />
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Card 2 */}
+                    <div className="benefit-card">
+                        <div className="benefit-card-content">
+                            <div className="benefit-card-front">
+                                <div className="benefit-icon-wrapper">
+                                    <FiCheckCircle className="benefit-card-icon" />
+                                </div>
+                                <h3>Core Functionality</h3>
+                                <p>Everything you need for effective API testing</p>
+                            </div>
+                            <div className="benefit-card-back">
+                                <p>We focus on the essential features that developers need daily, without unnecessary complexity.</p>
+                                <a href="http://localhost:5000/auth/google" className="benefit-card-cta">
+                                    Get started <FiArrowRight />
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Card 3 */}
+                    <div className="benefit-card">
+                        <div className="benefit-card-content">
+                            <div className="benefit-card-front">
+                                <div className="benefit-icon-wrapper">
+                                    <FiCheckCircle className="benefit-card-icon" />
+                                </div>
+                                <h3>Streamlined Workflow</h3>
+                                <p>Save time and reduce errors</p>
+                            </div>
+                            <div className="benefit-card-back">
+                                <p>Pigeon helps you build a more efficient workflow with saved requests, collections, and quick responses.</p>
+                                <a href="http://localhost:5000/auth/google" className="benefit-card-cta">
+                                    Explore more <FiArrowRight />
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Card 4 */}
+                    <div className="benefit-card">
+                        <div className="benefit-card-content">
+                            <div className="benefit-card-front">
+                                <div className="benefit-icon-wrapper">
+                                    <FiCheckCircle className="benefit-card-icon" />
+                                </div>
+                                <h3>Free to Use</h3>
+                                <p>Get started without any cost</p>
+                            </div>
+                            <div className="benefit-card-back">
+                                <p>Pigeon is 100% free to use with all core features available to everyone, no hidden limitations.</p>
+                                <a href="http://localhost:5000/auth/google" className="benefit-card-cta">
+                                    Sign up free <FiArrowRight />
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </section>
 
             {/* Call to Action Section */}

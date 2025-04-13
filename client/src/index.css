@@ -3,11 +3,13 @@
 /* Light theme variables (default) */
 body.light-theme {
   --background-color: #ffffff;
-  --text-color: #333333;
+  --text-color: #ffffff;
+  /* Changed text color to white */
   --navbar-background: #333;
   --navbar-text: #ffffff;
   --sidebar-background: #f0f0f0;
-  --sidebar-text: #333;
+  --sidebar-text: #ffffff;
+  /* Changed sidebar text to white */
   --button-background: #007bff;
   --button-text: #ffffff;
   --border-color: #ddd;
@@ -19,14 +21,16 @@ body.light-theme {
 body.dark-theme {
   --background-color: #22272e;
   /* Dark background */
-  --text-color: #adbac7;
-  /* Light text */
+  --text-color: #ffffff;
+  /* Changed text color to white */
   --navbar-background: #1c2128;
   /* Darker navbar */
-  --navbar-text: #adbac7;
+  --navbar-text: #ffffff;
+  /* Ensured navbar text is white */
   --sidebar-background: #2d333b;
   /* Darker sidebar */
-  --sidebar-text: #adbac7;
+  --sidebar-text: #ffffff;
+  /* Changed sidebar text to white */
   --button-background: #377df0;
   /* Brighter blue */
   --button-text: #ffffff;
@@ -48,6 +52,25 @@ body {
   transition: background-color 0.3s ease, color 0.3s ease;
   /* Smooth transition */
   min-height: 100vh;
+}
+
+/* Add page transition animation */
+@keyframes pageTransition {
+  0% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.8;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+body.page-transition {
+  animation: pageTransition 0.3s ease;
 }
 
 .App {

@@ -6,7 +6,7 @@
     padding: 32px;
     max-width: 1200px;
     margin: 0 auto;
-    background-color: #f8f9fa;
+    background-color: var(--background-color);
     min-height: calc(100vh - 64px);
 }
 
@@ -66,7 +66,7 @@
 }
 
 .stat-card {
-    background: white;
+    background: var(--card-background);
     border-radius: 16px;
     padding: 24px;
     display: flex;
@@ -121,7 +121,7 @@
 
 /* Categories Section */
 .categories-section {
-    background: white;
+    background: var(--card-background);
     padding: 1.5rem;
     border-radius: 16px;
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
@@ -129,13 +129,12 @@
 
 .category-tabs {
     display: flex;
-
     gap: 12px;
     padding: 8px;
     overflow-x: auto;
     scrollbar-width: none;
     -ms-overflow-style: none;
-    background: #f8f9fa;
+    background: var(--sidebar-background);
     border-radius: 12px;
 }
 
@@ -159,13 +158,12 @@
 .category-tab:hover {
     background: rgba(255, 108, 55, 0.1);
     color: #FF6C37
-
 }
 
 .category-tab.active {
     background: white;
     color: black;
-    
+
 }
 
 /* Grid Layouts */
@@ -180,12 +178,12 @@
 /* Card Styles */
 .api-card,
 .collection-card {
-    background: white;
+    background: var(--card-background);
     border-radius: 16px;
     padding: 24px;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
     transition: all 0.3s ease;
-    border: 1px solid rgba(0, 0, 0, 0.08);
+    border: 1px solid var(--border-color);
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -200,17 +198,17 @@
 .api-card.popular,
 .api-card.trending {
     border-left: 4px solid #FF6C37;
-    background: linear-gradient(to right, rgba(255, 108, 55, 0.05), white 15%);
+    background: linear-gradient(to right, rgba(255, 108, 55, 0.05), var(--card-background) 15%);
 }
 
 .collection-card.recommended {
     border-left: 4px solid #4caf50;
-    background: linear-gradient(to right, rgba(74, 222, 128, 0.05), white 15%);
+    background: linear-gradient(to right, rgba(74, 222, 128, 0.05), var(--card-background) 15%);
 }
 
 /* Section Headers */
 section {
-    background: white;
+    background: var(--card-background);
     padding: 2rem;
     border-radius: 16px;
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
@@ -218,13 +216,13 @@ section {
 
 section h2 {
     font-size: 1.5rem;
-    color: #2d3748;
+    color: var(--text-color);
     margin-bottom: 1.5rem;
     display: flex;
     align-items: center;
     gap: 12px;
     padding-bottom: 16px;
-    border-bottom: 2px solid #f1f1f1;
+    border-bottom: 2px solid var(--border-color);
 }
 
 .section-icon {
@@ -286,9 +284,9 @@ section h2 {
     align-items: center;
     justify-content: center;
     min-height: 200px;
-    color: #4a5568;
+    color: var(--text-color);
     font-size: 1.1rem;
-    background: white;
+    background: var(--card-background);
     border-radius: 16px;
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
 }
@@ -296,11 +294,11 @@ section h2 {
 /* Empty States */
 .no-results {
     text-align: center;
-    padding: 3rem 2rem;
-    background: white;
-    border-radius: 16px;
-    color: #4a5568;
-    font-size: 1.1rem;
+    padding: 40px;
+    color: var(--text-color);
+    background: var(--card-background);
+    border-radius: 8px;
+    margin-top: 20px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -346,9 +344,21 @@ section h2 {
 }
 
 .request-item {
-    border: 1px solid #eee;
+    background: var(--card-background);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
     padding: 15px;
-    border-radius: 4px;
+    margin-bottom: 10px;
+}
+
+.request-item h3 {
+    margin: 0 0 10px 0;
+    color: var(--text-color);
+}
+
+.timestamp {
+    color: var(--text-color);
+    font-size: 14px;
 }
 
 /* Search Section */
@@ -387,9 +397,10 @@ section h2 {
     border: 2px solid rgba(255, 255, 255, 0.2);
     border-radius: 12px;
     font-size: 16px;
-    background: white;
+    background: var(--card-background);
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
     transition: all 0.2s ease;
+    color: var(--text-color);
 }
 
 .search-input:focus {
@@ -409,7 +420,7 @@ section h2 {
 
 .search-button {
     padding: 16px 32px;
-    background-color: white;
+    background-color: var(--card-background);
     color: #FF6C37;
     border: none;
     border-radius: 12px;
@@ -496,10 +507,10 @@ section h2 {
 }
 
 .collection-card {
-    border: 1px solid #ddd;
+    border: 1px solid var(--border-color);
     border-radius: 8px;
     padding: 20px;
-    background: white;
+    background: var(--card-background);
     transition: transform 0.2s, box-shadow 0.2s;
 }
 
@@ -510,11 +521,11 @@ section h2 {
 
 .collection-card h3 {
     margin: 0 0 10px 0;
-    color: #333;
+    color: var(--text-color);
 }
 
 .collection-card p {
-    color: #666;
+    color: var(--text-color);
     margin-bottom: 15px;
 }
 
@@ -524,7 +535,7 @@ section h2 {
     align-items: center;
     margin-bottom: 15px;
     font-size: 14px;
-    color: #666;
+    color: var(--text-color);
 }
 
 .stars {
@@ -568,8 +579,8 @@ section h2 {
 }
 
 .request-item {
-    background: white;
-    border: 1px solid #ddd;
+    background: var(--card-background);
+    border: 1px solid var(--border-color);
     border-radius: 8px;
     padding: 15px;
     margin-bottom: 10px;
@@ -577,11 +588,11 @@ section h2 {
 
 .request-item h3 {
     margin: 0 0 10px 0;
-    color: #333;
+    color: var(--text-color);
 }
 
 .timestamp {
-    color: #666;
+    color: var(--text-color);
     font-size: 14px;
 }
 
@@ -598,10 +609,10 @@ section h2 {
 }
 
 .api-card {
-    border: 1px solid #ddd;
+    border: 1px solid var(--border-color);
     border-radius: 8px;
     padding: 20px;
-    background: white;
+    background: var(--card-background);
     transition: transform 0.2s, box-shadow 0.2s;
 }
 
@@ -669,7 +680,7 @@ section h2 {
 }
 
 .modal {
-    background: white;
+    background: var(--card-background);
     border-radius: 8px;
     padding: 24px;
     width: 90%;
@@ -679,7 +690,7 @@ section h2 {
 
 .modal h3 {
     margin: 0 0 16px 0;
-    color: #333;
+    color: var(--text-color);
 }
 
 .collection-list {
@@ -694,21 +705,21 @@ section h2 {
     padding: 12px;
     text-align: left;
     background: none;
-    border: 1px solid #ddd;
+    border: 1px solid var(--border-color);
     border-radius: 4px;
     cursor: pointer;
     transition: background-color 0.2s;
 }
 
 .collection-option:hover {
-    background-color: #f5f5f5;
+    background-color: var(--hover-background);
 }
 
 .modal-close {
     margin-top: 16px;
     padding: 8px 16px;
-    background-color: #f4f4f4;
-    border: 1px solid #ddd;
+    background-color: var(--hover-background);
+    border: 1px solid var(--border-color);
     border-radius: 4px;
     cursor: pointer;
     width: 100%;
@@ -730,7 +741,7 @@ section h2 {
 }
 
 .api-card {
-    background: white;
+    background: var(--card-background);
     border: 1px solid #e1e4e8;
     border-radius: 8px;
     padding: 20px;
@@ -744,12 +755,13 @@ section h2 {
 
 .api-card h3 {
     margin: 0 0 10px 0;
-    color: #2c3e50;
+    color: var(--text-color);
     font-size: 18px;
 }
 
 .api-description {
-    color: #666;
+    color: var(--text-color);
+    opacity: 0.8;
     font-size: 14px;
     margin-bottom: 15px;
     line-height: 1.4;
@@ -853,8 +865,8 @@ section h2 {
 .no-results {
     text-align: center;
     padding: 40px;
-    color: #666;
-    background: #f8f9fa;
+    color: var(--text-color);
+    background: var(--card-background);
     border-radius: 8px;
     margin-top: 20px;
 }
@@ -915,9 +927,9 @@ section h2 {
 .empty-state {
     text-align: center;
     padding: 2rem;
-    background: #f8f9fa;
+    background: var(--card-background);
     border-radius: 8px;
-    color: #666;
+    color: var(--text-color);
 }
 
 /* Responsive Grid Adjustments */

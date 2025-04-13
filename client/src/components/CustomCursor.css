@@ -1,0 +1,138 @@
+/* client/src/components/CustomCursor.css */
+*:not(input, textarea) {
+    cursor: none !important;
+}
+
+.cursor-dot,
+.cursor-ring {
+    pointer-events: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    border-radius: 50%;
+    z-index: 9999;
+    /* Removed transition for position, keeping only for visual properties */
+    transition: width 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+        height 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+        background-color 0.3s ease,
+        border-color 0.3s ease,
+        opacity 0.2s ease-in-out;
+}
+
+/* Default cursor colors for dark mode with subtle glow */
+.cursor-dot {
+    width: 8px;
+    height: 8px;
+    background-color: white;
+    box-shadow: 0 0 5px rgba(255, 255, 255, 0.8);
+    mix-blend-mode: exclusion;
+}
+
+.cursor-ring {
+    width: 40px;
+    height: 40px;
+    border: 2px solid rgba(255, 255, 255, 0.7);
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+}
+
+/* Light mode cursor colors */
+body:not(.dark-theme) .cursor-dot {
+    background-color: black;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.8);
+}
+
+body:not(.dark-theme) .cursor-ring {
+    border-color: rgba(0, 0, 0, 0.7);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
+
+/* Hide when cursor leaves window */
+.cursor-dot.hidden,
+.cursor-ring.hidden {
+    opacity: 0;
+}
+
+/* Click effect with pulsing animation */
+.cursor-dot.clicked {
+    background-color: var(--button-background, #FF6C37);
+    box-shadow: 0 0 10px var(--button-background, #FF6C37);
+    animation: dotPulse 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes dotPulse {
+    0% {
+        transform: translate(-50%, -50%) scale(0.6);
+    }
+
+    50% {
+        transform: translate(-50%, -50%) scale(1.2);
+    }
+
+    100% {
+        transform: translate(-50%, -50%) scale(0.6);
+    }
+}
+
+.cursor-ring.clicked {
+    width: 26px;
+    height: 26px;
+    border-width: 3px;
+    border-color: var(--button-background, #FF6C37);
+    opacity: 0.7;
+    animation: ringPulse 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes ringPulse {
+    0% {
+        transform: translate(-50%, -50%) scale(0.8);
+        opacity: 1;
+    }
+
+    70% {
+        transform: translate(-50%, -50%) scale(1.5);
+        opacity: 0.5;
+    }
+
+    100% {
+        transform: translate(-50%, -50%) scale(1.3);
+        opacity: 0.7;
+    }
+}
+
+/* Link hover effect with magnetic pull animation */
+.cursor-dot.link-hovered {
+    background-color: var(--button-background, #FF6C37);
+    box-shadow: 0 0 15px var(--button-background, #FF6C37);
+    mix-blend-mode: normal;
+}
+
+.cursor-ring.link-hovered {
+    width: 60px;
+    height: 60px;
+    border-width: 2px;
+    border-color: var(--button-background, #FF6C37);
+    background-color: rgba(255, 108, 55, 0.08);
+    animation: ringFloat 2s infinite alternate ease-in-out;
+}
+
+@keyframes ringFloat {
+    0% {
+        transform: translate(-50%, -50%) scale(1);
+    }
+
+    100% {
+        transform: translate(-50%, -50%) scale(1.15);
+    }
+}
+
+@media (max-width: 768px) {
+
+    .cursor-dot,
+    .cursor-ring {
+        display: none;
+    }
+
+    *:not(input, textarea) {
+        cursor: auto !important;
+    }
+}

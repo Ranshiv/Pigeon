@@ -1,9 +1,156 @@
 /* client/src/App.css */
+/* CSS Variables for theming */
+:root {
+  /* Light theme variables */
+  --background-color: #f8f9fa;
+  --text-color: #ffffff;
+  /* Changed text color to white */
+  --border-color: #ddd;
+  --card-bg: #ffffff;
+  --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --hover-bg: #f0f0f0;
+  --primary-btn-bg: #007bff;
+  --primary-btn-hover: #0056b3;
+  --secondary-btn-bg: #6c757d;
+  --secondary-btn-hover: #5a6268;
+  --navbar-bg: #ffffff;
+  --navbar-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  --panel-bg: #ffffff;
+}
+
+/* Dark theme variables */
+.dark-theme {
+  --background-color: #0b0b0a;
+  --text-color: #ffffff;
+  /* Changed text color to white */
+  --border-color: #333333;
+  --card-bg: #1a1a19;
+  --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+  --hover-bg: #1e1e1d;
+  --primary-btn-bg: #255d74;
+  --primary-btn-hover: #1a4d64;
+  --secondary-btn-bg: #4d4d4d;
+  --secondary-btn-hover: #333333;
+  --navbar-bg: #121211;
+  --navbar-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  --panel-bg: #121211;
+}
+
 html,
 body,
 #root {
   height: 100%;
   margin: 0;
+}
+
+/* Base body styling */
+body {
+  background-color: var(--background-color);
+  color: var(--text-color);
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-size: var(--app-font-size, 16px);
+  margin: 0;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Cursor-following glow effect */
+.glow-effect {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  pointer-events: none;
+  background: radial-gradient(circle,
+      rgba(37, 93, 116, 0.7) 0%,
+      rgba(37, 93, 116, 0.3) 40%,
+      rgba(37, 93, 116, 0) 70%);
+  transform: translate(-50%, -50%);
+  z-index: 0;
+  opacity: 0.6;
+  transition: opacity 0.3s ease, width 0.5s ease, height 0.5s ease, background 0.5s ease;
+  animation: pulse 3s infinite alternate;
+  mix-blend-mode: screen;
+  filter: blur(10px);
+}
+
+@keyframes pulse {
+  0% {
+    transform: translate(-50%, -50%) scale(0.95);
+    opacity: 0.5;
+  }
+
+  50% {
+    transform: translate(-50%, -50%) scale(1.05);
+    opacity: 0.7;
+  }
+
+  100% {
+    transform: translate(-50%, -50%) scale(0.98);
+    opacity: 0.6;
+  }
+}
+
+/* Glow effect states */
+.glow-effect.clicked {
+  background: radial-gradient(circle,
+      rgba(255, 87, 51, 0.8) 0%,
+      rgba(255, 87, 51, 0.4) 40%,
+      rgba(255, 87, 51, 0) 70%);
+  width: 250px;
+  height: 250px;
+  animation: expand 0.5s ease-out;
+}
+
+.glow-effect.link-hovered {
+  background: radial-gradient(circle,
+      rgba(37, 166, 178, 0.8) 0%,
+      rgba(37, 166, 178, 0.4) 40%,
+      rgba(37, 166, 178, 0) 70%);
+  width: 380px;
+  height: 380px;
+  animation: sparkle 2s infinite alternate;
+}
+
+@keyframes expand {
+  0% {
+    transform: translate(-50%, -50%) scale(0.8);
+    opacity: 0.9;
+  }
+
+  50% {
+    transform: translate(-50%, -50%) scale(1.2);
+    opacity: 0.7;
+  }
+
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0.6;
+  }
+}
+
+@keyframes sparkle {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0.6;
+    filter: blur(10px) brightness(1);
+  }
+
+  50% {
+    transform: translate(-50%, -50%) scale(1.08);
+    opacity: 0.8;
+    filter: blur(12px) brightness(1.2);
+  }
+
+  100% {
+    transform: translate(-50%, -50%) scale(1.02);
+    opacity: 0.7;
+    filter: blur(8px) brightness(1.1);
+  }
 }
 
 .App {
@@ -14,6 +161,10 @@ body,
   box-sizing: border-box;
   padding-top: 70px;
   /* Add padding for fixed navbar */
+  position: relative;
+  z-index: 1;
+  /* background-color: var(--background-color); */
+  transition: background-color 0.3s ease;
 }
 
 .container {
@@ -34,10 +185,11 @@ body,
   flex-direction: column;
   gap: 10px;
   min-width: 250px;
-  border-right: 1px solid #ddd;
-  /* Add a separator */
+  border-right: 1px solid var(--border-color);
   padding-right: 20px;
-  /* Add some padding */
+  background-color: var(--panel-bg);
+  border-radius: 8px;
+  box-shadow: var(--card-shadow);
 }
 
 /* Right Panel (Form / Details & Response) */
@@ -46,14 +198,17 @@ body,
   display: flex;
   flex-direction: column;
   gap: 20px;
-  /* Increased gap for better spacing */
+  background-color: var(--panel-bg);
+  border-radius: 8px;
+  padding: 15px;
+  box-shadow: var(--card-shadow);
 }
 
 .send-request-button,
 .add-request-button {
   padding: 10px 15px;
   font-size: 1em;
-  background-color: #007bff;
+  background-color: var(--primary-btn-bg);
   color: white;
   border: none;
   border-radius: 4px;
@@ -64,19 +219,21 @@ body,
 
 .send-request-button:hover,
 .add-request-button:hover {
-  background-color: #0056b3;
+  background-color: var(--primary-btn-hover);
 }
 
 /* Make Request Details section collapsible */
 .right-panel>div:not(:last-child) {
   /* Style for the request details section */
   padding: 15px;
-  border: 1px solid #ddd;
+  border: 1px solid var(--border-color);
   border-radius: 4px;
+  background-color: var(--card-bg);
 }
 
 .right-panel h2 {
   margin-top: 0;
+  color: var(--text-color);
 }
 
 /* Responsive Adjustments */
@@ -99,20 +256,6 @@ body,
   }
 }
 
-/* src/App.css (or index.css) - Modify body rule */
-body {
-  background-color: var(--background-color);
-  color: var(--text-color);
-  /* Remove font-family variable */
-  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  /* Set a default stack */
-  font-size: var(--app-font-size, 16px);
-  /* Keep font-size variable */
-  margin: 0;
-  transition: background-color 0.3s ease, color 0.3s ease;
-  min-height: 100vh;
-}
-
 /* Ensure other elements inherit font-size */
 button,
 input,
@@ -131,4 +274,40 @@ div {
   font-family: inherit;
   /* Inherit the default stack from body */
   font-size: inherit;
+  color: var(--text-color);
+}
+
+/* Add styling for form inputs in dark mode */
+.dark-theme input,
+.dark-theme textarea,
+.dark-theme select {
+  background-color: #1e1e1d;
+  color: #e0e0e0;
+  border: 1px solid #333;
+}
+
+.dark-theme input:focus,
+.dark-theme textarea:focus,
+.dark-theme select:focus {
+  outline: 1px solid #255d74;
+  border-color: #255d74;
+}
+
+/* Style scrollbars for dark theme */
+.dark-theme ::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.dark-theme ::-webkit-scrollbar-track {
+  background: #121211;
+}
+
+.dark-theme ::-webkit-scrollbar-thumb {
+  background: #333;
+  border-radius: 4px;
+}
+
+.dark-theme ::-webkit-scrollbar-thumb:hover {
+  background: #255d74;
 }
