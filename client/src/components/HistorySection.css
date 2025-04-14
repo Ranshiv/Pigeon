@@ -1,0 +1,35 @@
+/* Test Results Badge styling */
+.test-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 24px;
+    height: 20px;
+    padding: 0 6px;
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: bold;
+    margin-left: 8px;
+    color: white;
+}
+
+.test-passed {
+    background-color: #28a745;
+    /* Green */
+}
+
+.test-failed {
+    background-color: #dc3545;
+    /* Red */
+}
+
+/* Dark theme support */
+.dark-theme .test-badge.test-passed {
+    background-color: #2ea043;
+    /* Slightly different green for dark mode */
+}
+
+.dark-theme .test-badge.test-failed {
+    background-color: #f85149;
+    /* Slightly different red for dark mode */
+}

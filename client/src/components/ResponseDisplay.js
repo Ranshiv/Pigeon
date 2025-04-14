@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 // Removed SyntaxHighlighter imports as per user's last request to pause new features
 import './ResponseDisplay.css'; // Make sure CSS is imported
+import TestResultsDisplay from './TestResultsDisplay';
 
 const ResponseDisplay = ({ response }) => {
     const [activeTab, setActiveTab] = useState('body');
@@ -32,13 +33,43 @@ const ResponseDisplay = ({ response }) => {
         return parseFloat((bytes / Math.pow(k, safeIndex)).toFixed(dm)) + ' ' + sizes[safeIndex];
     };
 
+    // Ensure testResults is an array
+    const ensureTestResultsArray = () => {
+        if (!response.testResults) {
+            return null;
+        }
+
+        // If testResults is already an array, return it
+        if (Array.isArray(response.testResults)) {
+            return response.testResults;
+        }
+
+        // If testResults is an object with numeric keys (like from JSON), convert to array
+        if (typeof response.testResults === 'object') {
+            try {
+                // Attempt to convert object to array
+                const testArray = Object.values(response.testResults);
+                if (testArray.length > 0) {
+                    return testArray;
+                }
+            } catch (err) {
+                console.error("Error converting test results to array:", err);
+            }
+        }
+
+        return [];
+    };
+
+    // Get properly formatted test results array
+    const testResultsArray = ensureTestResultsArray();
+
     // Renders the response body
     const renderBody = () => {
         // Basic text display for now
         return <pre>{typeof response.body === 'object' ? JSON.stringify(response.body, null, 2) : String(response.body)}</pre>;
     };
 
-    // --- Updated renderHeaders function ---
+    // Renders the response headers
     const renderHeaders = () => {
         // Check if headers exist and are an object with keys
         if (!response.headers || typeof response.headers !== 'object' || Object.keys(response.headers).length === 0) {
@@ -65,7 +96,19 @@ const ResponseDisplay = ({ response }) => {
             </table>
         );
     };
-    // --- End of Updated renderHeaders ---
+
+    // Renders the test results tab
+    const renderTestResults = () => {
+        if (!testResultsArray || testResultsArray.length === 0) {
+            return (
+                <div className="no-tests-message">
+                    <p>No test results available. Add tests to your request to see results here.</p>
+                </div>
+            );
+        }
+
+        return <TestResultsDisplay testResults={testResultsArray} />;
+    };
 
     return (
         <div className="response-display">
@@ -83,12 +126,21 @@ const ResponseDisplay = ({ response }) => {
             <div className="response-tabs">
                 <button onClick={() => setActiveTab('body')} className={activeTab === 'body' ? 'active' : ''}>Body</button>
                 <button onClick={() => setActiveTab('headers')} className={activeTab === 'headers' ? 'active' : ''}>Headers</button>
+                <button onClick={() => setActiveTab('tests')} className={activeTab === 'tests' ? 'active' : ''}>
+                    Tests
+                    {testResultsArray && testResultsArray.length > 0 && (
+                        <span className="test-result-badge">
+                            {testResultsArray.filter(test => test.passed).length}/{testResultsArray.length}
+                        </span>
+                    )}
+                </button>
             </div>
 
             {/* Content based on active tab */}
             <div className="response-content">
                 {activeTab === 'body' && renderBody()}
                 {activeTab === 'headers' && renderHeaders()}
+                {activeTab === 'tests' && renderTestResults()}
             </div>
         </div>
     );

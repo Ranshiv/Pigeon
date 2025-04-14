@@ -31,25 +31,50 @@ const HistorySection = ({ history = [], onSelectHistory }) => { // Default histo
         );
     }
 
+    // Calculate test results stats for each history entry
+    const getTestResultsSummary = (entry) => {
+        if (!entry.testResults || !Array.isArray(entry.testResults) || entry.testResults.length === 0) {
+            return null;
+        }
+
+        const totalTests = entry.testResults.length;
+        const passedTests = entry.testResults.filter(test => test.passed).length;
+
+        return { total: totalTests, passed: passedTests };
+    };
+
     return (
         <div className="history-section">
             <h2><FiClock /> Request History</h2>
             <ul className="history-list">
-                {history.map((entry) => (
-                    <li
-                        key={entry._id}
-                        className="history-item"
-                        onClick={() => onSelectHistory(entry)} // Allow selecting an entry
-                        title={`View details for ${entry.method} ${entry.url}`}
-                    >
-                        <span className={`method-badge method-${entry.method?.toLowerCase()}`}>{entry.method}</span>
-                        <span className="history-url">{entry.url}</span>
-                        <span className={`status-badge status-${String(entry.responseStatus).charAt(0)}xx`}>
-                            {entry.responseStatus || 'N/A'}
-                        </span>
-                        <span className="history-time">{formatTimestamp(entry.timestamp)}</span>
-                    </li>
-                ))}
+                {history.map((entry) => {
+                    const testResults = getTestResultsSummary(entry);
+
+                    return (
+                        <li
+                            key={entry._id}
+                            className="history-item"
+                            onClick={() => onSelectHistory(entry)} // Allow selecting an entry
+                            title={`View details for ${entry.method} ${entry.url}`}
+                        >
+                            <span className={`method-badge method-${entry.method?.toLowerCase()}`}>{entry.method}</span>
+                            <span className="history-url">{entry.url}</span>
+                            <span className={`status-badge status-${String(entry.responseStatus).charAt(0)}xx`}>
+                                {entry.responseStatus || 'N/A'}
+                            </span>
+
+                            {/* Test Results Badge */}
+                            {testResults && (
+                                <span className={`test-badge ${testResults.passed === testResults.total ? 'test-passed' : 'test-failed'}`}
+                                    title={`Tests: ${testResults.passed}/${testResults.total} passed`}>
+                                    {testResults.passed}/{testResults.total}
+                                </span>
+                            )}
+
+                            <span className="history-time">{formatTimestamp(entry.timestamp)}</span>
+                        </li>
+                    );
+                })}
             </ul>
         </div>
     );
@@ -63,6 +88,7 @@ HistorySection.propTypes = {
         url: PropTypes.string,
         responseStatus: PropTypes.number,
         timestamp: PropTypes.string,
+        testResults: PropTypes.array // Add test results to prop types
     })),
     onSelectHistory: PropTypes.func.isRequired, // Function to handle click
 };

@@ -1,0 +1,228 @@
+/* client/src/components/TestResultsDisplay.css */
+.test-results-display {
+    border: 1px solid var(--border-color, #ddd);
+    border-radius: 4px;
+    background-color: var(--background-color, #f7f7f7);
+    overflow: hidden;
+    margin-top: 10px;
+}
+
+.test-results-empty {
+    padding: 20px;
+    text-align: center;
+    color: var(--secondary-text, #666);
+    background-color: var(--background-color, #f7f7f7);
+    border: 1px solid var(--border-color, #ddd);
+    border-radius: 4px;
+}
+
+.test-summary {
+    padding: 15px;
+    border-bottom: 1px solid var(--border-color, #ddd);
+    background-color: var(--background-color, #fff);
+}
+
+.test-summary h3 {
+    margin: 0 0 15px 0;
+    font-size: 16px;
+    color: var(--heading-color, #333);
+}
+
+.summary-stats {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+}
+
+.stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px;
+    flex: 1;
+    background-color: var(--stat-bg, #f0f0f0);
+    border-radius: 4px;
+    transition: transform 0.2s ease;
+}
+
+.stat-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+}
+
+.stat-item.passed {
+    background-color: rgba(40, 167, 69, 0.15);
+}
+
+.stat-item.failed {
+    background-color: rgba(220, 53, 69, 0.15);
+}
+
+.stat-value {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.stat-item.passed .stat-value {
+    color: #28a745;
+}
+
+.stat-item.failed .stat-value {
+    color: #dc3545;
+}
+
+.stat-label {
+    font-size: 12px;
+    color: var(--secondary-text, #666);
+}
+
+.progress-bar {
+    height: 8px;
+    background-color: var(--progress-bg, #e9ecef);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.progress {
+    height: 100%;
+    transition: width 0.6s ease;
+}
+
+.test-details {
+    padding: 15px;
+}
+
+.test-details h3 {
+    margin: 0 0 15px 0;
+    font-size: 16px;
+    color: var(--heading-color, #333);
+}
+
+.test-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.test-item {
+    display: flex;
+    padding: 12px;
+    border-radius: 4px;
+    background-color: var(--test-item-bg, #fff);
+    border: 1px solid var(--border-color, #ddd);
+}
+
+.test-item.passed {
+    border-left: 4px solid #28a745;
+}
+
+.test-item.failed {
+    border-left: 4px solid #dc3545;
+}
+
+.test-status {
+    margin-right: 15px;
+    display: flex;
+    align-items: center;
+}
+
+.status-icon {
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-weight: bold;
+}
+
+.status-icon.passed {
+    background-color: rgba(40, 167, 69, 0.2);
+    color: #28a745;
+}
+
+.status-icon.failed {
+    background-color: rgba(220, 53, 69, 0.2);
+    color: #dc3545;
+}
+
+.test-info {
+    flex: 1;
+}
+
+.test-name {
+    font-weight: 500;
+    color: var(--text-color, #333);
+    margin-bottom: 5px;
+}
+
+.test-error {
+    color: #dc3545;
+    font-size: 13px;
+    margin-top: 5px;
+    padding: 5px 8px;
+    background-color: rgba(220, 53, 69, 0.1);
+    border-radius: 3px;
+    font-family: monospace;
+}
+
+.test-duration {
+    font-size: 12px;
+    color: var(--secondary-text, #777);
+    margin-top: 5px;
+}
+
+/* Dark theme support */
+.dark-theme .test-results-display,
+.dark-theme .test-results-empty {
+    border-color: var(--dark-border, #444);
+    background-color: var(--dark-bg, #1a1a19);
+}
+
+.dark-theme .test-summary {
+    background-color: var(--dark-bg, #121211);
+    border-color: var(--dark-border, #444);
+}
+
+.dark-theme .test-summary h3,
+.dark-theme .test-details h3 {
+    color: var(--dark-text, #e0e0e0);
+}
+
+.dark-theme .stat-item {
+    background-color: var(--dark-stat-bg, #262626);
+}
+
+.dark-theme .stat-item.passed {
+    background-color: rgba(40, 167, 69, 0.2);
+}
+
+.dark-theme .stat-item.failed {
+    background-color: rgba(220, 53, 69, 0.2);
+}
+
+.dark-theme .stat-label {
+    color: var(--dark-text-secondary, #aaa);
+}
+
+.dark-theme .progress-bar {
+    background-color: var(--dark-progress-bg, #333);
+}
+
+.dark-theme .test-item {
+    background-color: var(--dark-test-item-bg, #1e1e1e);
+    border-color: var(--dark-border, #444);
+}
+
+.dark-theme .test-name {
+    color: var(--dark-text, #e0e0e0);
+}
+
+.dark-theme .test-duration {
+    color: var(--dark-text-secondary, #aaa);
+}
+
+.dark-theme .test-results-empty {
+    color: var(--dark-text-secondary, #aaa);
+}

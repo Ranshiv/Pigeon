@@ -16,6 +16,8 @@ const port = process.env.PORT || 5000;
 
 const User = require('./models/User');
 const History = require('./models/History');
+// Import the scriptRunner utility
+const { executePreRequestScript, executeTestScript } = require('./utils/scriptRunner');
 // --- MIDDLEWARE (Correct Order) ---
 app.use(cors({
     origin: 'http://localhost:3000', // Your frontend's URL
@@ -259,6 +261,7 @@ app.get('/api/requests', async (req, res) => {
 app.post('/api/requests/:id/send', ensureAuthenticated, async (req, res) => { // Added ensureAuthenticated
     const startTime = Date.now();
     let responseStatus, responseStatusText, responseHeadersObj, responseBodyText, responseSize, isJson = false; // Define vars here
+    let testResults = [];
 
     try {
         const requestDoc = await Request.findById(req.params.id);
@@ -266,7 +269,7 @@ app.post('/api/requests/:id/send', ensureAuthenticated, async (req, res) => { //
             return res.status(404).json({ message: 'Request not found' });
         }
 
-        const { url, method, headers, body, bodyType } = requestDoc;
+        const { url, method, headers, body, bodyType, preRequestScript, testScript } = requestDoc;
 
         // --- Prepare and Send Fetch Request ---
         const fetchOptions = {
@@ -308,7 +311,39 @@ app.post('/api/requests/:id/send', ensureAuthenticated, async (req, res) => { //
             }
         }
 
-        const externalResponse = await fetch(url, fetchOptions);
+        // --- Execute Pre-request Script if present ---
+        let requestWithScriptChanges = { url, ...fetchOptions };
+
+        if (preRequestScript) {
+            console.log("Executing pre-request script...");
+            const preRequestResult = executePreRequestScript(preRequestScript, requestWithScriptChanges);
+
+            if (preRequestResult.error) {
+                console.error("Pre-request script error:", preRequestResult.error);
+                // Continue with request, but log the error
+            } else {
+                // Apply any changes from the pre-request script
+                requestWithScriptChanges = preRequestResult.request;
+
+                // Update request options based on pre-request script changes
+                fetchOptions.headers = requestWithScriptChanges.headers || fetchOptions.headers;
+                fetchOptions.body = requestWithScriptChanges.body || fetchOptions.body;
+
+                // Handle variables set by pre-request script
+                if (requestWithScriptChanges.variables && requestWithScriptChanges.variables.values) {
+                    // Apply variables to URL
+                    let modifiedUrl = url;
+                    for (const [key, value] of Object.entries(requestWithScriptChanges.variables.values)) {
+                        const pattern = new RegExp(`{{\\s*${key}\\s*}}`, 'g');
+                        modifiedUrl = modifiedUrl.replace(pattern, value);
+                    }
+                    // Use the modified URL
+                    requestWithScriptChanges.url = modifiedUrl;
+                }
+            }
+        }
+
+        const externalResponse = await fetch(requestWithScriptChanges.url || url, fetchOptions);
         const duration = Date.now() - startTime;
 
         // --- Process Response ---
@@ -333,6 +368,34 @@ app.post('/api/requests/:id/send', ensureAuthenticated, async (req, res) => { //
             }
         }
 
+        // --- Execute Test Script if present ---
+        if (testScript) {
+            console.log("Executing test script...");
+            const responseForTesting = {
+                status: responseStatus,
+                statusText: responseStatusText,
+                headers: responseHeadersObj,
+                body: parsedResponseBody,
+                duration: duration,
+                size: responseSize
+            };
+
+            const testScriptResult = executeTestScript(testScript, responseForTesting);
+
+            if (testScriptResult.error) {
+                console.error("Test script error:", testScriptResult.error);
+                // Add the error as a test result
+                testResults = [{
+                    name: "Test Script Error",
+                    passed: false,
+                    error: testScriptResult.error.message,
+                    timestamp: Date.now()
+                }];
+            } else {
+                testResults = testScriptResult.results || [];
+            }
+        }
+
         // --- Send Response to Frontend ---
         const frontendResponse = {
             status: responseStatus,
@@ -341,7 +404,8 @@ app.post('/api/requests/:id/send', ensureAuthenticated, async (req, res) => { //
             body: parsedResponseBody,
             isJson: isJson, // Send flag to frontend
             duration: duration,
-            size: responseSize
+            size: responseSize,
+            testResults: testResults.length > 0 ? testResults : null
         };
         res.json(frontendResponse);
 
@@ -349,7 +413,7 @@ app.post('/api/requests/:id/send', ensureAuthenticated, async (req, res) => { //
         try {
             const historyEntry = new History({
                 userId: req.user.id, // Associate with logged-in user
-                url: url,
+                url: requestWithScriptChanges.url || url,
                 method: method,
                 requestHeaders: JSON.stringify(fetchOptions.headers), // Store headers used
                 requestBody: fetchOptions.body || '', // Store body sent
@@ -362,7 +426,9 @@ app.post('/api/requests/:id/send', ensureAuthenticated, async (req, res) => { //
                 timestamp: new Date(startTime), // Use the start time
                 duration: duration,
                 size: responseSize,
-                originalRequestId: requestDoc._id // Link to the saved request
+                originalRequestId: requestDoc._id, // Link to the saved request
+                // Save test results if available
+                testResults: testResults.length > 0 ? JSON.stringify(testResults) : null
             });
             await historyEntry.save();
             console.log("History entry saved for request ID:", requestDoc._id);
@@ -381,7 +447,8 @@ app.post('/api/requests/:id/send', ensureAuthenticated, async (req, res) => { //
             statusText: 'Server Error',
             headers: {},
             body: null,
-            duration: duration
+            duration: duration,
+            testResults: null
         });
 
         // --- Optionally save failed attempt to History ---
@@ -405,13 +472,28 @@ app.post('/api/requests/:id/send', ensureAuthenticated, async (req, res) => { //
     }
 });
 
-// --- NEW: History Route ---
+// --- NEW: History Route with parsed test results ---
 app.get('/api/history', ensureAuthenticated, async (req, res) => {
     try {
         const history = await History.find({ userId: req.user.id })
             .sort({ timestamp: -1 }) // Sort by newest first
             .limit(50); // Limit to latest 50 entries (for now)
-        res.json(history);
+
+        // Parse test results JSON strings into objects for the frontend
+        const historyWithParsedTests = history.map(entry => {
+            const historyObj = entry.toObject();
+            if (historyObj.testResults && typeof historyObj.testResults === 'string') {
+                try {
+                    historyObj.testResults = JSON.parse(historyObj.testResults);
+                } catch (err) {
+                    console.error("Error parsing test results for history entry:", err);
+                    historyObj.testResults = null;
+                }
+            }
+            return historyObj;
+        });
+
+        res.json(historyWithParsedTests);
     } catch (err) {
         console.error("Error fetching history:", err);
         res.status(500).json({ message: 'Error fetching history', error: err.message });
@@ -428,7 +510,7 @@ let apiCache = {
 async function fetchAndCacheAPIs() {
     try {
         console.log('Initializing API cache...');
-        
+
         // Using curated list of APIs
         apiCache.data = [
             {
@@ -516,26 +598,26 @@ fetchAndCacheAPIs();
 app.get('/api/search', async (req, res) => {
     try {
         const { query, category } = req.query;
-        
+
         // If cache is empty, initialize it
         if (!apiCache.data || apiCache.data.length === 0) {
             await fetchAndCacheAPIs();
         }
-        
+
         // Search in cached APIs
         let results = apiCache.data;
-        
+
         if (query) {
             const searchQuery = query.toLowerCase();
-            results = results.filter(api => 
+            results = results.filter(api =>
                 api.name.toLowerCase().includes(searchQuery) ||
                 api.description.toLowerCase().includes(searchQuery) ||
                 api.category.toLowerCase().includes(searchQuery)
             );
         }
-        
+
         if (category && category !== 'all') {
-            results = results.filter(api => 
+            results = results.filter(api =>
                 api.category.toLowerCase() === category.toLowerCase()
             );
         }
@@ -594,6 +676,56 @@ app.get('/api/popular-apis', ensureAuthenticated, async (req, res) => {
         console.error('Error fetching popular APIs:', err);
         res.status(500).json({ message: 'Error fetching popular APIs' });
     }
+});
+
+// Add a test endpoint for testing pre-request and test scripts
+app.get('/api/test-endpoint', (req, res) => {
+    const query = req.query;
+    const headers = req.headers;
+
+    // Simulate different responses based on query parameters
+    let statusCode = parseInt(query.status) || 200;
+    let delay = parseInt(query.delay) || 0;
+
+    // Allow testing different response types
+    let responseType = query.responseType || 'json';
+    let responseData;
+
+    switch (responseType) {
+        case 'json':
+            responseData = {
+                message: "This is a test response",
+                timestamp: new Date().toISOString(),
+                echo: {
+                    query: query,
+                    headers: headers
+                }
+            };
+            break;
+        case 'text':
+            responseData = "This is a plain text response. Timestamp: " + new Date().toISOString();
+            res.type('text/plain');
+            break;
+        case 'xml':
+            responseData = `<?xml version="1.0" encoding="UTF-8"?>
+<response>
+    <message>This is a test XML response</message>
+    <timestamp>${new Date().toISOString()}</timestamp>
+</response>`;
+            res.type('application/xml');
+            break;
+        case 'error':
+            statusCode = 500;
+            responseData = { error: "This is a simulated error" };
+            break;
+        default:
+            responseData = { message: "Unknown response type requested" };
+    }
+
+    // Simulate delay if requested
+    setTimeout(() => {
+        res.status(statusCode).send(responseData);
+    }, delay);
 });
 
 app.listen(port, () => {

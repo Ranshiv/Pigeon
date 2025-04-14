@@ -8,6 +8,9 @@ const requestSchema = new mongoose.Schema({
     headers: [{ name: String, value: String }],
     body: { type: String, default: '' }, // Store the request body as a string
     bodyType: { type: String, enum: ['none', 'json', 'form-data', 'x-www-form-urlencoded', 'raw'], default: 'none' }, // Type of request body
+    // Add fields for pre-request script and test script
+    preRequestScript: { type: String, default: '' },
+    testScript: { type: String, default: '' },
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now }
 });

@@ -27,6 +27,9 @@ const historySchema = new mongoose.Schema({
     duration: { type: Number }, // Request duration in ms
     size: { type: Number }, // Response size in bytes (approx)
 
+    // Test Results
+    testResults: { type: String }, // Store test results as stringified JSON
+
     // Optional: Link back to the saved request if it came from one
     originalRequestId: {
         type: mongoose.Schema.Types.ObjectId,

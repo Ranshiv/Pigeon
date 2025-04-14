@@ -1,0 +1,53 @@
+/* client/src/components/HistoryDetailsSection.css */
+.history-details-section {
+    display: flex;
+    width: 100%;
+    height: 100%;
+}
+
+.history-sidebar {
+    width: 300px;
+    overflow-y: auto;
+    border-right: 1px solid var(--border-color, #ddd);
+    padding: 0 10px;
+}
+
+.history-detail-content {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+}
+
+.history-meta {
+    margin-bottom: 20px;
+}
+
+.history-meta h2 {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 18px;
+    margin-bottom: 5px;
+}
+
+.history-timestamp {
+    color: var(--text-secondary, #666);
+    font-size: 14px;
+    margin-top: 0;
+}
+
+.select-history-prompt {
+    text-align: center;
+    color: var(--text-secondary, #666);
+    padding: 40px 20px;
+}
+
+/* Dark theme support */
+.dark-theme .history-sidebar {
+    border-color: var(--dark-border, #444);
+}
+
+.dark-theme .history-timestamp,
+.dark-theme .select-history-prompt {
+    color: var(--dark-text-secondary, #aaa);
+}

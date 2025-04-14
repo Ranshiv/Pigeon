@@ -4,6 +4,7 @@ import Home from './Home';
 import APINetworkSection from './APINetworkSection';
 import './Workspace.css';
 import SettingsPage from './SettingsPage';
+import HistoryDetailsSection from './HistoryDetailsSection';
 
 const Workspace = () => {
     return (
@@ -16,6 +17,7 @@ const Workspace = () => {
                     <Route path="workspaces/shared" element={<div>Shared Workspace</div>} />
                     <Route path="api-network/*" element={<APINetworkSection />} />
                     <Route path="settings" element={<SettingsPage />} />
+                    <Route path="history/*" element={<HistoryDetailsSection />} />
                 </Routes>
             </div>
         </div>

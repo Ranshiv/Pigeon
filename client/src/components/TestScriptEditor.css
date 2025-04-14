@@ -1,0 +1,100 @@
+/* client/src/components/TestScriptEditor.css */
+.test-script-editor {
+    margin: 15px 0;
+    border: 1px solid var(--border-color, #ddd);
+    border-radius: 4px;
+    background-color: var(--background-color, #f7f7f7);
+    overflow: hidden;
+}
+
+.script-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 15px;
+    background-color: var(--header-bg, #e9ecef);
+    border-bottom: 1px solid var(--border-color, #ddd);
+}
+
+.script-header h3 {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.editor-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.editor-actions button {
+    padding: 4px 8px;
+    font-size: 12px;
+    border-radius: 3px;
+    border: 1px solid var(--border-color, #ccc);
+    background-color: var(--button-bg, #fff);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.editor-actions button:hover {
+    background-color: var(--button-hover, #f0f0f0);
+}
+
+.script-info {
+    padding: 8px 15px;
+    font-size: 12px;
+    border-bottom: 1px solid var(--border-color, #ddd);
+    background-color: var(--info-bg, #f0f0f0);
+    color: var(--secondary-text, #666);
+}
+
+.script-textarea {
+    width: 100%;
+    min-height: 200px;
+    padding: 10px;
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    font-size: 13px;
+    line-height: 1.5;
+    border: none;
+    resize: vertical;
+    background-color: var(--editor-bg, #fff);
+    color: var(--text-color, #333);
+}
+
+.script-textarea:focus {
+    outline: none;
+    box-shadow: inset 0 0 0 1px var(--focus-color, #007bff);
+}
+
+/* Dark theme support */
+.dark-theme .test-script-editor {
+    border-color: var(--dark-border, #444);
+    background-color: var(--dark-bg, #1a1a19);
+}
+
+.dark-theme .script-header {
+    background-color: var(--dark-header-bg, #252525);
+    border-color: var(--dark-border, #444);
+}
+
+.dark-theme .script-info {
+    background-color: var(--dark-info-bg, #1e1e1e);
+    border-color: var(--dark-border, #444);
+    color: var(--dark-text-secondary, #aaa);
+}
+
+.dark-theme .script-textarea {
+    background-color: var(--dark-editor-bg, #121211);
+    color: var(--dark-text, #e0e0e0);
+}
+
+.dark-theme .editor-actions button {
+    background-color: var(--dark-button-bg, #333);
+    border-color: var(--dark-border, #555);
+    color: var(--dark-text, #e0e0e0);
+}
+
+.dark-theme .editor-actions button:hover {
+    background-color: var(--dark-button-hover, #444);
+}

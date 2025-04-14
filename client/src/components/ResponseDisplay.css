@@ -164,3 +164,42 @@ body.dark-theme .headers-table tr:nth-child(even) {
     white-space: pre-wrap;
     word-wrap: break-word;
 }
+
+/* Styles for the test results tab */
+.no-tests-message {
+    padding: 20px;
+    text-align: center;
+    color: var(--secondary-text, #666);
+}
+
+.dark-theme .no-tests-message {
+    color: var(--dark-text-secondary, #aaa);
+}
+
+.test-result-badge {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    margin-left: 8px;
+    background-color: var(--badge-bg, #6c757d);
+    color: white;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: bold;
+}
+
+.response-tabs button.active .test-result-badge {
+    background-color: white;
+    color: var(--active-tab, #007bff);
+}
+
+.dark-theme .test-result-badge {
+    background-color: var(--dark-badge-bg, #555);
+}
+
+.dark-theme .response-tabs button.active .test-result-badge {
+    color: var(--dark-active-tab, #0d6efd);
+}
