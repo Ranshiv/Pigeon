@@ -159,7 +159,7 @@ body {
   flex-direction: column;
   min-height: 100vh;
   box-sizing: border-box;
-  padding-top: 70px;
+  padding-top: 63px;
   /* Add padding for fixed navbar */
   position: relative;
   z-index: 1;
@@ -171,8 +171,8 @@ body {
   display: flex;
   gap: 20px;
   width: 100%;
-  max-width: 1200px;
-  padding: 20px;
+  max-width: 12000px;
+
   margin: 0 auto;
   flex-grow: 1;
   box-sizing: border-box;
