@@ -732,9 +732,6 @@
 }
 
 .benefit-card:hover .benefit-card-icon {
-    /* Remove the animation that causes abrupt movement */
-    /* animation: pulse 1s infinite; */
-    /* Replace with a smoother transform */
     transform: scale(1.1);
 }
 
@@ -940,6 +937,51 @@
 
     .public-home-container h2 {
         font-size: 2.2em;
+    }
+
+    .intro-section-container {
+        flex-direction: column;
+        padding: 60px 30px;
+        gap: 40px;
+        flex-wrap: nowrap !important;
+        /* Ensure no wrapping happens */
+        justify-content: center;
+        align-items: center;
+    }
+
+    .intro-content {
+        margin-right: 0;
+        max-width: 100%;
+        text-align: center;
+        flex: 0 0 auto;
+        /* Remove the percentage width constraint */
+    }
+
+    .intro-heading:after {
+        left: 50%;
+        transform: translateX(-50%);
+    }
+
+    .intro-description {
+        margin: 0 auto 2rem;
+    }
+
+    .intro-buttons {
+        justify-content: center;
+    }
+
+    .tech-stack {
+        align-items: center;
+    }
+
+    .intro-code-container {
+        max-width: 90%;
+        flex: 0 0 auto;
+        /* Remove the percentage width constraint */
+        transform: none !important;
+        animation: fadeIn 1.2s ease-out forwards !important;
+        height: 400px;
+        /* Slightly smaller on mobile */
     }
 }
 
@@ -1149,7 +1191,7 @@
 }
 
 .dark-theme .collaboration-description {
-    color: var(--dark-text);
+    color: var (--dark-text);
 }
 
 .collaboration-image {
@@ -1604,24 +1646,86 @@
 .intro-section-full-width {
     width: 100vw;
     height: 100vh;
-    /* Make it full viewport height */
     margin-left: calc(-50vw + 50%);
     color: white;
     padding: 0;
-    /* Remove padding to use full height */
     position: relative;
     overflow: hidden;
+    font-size: 16px;
     margin-bottom: 0;
-    /* Remove margin to use full height */
     z-index: 10;
-    /* Higher z-index to ensure it covers other content */
     display: flex;
-    /* Use flexbox for vertical centering */
     align-items: center;
-    /* Center content vertically */
     justify-content: center;
-    /* Center horizontally */
-    
+    background-color: var(--dark-bg, #0b0b0a);
+    background-image:
+        radial-gradient(circle at 30% 50%, rgba(37, 93, 116, 0.4) 0%, transparent 50%),
+        radial-gradient(circle at 70% 50%, rgba(67, 67, 167, 0.3) 0%, transparent 50%);
+}
+
+/* Add animated particles in the background */
+.intro-section-full-width:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image:
+        radial-gradient(white, rgba(255, 255, 255, 0.2) 2px, transparent 3px),
+        radial-gradient(white, rgba(255, 255, 255, 0.15) 1px, transparent 2px),
+        radial-gradient(white, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+    background-size: 550px 550px, 350px 350px, 250px 250px;
+    background-position: 0 0, 40px 60px, 130px 270px;
+    z-index: 0;
+    opacity: 0.2;
+    animation: particles 150s linear infinite;
+}
+
+@keyframes particles {
+    0% {
+        transform: translateY(0);
+    }
+
+    100% {
+        transform: translateY(-500px);
+    }
+}
+
+/* Add a glowing light effect */
+.intro-section-full-width:after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    right: 5%;
+    width: 300px;
+    height: 800px;
+    background: rgba(37, 93, 116, 0.3);
+    filter: blur(100px);
+    transform: translateY(-50%) rotate(25deg);
+    z-index: 0;
+    opacity: 0.8;
+    animation: glow 15s ease-in-out infinite alternate;
+}
+
+@keyframes glow {
+    0% {
+        opacity: 0.6;
+        filter: blur(100px);
+        transform: translateY(-50%) rotate(25deg);
+    }
+
+    50% {
+        opacity: 0.8;
+        filter: blur(120px);
+        transform: translateY(-50%) rotate(20deg) scale(1.05);
+    }
+
+    100% {
+        opacity: 0.6;
+        filter: blur(100px);
+        transform: translateY(-50%) rotate(25deg);
+    }
 }
 
 .intro-section-container {
@@ -1631,57 +1735,744 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    flex-wrap: wrap;
     position: relative;
     z-index: 2;
     height: 100%;
-    /* Use full height of parent */
+    gap: 60px;
+    flex-direction: row;
+    /* Force row direction consistently */
+    flex-wrap: nowrap;
+    /* Prevent wrapping which causes the layout shift */
 }
 
 .intro-content {
-    flex: 1;
+    flex: 0 0 40%;
+    /* Give it a fixed width percentage */
     max-width: 600px;
     animation: slideInLeft 1.2s ease-out forwards;
     margin-right: 40px;
+    position: relative;
 }
 
-.intro-heading {
-    font-size: 4.5em;
-    font-weight: 800;
-    margin-bottom: 30px;
-    line-height: 1.1;
-    letter-spacing: -1.5px;
+/* Add floating shapes behind the content */
+.intro-content:before {
+    content: '';
+    position: absolute;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    background: rgba(37, 93, 116, 0.15);
+    top: -80px;
+    left: -120px;
+    z-index: -1;
+    animation: float-slow 20s ease-in-out infinite alternate;
 }
 
-.intro-description {
-    font-size: 1.4em;
-    margin-bottom: 40px;
-    line-height: 1.6;
-    font-weight: 300;
-    opacity: 0.9;
+.intro-content:after {
+    content: '';
+    position: absolute;
+    width: 150px;
+    height: 150px;
+    border-radius: 10px;
+    background: rgba(67, 67, 167, 0.1);
+    bottom: -50px;
+    right: -60px;
+    z-index: -1;
+    transform: rotate(30deg);
+    animation: float-rotate 25s ease-in-out infinite alternate;
 }
 
-.intro-buttons {
+@keyframes float-slow {
+    0% {
+        transform: translate(0, 0);
+    }
+
+    100% {
+        transform: translate(20px, 20px);
+    }
+}
+
+@keyframes float-rotate {
+    0% {
+        transform: translate(0, 0) rotate(30deg);
+    }
+
+    100% {
+        transform: translate(-15px, 15px) rotate(45deg);
+    }
+}
+
+/* Enhanced code editor container */
+.intro-code-container {
+    flex: 0 0 50%;
+    max-width: 700px;
+    width: 90%;
+    position: relative;
+    z-index: 1;
+    animation: fadeIn 1.2s ease-out forwards;
+    border-radius: 16px;
+    box-shadow:
+        0 20px 40px rgba(0, 0, 0, 0.3),
+        0 0 0 1px rgba(255, 255, 255, 0.1),
+        0 0 0 3px rgba(255, 255, 255, 0.05);
+    background-color: #1e1e1e;
+    overflow: hidden;
+    font-family: 'Consolas', 'Courier New', monospace;
+    height: 450px;
     display: flex;
-    gap: 20px;
+    flex-direction: column;
+    transform: none !important;
+    transition: all 0.5s ease;
+    font-size: 13px;
 }
 
-/* Add styles to control the visibility of other sections */
-.intro-active .public-home-container>section:not(.intro-section-full-width) {
-    display: none;
-    /* Hide all other sections when intro is active */
+/* Add hover effect to code container */
+.intro-code-container:hover {
+    transform: perspective(1000px) rotateY(0deg) scale(1.02);
+    box-shadow:
+        0 25px 50px rgba(0, 0, 0, 0.4),
+        0 0 0 1px rgba(255, 255, 255, 0.2),
+        0 0 0 3px rgba(255, 255, 255, 0.1),
+        0 0 15px rgba(0, 123, 255, 0.3);
 }
 
-/* Optional: Add background styles for better visibility */
-.intro-section-full-width::before {
+/* Remove the floating animation from the code container */
+@keyframes float-container {
+    0% {
+        transform: perspective(1000px) rotateY(-5deg) translateY(0);
+    }
+
+    50% {
+        transform: perspective(1000px) rotateY(-3deg) translateY(-10px);
+    }
+
+    100% {
+        transform: perspective(1000px) rotateY(-5deg) translateY(0);
+    }
+}
+
+/* Remove the combined animation that was causing the issue */
+.intro-code-container {
+    /* animation:
+        slideInRight 1.2s ease-out forwards,
+        float-container 6s ease-in-out infinite 1.2s; */
+}
+
+/* Code editor header with improved styling */
+.code-editor-header {
+    display: flex;
+    align-items: center;
+    background-color: #252525;
+    padding: 10px 15px;
+    border-bottom: 1px solid #333;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    position: relative;
+
+}
+
+.code-editor-header:after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.1), transparent);
+}
+
+.window-controls {
+    display: flex;
+    gap: 8px;
+    margin-right: 15px;
+}
+
+.window-control {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+}
+
+.window-control:hover {
+    transform: scale(1.1);
+}
+
+.window-close {
+    background-color: #ff5f56;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
+}
+
+.window-minimize {
+    background-color: #ffbd2e;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
+}
+
+.window-maximize {
+    background-color: #27c93f;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
+}
+
+.file-tab {
+    background-color: #2d2d2d;
+    padding: 8px 18px;
+    border-radius: 6px 6px 0 0;
+    font-size: 0.8em;
+    color: #ddd;
+    position: relative;
+    margin-right: 2px;
+    transition: all 0.2s ease;
+    border-top: 1px solid #383838;
+    border-left: 1px solid #383838;
+    border-right: 1px solid #383838;
+}
+
+.file-tab:hover {
+    background-color: #232323;
+}
+
+.file-tab.active {
+    background-color: #1e1e1e;
+    color: white;
+    border-bottom: 1px solid #1e1e1e;
+}
+
+.file-tab.active:before {
     content: '';
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
-    height: 100%;
-    /* background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-darker) 100%); */
+    height: 2px;
+    background: var(--primary-color);
+}
+
+/* Enhanced code editor body */
+.code-editor-body {
+    flex-grow: 1;
+    padding: 15px 0 15px 15px;
+    position: relative;
+    overflow-y: auto;
+    overflow-x: hidden;
+    background-image:
+        linear-gradient(to bottom, rgba(30, 30, 30, 0.7) 50%, rgba(33, 33, 33, 0.7) 50%);
+    background-size: 100% 30px;
+    background-repeat: repeat-y;
+}
+
+/* Customized scrollbar */
+.code-editor-body::-webkit-scrollbar {
+    width: 8px;
+}
+
+.code-editor-body::-webkit-scrollbar-track {
+    background: #1e1e1e;
+}
+
+.code-editor-body::-webkit-scrollbar-thumb {
+    background-color: #555;
+    border-radius: 4px;
+}
+
+.code-editor-body::-webkit-scrollbar-thumb:hover {
+    background-color: #777;
+}
+
+/* Line numbers */
+.line-numbers {
+    position: absolute;
+    left: 0;
+    top: 15px;
+    width: 50px;
+    /* Increased width from 40px to 50px */
+    font-size: 0.85em;
+    /* Slightly increased font size for better visibility */
+    color: #727272;
+    text-align: right;
+    padding-right: 10px;
+    user-select: none;
+}
+
+.line-numbers div {
+    padding: 0 5px;
+    height: 20px;
+    line-height: 20px;
+    color: #666;
+}
+
+/* Code content with enhanced styling */
+.code-content {
+    margin-left: 60px;
+    /* Increased margin to account for wider line numbers */
+    font-size: 0.85em;
+    line-height: 1.5;
+    color: #d4d4d4;
+    white-space: pre;
+    font-family: 'Consolas', 'Courier New', monospace;
+    padding-right: 20px;
+}
+
+/* Line numbers */
+.line-numbers {
+    position: absolute;
+    left: 0;
+    top: 15px;
+    width: 50px;
+    /* Increased width from 40px to 50px */
+    font-size: 0.85em;
+    /* Slightly increased font size for better visibility */
+    color: #727272;
+    text-align: right;
+    padding-right: 10px;
+    user-select: none;
+}
+
+.line-numbers div {
+    padding: 0 5px;
+    height: 20px;
+    line-height: 20px;
+    color: #666;
+}
+
+/* Code content with enhanced styling */
+.code-content {
+    margin-left: 60px;
+    /* Increased margin to account for wider line numbers */
+    font-size: 0.85em;
+    line-height: 1.5;
+    color: #d4d4d4;
+    white-space: pre;
+    font-family: 'Consolas', 'Courier New', monospace;
+    padding-right: 20px;
+}
+
+/* --- Enhanced Intro Section Heading and Content --- */
+.intro-heading {
+    font-size: 3.5rem;
+    font-weight: 800;
+    margin-bottom: 1.5rem;
+    line-height: 1.1;
+    background: linear-gradient(135deg, #ffffff 0%, #e0e0e0 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: fadeIn 0.8s ease-out forwards;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+    position: relative;
+}
+
+/* Add colorful underline to heading */
+.intro-heading:after {
+    content: "";
+    position: absolute;
+    bottom: -10px;
+    left: 0;
+    width: 40%;
+    height: 4px;
+    background: linear-gradient(to right, var(--primary-color), var(--accent-color, #28a745), transparent);
+    border-radius: 2px;
+    animation: widthExpand 1s ease-out forwards 0.5s;
+}
+
+@keyframes widthExpand {
+    from {
+        width: 0;
+    }
+
+    to {
+        width: 40%;
+    }
+}
+
+.intro-description {
+    font-size: 1.25rem;
+    margin-bottom: 2.5rem;
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.9);
+    max-width: 90%;
+    animation: fadeIn 0.8s 0.3s ease-out forwards;
+    opacity: 0;
+    position: relative;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+}
+
+/* Add highlight to important text in description */
+.intro-description strong {
+    color: white;
+    position: relative;
+    font-weight: 600;
+}
+
+.intro-description strong:after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 30%;
+    background-color: rgba(0, 123, 255, 0.2);
     z-index: -1;
+    border-radius: 3px;
+}
+
+.intro-buttons {
+    display: flex;
+    gap: 1rem;
+    animation: fadeIn 0.8s 0.6s ease-out forwards;
+    opacity: 0;
+    position: relative;
+}
+
+/* Add animated arrow to primary button */
+.intro-button-primary:after {
+    content: '→';
+    display: inline-block;
+    margin-left: 6px;
+    transition: transform 0.3s ease;
+}
+
+.intro-button-primary:hover:after {
+    transform: translateX(5px);
+}
+
+/* Intro button styles with enhanced effects */
+.intro-button {
+    padding: 0.9rem 1.8rem;
+    font-size: 1rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+    min-width: 160px;
+}
+
+.intro-button-primary {
+    background: linear-gradient(90deg, var(--primary-color), #2196f3);
+    color: white;
+    box-shadow:
+        0 10px 25px rgba(0, 123, 255, 0.4),
+        0 0 0 2px rgba(0, 123, 255, 0.2);
+    position: relative;
+}
+
+.intro-button-primary:hover {
+    transform: translateY(-5px);
+    box-shadow:
+        0 15px 30px rgba(0, 123, 255, 0.5),
+        0 0 0 2px rgba(0, 123, 255, 0.4);
+    background: linear-gradient(90deg, #2196f3, var(--primary-color));
+}
+
+.intro-button-primary:active {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 123, 255, 0.4);
+}
+
+.intro-button-primary:before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transform: translateX(-100%);
+    transition: transform 0.6s;
+    z-index: -1;
+}
+
+.intro-button-primary:hover:before {
+    transform: translateX(100%);
+}
+
+.intro-button-secondary {
+    background-color: transparent;
+    color: white;
+    border: 2px solid rgba(255, 255, 255, 0.7);
+    position: relative;
+    overflow: hidden;
+}
+
+.intro-button-secondary:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-color: white;
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.intro-button-secondary:before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(100%);
+    transition: transform 0.4s ease-out;
+    z-index: -1;
+}
+
+.intro-button-secondary:hover:before {
+    transform: translateY(0);
+}
+
+/* Add floating badges/tags */
+.intro-section-badges {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.intro-badge {
+    position: absolute;
+    padding: 5px 10px;
+    border-radius: 30px;
+    color: white;
+    font-size: 11px;
+    font-weight: 600;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+    animation: float-badge 15s linear infinite;
+    opacity: 0.8;
+    transition: opacity 0.3s ease;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.intro-badge:nth-child(1) {
+    top: 15%;
+    left: 10%;
+    animation-delay: 0s;
+    background: linear-gradient(90deg, #007bff, #6610f2);
+}
+
+.intro-badge:nth-child(2) {
+    top: 25%;
+    right: 15%;
+    animation-delay: -5s;
+    background: linear-gradient(90deg, #28a745, #20c997);
+}
+
+.intro-badge:nth-child(3) {
+    bottom: 20%;
+    left: 15%;
+    animation-delay: -2s;
+    background: linear-gradient(90deg, #dc3545, #fd7e14);
+}
+
+.intro-badge:nth-child(4) {
+    bottom: 15%;
+    right: 10%;
+    animation-delay: -8s;
+    background: linear-gradient(90deg, #6f42c1, #e83e8c);
+}
+
+@keyframes float-badge {
+    0% {
+        transform: translate(0, 0) rotate(0deg);
+        opacity: 0.8;
+    }
+
+    25% {
+        opacity: 0.6;
+    }
+
+    50% {
+        transform: translate(10px, 10px) rotate(5deg);
+        opacity: 0.9;
+    }
+
+    75% {
+        opacity: 0.6;
+    }
+
+    100% {
+        transform: translate(0, 0) rotate(0deg);
+        opacity: 0.8;
+    }
+}
+
+/* Tech stack section */
+.tech-stack {
+    margin-top: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    animation: fadeIn 0.8s 0.9s ease-out forwards;
+    opacity: 0;
+}
+
+.tech-stack-title {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.tech-icons {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+}
+
+.tech-icons svg {
+    font-size: 22px;
+    color: rgba(255, 255, 255, 0.8);
+    transition: all 0.3s ease;
+}
+
+.tech-icons svg:hover {
+    color: white;
+    transform: translateY(-3px);
+}
+
+/* Code syntax highlighting */
+.keyword {
+    color: #569CD6;
+}
+
+.function {
+    color: #4EC9B0;
+}
+
+.string {
+    color: #CE9178;
+}
+
+.number {
+    color: #B5CEA8;
+}
+
+.comment {
+    color: #6A9955;
+}
+
+.property {
+    color: #9CDCFE;
+}
+
+/* Code typing animation */
+.code-line {
+    height: 20px;
+    line-height: 20px;
+    opacity: 0;
+    transform: translateX(10px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.code-line.typed {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.code-cursor {
+    display: inline-block;
+    width: 2px;
+    height: 18px;
+    background-color: white;
+    vertical-align: middle;
+    margin-left: 1px;
+    animation: blink 1s step-start infinite;
+}
+
+@keyframes blink {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0;
+    }
+}
+
+/* Media queries for responsive design */
+@media (max-width: 1024px) {
+    .intro-section-container {
+        flex-direction: column;
+        padding: 60px 30px;
+        gap: 40px;
+    }
+
+    .intro-content {
+        margin-right: 0;
+        max-width: 100%;
+        text-align: center;
+    }
+
+    .intro-heading:after {
+        left: 50%;
+        transform: translateX(-50%);
+    }
+
+    .intro-description {
+        margin: 0 auto 2rem;
+    }
+
+    .intro-buttons {
+        justify-content: center;
+    }
+
+    .tech-stack {
+        align-items: center;
+    }
+
+    .intro-code-container {
+        max-width: 90%;
+        transform: none !important;
+        animation: fadeIn 1.2s ease-out forwards !important;
+    }
+}
+
+@media (max-width: 768px) {
+    .intro-heading {
+        font-size: 2.8rem;
+    }
+
+    .intro-description {
+        font-size: 1.1rem;
+    }
+
+    .intro-buttons {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .tech-icons {
+        gap: 15px;
+    }
+
+    .tech-icons svg {
+        font-size: 20px;
+    }
+}
+
+/* Media query adjustments for larger screens */
+@media (min-width: 1440px) {
+    .intro-code-container {
+        max-width: 800px;
+        height: 500px;
+    }
+}
+
+/* Media query adjustments for smaller screens */
+@media (max-width: 1024px) {
+    .intro-code-container {
+        flex: 0 0 90%;
+        max-width: 90%;
+        width: 90%;
+    }
 }
 
 /* Keep existing CSS after this line */
