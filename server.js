@@ -16,6 +16,8 @@ const port = process.env.PORT || 5000;
 
 const User = require('./models/User');
 const History = require('./models/History');
+// Add global environment store (add this after other requires)
+const userEnvironments = {}; // Store environment variables by user ID
 // Import the scriptRunner utility
 const { executePreRequestScript, executeTestScript } = require('./utils/scriptRunner');
 // --- MIDDLEWARE (Correct Order) ---
@@ -263,6 +265,13 @@ app.post('/api/requests/:id/send', ensureAuthenticated, async (req, res) => { //
     let responseStatus, responseStatusText, responseHeadersObj, responseBodyText, responseSize, isJson = false; // Define vars here
     let testResults = [];
 
+    // Get or initialize user's environment store
+    const userId = req.user.id;
+    if (!userEnvironments[userId]) {
+        userEnvironments[userId] = {};
+    }
+    const userEnv = userEnvironments[userId];
+
     try {
         const requestDoc = await Request.findById(req.params.id);
         if (!requestDoc) {
@@ -311,12 +320,13 @@ app.post('/api/requests/:id/send', ensureAuthenticated, async (req, res) => { //
             }
         }
 
-        // --- Execute Pre-request Script if present ---
+        // --- Execute Pre-request Script with user environment ---
         let requestWithScriptChanges = { url, ...fetchOptions };
+        let updatedEnv = { ...userEnv };
 
         if (preRequestScript) {
             console.log("Executing pre-request script...");
-            const preRequestResult = executePreRequestScript(preRequestScript, requestWithScriptChanges);
+            const preRequestResult = executePreRequestScript(preRequestScript, requestWithScriptChanges, userEnv);
 
             if (preRequestResult.error) {
                 console.error("Pre-request script error:", preRequestResult.error);
@@ -324,6 +334,11 @@ app.post('/api/requests/:id/send', ensureAuthenticated, async (req, res) => { //
             } else {
                 // Apply any changes from the pre-request script
                 requestWithScriptChanges = preRequestResult.request;
+                updatedEnv = preRequestResult.environment;
+
+                // Update environment
+                userEnvironments[userId] = updatedEnv;
+                console.log("Updated environment after pre-request script:", Object.keys(updatedEnv));
 
                 // Update request options based on pre-request script changes
                 fetchOptions.headers = requestWithScriptChanges.headers || fetchOptions.headers;
@@ -368,7 +383,7 @@ app.post('/api/requests/:id/send', ensureAuthenticated, async (req, res) => { //
             }
         }
 
-        // --- Execute Test Script if present ---
+        // --- Execute Test Script with user environment ---
         if (testScript) {
             console.log("Executing test script...");
             const responseForTesting = {
@@ -380,7 +395,7 @@ app.post('/api/requests/:id/send', ensureAuthenticated, async (req, res) => { //
                 size: responseSize
             };
 
-            const testScriptResult = executeTestScript(testScript, responseForTesting);
+            const testScriptResult = executeTestScript(testScript, responseForTesting, userEnv);
 
             if (testScriptResult.error) {
                 console.error("Test script error:", testScriptResult.error);
@@ -393,6 +408,9 @@ app.post('/api/requests/:id/send', ensureAuthenticated, async (req, res) => { //
                 }];
             } else {
                 testResults = testScriptResult.results || [];
+                // Update environment after test script
+                userEnvironments[userId] = testScriptResult.environment;
+                console.log("Updated environment after test script:", Object.keys(testScriptResult.environment));
             }
         }
 
