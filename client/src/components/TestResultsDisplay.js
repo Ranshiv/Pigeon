@@ -93,11 +93,11 @@ const TestResultsDisplay = ({ testResults }) => {
             timestamp: new Date().toISOString(),
             results: normalizedResults
         };
-        
+
         // Convert to JSON
         const blob = new Blob([JSON.stringify(report, null, 2)], { type: 'application/json' });
         const url = URL.createObjectURL(blob);
-        
+
         // Create download link
         const a = document.createElement('a');
         a.href = url;
@@ -140,13 +140,13 @@ const TestResultsDisplay = ({ testResults }) => {
                 <div className="progress-bar">
                     <div
                         className="progress"
-                        style={{ 
-                            width: `${successRate}%`, 
-                            backgroundColor: successRate === 100 
-                                ? '#28a745' 
-                                : successRate >= 80 
-                                    ? '#ffc107' 
-                                    : '#dc3545' 
+                        style={{
+                            width: `${successRate}%`,
+                            backgroundColor: successRate === 100
+                                ? '#28a745'
+                                : successRate >= 80
+                                    ? '#ffc107'
+                                    : '#dc3545'
                         }}
                     ></div>
                 </div>
@@ -156,19 +156,19 @@ const TestResultsDisplay = ({ testResults }) => {
                 <div className="test-details-header">
                     <h3>Test Details</h3>
                     <div className="test-filters">
-                        <button 
+                        <button
                             className={`filter-btn ${filterStatus === 'all' ? 'active' : ''}`}
                             onClick={() => setFilterStatus('all')}
                         >
                             All ({totalTests})
                         </button>
-                        <button 
+                        <button
                             className={`filter-btn ${filterStatus === 'passed' ? 'active' : ''}`}
                             onClick={() => setFilterStatus('passed')}
                         >
                             Passed ({passedTests})
                         </button>
-                        <button 
+                        <button
                             className={`filter-btn ${filterStatus === 'failed' ? 'active' : ''}`}
                             onClick={() => setFilterStatus('failed')}
                         >
@@ -183,8 +183,8 @@ const TestResultsDisplay = ({ testResults }) => {
                         </div>
                     ) : (
                         filteredResults.map((test, index) => (
-                            <div 
-                                key={index} 
+                            <div
+                                key={index}
                                 className={`test-item ${test.passed ? 'passed' : 'failed'} ${expandedItems[index] ? 'expanded' : ''}`}
                                 onClick={() => toggleExpandItem(index)}
                             >
@@ -209,18 +209,18 @@ const TestResultsDisplay = ({ testResults }) => {
                                         {expandedItems[index] ? '▼' : '▶'}
                                     </div>
                                 </div>
-                                
+
                                 {expandedItems[index] && (
                                     <div className="test-details-content">
                                         <div className="test-result-code">
                                             <pre className="test-code-block">
                                                 {test.passed
                                                     ? `Test Passed: "${test.name}"\n` +
-                                                      `Result: ${test.passed}\n` +
-                                                      `Time: ${new Date(test.timestamp).toLocaleString()}`
+                                                    `Result: ${test.passed}\n` +
+                                                    `Time: ${new Date(test.timestamp).toLocaleString()}`
                                                     : `Test Failed: "${test.name}"\n` +
-                                                      `Error: ${test.error || 'Assertion failed'}\n` +
-                                                      `Time: ${new Date(test.timestamp).toLocaleString()}`
+                                                    `Error: ${test.error || 'Assertion failed'}\n` +
+                                                    `Time: ${new Date(test.timestamp).toLocaleString()}`
                                                 }
                                             </pre>
                                         </div>
@@ -231,7 +231,7 @@ const TestResultsDisplay = ({ testResults }) => {
                     )}
                 </div>
             </div>
-            
+
             <div className="ci-cd-tips">
                 <h4>CI/CD Integration</h4>
                 <p>These test results can be exported for use in CI/CD pipelines. Use the CLI runner to automate these tests.</p>

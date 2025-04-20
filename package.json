@@ -2,15 +2,26 @@
   "name": "pigeon",
   "version": "1.0.0",
   "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+  "bin": {
+    "pigeon": "./cli/pigeon-cli.js"
   },
-  "keywords": [],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "cli": "node ./cli/pigeon-cli.js"
+  },
+  "keywords": [
+    "api",
+    "testing",
+    "automation",
+    "ci",
+    "cd"
+  ],
   "author": "",
   "license": "ISC",
-  "description": "",
+  "description": "API Testing and Automation Tool with CI/CD Integration",
   "dependencies": {
     "axios": "^1.8.4",
+    "chalk": "^4.1.2",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
@@ -20,6 +31,9 @@
     "mongoose": "^8.12.1",
     "node-fetch": "^3.0.0",
     "passport": "^0.7.0",
-    "passport-google-oauth20": "^2.0.0"
+    "passport-google-oauth20": "^2.0.0",
+    "xargs": "^1.1.3",
+    "xmlbuilder": "^15.1.1",
+    "yargs": "^17.7.2"
   }
 }

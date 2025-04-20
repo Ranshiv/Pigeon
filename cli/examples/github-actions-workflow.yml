@@ -1,0 +1,43 @@
+name: API Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: "0 0 * * *" # Run daily at midnight
+
+jobs:
+  api-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "18"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run Pigeon API tests
+        run: npx pigeon run --collection "./tests/api-collection.json" --environment "production" --reporter junit --output "./test-results/pigeon-results.xml"
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: api-test-results
+          path: ./test-results/pigeon-results.xml
+
+      # Optional: Publish test results as GitHub checks
+      - name: Publish Test Results
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        if: always()
+        with:
+          files: ./test-results/pigeon-results.xml

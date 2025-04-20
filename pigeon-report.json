@@ -1,0 +1,61 @@
+{
+  "summary": {
+    "collection": "C:\\Users\\ransh\\OneDrive\\Desktop\\Pigeon\\test-collection.json",
+    "environment": "C:\\Users\\ransh\\OneDrive\\Desktop\\Pigeon\\test-environment.json",
+    "timestamp": "2025-04-20T09:38:15.235Z",
+    "duration": 48,
+    "totalRequests": 2,
+    "failedRequests": 0,
+    "totalTests": 5,
+    "passedTests": 5,
+    "failedTests": 0,
+    "successRate": 100
+  },
+  "results": [
+    {
+      "name": "Test URL and Header Variable Interpolation",
+      "url": "http://localhost:3500/api/users?active=true&role=admin",
+      "method": "GET",
+      "duration": 38,
+      "error": null,
+      "status": 200,
+      "tests": [
+        {
+          "name": "Response status is 200",
+          "passed": true,
+          "error": null
+        },
+        {
+          "name": "Response contains expected data",
+          "passed": true,
+          "error": null
+        },
+        {
+          "name": "Response has content-type header",
+          "passed": true,
+          "error": null
+        }
+      ]
+    },
+    {
+      "name": "Test Dynamic Variables Set in Pre-request Script",
+      "url": "http://localhost:3500/api/check",
+      "method": "GET",
+      "duration": 4,
+      "error": null,
+      "status": 200,
+      "tests": [
+        {
+          "name": "Response status is 200",
+          "passed": true,
+          "error": null
+        },
+        {
+          "name": "Response contains dynamic header value",
+          "passed": true,
+          "error": null
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+{
+  "API_URL": "localhost:3500",
+  "API_KEY": "test-api-key-12345",
+  "HEADER_VALUE": "TestHeaderValue",
+  "PATH_PARAM": "users",
+  "QUERY_PARAM": "active=true&role=admin",
+  "DYNAMIC_VAR": ""
+}

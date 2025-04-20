@@ -1,0 +1,510 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pigeon API Test Results - cli\examples\example-collection.json</title>
+  <style>
+    :root {
+      --color-bg: #f8f9fa;
+      --color-text: #343a40;
+      --color-primary: #FF6C37;
+      --color-success: #28a745;
+      --color-danger: #dc3545;
+      --color-warning: #ffc107;
+      --color-info: #17a2b8;
+      --color-border: #dee2e6;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      line-height: 1.6;
+      color: var(--color-text);
+      background-color: var(--color-bg);
+      margin: 0;
+      padding: 20px;
+    }
+    .report-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+    }
+    .report-header {
+      background-color: var(--color-primary);
+      color: white;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+    }
+    .report-title {
+      margin: 0;
+      font-size: 24px;
+      display: flex;
+      align-items: center;
+    }
+    .report-title .pigeon-logo {
+      margin-right: 10px;
+      font-size: 28px;
+    }
+    .report-meta {
+      margin-top: 10px;
+      font-size: 14px;
+      opacity: 0.9;
+    }
+    .report-summary {
+      display: flex;
+      padding: 20px;
+      background-color: #f1f3f5;
+      border-bottom: 1px solid var(--color-border);
+      flex-wrap: wrap;
+    }
+    .summary-item {
+      flex: 1;
+      min-width: 120px;
+      padding: 10px;
+      text-align: center;
+    }
+    .summary-value {
+      font-size: 24px;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+    .summary-label {
+      font-size: 14px;
+      color: #6c757d;
+    }
+    .report-content {
+      padding: 20px;
+    }
+    .request-result {
+      margin-bottom: 20px;
+      border: 1px solid var(--color-border);
+      border-radius: 6px;
+      overflow: hidden;
+    }
+    .request-result.passed {
+      border-left: 4px solid var(--color-success);
+    }
+    .request-result.failed {
+      border-left: 4px solid var(--color-danger);
+    }
+    .request-header {
+      background-color: #f8f9fa;
+      padding: 10px 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--color-border);
+    }
+    .request-status {
+      display: inline-block;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      text-align: center;
+      line-height: 24px;
+      margin-right: 10px;
+    }
+    .request-result.passed .request-status {
+      background-color: rgba(40, 167, 69, 0.2);
+      color: var(--color-success);
+    }
+    .request-result.failed .request-status {
+      background-color: rgba(220, 53, 69, 0.2);
+      color: var(--color-danger);
+    }
+    .request-method {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: bold;
+      color: white;
+    }
+    .GET {
+      background-color: var(--color-info);
+    }
+    .POST {
+      background-color: var(--color-success);
+    }
+    .PUT {
+      background-color: var(--color-warning);
+    }
+    .DELETE {
+      background-color: var(--color-danger);
+    }
+    .request-url {
+      padding: 10px 15px;
+      font-family: monospace;
+      border-bottom: 1px solid var(--color-border);
+      word-break: break-all;
+      background-color: #f8f9fa;
+    }
+    .request-details {
+      display: flex;
+      flex-wrap: wrap;
+      padding: 15px;
+      border-bottom: 1px solid var(--color-border);
+      background-color: white;
+    }
+    .detail {
+      margin-right: 20px;
+      margin-bottom: 5px;
+    }
+    .label {
+      font-weight: bold;
+      margin-right: 5px;
+    }
+    .request-error {
+      padding: 15px;
+      background-color: rgba(220, 53, 69, 0.1);
+      border-bottom: 1px solid var(--color-border);
+    }
+    .error-message {
+      color: var(--color-danger);
+      font-weight: bold;
+    }
+    .error-stack {
+      margin-top: 10px;
+      padding: 10px;
+      background-color: #f1f3f5;
+      border-radius: 4px;
+      overflow: auto;
+      font-size: 12px;
+      max-height: 200px;
+    }
+    .tests-container {
+      padding: 15px;
+    }
+    .tests-container h4 {
+      margin-top: 0;
+      margin-bottom: 10px;
+    }
+    .test-results {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .test-result {
+      padding: 8px 10px;
+      border-radius: 4px;
+      display: flex;
+      align-items: flex-start;
+    }
+    .test-result.passed {
+      background-color: rgba(40, 167, 69, 0.1);
+    }
+    .test-result.failed {
+      background-color: rgba(220, 53, 69, 0.1);
+    }
+    .test-status {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      text-align: center;
+      line-height: 20px;
+      margin-right: 10px;
+      flex-shrink: 0;
+    }
+    .test-result.passed .test-status {
+      color: var(--color-success);
+    }
+    .test-result.failed .test-status {
+      color: var(--color-danger);
+    }
+    .test-error {
+      margin-top: 5px;
+      padding: 5px;
+      border-radius: 4px;
+      background-color: rgba(220, 53, 69, 0.2);
+      color: var(--color-danger);
+      font-size: 12px;
+    }
+    .footer {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 12px;
+      color: #6c757d;
+    }
+    .success-bar {
+      height: 8px;
+      background-color: #e9ecef;
+      border-radius: 4px;
+      overflow: hidden;
+      margin-top: 10px;
+    }
+    .success-progress {
+      height: 100%;
+      background-color: var(--color-warning);
+      width: 75%;
+    }
+    @media (max-width: 768px) {
+      .summary-item {
+        min-width: calc(50% - 20px);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="report-container">
+    <div class="report-header">
+      <h1 class="report-title">
+        <span class="pigeon-logo">🐦</span> Pigeon API Test Results
+      </h1>
+      <div class="report-meta">
+        <div>Collection: cli\examples\example-collection.json</div>
+        <div>Environment: cli\examples\test-environment.json</div>
+        <div>Generated: 4/20/2025, 3:33:37 AM</div>
+      </div>
+    </div>
+    
+    <div class="report-summary">
+      <div class="summary-item">
+        <div class="summary-value">4</div>
+        <div class="summary-label">Requests</div>
+      </div>
+      <div class="summary-item">
+        <div class="summary-value">8</div>
+        <div class="summary-label">Tests</div>
+      </div>
+      <div class="summary-item">
+        <div class="summary-value" style="color: var(--color-success)">6</div>
+        <div class="summary-label">Passed</div>
+      </div>
+      <div class="summary-item">
+        <div class="summary-value" style="color: var(--color-danger)">2</div>
+        <div class="summary-label">Failed</div>
+      </div>
+      <div class="summary-item">
+        <div class="summary-value">75%</div>
+        <div class="summary-label">Success Rate</div>
+        <div class="success-bar">
+          <div class="success-progress"></div>
+        </div>
+      </div>
+      <div class="summary-item">
+        <div class="summary-value">0</div>
+        <div class="summary-label">Duration (s)</div>
+      </div>
+    </div>
+    
+    <div class="report-content">
+      
+      <div class="request-result passed">
+        <div class="request-header">
+          <h3>
+            <span class="request-status">✓</span>
+            [1/4] Get User Profile
+          </h3>
+          <span class="request-method GET">GET</span>
+        </div>
+        <div class="request-url">http://localhost:5001/api/cli-test/users/me</div>
+        
+        <div class="request-details">
+          <div class="detail">
+            <span class="label">Status:</span>
+            <span class="value">200</span>
+          </div>
+          <div class="detail">
+            <span class="label">Duration:</span>
+            <span class="value">29ms</span>
+          </div>
+          <div class="detail">
+            <span class="label">Tests:</span>
+            <span class="value">4/4 passed</span>
+          </div>
+        </div>
+        
+        
+        
+        
+          <div class="tests-container">
+            <h4>Test Results</h4>
+            <div class="test-results">
+              
+      <div class="test-result passed">
+        <span class="test-status">✓</span>
+        <span class="test-name">Status code is 200</span>
+        
+      </div>
+    
+      <div class="test-result passed">
+        <span class="test-status">✓</span>
+        <span class="test-name">Response is JSON</span>
+        
+      </div>
+    
+      <div class="test-result passed">
+        <span class="test-status">✓</span>
+        <span class="test-name">Response matches user schema</span>
+        
+      </div>
+    
+      <div class="test-result passed">
+        <span class="test-status">✓</span>
+        <span class="test-name">Response time is acceptable</span>
+        
+      </div>
+    
+            </div>
+          </div>
+        
+      </div>
+    
+      <div class="request-result failed">
+        <div class="request-header">
+          <h3>
+            <span class="request-status">✗</span>
+            [2/4] Create New Item
+          </h3>
+          <span class="request-method POST">POST</span>
+        </div>
+        <div class="request-url">{{API_URL}}/items</div>
+        
+        <div class="request-details">
+          <div class="detail">
+            <span class="label">Status:</span>
+            <span class="value">N/A</span>
+          </div>
+          <div class="detail">
+            <span class="label">Duration:</span>
+            <span class="value">N/A</span>
+          </div>
+          <div class="detail">
+            <span class="label">Tests:</span>
+            <span class="value">0/0 passed</span>
+          </div>
+        </div>
+        
+        
+      <div class="request-error">
+        <h4>Request Error</h4>
+        <div class="error-message">Request failed with status code 400</div>
+        <pre class="error-stack">AxiosError: Request failed with status code 400
+    at settle (C:\Users\ransh\OneDrive\Desktop\Pigeon\node_modules\axios\dist\node\axios.cjs:2031:12)
+    at IncomingMessage.handleStreamEnd (C:\Users\ransh\OneDrive\Desktop\Pigeon\node_modules\axios\dist\node\axios.cjs:3148:11)
+    at IncomingMessage.emit (node:events:530:35)
+    at endReadableNT (node:internal/streams/readable:1698:12)
+    at process.processTicksAndRejections (node:internal/process/task_queues:90:21)
+    at Axios.request (C:\Users\ransh\OneDrive\Desktop\Pigeon\node_modules\axios\dist\node\axios.cjs:4258:41)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async runRequest (C:\Users\ransh\OneDrive\Desktop\Pigeon\cli\runner.js:261:22)
+    at async runCollection (C:\Users\ransh\OneDrive\Desktop\Pigeon\cli\runner.js:37:22)
+    at async main (C:\Users\ransh\OneDrive\Desktop\Pigeon\cli\pigeon-cli.js:107:23)</pre>
+      </div>
+    
+        
+        
+      </div>
+    
+      <div class="request-result failed">
+        <div class="request-header">
+          <h3>
+            <span class="request-status">✗</span>
+            [3/4] Get Created Item
+          </h3>
+          <span class="request-method GET">GET</span>
+        </div>
+        <div class="request-url">http://localhost:5001/api/cli-test/items/{{itemId}}</div>
+        
+        <div class="request-details">
+          <div class="detail">
+            <span class="label">Status:</span>
+            <span class="value">200</span>
+          </div>
+          <div class="detail">
+            <span class="label">Duration:</span>
+            <span class="value">2ms</span>
+          </div>
+          <div class="detail">
+            <span class="label">Tests:</span>
+            <span class="value">2/3 passed</span>
+          </div>
+        </div>
+        
+        
+        
+        
+          <div class="tests-container">
+            <h4>Test Results</h4>
+            <div class="test-results">
+              
+      <div class="test-result passed">
+        <span class="test-status">✓</span>
+        <span class="test-name">Status code is 200</span>
+        
+      </div>
+    
+      <div class="test-result failed">
+        <span class="test-status">✗</span>
+        <span class="test-name">Item ID matches</span>
+        <div class="test-error">Assertion failed</div>
+      </div>
+    
+      <div class="test-result passed">
+        <span class="test-status">✓</span>
+        <span class="test-name">Item belongs to correct user</span>
+        
+      </div>
+    
+            </div>
+          </div>
+        
+      </div>
+    
+      <div class="request-result failed">
+        <div class="request-header">
+          <h3>
+            <span class="request-status">✗</span>
+            [4/4] Delete Created Item
+          </h3>
+          <span class="request-method DELETE">DELETE</span>
+        </div>
+        <div class="request-url">http://localhost:5001/api/cli-test/items/{{itemId}}</div>
+        
+        <div class="request-details">
+          <div class="detail">
+            <span class="label">Status:</span>
+            <span class="value">204</span>
+          </div>
+          <div class="detail">
+            <span class="label">Duration:</span>
+            <span class="value">3ms</span>
+          </div>
+          <div class="detail">
+            <span class="label">Tests:</span>
+            <span class="value">0/1 passed</span>
+          </div>
+        </div>
+        
+        
+        
+        
+          <div class="tests-container">
+            <h4>Test Results</h4>
+            <div class="test-results">
+              
+      <div class="test-result failed">
+        <span class="test-status">✗</span>
+        <span class="test-name">Test Script Error</span>
+        <div class="test-error">Test script error: environment.unset is not a function</div>
+      </div>
+    
+            </div>
+          </div>
+        
+      </div>
+    
+    </div>
+  </div>
+  
+  <div class="footer">
+    Generated by Pigeon API Testing Tool - 2025
+  </div>
+</body>
+</html>
+  

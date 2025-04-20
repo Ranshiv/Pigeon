@@ -38,7 +38,7 @@ function createSandbox(context = {}) {
         // Custom utility functions for scripts
         btoa: (str) => Buffer.from(str).toString('base64'),
         atob: (str) => Buffer.from(str, 'base64').toString(),
-        
+
         // Advanced utilities
         crypto: {
             md5: (str) => crypto.createHash('md5').update(str).digest('hex'),
@@ -46,12 +46,12 @@ function createSandbox(context = {}) {
             sha256: (str) => crypto.createHash('sha256').update(str).digest('hex'),
             randomBytes: (size) => crypto.randomBytes(size).toString('hex')
         },
-        
+
         // JSON Schema validation utility
         validateSchema: (data, schema) => {
             // Basic implementation of JSON schema validation
             if (!data || !schema) return false;
-            
+
             try {
                 // Type validation
                 if (schema.type) {
@@ -63,7 +63,7 @@ function createSandbox(context = {}) {
                     if (schema.type === 'boolean' && jsType !== 'boolean') return false;
                     if (schema.type === 'null' && data !== null) return false;
                 }
-                
+
                 // Object properties validation
                 if (schema.type === 'object' && schema.properties) {
                     for (const [key, propSchema] of Object.entries(schema.properties)) {
@@ -72,7 +72,7 @@ function createSandbox(context = {}) {
                         }
                     }
                 }
-                
+
                 // Array items validation
                 if (schema.type === 'array' && schema.items && Array.isArray(data)) {
                     for (const item of data) {
@@ -81,19 +81,19 @@ function createSandbox(context = {}) {
                         }
                     }
                 }
-                
+
                 // Required properties
                 if (schema.required && Array.isArray(schema.required)) {
                     for (const req of schema.required) {
                         if (data[req] === undefined) return false;
                     }
                 }
-                
+
                 // Enum validation
                 if (schema.enum && Array.isArray(schema.enum)) {
                     if (!schema.enum.includes(data)) return false;
                 }
-                
+
                 return true;
             } catch (error) {
                 console.error('Schema validation error:', error);
@@ -111,14 +111,17 @@ function createSandbox(context = {}) {
 /**
  * Executes a pre-request script to modify the request before sending
  * @param {string} script - The pre-request script to execute
- * @param {Object} request - The request object that can be modified
+ * @param {Object} context - The context object with request and environment data
  * @param {Object} environment - Environment variables
  * @returns {Object} - The potentially modified request and any errors
  */
-function executePreRequestScript(script, request, environment = {}) {
+function executePreRequestScript(script, context, environment = {}) {
     if (!script || typeof script !== 'string' || script.trim() === '') {
-        return { request, error: null };
+        return { request: context.request, error: null, environment };
     }
+
+    // Make sure we have request object
+    const request = context.request || {};
 
     // Create a variables collection for the request
     request.variables = {
@@ -134,33 +137,37 @@ function executePreRequestScript(script, request, environment = {}) {
             delete this.values[key];
         }
     };
-    
+
     // Add environment utilities
-    request.environment = {
-        set: function(key, value) {
+    const env = {
+        set: function (key, value) {
             environment[key] = value;
             return true;
         },
-        get: function(key) {
+        get: function (key) {
             return environment[key];
         },
-        has: function(key) {
+        has: function (key) {
             return environment[key] !== undefined;
+        },
+        unset: function (key) {
+            delete environment[key];
+            return true;
         }
     };
-    
+
     // Add utility methods for common pre-request tasks
     request.utils = {
         // Generate UUID v4
-        uuid: function() {
-            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        uuid: function () {
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
                 const r = Math.random() * 16 | 0,
                     v = c === 'x' ? r : (r & 0x3 | 0x8);
                 return v.toString(16);
             });
         },
         // Parse URL and get components
-        parseUrl: function(url) {
+        parseUrl: function (url) {
             try {
                 const parsed = new URL(url);
                 return {
@@ -179,13 +186,13 @@ function executePreRequestScript(script, request, environment = {}) {
             }
         },
         // Convert object to query string
-        toQueryString: function(obj) {
+        toQueryString: function (obj) {
             return Object.entries(obj)
                 .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
                 .join('&');
         },
         // Replace variables in a string
-        replaceVariables: function(template, variableGetter) {
+        replaceVariables: function (template, variableGetter) {
             return template.replace(/\{\{([^}]+)\}\}/g, (match, varName) => {
                 const trimmedName = varName.trim();
                 const value = variableGetter(trimmedName);
@@ -194,8 +201,12 @@ function executePreRequestScript(script, request, environment = {}) {
         }
     };
 
-    // Create the sandbox with the request object
-    const sandbox = createSandbox({ request });
+    // Create the sandbox with the request object and environment access
+    const sandbox = createSandbox({
+        request,
+        environment: env, // Provide environment interface instead of raw object
+        console: console // Make sure console.log works for debugging
+    });
 
     try {
         // Execute the script with a timeout
@@ -207,8 +218,8 @@ function executePreRequestScript(script, request, environment = {}) {
                 throw e;
             }
         `;
-        vm.runInNewContext(wrappedScript, sandbox, { timeout: 5000 });
-        
+        vm.runInNewContext(wrappedScript, sandbox, { timeout: 5001 });
+
         // Apply variable interpolation to URL and headers
         if (sandbox.request.url) {
             sandbox.request.url = sandbox.request.utils.replaceVariables(
@@ -216,19 +227,19 @@ function executePreRequestScript(script, request, environment = {}) {
                 (name) => sandbox.request.variables.get(name)
             );
         }
-        
+
         // Apply variable interpolation to headers
         if (sandbox.request.headers) {
-            for (const [key, value] of Object.entries(sandbox.request.headers)) {
-                if (typeof value === 'string') {
-                    sandbox.request.headers[key] = sandbox.request.utils.replaceVariables(
-                        value,
+            for (const header of sandbox.request.headers) {
+                if (typeof header.value === 'string') {
+                    header.value = sandbox.request.utils.replaceVariables(
+                        header.value,
                         (name) => sandbox.request.variables.get(name)
                     );
                 }
             }
         }
-        
+
         // Apply variable interpolation to body if it's a string
         if (typeof sandbox.request.body === 'string') {
             sandbox.request.body = sandbox.request.utils.replaceVariables(
@@ -236,11 +247,11 @@ function executePreRequestScript(script, request, environment = {}) {
                 (name) => sandbox.request.variables.get(name)
             );
         }
-        
-        return { 
-            request: sandbox.request, 
+
+        return {
+            request: sandbox.request,
             error: null,
-            environment: environment // Return potentially modified environment
+            environment // Return potentially modified environment
         };
     } catch (error) {
         return {
@@ -268,7 +279,7 @@ function executeTestScript(script, response, environment = {}) {
 
     // Tests object to store test assertions
     const tests = {};
-    
+
     // Add schema validation utility
     const jsonSchemaValidation = {
         validate: (data, schema) => {
@@ -280,21 +291,21 @@ function executeTestScript(script, response, environment = {}) {
         },
         // Add common schemas
         schemas: {
-            email: { 
-                type: 'string', 
-                pattern: '^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$' 
+            email: {
+                type: 'string',
+                pattern: '^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$'
             },
-            uuid: { 
-                type: 'string', 
-                pattern: '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$' 
+            uuid: {
+                type: 'string',
+                pattern: '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$'
             },
-            url: { 
-                type: 'string', 
-                pattern: '^https?:\\/\\/[\\w\\.-]+(?:\\.[a-z]{2,})+[\\/\\w\\.-]*$' 
+            url: {
+                type: 'string',
+                pattern: '^https?:\\/\\/[\\w\\.-]+(?:\\.[a-z]{2,})+[\\/\\w\\.-]*$'
             }
         }
     };
-    
+
     // Add environment access
     const env = {
         get: (key) => environment[key],
@@ -304,7 +315,7 @@ function executeTestScript(script, response, environment = {}) {
         },
         has: (key) => environment[key] !== undefined
     };
-    
+
     // Add assertions library
     const assert = {
         equal: (actual, expected, message) => {
@@ -388,7 +399,7 @@ function executeTestScript(script, response, environment = {}) {
                 throw e;
             }
         `;
-        vm.runInNewContext(wrappedScript, sandbox, { timeout: 5000 });
+        vm.runInNewContext(wrappedScript, sandbox, { timeout: 5001 });
 
         // Convert test results to an array format with additional metadata
         const results = Object.entries(sandbox.tests).map(([name, passed]) => ({
@@ -398,10 +409,10 @@ function executeTestScript(script, response, environment = {}) {
             timestamp: Date.now()
         }));
 
-        return { 
-            results, 
-            error: null, 
-            environment 
+        return {
+            results,
+            error: null,
+            environment
         };
     } catch (error) {
         return {
@@ -432,7 +443,7 @@ function validateJsonSchema(data, schema) {
         if (schema.type === 'boolean' && jsType !== 'boolean') return false;
         if (schema.type === 'null' && data !== null) return false;
     }
-    
+
     // Object property validation
     if (schema.properties && typeof data === 'object' && !Array.isArray(data)) {
         for (const [key, propSchema] of Object.entries(schema.properties)) {
@@ -441,7 +452,7 @@ function validateJsonSchema(data, schema) {
             }
         }
     }
-    
+
     // Array items validation
     if (schema.items && Array.isArray(data)) {
         for (const item of data) {
@@ -450,43 +461,43 @@ function validateJsonSchema(data, schema) {
             }
         }
     }
-    
+
     // Required properties
     if (schema.required && Array.isArray(schema.required) && typeof data === 'object') {
         for (const req of schema.required) {
             if (data[req] === undefined) return false;
         }
     }
-    
+
     // Pattern validation
     if (schema.pattern && typeof data === 'string') {
         const regex = new RegExp(schema.pattern);
         if (!regex.test(data)) return false;
     }
-    
+
     // Enum validation
     if (schema.enum && Array.isArray(schema.enum)) {
         if (!schema.enum.includes(data)) return false;
     }
-    
+
     // Min and max for numbers
     if (typeof data === 'number') {
         if (schema.minimum !== undefined && data < schema.minimum) return false;
         if (schema.maximum !== undefined && data > schema.maximum) return false;
     }
-    
+
     // Min and max length for strings
     if (typeof data === 'string') {
         if (schema.minLength !== undefined && data.length < schema.minLength) return false;
         if (schema.maxLength !== undefined && data.length > schema.maxLength) return false;
     }
-    
+
     // Min and max items for arrays
     if (Array.isArray(data)) {
         if (schema.minItems !== undefined && data.length < schema.minItems) return false;
         if (schema.maxItems !== undefined && data.length > schema.maxItems) return false;
     }
-    
+
     return true;
 }
 

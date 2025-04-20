@@ -1,0 +1,36 @@
+version: 2.1
+orbs:
+  node: circleci/node@5.1.0
+
+jobs:
+  run-api-tests:
+    docker:
+      - image: cimg/node:18.16
+    steps:
+      - checkout
+      - node/install-packages:
+          pkg-manager: npm
+      - run:
+          name: Create results directory
+          command: mkdir -p test-results
+      - run:
+          name: Run API Tests
+          command: npx pigeon run --collection "./tests/api-collection.json" --environment "staging" --reporter junit --output "./test-results/pigeon-results.xml"
+      - store_test_results:
+          path: test-results
+      - store_artifacts:
+          path: test-results
+          destination: test-reports
+
+workflows:
+  version: 2
+  api-test-workflow:
+    jobs:
+      - run-api-tests
+    triggers:
+      - schedule:
+          cron: "0 0 * * *"
+          filters:
+            branches:
+              only:
+                - main

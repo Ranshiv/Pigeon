@@ -1,0 +1,61 @@
+name: Test Environment Variable Handling
+
+on:
+  push:
+    branches: [main, master, develop]
+  pull_request:
+    branches: [main, master]
+  workflow_dispatch:
+    # Manual trigger
+
+jobs:
+  test-env-variables:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+
+      - name: Install dependencies
+        run: |
+          npm install
+          cd cli
+          npm install
+
+      - name: Start mock API server
+        run: |
+          node server.js &
+          sleep 5
+        env:
+          PORT: 3500
+
+      - name: Run Pigeon tests
+        run: |
+          cd cli
+          node pigeon-cli.js run --collection ../test-collection.json --environment ../test-environment.json --report html
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v3
+        with:
+          name: pigeon-report
+          path: pigeon-report.html
+
+      - name: Check test results
+        run: |
+          if [ ! -f "pigeon-report.json" ]; then
+            echo "Test report not found!"
+            exit 1
+          fi
+
+          FAILED_TESTS=$(cat pigeon-report.json | jq '.stats.failures')
+          if [ "$FAILED_TESTS" -gt 0 ]; then
+            echo "❌ $FAILED_TESTS tests failed!"
+            exit 1
+          else
+            echo "✅ All tests passed!"
+          fi

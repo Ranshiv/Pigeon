@@ -1,0 +1,75 @@
+{
+  "name": "Example API Test Collection",
+  "description": "A collection of API tests to demonstrate CI/CD integration",
+  "version": "1.0.0",
+  "requests": [
+    {
+      "name": "Get User Profile",
+      "url": "{{API_URL}}/users/me",
+      "method": "GET",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{API_KEY}}"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "preRequestScript": "// Generate a timestamp for tracking\nconst timestamp = Date.now();\nrequest.variables.set('requestTimestamp', timestamp);\nconsole.log('Running request at:', new Date(timestamp).toISOString());",
+      "testScript": "// Basic response validation\ntests['Status code is 200'] = response.status === 200;\ntests['Response is JSON'] = response.headers['content-type'].includes('application/json');\n\n// Schema validation\nconst userSchema = {\n  type: 'object',\n  required: ['id', 'name', 'email'],\n  properties: {\n    id: { type: 'string' },\n    name: { type: 'string' },\n    email: { type: 'string' }\n  }\n};\n\ntests['Response matches user schema'] = jsonSchema.validate(response.body, userSchema);\n\n// Performance testing\ntests['Response time is acceptable'] = response.duration < 1000;\n\n// Store user ID for next requests\nenvironment.set('userId', response.body.id);"
+    },
+    {
+      "name": "Create New Item",
+      "url": "{{API_URL}}/items",
+      "method": "POST",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{API_KEY}}"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "body": "{\n  \"name\": \"Test Item\",\n  \"description\": \"Created through CI/CD pipeline tests\",\n  \"userId\": \"{{userId}}\",\n  \"timestamp\": {{requestTimestamp}}\n}",
+      "bodyType": "json",
+      "preRequestScript": "// Ensure we have a user ID from previous request\nif (!environment.get('userId')) {\n  console.warn('No userId found in environment, using placeholder');\n  environment.set('userId', 'placeholder-user-id');\n}\n\n// Get timestamp from variables or create new one\nconst timestamp = request.variables.get('requestTimestamp') || Date.now();\nrequest.variables.set('requestTimestamp', timestamp);",
+      "testScript": "// Verify item creation\ntests['Status code is 201'] = response.status === 201;\ntests['Item has an ID'] = response.body.id !== undefined;\ntests['Item has the correct name'] = response.body.name === 'Test Item';\n\n// Store item ID for next requests\nenvironment.set('itemId', response.body.id);"
+    },
+    {
+      "name": "Get Created Item",
+      "url": "{{API_URL}}/items/{{itemId}}",
+      "method": "GET",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{API_KEY}}"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "testScript": "// Verify item retrieval\ntests['Status code is 200'] = response.status === 200;\ntests['Item ID matches'] = response.body.id === environment.get('itemId');\ntests['Item belongs to correct user'] = response.body.userId === environment.get('userId');"
+    },
+    {
+      "name": "Delete Created Item",
+      "url": "{{API_URL}}/items/{{itemId}}",
+      "method": "DELETE",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Bearer {{API_KEY}}"
+        },
+        {
+          "name": "Content-Type",
+          "value": "application/json"
+        }
+      ],
+      "testScript": "// Verify item deletion\ntests['Status code is 204'] = response.status === 204;\n\n// Clear item ID from environment\nenvironment.unset('itemId');"
+    }
+  ]
+}

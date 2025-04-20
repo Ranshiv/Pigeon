@@ -236,12 +236,12 @@ console.log("Pre-request script executed successfully");`;
         // Insert snippet at cursor position or at the end
         const textarea = document.querySelector('.script-editor');
         const cursorPosition = textarea?.selectionStart || currentScript.length;
-        
-        const newScript = 
-            currentScript.substring(0, cursorPosition) + 
-            snippet.code + 
+
+        const newScript =
+            currentScript.substring(0, cursorPosition) +
+            snippet.code +
             currentScript.substring(cursorPosition);
-            
+
         setCurrentScript(newScript);
         onChange(newScript);
         setShowSnippets(false);
@@ -252,9 +252,9 @@ console.log("Pre-request script executed successfully");`;
             <div className="script-header">
                 <h3>{scriptType === 'test' ? 'Test Script' : 'Pre-request Script'}</h3>
                 <div className="editor-actions">
-                    <button 
-                        type="button" 
-                        className="snippet-button" 
+                    <button
+                        type="button"
+                        className="snippet-button"
                         onClick={() => setShowSnippets(!showSnippets)}
                     >
                         Insert Snippet
@@ -271,14 +271,14 @@ console.log("Pre-request script executed successfully");`;
                     <p>Write JavaScript to modify your request before it is sent</p>
                 )}
             </div>
-            
+
             {showSnippets && (
                 <div className="snippet-menu">
                     <h4>Code Snippets</h4>
                     <div className="snippet-list">
                         {codeSnippets[scriptType === 'test' ? 'test' : 'preRequest'].map((snippet, index) => (
-                            <div 
-                                key={index} 
+                            <div
+                                key={index}
                                 className="snippet-item"
                                 onClick={() => insertSnippet(snippet)}
                             >
@@ -286,7 +286,7 @@ console.log("Pre-request script executed successfully");`;
                             </div>
                         ))}
                     </div>
-                    <button 
+                    <button
                         className="close-snippets"
                         onClick={() => setShowSnippets(false)}
                     >
@@ -294,7 +294,7 @@ console.log("Pre-request script executed successfully");`;
                     </button>
                 </div>
             )}
-            
+
             <textarea
                 value={currentScript}
                 onChange={handleScriptChange}

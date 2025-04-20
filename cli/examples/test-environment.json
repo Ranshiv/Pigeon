@@ -1,0 +1,4 @@
+{
+    "API_URL": "http://localhost:5001/api/cli-test",
+    "API_KEY": "test_api_key_1234"
+}

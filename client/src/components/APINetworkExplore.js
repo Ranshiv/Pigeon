@@ -71,7 +71,7 @@ const APINetworkExplore = () => {
 
     const fetchRecentHistory = async () => {
         try {
-            const response = await fetch('http://localhost:5000/api/history', {
+            const response = await fetch('http://localhost:5001/api/history', {
                 credentials: 'include'
             });
 
@@ -94,7 +94,7 @@ const APINetworkExplore = () => {
     const fetchCollections = async () => {
         try {
             setLoading(true);
-            const response = await fetch('http://localhost:5000/api/collections', {
+            const response = await fetch('http://localhost:5001/api/collections', {
                 credentials: 'include'
             });
             if (response.ok) {
@@ -111,7 +111,7 @@ const APINetworkExplore = () => {
 
     const fetchUserCollections = async () => {
         try {
-            const response = await fetch('http://localhost:5000/api/collections', {
+            const response = await fetch('http://localhost:5001/api/collections', {
                 credentials: 'include'
             });
             if (response.ok) {
@@ -168,7 +168,7 @@ const APINetworkExplore = () => {
     const handleForkCollection = async (collectionId) => {
         try {
             setLoading(true);
-            const response = await fetch(`http://localhost:5000/api/collections/${collectionId}/fork`, {
+            const response = await fetch(`http://localhost:5001/api/collections/${collectionId}/fork`, {
                 method: 'POST',
                 credentials: 'include'
             });

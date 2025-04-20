@@ -12,7 +12,7 @@ const Request = require('./models/Request');
 const axios = require('axios');
 
 const app = express();
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 5001;
 
 const User = require('./models/User');
 const History = require('./models/History');
@@ -49,7 +49,7 @@ mongoose.connect(process.env.DATABASE_URL)
 passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: 'http://localhost:5000/auth/google/callback',
+    callbackURL: 'http://localhost:5001/auth/google/callback',
     scope: ['profile', 'email']
 },
     async (accessToken, refreshToken, profile, cb) => { // Make the callback async
@@ -744,6 +744,80 @@ app.get('/api/test-endpoint', (req, res) => {
     setTimeout(() => {
         res.status(statusCode).send(responseData);
     }, delay);
+});
+
+// Add mock API endpoints for CLI testing
+app.get('/api/cli-test/users/me', (req, res) => {
+    // Check for API key
+    const apiKey = req.header('Authorization');
+    if (!apiKey || !apiKey.startsWith('Bearer ')) {
+        return res.status(401).json({
+            error: 'Unauthorized',
+            message: 'Missing or invalid API key'
+        });
+    }
+
+    res.json({
+        id: "user-123",
+        name: "Test User",
+        email: "user@example.com",
+        role: "tester",
+        createdAt: new Date().toISOString()
+    });
+});
+
+app.post('/api/cli-test/items', (req, res) => {
+    // Check for API key
+    const apiKey = req.header('Authorization');
+    if (!apiKey || !apiKey.startsWith('Bearer ')) {
+        return res.status(401).json({
+            error: 'Unauthorized',
+            message: 'Missing or invalid API key'
+        });
+    }
+
+    // Create a new item with the data from the request
+    const newItem = {
+        id: "item-" + Date.now(),
+        ...req.body,
+        createdAt: new Date().toISOString()
+    };
+
+    res.status(201).json(newItem);
+});
+
+app.get('/api/cli-test/items/:id', (req, res) => {
+    // Check for API key
+    const apiKey = req.header('Authorization');
+    if (!apiKey || !apiKey.startsWith('Bearer ')) {
+        return res.status(401).json({
+            error: 'Unauthorized',
+            message: 'Missing or invalid API key'
+        });
+    }
+
+    // Return the item with the provided ID
+    res.json({
+        id: req.params.id,
+        name: "Test Item",
+        description: "Created through CI/CD pipeline tests",
+        userId: req.query.userId || "user-123",
+        createdAt: new Date().toISOString()
+    });
+});
+
+app.delete('/api/cli-test/items/:id', (req, res) => {
+    // Check for API key
+    const apiKey = req.header('Authorization');
+    if (!apiKey || !apiKey.startsWith('Bearer ')) {
+        return res.status(401).json({
+            error: 'Unauthorized',
+            message: 'Missing or invalid API key'
+        });
+    }
+
+    // Successful deletion - no content
+    res.status(204).send();
 });
 
 app.listen(port, () => {

@@ -1,0 +1,109 @@
+name: Environment Variable Handling Tests
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "cli/runner.js"
+      - "cli/environment.js"
+      - "utils/scriptRunner.js"
+  pull_request:
+    branches: [main]
+    paths:
+      - "cli/runner.js"
+      - "cli/environment.js"
+      - "utils/scriptRunner.js"
+  # Manual trigger
+  workflow_dispatch:
+
+jobs:
+  test-env-handling:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "18"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Start mock API server
+        run: node server.js &
+        env:
+          PORT: 3500
+
+      - name: Wait for server to start
+        run: sleep 5
+
+      - name: Create test environment file
+        run: |
+          cat > env-test.json << EOF
+          {
+            "API_URL": "localhost:3500",
+            "API_KEY": "test-key-123",
+            "HEADER_VALUE": "Custom-Value",
+            "PATH_PARAM": "users",
+            "QUERY_PARAM": "active=true"
+          }
+          EOF
+
+      - name: Create test collection
+        run: |
+          cat > env-test-collection.json << EOF
+          {
+            "name": "Environment Variable Test Collection",
+            "requests": [
+              {
+                "name": "Test URL interpolation",
+                "url": "http://{{API_URL}}/api/{{PATH_PARAM}}?{{QUERY_PARAM}}",
+                "method": "GET",
+                "headers": [
+                  {
+                    "name": "X-Custom-Header",
+                    "value": "{{HEADER_VALUE}}"
+                  },
+                  {
+                    "name": "Authorization",
+                    "value": "Bearer {{API_KEY}}"
+                  }
+                ],
+                "preRequestScript": "console.log('Testing environment access:', environment.get('API_URL')); environment.set('DYNAMIC_VAR', 'dynamic-value-' + Date.now());",
+                "testScript": "tests.add('Environment variables correctly interpolated in URL', () => { return pm.request.url.includes('localhost:3500/api/users'); });"
+              },
+              {
+                "name": "Test environment variable set in pre-request script",
+                "url": "http://{{API_URL}}/api/check",
+                "method": "GET",
+                "headers": [
+                  {
+                    "name": "X-Dynamic-Header",
+                    "value": "{{DYNAMIC_VAR}}"
+                  }
+                ],
+                "testScript": "tests.add('Dynamic variable is available', () => { return pm.request.headers['X-Dynamic-Header'] && pm.request.headers['X-Dynamic-Header'].includes('dynamic-value'); });"
+              }
+            ]
+          }
+          EOF
+
+      - name: Run environment variable tests
+        run: node cli/pigeon-cli.js run --collection env-test-collection.json --environment env-test.json --reporter junit --output "./test-results/env-test-results.xml"
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: env-test-results
+          path: ./test-results/env-test-results.xml
+
+      - name: Publish Test Results
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        if: always()
+        with:
+          files: ./test-results/env-test-results.xml

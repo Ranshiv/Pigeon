@@ -398,7 +398,7 @@ console.log('Tasks exported successfully!');`;
                             <p>With real-time collaboration, remote teams can work together on API documentation with features like tagging users and linking to endpoints.</p>
                         </div>
                     </div>
-                    <a href="http://localhost:5000/auth/google" className="knowledge-cta">
+                    <a href="http://localhost:5001/auth/google" className="knowledge-cta">
                         Start Documentation <FiArrowRight />
                     </a>
                 </div>
@@ -488,7 +488,7 @@ console.log('Tasks exported successfully!');`;
                             </div>
                             <div className="benefit-card-back" style={{ background: 'linear-gradient(135deg, #2193b0 0%, #6dd5ed 100%)' }}>
                                 <p>Our clean, modern interface helps you focus on what matters - testing your APIs without distractions.</p>
-                                <a href="http://localhost:5000/auth/google" className="benefit-card-cta">
+                                <a href="http://localhost:5001/auth/google" className="benefit-card-cta">
                                     Try it now <FiArrowRight />
                                 </a>
                             </div>
@@ -507,7 +507,7 @@ console.log('Tasks exported successfully!');`;
                             </div>
                             <div className="benefit-card-back" style={{ background: 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)' }}>
                                 <p>We focus on the essential features that developers need daily, without unnecessary complexity.</p>
-                                <a href="http://localhost:5000/auth/google" className="benefit-card-cta">
+                                <a href="http://localhost:5001/auth/google" className="benefit-card-cta">
                                     Get started <FiArrowRight />
                                 </a>
                             </div>
@@ -526,7 +526,7 @@ console.log('Tasks exported successfully!');`;
                             </div>
                             <div className="benefit-card-back" style={{ background: 'linear-gradient(135deg, #f953c6 0%, #b91d73 100%)' }}>
                                 <p>Pigeon helps you build a more efficient workflow with saved requests, collections, and quick responses.</p>
-                                <a href="http://localhost:5000/auth/google" className="benefit-card-cta">
+                                <a href="http://localhost:5001/auth/google" className="benefit-card-cta">
                                     Explore more <FiArrowRight />
                                 </a>
                             </div>
@@ -545,7 +545,7 @@ console.log('Tasks exported successfully!');`;
                             </div>
                             <div className="benefit-card-back" style={{ background: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)' }}>
                                 <p>Pigeon is 100% free to use with all core features available to everyone, no hidden limitations.</p>
-                                <a href="http://localhost:5000/auth/google" className="benefit-card-cta">
+                                <a href="http://localhost:5001/auth/google" className="benefit-card-cta">
                                     Sign up free <FiArrowRight />
                                 </a>
                             </div>
@@ -562,7 +562,7 @@ console.log('Tasks exported successfully!');`;
                 <h2>Ready to Transform Your API Development?</h2>
                 <p>Join thousands of developers building better APIs with Pigeon.</p>
                 <div className="cta-buttons-container">
-                    <a href="http://localhost:5000/auth/google" className="button primary-button cta-button-public">Try It Free</a>
+                    <a href="http://localhost:5001/auth/google" className="button primary-button cta-button-public">Try It Free</a>
                     <div className="social-links">
                         <a href="https://github.com" target="_blank" rel="noopener noreferrer" aria-label="GitHub"><FaGithub /></a>
                         <a href="https://slack.com" target="_blank" rel="noopener noreferrer" aria-label="Slack"><FaSlack /></a>

@@ -1,0 +1,44 @@
+pipeline {
+    agent {
+        docker {
+            image 'node:18-alpine'
+        }
+    }
+    
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+        
+        stage('Install Dependencies') {
+            steps {
+                sh 'npm ci'
+            }
+        }
+        
+        stage('API Tests') {
+            steps {
+                sh 'npm run cli -- run --collection "./tests/api-collection.json" --environment "production" --reporter junit --output "./test-results/pigeon-results.xml"'
+            }
+            post {
+                always {
+                    junit '**/test-results/pigeon-results.xml'
+                }
+            }
+        }
+    }
+    
+    post {
+        success {
+            echo 'All API tests passed! ✅'
+        }
+        failure {
+            echo 'Some API tests failed! ❌'
+        }
+        always {
+            archiveArtifacts artifacts: 'test-results/**/*', allowEmptyArchive: true
+        }
+    }
+}
