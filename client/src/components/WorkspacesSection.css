@@ -1,11 +1,8 @@
 /* client/src/components/WorkspacesSection.css */
 .workspaces-section {
     display: flex;
-    /* align-items: flex-start;  Removed this */
-    /* padding: 20px; Removed this */
     width: 100%;
     height: 100%;
-    /* Ensure it takes full height */
 }
 
 .workspace-sidebar {
@@ -16,11 +13,9 @@
     display: flex;
     flex-direction: column;
     gap: 8px;
-    /* Add some spacing between sidebar items */
 }
 
 .workspace-sidebar>div {
-    /* Style the sidebar links */
     cursor: pointer;
     padding: 8px 12px;
     border-radius: 4px;
@@ -35,5 +30,443 @@
     flex: 1;
     padding: 1rem;
     overflow-y: auto;
-    /* Add scrolling for content */
+}
+
+/* New Workspace Styles */
+.workspaces-container {
+    width: 100%;
+    padding: 1rem;
+}
+
+.workspaces-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+/* Workspace Type Tabs Styling */
+.workspace-types-tabs {
+    display: flex;
+    margin-bottom: 1.5rem;
+    gap: 0.5rem;
+}
+
+.workspace-tab {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    background: #f5f5f5;
+    border: 1px solid #e0e0e0;
+    font-size: 0.9rem;
+    color: #555;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.workspace-tab.active {
+    background: #e8f0fe;
+    color: #1a73e8;
+    border-color: #c6dafc;
+}
+
+.workspace-tab:hover:not(.active) {
+    background: #eaeaea;
+}
+
+.workspace-header h1 {
+    margin: 0;
+    font-size: 1.8rem;
+    font-weight: 600;
+}
+
+.new-workspace-btn {
+    background-color: #4f46e5;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.new-workspace-btn:hover {
+    background-color: #4338ca;
+}
+
+.workspace-types-tabs {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid #e5e7eb;
+    padding-bottom: 0.25rem;
+}
+
+.workspace-tab {
+    background: none;
+    border: none;
+    padding: 0.6rem 1rem;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #6b7280;
+    cursor: pointer;
+    position: relative;
+    transition: color 0.2s;
+}
+
+.workspace-tab::after {
+    content: '';
+    position: absolute;
+    bottom: -0.25rem;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background-color: transparent;
+    transition: background-color 0.2s;
+}
+
+.workspace-tab.active {
+    color: #4f46e5;
+    font-weight: 500;
+}
+
+.workspace-tab.active::after {
+    background-color: #4f46e5;
+}
+
+.workspaces-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.25rem;
+}
+
+.workspace-card {
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 1.25rem;
+    background-color: white;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.workspace-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.workspace-card-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.workspace-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.workspace-icon.personal {
+    background-color: #e0f2fe;
+    color: #0369a1;
+}
+
+.workspace-icon.team {
+    background-color: #fef3c7;
+    color: #b45309;
+}
+
+.workspace-icon.public {
+    background-color: #dcfce7;
+    color: #16a34a;
+}
+
+.workspace-title {
+    flex: 1;
+}
+
+.workspace-title h3 {
+    margin: 0 0 0.25rem 0;
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+.workspace-type {
+    font-size: 0.7rem;
+    padding: 0.15rem 0.5rem;
+    border-radius: 1rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.workspace-type.personal {
+    background-color: #e0f2fe;
+    color: #0369a1;
+}
+
+.workspace-type.team {
+    background-color: #fef3c7;
+    color: #b45309;
+}
+
+.workspace-type.public {
+    background-color: #dcfce7;
+    color: #16a34a;
+}
+
+.workspace-description {
+    color: #6b7280;
+    font-size: 0.9rem;
+    margin-bottom: 1.25rem;
+    line-height: 1.5;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.workspace-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85rem;
+    color: #6b7280;
+    padding-bottom: 0.75rem;
+    margin-bottom: 0.75rem;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.collaborators-count {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.workspace-role {
+    font-size: 0.8rem;
+    color: #6b7280;
+}
+
+.workspace-role .role {
+    font-weight: 500;
+    color: #4f46e5;
+}
+
+.empty-workspaces {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 1rem;
+    text-align: center;
+    background-color: #f9fafb;
+    border-radius: 8px;
+    border: 1px dashed #d1d5db;
+}
+
+.empty-workspaces svg {
+    color: #9ca3af;
+    margin-bottom: 1rem;
+}
+
+.empty-workspaces p {
+    color: #6b7280;
+    margin-bottom: 1.5rem;
+}
+
+.create-workspace-btn {
+    background-color: #4f46e5;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 0.6rem 1.2rem;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.create-workspace-btn:hover {
+    background-color: #4338ca;
+}
+
+/* Modal Styles */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background-color: white;
+    border-radius: 8px;
+    padding: 1.5rem;
+    width: 100%;
+    max-width: 500px;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.workspace-modal {
+    max-width: 550px;
+}
+
+.modal-content h2 {
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+    font-size: 1.4rem;
+}
+
+.form-group {
+    margin-bottom: 1.25rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    font-size: 0.9rem;
+}
+
+.form-group input,
+.form-group textarea {
+    width: 100%;
+    padding: 0.6rem;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    font-size: 0.95rem;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: #4f46e5;
+    box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
+}
+
+.workspace-types {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.workspace-type-option {
+    display: flex;
+    gap: 1rem;
+    padding: 1rem;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: border-color 0.2s, background-color 0.2s;
+}
+
+.workspace-type-option.selected {
+    border-color: #4f46e5;
+    background-color: #eef2ff;
+}
+
+.type-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    flex-shrink: 0;
+}
+
+.workspace-type-option:nth-child(1) .type-icon {
+    background-color: #e0f2fe;
+    color: #0369a1;
+}
+
+.workspace-type-option:nth-child(2) .type-icon {
+    background-color: #fef3c7;
+    color: #b45309;
+}
+
+.workspace-type-option:nth-child(3) .type-icon {
+    background-color: #dcfce7;
+    color: #16a34a;
+}
+
+.type-info strong {
+    display: block;
+    margin-bottom: 0.25rem;
+    font-weight: 600;
+}
+
+.type-info p {
+    margin: 0;
+    color: #6b7280;
+    font-size: 0.85rem;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+}
+
+.cancel-btn,
+.create-btn {
+    padding: 0.6rem 1.2rem;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background-color 0.2s;
+}
+
+.cancel-btn {
+    background-color: #f3f4f6;
+    color: #1f2937;
+    border: none;
+}
+
+.cancel-btn:hover {
+    background-color: #e5e7eb;
+}
+
+.create-btn {
+    background-color: #4f46e5;
+    color: white;
+    border: none;
+}
+
+.create-btn:hover {
+    background-color: #4338ca;
+}
+
+.loading-message,
+.error-message {
+    text-align: center;
+    padding: 2rem;
+    color: #6b7280;
+}
+
+.error-message {
+    color: #ef4444;
 }

@@ -2,3 +2,238 @@
 .ai-agent-tools-section {
     width: 100%;
 }
+
+.ai-tools-section {
+    padding: 1.5rem;
+}
+
+.ai-tools-header {
+    margin-bottom: 1.75rem;
+}
+
+.ai-tools-header h2 {
+    display: flex;
+    align-items: center;
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+    font-size: 1.5rem;
+}
+
+.header-icon {
+    color: #6d28d9;
+    margin-right: 0.5rem;
+}
+
+.ai-tools-header p {
+    color: #6b7280;
+    margin: 0;
+}
+
+.ai-tools-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.25rem;
+    margin-bottom: 2.5rem;
+}
+
+.ai-tool-card {
+    background-color: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 1.25rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    transition: transform 0.2s, box-shadow 0.2s;
+    display: flex;
+    flex-direction: column;
+}
+
+.ai-tool-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.07);
+}
+
+.ai-tool-header {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+}
+
+.ai-tool-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    background-color: #ede9fe;
+    color: #6d28d9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    margin-right: 0.75rem;
+    flex-shrink: 0;
+}
+
+.ai-tool-title {
+    flex: 1;
+}
+
+.ai-tool-title h3 {
+    margin: 0;
+    margin-bottom: 0.25rem;
+    font-size: 1.1rem;
+}
+
+.ai-tool-category {
+    font-size: 0.75rem;
+    color: #6b7280;
+}
+
+.premium-badge {
+    background-color: #fef3c7;
+    color: #b45309;
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 0.2rem 0.5rem;
+    border-radius: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.ai-tool-description {
+    color: #6b7280;
+    font-size: 0.9rem;
+    margin-bottom: 1.25rem;
+    line-height: 1.4;
+    flex: 1;
+}
+
+.use-tool-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    width: 100%;
+    padding: 0.6rem 0;
+    background-color: #8b5cf6;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.use-tool-btn:hover {
+    background-color: #7c3aed;
+}
+
+.custom-agent-section {
+    background-color: #f5f3ff;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 2.5rem;
+    display: flex;
+    align-items: center;
+}
+
+.custom-agent-content {
+    flex: 3;
+}
+
+.custom-agent-content h3 {
+    margin-top: 0;
+    margin-bottom: 0.75rem;
+    font-size: 1.25rem;
+    color: #5b21b6;
+}
+
+.custom-agent-content p {
+    color: #6b7280;
+    margin-bottom: 1rem;
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+.agent-benefits {
+    margin-bottom: 1.5rem;
+    padding-left: 1.25rem;
+}
+
+.agent-benefits li {
+    margin-bottom: 0.5rem;
+    color: #4b5563;
+}
+
+.create-agent-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background-color: #8b5cf6;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 0.6rem 1.25rem;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.create-agent-btn:hover {
+    background-color: #7c3aed;
+}
+
+.custom-agent-image {
+    flex: 2;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.image-placeholder {
+    width: 180px;
+    height: 180px;
+    background-color: #ede9fe;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #6d28d9;
+}
+
+.ai-tools-insights {
+    background-color: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 1.5rem;
+}
+
+.ai-tools-insights h3 {
+    margin-top: 0;
+    margin-bottom: 1.25rem;
+    font-size: 1.2rem;
+    text-align: center;
+}
+
+.insights-stats {
+    display: flex;
+    justify-content: space-around;
+    text-align: center;
+}
+
+.stat-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.stat-value {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #6d28d9;
+    margin-bottom: 0.25rem;
+}
+
+.stat-label {
+    font-size: 0.85rem;
+    color: #6b7280;
+}

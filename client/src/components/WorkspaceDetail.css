@@ -1,0 +1,783 @@
+.workspace-detail-container {
+    padding: 1.5rem 2rem;
+}
+
+.workspace-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+}
+
+.workspace-title-section {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.workspace-title-section h1 {
+    margin: 0;
+    font-size: 2rem;
+    font-weight: 600;
+}
+
+.workspace-badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 1rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.workspace-badge.personal {
+    background-color: #e0f2fe;
+    color: #0369a1;
+}
+
+.workspace-badge.team {
+    background-color: #fef3c7;
+    color: #b45309;
+}
+
+.workspace-badge.public {
+    background-color: #dcfce7;
+    color: #16a34a;
+}
+
+.workspace-actions {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.workspace-edit-btn,
+.workspace-delete-btn {
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.workspace-edit-btn {
+    background-color: #f3f4f6;
+    color: #4b5563;
+    border: 1px solid #d1d5db;
+}
+
+.workspace-edit-btn:hover {
+    background-color: #e5e7eb;
+}
+
+.workspace-delete-btn {
+    background-color: #fee2e2;
+    color: #ef4444;
+    border: 1px solid #fecaca;
+}
+
+.workspace-delete-btn:hover {
+    background-color: #fecaca;
+}
+
+.workspace-description {
+    color: #6b7280;
+    font-size: 0.95rem;
+    margin-bottom: 2rem;
+    max-width: 800px;
+    line-height: 1.5;
+}
+
+.workspace-tabs {
+    display: flex;
+    border-bottom: 1px solid #e5e7eb;
+    margin-bottom: 1.5rem;
+    gap: 0.5rem;
+}
+
+.tab {
+    padding: 0.75rem 1.25rem;
+    background: none;
+    border: none;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #6b7280;
+    cursor: pointer;
+    position: relative;
+}
+
+.tab.active {
+    color: #4f46e5;
+}
+
+.tab.active::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background-color: #4f46e5;
+    border-radius: 2px 2px 0 0;
+}
+
+.workspace-content {
+    min-height: 300px;
+}
+
+.tab-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.25rem;
+}
+
+.tab-header h2 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+.add-collection-btn,
+.invite-member-btn {
+    padding: 0.5rem 1rem;
+    background-color: #4f46e5;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.add-collection-btn:hover,
+.invite-member-btn:hover {
+    background-color: #4338ca;
+}
+
+.collections-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.25rem;
+}
+
+.collection-card {
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 1.25rem;
+    background-color: white;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.collection-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.collection-card h3 {
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+    font-size: 1.1rem;
+}
+
+.collection-card p {
+    color: #6b7280;
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+}
+
+.collection-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    color: #6b7280;
+    margin-bottom: 1rem;
+}
+
+.view-collection-btn {
+    width: 100%;
+    padding: 0.5rem;
+    background-color: #f3f4f6;
+    color: #1f2937;
+    border: none;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.view-collection-btn:hover {
+    background-color: #e5e7eb;
+}
+
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 1rem;
+    text-align: center;
+    background-color: #f9fafb;
+    border-radius: 8px;
+    border: 1px dashed #d1d5db;
+}
+
+.empty-state svg {
+    color: #9ca3af;
+    margin-bottom: 1rem;
+}
+
+.empty-state p {
+    color: #6b7280;
+    margin-bottom: 1.5rem;
+}
+
+.primary-btn {
+    background-color: #4f46e5;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 0.6rem 1.2rem;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.primary-btn:hover {
+    background-color: #4338ca;
+}
+
+/* Members Tab Styles */
+.members-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.members-table th {
+    text-align: left;
+    padding: 0.75rem 1rem;
+    border-bottom: 2px solid #e5e7eb;
+    color: #4b5563;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.members-table td {
+    padding: 1rem;
+    border-bottom: 1px solid #e5e7eb;
+    font-size: 0.95rem;
+}
+
+.user-cell {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background-color: #4f46e5;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+.user-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.user-name {
+    font-weight: 500;
+    margin-bottom: 0.2rem;
+}
+
+.user-email {
+    font-size: 0.85rem;
+    color: #6b7280;
+}
+
+.role-badge {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.role-badge.admin {
+    background-color: #fef3c7;
+    color: #b45309;
+}
+
+.role-badge.editor {
+    background-color: #dcfce7;
+    color: #16a34a;
+}
+
+.role-badge.viewer {
+    background-color: #e0f2fe;
+    color: #0369a1;
+}
+
+.role-select {
+    padding: 0.25rem 0.5rem;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    font-size: 0.9rem;
+}
+
+.remove-member-btn {
+    padding: 0.25rem 0.5rem;
+    background-color: #fee2e2;
+    color: #ef4444;
+    border: none;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    cursor: pointer;
+}
+
+.owner-label {
+    font-size: 0.85rem;
+    color: #6b7280;
+    font-style: italic;
+}
+
+/* Merge Requests Styles */
+.merge-requests-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.merge-request-card {
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 1.25rem;
+    background-color: white;
+}
+
+.merge-request-card.approved {
+    border-left: 4px solid #16a34a;
+}
+
+.merge-request-card.rejected {
+    border-left: 4px solid #ef4444;
+}
+
+.merge-request-card.pending {
+    border-left: 4px solid #f59e0b;
+}
+
+.merge-request-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+}
+
+.merge-request-title {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.merge-icon {
+    color: #4f46e5;
+}
+
+.merge-request-title h3 {
+    margin: 0;
+    font-size: 1.1rem;
+}
+
+.status-badge {
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.status-badge.approved {
+    background-color: #dcfce7;
+    color: #16a34a;
+}
+
+.status-badge.rejected {
+    background-color: #fee2e2;
+    color: #ef4444;
+}
+
+.status-badge.pending {
+    background-color: #fef3c7;
+    color: #f59e0b;
+}
+
+.merge-details {
+    padding-top: 1rem;
+    border-top: 1px solid #e5e7eb;
+}
+
+.merge-collections {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.source,
+.target {
+    flex: 1;
+}
+
+.label {
+    display: block;
+    font-size: 0.8rem;
+    color: #6b7280;
+    margin-bottom: 0.25rem;
+}
+
+.value {
+    font-weight: 500;
+}
+
+.merge-arrow {
+    color: #6b7280;
+}
+
+.merge-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85rem;
+    color: #6b7280;
+    margin-bottom: 1rem;
+}
+
+.merge-actions {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 1rem;
+}
+
+.approve-btn,
+.reject-btn {
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.approve-btn {
+    background-color: #dcfce7;
+    color: #16a34a;
+    border: 1px solid #a7f3d0;
+}
+
+.reject-btn {
+    background-color: #fee2e2;
+    color: #ef4444;
+    border: 1px solid #fecaca;
+}
+
+.merge-result {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85rem;
+    color: #6b7280;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px dashed #e5e7eb;
+}
+
+/* Activity Timeline Styles */
+.activity-timeline {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.activity-item {
+    display: flex;
+    gap: 1rem;
+}
+
+.activity-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background-color: #eef2ff;
+    color: #4f46e5;
+    flex-shrink: 0;
+}
+
+.activity-content {
+    flex: 1;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.activity-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+}
+
+.user {
+    font-weight: 500;
+}
+
+.time {
+    color: #6b7280;
+    font-size: 0.85rem;
+}
+
+.activity-message {
+    margin: 0 0 0.5rem 0;
+    line-height: 1.4;
+}
+
+.activity-details {
+    padding: 0.75rem;
+    background-color: #f9fafb;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    font-family: monospace;
+    white-space: pre-wrap;
+}
+
+/* Modal Styles */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background-color: white;
+    border-radius: 8px;
+    padding: 1.5rem;
+    width: 100%;
+    max-width: 500px;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.modal-content h2 {
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+    font-size: 1.4rem;
+}
+
+.form-group {
+    margin-bottom: 1.25rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    font-size: 0.9rem;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 0.6rem;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    font-size: 0.95rem;
+}
+
+.role-options {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.role-option {
+    display: flex;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.role-option.selected {
+    border-color: #4f46e5;
+    background-color: #eef2ff;
+}
+
+.role-option svg {
+    flex-shrink: 0;
+    margin-top: 2px;
+    color: #6b7280;
+}
+
+.role-option.selected svg {
+    color: #4f46e5;
+}
+
+.role-option strong {
+    font-size: 0.9rem;
+    display: block;
+    margin-bottom: 0.2rem;
+}
+
+.role-option p {
+    margin: 0;
+    font-size: 0.8rem;
+    color: #6b7280;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+}
+
+.cancel-btn,
+.invite-btn {
+    padding: 0.6rem 1.2rem;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background-color 0.2s;
+}
+
+.cancel-btn {
+    background-color: #f3f4f6;
+    color: #1f2937;
+    border: none;
+}
+
+.cancel-btn:hover {
+    background-color: #e5e7eb;
+}
+
+.invite-btn {
+    background-color: #4f46e5;
+    color: white;
+    border: none;
+}
+
+.invite-btn:hover {
+    background-color: #4338ca;
+}
+
+/* Workspace Edit Form Styles */
+.workspace-edit-container {
+    padding: 20px;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.workspace-edit-container h1 {
+    margin-bottom: 20px;
+    font-size: 1.8rem;
+    color: var(--text-color, #333);
+}
+
+.workspace-edit-form .form-group {
+    margin-bottom: 20px;
+}
+
+.workspace-edit-form label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: var(--text-color, #333);
+}
+
+.workspace-edit-form input,
+.workspace-edit-form textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid var(--border-color, #ddd);
+    border-radius: 4px;
+    font-size: 16px;
+}
+
+.workspace-edit-form textarea {
+    min-height: 100px;
+    resize: vertical;
+}
+
+.workspace-edit-form .form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 30px;
+}
+
+.workspace-edit-form .cancel-btn,
+.workspace-edit-form .save-btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.workspace-edit-form .cancel-btn {
+    background-color: var(--secondary-btn-bg, #e0e0e0);
+    color: var(--text-color, #333);
+}
+
+.workspace-edit-form .save-btn {
+    background-color: var(--primary-btn-bg, #4285f4);
+    color: white;
+}
+
+.workspace-edit-form .cancel-btn:hover {
+    background-color: var(--secondary-btn-hover, #d0d0d0);
+}
+
+.workspace-edit-form .save-btn:hover {
+    background-color: var(--primary-btn-hover, #3367d6);
+}
+
+.info-box {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 15px;
+    background-color: var(--info-bg, #f0f7ff);
+    border: 1px solid var(--info-border, #cce5ff);
+    border-radius: 4px;
+    color: var(--info-text, #0366d6);
+}
+
+.error-message {
+    padding: 10px 15px;
+    margin-bottom: 20px;
+    background-color: var(--error-bg, #fff0f0);
+    border: 1px solid var(--error-border, #ffcdd2);
+    border-radius: 4px;
+    color: var(--error-text, #d32f2f);
+}

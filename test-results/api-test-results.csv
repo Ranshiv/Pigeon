@@ -1,6 +1,6 @@
 Request Name,URL,Method,Status,Duration (ms),Error,Test Count,Tests Passed,Tests Failed
-Test URL and Header Variable Interpolation,http://localhost:3500/api/users?active=true&role=admin,GET,200,34,,3,3,0
-Test Dynamic Variables Set in Pre-request Script,http://localhost:3500/api/check,GET,200,5,,2,2,0
+Test URL and Header Variable Interpolation,http://localhost:3500/api/users?active=true&role=admin,GET,200,41,,3,3,0
+Test Dynamic Variables Set in Pre-request Script,http://localhost:3500/api/check,GET,200,4,,2,2,0
 
 
 Detailed Test Results
@@ -15,8 +15,8 @@ Test Dynamic Variables Set in Pre-request Script,Response contains dynamic heade
 Summary
 Collection,test-collection.json
 Environment,test-environment.json
-Timestamp,2025-04-20T09:51:23.954Z
-Duration (ms),44
+Timestamp,2025-04-21T00:24:21.855Z
+Duration (ms),51
 Total Requests,2
 Failed Requests,0
 Total Tests,5

@@ -1,49 +1,437 @@
 //client/src/components/WorkspacesSection.js
 import React, { useState, useEffect } from 'react';
-import { Routes, Route, useNavigate, useParams, Navigate } from 'react-router-dom'; // Import useParams
-import ExploreSection from './ExploreSection';
+import { Routes, Route, useNavigate, useParams, Navigate } from 'react-router-dom';
+import APINetworkExplore from './APINetworkExplore';
 import SpotlightSection from './SpotlightSection';
 import TrendingSection from './TrendingSection';
 import AIAgentToolsSection from './AIAgentToolsSection';
-import RequestForm from './RequestForm'; // Import RequestForm
-import ResponseDisplay from './ResponseDisplay'; // Import ResponseDisplay
+import RequestForm from './RequestForm';
+import ResponseDisplay from './ResponseDisplay';
+import WorkspaceDetail from './WorkspaceDetail';
+import WorkspaceEdit from './WorkspaceEdit';
+import CollectionsManagement from './CollectionsManagement';
+import { FiGrid, FiPlus, FiUsers, FiGlobe, FiLock, FiStar } from 'react-icons/fi';
 import './WorkspacesSection.css';
 
 const WorkspacesSection = ({ requests, response, onSend, onCreate, onUpdate, onDelete }) => {
     const navigate = useNavigate();
+    const [workspaces, setWorkspaces] = useState([]);
+    const [personalWorkspaces, setPersonalWorkspaces] = useState([]);
+    const [teamWorkspaces, setTeamWorkspaces] = useState([]);
+    const [publicWorkspaces, setPublicWorkspaces] = useState([]);
+    const [myWorkspaces, setMyWorkspaces] = useState([]);
+    const [sharedWorkspaces, setSharedWorkspaces] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
+    const [showCreateModal, setShowCreateModal] = useState(false);
+    const [newWorkspaceName, setNewWorkspaceName] = useState('');
+    const [newWorkspaceDesc, setNewWorkspaceDesc] = useState('');
+    const [newWorkspaceType, setNewWorkspaceType] = useState('personal');
+    const [activeWorkspaceType, setActiveWorkspaceType] = useState('personal');
+    const [viewMode, setViewMode] = useState('my'); // 'my' for My Workspaces, 'shared' for Shared Workspaces
+
+    // Fetch workspaces on component mount
+    useEffect(() => {
+        fetchWorkspaces();
+    }, []);
+
+    const fetchWorkspaces = async () => {
+        try {
+            setLoading(true);
+            const response = await fetch('http://localhost:5001/api/workspaces', {
+                credentials: 'include'
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to fetch workspaces');
+            }
+
+            const data = await response.json();
+
+            // Convert the server response format to what our component expects
+            let workspacesList = [];
+            if (data.personal) workspacesList = [...workspacesList, ...data.personal];
+            if (data.team) workspacesList = [...workspacesList, ...data.team];
+
+            // Mark which ones are owned by the current user
+            workspacesList = workspacesList.map(workspace => ({
+                ...workspace,
+                isOwner: workspace.owner === 'temp-user-id' || workspace._id === 'ws1'
+            }));
+
+            // Set all workspaces
+            setWorkspaces(workspacesList);
+
+            // Filter workspaces owned by the current user vs shared with the current user
+            const ownedWorkspaces = workspacesList.filter(workspace => workspace.isOwner === true);
+            const sharedWithUser = workspacesList.filter(workspace => !workspace.isOwner && !workspace.isPublic);
+
+            setMyWorkspaces(ownedWorkspaces);
+            setSharedWorkspaces(sharedWithUser);
+
+            // Also maintain the existing categories
+            setPersonalWorkspaces(workspacesList.filter(workspace => workspace.isPersonal));
+            setTeamWorkspaces(workspacesList.filter(workspace => !workspace.isPersonal && !workspace.isPublic));
+            setPublicWorkspaces(workspacesList.filter(workspace => workspace.isPublic));
+
+        } catch (err) {
+            setError('Failed to load workspaces');
+            console.error('Error fetching workspaces:', err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleCreateWorkspace = async (e) => {
+        e.preventDefault();
+        try {
+            setError(null); // Clear previous errors
+            setLoading(true);
+
+            if (!newWorkspaceName.trim()) {
+                setError('Please enter a workspace name');
+                setLoading(false);
+                return;
+            }
+
+            const response = await fetch('http://localhost:5001/api/workspaces', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'include',
+                body: JSON.stringify({
+                    name: newWorkspaceName,
+                    description: newWorkspaceDesc,
+                    isPersonal: newWorkspaceType === 'personal',
+                    isPublic: newWorkspaceType === 'public'
+                })
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                const errorMessage = errorData.message || 'Failed to create workspace';
+                setError(errorMessage);
+                throw new Error(errorMessage);
+            }
+
+            const newWorkspace = await response.json();
+
+            // Add isOwner property
+            newWorkspace.isOwner = true;
+
+            // Update state with new workspace
+            setWorkspaces([...workspaces, newWorkspace]);
+
+            // Add to myWorkspaces since the user is creating it
+            setMyWorkspaces([...myWorkspaces, newWorkspace]);
+
+            // Update the appropriate workspace category
+            if (newWorkspaceType === 'personal') {
+                setPersonalWorkspaces([...personalWorkspaces, newWorkspace]);
+            } else if (newWorkspaceType === 'public') {
+                setPublicWorkspaces([...publicWorkspaces, newWorkspace]);
+            } else {
+                setTeamWorkspaces([...teamWorkspaces, newWorkspace]);
+            }
+
+            // Reset form and close modal
+            setNewWorkspaceName('');
+            setNewWorkspaceDesc('');
+            setNewWorkspaceType('personal');
+            setShowCreateModal(false);
+
+            // Navigate to the new workspace
+            navigate(`/workspace/workspaces/${newWorkspace._id}`);
+        } catch (err) {
+            console.error('Error creating workspace:', err);
+            if (!error) {
+                setError('Failed to create workspace. Please try again.');
+            }
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const renderWorkspaces = () => {
+        let workspacesToDisplay = [];
+
+        // First determine if we're showing "My Workspaces" or "Shared Workspaces"
+        if (viewMode === 'my') {
+            // From My Workspaces, filter by workspace type
+            switch (activeWorkspaceType) {
+                case 'personal':
+                    workspacesToDisplay = myWorkspaces.filter(workspace => workspace.isPersonal);
+                    break;
+                case 'team':
+                    workspacesToDisplay = myWorkspaces.filter(workspace => !workspace.isPersonal && !workspace.isPublic);
+                    break;
+                case 'public':
+                    workspacesToDisplay = myWorkspaces.filter(workspace => workspace.isPublic);
+                    break;
+                default:
+                    workspacesToDisplay = myWorkspaces;
+            }
+        } else {
+            // For Shared Workspaces
+            switch (activeWorkspaceType) {
+                case 'personal':
+                    workspacesToDisplay = sharedWorkspaces.filter(workspace => workspace.isPersonal);
+                    break;
+                case 'team':
+                    workspacesToDisplay = sharedWorkspaces.filter(workspace => !workspace.isPersonal && !workspace.isPublic);
+                    break;
+                case 'public':
+                    workspacesToDisplay = sharedWorkspaces.filter(workspace => workspace.isPublic);
+                    break;
+                default:
+                    workspacesToDisplay = sharedWorkspaces;
+            }
+        }
+
+        if (loading && workspacesToDisplay.length === 0) {
+            return <div className="loading-message">Loading workspaces...</div>;
+        }
+
+        if (error) {
+            return <div className="error-message">{error}</div>;
+        }
+
+        if (workspacesToDisplay.length === 0) {
+            return (
+                <div className="empty-workspaces">
+                    <FiGrid size={48} />
+                    <p>
+                        {viewMode === 'my'
+                            ? (activeWorkspaceType === 'personal'
+                                ? "You don't have any personal workspaces yet."
+                                : activeWorkspaceType === 'team'
+                                    ? "You don't have any team workspaces yet."
+                                    : "No public workspaces available.")
+                            : "You don't have any shared workspaces of this type."
+                        }
+                    </p>
+                    {viewMode === 'my' && (
+                        <button className="create-workspace-btn" onClick={() => setShowCreateModal(true)}>
+                            <FiPlus /> Create Your First Workspace
+                        </button>
+                    )}
+                </div>
+            );
+        }
+
+        return (
+            <div className="workspaces-grid">
+                {workspacesToDisplay.map(workspace => (
+                    <div
+                        key={workspace._id}
+                        className="workspace-card"
+                        onClick={() => navigate(`/workspace/workspaces/${workspace._id}`)}
+                    >
+                        <div className="workspace-card-header">
+                            {workspace.isPersonal && (
+                                <div className="workspace-icon personal">
+                                    <FiLock />
+                                </div>
+                            )}
+                            {workspace.isPublic && (
+                                <div className="workspace-icon public">
+                                    <FiGlobe />
+                                </div>
+                            )}
+                            {!workspace.isPersonal && !workspace.isPublic && (
+                                <div className="workspace-icon team">
+                                    <FiUsers />
+                                </div>
+                            )}
+                            <div className="workspace-title">
+                                <h3>{workspace.name}</h3>
+                                {workspace.isPersonal && <span className="workspace-type personal">Personal</span>}
+                                {workspace.isPublic && <span className="workspace-type public">Public</span>}
+                                {!workspace.isPersonal && !workspace.isPublic && <span className="workspace-type team">Team</span>}
+                            </div>
+                        </div>
+                        <p className="workspace-description">{workspace.description || 'No description provided.'}</p>
+
+                        <div className="workspace-meta">
+                            <div className="collections-count">
+                                <strong>{workspace.collectionsCount || 0}</strong> collections
+                            </div>
+                            <div className="collaborators-count">
+                                <FiUsers />
+                                <span>{workspace.collaboratorsCount || 1}</span>
+                            </div>
+                        </div>
+
+                        {workspace.userRole && (
+                            <div className="workspace-role">
+                                Your role: <span className="role">{workspace.userRole}</span>
+                            </div>
+                        )}
+                    </div>
+                ))}
+            </div>
+        );
+    };
+
     return (
         <div className="workspaces-section">
-            <div className="workspace-sidebar">
-                <div onClick={() => navigate('explore')}>Explore</div>
-                <div onClick={() => navigate('spotlight')}>Spotlight</div>
-                <div onClick={() => navigate('trending')}>Trending</div>
-                <div onClick={() => navigate('ai-agent-tools')}>AI Agent Tools</div>
-                <div onClick={() => navigate('requests/new')}>Add Request</div>
-            </div>
-            <div className="workspace-main-content">
-                <Routes>
-                    <Route index element={<Navigate to="explore" />} />
-                    <Route path="explore" element={<ExploreSection requests={requests} onSend={onSend} onDelete={onDelete} onSelect={(request) => navigate(`requests/${request._id}`)} onEdit={(request) => navigate(`requests/edit/${request._id}`)} />} />
-                    <Route path="spotlight" element={<SpotlightSection />} />
-                    <Route path="trending" element={<TrendingSection />} />
-                    <Route path="ai-agent-tools" element={<AIAgentToolsSection />} />
-                    <Route
-                        path="requests/new"
-                        element={<RequestForm onSubmit={onCreate} onCancel={() => navigate('explore')} />}
-                    />
-                    <Route
-                        path="requests/edit/:id"
-                        element={<EditRequestForm requests={requests} onSubmit={onUpdate} />}
-                    />
-                    <Route
-                        path="requests/:id"
-                        element={<RequestDetails requests={requests} response={response} onSend={onSend} />}
-                    />
-                </Routes>
-            </div>
+            <Routes>
+                <Route
+                    index
+                    element={
+                        <div className="workspaces-container">
+                            <div className="workspaces-header">
+                                <h1>Workspaces</h1>
+                                <button className="new-workspace-btn" onClick={() => setShowCreateModal(true)}>
+                                    <FiPlus /> New Workspace
+                                </button>
+                            </div>
+
+                            <div className="workspace-types-tabs">
+                                <button
+                                    className={`workspace-tab ${activeWorkspaceType === 'personal' ? 'active' : ''}`}
+                                    onClick={() => setActiveWorkspaceType('personal')}
+                                >
+                                    <FiLock size={16} /> Personal
+                                </button>
+                                <button
+                                    className={`workspace-tab ${activeWorkspaceType === 'team' ? 'active' : ''}`}
+                                    onClick={() => setActiveWorkspaceType('team')}
+                                >
+                                    <FiUsers size={16} /> Team
+                                </button>
+                                <button
+                                    className={`workspace-tab ${activeWorkspaceType === 'public' ? 'active' : ''}`}
+                                    onClick={() => setActiveWorkspaceType('public')}
+                                >
+                                    <FiGlobe size={16} /> Public
+                                </button>
+                            </div>
+
+                            {renderWorkspaces()}
+
+                            {/* Create Workspace Modal */}
+                            {showCreateModal && (
+                                <div className="modal-overlay">
+                                    <div className="modal-content workspace-modal">
+                                        <h2>Create New Workspace</h2>
+                                        <form onSubmit={handleCreateWorkspace}>
+                                            <div className="form-group">
+                                                <label htmlFor="workspaceName">Name</label>
+                                                <input
+                                                    type="text"
+                                                    id="workspaceName"
+                                                    value={newWorkspaceName}
+                                                    onChange={(e) => setNewWorkspaceName(e.target.value)}
+                                                    required
+                                                    placeholder="Enter workspace name"
+                                                />
+                                            </div>
+
+                                            <div className="form-group">
+                                                <label htmlFor="workspaceDesc">Description</label>
+                                                <textarea
+                                                    id="workspaceDesc"
+                                                    value={newWorkspaceDesc}
+                                                    onChange={(e) => setNewWorkspaceDesc(e.target.value)}
+                                                    placeholder="Describe your workspace"
+                                                    rows={3}
+                                                ></textarea>
+                                            </div>
+
+                                            <div className="form-group">
+                                                <label>Workspace Type</label>
+                                                <div className="workspace-types">
+                                                    <div
+                                                        className={`workspace-type-option ${newWorkspaceType === 'personal' ? 'selected' : ''}`}
+                                                        onClick={() => setNewWorkspaceType('personal')}
+                                                    >
+                                                        <div className="type-icon">
+                                                            <FiLock size={20} />
+                                                        </div>
+                                                        <div className="type-info">
+                                                            <strong>Personal</strong>
+                                                            <p>Private workspace only for you</p>
+                                                        </div>
+                                                    </div>
+
+                                                    <div
+                                                        className={`workspace-type-option ${newWorkspaceType === 'team' ? 'selected' : ''}`}
+                                                        onClick={() => setNewWorkspaceType('team')}
+                                                    >
+                                                        <div className="type-icon">
+                                                            <FiUsers size={20} />
+                                                        </div>
+                                                        <div className="type-info">
+                                                            <strong>Team</strong>
+                                                            <p>Collaborate with specific people</p>
+                                                        </div>
+                                                    </div>
+
+                                                    <div
+                                                        className={`workspace-type-option ${newWorkspaceType === 'public' ? 'selected' : ''}`}
+                                                        onClick={() => setNewWorkspaceType('public')}
+                                                    >
+                                                        <div className="type-icon">
+                                                            <FiGlobe size={20} />
+                                                        </div>
+                                                        <div className="type-info">
+                                                            <strong>Public</strong>
+                                                            <p>Visible to everyone in the community</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div className="modal-actions">
+                                                <button type="button" className="cancel-btn" onClick={() => setShowCreateModal(false)}>
+                                                    Cancel
+                                                </button>
+                                                <button type="submit" className="create-btn" disabled={loading}>
+                                                    {loading ? 'Creating...' : 'Create Workspace'}
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    }
+                />
+
+                {/* Workspace Detail Route */}
+                <Route path=":id" element={<WorkspaceDetail />} />
+
+                {/* Workspace Edit Route */}
+                <Route path=":id/edit" element={<WorkspaceEdit />} />
+
+                {/* Collections Management Route */}
+                <Route path="collections/*" element={<CollectionsManagement />} />
+
+                {/* Updated Routes - Using APINetworkExplore instead of ExploreSection */}
+                <Route path="explore" element={<APINetworkExplore requests={requests} onSend={onSend} onDelete={onDelete} onSelect={(request) => navigate(`requests/${request._id}`)} onEdit={(request) => navigate(`requests/edit/${request._id}`)} />} />
+                <Route path="spotlight" element={<SpotlightSection />} />
+                <Route path="trending" element={<TrendingSection />} />
+                <Route path="ai-agent-tools" element={<AIAgentToolsSection />} />
+                <Route
+                    path="requests/new"
+                    element={<RequestForm onSubmit={onCreate} onCancel={() => navigate('explore')} />}
+                />
+                <Route
+                    path="requests/edit/:id"
+                    element={<EditRequestForm requests={requests} onSubmit={onUpdate} />}
+                />
+                <Route
+                    path="requests/:id"
+                    element={<RequestDetails requests={requests} response={response} onSend={onSend} />}
+                />
+            </Routes>
         </div>
     );
 };
+
+// Existing Components (keep them as is)
 const RequestDetails = ({ requests, response, onSend }) => {
     const { id } = useParams();
     const request = requests.find((r) => r._id === id);
@@ -70,7 +458,6 @@ const RequestDetails = ({ requests, response, onSend }) => {
             </button>
             <button className='edit-request-button' onClick={() => navigate(`requests/edit/${request._id}`)}>Edit</button>
             {response && <ResponseDisplay response={response} />}
-
         </>
     );
 };

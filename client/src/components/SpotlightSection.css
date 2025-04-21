@@ -1,6 +1,7 @@
 /* client/src/components/SpotlightSection.css */
 .spotlight-section {
     width: 100%;
+    padding: 1.5rem;
 }
 
 .spotlight-item {
@@ -23,4 +24,168 @@
 
 .spotlight-item button:hover {
     background-color: #0056b3;
+}
+
+.spotlight-header {
+    margin-bottom: 2rem;
+}
+
+.spotlight-header h2 {
+    display: flex;
+    align-items: center;
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+    font-size: 1.5rem;
+}
+
+.header-icon {
+    color: #f59e0b;
+    margin-right: 0.5rem;
+}
+
+.spotlight-header p {
+    color: #6b7280;
+    margin: 0;
+}
+
+.featured-apis {
+    margin-bottom: 2.5rem;
+}
+
+.featured-apis h3 {
+    margin-top: 0;
+    margin-bottom: 1rem;
+    font-size: 1.2rem;
+}
+
+.api-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+.api-card {
+    background-color: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 1.25rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.api-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.07);
+}
+
+.api-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.api-header h4 {
+    margin: 0;
+    font-size: 1.1rem;
+}
+
+.category-badge {
+    font-size: 0.75rem;
+    background-color: #f3f4f6;
+    color: #4b5563;
+    padding: 0.25rem 0.5rem;
+    border-radius: 1rem;
+    font-weight: 500;
+}
+
+.api-description {
+    color: #6b7280;
+    font-size: 0.9rem;
+    margin-bottom: 1.25rem;
+    line-height: 1.4;
+}
+
+.api-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.api-stats {
+    display: flex;
+    gap: 1rem;
+}
+
+.api-rating,
+.api-usage {
+    display: flex;
+    align-items: center;
+    font-size: 0.85rem;
+    color: #6b7280;
+}
+
+.star-icon {
+    color: #f59e0b;
+    margin-right: 0.25rem;
+}
+
+.usage-icon {
+    color: #4f46e5;
+    margin-right: 0.25rem;
+}
+
+.view-api-btn {
+    background-color: #f3f4f6;
+    color: #1f2937;
+    border: none;
+    border-radius: 4px;
+    padding: 0.4rem 0.75rem;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.view-api-btn:hover {
+    background-color: #e5e7eb;
+}
+
+.spotlight-community {
+    background-color: #f9fafb;
+    border-radius: 8px;
+    padding: 1.5rem;
+}
+
+.spotlight-community h3 {
+    margin-top: 0;
+    margin-bottom: 1rem;
+    font-size: 1.2rem;
+}
+
+.community-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.community-content p {
+    color: #6b7280;
+    margin: 0;
+}
+
+.explore-community-btn {
+    background-color: #4f46e5;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.explore-community-btn:hover {
+    background-color: #4338ca;
 }

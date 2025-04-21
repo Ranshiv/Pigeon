@@ -17,7 +17,15 @@ function App() {
     // Check authentication status on app load
     const checkAuth = async () => {
       try {
-        const res = await fetch('/api/auth/check');
+        // Updated to use the full URL like other API calls in the application
+        const res = await fetch('http://localhost:5001/api/auth/check', {
+          credentials: 'include' // Include credentials for CORS requests
+        });
+
+        if (!res.ok) {
+          throw new Error('Authentication check failed');
+        }
+
         const data = await res.json();
         setIsAuthenticated(data.isAuthenticated);
       } catch (err) {
