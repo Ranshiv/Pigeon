@@ -203,3 +203,646 @@ body.dark-theme .headers-table tr:nth-child(even) {
 .dark-theme .response-tabs button.active .test-result-badge {
     color: var(--dark-active-tab, #0d6efd);
 }
+
+/* ResponseDisplay.css - Designed to match Postman UI */
+.response-area {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    border-top: 1px solid #e0e0e0;
+    overflow: hidden;
+}
+
+/* Response header with status and metadata */
+.response-header {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 16px;
+    background-color: #f6f6f6;
+    border-bottom: 1px solid #e0e0e0;
+    align-items: center;
+    height: 40px;
+}
+
+.response-status {
+    display: flex;
+    align-items: center;
+    font-size: 13px;
+}
+
+.status-icon {
+    margin-right: 6px;
+    font-size: 16px;
+}
+
+.status-icon.success {
+    color: #00aa13;
+}
+
+.status-icon.error {
+    color: #d32f2f;
+}
+
+.status-code {
+    font-weight: 600;
+    margin-right: 6px;
+}
+
+.status-text {
+    color: #666666;
+}
+
+/* Status classes for different response codes */
+.status-2xx {
+    color: #00aa13;
+}
+
+.status-3xx {
+    color: #ff9800;
+}
+
+.status-4xx,
+.status-5xx {
+    color: #d32f2f;
+}
+
+.response-meta {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    font-size: 12px;
+    color: #666666;
+}
+
+.response-time,
+.response-size {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.meta-icon {
+    font-size: 14px;
+}
+
+/* Loading spinner */
+.loading-spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(0, 0, 0, 0.1);
+    border-top-color: #FF6C37;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-right: 8px;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Response section tabs */
+.response-section-tabs {
+    display: flex;
+    border-bottom: 1px solid #e0e0e0;
+    background-color: #f6f6f6;
+    padding: 0 16px;
+}
+
+.response-section-tab {
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 12px;
+    color: #666666;
+    position: relative;
+    transition: all 0.2s;
+}
+
+.response-section-tab.active {
+    color: #FF6C37;
+}
+
+.response-section-tab.active::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background-color: #FF6C37;
+}
+
+.test-badge {
+    display: inline-block;
+    margin-left: 6px;
+    padding: 2px 6px;
+    background-color: #00aa13;
+    color: white;
+    border-radius: 8px;
+    font-size: 10px;
+    font-weight: bold;
+}
+
+/* Response body area */
+.response-body {
+    flex: 1;
+    overflow: auto;
+    padding: 0;
+    background-color: white;
+}
+
+/* Body content */
+.response-body-content {
+    margin: 0;
+    padding: 16px;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', monospace;
+    font-size: 13px;
+    line-height: 1.5;
+    white-space: pre-wrap;
+    overflow: auto;
+}
+
+/* Headers table */
+.response-headers-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.response-headers-table th,
+.response-headers-table td {
+    padding: 8px 16px;
+    text-align: left;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.response-headers-table th {
+    font-weight: 600;
+    color: #666666;
+    background-color: #f9f9f9;
+}
+
+/* Empty states */
+.empty-body,
+.empty-headers,
+.empty-tests,
+.no-response-message,
+.error-body {
+    padding: 32px;
+    text-align: center;
+    color: #666666;
+    font-size: 14px;
+    background-color: #f9f9f9;
+    font-style: italic;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Error state */
+.error-body {
+    color: #d32f2f;
+}
+
+/* Language-specific styling */
+.language-json {
+    color: #333333;
+}
+
+.language-json .string {
+    color: #008000;
+}
+
+.language-json .number {
+    color: #0000ff;
+}
+
+.language-json .boolean {
+    color: #b22222;
+}
+
+.language-json .null {
+    color: #808080;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .response-header {
+        flex-direction: column;
+        align-items: flex-start;
+        height: auto;
+        padding: 12px 16px;
+    }
+
+    .response-meta {
+        margin-top: 8px;
+    }
+}
+
+/* ResponseDisplay.css - Dark theme version matching Postman UI */
+.response-area {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    border-top: 1px solid #3e3e3e;
+    overflow: hidden;
+    background-color: #1c1c1e;
+    color: #e6e6e6;
+}
+
+/* Response header with status and metadata */
+.response-header {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 16px;
+    background-color: #262626;
+    border-bottom: 1px solid #3e3e3e;
+    align-items: center;
+    height: 40px;
+}
+
+.response-status {
+    display: flex;
+    align-items: center;
+    font-size: 13px;
+}
+
+.status-icon {
+    margin-right: 6px;
+    font-size: 16px;
+}
+
+.status-icon.success {
+    color: #00aa13;
+}
+
+.status-icon.error {
+    color: #ff5252;
+}
+
+.status-code {
+    font-weight: 600;
+    margin-right: 6px;
+}
+
+.status-text {
+    color: #a0a0a0;
+}
+
+/* Status classes for different response codes */
+.status-2xx {
+    color: #00aa13;
+}
+
+.status-3xx {
+    color: #ff9800;
+}
+
+.status-4xx,
+.status-5xx {
+    color: #ff5252;
+}
+
+.response-meta {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    font-size: 12px;
+    color: #a0a0a0;
+}
+
+.response-time,
+.response-size {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.meta-icon {
+    font-size: 14px;
+}
+
+/* Loading spinner */
+.loading-spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-top-color: #FF6C37;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-right: 8px;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Response section tabs */
+.response-section-tabs {
+    display: flex;
+    border-bottom: 1px solid #3e3e3e;
+    background-color: #262626;
+    padding: 0 16px;
+}
+
+.response-section-tab {
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 12px;
+    color: #a0a0a0;
+    position: relative;
+    transition: all 0.2s;
+}
+
+.response-section-tab.active {
+    color: #FF6C37;
+}
+
+.response-section-tab.active::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background-color: #FF6C37;
+}
+
+.test-badge {
+    display: inline-block;
+    margin-left: 6px;
+    padding: 2px 6px;
+    background-color: #00aa13;
+    color: white;
+    border-radius: 8px;
+    font-size: 10px;
+    font-weight: bold;
+}
+
+/* Response body area */
+.response-body {
+    flex: 1;
+    overflow: auto;
+    padding: 0;
+    background-color: #1c1c1e;
+}
+
+/* Body content */
+.response-body-content {
+    margin: 0;
+    padding: 16px;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', monospace;
+    font-size: 13px;
+    line-height: 1.5;
+    white-space: pre-wrap;
+    overflow: auto;
+    color: #e6e6e6;
+}
+
+/* Headers table */
+.response-headers-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.response-headers-table th,
+.response-headers-table td {
+    padding: 8px 16px;
+    text-align: left;
+    border-bottom: 1px solid #3e3e3e;
+}
+
+.response-headers-table th {
+    font-weight: 600;
+    color: #a0a0a0;
+    background-color: #262626;
+}
+
+.response-headers-table td {
+    color: #e6e6e6;
+}
+
+/* Empty states */
+.empty-body,
+.empty-headers,
+.empty-tests,
+.no-response-message,
+.error-body {
+    padding: 32px;
+    text-align: center;
+    color: #a0a0a0;
+    font-size: 14px;
+    background-color: #1c1c1e;
+    font-style: italic;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Error state */
+.error-body {
+    color: #ff5252;
+}
+
+/* Language-specific styling for JSON */
+.language-json {
+    color: #e6e6e6;
+}
+
+.language-json .string {
+    color: #7ec699;
+}
+
+.language-json .number {
+    color: #d19a66;
+}
+
+.language-json .boolean {
+    color: #ff9800;
+}
+
+.language-json .null {
+    color: #a0a0a0;
+}
+
+.language-json .punctuation {
+    color: #c792ea;
+}
+
+.language-json .property {
+    color: #82aaff;
+}
+
+/* XML syntax highlighting */
+.language-xml .tag {
+    color: #c792ea;
+}
+
+.language-xml .attr-name {
+    color: #82aaff;
+}
+
+.language-xml .attr-value {
+    color: #7ec699;
+}
+
+/* HTML syntax highlighting */
+.language-html .tag {
+    color: #c792ea;
+}
+
+.language-html .attr-name {
+    color: #82aaff;
+}
+
+.language-html .attr-value {
+    color: #7ec699;
+}
+
+/* Response time indicator */
+.time-indicator {
+    font-weight: normal;
+    color: #a0a0a0;
+}
+
+.time-good {
+    color: #00aa13;
+}
+
+.time-medium {
+    color: #ff9800;
+}
+
+.time-slow {
+    color: #ff5252;
+}
+
+/* Pretty/Raw toggle */
+.view-toggle {
+    display: flex;
+    align-items: center;
+    margin-left: auto;
+    gap: 8px;
+    margin-right: 16px;
+}
+
+.view-toggle-btn {
+    background: transparent;
+    border: 1px solid #3e3e3e;
+    color: #a0a0a0;
+    padding: 2px 8px;
+    font-size: 11px;
+    cursor: pointer;
+    border-radius: 3px;
+}
+
+.view-toggle-btn.active {
+    background-color: #3e3e3e;
+    color: #e6e6e6;
+}
+
+/* Copy button */
+.copy-btn {
+    background: transparent;
+    border: 1px solid #3e3e3e;
+    color: #a0a0a0;
+    padding: 2px 8px;
+    font-size: 11px;
+    cursor: pointer;
+    border-radius: 3px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.copy-btn:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+.copy-icon {
+    font-size: 12px;
+}
+
+/* Response subtabs (for Body section) */
+.response-body-tabs {
+    display: flex;
+    padding: 8px 16px;
+    border-bottom: 1px solid #3e3e3e;
+    background-color: #1c1c1e;
+}
+
+.response-body-tab {
+    padding: 4px 8px;
+    cursor: pointer;
+    font-size: 11px;
+    color: #a0a0a0;
+    border-radius: 3px;
+    margin-right: 4px;
+}
+
+.response-body-tab.active {
+    background-color: #3e3e3e;
+    color: #e6e6e6;
+}
+
+/* Test results styling */
+.test-results {
+    padding: 16px;
+}
+
+.test-item {
+    display: flex;
+    align-items: flex-start;
+    padding: 8px 0;
+    border-bottom: 1px solid #3e3e3e;
+}
+
+.test-status {
+    margin-right: 8px;
+    font-size: 16px;
+}
+
+.test-pass {
+    color: #00aa13;
+}
+
+.test-fail {
+    color: #ff5252;
+}
+
+.test-name {
+    flex: 1;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.test-message {
+    margin-top: 4px;
+    font-size: 12px;
+    color: #a0a0a0;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .response-header {
+        flex-direction: column;
+        align-items: flex-start;
+        height: auto;
+        padding: 12px 16px;
+    }
+
+    .response-meta {
+        margin-top: 8px;
+    }
+
+    .view-toggle {
+        margin-top: 8px;
+        margin-left: 0;
+    }
+}

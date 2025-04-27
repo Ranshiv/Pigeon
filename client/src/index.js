@@ -6,6 +6,7 @@ import App from './App';
 import { BrowserRouter } from 'react-router-dom';
 import { ThemeProvider } from './context/ThemeContext';
 import { FontProvider } from './context/FontContext'; // Import FontProvider
+import { CollaborationProvider } from './context/CollaborationContext'; // Import CollaborationProvider
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
@@ -13,7 +14,9 @@ root.render(
     <BrowserRouter>
       <ThemeProvider>
         <FontProvider> {/* Wrap with FontProvider */}
-          <App />
+          <CollaborationProvider> {/* Wrap with CollaborationProvider */}
+            <App />
+          </CollaborationProvider>
         </FontProvider>
       </ThemeProvider>
     </BrowserRouter>

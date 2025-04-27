@@ -1,0 +1,550 @@
+/* client/src/components/ActiveCollaborators.css */
+.active-collaborators-container {
+  display: inline-flex;
+  position: relative;
+  /* Keep as relative */
+  z-index: 5;
+  /* Appropriate z-index */
+  justify-content: flex-end;
+  margin-left: 10px;
+  /* Reduced margin */
+  align-items: center;
+  height: 32px;
+  /* Reduced height to better fit header */
+  max-width: 180px;
+  /* Reduced max-width to prevent stretching */
+  overflow: visible;
+  /* Allow dropdown to be visible */
+  flex-shrink: 0;
+  /* Prevent the container from shrinking */
+}
+
+/* In collection header context, adjust styles to prevent overlay issues */
+.collaboration-wrapper .active-collaborators-container {
+  max-width: 200px;
+  margin-left: 0;
+  /* Reset margin when in the collaboration wrapper */
+}
+
+.active-collaborators {
+  display: flex;
+  flex-direction: column;
+  padding: 4px 8px;
+  /* Further reduced padding */
+  background-color: var(--sidebar-bg);
+  /* Match the theme */
+  color: var(--text-color);
+  /* Match theme text color */
+  border-radius: 6px;
+  width: auto;
+  /* Auto width based on content */
+  min-width: 160px;
+  /* Reduced minimum width */
+  max-width: 180px;
+  /* Reduced maximum width */
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+  /* Match theme border */
+  font-size: 0.85rem;
+  box-shadow: var(--shadow-sm);
+  /* Match theme shadows */
+  transition: all 0.2s ease;
+  position: static;
+  /* Keep it in document flow */
+  z-index: 6;
+  /* Higher z-index than container */
+}
+
+/* Fix for the activity log dropdown positioning */
+.activity-log {
+  position: absolute;
+  top: calc(100% + 5px);
+  right: 0;
+  /* Position from the right instead of left */
+  left: auto;
+  /* Reset left positioning */
+  width: 250px;
+  max-height: 300px;
+  overflow-y: auto;
+  background-color: var(--background-color);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  box-shadow: var(--shadow-md);
+  z-index: 51;
+  /* Higher z-index to stay on top */
+  padding: 12px;
+  color: var(--text-color);
+}
+
+.collaborators-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-bottom: 10px;
+  margin-bottom: 10px;
+  border-bottom: 1px solid var(--border-color);
+  font-weight: 600;
+  color: var(--text-color);
+  /* Updated to use theme variable */
+  font-size: 0.9rem;
+}
+
+.collaborators-header.error {
+  color: #b91c1c;
+}
+
+.collaborators-header svg {
+  font-size: 1rem;
+}
+
+.collaborators-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.collaborator-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 5px;
+  border-radius: 6px;
+  transition: background-color 0.2s;
+}
+
+.collaborator-item:hover {
+  background-color: rgba(0, 0, 0, 0.02);
+}
+
+.collaborator-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: #673ab7;
+  color: white;
+  font-size: 0.9rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  position: relative;
+  cursor: default;
+  transition: transform 0.2s;
+}
+
+.collaborator-avatar:hover {
+  transform: scale(1.05);
+}
+
+.collaborator-info {
+  flex: 1;
+  overflow: hidden;
+}
+
+.collaborator-name {
+  font-weight: 500;
+  color: var(--text-color);
+  /* Updated to use theme variable */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.collaborator-time {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  /* Updated to use theme variable */
+}
+
+.active-indicator {
+  position: absolute;
+  bottom: -1px;
+  right: -1px;
+  width: 10px;
+  height: 10px;
+  background-color: #10b981;
+  border: 2px solid white;
+  border-radius: 50%;
+}
+
+.typing-indicator {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background-color: #2563eb;
+  color: white;
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  animation: pulse 1.5s infinite;
+  border: 1px solid white;
+}
+
+.typing-indicator svg {
+  font-size: 0.65rem;
+}
+
+.typing-message {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  color: #4b5563;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid #f3f4f6;
+  font-style: italic;
+}
+
+.typing-message svg {
+  color: #2563eb;
+  font-size: 0.9rem;
+  animation: pulse 1.5s infinite;
+}
+
+.connection-error {
+  padding: 10px;
+  background-color: #fee2e2;
+  border-radius: 6px;
+  margin-top: 10px;
+}
+
+.connection-error p {
+  font-size: 0.8rem;
+  color: #991b1b;
+  margin-top: 0;
+  margin-bottom: 8px;
+}
+
+.reconnect-button {
+  background-color: #dc2626;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.reconnect-button:hover {
+  background-color: #b91c1c;
+}
+
+.reconnect-button:disabled {
+  background-color: #ef4444;
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(0.95);
+    opacity: 0.8;
+  }
+
+  70% {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  100% {
+    transform: scale(0.95);
+    opacity: 0.8;
+  }
+}
+
+@media (max-width: 640px) {
+  .active-collaborators {
+    width: 220px;
+    padding: 8px;
+  }
+
+  .collaborator-avatar {
+    width: 28px;
+    height: 28px;
+    font-size: 0.8rem;
+  }
+
+  .collaborator-name {
+    font-size: 0.8rem;
+  }
+
+  .collaborator-time {
+    font-size: 0.7rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .active-collaborators {
+    position: static;
+    /* Maintain static positioning */
+    width: 100%;
+    /* Take full width */
+    margin-bottom: 15px;
+    /* Add some space below */
+    max-width: none;
+    /* Allow full width on small screens */
+  }
+
+  .active-collaborators-container {
+    max-width: none;
+    /* Allow full width on small screens */
+    margin-left: 0;
+    /* Remove left margin on small screens */
+    height: auto;
+    /* Allow height to adjust to content */
+  }
+
+  .activity-log {
+    position: fixed;
+    /* On mobile, use fixed positioning */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90%;
+    max-width: 300px;
+  }
+}
+
+.active-collaborators:hover {
+  background-color: #f3f4f6;
+}
+
+.active-collaborators.active {
+  background-color: #e0f2fe;
+  border-color: #93c5fd;
+  color: #1e40af;
+}
+
+.active-collaborators.inactive {
+  background-color: #f3f4f6;
+  color: #6b7280;
+}
+
+.active-collaborators.disconnected {
+  background-color: #fee2e2;
+  border-color: #fca5a5;
+  color: #b91c1c;
+}
+
+.active-collaborators.offline {
+  color: #94a3b8;
+  background-color: #f1f5f9;
+  padding: 6px 12px;
+}
+
+.active-collaborators.empty {
+  color: #868e96;
+  font-size: 0.85rem;
+  font-style: italic;
+  background-color: #f1f5f9;
+  padding: 6px 12px;
+}
+
+.collab-icon {
+  font-size: 1.1rem;
+}
+
+.active-user-avatars {
+  display: flex;
+  margin-top: 8px;
+  margin-left: 4px;
+}
+
+.user-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background-color: #4f46e5;
+  color: white;
+  font-size: 0.7rem;
+  font-weight: bold;
+  margin-left: -8px;
+  border: 1px solid white;
+}
+
+.user-avatar:first-child {
+  margin-left: 0;
+}
+
+.user-avatar.more {
+  background-color: #9ca3af;
+}
+
+.collaborator-count {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: #495057;
+  white-space: nowrap;
+}
+
+.collaborator-icon {
+  color: #4f46e5;
+}
+
+.collaborator-avatars {
+  display: flex;
+  margin-left: 0.5rem;
+}
+
+.collaborator-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background-color: #4f46e5;
+  color: white;
+  font-size: 0.8rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: -8px;
+  border: 2px solid #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  position: relative;
+  cursor: default;
+  transition: transform 0.2s;
+}
+
+.collaborator-avatar:first-child {
+  margin-left: 0;
+}
+
+.collaborator-avatar.more {
+  background-color: #adb5bd;
+  font-size: 0.75rem;
+}
+
+.collaborator-avatar:hover {
+  transform: translateY(-3px) scale(1.05);
+  z-index: 10 !important;
+}
+
+@media (max-width: 640px) {
+  .active-collaborators {
+    padding: 4px 8px;
+  }
+
+  .collaborator-count span {
+    display: none;
+  }
+
+  .collaborator-avatar {
+    width: 24px;
+    height: 24px;
+    font-size: 0.7rem;
+  }
+}
+
+.activity-log {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 250px;
+  max-height: 300px;
+  overflow-y: auto;
+  background-color: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  z-index: 50;
+  margin-top: 4px;
+  padding: 12px;
+}
+
+.collection-header .active-collaborators-container {
+  position: relative;
+  z-index: 10;
+  /* Even higher z-index in collection header */
+}
+
+.collection-header .activity-log {
+  right: 0;
+  left: auto;
+}
+
+.activity-log h3 {
+  font-size: 1rem;
+  margin-top: 0;
+  margin-bottom: 8px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.activity-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.activity-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 6px 0;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.activity-item:last-child {
+  border-bottom: none;
+}
+
+.activity-indicator {
+  padding-top: 2px;
+}
+
+.activity-icon {
+  font-size: 0.8rem;
+}
+
+.activity-content {
+  flex: 1;
+}
+
+.activity-message {
+  font-size: 0.85rem;
+}
+
+.activity-time {
+  font-size: 0.7rem;
+  color: #6b7280;
+  margin-top: 2px;
+}
+
+.activity-joined .activity-icon {
+  color: #10b981;
+}
+
+.activity-left .activity-icon {
+  color: #ef4444;
+}
+
+.activity-edit .activity-icon {
+  color: #3b82f6;
+}
+
+.activity-comment .activity-icon {
+  color: #8b5cf6;
+}
+
+.no-activity {
+  color: #6b7280;
+  font-size: 0.85rem;
+  font-style: italic;
+  text-align: center;
+  margin: 16px 0;
+}

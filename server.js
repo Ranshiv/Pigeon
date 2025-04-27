@@ -10,8 +10,19 @@ require('dotenv').config();
 const fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args));
 const Request = require('./models/Request');
 const axios = require('axios');
+const http = require('http'); // Add http for socket.io
+const socketIo = require('socket.io'); // Add socket.io
 
 const app = express();
+const server = http.createServer(app); // Create HTTP server
+const io = socketIo(server, { // Initialize socket.io
+    cors: {
+        origin: "http://localhost:3000",
+        methods: ["GET", "POST"],
+        credentials: true
+    }
+});
+
 const port = process.env.PORT || 5001;
 
 const User = require('./models/User');
@@ -46,6 +57,11 @@ const workspacesStore = {
         isPublic: true
     }
 };
+// Add a store for created collections
+const collectionsStore = {};
+
+// Add a counter for generating unique IDs
+let collectionIdCounter = 100;
 // --- MIDDLEWARE (Correct Order) ---
 app.use(cors({
     origin: 'http://localhost:3000', // Your frontend's URL
@@ -71,6 +87,22 @@ const ensureAuthenticated = (req, res, next) => {
     // For development purposes: automatically authenticate all requests
     // This allows workspace functionality to work properly
     req.isAuthenticated = () => true;
+    if (!req.user) {
+        req.user = {
+            id: "temp-user-id",
+            name: "Temporary User",
+            email: "temp@example.com",
+            displayName: "Temporary User"
+        };
+    }
+    return next();
+};
+
+// Add this after your other middleware definitions, before your routes
+// JWT Authentication middleware
+const authenticateJWT = (req, res, next) => {
+    // For development purposes, we'll auto-authenticate
+    // In a production environment, this would verify a JWT token
     if (!req.user) {
         req.user = {
             id: "temp-user-id",
@@ -1049,23 +1081,17 @@ app.get('/api/workspaces/:id', ensureAuthenticated, async (req, res) => {
     }
 });
 
-// Get collections for a workspace
+// Get collections for a workspace - UPDATE TO USE STORED COLLECTIONS
 app.get('/api/workspaces/:id/collections', ensureAuthenticated, async (req, res) => {
     try {
-        // Mock collections data
-        const collections = [
-            {
-                _id: "coll1",
-                name: "Sample Collection",
-                description: "This is a sample API collection",
-                workspaceId: req.params.id,
-                requestsCount: 3,
-                createdAt: new Date(),
-                updatedAt: new Date()
-            }
-        ];
+        const workspaceId = req.params.id;
 
-        res.json(collections);
+        // Get collections for this workspace
+        if (!collectionsStore[workspaceId]) {
+            collectionsStore[workspaceId] = [];
+        }
+
+        res.json(collectionsStore[workspaceId]);
     } catch (err) {
         console.error("Error fetching workspace collections:", err);
         res.status(500).json({ message: 'Error fetching workspace collections' });
@@ -1122,8 +1148,12 @@ app.post('/api/workspaces/:id/invite', ensureAuthenticated, async (req, res) => 
 // Delete a collaborator from workspace
 app.delete('/api/workspaces/:id/collaborators/:userId', ensureAuthenticated, async (req, res) => {
     try {
-        // Just return success
-        res.status(200).json({ message: "Collaborator removed successfully" });
+        // Add success details for better frontend handling
+        res.status(200).json({
+            message: "Collaborator removed successfully",
+            userId: req.params.userId,
+            workspaceId: req.params.id
+        });
     } catch (err) {
         console.error("Error removing collaborator:", err);
         res.status(500).json({ message: 'Error removing collaborator' });
@@ -1135,10 +1165,17 @@ app.patch('/api/workspaces/:id/collaborators/:userId', ensureAuthenticated, asyn
     try {
         const { role } = req.body;
 
-        // Mock updated collaborator data
+        // Validate role
+        if (!role || !['admin', 'editor', 'viewer'].includes(role)) {
+            return res.status(400).json({ message: 'Invalid role provided' });
+        }
+
+        // Mock updated collaborator data with more complete information
         const updatedCollaborator = {
             userId: req.params.userId,
-            role: role
+            workspaceId: req.params.id,
+            role: role,
+            updatedAt: new Date()
         };
 
         res.json(updatedCollaborator);
@@ -1365,10 +1402,10 @@ app.get('/api/collections/:id', ensureAuthenticated, async (req, res) => {
     }
 });
 
-// Create a new collection
+// Create a new collection - UPDATE TO STORE IN WORKSPACE COLLECTIONS
 app.post('/api/collections', ensureAuthenticated, async (req, res) => {
     try {
-        const { name, description } = req.body;
+        const { name, description, workspaceId } = req.body;
         const userId = req.user.id;
 
         // Validate required fields
@@ -1376,18 +1413,31 @@ app.post('/api/collections', ensureAuthenticated, async (req, res) => {
             return res.status(400).json({ message: 'Collection name is required' });
         }
 
-        // Mock creating a new collection
+        // Generate a unique ID for the collection
+        const newCollectionId = "coll" + (collectionIdCounter++);
+
+        // Create the new collection
         const newCollection = {
-            _id: "coll" + Date.now().toString(),
+            _id: newCollectionId,
             name,
             description: description || "",
+            workspaceId: workspaceId || "ws1", // Default to personal workspace if not specified
             isPublic: false,
             owner: userId,
-            requestCount: 0,
+            requestsCount: 0,
             collaborators: [],
             createdAt: new Date(),
             updatedAt: new Date()
         };
+
+        // Add to collections store by workspace
+        if (!collectionsStore[newCollection.workspaceId]) {
+            collectionsStore[newCollection.workspaceId] = [];
+        }
+
+        collectionsStore[newCollection.workspaceId].push(newCollection);
+        console.log(`Added collection ${newCollection._id} to workspace ${newCollection.workspaceId}`);
+        console.log(`Workspace now has ${collectionsStore[newCollection.workspaceId].length} collections`);
 
         res.status(201).json(newCollection);
     } catch (err) {
@@ -1520,6 +1570,54 @@ app.post('/api/collections/:id/merge-request', ensureAuthenticated, async (req, 
     } catch (err) {
         console.error("Error creating merge request:", err);
         res.status(500).json({ message: 'Error creating merge request' });
+    }
+});
+
+// Approve a merge request
+app.post('/api/merge-requests/:id/approve', ensureAuthenticated, async (req, res) => {
+    try {
+        const mergeRequestId = req.params.id;
+
+        // Mock approving a merge request
+        const approvedMergeRequest = {
+            _id: mergeRequestId,
+            status: "approved",
+            actionBy: {
+                userId: req.user.id,
+                displayName: req.user.name || "User",
+                email: req.user.email
+            },
+            updatedAt: new Date()
+        };
+
+        res.json(approvedMergeRequest);
+    } catch (err) {
+        console.error("Error approving merge request:", err);
+        res.status(500).json({ message: 'Error approving merge request' });
+    }
+});
+
+// Reject a merge request
+app.post('/api/merge-requests/:id/reject', ensureAuthenticated, async (req, res) => {
+    try {
+        const mergeRequestId = req.params.id;
+
+        // Mock rejecting a merge request
+        const rejectedMergeRequest = {
+            _id: mergeRequestId,
+            status: "rejected",
+            actionBy: {
+                userId: req.user.id,
+                displayName: req.user.name || "User",
+                email: req.user.email
+            },
+            updatedAt: new Date()
+        };
+
+        res.json(rejectedMergeRequest);
+    } catch (err) {
+        console.error("Error rejecting merge request:", err);
+        res.status(500).json({ message: 'Error rejecting merge request' });
     }
 });
 
@@ -2365,6 +2463,1243 @@ app.get('/api/workspaces/shared', ensureAuthenticated, async (req, res) => {
     }
 });
 
-app.listen(port, () => {
+// WebSocket connection and event handling setup
+io.on('connection', (socket) => {
+    console.log('User connected:', socket.id);
+
+    // Track user rooms (workspaces/collections they are in)
+    const userRooms = new Set();
+    let authenticatedUser = null;
+
+    // Authenticate the socket connection with the session
+    socket.on('authenticate', async (userData, callback) => {
+        try {
+            // Store user data with the socket
+            authenticatedUser = {
+                id: userData.userId || socket.id,
+                name: userData.name || 'Anonymous',
+                email: userData.email || null,
+                avatar: userData.avatar || null,
+                // Add important fields for consistent overlay display
+                displayName: userData.displayName || userData.name || 'Anonymous',
+                profilePicture: userData.profilePicture || userData.avatar || null,
+                userStatus: userData.userStatus || 'online'
+            };
+
+            // Explicitly set this on the socket object so other parts can access it
+            socket.authenticatedUser = authenticatedUser;
+
+            console.log(`User authenticated: ${authenticatedUser.name} (${socket.id})`);
+
+            // Send successful authentication response
+            if (callback) {
+                callback({
+                    success: true,
+                    message: 'Authentication successful',
+                    userId: authenticatedUser.id,
+                    displayName: authenticatedUser.displayName
+                });
+            }
+        } catch (err) {
+            console.error('Authentication error:', err);
+            if (callback) {
+                callback({ success: false, message: 'Authentication failed' });
+            }
+        }
+    });
+
+    // Helper function to join a room and notify others
+    const joinRoom = (roomName) => {
+        if (!authenticatedUser) {
+            console.warn(`Unauthenticated user ${socket.id} attempted to join room ${roomName}`);
+            return;
+        }
+
+        socket.join(roomName);
+        userRooms.add(roomName);
+
+        // Notify others in the room that someone joined with consistent data structure
+        socket.to(roomName).emit('userJoined', {
+            userId: socket.id,
+            user: authenticatedUser,
+            timestamp: new Date()
+        });
+
+        // Get and send current active users in this room with consistent data structure
+        const roomSockets = io.sockets.adapter.rooms.get(roomName);
+        if (roomSockets) {
+            const users = Array.from(roomSockets).map(socketId => {
+                const socketInstance = io.sockets.sockets.get(socketId);
+                // Use the authenticatedUser object, or create a fallback with socket ID
+                return socketInstance.authenticatedUser || {
+                    id: socketId,
+                    name: "Anonymous",
+                    displayName: "Anonymous",
+                    userStatus: "online"
+                };
+            });
+
+            // Send to the joining user the list of active users
+            socket.emit('activeUsers', {
+                room: roomName,
+                users: users,
+                timestamp: new Date()
+            });
+
+            // Also broadcast to everyone else so they all have the latest
+            socket.to(roomName).emit('activeUsers', {
+                room: roomName,
+                users: users,
+                timestamp: new Date()
+            });
+        }
+
+        console.log(`User ${socket.id} joined room ${roomName}`);
+    };
+
+    // Helper function to leave a room and notify others
+    const leaveRoom = (roomName) => {
+        if (!authenticatedUser) {
+            console.warn(`Unauthenticated user ${socket.id} attempted to leave room ${roomName}`);
+            return;
+        }
+
+        socket.leave(roomName);
+        userRooms.delete(roomName);
+
+        // Notify others in the room with consistent data structure
+        socket.to(roomName).emit('userLeft', {
+            userId: socket.id,
+            user: authenticatedUser,
+            timestamp: new Date()
+        });
+
+        // Send updated list of active users to all remaining users
+        const roomSockets = io.sockets.adapter.rooms.get(roomName);
+        if (roomSockets) {
+            const users = Array.from(roomSockets).map(socketId => {
+                const socketInstance = io.sockets.sockets.get(socketId);
+                return socketInstance.authenticatedUser || {
+                    id: socketId,
+                    name: "Anonymous",
+                    displayName: "Anonymous",
+                    userStatus: "online"
+                };
+            });
+
+            io.to(roomName).emit('activeUsers', {
+                room: roomName,
+                users: users,
+                timestamp: new Date()
+            });
+        }
+
+        console.log(`User ${socket.id} left room ${roomName}`);
+    };
+
+    // Helper function to get active users in a room
+    const getActiveUsersInRoom = (roomName) => {
+        const roomSockets = io.sockets.adapter.rooms.get(roomName);
+        if (!roomSockets) return [];
+
+        return Array.from(roomSockets).map(socketId => {
+            const socketInstance = io.sockets.sockets.get(socketId);
+            return socketInstance.authenticatedUser || {
+                id: socketId,
+                name: "Anonymous",
+                displayName: "Anonymous",
+                userStatus: "online"
+            };
+        });
+    };
+
+    // Join a workspace room
+    socket.on('joinWorkspace', (workspaceId) => {
+        if (!authenticatedUser) {
+            console.warn(`Unauthenticated user ${socket.id} attempted to join workspace ${workspaceId}`);
+            return;
+        }
+
+        // Create a room name for this workspace
+        const roomName = `workspace:${workspaceId}`;
+        joinRoom(roomName);
+    });
+
+    // Leave a workspace room
+    socket.on('leaveWorkspace', (workspaceId) => {
+        if (!authenticatedUser) {
+            console.warn(`Unauthenticated user ${socket.id} attempted to leave workspace ${workspaceId}`);
+            return;
+        }
+
+        const roomName = `workspace:${workspaceId}`;
+        if (userRooms.has(roomName)) {
+            leaveRoom(roomName);
+        } else {
+            console.warn(`User ${socket.id} attempted to leave a workspace room they're not in: ${roomName}`);
+        }
+    });
+
+    // Join a collection room
+    socket.on('joinCollection', (collectionId) => {
+        if (!authenticatedUser) {
+            console.warn(`Unauthenticated user ${socket.id} attempted to join collection ${collectionId}`);
+            return;
+        }
+
+        const roomName = `collection:${collectionId}`;
+        joinRoom(roomName);
+    });
+
+    // Leave a collection room
+    socket.on('leaveCollection', (collectionId) => {
+        if (!authenticatedUser) {
+            console.warn(`Unauthenticated user ${socket.id} attempted to leave collection ${collectionId}`);
+            return;
+        }
+
+        const roomName = `collection:${collectionId}`;
+        if (userRooms.has(roomName)) {
+            leaveRoom(roomName);
+        } else {
+            console.warn(`User ${socket.id} attempted to leave a collection room they're not in: ${roomName}`);
+        }
+    });
+
+    // Handle user activity broadcasts
+    socket.on('userActivity', ({ room, activity }) => {
+        if (!authenticatedUser) {
+            console.warn('Unauthenticated user activity received');
+            return;
+        }
+
+        console.log(`Activity in ${room}:`, activity);
+
+        // Broadcast to others in the room
+        socket.to(room).emit('userActivity', {
+            userId: socket.id,
+            user: authenticatedUser,
+            activity,
+            timestamp: new Date()
+        });
+    });
+
+    // Handle typing indicators
+    socket.on('typingIndicator', ({ room, isTyping }) => {
+        if (!authenticatedUser) return;
+
+        socket.to(room).emit('typingIndicator', {
+            userId: socket.id,
+            user: authenticatedUser,
+            isTyping,
+            timestamp: new Date()
+        });
+    });
+
+    // Handle heartbeats to keep track of active users
+    socket.on('heartbeat', ({ room }) => {
+        // Refresh the user's presence in the room
+        if (userRooms.has(room)) {
+            // Optionally broadcast to room that user is still active
+            socket.to(room).emit('heartbeat', {
+                userId: socket.id,
+                timestamp: new Date()
+            });
+        }
+    });
+
+    // Request for active users in a specific room
+    socket.on('getActiveUsers', ({ room }, callback) => {
+        const roomSockets = io.sockets.adapter.rooms.get(room);
+
+        if (roomSockets) {
+            const users = Array.from(roomSockets).map(socketId => {
+                const socketInstance = io.sockets.sockets.get(socketId);
+                return socketInstance.authenticatedUser || { id: socketId };
+            });
+
+            if (callback) {
+                callback(users);
+            }
+        } else if (callback) {
+            callback([]);
+        }
+    });
+
+    // NEW HANDLERS FOR VERSION CONTROL AND COLLABORATIVE EDITING
+
+    // Handle document editing started
+    socket.on('documentEditStarted', ({ room, entityType, entityId }) => {
+        if (!authenticatedUser) return;
+
+        // Broadcast to room that user started editing
+        socket.to(room).emit('documentEditStarted', {
+            userId: socket.id,
+            user: authenticatedUser,
+            entityType,
+            entityId,
+            timestamp: new Date()
+        });
+
+        console.log(`User ${socket.id} started editing ${entityType}:${entityId}`);
+    });
+
+    // Handle document editing ended
+    socket.on('documentEditEnded', ({ room, entityType, entityId }) => {
+        if (!authenticatedUser) return;
+
+        // Broadcast to room that user stopped editing
+        socket.to(room).emit('documentEditEnded', {
+            userId: socket.id,
+            user: authenticatedUser,
+            entityType,
+            entityId,
+            timestamp: new Date()
+        });
+
+        console.log(`User ${socket.id} stopped editing ${entityType}:${entityId}`);
+    });
+
+    // Handle document version changed
+    socket.on('documentVersionChanged', ({ room, entityType, entityId, version }) => {
+        if (!authenticatedUser) return;
+
+        // Broadcast version change to all users in the room
+        socket.to(room).emit('documentVersionChanged', {
+            userId: socket.id,
+            user: authenticatedUser,
+            entityType,
+            entityId,
+            version,
+            timestamp: new Date()
+        });
+
+        console.log(`User ${socket.id} created new version of ${entityType}:${entityId}`);
+
+        // Also save version to database (simplified; in production would store in MongoDB)
+        try {
+            // In a real implementation, this would store the version in the database
+            console.log(`Saving version for ${entityType}:${entityId}`, version);
+
+            // Log the activity
+            const activityData = {
+                type: 'version_created',
+                entityType,
+                entityId,
+                userId: authenticatedUser.id,
+                userName: authenticatedUser.name,
+                timestamp: new Date(),
+                versionId: version.id,
+                changes: version.changes
+            };
+
+            // In a real implementation, store this activity
+            console.log('New activity logged:', activityData);
+        } catch (error) {
+            console.error('Error storing version:', error);
+        }
+    });
+
+    // Handle document branch created
+    socket.on('documentBranchCreated', ({ room, entityType, entityId, branch }) => {
+        if (!authenticatedUser) return;
+
+        // Broadcast branch creation to all users in the room
+        socket.to(room).emit('documentBranchCreated', {
+            userId: socket.id,
+            user: authenticatedUser,
+            entityType,
+            entityId,
+            branch,
+            timestamp: new Date()
+        });
+
+        console.log(`User ${socket.id} created branch ${branch.name} for ${entityType}:${entityId}`);
+    });
+
+    // Handle merge request created
+    socket.on('mergeRequestCreated', ({ room, mergeRequest }) => {
+        if (!authenticatedUser) return;
+
+        // Broadcast merge request to all users in the room
+        socket.to(room).emit('mergeRequestCreated', {
+            userId: socket.id,
+            user: authenticatedUser,
+            mergeRequest,
+            timestamp: new Date()
+        });
+
+        console.log(`User ${socket.id} created merge request: ${mergeRequest.title || mergeRequest._id}`);
+    });
+
+    // Handle disconnect
+    socket.on('disconnect', () => {
+        console.log('User disconnected:', socket.id);
+
+        // Notify all rooms this user was in
+        for (const room of userRooms) {
+            socket.to(room).emit('userLeft', {
+                userId: socket.id,
+                user: authenticatedUser,
+                timestamp: new Date(),
+                reason: 'disconnect'
+            });
+        }
+
+        // Clear user rooms
+        userRooms.clear();
+    });
+});
+
+server.listen(port, () => {
     console.log(`Server listening on port ${port}`);
+});
+
+// Add merge request approval endpoint
+app.post('/api/merge-requests/:id/approve', authenticateJWT, async (req, res) => {
+    try {
+        const mergeRequestId = req.params.id;
+        const userId = req.user.id;
+
+        // Find the merge request
+        const mergeRequest = await db.collection('mergeRequests').findOne({
+            _id: new ObjectId(mergeRequestId)
+        });
+
+        if (!mergeRequest) {
+            return res.status(404).json({ message: 'Merge request not found' });
+        }
+
+        // Check if the merge request is already processed
+        if (mergeRequest.status !== 'pending') {
+            return res.status(400).json({ message: `Merge request already ${mergeRequest.status}` });
+        }
+
+        // Get the workspace to check user permissions
+        const workspace = await db.collection('workspaces').findOne({
+            _id: new ObjectId(mergeRequest.workspaceId)
+        });
+
+        // Check if user has permission (admin or editor)
+        const collaborator = workspace.collaborators.find(c => c.userId === userId);
+        if (!collaborator || (collaborator.role !== 'admin' && collaborator.role !== 'editor')) {
+            return res.status(403).json({ message: 'You do not have permission to approve merge requests' });
+        }
+
+        // Get user details for action metadata
+        const user = await db.collection('users').findOne({ _id: new ObjectId(userId) });
+
+        // Update the merge request status
+        const result = await db.collection('mergeRequests').updateOne(
+            { _id: new ObjectId(mergeRequestId) },
+            {
+                $set: {
+                    status: 'approved',
+                    actionBy: {
+                        userId: userId,
+                        displayName: user.displayName || user.email,
+                        email: user.email
+                    },
+                    updatedAt: new Date()
+                }
+            }
+        );
+
+        if (result.modifiedCount === 0) {
+            return res.status(500).json({ message: 'Failed to update merge request' });
+        }
+
+        // Process the actual merge of data from source collection to target collection
+        const sourceCollection = await db.collection('collections').findOne({
+            _id: new ObjectId(mergeRequest.sourceCollection._id)
+        });
+
+        const targetCollection = await db.collection('collections').findOne({
+            _id: new ObjectId(mergeRequest.targetCollection._id)
+        });
+
+        // Merge requests (only add new ones or update if different)
+        if (sourceCollection.requests && sourceCollection.requests.length > 0) {
+            for (const sourceRequest of sourceCollection.requests) {
+                // Check if request exists in target by id or URL signature
+                const existingRequest = targetCollection.requests.find(r =>
+                    r._id.toString() === sourceRequest._id.toString() ||
+                    (r.url === sourceRequest.url && r.method === sourceRequest.method)
+                );
+
+                if (!existingRequest) {
+                    // Add new request
+                    const newRequest = { ...sourceRequest, mergedFrom: sourceCollection._id.toString() };
+                    await db.collection('collections').updateOne(
+                        { _id: targetCollection._id },
+                        { $push: { requests: newRequest } }
+                    );
+                } else {
+                    // Compare and update if needed
+                    const needsUpdate = JSON.stringify(existingRequest) !== JSON.stringify(sourceRequest);
+                    if (needsUpdate) {
+                        // Update the existing request
+                        const updatedRequest = { ...sourceRequest, mergedFrom: sourceCollection._id.toString() };
+                        await db.collection('collections').updateOne(
+                            {
+                                _id: targetCollection._id,
+                                "requests._id": existingRequest._id
+                            },
+                            { $set: { "requests.$": updatedRequest } }
+                        );
+                    }
+                }
+            }
+        }
+
+        // Add audit log for the merge
+        await db.collection('activities').insertOne({
+            type: 'merge_approved',
+            workspaceId: workspace._id,
+            user: {
+                userId: userId,
+                displayName: user.displayName || user.email,
+                email: user.email
+            },
+            details: {
+                mergeRequestId: mergeRequestId,
+                sourceCollectionId: sourceCollection._id.toString(),
+                sourceCollectionName: sourceCollection.name,
+                targetCollectionId: targetCollection._id.toString(),
+                targetCollectionName: targetCollection.name
+            },
+            message: `Merge from "${sourceCollection.name}" to "${targetCollection.name}" was approved by ${user.displayName || user.email}`,
+            timestamp: new Date()
+        });
+
+        // Get the updated merge request to return
+        const updatedMergeRequest = await db.collection('mergeRequests').findOne({
+            _id: new ObjectId(mergeRequestId)
+        });
+
+        // If socket.io is available, notify collaboration users
+        if (io) {
+            const workspaceRoom = `workspace:${workspace._id.toString()}`;
+            io.to(workspaceRoom).emit('userActivity', {
+                userId: userId,
+                activity: {
+                    type: 'merge_approved',
+                    details: {
+                        mergeRequestId,
+                        sourceName: sourceCollection.name,
+                        targetName: targetCollection.name
+                    }
+                },
+                timestamp: new Date()
+            });
+        }
+
+        res.json(updatedMergeRequest);
+    } catch (error) {
+        console.error('Error approving merge request:', error);
+        res.status(500).json({ message: 'Internal server error', error: error.message });
+    }
+});
+
+// Add merge request rejection endpoint
+app.post('/api/merge-requests/:id/reject', authenticateJWT, async (req, res) => {
+    try {
+        const mergeRequestId = req.params.id;
+        const userId = req.user.id;
+
+        // Find the merge request
+        const mergeRequest = await db.collection('mergeRequests').findOne({
+            _id: new ObjectId(mergeRequestId)
+        });
+
+        if (!mergeRequest) {
+            return res.status(404).json({ message: 'Merge request not found' });
+        }
+
+        // Check if the merge request is already processed
+        if (mergeRequest.status !== 'pending') {
+            return res.status(400).json({ message: `Merge request already ${mergeRequest.status}` });
+        }
+
+        // Get the workspace to check user permissions
+        const workspace = await db.collection('workspaces').findOne({
+            _id: new ObjectId(mergeRequest.workspaceId)
+        });
+
+        // Check if user has permission (admin or editor)
+        const collaborator = workspace.collaborators.find(c => c.userId === userId);
+        if (!collaborator || (collaborator.role !== 'admin' && collaborator.role !== 'editor')) {
+            return res.status(403).json({ message: 'You do not have permission to reject merge requests' });
+        }
+
+        // Get user details for action metadata
+        const user = await db.collection('users').findOne({ _id: new ObjectId(userId) });
+
+        // Update the merge request status
+        const result = await db.collection('mergeRequests').updateOne(
+            { _id: new ObjectId(mergeRequestId) },
+            {
+                $set: {
+                    status: 'rejected',
+                    actionBy: {
+                        userId: userId,
+                        displayName: user.displayName || user.email,
+                        email: user.email
+                    },
+                    updatedAt: new Date()
+                }
+            }
+        );
+
+        if (result.modifiedCount === 0) {
+            return res.status(500).json({ message: 'Failed to update merge request' });
+        }
+
+        // Add audit log for the rejection
+        const sourceCollection = await db.collection('collections').findOne({
+            _id: new ObjectId(mergeRequest.sourceCollection._id)
+        });
+
+        const targetCollection = await db.collection('collections').findOne({
+            _id: new ObjectId(mergeRequest.targetCollection._id)
+        });
+
+        await db.collection('activities').insertOne({
+            type: 'merge_rejected',
+            workspaceId: workspace._id,
+            user: {
+                userId: userId,
+                displayName: user.displayName || user.email,
+                email: user.email
+            },
+            details: {
+                mergeRequestId: mergeRequestId,
+                sourceCollectionId: sourceCollection._id.toString(),
+                sourceCollectionName: sourceCollection.name,
+                targetCollectionId: targetCollection._id.toString(),
+                targetCollectionName: targetCollection.name
+            },
+            message: `Merge from "${sourceCollection.name}" to "${targetCollection.name}" was rejected by ${user.displayName || user.email}`,
+            timestamp: new Date()
+        });
+
+        // Get the updated merge request to return
+        const updatedMergeRequest = await db.collection('mergeRequests').findOne({
+            _id: new ObjectId(mergeRequestId)
+        });
+
+        // If socket.io is available, notify collaboration users
+        if (io) {
+            const workspaceRoom = `workspace:${workspace._id.toString()}`;
+            io.to(workspaceRoom).emit('userActivity', {
+                userId: userId,
+                activity: {
+                    type: 'merge_rejected',
+                    details: {
+                        mergeRequestId,
+                        sourceName: sourceCollection.name,
+                        targetName: targetCollection.name
+                    }
+                },
+                timestamp: new Date()
+            });
+        }
+
+        res.json(updatedMergeRequest);
+    } catch (error) {
+        console.error('Error rejecting merge request:', error);
+        res.status(500).json({ message: 'Internal server error', error: error.message });
+    }
+});
+
+// --- VERSION CONTROL API ENDPOINTS ---
+
+// Get version history for a workspace
+app.get('/api/workspaces/:id/versions', authenticateJWT, async (req, res) => {
+    try {
+        const workspaceId = req.params.id;
+
+        // In a real implementation, this would query from MongoDB
+        // For now, we'll return mock version history data
+        const versionHistory = [
+            {
+                id: `v-${Date.now()}-1`,
+                entityType: 'workspace',
+                entityId: workspaceId,
+                userId: req.user.id,
+                userName: req.user.name || 'Anonymous User',
+                timestamp: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000), // 7 days ago
+                message: 'Updated workspace settings',
+                type: 'commit',
+                changes: {
+                    modified: [
+                        {
+                            field: 'name',
+                            oldValue: 'Old Workspace Name',
+                            newValue: 'New Workspace Name'
+                        },
+                        {
+                            field: 'description',
+                            oldValue: 'Old description',
+                            newValue: 'Updated description for the workspace'
+                        }
+                    ]
+                }
+            },
+            {
+                id: `v-${Date.now()}-2`,
+                entityType: 'workspace',
+                entityId: workspaceId,
+                userId: req.user.id,
+                userName: req.user.name || 'Anonymous User',
+                timestamp: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000), // 3 days ago
+                message: 'Added new collaborator',
+                type: 'commit',
+                changes: {
+                    added: [
+                        {
+                            field: 'collaborators',
+                            value: {
+                                userId: 'user-123',
+                                displayName: 'Jane Smith',
+                                email: 'jane@example.com',
+                                role: 'editor'
+                            }
+                        }
+                    ]
+                }
+            }
+        ];
+
+        res.json(versionHistory);
+    } catch (err) {
+        console.error("Error fetching workspace version history:", err);
+        res.status(500).json({ message: 'Error fetching workspace version history' });
+    }
+});
+
+// Get version history for a collection
+app.get('/api/collections/:id/versions', authenticateJWT, async (req, res) => {
+    try {
+        const collectionId = req.params.id;
+
+        // In a real implementation, this would query from MongoDB
+        // For now, we'll return mock version history data
+        const versionHistory = [
+            {
+                id: `v-${Date.now()}-3`,
+                entityType: 'collection',
+                entityId: collectionId,
+                userId: req.user.id,
+                userName: req.user.name || 'Anonymous User',
+                timestamp: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000), // 5 days ago
+                message: 'Initial collection creation',
+                type: 'commit',
+                changes: {
+                    added: [
+                        {
+                            field: 'name',
+                            value: 'API Collection'
+                        },
+                        {
+                            field: 'description',
+                            value: 'Collection of API endpoints'
+                        }
+                    ]
+                }
+            },
+            {
+                id: `v-${Date.now()}-4`,
+                entityType: 'collection',
+                entityId: collectionId,
+                userId: req.user.id,
+                userName: req.user.name || 'Anonymous User',
+                timestamp: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000), // 2 days ago
+                message: 'Added new request',
+                type: 'commit',
+                changes: {
+                    added: [
+                        {
+                            field: 'requests',
+                            value: {
+                                id: 'req-123',
+                                name: 'Get Users',
+                                method: 'GET',
+                                url: 'https://api.example.com/users'
+                            }
+                        }
+                    ]
+                }
+            },
+            {
+                id: `v-${Date.now()}-5`,
+                entityType: 'collection',
+                entityId: collectionId,
+                userId: req.user.id,
+                userName: req.user.name || 'Anonymous User',
+                timestamp: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000), // 1 day ago
+                message: 'Updated request parameters',
+                type: 'commit',
+                changes: {
+                    modified: [
+                        {
+                            field: 'requests[0].url',
+                            oldValue: 'https://api.example.com/users',
+                            newValue: 'https://api.example.com/users?page=1&limit=10'
+                        }
+                    ]
+                }
+            }
+        ];
+
+        res.json(versionHistory);
+    } catch (err) {
+        console.error("Error fetching collection version history:", err);
+        res.status(500).json({ message: 'Error fetching collection version history' });
+    }
+});
+
+// Save a new version for a workspace
+app.post('/api/workspaces/:id/versions', authenticateJWT, async (req, res) => {
+    try {
+        const workspaceId = req.params.id;
+        const { changes, message, userId } = req.body;
+
+        if (!changes) {
+            return res.status(400).json({ message: 'Changes are required' });
+        }
+
+        // In a real implementation, this would save to MongoDB
+        // For now, we'll just create a mock version object and return it
+        const newVersion = {
+            id: `v-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
+            entityType: 'workspace',
+            entityId: workspaceId,
+            userId: userId || req.user.id,
+            userName: req.user.name || 'Anonymous User',
+            timestamp: new Date(),
+            message: message || 'Updated workspace',
+            type: 'commit',
+            changes
+        };
+
+        // Log the created version
+        console.log('Created new workspace version:', newVersion);
+
+        res.status(201).json(newVersion);
+    } catch (err) {
+        console.error("Error saving workspace version:", err);
+        res.status(500).json({ message: 'Error saving workspace version' });
+    }
+});
+
+// Save a new version for a collection
+app.post('/api/collections/:id/versions', authenticateJWT, async (req, res) => {
+    try {
+        const collectionId = req.params.id;
+        const { changes, message, userId } = req.body;
+
+        if (!changes) {
+            return res.status(400).json({ message: 'Changes are required' });
+        }
+
+        // In a real implementation, this would save to MongoDB
+        // For now, we'll just create a mock version object and return it
+        const newVersion = {
+            id: `v-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
+            entityType: 'collection',
+            entityId: collectionId,
+            userId: userId || req.user.id,
+            userName: req.user.name || 'Anonymous User',
+            timestamp: new Date(),
+            message: message || 'Updated collection',
+            type: 'commit',
+            changes
+        };
+
+        // Log the created version
+        console.log('Created new collection version:', newVersion);
+
+        res.status(201).json(newVersion);
+    } catch (err) {
+        console.error("Error saving collection version:", err);
+        res.status(500).json({ message: 'Error saving collection version' });
+    }
+});
+
+// Create a merge request
+app.post('/api/:entityType/:id/merge-request', authenticateJWT, async (req, res) => {
+    try {
+        const { entityType, id } = req.params;
+        const { targetId, title, description, userId } = req.body;
+
+        if (!targetId) {
+            return res.status(400).json({ message: 'Target ID is required' });
+        }
+
+        // In a real implementation, this would save to MongoDB
+        // For now, we'll just create a mock merge request object and return it
+        const mergeRequest = {
+            id: `mr-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
+            sourceType: entityType,
+            sourceId: id,
+            targetType: entityType,
+            targetId,
+            title: title || `Merge ${entityType} ${id} to ${targetId}`,
+            description: description || '',
+            status: 'pending',
+            createdBy: {
+                userId: userId || req.user.id,
+                name: req.user.name || 'Anonymous User',
+                email: req.user.email || 'anonymous@example.com'
+            },
+            createdAt: new Date(),
+            updatedAt: new Date()
+        };
+
+        // Log the created merge request
+        console.log('Created new merge request:', mergeRequest);
+
+        res.status(201).json(mergeRequest);
+    } catch (err) {
+        console.error("Error creating merge request:", err);
+        res.status(500).json({ message: 'Error creating merge request' });
+    }
+});
+
+// --- VERSION CONTROL & BRANCH MANAGEMENT API ENDPOINTS ---
+
+// Get branches for a collection
+app.get('/api/collections/:id/branches', authenticateJWT, async (req, res) => {
+    try {
+        const collectionId = req.params.id;
+
+        // In a real implementation, this would query branches from MongoDB
+        // For now, we'll return mock branch data
+        const branches = [
+            {
+                id: `branch-${Date.now()}-1`,
+                name: 'feature/auth-endpoints',
+                description: 'Adding new OAuth2 authentication endpoints',
+                collectionId: collectionId,
+                basedOn: 'main',
+                createdBy: req.user.id,
+                createdByName: req.user.name || 'Anonymous User',
+                createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000), // 5 days ago
+                lastCommit: {
+                    id: `commit-${Date.now()}-1`,
+                    message: 'Updated token endpoint',
+                    timestamp: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000) // 2 days ago
+                }
+            },
+            {
+                id: `branch-${Date.now()}-2`,
+                name: 'bugfix/rate-limiting',
+                description: 'Fix rate limiting issues on API endpoints',
+                collectionId: collectionId,
+                basedOn: 'main',
+                createdBy: req.user.id,
+                createdByName: req.user.name || 'Anonymous User',
+                createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000), // 3 days ago
+                lastCommit: {
+                    id: `commit-${Date.now()}-2`,
+                    message: 'Added proper headers for rate limits',
+                    timestamp: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000) // 1 day ago
+                }
+            }
+        ];
+
+        res.json(branches);
+    } catch (err) {
+        console.error("Error fetching collection branches:", err);
+        res.status(500).json({ message: 'Error fetching branches' });
+    }
+});
+
+// Create a new branch for a collection
+app.post('/api/collections/:id/branches', authenticateJWT, async (req, res) => {
+    try {
+        const collectionId = req.params.id;
+        const { name, description, baseBranch } = req.body;
+
+        if (!name) {
+            return res.status(400).json({ message: 'Branch name is required' });
+        }
+
+        // In a real implementation, this would create a branch in MongoDB
+        // For now, we'll create a mock branch object
+        const newBranch = {
+            id: `branch-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
+            name,
+            description,
+            collectionId,
+            basedOn: baseBranch || 'main',
+            createdBy: req.user.id,
+            createdByName: req.user.name || 'Anonymous User',
+            createdAt: new Date(),
+            lastCommit: null
+        };
+
+        console.log(`Created new branch: ${newBranch.name} for collection ${collectionId}`);
+
+        res.status(201).json(newBranch);
+    } catch (err) {
+        console.error("Error creating collection branch:", err);
+        res.status(500).json({ message: 'Error creating branch' });
+    }
+});
+
+// Switch active branch for a collection
+app.post('/api/collections/:id/switch-branch', authenticateJWT, async (req, res) => {
+    try {
+        const collectionId = req.params.id;
+        const { branchName } = req.body;
+
+        if (!branchName) {
+            return res.status(400).json({ message: 'Branch name is required' });
+        }
+
+        // In a real implementation, this would update the user's active branch for this collection
+        // For now, we'll just return a mock updated collection
+        const updatedCollection = {
+            _id: collectionId,
+            name: "Updated Collection View",
+            description: "Now viewing a different branch",
+            activeBranch: branchName,
+            updatedAt: new Date(),
+            branches: [
+                { name: 'main' },
+                { name: branchName }
+            ],
+            // Other collection properties would be here
+        };
+
+        console.log(`Switched to branch ${branchName} for collection ${collectionId}`);
+
+        res.json(updatedCollection);
+    } catch (err) {
+        console.error("Error switching collection branch:", err);
+        res.status(500).json({ message: 'Error switching branch' });
+    }
+});
+
+// Get diff between collections or branches
+app.post('/api/collections/diff', authenticateJWT, async (req, res) => {
+    try {
+        const { sourceId, targetId, sourceBranch, targetBranch } = req.body;
+
+        if (!sourceId || !targetId) {
+            return res.status(400).json({ message: 'Source and target IDs are required' });
+        }
+
+        // In a real implementation, this would calculate actual diffs between collections or branches
+        // For now, we'll return mock diff data
+        const diffData = {
+            summary: {
+                added: 3,
+                modified: 2,
+                deleted: 1
+            },
+            added: [
+                {
+                    path: '/requests/0',
+                    type: 'request',
+                    value: {
+                        name: 'New GET Request',
+                        url: 'https://api.example.com/v1/users',
+                        method: 'GET',
+                        headers: [
+                            { name: 'Content-Type', value: 'application/json' }
+                        ]
+                    }
+                },
+                {
+                    path: '/requests/1',
+                    type: 'request',
+                    value: {
+                        name: 'New POST Request',
+                        url: 'https://api.example.com/v1/users',
+                        method: 'POST',
+                        headers: [
+                            { name: 'Content-Type', value: 'application/json' }
+                        ],
+                        body: { type: 'json', content: '{"name": "John Doe", "email": "john@example.com"}' }
+                    }
+                },
+                {
+                    path: '/folders/0',
+                    type: 'folder',
+                    value: {
+                        name: 'New Authentication Folder'
+                    }
+                }
+            ],
+            modified: [
+                {
+                    path: '/requests/2',
+                    type: 'request',
+                    oldValue: {
+                        name: 'Old Request Name',
+                        url: 'https://api.example.com/v1/items',
+                        method: 'GET'
+                    },
+                    newValue: {
+                        name: 'Updated Request Name',
+                        url: 'https://api.example.com/v2/items',
+                        method: 'GET',
+                        headers: [
+                            { name: 'Authorization', value: 'Bearer {{token}}' }
+                        ]
+                    },
+                    changes: [
+                        {
+                            field: 'name',
+                            oldValue: 'Old Request Name',
+                            newValue: 'Updated Request Name'
+                        },
+                        {
+                            field: 'url',
+                            oldValue: 'https://api.example.com/v1/items',
+                            newValue: 'https://api.example.com/v2/items'
+                        },
+                        {
+                            field: 'headers',
+                            oldValue: [],
+                            newValue: [{ name: 'Authorization', value: 'Bearer {{token}}' }]
+                        }
+                    ]
+                },
+                {
+                    path: '/description',
+                    type: 'metadata',
+                    oldValue: 'Old collection description',
+                    newValue: 'Updated collection description with more details',
+                    changes: [
+                        {
+                            field: 'description',
+                            oldValue: 'Old collection description',
+                            newValue: 'Updated collection description with more details'
+                        }
+                    ]
+                }
+            ],
+            deleted: [
+                {
+                    path: '/requests/3',
+                    type: 'request',
+                    value: {
+                        name: 'Deleted Request',
+                        url: 'https://api.example.com/v1/deprecated',
+                        method: 'DELETE'
+                    }
+                }
+            ]
+        };
+
+        res.json(diffData);
+    } catch (err) {
+        console.error("Error generating diff:", err);
+        res.status(500).json({ message: 'Error generating diff' });
+    }
+});
+
+// Check for merge conflicts
+app.post('/api/collections/:id/check-conflicts', authenticateJWT, async (req, res) => {
+    try {
+        const sourceCollectionId = req.params.id;
+        const { targetCollectionId, sourceBranch, targetBranch } = req.body;
+
+        if (!targetCollectionId) {
+            return res.status(400).json({ message: 'Target collection ID is required' });
+        }
+
+        // In a real implementation, this would check for actual conflicts
+        // For demonstration, we'll sometimes return conflicts and sometimes not
+        // to show both flows
+        const hasConflicts = Math.random() > 0.5;
+
+        if (!hasConflicts) {
+            // No conflicts
+            return res.json([]);
+        }
+
+        // Mock conflicts
+        const conflicts = [
+            {
+                id: `conflict-${Date.now()}-1`,
+                path: '/requests/2',
+                type: 'request',
+                source: {
+                    name: 'User Authentication',
+                    url: 'https://api.example.com/v1/auth',
+                    method: 'POST',
+                    headers: [
+                        { name: 'Content-Type', value: 'application/json' }
+                    ],
+                    body: {
+                        type: 'json',
+                        content: '{"username": "user", "password": "pass", "remember_me": true}'
+                    }
+                },
+                target: {
+                    name: 'User Authentication',
+                    url: 'https://api.example.com/v2/auth',
+                    method: 'POST',
+                    headers: [
+                        { name: 'Content-Type', value: 'application/json' },
+                        { name: 'X-API-Version', value: '2.0' }
+                    ],
+                    body: {
+                        type: 'json',
+                        content: '{"email": "user@example.com", "password": "pass"}'
+                    }
+                }
+            },
+            {
+                id: `conflict-${Date.now()}-2`,
+                path: '/environment/variables/apiKey',
+                type: 'environment',
+                source: {
+                    key: 'apiKey',
+                    value: '1234567890',
+                    description: 'API key for v1'
+                },
+                target: {
+                    key: 'apiKey',
+                    value: 'abcdefghijklmn',
+                    description: 'API key for production'
+                }
+            }
+        ];
+
+        res.json(conflicts);
+    } catch (err) {
+        console.error("Error checking for conflicts:", err);
+        res.status(500).json({ message: 'Error checking for conflicts' });
+    }
+});
+
+// Resolve merge conflicts
+app.post('/api/collections/:id/resolve-conflicts', authenticateJWT, async (req, res) => {
+    try {
+        const sourceCollectionId = req.params.id;
+        const { targetCollectionId, resolutions } = req.body;
+
+        if (!targetCollectionId || !resolutions) {
+            return res.status(400).json({ message: 'Target collection ID and resolutions are required' });
+        }
+
+        // In a real implementation, this would resolve the conflicts according to the provided resolutions
+        // For now, we'll just log the resolutions and return success
+        console.log(`Resolving conflicts from ${sourceCollectionId} to ${targetCollectionId}`);
+        console.log('Resolutions:', JSON.stringify(resolutions, null, 2));
+
+        res.json({
+            message: 'Conflicts resolved successfully',
+            resolvedConflicts: Object.keys(resolutions).length
+        });
+    } catch (err) {
+        console.error("Error resolving conflicts:", err);
+        res.status(500).json({ message: 'Error resolving conflicts' });
+    }
 });

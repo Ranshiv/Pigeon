@@ -1,302 +1,402 @@
-/* client/src/components/RequestForm.css */
-.request-form {
+/* client/src/components/RequestForm.css - Dark theme matching Postman UI */
+.request-workspace {
     display: flex;
     flex-direction: column;
-    gap: 20px;
-    width: 100%;
-    max-width: 100%;
-    margin: 0;
-    padding: 0;
-    background-color: #121212;
-    color: #e0e0e0;
-    overflow-x: hidden;
-    /* Prevent horizontal scrollbar */
-    overflow-y: visible;
-    /* Allow vertical scrolling if needed */
-    padding: 20px;
+    height: 100%;
+    background-color: #1c1c1e;
+    color: #e6e6e6;
+    overflow: hidden;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
 }
 
-.form-header {
-    margin-bottom: 15px;
-    font-size: 18px;
-    color: #ffffff;
-    font-weight: 400;
-}
-
-.form-group {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    width: 100%;
-    max-width: 100%;
-    box-sizing: border-box;
-}
-
-.form-group label {
+/* URL bar styling - matching the dark theme reference image */
+.request-url-bar {
     display: flex;
     align-items: center;
-    font-size: 14px;
-    font-weight: 400;
-    color: #aaaaaa;
-    gap: 6px;
-}
-
-.label-icon {
-    font-size: 16px;
-    color: #888888;
-}
-
-.url-input-container {
-    display: flex;
+    padding: 12px 16px;
+    border-bottom: 1px solid #3e3e3e;
     gap: 8px;
-    align-items: center;
-    width: 100%;
+    background-color: #1c1c1e;
 }
 
 .method-select {
-    width: 85px;
+    width: 90px;
+    height: 36px;
     border: none;
-    background-color: #202020;
-    color: #ffffff;
-    font-size: 14px;
-    height: 38px;
-    padding: 0 10px;
     border-radius: 3px;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 13px;
+    padding: 0 8px;
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+    background-size: 12px;
+}
+
+/* Method colors matching Postman's color scheme */
+.method-select[data-method="GET"] {
+    background-color: #00aa13;
+}
+
+.method-select[data-method="POST"] {
+    background-color: #FF6C37;
+}
+
+.method-select[data-method="PUT"] {
+    background-color: #0000ff;
+}
+
+.method-select[data-method="DELETE"] {
+    background-color: #ff0000;
+}
+
+.method-select[data-method="PATCH"] {
+    background-color: #9933cc;
 }
 
 .url-input {
     flex: 1;
-    border: 1px solid #333333;
-    background-color: #202020;
-    color: #e0e0e0;
-    padding: 8px 10px !important;
-    height: 38px;
-    font-family: 'Consolas', monospace;
-    font-size: 14px;
+    height: 36px;
+    border: 1px solid #3e3e3e;
     border-radius: 3px;
-}
-
-.url-input:focus,
-.request-form input[type="text"]:focus,
-.request-form select:focus,
-.request-form textarea:focus {
-    border-color: #1e88e5;
+    padding: 0 12px;
+    font-size: 13px;
+    background-color: #333333;
+    color: #e6e6e6;
     outline: none;
 }
 
-.header-section {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    max-width: 100%;
-    box-sizing: border-box;
+.url-input:focus {
+    border-color: #FF6C37;
 }
 
-.header-row {
-    display: flex;
-    gap: 8px;
-    align-items: center;
-    width: 100%;
-    max-width: 100%;
-    box-sizing: border-box;
-}
-
-.header-row input {
-    flex: 1;
-    border: 1px solid #333333;
-    background-color: #202020;
-    color: #e0e0e0;
-    padding: 8px 10px;
-    height: 38px;
-    font-size: 14px;
-    font-family: 'Consolas', monospace;
+.send-btn {
+    height: 36px;
+    padding: 0 16px;
+    border: none;
+    background-color: #FF6C37;
+    color: white;
     border-radius: 3px;
-    box-sizing: border-box;
-}
-
-.add-header-container {
+    font-size: 13px;
+    font-weight: 600;
     display: flex;
     align-items: center;
-    margin-top: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
 }
 
-.add-header-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+.send-btn:hover {
+    background-color: #e55e2e;
+}
+
+.save-btn {
+    height: 36px;
+    padding: 0 16px;
+    border: 1px solid #3e3e3e;
     background-color: transparent;
-    color: #ffffff;
-    border: 1px solid #333333;
-    height: 38px;
-    width: 38px;
+    color: #e6e6e6;
     border-radius: 3px;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
     cursor: pointer;
+    transition: all 0.2s;
 }
 
-.header-label {
-    padding: 8px 12px;
-    font-size: 14px;
-    color: #aaaaaa;
-    margin-left: 8px;
+.save-btn:hover {
+    background-color: rgba(255, 255, 255, 0.05);
 }
 
-.remove-btn {
-    background-color: #e53935;
-    color: white;
+/* Request name area */
+.request-name-area {
+    padding: 8px 16px;
+    border-bottom: 1px solid #3e3e3e;
+}
+
+.request-name-input {
+    width: 100%;
     border: none;
-    width: 38px;
-    height: 38px;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 4px 0;
+    outline: none;
+    background-color: transparent;
+    color: #e6e6e6;
+}
+
+.request-name-input:focus {
+    border-bottom: 1px solid #FF6C37;
+}
+
+/* Request tabs styling */
+.request-tabs {
+    display: flex;
+    padding: 0 16px;
+    border-bottom: 1px solid #3e3e3e;
+    background-color: #262626;
+}
+
+.request-tab {
+    padding: 12px 16px;
+    cursor: pointer;
+    font-size: 13px;
+    color: #a0a0a0;
+    position: relative;
+    transition: all 0.2s;
+}
+
+.request-tab.active {
+    color: #FF6C37;
+    font-weight: 500;
+}
+
+.request-tab.active::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background-color: #FF6C37;
+}
+
+/* Request sections styling */
+.request-sections {
+    flex: 1;
+    overflow: auto;
+    background-color: #1c1c1e;
+}
+
+/* Params section */
+.params-section {
+    padding: 16px;
+    height: 100%;
+    overflow: auto;
+}
+
+/* Table styling - matching dark theme */
+.params-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.params-table th {
+    text-align: left;
+    padding: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #a0a0a0;
+    border-bottom: 1px solid #3e3e3e;
+    background-color: #262626;
+}
+
+.params-table td {
+    padding: 4px 8px;
+    vertical-align: middle;
+    border-bottom: 1px solid #3e3e3e;
+}
+
+.params-table input[type="checkbox"] {
+    margin: 0;
+    cursor: pointer;
+    accent-color: #FF6C37;
+}
+
+.params-table input[type="text"] {
+    width: 100%;
+    border: 1px solid transparent;
+    padding: 6px 8px;
+    font-size: 13px;
+    background-color: transparent;
+    color: #e6e6e6;
+    outline: none;
+    transition: all 0.2s;
+}
+
+.params-table input[type="text"]:hover {
+    border-color: #3e3e3e;
+}
+
+.params-table input[type="text"]:focus {
+    border-color: #FF6C37;
+    background-color: rgba(255, 108, 55, 0.05);
+}
+
+.delete-row-btn {
+    background: transparent;
+    border: none;
+    color: #777;
+    cursor: pointer;
+    font-size: 16px;
+    padding: 0;
     display: flex;
     align-items: center;
     justify-content: center;
-    cursor: pointer;
-    border-radius: 3px;
+    width: 24px;
+    height: 24px;
+    border-radius: 12px;
 }
 
-.request-form input[type="text"],
-.request-form select,
-.request-form textarea {
-    padding: 8px 10px;
-    border: 1px solid #333333;
-    background-color: #202020;
-    color: #e0e0e0;
-    font-size: 14px;
-    border-radius: 3px;
-    box-sizing: border-box;
+.delete-row-btn:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #ff5252;
 }
 
-.request-form textarea {
-    min-height: 120px;
-    font-family: 'Consolas', monospace;
-    resize: vertical;
-    line-height: 1.5;
-    max-width: 100%;
-    box-sizing: border-box;
-    /* Include padding in width calculation */
-    overflow-x: auto;
-    /* Add horizontal scrollbar only inside textarea if needed */
-}
-
-.form-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 10px;
-    margin-top: 10px;
-}
-
-.cancel-btn {
-    background-color: #424242;
-    color: #ffffff;
+.add-row-btn {
+    background: transparent;
     border: none;
-    border-radius: 3px;
-    height: 38px;
-    padding: 0 16px;
-    font-size: 14px;
+    color: #FF6C37;
     cursor: pointer;
-}
-
-.submit-btn {
-    background-color: #1e88e5;
-    color: white;
-    border: none;
-    border-radius: 3px;
-    height: 38px;
-    padding: 0 16px;
-    font-size: 14px;
-    cursor: pointer;
-}
-
-/* Script section styles matching the screenshot */
-.script-section {
-    width: 100%;
-    border-left: 3px solid #1e88e5;
-    padding-left: 10px;
-    margin: 5px 0;
-    max-width: 100%;
-    box-sizing: border-box;
-}
-
-.script-toggle {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 8px 0;
-    cursor: pointer;
-    user-select: none;
-}
-
-.script-toggle span {
+    padding: 8px 12px;
+    font-size: 13px;
+    margin-top: 8px;
     display: flex;
     align-items: center;
     gap: 6px;
-    font-size: 14px;
-    color: #e0e0e0;
 }
 
-.toggle-icon {
-    font-size: 12px;
-    color: #888888;
+.add-row-btn:hover {
+    background-color: rgba(255, 108, 55, 0.1);
+    border-radius: 3px;
 }
 
-.script-content {
-    padding: 0;
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height 0.3s ease;
-}
-
-.script-content.open {
-    padding: 10px 0;
-    max-height: 500px;
-    overflow-y: auto;
-    overflow-x: hidden;
-    /* Prevent horizontal scrollbar in script editor */
-}
-
-/* Helper text */
-.helper-text {
-    font-size: 12px;
-    color: #888888;
-    margin-top: 4px;
-}
-
-/* Body type selector with tabs */
-.request-body-label {
-    margin-bottom: 8px;
-    font-size: 14px;
-    color: #aaaaaa;
+/* Body section */
+.body-section {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: 16px;
 }
 
 .body-type-tabs {
     display: flex;
     margin-bottom: 12px;
-    width: 100%;
-    flex-wrap: wrap;
-    /* Allow tabs to wrap to prevent overflow */
 }
 
 .body-type-tab {
-    padding: 6px 16px;
-    cursor: pointer;
-    border: none;
-    background-color: transparent;
-    color: #aaaaaa;
+    padding: 6px 12px;
     font-size: 13px;
+    color: #a0a0a0;
+    cursor: pointer;
     border-bottom: 2px solid transparent;
 }
 
-.body-type-tab:hover {
-    color: #ffffff;
-}
-
 .body-type-tab.active {
-    color: #1e88e5;
-    border-bottom: 2px solid #1e88e5;
-    font-weight: 500;
+    color: #FF6C37;
+    border-bottom-color: #FF6C37;
 }
 
-/* Ensure the workspace main content doesn't add unnecessary scroll */
-.main-content {
-    overflow-x: hidden;
+.body-editor {
+    flex: 1;
+    min-height: 200px;
+    border: 1px solid #3e3e3e;
+    border-radius: 3px;
+    padding: 12px;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', monospace;
+    font-size: 13px;
+    line-height: 1.5;
+    overflow: auto;
+    resize: none;
+    outline: none;
+    background-color: #262626;
+    color: #e6e6e6;
+}
+
+.body-editor:focus {
+    border-color: #FF6C37;
+}
+
+/* Script section */
+.script-section {
+    padding: 16px;
+    height: 100%;
+}
+
+.script-editor {
+    height: 250px;
+    border: 1px solid #3e3e3e;
+    border-radius: 3px;
+    padding: 12px;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', monospace;
+    font-size: 13px;
+    line-height: 1.5;
+    overflow: auto;
+    resize: none;
+    outline: none;
+    background-color: #262626;
+    color: #e6e6e6;
+}
+
+.script-editor:focus {
+    border-color: #FF6C37;
+}
+
+/* Headers section - identical structure to params */
+.headers-section {
+    padding: 16px;
+    height: 100%;
+    overflow: auto;
+}
+
+/* Tests section */
+.tests-section {
+    padding: 16px;
+    height: 100%;
+    overflow: auto;
+}
+
+/* Form section common styles */
+.form-section {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.form-section label {
+    display: block;
+    margin-bottom: 4px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #a0a0a0;
+}
+
+.form-section input,
+.form-section select,
+.form-section textarea {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #3e3e3e;
+    border-radius: 3px;
+    font-size: 13px;
+    background-color: #262626;
+    color: #e6e6e6;
+}
+
+.form-section input:focus,
+.form-section select:focus,
+.form-section textarea:focus {
+    border-color: #FF6C37;
+    outline: none;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .request-url-bar {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .url-input {
+        order: 3;
+        width: 100%;
+        margin-top: 8px;
+    }
+
+    .send-btn,
+    .save-btn {
+        flex: 1;
+    }
 }

@@ -1,15 +1,22 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect, useMemo } from 'react';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import './WorkspaceDetail.css';
-import { FiUsers, FiPlus, FiEdit, FiTrash2, FiActivity, FiGitMerge, FiGitBranch, FiGitPullRequest, FiLock } from 'react-icons/fi';
+import {
+    FiUsers, FiPlus, FiEdit, FiTrash2, FiActivity,
+    FiGitMerge, FiGitBranch, FiGitPullRequest, FiLock,
+    FiCalendar, FiBarChart2, FiPackage, FiClock, FiStar
+} from 'react-icons/fi';
+import { useCollaboration } from '../context/CollaborationContext';
+import ActiveCollaborators from './ActiveCollaborators';
 
 const WorkspaceDetail = () => {
     const { id } = useParams();
     const navigate = useNavigate();
+    const location = useLocation();
     const [workspace, setWorkspace] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [debugInfo, setDebugInfo] = useState(null); // Added for debugging
+    const [debugInfo, setDebugInfo] = useState(null);
     const [collections, setCollections] = useState([]);
     const [activeTab, setActiveTab] = useState('collections');
     const [mergeRequests, setMergeRequests] = useState([]);
@@ -19,13 +26,30 @@ const WorkspaceDetail = () => {
     const [inviteEmail, setInviteEmail] = useState('');
     const [inviteRole, setInviteRole] = useState('viewer');
 
+    // Access the collaboration context
+    const { joinWorkspace, sendActivity, connected } = useCollaboration();
+
+    // Computed values
+    const pendingMergeRequestsCount = useMemo(() =>
+        mergeRequests.filter(mr => mr.status === 'pending').length,
+        [mergeRequests]
+    );
+
+    // Recent collections based on updated time
+    const recentCollections = useMemo(() =>
+        [...collections].sort((a, b) =>
+            new Date(b.updatedAt) - new Date(a.updatedAt)
+        ).slice(0, 3),
+        [collections]
+    );
+
     // Fetch workspace data
     useEffect(() => {
         const fetchWorkspace = async () => {
             try {
                 setLoading(true);
-                setError(null); // Reset error state
-                setDebugInfo(null); // Reset debug info
+                setError(null);
+                setDebugInfo(null);
 
                 // First API call - main workspace data
                 console.log(`Fetching workspace with ID: ${id}`);
@@ -49,65 +73,19 @@ const WorkspaceDetail = () => {
                 setWorkspace(data);
                 setCollaborators(data.collaborators || []);
 
-                try {
-                    // Second API call - collections
-                    console.log(`Fetching collections for workspace: ${id}`);
-                    const collectionsResponse = await fetch(`http://localhost:5001/api/workspaces/${id}/collections`, {
-                        credentials: 'include'
-                    });
-
-                    if (collectionsResponse.ok) {
-                        const collectionsData = await collectionsResponse.json();
-                        console.log('Collections data received:', collectionsData);
-                        setCollections(collectionsData);
-                    } else {
-                        console.warn(`Failed to fetch collections: ${collectionsResponse.status} ${collectionsResponse.statusText}`);
-                        // Don't throw error, just continue with empty collections
-                    }
-                } catch (collErr) {
-                    console.error('Error fetching collections:', collErr);
-                    // Continue execution, don't block on collections error
+                // Join the workspace room for real-time collaboration
+                if (connected) {
+                    joinWorkspace(id);
+                    // Send activity that user joined the workspace
+                    sendActivity('workspace_view', { workspaceId: id, workspaceName: data.name });
                 }
 
-                try {
-                    // Third API call - merge requests
-                    console.log(`Fetching merge requests for workspace: ${id}`);
-                    const mergeResponse = await fetch(`http://localhost:5001/api/workspaces/${id}/merge-requests`, {
-                        credentials: 'include'
-                    });
-
-                    if (mergeResponse.ok) {
-                        const mergeData = await mergeResponse.json();
-                        console.log('Merge requests data received:', mergeData);
-                        setMergeRequests(mergeData);
-                    } else {
-                        console.warn(`Failed to fetch merge requests: ${mergeResponse.status} ${mergeResponse.statusText}`);
-                        // Don't throw error, just continue with empty merge requests
-                    }
-                } catch (mergeErr) {
-                    console.error('Error fetching merge requests:', mergeErr);
-                    // Continue execution, don't block on merge requests error
-                }
-
-                try {
-                    // Fourth API call - activity
-                    console.log(`Fetching activity for workspace: ${id}`);
-                    const activityResponse = await fetch(`http://localhost:5001/api/workspaces/${id}/activity`, {
-                        credentials: 'include'
-                    });
-
-                    if (activityResponse.ok) {
-                        const activityData = await activityResponse.json();
-                        console.log('Activity data received:', activityData);
-                        setActivities(activityData);
-                    } else {
-                        console.warn(`Failed to fetch activity: ${activityResponse.status} ${activityResponse.statusText}`);
-                        // Don't throw error, just continue with empty activities
-                    }
-                } catch (actErr) {
-                    console.error('Error fetching activity:', actErr);
-                    // Continue execution, don't block on activity error
-                }
+                // Load collections, merge requests, and activities in parallel for better performance
+                await Promise.allSettled([
+                    fetchCollections(id),
+                    fetchMergeRequests(id),
+                    fetchActivities(id)
+                ]);
 
             } catch (err) {
                 console.error('Error in workspace data fetching:', err);
@@ -118,7 +96,99 @@ const WorkspaceDetail = () => {
         };
 
         fetchWorkspace();
-    }, [id]);
+
+        // Clean up when component unmounts
+        return () => {
+            // Nothing to clean up here as the context will handle socket disconnection
+        };
+    }, [id, joinWorkspace, connected, sendActivity]);
+
+    // Effect to refresh collections when navigating back to this page
+    useEffect(() => {
+        // Only fetch collections if we're on the collections tab and workspace is loaded
+        if (activeTab === 'collections' && workspace && id) {
+            fetchCollections(id);
+        }
+    }, [location.pathname, activeTab]);
+
+    // Helper functions for fetch operations
+    const fetchCollections = async (workspaceId) => {
+        try {
+            console.log(`Fetching collections for workspace: ${workspaceId}`);
+            const response = await fetch(`http://localhost:5001/api/workspaces/${workspaceId}/collections`, {
+                credentials: 'include'
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                console.log('Collections data received:', data);
+                setCollections(data);
+                return data;
+            } else {
+                console.warn(`Failed to fetch collections: ${response.status} ${response.statusText}`);
+                return [];
+            }
+        } catch (err) {
+            console.error('Error fetching collections:', err);
+            return [];
+        }
+    };
+
+    const fetchMergeRequests = async (workspaceId) => {
+        try {
+            console.log(`Fetching merge requests for workspace: ${workspaceId}`);
+            const response = await fetch(`http://localhost:5001/api/workspaces/${workspaceId}/merge-requests`, {
+                credentials: 'include'
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                console.log('Merge requests data received:', data);
+                setMergeRequests(data);
+                return data;
+            } else {
+                console.warn(`Failed to fetch merge requests: ${response.status} ${response.statusText}`);
+                return [];
+            }
+        } catch (err) {
+            console.error('Error fetching merge requests:', err);
+            return [];
+        }
+    };
+
+    const fetchActivities = async (workspaceId) => {
+        try {
+            console.log(`Fetching activity for workspace: ${workspaceId}`);
+            const response = await fetch(`http://localhost:5001/api/workspaces/${workspaceId}/activity`, {
+                credentials: 'include'
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                console.log('Activity data received:', data);
+                setActivities(data);
+                return data;
+            } else {
+                console.warn(`Failed to fetch activity: ${response.status} ${response.statusText}`);
+                return [];
+            }
+        } catch (err) {
+            console.error('Error fetching activity:', err);
+            return [];
+        }
+    };
+
+    // Send activities when changing tabs
+    const handleTabChange = (tabName) => {
+        setActiveTab(tabName);
+        if (connected && workspace) {
+            sendActivity('tab_change', {
+                tab: tabName,
+                workspaceId: id,
+                workspaceName: workspace.name
+            });
+        }
+    };
 
     // Handle inviting users to workspace
     const handleInviteUser = async (e) => {
@@ -147,6 +217,15 @@ const WorkspaceDetail = () => {
             // Update the collaborators list
             setCollaborators([...collaborators, updatedCollaborator]);
 
+            // Send activity about the new member
+            if (connected) {
+                sendActivity('member_invited', {
+                    email: inviteEmail,
+                    role: inviteRole,
+                    workspaceId: id
+                });
+            }
+
             // Reset form and close modal
             setInviteEmail('');
             setInviteRole('viewer');
@@ -174,7 +253,16 @@ const WorkspaceDetail = () => {
                 }
 
                 // Update the collaborators list
+                const removedCollaborator = collaborators.find(c => c.userId === collaboratorId);
                 setCollaborators(collaborators.filter(c => c.userId !== collaboratorId));
+
+                // Send activity about removed member
+                if (connected && removedCollaborator) {
+                    sendActivity('member_removed', {
+                        email: removedCollaborator.email,
+                        workspaceId: id
+                    });
+                }
             } catch (err) {
                 setError('Failed to remove collaborator. Please try again.');
                 console.error('Error removing collaborator:', err);
@@ -206,9 +294,20 @@ const WorkspaceDetail = () => {
             const updatedCollaborator = await response.json();
 
             // Update the collaborators list
+            const collaborator = collaborators.find(c => c.userId === collaboratorId);
             setCollaborators(collaborators.map(c =>
                 c.userId === collaboratorId ? { ...c, role: newRole } : c
             ));
+
+            // Send activity about role change
+            if (connected && collaborator) {
+                sendActivity('role_updated', {
+                    email: collaborator.email,
+                    previousRole: collaborator.role,
+                    newRole: newRole,
+                    workspaceId: id
+                });
+            }
         } catch (err) {
             setError('Failed to update collaborator role. Please try again.');
             console.error('Error updating collaborator role:', err);
@@ -256,9 +355,19 @@ const WorkspaceDetail = () => {
             }
 
             // Update the merge requests list
+            const mergeRequest = mergeRequests.find(mr => mr._id === mergeRequestId);
             setMergeRequests(mergeRequests.map(mr =>
                 mr._id === mergeRequestId ? { ...mr, status: 'approved' } : mr
             ));
+
+            // Send activity about approved merge request
+            if (connected && mergeRequest) {
+                sendActivity('merge_approved', {
+                    mergeRequestId,
+                    sourceName: mergeRequest.sourceCollection.name,
+                    targetName: mergeRequest.targetCollection.name
+                });
+            }
         } catch (err) {
             setError('Failed to approve merge request. Please try again.');
             console.error('Error approving merge request:', err);
@@ -280,9 +389,19 @@ const WorkspaceDetail = () => {
             }
 
             // Update the merge requests list
+            const mergeRequest = mergeRequests.find(mr => mr._id === mergeRequestId);
             setMergeRequests(mergeRequests.map(mr =>
                 mr._id === mergeRequestId ? { ...mr, status: 'rejected' } : mr
             ));
+
+            // Send activity about rejected merge request
+            if (connected && mergeRequest) {
+                sendActivity('merge_rejected', {
+                    mergeRequestId,
+                    sourceName: mergeRequest.sourceCollection.name,
+                    targetName: mergeRequest.targetCollection.name
+                });
+            }
         } catch (err) {
             setError('Failed to reject merge request. Please try again.');
             console.error('Error rejecting merge request:', err);
@@ -291,8 +410,35 @@ const WorkspaceDetail = () => {
         }
     };
 
+    // Utility function to format dates nicely
+    const formatDate = (dateString) => {
+        const date = new Date(dateString);
+        const now = new Date();
+        const diffTime = Math.abs(now - date);
+        const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+
+        if (diffDays === 0) {
+            return 'Today';
+        } else if (diffDays === 1) {
+            return 'Yesterday';
+        } else if (diffDays < 7) {
+            return `${diffDays} days ago`;
+        } else {
+            return date.toLocaleDateString(undefined, {
+                month: 'short',
+                day: 'numeric',
+                year: date.getFullYear() !== now.getFullYear() ? 'numeric' : undefined
+            });
+        }
+    };
+
     if (loading && !workspace) {
-        return <div className="loading-container">Loading workspace...</div>;
+        return (
+            <div className="loading-container">
+                <div className="loading-spinner"></div>
+                <p>Loading workspace...</p>
+            </div>
+        );
     }
 
     if (error) {
@@ -328,6 +474,7 @@ const WorkspaceDetail = () => {
             case 'request_sent': return <FiActivity />;
             case 'merge_requested': return <FiGitPullRequest />;
             case 'merge_approved': return <FiGitMerge />;
+            case 'user_added': return <FiUsers />;
             default: return <FiActivity />;
         }
     };
@@ -343,45 +490,110 @@ const WorkspaceDetail = () => {
                 </div>
 
                 <div className="workspace-actions">
+                    <div className="collaborators-indicator">
+                        <ActiveCollaborators workspaceId={id} />
+                    </div>
+
                     {workspace.userRole === 'admin' && (
                         <>
                             <button className="workspace-edit-btn" onClick={() => navigate(`/workspace/workspaces/${id}/edit`)}>
                                 <FiEdit /> Edit
                             </button>
-                            <button className="workspace-delete-btn" onClick={handleDeleteWorkspace}>
-                                <FiTrash2 /> Delete
-                            </button>
+                            {!workspace.isPersonal && (
+                                <button className="workspace-delete-btn" onClick={handleDeleteWorkspace}>
+                                    <FiTrash2 /> Delete
+                                </button>
+                            )}
                         </>
                     )}
                 </div>
             </header>
 
-            <p className="workspace-description">{workspace.description}</p>
+            {workspace.description && (
+                <p className="workspace-description">{workspace.description}</p>
+            )}
+
+            {/* Dashboard Overview Section - New addition */}
+            <div className="workspace-dashboard">
+                <div className="dashboard-stats">
+                    <div className="stat-card">
+                        <div className="stat-icon collections">
+                            <FiPackage />
+                        </div>
+                        <div className="stat-info">
+                            <span className="stat-value">{collections.length}</span>
+                            <span className="stat-label">Collections</span>
+                        </div>
+                    </div>
+                    <div className="stat-card">
+                        <div className="stat-icon members">
+                            <FiUsers />
+                        </div>
+                        <div className="stat-info">
+                            <span className="stat-value">{collaborators.length}</span>
+                            <span className="stat-label">Members</span>
+                        </div>
+                    </div>
+                    <div className="stat-card">
+                        <div className="stat-icon pending">
+                            <FiGitPullRequest />
+                        </div>
+                        <div className="stat-info">
+                            <span className="stat-value">{pendingMergeRequestsCount}</span>
+                            <span className="stat-label">Pending Requests</span>
+                        </div>
+                    </div>
+                    <div className="stat-card">
+                        <div className="stat-icon activity">
+                            <FiActivity />
+                        </div>
+                        <div className="stat-info">
+                            <span className="stat-value">{activities.length}</span>
+                            <span className="stat-label">Activities</span>
+                        </div>
+                    </div>
+                </div>
+
+                {recentCollections.length > 0 && (
+                    <div className="recent-collections">
+                        <h3><FiClock /> Recent Collections</h3>
+                        <div className="recent-collections-list">
+                            {recentCollections.map(collection => (
+                                <div key={collection._id} className="recent-collection-item"
+                                    onClick={() => navigate(`/workspace/collections/${collection._id}`)}>
+                                    <div className="collection-name">{collection.name}</div>
+                                    <div className="collection-updated">Updated {formatDate(collection.updatedAt)}</div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
+            </div>
 
             <div className="workspace-tabs">
                 <button
                     className={`tab ${activeTab === 'collections' ? 'active' : ''}`}
-                    onClick={() => setActiveTab('collections')}
+                    onClick={() => handleTabChange('collections')}
                 >
-                    Collections
+                    <FiPackage /> Collections
                 </button>
                 <button
                     className={`tab ${activeTab === 'members' ? 'active' : ''}`}
-                    onClick={() => setActiveTab('members')}
+                    onClick={() => handleTabChange('members')}
                 >
-                    Members ({collaborators.length})
+                    <FiUsers /> Members ({collaborators.length})
                 </button>
                 <button
                     className={`tab ${activeTab === 'merge-requests' ? 'active' : ''}`}
-                    onClick={() => setActiveTab('merge-requests')}
+                    onClick={() => handleTabChange('merge-requests')}
                 >
-                    Merge Requests ({mergeRequests.length})
+                    <FiGitPullRequest /> Merge Requests {pendingMergeRequestsCount > 0 && <span className="notification-badge">{pendingMergeRequestsCount}</span>}
                 </button>
                 <button
                     className={`tab ${activeTab === 'activity' ? 'active' : ''}`}
-                    onClick={() => setActiveTab('activity')}
+                    onClick={() => handleTabChange('activity')}
                 >
-                    Activity
+                    <FiActivity /> Activity
                 </button>
             </div>
 
@@ -399,6 +611,7 @@ const WorkspaceDetail = () => {
                         <div className="collections-list">
                             {collections.length === 0 ? (
                                 <div className="empty-state">
+                                    <FiPackage size={32} />
                                     <p>No collections in this workspace yet.</p>
                                     <button className="primary-btn" onClick={() => navigate(`/workspace/collections/new?workspaceId=${id}`)}>
                                         Create your first collection
@@ -412,7 +625,7 @@ const WorkspaceDetail = () => {
                                             <p>{collection.description || 'No description'}</p>
                                             <div className="collection-meta">
                                                 <span>{collection.requestsCount || 0} requests</span>
-                                                <span>Updated {new Date(collection.updatedAt).toLocaleDateString()}</span>
+                                                <span>Updated {formatDate(collection.updatedAt)}</span>
                                             </div>
                                             <button className="view-collection-btn" onClick={() => navigate(`/workspace/collections/${collection._id}`)}>
                                                 View Collection
@@ -451,7 +664,9 @@ const WorkspaceDetail = () => {
                                     {collaborators.map(collab => (
                                         <tr key={collab.userId}>
                                             <td className="user-cell">
-                                                <div className="avatar">{collab.displayName ? collab.displayName[0].toUpperCase() : 'U'}</div>
+                                                <div className="avatar">
+                                                    {collab.displayName ? collab.displayName[0].toUpperCase() : 'U'}
+                                                </div>
                                                 <div className="user-info">
                                                     <span className="user-name">{collab.displayName}</span>
                                                     <span className="user-email">{collab.email}</span>
@@ -474,18 +689,17 @@ const WorkspaceDetail = () => {
                                                     </span>
                                                 )}
                                             </td>
-                                            <td>{new Date(collab.joinedAt).toLocaleDateString()}</td>
+                                            <td>{formatDate(collab.joinedAt)}</td>
                                             {workspace.userRole === 'admin' && (
                                                 <td>
-                                                    {collab.userId !== workspace.owner && (
+                                                    {collab.userId !== workspace.owner ? (
                                                         <button
                                                             className="remove-member-btn"
                                                             onClick={() => handleRemoveCollaborator(collab.userId)}
                                                         >
                                                             Remove
                                                         </button>
-                                                    )}
-                                                    {collab.userId === workspace.owner && (
+                                                    ) : (
                                                         <span className="owner-label">Owner</span>
                                                     )}
                                                 </td>
@@ -542,7 +756,7 @@ const WorkspaceDetail = () => {
 
                                             <div className="merge-meta">
                                                 <span>Created by: {request.createdBy.displayName}</span>
-                                                <span>Created: {new Date(request.createdAt).toLocaleDateString()}</span>
+                                                <span>Created: {formatDate(request.createdAt)}</span>
                                             </div>
 
                                             {request.status === 'pending' && workspace.userRole !== 'viewer' && (
@@ -562,13 +776,13 @@ const WorkspaceDetail = () => {
                                                 </div>
                                             )}
 
-                                            {request.status !== 'pending' && (
+                                            {request.status !== 'pending' && request.actionBy && (
                                                 <div className="merge-result">
                                                     <span>
                                                         {request.status === 'approved' ? 'Approved' : 'Rejected'} by: {request.actionBy.displayName}
                                                     </span>
                                                     <span>
-                                                        {request.status === 'approved' ? 'Approved' : 'Rejected'} on: {new Date(request.updatedAt).toLocaleDateString()}
+                                                        {request.status === 'approved' ? 'Approved' : 'Rejected'} on: {formatDate(request.updatedAt)}
                                                     </span>
                                                 </div>
                                             )}
@@ -602,11 +816,16 @@ const WorkspaceDetail = () => {
                                         <div className="activity-content">
                                             <div className="activity-header">
                                                 <span className="user">{activity.user.displayName}</span>
-                                                <span className="time">{new Date(activity.timestamp).toLocaleString()}</span>
+                                                <span className="time">{formatDate(activity.timestamp)}</span>
                                             </div>
                                             <p className="activity-message">{activity.message}</p>
                                             {activity.details && (
-                                                <div className="activity-details">{activity.details}</div>
+                                                <div className="activity-details">
+                                                    {typeof activity.details === 'string'
+                                                        ? activity.details
+                                                        : JSON.stringify(activity.details)
+                                                    }
+                                                </div>
                                             )}
                                         </div>
                                     </div>

@@ -80,6 +80,15 @@ const SettingsPage = () => {
             if (res.ok) {
                 const data = await res.json();
                 setCurrentUser(data.user); // Update user state with the response
+
+                // Update user data in localStorage to ensure it's available for collaborator display
+                const userData = JSON.parse(localStorage.getItem('user') || '{}');
+                localStorage.setItem('user', JSON.stringify({
+                    ...userData,
+                    ...updateData,
+                    displayName: updateData.displayName || userData.displayName || currentUser.displayName
+                }));
+
                 return true;
             } else {
                 const errorData = await res.json();

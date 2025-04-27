@@ -1,257 +1,470 @@
-// client/src/components/RequestForm.js
 import React, { useState, useEffect } from 'react';
 import './RequestForm.css';
-import TestScriptEditor from './TestScriptEditor';
-// Import icons
-import { FiTag, FiGlobe, FiFileText, FiCode, FiCheck, FiPlus, FiX } from 'react-icons/fi';
 
-const RequestForm = ({ onSubmit, initialValues, onCancel }) => {
-    const [name, setName] = useState('');
-    const [url, setUrl] = useState('');
-    const [method, setMethod] = useState('GET');
-    const [headers, setHeaders] = useState([{ name: '', value: '' }]);
-    const [body, setBody] = useState('');
-    const [bodyType, setBodyType] = useState('none');
-    // New states for testing features
-    const [preRequestScript, setPreRequestScript] = useState('');
-    const [testScript, setTestScript] = useState('');
-    const [showPreRequestScript, setShowPreRequestScript] = useState(false);
-    const [showTestScript, setShowTestScript] = useState(false);
+// HTTP Methods
+const HTTP_METHODS = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD', 'OPTIONS'];
 
-    useEffect(() => {
-        if (initialValues) {
-            setName(initialValues.name || '');
-            setUrl(initialValues.url || '');
-            setMethod(initialValues.method || 'GET');
-            setHeaders(initialValues.headers && initialValues.headers.length > 0 ? initialValues.headers : [{ name: '', value: '' }]);
-            setBody(initialValues.body || '');
-            setBodyType(initialValues.bodyType || 'none');
-            // Load test scripts if available
-            setPreRequestScript(initialValues.preRequestScript || '');
-            setTestScript(initialValues.testScript || '');
-        }
-    }, [initialValues])
+const RequestForm = ({ onSendRequest, initialRequest }) => {
+    // Form state
+    const [method, setMethod] = useState(initialRequest?.method || 'GET');
+    const [url, setUrl] = useState(initialRequest?.url || '');
+    const [requestName, setRequestName] = useState(initialRequest?.name || 'Get Users');
+    const [activeTab, setActiveTab] = useState('params');
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        onSubmit({
-            _id: initialValues?._id,
-            name,
-            url,
-            method,
-            headers: headers.filter((header) => header.name !== ''), // Remove empty headers
-            body,
-            bodyType,
-            // Include test scripts in the submission
-            preRequestScript,
-            testScript
-        });
+    // Tab content states
+    const [params, setParams] = useState(initialRequest?.params || [
+        { enabled: true, key: 'Key', value: 'Value', description: 'Description' }
+    ]);
+    const [headers, setHeaders] = useState(initialRequest?.headers || []);
+    const [bodyType, setBodyType] = useState(initialRequest?.bodyType || 'none');
+    const [bodyContent, setBodyContent] = useState(initialRequest?.body || '');
+    const [preRequestScript, setPreRequestScript] = useState(initialRequest?.preRequestScript || '');
+    const [tests, setTests] = useState(initialRequest?.tests || '');
+
+    // Handlers for form inputs
+    const handleMethodChange = (e) => setMethod(e.target.value);
+    const handleUrlChange = (e) => setUrl(e.target.value);
+    const handleNameChange = (e) => setRequestName(e.target.value);
+
+    // Tab change handler
+    const handleTabChange = (tab) => setActiveTab(tab);
+
+    // Parameter handlers
+    const handleParamChange = (index, field, value) => {
+        const newParams = [...params];
+        newParams[index][field] = value;
+        setParams(newParams);
     };
 
+    const handleAddParam = () => {
+        setParams([...params, { enabled: true, key: '', value: '', description: '' }]);
+    };
+
+    const handleRemoveParam = (index) => {
+        const newParams = [...params];
+        newParams.splice(index, 1);
+        setParams(newParams);
+    };
+
+    // Header handlers
     const handleHeaderChange = (index, field, value) => {
         const newHeaders = [...headers];
         newHeaders[index][field] = value;
         setHeaders(newHeaders);
     };
 
-    const addHeader = () => {
-        setHeaders([...headers, { name: '', value: '' }]);
+    const handleAddHeader = () => {
+        setHeaders([...headers, { enabled: true, key: '', value: '', description: '' }]);
     };
 
-    const removeHeader = (index) => {
+    const handleRemoveHeader = (index) => {
         const newHeaders = [...headers];
         newHeaders.splice(index, 1);
         setHeaders(newHeaders);
     };
 
+    // Form submission handler
+    const handleSubmit = (e) => {
+        e.preventDefault();
+
+        // Build request object
+        const request = {
+            name: requestName,
+            method,
+            url,
+            params: params.filter(p => p.enabled && p.key),
+            headers: headers.filter(h => h.enabled && h.key),
+            bodyType,
+            body: bodyContent,
+            preRequestScript,
+            tests
+        };
+
+        // Send request
+        onSendRequest(request);
+    };
+
+    // Update URL with query parameters
+    useEffect(() => {
+        const updateUrlWithParams = () => {
+            try {
+                const urlObj = new URL(url);
+
+                // Clear existing params
+                urlObj.search = '';
+
+                // Add enabled params
+                params.forEach(param => {
+                    if (param.enabled && param.key) {
+                        urlObj.searchParams.append(param.key, param.value || '');
+                    }
+                });
+
+                // Update URL without triggering infinite loop
+                const newUrl = urlObj.toString();
+                if (newUrl !== url) {
+                    setUrl(newUrl);
+                }
+            } catch (error) {
+                // Invalid URL, ignore
+            }
+        };
+
+        // Only update if URL is valid and we have params
+        if (url?.includes('://') && params.some(p => p.enabled && p.key)) {
+            updateUrlWithParams();
+        }
+    }, [params]);
+
+    // Render tab content based on active tab
+    const renderTabContent = () => {
+        switch (activeTab) {
+            case 'params':
+                return (
+                    <div className="params-section">
+                        <table className="params-table">
+                            <thead>
+                                <tr>
+                                    <th width="30"></th>
+                                    <th width="30%">Key</th>
+                                    <th width="30%">Value</th>
+                                    <th width="30%">Description</th>
+                                    <th width="40"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {params.map((param, index) => (
+                                    <tr key={`param-${index}`}>
+                                        <td>
+                                            <input
+                                                type="checkbox"
+                                                checked={param.enabled}
+                                                onChange={(e) => handleParamChange(index, 'enabled', e.target.checked)}
+                                            />
+                                        </td>
+                                        <td>
+                                            <input
+                                                type="text"
+                                                value={param.key}
+                                                onChange={(e) => handleParamChange(index, 'key', e.target.value)}
+                                                placeholder="Key"
+                                            />
+                                        </td>
+                                        <td>
+                                            <input
+                                                type="text"
+                                                value={param.value}
+                                                onChange={(e) => handleParamChange(index, 'value', e.target.value)}
+                                                placeholder="Value"
+                                            />
+                                        </td>
+                                        <td>
+                                            <input
+                                                type="text"
+                                                value={param.description}
+                                                onChange={(e) => handleParamChange(index, 'description', e.target.value)}
+                                                placeholder="Description"
+                                            />
+                                        </td>
+                                        <td>
+                                            <button
+                                                className="delete-row-btn"
+                                                onClick={() => handleRemoveParam(index)}
+                                                aria-label="Delete parameter"
+                                            >
+                                                ×
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                        <button className="add-row-btn" onClick={handleAddParam}>
+                            + Add
+                        </button>
+                    </div>
+                );
+
+            case 'headers':
+                return (
+                    <div className="headers-section">
+                        <table className="params-table">
+                            <thead>
+                                <tr>
+                                    <th width="30"></th>
+                                    <th width="30%">Key</th>
+                                    <th width="30%">Value</th>
+                                    <th width="30%">Description</th>
+                                    <th width="40"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {headers.map((header, index) => (
+                                    <tr key={`header-${index}`}>
+                                        <td>
+                                            <input
+                                                type="checkbox"
+                                                checked={header.enabled}
+                                                onChange={(e) => handleHeaderChange(index, 'enabled', e.target.checked)}
+                                            />
+                                        </td>
+                                        <td>
+                                            <input
+                                                type="text"
+                                                value={header.key}
+                                                onChange={(e) => handleHeaderChange(index, 'key', e.target.value)}
+                                                placeholder="Key"
+                                            />
+                                        </td>
+                                        <td>
+                                            <input
+                                                type="text"
+                                                value={header.value}
+                                                onChange={(e) => handleHeaderChange(index, 'value', e.target.value)}
+                                                placeholder="Value"
+                                            />
+                                        </td>
+                                        <td>
+                                            <input
+                                                type="text"
+                                                value={header.description}
+                                                onChange={(e) => handleHeaderChange(index, 'description', e.target.value)}
+                                                placeholder="Description"
+                                            />
+                                        </td>
+                                        <td>
+                                            <button
+                                                className="delete-row-btn"
+                                                onClick={() => handleRemoveHeader(index)}
+                                                aria-label="Delete header"
+                                            >
+                                                ×
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                        <button className="add-row-btn" onClick={handleAddHeader}>
+                            + Add
+                        </button>
+                    </div>
+                );
+
+            case 'body':
+                return (
+                    <div className="body-section">
+                        <div className="body-type-tabs">
+                            <div
+                                className={`body-type-tab ${bodyType === 'none' ? 'active' : ''}`}
+                                onClick={() => setBodyType('none')}
+                            >
+                                None
+                            </div>
+                            <div
+                                className={`body-type-tab ${bodyType === 'form-data' ? 'active' : ''}`}
+                                onClick={() => setBodyType('form-data')}
+                            >
+                                Form Data
+                            </div>
+                            <div
+                                className={`body-type-tab ${bodyType === 'x-www-form-urlencoded' ? 'active' : ''}`}
+                                onClick={() => setBodyType('x-www-form-urlencoded')}
+                            >
+                                x-www-form-urlencoded
+                            </div>
+                            <div
+                                className={`body-type-tab ${bodyType === 'raw' ? 'active' : ''}`}
+                                onClick={() => setBodyType('raw')}
+                            >
+                                Raw
+                            </div>
+                            <div
+                                className={`body-type-tab ${bodyType === 'binary' ? 'active' : ''}`}
+                                onClick={() => setBodyType('binary')}
+                            >
+                                Binary
+                            </div>
+                        </div>
+
+                        {bodyType === 'raw' && (
+                            <textarea
+                                className="body-editor"
+                                value={bodyContent}
+                                onChange={(e) => setBodyContent(e.target.value)}
+                                placeholder="Enter request body"
+                                spellCheck="false"
+                            />
+                        )}
+
+                        {bodyType === 'none' && (
+                            <div className="empty-body">
+                                This request does not have a body
+                            </div>
+                        )}
+
+                        {(bodyType === 'form-data' || bodyType === 'x-www-form-urlencoded') && (
+                            <div className="form-data-editor">
+                                <table className="params-table">
+                                    <thead>
+                                        <tr>
+                                            <th width="30"></th>
+                                            <th width="30%">Key</th>
+                                            <th width="30%">Value</th>
+                                            <th width="30%">Description</th>
+                                            <th width="40"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                <input type="checkbox" checked={true} />
+                                            </td>
+                                            <td>
+                                                <input type="text" placeholder="Key" />
+                                            </td>
+                                            <td>
+                                                <input type="text" placeholder="Value" />
+                                            </td>
+                                            <td>
+                                                <input type="text" placeholder="Description" />
+                                            </td>
+                                            <td>
+                                                <button className="delete-row-btn">×</button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <button className="add-row-btn">
+                                    + Add
+                                </button>
+                            </div>
+                        )}
+
+                        {bodyType === 'binary' && (
+                            <div className="binary-upload">
+                                <input type="file" />
+                            </div>
+                        )}
+                    </div>
+                );
+
+            case 'pre-request-script':
+                return (
+                    <div className="script-section">
+                        <textarea
+                            className="script-editor"
+                            value={preRequestScript}
+                            onChange={(e) => setPreRequestScript(e.target.value)}
+                            placeholder="// Write pre-request script here (JavaScript)"
+                            spellCheck="false"
+                        />
+                    </div>
+                );
+
+            case 'tests':
+                return (
+                    <div className="script-section">
+                        <textarea
+                            className="script-editor"
+                            value={tests}
+                            onChange={(e) => setTests(e.target.value)}
+                            placeholder="// Write test script here (JavaScript)"
+                            spellCheck="false"
+                        />
+                    </div>
+                );
+
+            default:
+                return null;
+        }
+    };
+
     return (
-        <form onSubmit={handleSubmit} className="request-form">
-            <div className="form-header">
-                {initialValues ? 'Edit Request' : 'Create New Request'}
-            </div>
-
-            <div className="form-group">
-                <label htmlFor="name">
-                    <FiTag className="label-icon" /> Request Name:
-                </label>
-                <input
-                    type="text"
-                    id="name"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    placeholder="Enter a descriptive name"
-                    required
-                />
-                <div className="helper-text">A clear name helps you find this request later</div>
-            </div>
-
-            <div className="form-group">
-                <label htmlFor="url">
-                    <FiGlobe className="label-icon" /> Request URL:
-                </label>
-                <div className="url-input-container">
-                    <select
-                        id="method"
-                        value={method}
-                        onChange={(e) => setMethod(e.target.value)}
-                        className="method-select"
-                    >
-                        <option value="GET">GET</option>
-                        <option value="POST">POST</option>
-                        <option value="PUT">PUT</option>
-                        <option value="DELETE">DELETE</option>
-                        <option value="PATCH">PATCH</option>
-                        <option value="OPTIONS">OPTIONS</option>
-                        <option value="HEAD">HEAD</option>
-                    </select>
+        <div className="request-workspace">
+            <form onSubmit={handleSubmit}>
+                {/* Request name input */}
+                <div className="request-name-area">
                     <input
                         type="text"
-                        id="url"
-                        value={url}
-                        onChange={(e) => setUrl(e.target.value)}
-                        placeholder="https://api.example.com/endpoint"
+                        className="request-name-input"
+                        value={requestName}
+                        onChange={handleNameChange}
+                        placeholder="Request name"
+                    />
+                </div>
+
+                {/* URL bar */}
+                <div className="request-url-bar">
+                    <select
+                        className="method-select"
+                        data-method={method}
+                        value={method}
+                        onChange={handleMethodChange}
+                    >
+                        {HTTP_METHODS.map(m => (
+                            <option key={m} value={m}>{m}</option>
+                        ))}
+                    </select>
+
+                    <input
+                        type="text"
                         className="url-input"
+                        value={url}
+                        onChange={handleUrlChange}
+                        placeholder="Enter request URL"
                         required
                     />
-                </div>
-            </div>
 
-            {/* Pre-Request Script Section */}
-            <div className="script-section">
-                <div
-                    className="script-toggle"
-                    onClick={() => setShowPreRequestScript(!showPreRequestScript)}
-                >
-                    <span><FiCode className="label-icon" /> Pre-request Script</span>
-                    <span className="toggle-icon">{showPreRequestScript ? '▲' : '▼'}</span>
-                </div>
-                <div className={`script-content ${showPreRequestScript ? 'open' : ''}`}>
-                    {showPreRequestScript && (
-                        <TestScriptEditor
-                            script={preRequestScript}
-                            onChange={setPreRequestScript}
-                            scriptType="pre-request"
-                        />
-                    )}
-                </div>
-            </div>
+                    <button type="submit" className="send-btn">
+                        Send
+                    </button>
 
-            <div className="form-group">
-                <label>
-                    <FiFileText className="label-icon" /> Headers:
-                </label>
-                <div className="header-section">
-                    {headers.map((header, index) => (
-                        <div key={index} className="header-row">
-                            <input
-                                type="text"
-                                placeholder="Header Name"
-                                value={header.name}
-                                onChange={(e) => handleHeaderChange(index, 'name', e.target.value)}
-                            />
-                            <input
-                                type="text"
-                                placeholder="Header Value"
-                                value={header.value}
-                                onChange={(e) => handleHeaderChange(index, 'value', e.target.value)}
-                            />
-                            <button
-                                type="button"
-                                onClick={() => removeHeader(index)}
-                                className="remove-btn"
-                                aria-label="Remove header"
-                            >
-                                <FiX />
-                            </button>
-                        </div>
-                    ))}
-                    <div className="add-header-container">
-                        <button
-                            type="button"
-                            onClick={addHeader}
-                            className="add-header-btn"
-                            aria-label="Add header"
-                        >
-                            <FiPlus />
-                        </button>
-                        <span className="header-label">Add Header</span>
+                    <button type="button" className="save-btn">
+                        Save
+                    </button>
+                </div>
+
+                {/* Request tabs */}
+                <div className="request-tabs">
+                    <div
+                        className={`request-tab ${activeTab === 'params' ? 'active' : ''}`}
+                        onClick={() => handleTabChange('params')}
+                    >
+                        Params
+                    </div>
+                    <div
+                        className={`request-tab ${activeTab === 'headers' ? 'active' : ''}`}
+                        onClick={() => handleTabChange('headers')}
+                    >
+                        Headers
+                    </div>
+                    <div
+                        className={`request-tab ${activeTab === 'body' ? 'active' : ''}`}
+                        onClick={() => handleTabChange('body')}
+                    >
+                        Body
+                    </div>
+                    <div
+                        className={`request-tab ${activeTab === 'pre-request-script' ? 'active' : ''}`}
+                        onClick={() => handleTabChange('pre-request-script')}
+                    >
+                        Pre-request Script
+                    </div>
+                    <div
+                        className={`request-tab ${activeTab === 'tests' ? 'active' : ''}`}
+                        onClick={() => handleTabChange('tests')}
+                    >
+                        Tests
                     </div>
                 </div>
-            </div>
 
-            <div className="form-group">
-                <label className="request-body-label">Request Body:</label>
-                <div className="body-type-tabs">
-                    <button
-                        type="button"
-                        className={`body-type-tab ${bodyType === 'none' ? 'active' : ''}`}
-                        onClick={() => setBodyType('none')}
-                    >
-                        None
-                    </button>
-                    <button
-                        type="button"
-                        className={`body-type-tab ${bodyType === 'json' ? 'active' : ''}`}
-                        onClick={() => setBodyType('json')}
-                    >
-                        JSON
-                    </button>
-                    <button
-                        type="button"
-                        className={`body-type-tab ${bodyType === 'x-www-form-urlencoded' ? 'active' : ''}`}
-                        onClick={() => setBodyType('x-www-form-urlencoded')}
-                    >
-                        Form URL Encoded
-                    </button>
-                    <button
-                        type="button"
-                        className={`body-type-tab ${bodyType === 'raw' ? 'active' : ''}`}
-                        onClick={() => setBodyType('raw')}
-                    >
-                        Raw
-                    </button>
+                {/* Request section content */}
+                <div className="request-sections">
+                    {renderTabContent()}
                 </div>
-
-                {bodyType !== 'none' && (
-                    <textarea
-                        id="body"
-                        value={body}
-                        onChange={(e) => setBody(e.target.value)}
-                        rows="8"
-                        placeholder={bodyType === 'json' ? '{\n  "key": "value"\n}' : bodyType === 'x-www-form-urlencoded' ? 'key1=value1&key2=value2' : ''}
-                    />
-                )}
-            </div>
-
-            {/* Test Script Section */}
-            <div className="script-section">
-                <div
-                    className="script-toggle"
-                    onClick={() => setShowTestScript(!showTestScript)}
-                >
-                    <span><FiCheck className="label-icon" /> Test Script</span>
-                    <span className="toggle-icon">{showTestScript ? '▲' : '▼'}</span>
-                </div>
-                <div className={`script-content ${showTestScript ? 'open' : ''}`}>
-                    {showTestScript && (
-                        <TestScriptEditor
-                            script={testScript}
-                            onChange={setTestScript}
-                            scriptType="test"
-                        />
-                    )}
-                </div>
-            </div>
-
-            <div className="form-actions">
-                <button type="button" onClick={onCancel} className="cancel-btn">
-                    Cancel
-                </button>
-                <button type="submit" className="submit-btn">
-                    {initialValues ? 'Save Changes' : 'Create Request'}
-                </button>
-            </div>
-        </form>
+            </form>
+        </div>
     );
 };
 

@@ -9,6 +9,8 @@
     flex: 1;
     /* Take up remaining space */
     padding: 20px;
+    padding-top: 50px;
+    /* Reduced from 80px to 68px to account for the smaller navbar */
     overflow-y: auto;
     /* Allow scrolling if content overflows */
 }

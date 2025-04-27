@@ -16,6 +16,8 @@ import {
     FiZap,
     FiPlus
 } from 'react-icons/fi';
+import Notifications from './Notifications'; // Import the Notifications component
+import { useCollaboration } from '../context/CollaborationContext';
 
 const Navbar = ({ isAuthenticated }) => {
     const navigate = useNavigate();
@@ -29,6 +31,8 @@ const Navbar = ({ isAuthenticated }) => {
     const [prevScrollPos, setPrevScrollPos] = useState(0);
     const [navbarVisible, setNavbarVisible] = useState(true);
     const navbarRef = useRef(null);
+    const { sendActivity, socket } = useCollaboration();
+    const [notificationIndex, setNotificationIndex] = useState(0);
 
     // Enhanced scroll effect with smart hide/show based on scroll direction
     useEffect(() => {
@@ -101,7 +105,7 @@ const Navbar = ({ isAuthenticated }) => {
             }, 300);
             return () => clearTimeout(timer);
         }
-    }, [location.pathname]);
+    }, [location.pathname, isMobileMenuOpen]);
 
     const isActive = (path) => {
         if (path === '/') return location.pathname === '/';
@@ -154,6 +158,48 @@ const Navbar = ({ isAuthenticated }) => {
                 document.body.classList.remove('page-transition');
             }, 200);
         }
+    };
+
+    // Array of different notification types for testing
+    const notificationTypes = [
+        {
+            type: 'workspace_view',
+            details: { workspaceName: 'Test Workspace ' + Math.floor(Math.random() * 100) }
+        },
+        {
+            type: 'collection_edit',
+            details: { collectionName: 'Collection ' + Math.floor(Math.random() * 100) }
+        },
+        {
+            type: 'request_sent',
+            details: { endpoint: 'https://api.example.com/test/' + Math.floor(Math.random() * 100) }
+        },
+        {
+            type: 'comment_added',
+            details: { comment: 'This is a test comment ' + Math.floor(Math.random() * 100) }
+        }
+    ];
+
+    // Function to send a test notification that iterates through different types
+    const sendTestNotification = () => {
+        if (!socket) {
+            console.error('Socket not connected, cannot send test notification');
+            alert('Socket not connected! Please make sure the server is running and socket is connected.');
+            return;
+        }
+
+        // Get the current notification type and increment the index for next time
+        const currentNotification = notificationTypes[notificationIndex];
+        const nextIndex = (notificationIndex + 1) % notificationTypes.length;
+        setNotificationIndex(nextIndex);
+
+        console.log(`Sending test notification (${currentNotification.type}):`, currentNotification.details);
+
+        // Use the sendActivity method from CollaborationContext
+        sendActivity(currentNotification.type, currentNotification.details);
+
+        // Show a toast or alert indicating which type was sent
+        alert(`Test notification sent: ${currentNotification.type}`);
     };
 
     return (
@@ -242,6 +288,11 @@ const Navbar = ({ isAuthenticated }) => {
                             </div>
 
                             <div className="navbar-end">
+                                {/* Add Notifications component here */}
+                                <div className="navbar-item notifications-menu">
+                                    <Notifications />
+                                </div>
+
                                 <div
                                     className="navbar-item"
                                     onClick={() => handleNavigation('/workspace/settings')}
@@ -275,6 +326,17 @@ const Navbar = ({ isAuthenticated }) => {
                                         </div>
                                     )}
                                 </div>
+
+                                {/* Single test notification button that cycles through types */}
+                                {isAuthenticated && (
+                                    <button
+                                        className="test-notification-btn"
+                                        onClick={sendTestNotification}
+                                        title="Send test notification (cycles through types)"
+                                    >
+                                        Test Notification
+                                    </button>
+                                )}
                             </div>
                         </>
                     ) : (

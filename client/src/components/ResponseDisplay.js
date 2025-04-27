@@ -1,93 +1,117 @@
-// client/src/components/ResponseDisplay.js (Updated renderHeaders)
-import React, { useState } from 'react';
-// Removed SyntaxHighlighter imports as per user's last request to pause new features
-import './ResponseDisplay.css'; // Make sure CSS is imported
+// client/src/components/ResponseDisplay.js
+import React, { useState, useEffect } from 'react';
+import './ResponseDisplay.css';
 import TestResultsDisplay from './TestResultsDisplay';
+import { FiCheckCircle, FiAlertCircle, FiClock, FiFileText, FiCode } from 'react-icons/fi';
 
-const ResponseDisplay = ({ response }) => {
+const ResponseDisplay = ({ requestId }) => {
+    const [response, setResponse] = useState(null);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
     const [activeTab, setActiveTab] = useState('body');
 
-    if (!response) {
-        return null;
-    }
+    // Fetch response data when requestId changes
+    useEffect(() => {
+        if (requestId) {
+            fetchResponse(requestId);
+        } else {
+            // Clear response if no requestId
+            setResponse(null);
+        }
+    }, [requestId]);
 
-    // Display error message if present
-    if (response.error) {
-        return (
-            <div className="response-display error-display">
-                <h3>Error</h3>
-                <pre>{response.error}</pre>
-                {response.duration !== undefined && <p>Time: {response.duration} ms</p>}
-            </div>
-        );
-    }
+    const fetchResponse = async (id) => {
+        setLoading(true);
+        setError(null);
+
+        try {
+            const response = await fetch(`http://localhost:5001/api/requests/${id}/response`, {
+                credentials: 'include'
+            });
+
+            if (!response.ok) {
+                throw new Error(`Failed to fetch response: ${response.statusText}`);
+            }
+
+            const data = await response.json();
+            setResponse(data);
+        } catch (err) {
+            console.error('Error fetching response:', err);
+            setError(err.message || 'Failed to load response data');
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const formatBytes = (bytes, decimals = 2) => {
-        if (!bytes && bytes !== 0) return ''; // Handle undefined/null
+        if (!bytes && bytes !== 0) return '';
         if (bytes === 0) return '0 Bytes';
         const k = 1024;
         const dm = decimals < 0 ? 0 : decimals;
         const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
         const i = Math.floor(Math.log(bytes) / Math.log(k));
-        const safeIndex = Math.min(i, sizes.length - 1); // Ensure index is valid
+        const safeIndex = Math.min(i, sizes.length - 1);
         return parseFloat((bytes / Math.pow(k, safeIndex)).toFixed(dm)) + ' ' + sizes[safeIndex];
     };
 
-    // Ensure testResults is an array
-    const ensureTestResultsArray = () => {
-        if (!response.testResults) {
-            return null;
-        }
-
-        // If testResults is already an array, return it
-        if (Array.isArray(response.testResults)) {
-            return response.testResults;
-        }
-
-        // If testResults is an object with numeric keys (like from JSON), convert to array
-        if (typeof response.testResults === 'object') {
-            try {
-                // Attempt to convert object to array
-                const testArray = Object.values(response.testResults);
-                if (testArray.length > 0) {
-                    return testArray;
-                }
-            } catch (err) {
-                console.error("Error converting test results to array:", err);
-            }
-        }
-
-        return [];
-    };
-
-    // Get properly formatted test results array
-    const testResultsArray = ensureTestResultsArray();
-
     // Renders the response body
     const renderBody = () => {
-        // Basic text display for now
-        return <pre>{typeof response.body === 'object' ? JSON.stringify(response.body, null, 2) : String(response.body)}</pre>;
+        if (!response || !response.body) {
+            return <div className="empty-body">No response body available</div>;
+        }
+
+        let formattedBody;
+        let language = 'text';
+
+        // Determine content type and try to format accordingly
+        const contentType = response.headers && response.headers['content-type'];
+
+        try {
+            if (contentType && contentType.includes('application/json')) {
+                // Format JSON
+                language = 'json';
+                if (typeof response.body === 'string') {
+                    formattedBody = JSON.stringify(JSON.parse(response.body), null, 2);
+                } else {
+                    formattedBody = JSON.stringify(response.body, null, 2);
+                }
+            } else if (contentType && (contentType.includes('text/html') || contentType.includes('application/xml'))) {
+                // Format HTML/XML
+                language = contentType.includes('text/html') ? 'html' : 'xml';
+                formattedBody = typeof response.body === 'string' ? response.body : String(response.body);
+            } else {
+                // Default text formatting
+                formattedBody = typeof response.body === 'string' ? response.body : JSON.stringify(response.body, null, 2);
+            }
+        } catch (err) {
+            console.warn('Error formatting response body:', err);
+            formattedBody = String(response.body);
+        }
+
+        return (
+            <pre className={`response-body-content language-${language}`}>
+                {formattedBody}
+            </pre>
+        );
     };
 
     // Renders the response headers
     const renderHeaders = () => {
-        // Check if headers exist and are an object with keys
-        if (!response.headers || typeof response.headers !== 'object' || Object.keys(response.headers).length === 0) {
-            return <p>No headers received.</p>;
+        if (!response || !response.headers || Object.keys(response.headers).length === 0) {
+            return <div className="empty-headers">No headers received</div>;
         }
 
         return (
-            <table className="headers-table">
+            <table className="response-headers-table">
                 <thead>
                     <tr>
-                        <th>Header Name</th>
-                        <th>Header Value</th>
+                        <th>Key</th>
+                        <th>Value</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {/* Map over the header key-value pairs */}
-                    {Object.entries(response.headers).map(([key, value]) => (
-                        <tr key={key}>
+                    {Object.entries(response.headers).map(([key, value], index) => (
+                        <tr key={index}>
                             <td>{key}</td>
                             <td>{value}</td>
                         </tr>
@@ -99,45 +123,120 @@ const ResponseDisplay = ({ response }) => {
 
     // Renders the test results tab
     const renderTestResults = () => {
-        if (!testResultsArray || testResultsArray.length === 0) {
-            return (
-                <div className="no-tests-message">
-                    <p>No test results available. Add tests to your request to see results here.</p>
-                </div>
-            );
+        if (!response || !response.testResults ||
+            (Array.isArray(response.testResults) && response.testResults.length === 0) ||
+            (!Array.isArray(response.testResults) && Object.keys(response.testResults).length === 0)) {
+            return <div className="empty-tests">No test results available</div>;
         }
+
+        // Ensure testResults is an array
+        const testResultsArray = Array.isArray(response.testResults)
+            ? response.testResults
+            : Object.values(response.testResults);
 
         return <TestResultsDisplay testResults={testResultsArray} />;
     };
 
-    return (
-        <div className="response-display">
-            {/* Meta information bar */}
-            <div className="response-meta">
-                <span className={`status-indicator status-${String(response.status).charAt(0)}xx`}>
-                    {response.status} {response.statusText}
-                </span>
-                {/* Safely access duration and size */}
-                {response.duration !== undefined && <span className="meta-item">Time: {response.duration} ms</span>}
-                {response.size !== undefined && <span className="meta-item">Size: {formatBytes(response.size)}</span>}
+    if (loading) {
+        return (
+            <div className="response-area loading">
+                <div className="response-header">
+                    <div className="loading-spinner"></div>
+                    <span>Loading response...</span>
+                </div>
             </div>
+        );
+    }
 
-            {/* Tabs */}
-            <div className="response-tabs">
-                <button onClick={() => setActiveTab('body')} className={activeTab === 'body' ? 'active' : ''}>Body</button>
-                <button onClick={() => setActiveTab('headers')} className={activeTab === 'headers' ? 'active' : ''}>Headers</button>
-                <button onClick={() => setActiveTab('tests')} className={activeTab === 'tests' ? 'active' : ''}>
-                    Tests
-                    {testResultsArray && testResultsArray.length > 0 && (
-                        <span className="test-result-badge">
-                            {testResultsArray.filter(test => test.passed).length}/{testResultsArray.length}
+    if (error) {
+        return (
+            <div className="response-area error">
+                <div className="response-header">
+                    <div className="response-status error">
+                        <FiAlertCircle className="status-icon" />
+                        <span>Error</span>
+                    </div>
+                </div>
+                <div className="response-body error-body">
+                    {error}
+                </div>
+            </div>
+        );
+    }
+
+    if (!response) {
+        return (
+            <div className="response-area no-response">
+                <div className="response-header">
+                    <div className="no-response-message">
+                        Send a request to see the response
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    // Get status code class (2xx, 4xx, etc)
+    const statusClass = response.status ? `status-${Math.floor(response.status / 100)}xx` : '';
+    const isSuccess = response.status >= 200 && response.status < 300;
+
+    return (
+        <div className="response-area">
+            <div className="response-header">
+                <div className={`response-status ${statusClass}`}>
+                    {isSuccess ? (
+                        <FiCheckCircle className="status-icon success" />
+                    ) : (
+                        <FiAlertCircle className="status-icon error" />
+                    )}
+                    <span className="status-code">{response.status}</span>
+                    <span className="status-text">{response.statusText}</span>
+                </div>
+                <div className="response-meta">
+                    {response.duration !== undefined && (
+                        <span className="response-time">
+                            <FiClock className="meta-icon" />
+                            {response.duration} ms
                         </span>
                     )}
-                </button>
+                    {response.size !== undefined && (
+                        <span className="response-size">
+                            <FiFileText className="meta-icon" />
+                            {formatBytes(response.size)}
+                        </span>
+                    )}
+                </div>
             </div>
 
-            {/* Content based on active tab */}
-            <div className="response-content">
+            <div className="response-section-tabs">
+                <div
+                    className={`response-section-tab ${activeTab === 'body' ? 'active' : ''}`}
+                    onClick={() => setActiveTab('body')}
+                >
+                    Body
+                </div>
+                <div
+                    className={`response-section-tab ${activeTab === 'headers' ? 'active' : ''}`}
+                    onClick={() => setActiveTab('headers')}
+                >
+                    Headers
+                </div>
+                <div
+                    className={`response-section-tab ${activeTab === 'tests' ? 'active' : ''}`}
+                    onClick={() => setActiveTab('tests')}
+                >
+                    Tests
+                    {response.testResults && (
+                        <span className="test-badge">
+                            {Array.isArray(response.testResults)
+                                ? `${response.testResults.filter(t => t.passed).length}/${response.testResults.length}`
+                                : ''}
+                        </span>
+                    )}
+                </div>
+            </div>
+
+            <div className="response-body">
                 {activeTab === 'body' && renderBody()}
                 {activeTab === 'headers' && renderHeaders()}
                 {activeTab === 'tests' && renderTestResults()}
