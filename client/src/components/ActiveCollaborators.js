@@ -3,7 +3,6 @@ import React, { useEffect, useState, useCallback } from 'react';
 import './ActiveCollaborators.css';
 import { useCollaboration } from '../context/CollaborationContext';
 import { FiUsers, FiMessageCircle } from 'react-icons/fi';
-// Replacing BiMessageTyping with FiMessageCircle which is available in react-icons/fi
 
 function ActiveCollaborators({ collectionId, workspaceId }) {
   const {
@@ -22,12 +21,12 @@ function ActiveCollaborators({ collectionId, workspaceId }) {
   const [activeUsers, setActiveUsers] = useState([]);
   const [roomId, setRoomId] = useState(null);
   const [typingUsers, setTypingUsers] = useState([]);
+  const [expanded, setExpanded] = useState(false);
 
   // Update active users list from context
   const updateActiveUsers = useCallback(() => {
     if (roomId && connected) {
       const users = getActiveUsers(roomId);
-      console.log('Updated active users for room', roomId, ':', users);
       setActiveUsers(users);
 
       // Also update typing users
@@ -49,7 +48,6 @@ function ActiveCollaborators({ collectionId, workspaceId }) {
       setRoomId(currentRoomId);
 
       if (connected) {
-        console.log('Joining collection room:', collectionId);
         joinCollection(collectionId);
       }
     } else if (workspaceId) {
@@ -57,7 +55,6 @@ function ActiveCollaborators({ collectionId, workspaceId }) {
       setRoomId(currentRoomId);
 
       if (connected) {
-        console.log('Joining workspace room:', workspaceId);
         joinWorkspace(workspaceId);
       }
     }
@@ -66,10 +63,8 @@ function ActiveCollaborators({ collectionId, workspaceId }) {
     return () => {
       if (connected && currentRoomId) {
         if (collectionId) {
-          console.log('Leaving collection room:', collectionId);
           leaveCollection(collectionId);
         } else if (workspaceId) {
-          console.log('Leaving workspace room:', workspaceId);
           leaveWorkspace(workspaceId);
         }
       }
@@ -84,7 +79,7 @@ function ActiveCollaborators({ collectionId, workspaceId }) {
     const refreshInterval = setInterval(updateActiveUsers, 5000); // Refresh every 5 seconds
 
     return () => clearInterval(refreshInterval);
-  }, [roomId, connected, getActiveUsers, updateActiveUsers, getTypingUsers]);
+  }, [roomId, connected, updateActiveUsers]);
 
   // Generate random colors for user avatars based on user ID
   const getInitialsColor = (id) => {
@@ -106,39 +101,19 @@ function ActiveCollaborators({ collectionId, workspaceId }) {
         // Get initials from first and last name
         return (nameParts[0][0] + nameParts[nameParts.length - 1][0]).toUpperCase();
       } else {
-        // Just use first two letters of the name
-        return user.name.slice(0, 2).toUpperCase();
+        // Just use first letter of the name
+        return user.name[0].toUpperCase();
       }
     }
 
     // Check if user has an email property
     if (user.email) {
-      // Extract the first part of the email (before @)
-      const emailPrefix = user.email.split('@')[0];
-      // Return the first 2 letters of the email prefix
-      return emailPrefix.slice(0, 2).toUpperCase();
+      // Return the first letter of the email prefix
+      return user.email[0].toUpperCase();
     }
 
     // Last resort: use user ID
-    return user.id.slice(0, 2).toUpperCase();
-  };
-
-  // Format time since user joined
-  const getActiveTime = (joinedAt) => {
-    if (!joinedAt) return '';
-
-    const joinTime = new Date(joinedAt);
-    const now = new Date();
-    const diffMs = now - joinTime;
-    const diffMins = Math.floor(diffMs / 60000);
-
-    if (diffMins < 1) return 'Just now';
-    if (diffMins === 1) return '1 min';
-    if (diffMins < 60) return `${diffMins} mins`;
-
-    const diffHours = Math.floor(diffMins / 60);
-    if (diffHours === 1) return '1 hr';
-    return `${diffHours} hrs`;
+    return user.id[0].toUpperCase();
   };
 
   // Handle reconnection attempts
@@ -146,81 +121,96 @@ function ActiveCollaborators({ collectionId, workspaceId }) {
     reconnect();
   };
 
-  // If there's a connection error, show reconnection UI
+  // Toggle expanded view
+  const toggleExpanded = () => {
+    setExpanded(!expanded);
+  };
+
+  // If there's a connection error, show a minimal error indicator
   if (connectionError) {
     return (
-      <div className="active-collaborators">
-        <div className="collaborators-header error">
-          <span>Connection Lost</span>
-        </div>
-        <div className="connection-error">
-          <p>{connectionError}</p>
-          <button
-            onClick={handleReconnect}
-            disabled={isReconnecting}
-            className="reconnect-button"
-          >
-            {isReconnecting ? 'Reconnecting...' : 'Reconnect'}
-          </button>
+      <div className="active-collaborators-minimal">
+        <div className="collaborators-connection-error" onClick={handleReconnect}>
+          <FiUsers className="connection-error-icon" />
+          <span className="error-dot"></span>
         </div>
       </div>
     );
   }
 
-  // If there are no active users, show a simplified UI
+  // If there are no active users, show minimal UI
   if (!activeUsers || activeUsers.length === 0) {
     return (
-      <div className="active-collaborators">
-        <div className="collaborators-header">
+      <div className="active-collaborators-minimal">
+        <div className="collaborators-summary empty">
           <FiUsers />
-          <span>No Active Collaborators</span>
         </div>
       </div>
     );
   }
 
-  return (
-    <div className="active-collaborators">
-      <div className="collaborators-header">
-        <FiUsers />
-        <span>{activeUsers.length} Active {activeUsers.length === 1 ? 'Collaborator' : 'Collaborators'}</span>
-      </div>
+  const maxAvatarsToShow = expanded ? activeUsers.length : 3;
+  const hasMoreUsers = activeUsers.length > maxAvatarsToShow && !expanded;
 
-      <div className="collaborators-list">
-        {activeUsers.map((user) => (
-          <div
-            key={user.id}
-            className="collaborator-item"
-          >
+  return (
+    <div className={`active-collaborators-minimal ${expanded ? 'expanded' : ''}`}>
+      {/* Minimal collaborator summary that always shows */}
+      <div className="collaborators-summary" onClick={toggleExpanded}>
+        <div className="avatar-stack">
+          {activeUsers.slice(0, maxAvatarsToShow).map((user, index) => (
             <div
-              className="collaborator-avatar"
-              style={{ backgroundColor: getInitialsColor(user.id) }}
-              title={user.name || `User ${user.id.substring(0, 6)}`}
+              key={user.id}
+              className="mini-avatar"
+              style={{
+                backgroundColor: getInitialsColor(user.id),
+                zIndex: 10 - index // Ensures proper stacking order
+              }}
+              title={user.name || user.email || `User ${user.id.substring(0, 6)}`}
             >
               {getUserInitials(user)}
-              <span className="active-indicator"></span>
-              {/* Show typing indicator if user is typing */}
-              {typingUsers.some(typingUser => typingUser.userId === user.id) && (
-                <span className="typing-indicator">
-                  <FiMessageCircle />
-                </span>
-              )}
             </div>
-            <div className="collaborator-info">
-              <div className="collaborator-name">{user.name || `User ${user.id.substring(0, 6)}`}</div>
-              <div className="collaborator-time">{getActiveTime(user.joinedAt)}</div>
+          ))}
+          {hasMoreUsers && (
+            <div className="mini-avatar more">
+              +{activeUsers.length - maxAvatarsToShow}
             </div>
-          </div>
-        ))}
+          )}
+        </div>
       </div>
 
-      {/* Show typing indicator message */}
-      {typingUsers.length > 0 && (
-        <div className="typing-message">
+      {/* Expanded collaborator details that shows on click */}
+      {expanded && (
+        <div className="collaborator-details">
+          <div className="collaborator-details-header">
+            <FiUsers />
+            <span>{activeUsers.length} Active {activeUsers.length === 1 ? 'User' : 'Users'}</span>
+            <button className="close-button" onClick={toggleExpanded}>×</button>
+          </div>
+          <div className="collaborator-list">
+            {activeUsers.map((user) => (
+              <div key={user.id} className="collaborator-item-minimal">
+                <div
+                  className="collaborator-avatar-minimal"
+                  style={{ backgroundColor: getInitialsColor(user.id) }}
+                >
+                  {getUserInitials(user)}
+                  {typingUsers.some(typingUser => typingUser.userId === user.id) && (
+                    <span className="typing-indicator-minimal"><FiMessageCircle /></span>
+                  )}
+                </div>
+                <div className="collaborator-name-minimal">
+                  {user.name || user.email || `User ${user.id.substring(0, 6)}`}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Typing indicator that shows at the bottom */}
+      {!expanded && typingUsers.length > 0 && (
+        <div className="typing-indicator-floating">
           <FiMessageCircle />
-          {typingUsers.length === 1
-            ? `${typingUsers[0].name} is typing...`
-            : `${typingUsers.length} people are typing...`}
         </div>
       )}
     </div>

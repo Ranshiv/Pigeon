@@ -1,34 +1,35 @@
-/* client/src/components/RequestForm.css - Dark theme matching Postman UI */
+/* client/src/components/RequestForm.css */
 .request-workspace {
     display: flex;
     flex-direction: column;
     height: 100%;
-    background-color: #1c1c1e;
-    color: #e6e6e6;
+    background-color: var(--card-bg);
+    color: var(--text-color);
     overflow: hidden;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-color);
 }
 
-/* URL bar styling - matching the dark theme reference image */
+/* URL bar styling */
 .request-url-bar {
     display: flex;
     align-items: center;
-    padding: 12px 16px;
-    border-bottom: 1px solid #3e3e3e;
-    gap: 8px;
-    background-color: #1c1c1e;
+    padding: var(--spacing-md);
+    border-bottom: 1px solid var(--border-color);
+    gap: var(--spacing-sm);
+    background-color: var(--card-bg);
 }
 
 .method-select {
     width: 90px;
     height: 36px;
     border: none;
-    border-radius: 3px;
+    border-radius: var(--radius-sm);
     color: white;
-    font-weight: bold;
+    font-weight: var(--font-weight-medium);
     cursor: pointer;
     font-size: 13px;
-    padding: 0 8px;
+    padding: 0 var(--spacing-sm);
     appearance: none;
     background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
     background-repeat: no-repeat;
@@ -36,121 +37,120 @@
     background-size: 12px;
 }
 
-/* Method colors matching Postman's color scheme */
+/* Method colors using CSS variables */
 .method-select[data-method="GET"] {
-    background-color: #00aa13;
+    background-color: var(--method-get);
 }
 
 .method-select[data-method="POST"] {
-    background-color: #FF6C37;
+    background-color: var(--method-post);
 }
 
 .method-select[data-method="PUT"] {
-    background-color: #0000ff;
+    background-color: var(--method-put);
 }
 
 .method-select[data-method="DELETE"] {
-    background-color: #ff0000;
+    background-color: var(--method-delete);
 }
 
 .method-select[data-method="PATCH"] {
-    background-color: #9933cc;
+    background-color: var(--method-patch);
 }
 
 .url-input {
     flex: 1;
     height: 36px;
-    border: 1px solid #3e3e3e;
-    border-radius: 3px;
-    padding: 0 12px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    padding: 0 var(--spacing-sm);
     font-size: 13px;
-    background-color: #333333;
-    color: #e6e6e6;
+    background-color: var(--card-bg);
+    color: var(--text-color);
     outline: none;
 }
 
 .url-input:focus {
-    border-color: #FF6C37;
+    border-color: var(--primary-color);
 }
 
 .send-btn {
     height: 36px;
-    padding: 0 16px;
+    padding: 0 var(--spacing-md);
     border: none;
-    background-color: #FF6C37;
+    background-color: var(--primary-color);
     color: white;
-    border-radius: 3px;
+    border-radius: var(--radius-sm);
     font-size: 13px;
-    font-weight: 600;
+    font-weight: var(--font-weight-medium);
     display: flex;
     align-items: center;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: background-color var(--transition-fast);
 }
 
 .send-btn:hover {
-    background-color: #e55e2e;
+    background-color: var(--primary-hover);
 }
 
 .save-btn {
     height: 36px;
-    padding: 0 16px;
-    border: 1px solid #3e3e3e;
+    padding: 0 var(--spacing-md);
+    border: 1px solid var(--border-color);
     background-color: transparent;
-    color: #e6e6e6;
-    border-radius: 3px;
+    color: var(--text-color);
+    border-radius: var(--radius-sm);
     font-size: 13px;
     display: flex;
     align-items: center;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: background-color var(--transition-fast);
 }
 
 .save-btn:hover {
-    background-color: rgba(255, 255, 255, 0.05);
+    background-color: var(--hover-bg);
 }
 
 /* Request name area */
 .request-name-area {
-    padding: 8px 16px;
-    border-bottom: 1px solid #3e3e3e;
+    padding: var(--spacing-sm) var(--spacing-md);
+    border-bottom: 1px solid var(--border-color);
 }
 
 .request-name-input {
     width: 100%;
     border: none;
     font-size: 14px;
-    font-weight: 600;
+    font-weight: var(--font-weight-medium);
     padding: 4px 0;
     outline: none;
     background-color: transparent;
-    color: #e6e6e6;
+    color: var(--text-color);
 }
 
 .request-name-input:focus {
-    border-bottom: 1px solid #FF6C37;
+    border-bottom: 1px solid var(--primary-color);
 }
 
 /* Request tabs styling */
 .request-tabs {
     display: flex;
-    padding: 0 16px;
-    border-bottom: 1px solid #3e3e3e;
-    background-color: #262626;
+    padding: 0 var(--spacing-md);
+    border-bottom: 1px solid var(--border-color);
 }
 
 .request-tab {
-    padding: 12px 16px;
+    padding: var(--spacing-sm) var(--spacing-md);
     cursor: pointer;
     font-size: 13px;
-    color: #a0a0a0;
+    color: var(--text-secondary);
     position: relative;
-    transition: all 0.2s;
+    transition: color var(--transition-fast);
 }
 
 .request-tab.active {
-    color: #FF6C37;
-    font-weight: 500;
+    color: var(--primary-color);
+    font-weight: var(--font-weight-medium);
 }
 
 .request-tab.active::after {
@@ -160,24 +160,24 @@
     left: 0;
     width: 100%;
     height: 2px;
-    background-color: #FF6C37;
+    background-color: var(--primary-color);
 }
 
 /* Request sections styling */
 .request-sections {
     flex: 1;
     overflow: auto;
-    background-color: #1c1c1e;
+    background-color: var(--card-bg);
 }
 
 /* Params section */
 .params-section {
-    padding: 16px;
+    padding: var(--spacing-md);
     height: 100%;
     overflow: auto;
 }
 
-/* Table styling - matching dark theme */
+/* Table styling */
 .params-table {
     width: 100%;
     border-collapse: collapse;
@@ -185,50 +185,50 @@
 
 .params-table th {
     text-align: left;
-    padding: 8px;
+    padding: var(--spacing-sm);
     font-size: 12px;
-    font-weight: 600;
-    color: #a0a0a0;
-    border-bottom: 1px solid #3e3e3e;
-    background-color: #262626;
+    font-weight: var(--font-weight-medium);
+    color: var(--text-secondary);
+    border-bottom: 1px solid var(--border-color);
+    background-color: var(--card-bg);
 }
 
 .params-table td {
-    padding: 4px 8px;
+    padding: 4px var(--spacing-sm);
     vertical-align: middle;
-    border-bottom: 1px solid #3e3e3e;
+    border-bottom: 1px solid var(--border-color);
 }
 
 .params-table input[type="checkbox"] {
     margin: 0;
     cursor: pointer;
-    accent-color: #FF6C37;
+    accent-color: var(--primary-color);
 }
 
 .params-table input[type="text"] {
     width: 100%;
     border: 1px solid transparent;
-    padding: 6px 8px;
+    padding: 6px var(--spacing-sm);
     font-size: 13px;
     background-color: transparent;
-    color: #e6e6e6;
+    color: var(--text-color);
     outline: none;
-    transition: all 0.2s;
+    transition: border-color var(--transition-fast), background-color var(--transition-fast);
 }
 
 .params-table input[type="text"]:hover {
-    border-color: #3e3e3e;
+    border-color: var(--border-color);
 }
 
 .params-table input[type="text"]:focus {
-    border-color: #FF6C37;
-    background-color: rgba(255, 108, 55, 0.05);
+    border-color: var(--primary-color);
+    background-color: var(--hover-bg);
 }
 
 .delete-row-btn {
     background: transparent;
     border: none;
-    color: #777;
+    color: var(--text-secondary);
     cursor: pointer;
     font-size: 16px;
     padding: 0;
@@ -237,30 +237,32 @@
     justify-content: center;
     width: 24px;
     height: 24px;
-    border-radius: 12px;
+    border-radius: 50%;
+    transition: background-color var(--transition-fast), color var(--transition-fast);
 }
 
 .delete-row-btn:hover {
-    background-color: rgba(255, 255, 255, 0.1);
-    color: #ff5252;
+    background-color: var(--hover-bg);
+    color: var(--danger-color);
 }
 
 .add-row-btn {
     background: transparent;
     border: none;
-    color: #FF6C37;
+    color: var(--primary-color);
     cursor: pointer;
-    padding: 8px 12px;
+    padding: var(--spacing-sm);
     font-size: 13px;
-    margin-top: 8px;
+    margin-top: var(--spacing-sm);
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: var(--spacing-xs);
+    transition: background-color var(--transition-fast);
+    border-radius: var(--radius-sm);
 }
 
 .add-row-btn:hover {
-    background-color: rgba(255, 108, 55, 0.1);
-    border-radius: 3px;
+    background-color: var(--hover-bg);
 }
 
 /* Body section */
@@ -268,82 +270,85 @@
     display: flex;
     flex-direction: column;
     height: 100%;
-    padding: 16px;
+    padding: var(--spacing-md);
 }
 
 .body-type-tabs {
     display: flex;
-    margin-bottom: 12px;
+    margin-bottom: var(--spacing-sm);
 }
 
 .body-type-tab {
-    padding: 6px 12px;
+    padding: var(--spacing-xs) var(--spacing-sm);
     font-size: 13px;
-    color: #a0a0a0;
+    color: var(--text-secondary);
     cursor: pointer;
     border-bottom: 2px solid transparent;
+    transition: color var(--transition-fast), border-color var(--transition-fast);
 }
 
 .body-type-tab.active {
-    color: #FF6C37;
-    border-bottom-color: #FF6C37;
+    color: var(--primary-color);
+    border-bottom-color: var(--primary-color);
 }
 
 .body-editor {
     flex: 1;
     min-height: 200px;
-    border: 1px solid #3e3e3e;
-    border-radius: 3px;
-    padding: 12px;
-    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', monospace;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    padding: var(--spacing-sm);
+    font-family: 'Roboto Mono', monospace;
     font-size: 13px;
     line-height: 1.5;
     overflow: auto;
     resize: none;
     outline: none;
-    background-color: #262626;
-    color: #e6e6e6;
+    background-color: var(--card-bg);
+    color: var(--text-color);
+    transition: border-color var(--transition-fast);
 }
 
 .body-editor:focus {
-    border-color: #FF6C37;
+    border-color: var(--primary-color);
 }
 
 /* Script section */
 .script-section {
-    padding: 16px;
+    padding: var(--spacing-md);
     height: 100%;
 }
 
 .script-editor {
     height: 250px;
-    border: 1px solid #3e3e3e;
-    border-radius: 3px;
-    padding: 12px;
-    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', monospace;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    padding: var(--spacing-sm);
+    font-family: 'Roboto Mono', monospace;
     font-size: 13px;
     line-height: 1.5;
     overflow: auto;
     resize: none;
     outline: none;
-    background-color: #262626;
-    color: #e6e6e6;
+    background-color: var(--card-bg);
+    color: var(--text-color);
+    transition: border-color var(--transition-fast);
 }
 
 .script-editor:focus {
-    border-color: #FF6C37;
+    border-color: var(--primary-color);
 }
 
 /* Headers section - identical structure to params */
 .headers-section {
-    padding: 16px;
+    padding: var(--spacing-md);
     height: 100%;
     overflow: auto;
 }
 
 /* Tests section */
 .tests-section {
-    padding: 16px;
+    padding: var(--spacing-md);
     height: 100%;
     overflow: auto;
 }
@@ -352,33 +357,34 @@
 .form-section {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: var(--spacing-sm);
 }
 
 .form-section label {
     display: block;
     margin-bottom: 4px;
     font-size: 13px;
-    font-weight: 500;
-    color: #a0a0a0;
+    font-weight: var(--font-weight-medium);
+    color: var(--text-secondary);
 }
 
 .form-section input,
 .form-section select,
 .form-section textarea {
     width: 100%;
-    padding: 8px 12px;
-    border: 1px solid #3e3e3e;
-    border-radius: 3px;
+    padding: var(--spacing-sm);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
     font-size: 13px;
-    background-color: #262626;
-    color: #e6e6e6;
+    background-color: var(--card-bg);
+    color: var(--text-color);
+    transition: border-color var(--transition-fast);
 }
 
 .form-section input:focus,
 .form-section select:focus,
 .form-section textarea:focus {
-    border-color: #FF6C37;
+    border-color: var(--primary-color);
     outline: none;
 }
 
@@ -386,13 +392,13 @@
 @media (max-width: 768px) {
     .request-url-bar {
         flex-wrap: wrap;
-        gap: 8px;
+        gap: var(--spacing-sm);
     }
 
     .url-input {
         order: 3;
         width: 100%;
-        margin-top: 8px;
+        margin-top: var(--spacing-sm);
     }
 
     .send-btn,

@@ -48,7 +48,7 @@ const CollectionsManagement = () => {
     const fetchCollections = async () => {
         try {
             setLoading(true);
-            const response = await fetch('http://localhost:5001/api/collections', {
+            const response = await fetch('/api/collections', {
                 credentials: 'include'
             });
             if (response.ok) {
@@ -67,7 +67,7 @@ const CollectionsManagement = () => {
 
     const fetchSharedCollections = async () => {
         try {
-            const response = await fetch('http://localhost:5001/api/collections/shared', {
+            const response = await fetch('/api/collections/shared', {
                 credentials: 'include'
             });
             if (response.ok) {
@@ -88,7 +88,7 @@ const CollectionsManagement = () => {
             // Log the request attempt to help with debugging
             console.log('Creating new collection:', { name: newCollectionName, description: newCollectionDesc });
 
-            const response = await fetch('http://localhost:5001/api/collections', {
+            const response = await fetch('/api/collections', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -134,7 +134,7 @@ const CollectionsManagement = () => {
         if (window.confirm('Are you sure you want to delete this collection?')) {
             try {
                 setLoading(true);
-                const response = await fetch(`http://localhost:5001/api/collections/${collectionId}`, {
+                const response = await fetch(`/api/collections/${collectionId}`, {
                     method: 'DELETE',
                     credentials: 'include'
                 });
@@ -156,7 +156,7 @@ const CollectionsManagement = () => {
     const handleForkCollection = async (collectionId) => {
         try {
             setLoading(true);
-            const response = await fetch(`http://localhost:5001/api/collections/${collectionId}/fork`, {
+            const response = await fetch(`/api/collections/${collectionId}/fork`, {
                 method: 'POST',
                 credentials: 'include'
             });
@@ -184,7 +184,7 @@ const CollectionsManagement = () => {
 
         try {
             setLoading(true);
-            const response = await fetch(`http://localhost:5001/api/collections/${selectedCollection._id}/share`, {
+            const response = await fetch(`/api/collections/${selectedCollection._id}/share`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -202,7 +202,7 @@ const CollectionsManagement = () => {
                 setShareEmail('');
 
                 // Refresh the collection to see updated collaborators
-                const updatedCollectionResponse = await fetch(`http://localhost:5001/api/collections/${selectedCollection._id}`, {
+                const updatedCollectionResponse = await fetch(`/api/collections/${selectedCollection._id}`, {
                     credentials: 'include'
                 });
 
@@ -227,7 +227,7 @@ const CollectionsManagement = () => {
     const handleMergeRequest = async (sourceCollection, targetCollection) => {
         try {
             setLoading(true);
-            const response = await fetch(`http://localhost:5001/api/collections/${sourceCollection._id}/merge-request`, {
+            const response = await fetch(`/api/collections/${sourceCollection._id}/merge-request`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -257,7 +257,7 @@ const CollectionsManagement = () => {
     const fetchCollectionBranches = async (collectionId) => {
         try {
             setLoading(true);
-            const response = await fetch(`http://localhost:5001/api/collections/${collectionId}/branches`, {
+            const response = await fetch(`/api/collections/${collectionId}/branches`, {
                 credentials: 'include'
             });
 
@@ -283,7 +283,7 @@ const CollectionsManagement = () => {
 
         try {
             setLoading(true);
-            const response = await fetch(`http://localhost:5001/api/collections/${selectedCollection._id}/branches`, {
+            const response = await fetch(`/api/collections/${selectedCollection._id}/branches`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -318,7 +318,7 @@ const CollectionsManagement = () => {
     const handleSwitchBranch = async (branchName, collectionId) => {
         try {
             setLoading(true);
-            const response = await fetch(`http://localhost:5001/api/collections/${collectionId}/switch-branch`, {
+            const response = await fetch(`/api/collections/${collectionId}/switch-branch`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -351,7 +351,7 @@ const CollectionsManagement = () => {
     const fetchVersionHistory = async (collectionId) => {
         try {
             setLoading(true);
-            const response = await fetch(`http://localhost:5001/api/collections/${collectionId}/versions`, {
+            const response = await fetch(`/api/collections/${collectionId}/versions`, {
                 credentials: 'include'
             });
 
@@ -378,7 +378,7 @@ const CollectionsManagement = () => {
             setDiffSource(source);
             setDiffTarget(target);
 
-            const response = await fetch(`http://localhost:5001/api/collections/diff`, {
+            const response = await fetch(`/api/collections/diff`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -414,7 +414,7 @@ const CollectionsManagement = () => {
             setSourceCollection(sourceCollection);
             setTargetCollection(targetCollection);
 
-            const response = await fetch(`http://localhost:5001/api/collections/${sourceCollection._id}/check-conflicts`, {
+            const response = await fetch(`/api/collections/${sourceCollection._id}/check-conflicts`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -485,7 +485,7 @@ const CollectionsManagement = () => {
         try {
             setLoading(true);
 
-            const response = await fetch(`http://localhost:5001/api/collections/${sourceCollection._id}/resolve-conflicts`, {
+            const response = await fetch(`/api/collections/${sourceCollection._id}/resolve-conflicts`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

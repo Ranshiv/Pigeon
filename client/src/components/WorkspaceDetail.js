@@ -25,9 +25,10 @@ const WorkspaceDetail = () => {
     const [showAddUserModal, setShowAddUserModal] = useState(false);
     const [inviteEmail, setInviteEmail] = useState('');
     const [inviteRole, setInviteRole] = useState('viewer');
+    const [activeUsers, setActiveUsers] = useState([]);
 
     // Access the collaboration context
-    const { joinWorkspace, sendActivity, connected } = useCollaboration();
+    const { joinWorkspace, sendActivity, connected, getActiveUsers } = useCollaboration();
 
     // Computed values
     const pendingMergeRequestsCount = useMemo(() =>
@@ -110,6 +111,57 @@ const WorkspaceDetail = () => {
             fetchCollections(id);
         }
     }, [location.pathname, activeTab]);
+
+    // Effect to periodically update active users
+    useEffect(() => {
+        if (connected && id && activeTab === 'members') {
+            // Initial update
+            updateActiveUsers();
+
+            // Set up interval to periodically refresh
+            const interval = setInterval(updateActiveUsers, 5000);
+
+            return () => clearInterval(interval);
+        }
+    }, [connected, id, activeTab]);
+
+    // Function to update active users
+    const updateActiveUsers = () => {
+        if (connected && id) {
+            const currentActiveUsers = getActiveUsers(id) || [];
+            setActiveUsers(currentActiveUsers);
+        }
+    };
+
+    // Combine both formal collaborators and active users for display
+    const getAllMembers = useMemo(() => {
+        if (!activeUsers.length) return collaborators;
+
+        // Create a new array with all collaborators
+        const allMembers = [...collaborators];
+
+        // Add active users who aren't already in the collaborators list
+        activeUsers.forEach(activeUser => {
+            // Check if this active user is already in the collaborators list
+            const existingMember = allMembers.find(
+                collab => collab.userId === activeUser.id || collab.email === activeUser.email
+            );
+
+            // If they're not in the list, add them with 'visitor' role
+            if (!existingMember) {
+                allMembers.push({
+                    userId: activeUser.id,
+                    displayName: activeUser.name || `Guest ${activeUser.id.substring(0, 6)}`,
+                    email: activeUser.email || 'Anonymous User',
+                    role: 'visitor', // Indicate they're not formally invited
+                    joinedAt: activeUser.joinedAt || new Date(),
+                    isActiveVisitor: true // Flag to identify visitors vs. invited members
+                });
+            }
+        });
+
+        return allMembers;
+    }, [collaborators, activeUsers]);
 
     // Helper functions for fetch operations
     const fetchCollections = async (workspaceId) => {
@@ -490,8 +542,14 @@ const WorkspaceDetail = () => {
                 </div>
 
                 <div className="workspace-actions">
-                    <div className="collaborators-indicator">
-                        <ActiveCollaborators workspaceId={id} />
+                    <div className="members-indicator">
+                        <FiUsers />
+                        <span>{getAllMembers.length} {getAllMembers.length === 1 ? 'Member' : 'Members'}</span>
+                        {!workspace.isPersonal && workspace.userRole === 'admin' && (
+                            <button className="invite-member-btn-small" onClick={() => setShowAddUserModal(true)}>
+                                <FiPlus />
+                            </button>
+                        )}
                     </div>
 
                     {workspace.userRole === 'admin' && (
@@ -530,7 +588,7 @@ const WorkspaceDetail = () => {
                             <FiUsers />
                         </div>
                         <div className="stat-info">
-                            <span className="stat-value">{collaborators.length}</span>
+                            <span className="stat-value">{getAllMembers.length}</span>
                             <span className="stat-label">Members</span>
                         </div>
                     </div>
@@ -581,7 +639,7 @@ const WorkspaceDetail = () => {
                     className={`tab ${activeTab === 'members' ? 'active' : ''}`}
                     onClick={() => handleTabChange('members')}
                 >
-                    <FiUsers /> Members ({collaborators.length})
+                    <FiUsers /> Members ({getAllMembers.length})
                 </button>
                 <button
                     className={`tab ${activeTab === 'merge-requests' ? 'active' : ''}`}
@@ -650,7 +708,17 @@ const WorkspaceDetail = () => {
                             )}
                         </div>
 
+                        <div className="active-members-section">
+                            <div className="section-title">
+                                <h3>Currently Active</h3>
+                            </div>
+                            <ActiveCollaborators workspaceId={id} />
+                        </div>
+
                         <div className="members-list">
+                            <div className="section-title">
+                                <h3>All Members</h3>
+                            </div>
                             <table className="members-table">
                                 <thead>
                                     <tr>
@@ -661,19 +729,22 @@ const WorkspaceDetail = () => {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {collaborators.map(collab => (
+                                    {getAllMembers.map(collab => (
                                         <tr key={collab.userId}>
                                             <td className="user-cell">
                                                 <div className="avatar">
                                                     {collab.displayName ? collab.displayName[0].toUpperCase() : 'U'}
                                                 </div>
                                                 <div className="user-info">
-                                                    <span className="user-name">{collab.displayName}</span>
+                                                    <span className="user-name">
+                                                        {collab.displayName}
+                                                        {collab.isActiveVisitor && <span className="active-indicator" title="Currently active in workspace"></span>}
+                                                    </span>
                                                     <span className="user-email">{collab.email}</span>
                                                 </div>
                                             </td>
                                             <td>
-                                                {workspace.userRole === 'admin' && collab.userId !== workspace.owner ? (
+                                                {workspace.userRole === 'admin' && collab.userId !== workspace.owner && !collab.isActiveVisitor ? (
                                                     <select
                                                         value={collab.role}
                                                         onChange={(e) => handleUpdateCollaboratorRole(collab.userId, e.target.value)}

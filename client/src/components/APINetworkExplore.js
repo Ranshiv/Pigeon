@@ -270,7 +270,7 @@ const APINetworkExplore = () => {
         );
 
     return (
-        <div className="api-network-explore">
+        <>
             {/* Search Section */}
             <section className="search-section">
                 <h1>Discover Public APIs</h1>
@@ -297,7 +297,7 @@ const APINetworkExplore = () => {
                 <div className="stat-card">
                     <FiThumbsUp className="stat-icon" />
                     <div className="stat-content">
-                        <span className="stat-value">{popularAPIs.length }</span>
+                        <span className="stat-value">{popularAPIs.length}</span>
                         <span className="stat-label">Popular APIs</span>
                     </div>
                 </div>
@@ -459,9 +459,6 @@ const APINetworkExplore = () => {
                 </div>
             </section>
 
-            {/* API Search Results */}
-            
-
             {/* Recent Activity */}
             <section className="recent-activity">
                 <h2><FiTrendingUp className="section-icon" /> Recent Activity</h2>
@@ -480,7 +477,7 @@ const APINetworkExplore = () => {
                     )}
                 </div>
             </section>
-        </div>
+        </>
     );
 };
 

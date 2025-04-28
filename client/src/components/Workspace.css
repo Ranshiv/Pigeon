@@ -1,16 +1,11 @@
 /* client/src/components/Workspace.css */
-.workspace-container {
-    display: flex;
-    height: 100%;
-    flex-direction: column;
+/* Since we've removed the container divs, we'll modify the styles to apply to the routes content directly */
+
+/* Create global styles that will apply to all route content */
+:root {
+    --workspace-padding: 20px;
+    --workspace-top-padding: 50px;
 }
 
-.main-content {
-    flex: 1;
-    /* Take up remaining space */
-    padding: 20px;
-    padding-top: 50px;
-    /* Reduced from 80px to 68px to account for the smaller navbar */
-    overflow-y: auto;
-    /* Allow scrolling if content overflows */
-}
+/* These styles will be applied via the App.css to ensure proper spacing */
+/* We're removing the .workspace-container and .main-content classes since those elements are gone */

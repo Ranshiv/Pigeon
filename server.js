@@ -1302,7 +1302,32 @@ app.get('/api/collections/:id', ensureAuthenticated, async (req, res) => {
         const collectionId = req.params.id;
         const userId = req.user.id;
 
-        // Mock collection data based on ID
+        console.log(`Fetching collection with ID: ${collectionId}`);
+
+        // First check for dynamically created collections in our store
+        if (collectionsStore) {
+            // Look through all workspace collections for this ID
+            for (const workspaceId in collectionsStore) {
+                const matchingCollection = collectionsStore[workspaceId].find(
+                    coll => coll._id === collectionId
+                );
+
+                if (matchingCollection) {
+                    console.log(`Found collection in collectionsStore for workspace ${workspaceId}`);
+                    // Add some mock requests to the collection
+                    const collectionWithRequests = {
+                        ...matchingCollection,
+                        requests: [
+                            { _id: `req-${Date.now()}-1`, name: "Get Data", method: "GET", url: "https://api.example.com/data" },
+                            { _id: `req-${Date.now()}-2`, name: "Create Item", method: "POST", url: "https://api.example.com/items" }
+                        ]
+                    };
+                    return res.json(collectionWithRequests);
+                }
+            }
+        }
+
+        // If we didn't find the collection in the store, check for static mock collections
         let collection;
 
         switch (collectionId) {
@@ -1334,8 +1359,7 @@ app.get('/api/collections/:id', ensureAuthenticated, async (req, res) => {
                     owner: userId,
                     requests: [
                         { _id: "req6", name: "Authentication", method: "POST", url: "https://api.example.com/auth" },
-                        { _id: "req7", name: "Get Profile", method: "GET", url: "https://api.example.com/profile" },
-                        // Add more requests here
+                        { _id: "req7", name: "Get Profile", method: "GET", url: "https://api.example.com/profile" }
                     ],
                     collaborators: [
                         {
@@ -1356,8 +1380,7 @@ app.get('/api/collections/:id', ensureAuthenticated, async (req, res) => {
                     owner: userId,
                     requests: [
                         { _id: "req8", name: "Weather API", method: "GET", url: "https://api.weather.com/current" },
-                        { _id: "req9", name: "Currency Exchange", method: "GET", url: "https://api.exchange.com/rates" },
-                        // Add more requests here
+                        { _id: "req9", name: "Currency Exchange", method: "GET", url: "https://api.exchange.com/rates" }
                     ],
                     collaborators: [],
                     createdAt: new Date(),
@@ -1374,8 +1397,7 @@ app.get('/api/collections/:id', ensureAuthenticated, async (req, res) => {
                     myRole: "viewer",
                     requests: [
                         { _id: "req10", name: "Team Auth", method: "POST", url: "https://api.team.com/auth" },
-                        { _id: "req11", name: "Get Team Members", method: "GET", url: "https://api.team.com/members" },
-                        // Add more requests here
+                        { _id: "req11", name: "Get Team Members", method: "GET", url: "https://api.team.com/members" }
                     ],
                     collaborators: [
                         {
@@ -1392,6 +1414,24 @@ app.get('/api/collections/:id', ensureAuthenticated, async (req, res) => {
                 };
                 break;
             default:
+                // Try to handle dynamically generated collection IDs (like coll100)
+                if (collectionId.startsWith('coll')) {
+                    collection = {
+                        _id: collectionId,
+                        name: `Collection ${collectionId.replace('coll', '')}`,
+                        description: "Dynamically created collection",
+                        isPublic: false,
+                        owner: userId,
+                        requests: [
+                            { _id: `req-${Date.now()}-1`, name: "Get Data", method: "GET", url: "https://api.example.com/data" },
+                            { _id: `req-${Date.now()}-2`, name: "Create Item", method: "POST", url: "https://api.example.com/items" }
+                        ],
+                        collaborators: [],
+                        createdAt: new Date(),
+                        updatedAt: new Date()
+                    };
+                    break;
+                }
                 return res.status(404).json({ message: 'Collection not found' });
         }
 
@@ -3701,5 +3741,187 @@ app.post('/api/collections/:id/resolve-conflicts', authenticateJWT, async (req, 
     } catch (err) {
         console.error("Error resolving conflicts:", err);
         res.status(500).json({ message: 'Error resolving conflicts' });
+    }
+});
+
+// --- SAMPLE DATA MANAGEMENT ENDPOINTS ---
+
+// Get all sample data sets for a collection
+app.get('/api/collections/:id/sample-data', ensureAuthenticated, async (req, res) => {
+    try {
+        const collectionId = req.params.id;
+
+        // In a real implementation, this would query from MongoDB
+        // For now, we'll return mock sample data
+
+        // Check if we have existing data stored for this collection
+        if (!global.sampleDataStore) {
+            global.sampleDataStore = {};
+        }
+
+        if (!global.sampleDataStore[collectionId]) {
+            // Initialize with some example data
+            global.sampleDataStore[collectionId] = [
+                {
+                    _id: `sample-${Date.now()}-1`,
+                    name: 'Login Credentials',
+                    collectionId,
+                    content: {
+                        username: 'testuser',
+                        password: 'password123',
+                        rememberMe: true
+                    },
+                    createdBy: req.user.id,
+                    createdAt: new Date(),
+                    updatedAt: new Date()
+                },
+                {
+                    _id: `sample-${Date.now()}-2`,
+                    name: 'User Profile Data',
+                    collectionId,
+                    content: {
+                        firstName: 'John',
+                        lastName: 'Doe',
+                        email: 'john.doe@example.com',
+                        age: 30,
+                        preferences: {
+                            theme: 'dark',
+                            notifications: true
+                        }
+                    },
+                    createdBy: req.user.id,
+                    createdAt: new Date(),
+                    updatedAt: new Date()
+                }
+            ];
+        }
+
+        res.json(global.sampleDataStore[collectionId]);
+    } catch (err) {
+        console.error("Error fetching sample data:", err);
+        res.status(500).json({ message: 'Error fetching sample data' });
+    }
+});
+
+// Create new sample dataset
+app.post('/api/collections/:id/sample-data', ensureAuthenticated, async (req, res) => {
+    try {
+        const collectionId = req.params.id;
+        const { name, content } = req.body;
+
+        if (!name) {
+            return res.status(400).json({ message: 'Dataset name is required' });
+        }
+
+        // Ensure our global store exists
+        if (!global.sampleDataStore) {
+            global.sampleDataStore = {};
+        }
+
+        if (!global.sampleDataStore[collectionId]) {
+            global.sampleDataStore[collectionId] = [];
+        }
+
+        // Create new sample data set
+        const newSampleData = {
+            _id: `sample-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
+            name,
+            collectionId,
+            content: content || {},
+            createdBy: req.user.id,
+            createdAt: new Date(),
+            updatedAt: new Date()
+        };
+
+        global.sampleDataStore[collectionId].push(newSampleData);
+        console.log(`Created new sample dataset "${name}" for collection ${collectionId}`);
+
+        res.status(201).json(newSampleData);
+    } catch (err) {
+        console.error("Error creating sample data:", err);
+        res.status(500).json({ message: 'Error creating sample data' });
+    }
+});
+
+// Update a sample dataset
+app.put('/api/collections/:collectionId/sample-data/:datasetId', ensureAuthenticated, async (req, res) => {
+    try {
+        const { collectionId, datasetId } = req.params;
+        const { content } = req.body;
+
+        // Ensure our global store exists
+        if (!global.sampleDataStore || !global.sampleDataStore[collectionId]) {
+            return res.status(404).json({ message: 'Collection not found' });
+        }
+
+        // Find the dataset to update
+        const datasetIndex = global.sampleDataStore[collectionId].findIndex(ds => ds._id === datasetId);
+        if (datasetIndex === -1) {
+            return res.status(404).json({ message: 'Sample dataset not found' });
+        }
+
+        // Update the dataset
+        global.sampleDataStore[collectionId][datasetIndex] = {
+            ...global.sampleDataStore[collectionId][datasetIndex],
+            content: content || {},
+            updatedAt: new Date()
+        };
+
+        console.log(`Updated sample dataset "${global.sampleDataStore[collectionId][datasetIndex].name}" for collection ${collectionId}`);
+
+        res.json(global.sampleDataStore[collectionId][datasetIndex]);
+    } catch (err) {
+        console.error("Error updating sample data:", err);
+        res.status(500).json({ message: 'Error updating sample data' });
+    }
+});
+
+// Delete a sample dataset
+app.delete('/api/collections/:collectionId/sample-data/:datasetId', ensureAuthenticated, async (req, res) => {
+    try {
+        const { collectionId, datasetId } = req.params;
+
+        // Ensure our global store exists
+        if (!global.sampleDataStore || !global.sampleDataStore[collectionId]) {
+            return res.status(404).json({ message: 'Collection not found' });
+        }
+
+        // Find the dataset to delete
+        const datasetIndex = global.sampleDataStore[collectionId].findIndex(ds => ds._id === datasetId);
+        if (datasetIndex === -1) {
+            return res.status(404).json({ message: 'Sample dataset not found' });
+        }
+
+        // Delete the dataset
+        const deletedDataset = global.sampleDataStore[collectionId].splice(datasetIndex, 1)[0];
+        console.log(`Deleted sample dataset "${deletedDataset.name}" from collection ${collectionId}`);
+
+        res.json({ message: 'Sample dataset deleted successfully' });
+    } catch (err) {
+        console.error("Error deleting sample data:", err);
+        res.status(500).json({ message: 'Error deleting sample data' });
+    }
+});
+
+// Get a specific sample dataset
+app.get('/api/collections/:collectionId/sample-data/:datasetId', ensureAuthenticated, async (req, res) => {
+    try {
+        const { collectionId, datasetId } = req.params;
+
+        // Ensure our global store exists
+        if (!global.sampleDataStore || !global.sampleDataStore[collectionId]) {
+            return res.status(404).json({ message: 'Collection not found' });
+        }
+
+        // Find the dataset
+        const dataset = global.sampleDataStore[collectionId].find(ds => ds._id === datasetId);
+        if (!dataset) {
+            return res.status(404).json({ message: 'Sample dataset not found' });
+        }
+
+        res.json(dataset);
+    } catch (err) {
+        console.error("Error fetching sample dataset:", err);
+        res.status(500).json({ message: 'Error fetching sample dataset' });
     }
 });

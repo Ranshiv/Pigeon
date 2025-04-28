@@ -5,6 +5,7 @@ import './CollectionDetail.css';
 import ActiveCollaborators from './ActiveCollaborators';
 import RequestForm from './RequestForm';
 import ResponseDisplay from './ResponseDisplay';
+import SampleDataManager from './SampleDataManager';
 import { useCollaboration } from '../context/CollaborationContext';
 import { FiSave, FiSettings, FiPlay, FiAlertCircle, FiCheckCircle } from 'react-icons/fi';
 
@@ -22,6 +23,7 @@ function CollectionDetail() {
   const [isRunningAll, setIsRunningAll] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [pendingChanges, setPendingChanges] = useState(false);
+  const [activeTab, setActiveTab] = useState('requests');
 
   // Get collaboration context features
   const {
@@ -39,7 +41,7 @@ function CollectionDetail() {
   const fetchCollection = useCallback(async () => {
     try {
       setLoading(true);
-      const response = await fetch(`http://localhost:5001/api/collections/${collectionId}`, {
+      const response = await fetch(`/api/collections/${collectionId}`, {
         credentials: 'include'
       });
 
@@ -127,7 +129,7 @@ function CollectionDetail() {
       // Track changes for version control
       trackChanges('collection', collectionId, updatedCollection);
 
-      const response = await fetch(`http://localhost:5001/api/collections/${collectionId}`, {
+      const response = await fetch(`/api/collections/${collectionId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json'
@@ -203,7 +205,7 @@ function CollectionDetail() {
           // For client-side testing, create a fallback ID if _id is missing
           const requestId = request._id || request.id;
 
-          const response = await fetch(`http://localhost:5001/api/requests/${requestId}/send`, {
+          const response = await fetch(`/api/requests/${requestId}/send`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json'
@@ -341,7 +343,7 @@ function CollectionDetail() {
       // Track changes for version control
       trackChanges('collection', collectionId, updatedCollection);
 
-      const response = await fetch(`http://localhost:5001/api/collections/${collectionId}`, {
+      const response = await fetch(`/api/collections/${collectionId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json'
@@ -596,58 +598,81 @@ function CollectionDetail() {
         </div>
 
         <div className="collection-main">
-          {!selectedRequest && !showRequestForm ? (
-            <div className="collection-info">
-              <h3>Collection Details</h3>
-              <div className="collection-description">
-                {collection?.description || 'No description provided.'}
-              </div>
-              <div className="collection-meta">
-                <div className="meta-item">
-                  <strong>Created by:</strong> {collection?.owner ? collection.owner : 'Unknown'}
-                </div>
-                <div className="meta-item">
-                  <strong>Created on:</strong> {collection?.createdAt ? new Date(collection.createdAt).toLocaleDateString() : 'Unknown'}
-                </div>
-                <div className="meta-item">
-                  <strong>Last modified:</strong> {collection?.updatedAt ? new Date(collection.updatedAt).toLocaleDateString() : 'Unknown'}
-                </div>
-                <div className="meta-item">
-                  <strong>Requests:</strong> {requests.length}
-                </div>
-                <div className="meta-item">
-                  <strong>Visibility:</strong> {collection?.isPublic ? 'Public' : 'Private'}
-                </div>
-                <div className="meta-item">
-                  <strong>Active Collaborators:</strong> <div className="collaborator-count">{getActiveUsers(collectionId).length}</div>
-                </div>
-              </div>
+          <div className="tab-navigation">
+            <button
+              className={`tab-btn ${activeTab === 'requests' ? 'active' : ''}`}
+              onClick={() => setActiveTab('requests')}
+            >
+              Requests
+            </button>
+            <button
+              className={`tab-btn ${activeTab === 'sampleData' ? 'active' : ''}`}
+              onClick={() => setActiveTab('sampleData')}
+            >
+              Sample Data
+            </button>
+          </div>
 
-              <div className="real-time-info">
-                <h4>Real-time Collaboration</h4>
-                <p>This collection supports real-time collaboration. You can work together with your team members simultaneously.</p>
-                <button className="primary-button" onClick={handleAddRequest}>Create Your First Request</button>
-              </div>
-            </div>
-          ) : (
-            showRequestForm && selectedRequest && (
-              <div className="request-workspace">
-                <RequestForm
-                  request={selectedRequest}
-                  onSave={handleSaveRequest}
-                  onRunRequest={(requestId) => {
-                    sendActivity('request_sent', {
-                      requestId,
-                      requestName: selectedRequest.name,
-                      collectionName: collection.name
-                    });
-                  }}
-                />
-                <ResponseDisplay requestId={selectedRequest._id || selectedRequest.id} />
-              </div>
-            )
+          {activeTab === 'requests' && (
+            <>
+              {!selectedRequest && !showRequestForm ? (
+                <div className="collection-info">
+                  <h3>Collection Details</h3>
+                  <div className="collection-description">
+                    {collection?.description || 'No description provided.'}
+                  </div>
+                  <div className="collection-meta">
+                    <div className="meta-item">
+                      <strong>Created by:</strong> {collection?.owner ? collection.owner : 'Unknown'}
+                    </div>
+                    <div className="meta-item">
+                      <strong>Created on:</strong> {collection?.createdAt ? new Date(collection.createdAt).toLocaleDateString() : 'Unknown'}
+                    </div>
+                    <div className="meta-item">
+                      <strong>Last modified:</strong> {collection?.updatedAt ? new Date(collection.updatedAt).toLocaleDateString() : 'Unknown'}
+                    </div>
+                    <div className="meta-item">
+                      <strong>Requests:</strong> {requests.length}
+                    </div>
+                    <div className="meta-item">
+                      <strong>Visibility:</strong> {collection?.isPublic ? 'Public' : 'Private'}
+                    </div>
+                    <div className="meta-item">
+                      <strong>Active Collaborators:</strong> <div className="collaborator-count">{getActiveUsers(collectionId).length}</div>
+                    </div>
+                  </div>
+
+                  <div className="real-time-info">
+                    <h4>Real-time Collaboration</h4>
+                    <p>This collection supports real-time collaboration. You can work together with your team members simultaneously.</p>
+                    <button className="primary-button" onClick={handleAddRequest}>Create Your First Request</button>
+                  </div>
+                </div>
+              ) : (
+                showRequestForm && selectedRequest && (
+                  <div className="request-workspace">
+                    <RequestForm
+                      request={selectedRequest}
+                      onSave={handleSaveRequest}
+                      onRunRequest={(requestId) => {
+                        sendActivity('request_sent', {
+                          requestId,
+                          requestName: selectedRequest.name,
+                          collectionName: collection.name
+                        });
+                      }}
+                    />
+                    <ResponseDisplay requestId={selectedRequest._id || selectedRequest.id} />
+                  </div>
+                )
+              )}
+              {renderRunAllResults()}
+            </>
           )}
-          {renderRunAllResults()}
+
+          {activeTab === 'sampleData' && (
+            <SampleDataManager collectionId={collectionId} />
+          )}
         </div>
       </div>
       {renderSettingsModal()}

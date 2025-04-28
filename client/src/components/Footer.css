@@ -1,15 +1,51 @@
 /* client/src/components/Footer.css */
 .footer {
-    background-color: #333;
-    color: white;
+    background-color: var(--card-bg);
+    color: var(--text-secondary);
     text-align: center;
-    padding: 10px 0;
+    padding: var(--spacing-md) 0;
     position: relative;
-    bottom: 0;
     width: 100%;
-    left: 0;
-    z-index: 1000;
-    /* Higher z-index to ensure footer stays above content */
-    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
-    /* Optional shadow for better visual distinction */
+    z-index: 10;
+    border-top: 1px solid var(--border-color);
+    font-size: 13px;
+}
+
+.footer-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 var(--spacing-md);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.footer-brand {
+    font-weight: var(--font-weight-medium);
+}
+
+.footer-links {
+    display: flex;
+    gap: var(--spacing-md);
+}
+
+.footer-link {
+    color: var(--text-secondary);
+    transition: color var(--transition-fast);
+}
+
+.footer-link:hover {
+    color: var(--primary-color);
+}
+
+@media (max-width: 768px) {
+    .footer-container {
+        flex-direction: column;
+        gap: var(--spacing-sm);
+    }
+
+    .footer-links {
+        margin-top: var(--spacing-sm);
+    }
 }

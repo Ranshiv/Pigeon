@@ -238,6 +238,7 @@
   flex-direction: column;
   overflow: hidden;
   background-color: var(--background-color);
+  height: 100%;
 }
 
 /* Request workspace styling */
@@ -852,4 +853,42 @@
   .main-panel {
     padding: 12px;
   }
+}
+
+/* Tab Navigation */
+.tab-navigation {
+  display: flex;
+  border-bottom: 1px solid #e1e4e8;
+  margin-bottom: 20px;
+  background: #f6f8fa;
+}
+
+.tab-btn {
+  padding: 12px 20px;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #586069;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tab-btn:hover {
+  color: #0366d6;
+  background: rgba(3, 102, 214, 0.05);
+}
+
+.tab-btn.active {
+  color: #0366d6;
+  border-bottom: 2px solid #0366d6;
+  background: white;
+}
+
+/* Sample Data tab height fix */
+.collection-main>.sample-data-manager {
+  flex-grow: 1;
+  margin: 0;
+  border-radius: 0;
 }

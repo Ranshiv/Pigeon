@@ -54,13 +54,11 @@ function App() {
       <div className="App">
         <CustomCursor /> {/* Add the CustomCursor component */}
         <Navbar isAuthenticated={isAuthenticated} />  {/* Pass isAuthenticated to Navbar */}
-        <div className="container">
-          <Routes>
-            <Route path="/" element={isAuthenticated ? <Navigate to="/workspace" /> : <PublicHome />} />
-            <Route path="/workspace/*" element={isAuthenticated ? <Workspace /> : <Navigate to="/" />} />
-            <Route path="*" element={<div>404 Not Found</div>} />
-          </Routes>
-        </div>
+        <Routes>
+          <Route path="/" element={isAuthenticated ? <Navigate to="/workspace" /> : <PublicHome />} />
+          <Route path="/workspace/*" element={isAuthenticated ? <Workspace /> : <Navigate to="/" />} />
+          <Route path="*" element={<div>404 Not Found</div>} />
+        </Routes>
         <Footer />
       </div>
     </CollaborationProvider>
