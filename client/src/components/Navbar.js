@@ -4,6 +4,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import {
     FiSettings,
     FiUser,
+    FiUsers,
     FiLogOut,
     FiMenu,
     FiX,
@@ -14,7 +15,10 @@ import {
     FiClock,
     FiTrendingUp,
     FiZap,
-    FiPlus
+    FiPlus,
+    FiSearch,
+    FiCheck,
+    FiChevronRight
 } from 'react-icons/fi';
 import Notifications from './Notifications'; // Import the Notifications component
 import { useCollaboration } from '../context/CollaborationContext';
@@ -31,7 +35,58 @@ const Navbar = ({ isAuthenticated }) => {
     const [prevScrollPos, setPrevScrollPos] = useState(0);
     const [navbarVisible, setNavbarVisible] = useState(true);
     const navbarRef = useRef(null);
+    const workspaceDropdownRef = useRef(null);
     const { socket } = useCollaboration();
+
+    // Workspace state
+    const [myWorkspaces, setMyWorkspaces] = useState([]);
+    const [recentWorkspaces, setRecentWorkspaces] = useState([]);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [isLoadingWorkspaces, setIsLoadingWorkspaces] = useState(false);
+    const searchInputRef = useRef(null);
+
+    // Fetch workspaces when dropdown opens and when navigating back to workspaces page
+    useEffect(() => {
+        if ((showWorkspaceDropdown && isAuthenticated) ||
+            (isAuthenticated && location.pathname.includes('/workspace/workspaces'))) {
+            fetchWorkspaces();
+        }
+    }, [showWorkspaceDropdown, isAuthenticated, location.pathname]);
+
+    // Function to fetch workspaces
+    const fetchWorkspaces = async () => {
+        try {
+            setIsLoadingWorkspaces(true);
+            const response = await fetch('http://localhost:5001/api/workspaces', {
+                credentials: 'include'
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+
+                // Process workspaces data
+                let allWorkspaces = [];
+                if (data.personal) allWorkspaces = [...allWorkspaces, ...data.personal];
+                if (data.team) allWorkspaces = [...allWorkspaces, ...data.team];
+
+                setMyWorkspaces(allWorkspaces);
+
+                // Set recent workspaces (first 2 for recently visited)
+                setRecentWorkspaces(allWorkspaces.slice(0, 2));
+            }
+        } catch (error) {
+            console.error('Error fetching workspaces:', error);
+        } finally {
+            setIsLoadingWorkspaces(false);
+        }
+    };
+
+    // Filter workspaces based on search query
+    const filteredWorkspaces = searchQuery ?
+        myWorkspaces.filter(workspace =>
+            workspace.name.toLowerCase().includes(searchQuery.toLowerCase())
+        ) :
+        myWorkspaces;
 
     // Enhanced scroll effect with smart hide/show based on scroll direction
     useEffect(() => {
@@ -135,6 +190,14 @@ const Navbar = ({ isAuthenticated }) => {
     // Enhanced click outside handler with smooth transitions
     useEffect(() => {
         const handleClickOutside = (event) => {
+            // Don't close workspace dropdown if clicking inside it
+            if (showWorkspaceDropdown &&
+                workspaceDropdownRef.current &&
+                workspaceDropdownRef.current.contains(event.target)) {
+                return;
+            }
+
+            // For other dropdowns
             if (!event.target.closest('.profile-menu-container') && !event.target.closest('.has-dropdown')) {
                 // Smooth hide transitions
                 if (showProfileMenu) setShowProfileMenu(false);
@@ -187,20 +250,122 @@ const Navbar = ({ isAuthenticated }) => {
                                 {/* Workspace dropdown */}
                                 <div
                                     className="navbar-item has-dropdown"
-                                    onMouseEnter={() => setShowWorkspaceDropdown(true)}
-                                    onMouseLeave={() => setShowWorkspaceDropdown(false)}
+                                    onClick={() => {
+                                        setShowWorkspaceDropdown(!showWorkspaceDropdown);
+                                        // Close API dropdown when Workspace dropdown opens
+                                        if (showApiDropdown) setShowApiDropdown(false);
+                                        // Focus the search input when dropdown opens
+                                        if (!showWorkspaceDropdown) {
+                                            setTimeout(() => {
+                                                if (searchInputRef.current) {
+                                                    searchInputRef.current.focus();
+                                                }
+                                            }, 100);
+                                        }
+                                    }}
                                 >
                                     <span className={isActive('/workspace/workspaces') ? 'active' : ''}>
-                                        <FiGrid size={18} /> Workspace
+                                        <FiGrid size={18} /> Workspaces
                                     </span>
 
                                     {showWorkspaceDropdown && (
-                                        <div className="navbar-dropdown">
-                                            <div className="dropdown-item" onClick={() => handleNavigation('/workspace/workspaces/my-workspace')}>
-                                                My Workspace
+                                        <div className="workspace-selector-dropdown" ref={workspaceDropdownRef}>
+                                            <div className="workspace-search-container">
+                                                <FiSearch className="search-icon" />
+                                                <input
+                                                    ref={searchInputRef}
+                                                    type="text"
+                                                    className="workspace-search-input"
+                                                    placeholder="Search workspaces"
+                                                    value={searchQuery}
+                                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                                />
                                             </div>
-                                            <div className="dropdown-item" onClick={() => handleNavigation('/workspace/workspaces/shared')}>
-                                                Shared
+                                            <button
+                                                className="create-workspace-btn"
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    // Navigate to workspaces page and set a flag to show create modal
+                                                    handleNavigation('/workspace/workspaces?create=true');
+                                                    setShowWorkspaceDropdown(false);
+                                                }}
+                                            >
+                                                Create Workspace
+                                            </button>
+
+                                            {/* Recently visited section */}
+                                            <div className="workspace-section">
+                                                <h3 className="workspace-section-title">Recently visited</h3>
+                                                <div className="workspace-list">
+                                                    {recentWorkspaces.length > 0 ? recentWorkspaces.map(workspace => (
+                                                        <div
+                                                            key={workspace._id}
+                                                            className="workspace-item"
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                handleNavigation(`/workspace/workspaces/${workspace._id}`);
+                                                                setShowWorkspaceDropdown(false);
+                                                            }}
+                                                        >
+                                                            <div className="workspace-icon-small">
+                                                                {workspace.isPersonal ? (
+                                                                    <FiUser />
+                                                                ) : (
+                                                                    <FiUsers />
+                                                                )}
+                                                            </div>
+                                                            <div className="workspace-name">
+                                                                {workspace.name}
+                                                                {workspace._id === location.pathname.split('/').pop() && (
+                                                                    <FiCheck className="current-workspace-indicator" />
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                    )) : (
+                                                        <div className="workspace-item">
+                                                            <div className="workspace-icon-small">
+                                                                <FiUser />
+                                                            </div>
+                                                            <div className="workspace-name">
+                                                                My Workspace
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+
+                                            {/* More workspaces section */}
+                                            <div className="workspace-section">
+                                                <h3 className="workspace-section-title">More workspaces</h3>
+                                                <div className="workspace-list">
+                                                    <div
+                                                        className="workspace-item"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            handleNavigation(`/workspace/workspaces/team`);
+                                                            setShowWorkspaceDropdown(false);
+                                                        }}
+                                                    >
+                                                        <div className="workspace-icon-small">
+                                                            <FiUsers />
+                                                        </div>
+                                                        <div className="workspace-name">
+                                                            Team Workspace
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            {/* View all workspaces link */}
+                                            <div
+                                                className="view-all-workspaces"
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handleNavigation('/workspace/workspaces');
+                                                    setShowWorkspaceDropdown(false);
+                                                }}
+                                            >
+                                                View all workspaces <FiChevronRight />
                                             </div>
                                         </div>
                                     )}
@@ -209,8 +374,11 @@ const Navbar = ({ isAuthenticated }) => {
                                 {/* API Network dropdown */}
                                 <div
                                     className="navbar-item has-dropdown"
-                                    onMouseEnter={() => setShowApiDropdown(true)}
-                                    onMouseLeave={() => setShowApiDropdown(false)}
+                                    onClick={() => {
+                                        setShowApiDropdown(!showApiDropdown);
+                                        // Close workspace dropdown when API dropdown opens
+                                        if (showWorkspaceDropdown) setShowWorkspaceDropdown(false);
+                                    }}
                                 >
                                     <span className={isActive('/workspace/api-network') ? 'active' : ''}>
                                         <FiGlobe size={18} /> API Network

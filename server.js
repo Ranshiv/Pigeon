@@ -12,6 +12,7 @@ const Request = require('./models/Request');
 const axios = require('axios');
 const http = require('http'); // Add http for socket.io
 const socketIo = require('socket.io'); // Add socket.io
+const { MongoClient, ObjectId } = require('mongodb'); // MongoDB imports
 
 const app = express();
 const server = http.createServer(app); // Create HTTP server
@@ -32,32 +33,41 @@ const userEnvironments = {}; // Store environment variables by user ID
 // Import the scriptRunner utility
 const { executePreRequestScript, executeTestScript } = require('./utils/scriptRunner');
 
-// Store for workspaces to persist names and other properties when editing
-const workspacesStore = {
-    // Default workspaces
-    "ws1": {
-        _id: "ws1",
-        name: "Personal Workspace",
-        description: "My default personal workspace",
-        isPersonal: true,
-        isPublic: false
-    },
-    "ws2": {
-        _id: "ws2",
-        name: "API Testing Team",
-        description: "Team workspace for API testing and documentation",
-        isPersonal: false,
-        isPublic: false
-    },
-    "ws3": {
-        _id: "ws3",
-        name: "Public Documentation",
-        description: "Public API documentation workspace",
-        isPersonal: false,
-        isPublic: true
+// MongoDB connection URI and DB name
+const mongoURI = process.env.MONGODB_URI || 'mongodb://localhost:27017';
+const dbName = process.env.DB_NAME || 'pigeon_db';
+
+// Create MongoDB client
+const client = new MongoClient(mongoURI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+});
+
+// Database reference
+let db;
+
+// Connect to MongoDB
+async function connectToDatabase() {
+    try {
+        await client.connect();
+        console.log('Connected to MongoDB');
+        db = client.db(dbName);
+
+        // Ensure indexes for better performance
+        await db.collection('workspaces').createIndex({ owner: 1 });
+        await db.collection('collections').createIndex({ workspaceId: 1 });
+        await db.collection('collections').createIndex({ owner: 1 });
+    } catch (err) {
+        console.error('Failed to connect to MongoDB:', err);
     }
-};
-// Add a store for created collections
+}
+
+// Call the connection function
+connectToDatabase();
+
+// These in-memory stores will be removed and replaced with MongoDB
+// Keep them temporarily for backward compatibility
+const workspacesStore = {};
 const collectionsStore = {};
 
 // Add a counter for generating unique IDs
@@ -894,49 +904,95 @@ app.delete('/api/cli-test/items/:id', (req, res) => {
 // Get all workspaces
 app.get('/api/workspaces', ensureAuthenticated, async (req, res) => {
     try {
-        // Mock workspaces data based on user auth
-        // In a real implementation, this would query a database
-        const userWorkspaces = {
-            personal: [
-                {
-                    _id: "ws1",
-                    name: "API Testing",
-                    description: "Workspace for API testing and documentation",
-                    isPersonal: true,
-                    isPublic: false,
-                    owner: "temp-user-id",
-                    createdAt: new Date(),
-                    collaboratorsCount: 1,
-                    collectionsCount: 3
-                },
-                {
-                    _id: "ws2",
-                    name: "Frontend Development",
-                    description: "Frontend development workspace",
-                    isPersonal: true,
-                    isPublic: false,
-                    owner: "temp-user-id",
-                    createdAt: new Date(),
-                    collaboratorsCount: 1,
-                    collectionsCount: 2
-                }
-            ],
-            team: [
-                {
-                    _id: "ws3",
-                    name: "Team Project X",
-                    description: "Collaborative workspace for Project X",
-                    isPersonal: false,
-                    isPublic: false,
-                    owner: "temp-user-id",
-                    createdAt: new Date(),
-                    collaboratorsCount: 5,
-                    collectionsCount: 8
-                }
-            ]
-        };
+        const userId = req.user.id;
 
-        res.json(userWorkspaces);
+        // Fetch workspaces from MongoDB
+        const workspaces = await db.collection('workspaces')
+            .find({
+                $or: [
+                    { owner: userId },
+                    { "collaborators.userId": userId }
+                ]
+            })
+            .toArray();
+
+        // Separate into personal and team workspaces
+        const personalWorkspaces = [];
+        const teamWorkspaces = [];
+
+        for (const workspace of workspaces) {
+            // Convert MongoDB ObjectId to string for client use
+            const wsWithStringId = {
+                ...workspace,
+                _id: workspace._id.toString()
+            };
+
+            // Add collection count information
+            const collectionsCount = await db.collection('collections')
+                .countDocuments({ workspaceId: workspace._id.toString() });
+
+            wsWithStringId.collectionsCount = collectionsCount;
+            wsWithStringId.collaboratorsCount = workspace.collaborators ? workspace.collaborators.length : 1;
+
+            // Add to appropriate array
+            if (workspace.isPersonal) {
+                personalWorkspaces.push(wsWithStringId);
+            } else {
+                teamWorkspaces.push(wsWithStringId);
+            }
+
+            // For backward compatibility, also update the in-memory store
+            workspacesStore[workspace._id.toString()] = {
+                name: workspace.name,
+                description: workspace.description || "",
+                isPersonal: workspace.isPersonal || false,
+                isPublic: workspace.isPublic || false
+            };
+        }
+
+        // Add default workspace if none exist
+        if (personalWorkspaces.length === 0 && teamWorkspaces.length === 0) {
+            // Create a default workspace in MongoDB
+            const defaultWorkspace = {
+                name: "API Testing",
+                description: "Workspace for API testing and documentation",
+                isPersonal: true,
+                isPublic: false,
+                owner: userId,
+                userRole: "admin",
+                collaborators: [
+                    {
+                        userId: userId,
+                        displayName: req.user.name || "User",
+                        email: req.user.email,
+                        role: "admin",
+                        joinedAt: new Date()
+                    }
+                ],
+                createdAt: new Date(),
+                updatedAt: new Date()
+            };
+
+            const result = await db.collection('workspaces').insertOne(defaultWorkspace);
+            defaultWorkspace._id = result.insertedId.toString();
+            defaultWorkspace.collectionsCount = 0;
+            defaultWorkspace.collaboratorsCount = 1;
+
+            personalWorkspaces.push(defaultWorkspace);
+
+            // Update in-memory store as well
+            workspacesStore[defaultWorkspace._id] = {
+                name: defaultWorkspace.name,
+                description: defaultWorkspace.description,
+                isPersonal: defaultWorkspace.isPersonal,
+                isPublic: defaultWorkspace.isPublic
+            };
+        }
+
+        res.json({
+            personal: personalWorkspaces,
+            team: teamWorkspaces
+        });
     } catch (err) {
         console.error("Error fetching workspaces:", err);
         res.status(500).json({ message: 'Error fetching workspaces' });
@@ -1081,17 +1137,34 @@ app.get('/api/workspaces/:id', ensureAuthenticated, async (req, res) => {
     }
 });
 
-// Get collections for a workspace - UPDATE TO USE STORED COLLECTIONS
+// Get collections for a workspace - Updated to use MongoDB
 app.get('/api/workspaces/:id/collections', ensureAuthenticated, async (req, res) => {
     try {
         const workspaceId = req.params.id;
 
-        // Get collections for this workspace
+        // Fetch collections from MongoDB
+        const collections = await db.collection('collections')
+            .find({ workspaceId: workspaceId })
+            .toArray();
+
+        // For backward compatibility, also update the in-memory store
         if (!collectionsStore[workspaceId]) {
             collectionsStore[workspaceId] = [];
         }
 
-        res.json(collectionsStore[workspaceId]);
+        // Update the in-memory store with MongoDB data
+        collectionsStore[workspaceId] = collections.map(collection => ({
+            ...collection,
+            _id: collection._id.toString() // Convert ObjectId to string for memory store
+        }));
+
+        // Return collections with string IDs for client-side use
+        const collectionsWithStringIds = collections.map(collection => ({
+            ...collection,
+            _id: collection._id.toString() // Convert ObjectId to string for client use
+        }));
+
+        res.json(collectionsWithStringIds);
     } catch (err) {
         console.error("Error fetching workspace collections:", err);
         res.status(500).json({ message: 'Error fetching workspace collections' });
@@ -1442,7 +1515,7 @@ app.get('/api/collections/:id', ensureAuthenticated, async (req, res) => {
     }
 });
 
-// Create a new collection - UPDATE TO STORE IN WORKSPACE COLLECTIONS
+// Create a new collection - Store in MongoDB
 app.post('/api/collections', ensureAuthenticated, async (req, res) => {
     try {
         const { name, description, workspaceId } = req.body;
@@ -1453,12 +1526,8 @@ app.post('/api/collections', ensureAuthenticated, async (req, res) => {
             return res.status(400).json({ message: 'Collection name is required' });
         }
 
-        // Generate a unique ID for the collection
-        const newCollectionId = "coll" + (collectionIdCounter++);
-
-        // Create the new collection
+        // Create the new collection object
         const newCollection = {
-            _id: newCollectionId,
             name,
             description: description || "",
             workspaceId: workspaceId || "ws1", // Default to personal workspace if not specified
@@ -1470,16 +1539,31 @@ app.post('/api/collections', ensureAuthenticated, async (req, res) => {
             updatedAt: new Date()
         };
 
-        // Add to collections store by workspace
+        // Store the collection in MongoDB
+        const result = await db.collection('collections').insertOne(newCollection);
+
+        // Add the MongoDB _id to the collection
+        newCollection._id = result.insertedId;
+
+        // For backward compatibility, also store in memory
         if (!collectionsStore[newCollection.workspaceId]) {
             collectionsStore[newCollection.workspaceId] = [];
         }
 
-        collectionsStore[newCollection.workspaceId].push(newCollection);
+        // Convert MongoDB ObjectId to string for memory store
+        const memoryCollection = {
+            ...newCollection,
+            _id: result.insertedId.toString()
+        };
+
+        collectionsStore[newCollection.workspaceId].push(memoryCollection);
         console.log(`Added collection ${newCollection._id} to workspace ${newCollection.workspaceId}`);
         console.log(`Workspace now has ${collectionsStore[newCollection.workspaceId].length} collections`);
 
-        res.status(201).json(newCollection);
+        res.status(201).json({
+            ...newCollection,
+            _id: result.insertedId.toString() // Convert ObjectId to string for the client
+        });
     } catch (err) {
         console.error("Error creating collection:", err);
         res.status(500).json({ message: 'Error creating collection' });
@@ -1668,50 +1752,64 @@ app.get('/api/workspaces', ensureAuthenticated, async (req, res) => {
     try {
         const userId = req.user.id;
 
-        // Mock workspaces data
-        const personalWorkspaces = [
-            {
+        // Convert workspacesStore to arrays of personal and team workspaces
+        const personalWorkspaces = [];
+        const teamWorkspaces = [];
+
+        // Get workspaces from our dynamic store
+        for (const wsId in workspacesStore) {
+            const workspace = {
+                ...workspacesStore[wsId],
+                _id: wsId,
+                owner: userId,
+                createdAt: new Date(),
+                collaboratorsCount: 1,
+                collectionsCount: collectionsStore[wsId] ? collectionsStore[wsId].length : 0
+            };
+
+            if (workspace.isPersonal) {
+                personalWorkspaces.push(workspace);
+            } else {
+                teamWorkspaces.push(workspace);
+            }
+        }
+
+        // Add default workspaces if none exist
+        if (personalWorkspaces.length === 0 && teamWorkspaces.length === 0) {
+            personalWorkspaces.push({
                 _id: "ws1",
-                name: "Personal Workspace",
-                description: "My default personal workspace",
+                name: "API Testing",
+                description: "Workspace for API testing and documentation",
                 isPersonal: true,
                 isPublic: false,
-                owner: userId,
-                memberCount: 1,
-                collectionCount: 2,
-                createdAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000), // 30 days ago
-                updatedAt: new Date()
-            }
-        ];
-
-        const teamWorkspaces = [
-            {
+                owner: "temp-user-id",
+                createdAt: new Date(),
+                collaboratorsCount: 1,
+                collectionsCount: 3
+            });
+            personalWorkspaces.push({
                 _id: "ws2",
-                name: "API Testing Team",
-                description: "Team workspace for API testing and documentation",
+                name: "Frontend Development",
+                description: "Frontend development workspace",
+                isPersonal: true,
+                isPublic: false,
+                owner: "temp-user-id",
+                createdAt: new Date(),
+                collaboratorsCount: 1,
+                collectionsCount: 2
+            });
+            teamWorkspaces.push({
+                _id: "ws3",
+                name: "Team Project X",
+                description: "Collaborative workspace for Project X",
                 isPersonal: false,
                 isPublic: false,
-                owner: "other-user-id",
-                userRole: "editor",
-                memberCount: 5,
-                collectionCount: 8,
-                createdAt: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000), // 15 days ago
-                updatedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000) // 2 days ago
-            },
-            {
-                _id: "ws3",
-                name: "Public Documentation",
-                description: "Public API documentation workspace",
-                isPersonal: false,
-                isPublic: true,
-                owner: "another-user-id",
-                userRole: "viewer",
-                memberCount: 12,
-                collectionCount: 4,
-                createdAt: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000), // 60 days ago
-                updatedAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000) // 5 days ago
-            }
-        ];
+                owner: "temp-user-id",
+                createdAt: new Date(),
+                collaboratorsCount: 5,
+                collectionsCount: 8
+            });
+        }
 
         res.json({
             personal: personalWorkspaces,
@@ -2217,29 +2315,14 @@ app.post('/api/workspaces', ensureAuthenticated, async (req, res) => {
             return res.status(400).json({ message: 'Workspace name is required' });
         }
 
-        // Create a workspace ID
-        const newWorkspaceId = "ws" + Date.now().toString();
-
-        // Store the workspace data in our workspacesStore
-        workspacesStore[newWorkspaceId] = {
-            _id: newWorkspaceId,
-            name: name,
-            description: description || "",
-            isPersonal: isPersonal || false,
-            isPublic: isPublic || false
-        };
-
-        // Mock creating a new workspace
+        // Create a new workspace document for MongoDB
         const newWorkspace = {
-            _id: newWorkspaceId,
-            name: name, // Use the name provided by the user
+            name: name,
             description: description || "",
             isPersonal: isPersonal || false,
             isPublic: isPublic || false,
             owner: userId,
             userRole: "admin",
-            memberCount: 1,
-            collectionCount: 0,
             collaborators: [
                 {
                     userId: userId,
@@ -2253,7 +2336,30 @@ app.post('/api/workspaces', ensureAuthenticated, async (req, res) => {
             updatedAt: new Date()
         };
 
-        res.status(201).json(newWorkspace);
+        // Store the workspace in MongoDB
+        const result = await db.collection('workspaces').insertOne(newWorkspace);
+
+        // Add the _id to the workspace object
+        newWorkspace._id = result.insertedId;
+
+        // For backward compatibility, also store in memory
+        const workspaceId = result.insertedId.toString();
+        workspacesStore[workspaceId] = {
+            name: name,
+            description: description || "",
+            isPersonal: isPersonal || false,
+            isPublic: isPublic || false
+        };
+
+        console.log(`Created new workspace "${name}" with ID: ${workspaceId}`);
+
+        // Return the created workspace
+        res.status(201).json({
+            ...newWorkspace,
+            _id: workspaceId,
+            memberCount: 1,
+            collectionCount: 0
+        });
     } catch (err) {
         console.error("Error creating workspace:", err);
         res.status(500).json({ message: 'Error creating workspace' });

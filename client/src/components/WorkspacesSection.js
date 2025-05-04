@@ -1,6 +1,6 @@
 //client/src/components/WorkspacesSection.js
 import React, { useState, useEffect } from 'react';
-import { Routes, Route, useNavigate, useParams, Navigate } from 'react-router-dom';
+import { Routes, Route, useNavigate, useParams, Navigate, useLocation } from 'react-router-dom';
 import APINetworkExplore from './APINetworkExplore';
 import SpotlightSection from './SpotlightSection';
 import TrendingSection from './TrendingSection';
@@ -15,6 +15,7 @@ import './WorkspacesSection.css';
 
 const WorkspacesSection = ({ requests, response, onSend, onCreate, onUpdate, onDelete }) => {
     const navigate = useNavigate();
+    const location = useLocation();
     const [workspaces, setWorkspaces] = useState([]);
     const [personalWorkspaces, setPersonalWorkspaces] = useState([]);
     const [teamWorkspaces, setTeamWorkspaces] = useState([]);
@@ -29,6 +30,33 @@ const WorkspacesSection = ({ requests, response, onSend, onCreate, onUpdate, onD
     const [newWorkspaceType, setNewWorkspaceType] = useState('personal');
     const [activeWorkspaceType, setActiveWorkspaceType] = useState('personal');
     const [viewMode, setViewMode] = useState('my'); // 'my' for My Workspaces, 'shared' for Shared Workspaces
+    const [autoCreateWorkspace, setAutoCreateWorkspace] = useState(false);
+
+    // Check if there's a create=true parameter in the URL
+    useEffect(() => {
+        const params = new URLSearchParams(location.search);
+        if (params.get('create') === 'true') {
+            setShowCreateModal(true);
+            // Remove the parameter from URL to avoid reopening modal on page refresh
+            navigate('/workspace/workspaces', { replace: true });
+        }
+    }, [location.search, navigate]);
+
+    // Effect to automatically create workspace when both name and description are provided
+    useEffect(() => {
+        // Only trigger auto-creation when both fields have values and autoCreateWorkspace is not already running
+        if (newWorkspaceName.trim() && newWorkspaceDesc.trim() && !autoCreateWorkspace && !loading) {
+            // Set small delay to avoid multiple triggers
+            const timer = setTimeout(() => {
+                setAutoCreateWorkspace(true);
+                // Use a form submission event to create the workspace
+                const event = new Event('submit', { cancelable: true });
+                handleCreateWorkspace(event);
+            }, 1000); // 1 second delay after user stops typing
+
+            return () => clearTimeout(timer);
+        }
+    }, [newWorkspaceName, newWorkspaceDesc]);
 
     // Fetch workspaces on component mount
     useEffect(() => {
@@ -47,17 +75,24 @@ const WorkspacesSection = ({ requests, response, onSend, onCreate, onUpdate, onD
             }
 
             const data = await response.json();
+            console.log("Fetched workspaces data:", data); // Debug log to see what's coming from server
 
             // Convert the server response format to what our component expects
             let workspacesList = [];
-            if (data.personal) workspacesList = [...workspacesList, ...data.personal];
-            if (data.team) workspacesList = [...workspacesList, ...data.team];
+            if (data.personal && Array.isArray(data.personal)) {
+                workspacesList = [...workspacesList, ...data.personal];
+            }
+            if (data.team && Array.isArray(data.team)) {
+                workspacesList = [...workspacesList, ...data.team];
+            }
 
             // Mark which ones are owned by the current user
             workspacesList = workspacesList.map(workspace => ({
                 ...workspace,
                 isOwner: workspace.owner === 'temp-user-id' || workspace._id === 'ws1'
             }));
+
+            console.log("Processed workspaces list:", workspacesList); // Debug log to see processed data
 
             // Set all workspaces
             setWorkspaces(workspacesList);
@@ -121,18 +156,18 @@ const WorkspacesSection = ({ requests, response, onSend, onCreate, onUpdate, onD
             newWorkspace.isOwner = true;
 
             // Update state with new workspace
-            setWorkspaces([...workspaces, newWorkspace]);
+            setWorkspaces(prevWorkspaces => [...prevWorkspaces, newWorkspace]);
 
             // Add to myWorkspaces since the user is creating it
-            setMyWorkspaces([...myWorkspaces, newWorkspace]);
+            setMyWorkspaces(prevWorkspaces => [...prevWorkspaces, newWorkspace]);
 
             // Update the appropriate workspace category
             if (newWorkspaceType === 'personal') {
-                setPersonalWorkspaces([...personalWorkspaces, newWorkspace]);
+                setPersonalWorkspaces(prevWorkspaces => [...prevWorkspaces, newWorkspace]);
             } else if (newWorkspaceType === 'public') {
-                setPublicWorkspaces([...publicWorkspaces, newWorkspace]);
+                setPublicWorkspaces(prevWorkspaces => [...prevWorkspaces, newWorkspace]);
             } else {
-                setTeamWorkspaces([...teamWorkspaces, newWorkspace]);
+                setTeamWorkspaces(prevWorkspaces => [...prevWorkspaces, newWorkspace]);
             }
 
             // Reset form and close modal
@@ -140,6 +175,9 @@ const WorkspacesSection = ({ requests, response, onSend, onCreate, onUpdate, onD
             setNewWorkspaceDesc('');
             setNewWorkspaceType('personal');
             setShowCreateModal(false);
+
+            // Fetch all workspaces to ensure UI is up to date
+            await fetchWorkspaces();
 
             // Navigate to the new workspace
             navigate(`/workspace/workspaces/${newWorkspace._id}`);
@@ -150,27 +188,40 @@ const WorkspacesSection = ({ requests, response, onSend, onCreate, onUpdate, onD
             }
         } finally {
             setLoading(false);
+            setAutoCreateWorkspace(false); // Reset auto creation flag
         }
     };
 
     const renderWorkspaces = () => {
+        // Add debug logging to help understand what's happening
+        console.log("Current state:", {
+            workspaces,
+            myWorkspaces,
+            personalWorkspaces,
+            teamWorkspaces,
+            publicWorkspaces,
+            activeWorkspaceType,
+            viewMode
+        });
+
+        // Use the full workspaces list directly for more reliable filtering
         let workspacesToDisplay = [];
 
         // First determine if we're showing "My Workspaces" or "Shared Workspaces"
         if (viewMode === 'my') {
-            // From My Workspaces, filter by workspace type
+            // Use the full workspaces list and filter based on activeWorkspaceType
             switch (activeWorkspaceType) {
                 case 'personal':
-                    workspacesToDisplay = myWorkspaces.filter(workspace => workspace.isPersonal);
+                    workspacesToDisplay = workspaces.filter(workspace => workspace.isPersonal);
                     break;
                 case 'team':
-                    workspacesToDisplay = myWorkspaces.filter(workspace => !workspace.isPersonal && !workspace.isPublic);
+                    workspacesToDisplay = workspaces.filter(workspace => !workspace.isPersonal && !workspace.isPublic);
                     break;
                 case 'public':
-                    workspacesToDisplay = myWorkspaces.filter(workspace => workspace.isPublic);
+                    workspacesToDisplay = workspaces.filter(workspace => workspace.isPublic);
                     break;
                 default:
-                    workspacesToDisplay = myWorkspaces;
+                    workspacesToDisplay = workspaces;
             }
         } else {
             // For Shared Workspaces
@@ -188,6 +239,8 @@ const WorkspacesSection = ({ requests, response, onSend, onCreate, onUpdate, onD
                     workspacesToDisplay = sharedWorkspaces;
             }
         }
+
+        console.log("Workspaces to display:", workspacesToDisplay);
 
         if (loading && workspacesToDisplay.length === 0) {
             return <div className="loading-message">Loading workspaces...</div>;
@@ -246,11 +299,15 @@ const WorkspacesSection = ({ requests, response, onSend, onCreate, onUpdate, onD
                             )}
                             <div className="workspace-title">
                                 <h3>{workspace.name}</h3>
-                                {workspace.isPersonal && <span className="workspace-type personal">Personal</span>}
-                                {workspace.isPublic && <span className="workspace-type public">Public</span>}
-                                {!workspace.isPersonal && !workspace.isPublic && <span className="workspace-type team">Team</span>}
                             </div>
                         </div>
+
+                        <div className="workspace-type-badge">
+                            {workspace.isPersonal && <span className="workspace-type personal">PERSONAL</span>}
+                            {workspace.isPublic && <span className="workspace-type public">PUBLIC</span>}
+                            {!workspace.isPersonal && !workspace.isPublic && <span className="workspace-type team">TEAM</span>}
+                        </div>
+
                         <p className="workspace-description">{workspace.description || 'No description provided.'}</p>
 
                         <div className="workspace-meta">

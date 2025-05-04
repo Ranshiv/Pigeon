@@ -33,3 +33,392 @@
     background-color: #f85149;
     /* Slightly different red for dark mode */
 }
+
+/* src/components/HistorySection.css */
+
+.history-section {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow-y: auto;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.history-header {
+    position: sticky;
+    top: 0;
+    background-color: var(--background-color, #fff);
+    z-index: 10;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border-color, #eaeaea);
+}
+
+.history-header h2 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 18px;
+    margin: 0 0 12px 0;
+    color: var(--heading-color, #242424);
+}
+
+.history-search {
+    position: relative;
+    margin-bottom: 12px;
+}
+
+.history-search input {
+    width: 100%;
+    padding: 8px 32px 8px 32px;
+    border: 1px solid var(--border-color, #e0e0e0);
+    border-radius: 6px;
+    font-size: 14px;
+    transition: border-color 0.2s ease;
+}
+
+.history-search input:focus {
+    outline: none;
+    border-color: var(--primary-color, #007bff);
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.1);
+}
+
+.search-icon {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-secondary, #888);
+    font-size: 14px;
+}
+
+.clear-search {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-secondary, #888);
+    cursor: pointer;
+    padding: 2px;
+    border-radius: 50%;
+    font-size: 14px;
+}
+
+.clear-search:hover {
+    color: var(--danger-color, #dc3545);
+    background-color: rgba(220, 53, 69, 0.1);
+}
+
+.method-filters {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+    margin-bottom: 8px;
+}
+
+.filter-btn {
+    padding: 4px 8px;
+    border: 1px solid var(--border-color, #e0e0e0);
+    border-radius: 4px;
+    background: none;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.filter-btn:hover {
+    background-color: var(--hover-bg, #f8f9fa);
+}
+
+.filter-btn.active {
+    background-color: var(--primary-light, #e6f7ff);
+    border-color: var(--primary-color, #007bff);
+    color: var(--primary-color, #007bff);
+}
+
+.filter-btn.method-get {
+    color: var(--get-color, #61affe);
+}
+
+.filter-btn.method-post {
+    color: var(--post-color, #49cc90);
+}
+
+.filter-btn.method-put {
+    color: var(--put-color, #fca130);
+}
+
+.filter-btn.method-delete {
+    color: var(--delete-color, #f93e3e);
+}
+
+.filter-btn.method-patch {
+    color: var(--patch-color, #50e3c2);
+}
+
+.filter-btn.method-get.active {
+    background-color: rgba(97, 175, 254, 0.1);
+    border-color: var(--get-color, #61affe);
+}
+
+.filter-btn.method-post.active {
+    background-color: rgba(73, 204, 144, 0.1);
+    border-color: var(--post-color, #49cc90);
+}
+
+.filter-btn.method-put.active {
+    background-color: rgba(252, 161, 48, 0.1);
+    border-color: var(--put-color, #fca130);
+}
+
+.filter-btn.method-delete.active {
+    background-color: rgba(249, 62, 62, 0.1);
+    border-color: var(--delete-color, #f93e3e);
+}
+
+.filter-btn.method-patch.active {
+    background-color: rgba(80, 227, 194, 0.1);
+    border-color: var(--patch-color, #50e3c2);
+}
+
+.history-group {
+    margin-bottom: 16px;
+}
+
+.group-header {
+    font-size: 14px;
+    color: var(--text-secondary, #606060);
+    padding: 8px 16px;
+    margin: 0;
+    font-weight: 600;
+    background-color: var(--group-header-bg, #f8f9fa);
+    border-bottom: 1px solid var(--border-color, #eaeaea);
+}
+
+.history-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.history-item {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border-color, #eaeaea);
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.history-item:hover {
+    background-color: var(--hover-bg, #f8f9fa);
+}
+
+.history-item-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+}
+
+.history-url {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-primary, #242424);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.history-item-details {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+}
+
+.method-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: bold;
+    text-transform: uppercase;
+    min-width: 50px;
+}
+
+.method-get {
+    background-color: rgba(97, 175, 254, 0.1);
+    color: var(--get-color, #61affe);
+}
+
+.method-post {
+    background-color: rgba(73, 204, 144, 0.1);
+    color: var(--post-color, #49cc90);
+}
+
+.method-put {
+    background-color: rgba(252, 161, 48, 0.1);
+    color: var(--put-color, #fca130);
+}
+
+.method-delete {
+    background-color: rgba(249, 62, 62, 0.1);
+    color: var(--delete-color, #f93e3e);
+}
+
+.method-patch {
+    background-color: rgba(80, 227, 194, 0.1);
+    color: var(--patch-color, #50e3c2);
+}
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    min-width: 40px;
+}
+
+.status-2xx {
+    background-color: rgba(73, 204, 144, 0.1);
+    color: var(--success-color, #49cc90);
+}
+
+.status-3xx {
+    background-color: rgba(73, 139, 204, 0.1);
+    color: var(--info-color, #498bcc);
+}
+
+.status-4xx {
+    background-color: rgba(252, 161, 48, 0.1);
+    color: var(--warning-color, #fca130);
+}
+
+.status-5xx {
+    background-color: rgba(249, 62, 62, 0.1);
+    color: var(--danger-color, #f93e3e);
+}
+
+.history-time {
+    color: var(--text-secondary, #606060);
+    margin-left: auto;
+}
+
+/* Test Results Badge styling */
+.test-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    color: white;
+}
+
+.test-passed {
+    background-color: var(--success-color, #28a745);
+}
+
+.test-failed {
+    background-color: var(--danger-color, #dc3545);
+}
+
+/* Empty state styling */
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    text-align: center;
+    color: var(--text-secondary, #666);
+}
+
+.empty-icon {
+    font-size: 32px;
+    margin-bottom: 16px;
+    color: var(--text-secondary, #888);
+}
+
+.reset-filters {
+    margin-top: 16px;
+    padding: 8px 16px;
+    background-color: var(--primary-light, #e6f7ff);
+    color: var(--primary-color, #007bff);
+    border: 1px solid var(--primary-color, #007bff);
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+/* Error state */
+.history-section.error {
+    padding: 20px;
+    color: var(--danger-color, #dc3545);
+    text-align: center;
+}
+
+/* Dark theme support */
+.dark-theme .history-header {
+    background-color: var(--dark-bg, #2d2d2d);
+    border-color: var(--dark-border, #444);
+}
+
+.dark-theme .history-header h2 {
+    color: var(--dark-heading-color, #e0e0e0);
+}
+
+.dark-theme .history-search input {
+    background-color: var(--dark-input-bg, #3a3a3a);
+    border-color: var(--dark-border, #555);
+    color: var(--dark-text, #e0e0e0);
+}
+
+.dark-theme .group-header {
+    background-color: var(--dark-group-header-bg, #333);
+    color: var(--dark-text-secondary, #aaa);
+    border-color: var(--dark-border, #444);
+}
+
+.dark-theme .history-item {
+    border-color: var(--dark-border, #444);
+}
+
+.dark-theme .history-item:hover {
+    background-color: var(--dark-hover-bg, #3a3a3a);
+}
+
+.dark-theme .history-url {
+    color: var(--dark-text, #e0e0e0);
+}
+
+.dark-theme .history-time {
+    color: var(--dark-text-secondary, #aaa);
+}
+
+.dark-theme .filter-btn {
+    background-color: var(--dark-input-bg, #3a3a3a);
+    border-color: var(--dark-border, #555);
+}
+
+.dark-theme .filter-btn:hover {
+    background-color: var(--dark-hover-bg, #444);
+}
+
+.dark-theme .filter-btn.active {
+    background-color: rgba(0, 123, 255, 0.2);
+}
+
+.dark-theme .test-badge.test-passed {
+    background-color: var(--dark-success, #2ea043);
+}
+
+.dark-theme .test-badge.test-failed {
+    background-color: var(--dark-danger, #f85149);
+}
