@@ -6,6 +6,7 @@ import Footer from './components/Footer';
 import Home from './components/Home';
 import Workspace from './components/Workspace';
 import PublicHome from './components/PublicHome'; // Import the new PublicHome component
+import DocumentationOverview from './components/DocumentationOverview'; // Import the DocumentationOverview component
 import { CollaborationProvider } from './context/CollaborationContext'; // Import our new CollaborationProvider
 import './App.css';
 
@@ -55,6 +56,7 @@ function App() {
         <Routes>
           <Route path="/" element={isAuthenticated ? <Navigate to="/workspace" /> : <PublicHome />} />
           <Route path="/workspace/*" element={isAuthenticated ? <Workspace /> : <Navigate to="/" />} />
+          <Route path="/documentation" element={<DocumentationOverview />} /> {/* Add the documentation route */}
           <Route path="*" element={<div>404 Not Found</div>} />
         </Routes>
         <Footer />

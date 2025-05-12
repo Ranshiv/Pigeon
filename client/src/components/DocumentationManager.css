@@ -1,0 +1,455 @@
+/* DocumentationManager.css */
+.documentation-manager {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+    background-color: var(--background-color, #fff);
+}
+
+.documentation-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    padding: 16px 20px;
+    background-color: var(--header-bg, #ffffff);
+    border-bottom: 1px solid var(--border-color, #e0e0e0);
+    gap: 16px;
+}
+
+.documentation-nav {
+    margin-right: auto;
+}
+
+.back-link {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    color: var(--text-secondary, #666666);
+    text-decoration: none;
+    font-size: 14px;
+    transition: color 0.2s;
+}
+
+.back-link:hover {
+    color: var(--primary-color, #ff6c37);
+}
+
+.documentation-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.doc-icon {
+    color: var(--primary-color, #ff6c37);
+    font-size: 20px;
+}
+
+.documentation-title h2 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.last-updated {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    color: var(--text-tertiary, #999999);
+    margin-left: 16px;
+}
+
+.documentation-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: auto;
+}
+
+/* View mode toggle styles */
+.view-mode-toggle {
+    display: flex;
+    border: 1px solid var(--border-color, #e0e0e0);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-right: 8px;
+}
+
+.view-btn {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 12px;
+    background: var(--background-color, #fff);
+    border: none;
+    font-size: 13px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.view-btn.active {
+    background-color: var(--primary-color, #ff6c37);
+    color: white;
+}
+
+.view-btn:not(.active):hover {
+    background-color: var(--hover-bg, #f5f5f5);
+}
+
+.action-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
+    background-color: var(--background-light, #f5f5f5);
+    border: 1px solid var(--border-color, #e0e0e0);
+    border-radius: 4px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: var(--text-primary, #333);
+}
+
+.action-btn:hover {
+    background-color: var(--hover-bg, #e8e8e8);
+}
+
+.action-btn.active {
+    background-color: var(--primary-light, #fff0eb);
+    border-color: var(--primary-color, #ff6c37);
+    color: var(--primary-color, #ff6c37);
+}
+
+.publish-btn {
+    background-color: var(--success-light, #edf7ed);
+    color: var(--success-color, #4caf50);
+    border-color: var(--success-color, #4caf50);
+}
+
+.publish-btn:hover {
+    background-color: var(--success-light-hover, #dbefdb);
+}
+
+.action-dropdown {
+    position: relative;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    z-index: 10;
+    background-color: var(--card-bg, #ffffff);
+    min-width: 160px;
+    border: 1px solid var(--border-color, #e0e0e0);
+    border-radius: 4px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    margin-top: 4px;
+}
+
+.action-dropdown:hover .dropdown-content {
+    display: block;
+}
+
+.dropdown-content button {
+    display: block;
+    width: 100%;
+    padding: 8px 12px;
+    text-align: left;
+    background: none;
+    border: none;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.dropdown-content button:hover {
+    background-color: var(--hover-bg, #f5f5f5);
+}
+
+/* Main documentation content container */
+.documentation-content {
+    flex: 1;
+    overflow: hidden;
+}
+
+/* Loading state */
+.documentation-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+}
+
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid rgba(255, 108, 55, 0.3);
+    border-top-color: var(--primary-color, #ff6c37);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 16px;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Error state */
+.documentation-error {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    padding: 20px;
+    text-align: center;
+}
+
+.documentation-error h3 {
+    color: var(--error-color, #f44336);
+    margin-bottom: 8px;
+}
+
+.documentation-error button {
+    margin-top: 16px;
+    padding: 8px 16px;
+    background-color: var(--primary-color, #ff6c37);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.documentation-error button:hover {
+    background-color: var(--primary-hover, #e55a2a);
+}
+
+/* Settings panel */
+.documentation-settings {
+    padding: 24px;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.documentation-settings h3 {
+    margin-top: 0;
+    margin-bottom: 24px;
+    font-size: 20px;
+    font-weight: 600;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border-color, #e0e0e0);
+}
+
+.settings-section {
+    margin-bottom: 32px;
+}
+
+.settings-section h4 {
+    margin-top: 0;
+    margin-bottom: 16px;
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.setting-option {
+    margin-bottom: 16px;
+}
+
+.setting-option label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 500;
+    margin-bottom: 6px;
+}
+
+.setting-description {
+    margin-top: 4px;
+    margin-bottom: 0;
+    font-size: 13px;
+    color: var(--text-tertiary, #999999);
+    padding-left: 24px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 500;
+}
+
+.form-group input,
+.form-group textarea {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid var(--border-color, #e0e0e0);
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: var(--primary-color, #ff6c37);
+    box-shadow: 0 0 0 2px rgba(255, 108, 55, 0.2);
+}
+
+.settings-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 32px;
+}
+
+.cancel-btn {
+    padding: 8px 16px;
+    background-color: var(--background-light, #f5f5f5);
+    color: var(--text-secondary, #666666);
+    border: 1px solid var(--border-color, #e0e0e0);
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.cancel-btn:hover {
+    background-color: var(--hover-bg, #e8e8e8);
+}
+
+.save-btn {
+    padding: 8px 16px;
+    background-color: var(--primary-color, #ff6c37);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.save-btn:hover {
+    background-color: var(--primary-hover, #e55a2a);
+}
+
+/* Responsive tweaks */
+@media screen and (max-width: 768px) {
+    .documentation-header {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 12px 16px;
+    }
+
+    .documentation-title {
+        margin: 8px 0;
+    }
+
+    .documentation-actions {
+        margin-left: 0;
+        width: 100%;
+        justify-content: space-between;
+        margin-top: 8px;
+    }
+
+    .action-btn {
+        padding: 6px 10px;
+        font-size: 12px;
+    }
+
+    .view-mode-toggle {
+        margin-right: 0;
+    }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+    .documentation-manager {
+        background-color: var(--background-color, #1e1e1e);
+    }
+
+    .documentation-header {
+        background-color: var(--header-bg, #252525);
+        border-bottom-color: var(--border-color, #333333);
+    }
+
+    .back-link,
+    .action-btn,
+    .documentation-title h2 {
+        color: var(--text-primary, #e0e0e0);
+    }
+
+    .action-btn {
+        background-color: var(--background-light, #2c2c2c);
+        border-color: var(--border-color, #333333);
+    }
+
+    .action-btn:hover {
+        background-color: var(--hover-bg, #3c3c3c);
+    }
+
+    .action-btn.active {
+        background-color: rgba(255, 108, 55, 0.2);
+    }
+
+    .view-btn {
+        background: var(--background-color, #1e1e1e);
+        color: var(--text-primary, #e0e0e0);
+    }
+
+    .view-btn:not(.active):hover {
+        background-color: var(--hover-bg, #2c2c2c);
+    }
+
+    .dropdown-content {
+        background-color: var(--card-bg, #252525);
+        border-color: var(--border-color, #333333);
+    }
+
+    .dropdown-content button {
+        color: var(--text-primary, #e0e0e0);
+    }
+
+    .dropdown-content button:hover {
+        background-color: var(--hover-bg, #333333);
+    }
+
+    .documentation-settings h3,
+    .settings-section h4 {
+        color: var(--text-primary, #e0e0e0);
+    }
+
+    .documentation-settings h3 {
+        border-bottom-color: var(--border-color, #333333);
+    }
+
+    .setting-option label,
+    .form-group label {
+        color: var(--text-primary, #e0e0e0);
+    }
+
+    .form-group input,
+    .form-group textarea {
+        background-color: var(--input-bg, #2c2c2c);
+        border-color: var(--border-color, #333333);
+        color: var(--text-primary, #e0e0e0);
+    }
+
+    .cancel-btn {
+        background-color: var(--background-light, #2c2c2c);
+        border-color: var(--border-color, #333333);
+        color: var(--text-primary, #e0e0e0);
+    }
+
+    .cancel-btn:hover {
+        background-color: var(--hover-bg, #3c3c3c);
+    }
+}

@@ -1,0 +1,279 @@
+/* DocumentationEditor.css */
+.documentation-editor {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background-color: var(--background-color, #ffffff);
+    border-radius: 6px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.editor-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    border-bottom: 1px solid var(--border-color, #eaeaea);
+}
+
+.editor-title-section {
+    flex: 1;
+}
+
+.title-input {
+    width: 100%;
+    padding: 8px 12px;
+    font-size: 16px;
+    border: 1px solid var(--border-color, #eaeaea);
+    border-radius: 4px;
+}
+
+.editor-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.view-toggle {
+    padding: 8px 16px;
+    border: 1px solid var(--border-color, #eaeaea);
+    background-color: var(--background-color, #ffffff);
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.view-toggle.active {
+    background-color: var(--primary-color, #FF6C37);
+    color: white;
+    border-color: var(--primary-color, #FF6C37);
+}
+
+.save-button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background-color: var(--primary-color, #FF6C37);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.save-button:hover {
+    background-color: var(--primary-hover, #e55a2a);
+}
+
+.save-button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
+
+.editor-main {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+}
+
+.editor-sidebar {
+    width: 250px;
+    padding: 16px;
+    border-right: 1px solid var(--border-color, #eaeaea);
+    overflow-y: auto;
+    background-color: var(--sidebar-background, #f8f9fa);
+}
+
+.editor-content {
+    flex: 1;
+    display: flex;
+    overflow: hidden;
+}
+
+.documentation-textarea {
+    flex: 1;
+    padding: 16px;
+    border: none;
+    resize: none;
+    font-family: 'Courier New', monospace;
+    font-size: 14px;
+    line-height: 1.5;
+    outline: none;
+}
+
+.documentation-preview {
+    flex: 1;
+    padding: 16px;
+    overflow-y: auto;
+    line-height: 1.6;
+}
+
+.documentation-preview h1 {
+    font-size: 24px;
+    margin-top: 0;
+    margin-bottom: 16px;
+    color: var(--text-primary, #333333);
+}
+
+.documentation-preview h2 {
+    font-size: 20px;
+    margin-top: 24px;
+    margin-bottom: 16px;
+    color: var(--text-primary, #333333);
+}
+
+.documentation-preview h3 {
+    font-size: 18px;
+    margin-top: 20px;
+    margin-bottom: 12px;
+    color: var(--text-primary, #333333);
+}
+
+.documentation-preview pre {
+    background-color: var(--code-background, #f1f1f1);
+    padding: 12px;
+    border-radius: 4px;
+    overflow-x: auto;
+}
+
+.documentation-preview code {
+    font-family: 'Courier New', monospace;
+    font-size: 14px;
+}
+
+.documentation-preview p {
+    margin-top: 0;
+    margin-bottom: 16px;
+}
+
+.documentation-preview img {
+    max-width: 100%;
+}
+
+.documentation-preview table {
+    border-collapse: collapse;
+    width: 100%;
+    margin-bottom: 16px;
+}
+
+.documentation-preview th,
+.documentation-preview td {
+    border: 1px solid var(--border-color, #eaeaea);
+    padding: 8px 12px;
+    text-align: left;
+}
+
+.documentation-preview th {
+    background-color: var(--table-header-background, #f8f9fa);
+    font-weight: bold;
+}
+
+.editor-tools {
+    margin-bottom: 24px;
+}
+
+.editor-tools h4 {
+    margin-top: 0;
+    margin-bottom: 12px;
+    font-size: 16px;
+    color: var(--text-primary, #333333);
+}
+
+.editor-tools button {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 4px;
+    background-color: transparent;
+    border: 1px solid var(--border-color, #eaeaea);
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    text-align: left;
+    color: var(--text-secondary, #666666);
+}
+
+.editor-tools button:hover {
+    background-color: var(--hover-background, #f5f5f5);
+}
+
+.editor-tools button svg {
+    margin-right: 8px;
+}
+
+.endpoints-list {
+    margin-top: 24px;
+}
+
+.endpoints-list h4 {
+    margin-top: 0;
+    margin-bottom: 12px;
+    font-size: 16px;
+    color: var(--text-primary, #333333);
+}
+
+.help-text {
+    font-size: 12px;
+    color: var(--text-tertiary, #999999);
+    margin-top: 0;
+    margin-bottom: 12px;
+}
+
+.endpoint-item {
+    display: flex;
+    align-items: center;
+    padding: 8px;
+    border: 1px solid var(--border-color, #eaeaea);
+    border-radius: 4px;
+    margin-bottom: 8px;
+    cursor: pointer;
+    background-color: var(--background-color, #ffffff);
+    transition: background-color 0.2s ease;
+}
+
+.endpoint-item:hover {
+    background-color: var(--hover-background, #f5f5f5);
+}
+
+.method-badge {
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: bold;
+    margin-right: 8px;
+    min-width: 40px;
+    text-align: center;
+}
+
+.method-get {
+    background-color: rgba(97, 175, 254, 0.1);
+    color: var(--get-color, #61affe);
+}
+
+.method-post {
+    background-color: rgba(73, 204, 144, 0.1);
+    color: var(--post-color, #49cc90);
+}
+
+.method-put {
+    background-color: rgba(252, 161, 48, 0.1);
+    color: var(--put-color, #fca130);
+}
+
+.method-delete {
+    background-color: rgba(249, 62, 62, 0.1);
+    color: var(--delete-color, #f93e3e);
+}
+
+.method-patch {
+    background-color: rgba(80, 227, 194, 0.1);
+    color: var(--patch-color, #50e3c2);
+}
+
+.endpoint-name {
+    flex: 1;
+    font-size: 14px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}

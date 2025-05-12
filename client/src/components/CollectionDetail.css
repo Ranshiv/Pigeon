@@ -669,6 +669,87 @@
   font-size: 12px;
 }
 
+/* Documentation tab styles */
+.documentation-tab-content {
+  height: 100%;
+  overflow: auto;
+}
+
+.documentation-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 48px 20px;
+  color: var(--text-secondary, #666);
+}
+
+.documentation-placeholder .placeholder-icon {
+  font-size: 64px;
+  color: var(--text-tertiary, #999);
+  margin-bottom: 24px;
+  opacity: 0.6;
+}
+
+.documentation-placeholder h3 {
+  margin-bottom: 12px;
+  font-weight: 500;
+}
+
+.documentation-placeholder p {
+  margin-bottom: 24px;
+  max-width: 400px;
+}
+
+.create-doc-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background-color: var(--primary-color, #ff6c37);
+  color: white;
+  border-radius: 4px;
+  text-decoration: none;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.create-doc-link:hover {
+  background-color: var(--primary-hover, #e55a2a);
+}
+
+/* Tab navigation additions */
+.tab-btn .fi {
+  margin-right: 6px;
+}
+
+/* Documentation loading spinner */
+.documentation-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 300px;
+  color: var(--text-secondary, #666);
+}
+
+.documentation-loading .spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(255, 108, 55, 0.2);
+  border-top-color: var(--primary-color, #ff6c37);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 16px;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .collection-content {
@@ -679,6 +760,21 @@
     width: 100%;
     height: auto;
     max-height: 200px;
+  }
+
+  .top-bar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .sidebar {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .main-panel {
+    padding: 12px;
   }
 }
 
@@ -835,55 +931,6 @@
   background-color: var(--background-color);
   border: 1px solid var(--border-color);
   border-radius: 4px;
-}
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-  .top-bar {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .sidebar {
-    width: 100%;
-    border-right: none;
-    border-bottom: 1px solid var(--border-color);
-  }
-
-  .main-panel {
-    padding: 12px;
-  }
-}
-
-/* Tab Navigation */
-.tab-navigation {
-  display: flex;
-  border-bottom: 1px solid #e1e4e8;
-  margin-bottom: 20px;
-  background: #f6f8fa;
-}
-
-.tab-btn {
-  padding: 12px 20px;
-  background: transparent;
-  border: none;
-  border-bottom: 2px solid transparent;
-  font-size: 0.95rem;
-  font-weight: 500;
-  color: #586069;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.tab-btn:hover {
-  color: #0366d6;
-  background: rgba(3, 102, 214, 0.05);
-}
-
-.tab-btn.active {
-  color: #0366d6;
-  border-bottom: 2px solid #0366d6;
-  background: white;
 }
 
 /* Sample Data tab height fix */

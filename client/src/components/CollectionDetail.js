@@ -1,13 +1,14 @@
 // client/src/components/CollectionDetail.js
 import React, { useEffect, useState, useCallback } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import './CollectionDetail.css';
 import ActiveCollaborators from './ActiveCollaborators';
 import RequestForm from './RequestForm';
 import ResponseDisplay from './ResponseDisplay';
 import SampleDataManager from './SampleDataManager';
+import DocumentationViewer from './DocumentationViewer';
 import { useCollaboration } from '../context/CollaborationContext';
-import { FiSave, FiSettings, FiPlay, FiAlertCircle, FiCheckCircle } from 'react-icons/fi';
+import { FiSave, FiSettings, FiPlay, FiAlertCircle, FiCheckCircle, FiBook, FiEdit } from 'react-icons/fi';
 
 function CollectionDetail() {
   const { collectionId } = useParams();
@@ -24,6 +25,8 @@ function CollectionDetail() {
   const [showSettings, setShowSettings] = useState(false);
   const [pendingChanges, setPendingChanges] = useState(false);
   const [activeTab, setActiveTab] = useState('requests');
+  const [documentation, setDocumentation] = useState(null);
+  const [isLoadingDocs, setIsLoadingDocs] = useState(false);
 
   // Get collaboration context features
   const {
@@ -65,6 +68,36 @@ function CollectionDetail() {
       setLoading(false);
     }
   }, [collectionId]);
+
+  // Fetch documentation data when the documentation tab is selected
+  const fetchDocumentation = useCallback(async () => {
+    if (activeTab !== 'documentation') return;
+
+    try {
+      setIsLoadingDocs(true);
+
+      const response = await fetch(`/api/collections/${collectionId}/documentation`, {
+        credentials: 'include'
+      });
+
+      if (!response.ok && response.status !== 404) {
+        throw new Error('Failed to fetch documentation');
+      }
+
+      if (response.ok) {
+        const data = await response.json();
+        setDocumentation(data);
+      } else {
+        // No documentation exists yet
+        setDocumentation(null);
+      }
+    } catch (err) {
+      console.error('Error fetching documentation:', err);
+      // Don't set error state, just log it
+    } finally {
+      setIsLoadingDocs(false);
+    }
+  }, [collectionId, activeTab]);
 
   // Join the collaboration room for this collection
   const joinCollaborationRoom = useCallback(() => {
@@ -114,6 +147,11 @@ function CollectionDetail() {
       joinCollaborationRoom();
     }
   }, [collection, connected, joinCollaborationRoom]);
+
+  // Fetch documentation when the documentation tab is selected
+  useEffect(() => {
+    fetchDocumentation();
+  }, [fetchDocumentation]);
 
   // Save collection changes to the server
   const saveCollection = async () => {
@@ -606,6 +644,12 @@ function CollectionDetail() {
               Requests
             </button>
             <button
+              className={`tab-btn ${activeTab === 'documentation' ? 'active' : ''}`}
+              onClick={() => setActiveTab('documentation')}
+            >
+              <FiBook /> Documentation
+            </button>
+            <button
               className={`tab-btn ${activeTab === 'sampleData' ? 'active' : ''}`}
               onClick={() => setActiveTab('sampleData')}
             >
@@ -668,6 +712,28 @@ function CollectionDetail() {
               )}
               {renderRunAllResults()}
             </>
+          )}
+
+          {activeTab === 'documentation' && (
+            <div className="documentation-tab-content">
+              {isLoadingDocs ? (
+                <div className="documentation-loading">
+                  <div className="spinner"></div>
+                  <p>Loading documentation...</p>
+                </div>
+              ) : documentation ? (
+                <DocumentationViewer documentation={documentation} collection={collection} />
+              ) : (
+                <div className="documentation-placeholder">
+                  <FiBook className="placeholder-icon" />
+                  <h3>No Documentation Available</h3>
+                  <p>This collection doesn't have any documentation yet.</p>
+                  <Link to={`/workspace/collections/${collectionId}/documentation`} className="create-doc-link">
+                    <FiEdit /> Create Documentation
+                  </Link>
+                </div>
+              )}
+            </div>
           )}
 
           {activeTab === 'sampleData' && (

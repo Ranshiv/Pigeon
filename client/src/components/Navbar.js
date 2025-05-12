@@ -18,7 +18,8 @@ import {
     FiPlus,
     FiSearch,
     FiCheck,
-    FiChevronRight
+    FiChevronRight,
+    FiBook  // Add FiBook icon for documentation
 } from 'react-icons/fi';
 import Notifications from './Notifications'; // Import the Notifications component
 import { useCollaboration } from '../context/CollaborationContext';
@@ -408,6 +409,13 @@ const Navbar = ({ isAuthenticated }) => {
                                 <div className="navbar-item" onClick={() => handleNavigation('/workspace/history')}>
                                     <span className={isActive('/workspace/history') ? 'active' : ''}>
                                         <FiClock size={18} /> History
+                                    </span>
+                                </div>
+
+                                {/* Documentation link */}
+                                <div className="navbar-item" onClick={() => handleNavigation('/documentation')}>
+                                    <span className={isActive('/documentation') ? 'active' : ''}>
+                                        <FiBook size={18} /> Docs
                                     </span>
                                 </div>
                             </div>
