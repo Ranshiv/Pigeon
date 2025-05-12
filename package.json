@@ -20,6 +20,7 @@
   "license": "ISC",
   "description": "API Testing and Automation Tool with CI/CD Integration",
   "dependencies": {
+    "@apidevtools/swagger-parser": "^10.1.1",
     "axios": "^1.8.4",
     "chalk": "^4.1.2",
     "cookie-parser": "^1.4.7",
@@ -27,6 +28,7 @@
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "express-session": "^1.18.1",
+    "js-yaml": "^4.1.0",
     "mongodb": "^6.14.2",
     "mongoose": "^8.12.1",
     "node-fetch": "^3.0.0",

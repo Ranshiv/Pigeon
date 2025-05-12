@@ -69,11 +69,13 @@ const DocumentationManager = () => {
     const handleSaveDocumentation = async (docData) => {
         try {
             setIsSaving(true);
+            console.log("Saving documentation data:", docData);
 
             const url = documentation
                 ? `/api/collections/${collectionId}/documentation/${documentation._id}`
                 : `/api/collections/${collectionId}/documentation`;
 
+            console.log("Saving to URL:", url);
             const method = documentation ? 'PUT' : 'POST';
 
             const response = await fetch(url, {
@@ -86,10 +88,13 @@ const DocumentationManager = () => {
             });
 
             if (!response.ok) {
-                throw new Error(`Failed to save documentation: ${response.status}`);
+                const errorText = await response.text();
+                console.error("Server response error:", response.status, errorText);
+                throw new Error(`Failed to save documentation: ${response.status}${errorText ? ' - ' + errorText : ''}`);
             }
 
             const savedDoc = await response.json();
+            console.log("Documentation saved successfully:", savedDoc);
             setDocumentation(savedDoc);
 
             // Show success message
@@ -287,13 +292,35 @@ const DocumentationManager = () => {
                             const newDocData = {
                                 title: `${specData.info?.title || collection?.name} Documentation`,
                                 content: docContent,
-                                collectionId: collectionId,
-                                updatedAt: new Date().toISOString(),
                                 importedFrom: 'openapi'
                             };
 
-                            // Save the generated documentation
-                            await handleSaveDocumentation(newDocData);
+                            // Use the specific import endpoint for OpenAPI/Swagger
+                            setIsSaving(true);
+                            console.log("Importing OpenAPI documentation with data:", newDocData);
+
+                            const importResponse = await fetch(`/api/collections/${collectionId}/documentation/import/openapi`, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                credentials: 'include',
+                                body: JSON.stringify(newDocData)
+                            });
+
+                            if (!importResponse.ok) {
+                                const errorText = await importResponse.text();
+                                console.error("Server response error:", importResponse.status, errorText);
+                                throw new Error(`Failed to import documentation: ${importResponse.status}${errorText ? ' - ' + errorText : ''}`);
+                            }
+
+                            const savedDoc = await importResponse.json();
+                            console.log("Documentation imported successfully:", savedDoc);
+                            setDocumentation(savedDoc);
+                            setIsSaving(false);
+
+                            // Show success message
+                            alert('OpenAPI documentation imported successfully');
 
                             // Switch to view mode to see the imported documentation
                             setView('view');

@@ -2504,8 +2504,13 @@ app.post('/api/merge-requests/:id/reject', ensureAuthenticated, async (req, res)
     }
 });
 
+// --- WORKSPACE ROUTES ---
+
+// Get all workspaces
 app.get('/api/workspaces', ensureAuthenticated, async (req, res) => {
     try {
+        const userId = req.user.id;
+
         // Mock workspaces data based on user auth
         // In a real implementation, this would query a database
         const userWorkspaces = {
@@ -4029,5 +4034,70 @@ app.get('/api/collections/:collectionId/sample-data/:datasetId', ensureAuthentic
     } catch (err) {
         console.error("Error fetching sample dataset:", err);
         res.status(500).json({ message: 'Error fetching sample dataset' });
+    }
+});
+
+// Add documentation import route for OpenAPI/Swagger
+app.post('/api/collections/:id/documentation/import/openapi', ensureAuthenticated, async (req, res) => {
+    try {
+        const collectionId = req.params.id;
+        const { title, content, importedFrom } = req.body;
+
+        if (!content) {
+            return res.status(400).json({ message: 'Documentation content is required' });
+        }
+
+        // Check if collection exists
+        const collection = await db.collection('collections').findOne({
+            _id: new ObjectId(collectionId)
+        });
+
+        if (!collection) {
+            return res.status(404).json({ message: 'Collection not found' });
+        }
+
+        // Check if documentation already exists
+        let existingDoc = await db.collection('documentation').findOne({
+            collectionId: collectionId
+        });
+
+        let docData;
+        if (existingDoc) {
+            // Update existing documentation
+            docData = {
+                title: title || existingDoc.title,
+                content: content,
+                collectionId: collectionId,
+                updatedAt: new Date(),
+                importedFrom: importedFrom || 'openapi'
+            };
+
+            await db.collection('documentation').updateOne(
+                { _id: existingDoc._id },
+                { $set: docData }
+            );
+
+            docData._id = existingDoc._id;
+        } else {
+            // Create new documentation
+            docData = {
+                title: title || `${collection.name} Documentation`,
+                content: content,
+                collectionId: collectionId,
+                createdAt: new Date(),
+                updatedAt: new Date(),
+                importedFrom: importedFrom || 'openapi'
+            };
+
+            const result = await db.collection('documentation').insertOne(docData);
+            docData._id = result.insertedId;
+        }
+
+        console.log(`Imported OpenAPI/Swagger documentation for collection ${collectionId}`);
+
+        res.status(201).json(docData);
+    } catch (err) {
+        console.error("Error importing documentation:", err);
+        res.status(500).json({ message: 'Error importing documentation' });
     }
 });
