@@ -30,10 +30,19 @@ const historySchema = new mongoose.Schema({
     // Test Results
     testResults: { type: String }, // Store test results as stringified JSON
 
-    // Optional: Link back to the saved request if it came from one
+    // UPDATED: Allow string IDs for collection requests
     originalRequestId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Request',
+        type: mongoose.Schema.Types.Mixed, // Changed from ObjectId to Mixed to support both ObjectId and string IDs
+        required: false
+    },
+
+    // Add fields to track collection requests
+    collectionId: {
+        type: String,
+        required: false
+    },
+    collectionRequestId: {
+        type: String,
         required: false
     }
 });

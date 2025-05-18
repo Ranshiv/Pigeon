@@ -3,33 +3,42 @@
     display: flex;
     flex-direction: column;
     height: 100%;
-    background-color: var(--card-bg);
-    color: var(--text-color);
+    background-color: var(--card-bg, #1e1e1e);
+    color: var(--text-color, #e6e6e6);
+    overflow: auto;
+    border-radius: var(--radius-md, 4px);
+    /* No border here to prevent extra borders */
+}
+
+/* Form structure - adjusted to take full height without extra containers */
+.request-workspace form {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
     overflow: hidden;
-    border-radius: var(--radius-md);
-    border: 1px solid var(--border-color);
+    border: none;
 }
 
 /* URL bar styling */
 .request-url-bar {
     display: flex;
     align-items: center;
-    padding: var(--spacing-md);
-    border-bottom: 1px solid var(--border-color);
-    gap: var(--spacing-sm);
-    background-color: var(--card-bg);
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border-color, #3e3e3e);
+    gap: 12px;
+    background-color: var(--card-bg, #1e1e1e);
 }
 
 .method-select {
-    width: 90px;
-    height: 36px;
+    width: 98px;
+    height: 38px;
     border: none;
-    border-radius: var(--radius-sm);
+    border-radius: 4px;
     color: white;
-    font-weight: var(--font-weight-medium);
+    font-weight: 600;
     cursor: pointer;
     font-size: 13px;
-    padding: 0 var(--spacing-sm);
+    padding: 0 12px;
     appearance: none;
     background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
     background-repeat: no-repeat;
@@ -39,196 +48,290 @@
 
 /* Method colors using CSS variables */
 .method-select[data-method="GET"] {
-    background-color: var(--method-get);
+    background-color: var(--method-get, #00aa13);
 }
 
 .method-select[data-method="POST"] {
-    background-color: var(--method-post);
+    background-color: var(--method-post, #FF6C37);
 }
 
 .method-select[data-method="PUT"] {
-    background-color: var(--method-put);
+    background-color: var(--method-put, #0066cc);
 }
 
 .method-select[data-method="DELETE"] {
-    background-color: var(--method-delete);
+    background-color: var(--method-delete, #cc3333);
 }
 
 .method-select[data-method="PATCH"] {
-    background-color: var(--method-patch);
+    background-color: var(--method-patch, #9933cc);
 }
 
 .url-input {
     flex: 1;
-    height: 36px;
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-sm);
-    padding: 0 var(--spacing-sm);
+    height: 38px;
+    border: 1px solid var(--border-color, #3e3e3e);
+    border-radius: 4px;
+    padding: 0 12px;
     font-size: 13px;
-    background-color: var(--card-bg);
-    color: var(--text-color);
+    background-color: rgba(0, 0, 0, 0.2);
+    color: var(--text-color, #e6e6e6);
     outline: none;
+    transition: border-color 0.2s;
 }
 
 .url-input:focus {
-    border-color: var(--primary-color);
+    border-color: var(--primary-color, #FF6C37);
+    box-shadow: 0 0 0 1px rgba(255, 108, 55, 0.3);
 }
 
 .send-btn {
-    height: 36px;
-    padding: 0 var(--spacing-md);
+    height: 38px;
+    min-width: 80px;
+    padding: 0 16px;
     border: none;
-    background-color: var(--primary-color);
+    background-color: var(--primary-color, #FF6C37);
     color: white;
-    border-radius: var(--radius-sm);
+    border-radius: 4px;
     font-size: 13px;
-    font-weight: var(--font-weight-medium);
+    font-weight: 600;
     display: flex;
     align-items: center;
+    justify-content: center;
     cursor: pointer;
-    transition: background-color var(--transition-fast);
+    transition: background-color 0.2s;
 }
 
 .send-btn:hover {
-    background-color: var(--primary-hover);
+    background-color: var(--primary-hover, #e65a2e);
 }
 
 .save-btn {
-    height: 36px;
-    padding: 0 var(--spacing-md);
-    border: 1px solid var(--border-color);
+    height: 38px;
+    min-width: 80px;
+    padding: 0 16px;
+    border: 1px solid var(--border-color, #3e3e3e);
     background-color: transparent;
-    color: var(--text-color);
-    border-radius: var(--radius-sm);
+    color: var(--text-color, #e6e6e6);
+    border-radius: 4px;
     font-size: 13px;
     display: flex;
     align-items: center;
+    justify-content: center;
     cursor: pointer;
-    transition: background-color var(--transition-fast);
+    transition: background-color 0.2s;
 }
 
 .save-btn:hover {
-    background-color: var(--hover-bg);
+    background-color: rgba(255, 255, 255, 0.05);
 }
 
 /* Request name area */
 .request-name-area {
-    padding: var(--spacing-sm) var(--spacing-md);
-    border-bottom: 1px solid var(--border-color);
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border-color, #3e3e3e);
 }
 
 .request-name-input {
     width: 100%;
     border: none;
     font-size: 14px;
-    font-weight: var(--font-weight-medium);
-    padding: 4px 0;
+    font-weight: 600;
+    padding: 6px 0;
     outline: none;
     background-color: transparent;
-    color: var(--text-color);
+    color: var(--text-color, #e6e6e6);
 }
 
 .request-name-input:focus {
-    border-bottom: 1px solid var(--primary-color);
+    border-bottom: 1px solid var(--primary-color, #FF6C37);
 }
 
-/* Request tabs styling */
+/* Request tabs styling - Improved for better tab clarity */
 .request-tabs {
     display: flex;
-    padding: 0 var(--spacing-md);
-    border-bottom: 1px solid var(--border-color);
+    padding: 0;
+    border-bottom: 1px solid var(--border-color, #3e3e3e);
+    background-color: rgba(0, 0, 0, 0.1);
 }
 
 .request-tab {
-    padding: var(--spacing-sm) var(--spacing-md);
+    padding: 12px 16px;
     cursor: pointer;
     font-size: 13px;
-    color: var(--text-secondary);
+    color: var(--text-secondary, #a0a0a0);
     position: relative;
-    transition: color var(--transition-fast);
+    transition: all 0.2s;
+    border-right: 1px solid rgba(62, 62, 62, 0.5);
+}
+
+.request-tab:hover {
+    background-color: rgba(255, 255, 255, 0.03);
+    color: var(--text-color, #e6e6e6);
 }
 
 .request-tab.active {
-    color: var(--primary-color);
-    font-weight: var(--font-weight-medium);
+    color: var(--primary-color, #FF6C37);
+    font-weight: 500;
+    background-color: var(--card-bg, #1e1e1e);
+    border-bottom: none;
 }
 
 .request-tab.active::after {
     content: '';
     position: absolute;
-    bottom: 0;
+    bottom: -1px;
     left: 0;
     width: 100%;
     height: 2px;
-    background-color: var(--primary-color);
+    background-color: var(--primary-color, #FF6C37);
 }
 
-/* Request sections styling */
-.request-sections {
-    flex: 1;
+/* Removed the .request-sections container styling and moved styles to tab content */
+
+/* Tab content styling - now direct children of form */
+.params-section,
+.headers-section,
+.body-section,
+.script-section {
+    flex: 1 1 auto;
     overflow: auto;
-    background-color: var(--card-bg);
+    background-color: var(--card-bg, #1e1e1e);
+    min-height: 180px;
+    max-height: none;
+    border: none !important;
+    /* Force no borders */
+    box-shadow: none !important;
+    /* Force no shadows */
 }
 
 /* Params section */
-.params-section {
-    padding: var(--spacing-md);
-    height: 100%;
+.params-section,
+.headers-section {
+    padding: 16px;
+    height: auto;
     overflow: auto;
+    border: none;
 }
 
-/* Table styling */
+.table-container {
+    position: relative;
+    width: 100%;
+    overflow-x: auto;
+    background-color: var(--card-bg, #1e1e1e);
+    border: none;
+}
+
 .params-table {
     width: 100%;
+    table-layout: fixed;
     border-collapse: collapse;
+    border-spacing: 0;
+    margin: 0;
+    border: none;
+}
+
+/* Make sure we have no borders on the table wrapper */
+form .params-section,
+form .headers-section {
+    border: none !important;
+    position: relative;
+    z-index: 1;
+}
+
+/* Table styling - Complete overhaul for reliable layout at all screen widths */
+.params-table {
+    width: 100%;
+    table-layout: fixed;
+    border-collapse: collapse;
+    margin-bottom: 12px;
+    border: none;
+    background: transparent;
+}
+
+.params-table thead {
+    position: sticky;
+    top: 0;
+    z-index: 2;
 }
 
 .params-table th {
     text-align: left;
-    padding: var(--spacing-sm);
+    padding: 8px 10px;
     font-size: 12px;
-    font-weight: var(--font-weight-medium);
-    color: var(--text-secondary);
-    border-bottom: 1px solid var(--border-color);
-    background-color: var(--card-bg);
+    font-weight: 500;
+    color: var(--text-secondary, #a0a0a0);
+    border-bottom: 1px solid var(--border-color, #3e3e3e);
+    background-color: rgba(0, 0, 0, 0.2);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Set explicit widths for each column */
+.params-table th:nth-child(1),
+.params-table td:nth-child(1) {
+    width: 30px;
+}
+
+.params-table th:nth-child(5),
+.params-table td:nth-child(5) {
+    width: 40px;
+}
+
+.params-table th:nth-child(2),
+.params-table th:nth-child(3),
+.params-table th:nth-child(4) {
+    width: calc((100% - 70px) / 3);
 }
 
 .params-table td {
-    padding: 4px var(--spacing-sm);
+    padding: 6px 10px;
     vertical-align: middle;
-    border-bottom: 1px solid var(--border-color);
+    border-bottom: 1px solid rgba(62, 62, 62, 0.5);
 }
 
+.params-table tr:hover td {
+    background-color: rgba(255, 255, 255, 0.02);
+}
+
+/* Input styling */
 .params-table input[type="checkbox"] {
     margin: 0;
     cursor: pointer;
-    accent-color: var(--primary-color);
+    accent-color: var(--primary-color, #FF6C37);
+    width: 16px;
+    height: 16px;
 }
 
 .params-table input[type="text"] {
     width: 100%;
     border: 1px solid transparent;
-    padding: 6px var(--spacing-sm);
+    padding: 6px 10px;
     font-size: 13px;
     background-color: transparent;
-    color: var(--text-color);
+    color: var(--text-color, #e6e6e6);
     outline: none;
-    transition: border-color var(--transition-fast), background-color var(--transition-fast);
+    transition: all 0.2s;
+    border-radius: 4px;
+    box-sizing: border-box;
 }
 
 .params-table input[type="text"]:hover {
-    border-color: var(--border-color);
+    border-color: rgba(62, 62, 62, 0.8);
+    background-color: rgba(0, 0, 0, 0.1);
 }
 
 .params-table input[type="text"]:focus {
-    border-color: var(--primary-color);
-    background-color: var(--hover-bg);
+    border-color: var(--primary-color, #FF6C37);
+    background-color: rgba(0, 0, 0, 0.2);
+    box-shadow: 0 0 0 1px rgba(255, 108, 55, 0.3);
 }
 
+/* Delete button styling */
 .delete-row-btn {
     background: transparent;
     border: none;
-    color: var(--text-secondary);
+    color: var(--text-secondary, #a0a0a0);
     cursor: pointer;
     font-size: 16px;
     padding: 0;
@@ -238,31 +341,42 @@
     width: 24px;
     height: 24px;
     border-radius: 50%;
-    transition: background-color var(--transition-fast), color var(--transition-fast);
+    transition: all 0.2s;
 }
 
 .delete-row-btn:hover {
-    background-color: var(--hover-bg);
-    color: var(--danger-color);
+    background-color: rgba(255, 255, 255, 0.05);
+    color: var(--danger-color, #dc3545);
 }
 
-.add-row-btn {
-    background: transparent;
+/* Add container for the Add button to increase stability */
+.add-row-container {
+    padding: 12px 0;
+    display: block;
     border: none;
-    color: var(--primary-color);
+    margin-top: 0;
+}
+
+/* Updated add-row-btn styling with more stable properties */
+.add-row-btn {
+    background-color: transparent;
+    border: 1px solid transparent;
+    color: var(--primary-color, #FF6C37);
     cursor: pointer;
-    padding: var(--spacing-sm);
     font-size: 13px;
-    margin-top: var(--spacing-sm);
-    display: flex;
+    padding: 6px 12px;
+    border-radius: 4px;
+    height: 30px;
+    min-width: 70px;
+    font-weight: 500;
+    display: inline-flex;
     align-items: center;
-    gap: var(--spacing-xs);
-    transition: background-color var(--transition-fast);
-    border-radius: var(--radius-sm);
+    text-align: center;
+    user-select: none;
 }
 
 .add-row-btn:hover {
-    background-color: var(--hover-bg);
+    background-color: rgba(255, 108, 55, 0.1);
 }
 
 /* Body section */
@@ -270,135 +384,189 @@
     display: flex;
     flex-direction: column;
     height: 100%;
-    padding: var(--spacing-md);
+    padding: 16px;
 }
 
 .body-type-tabs {
     display: flex;
-    margin-bottom: var(--spacing-sm);
+    margin-bottom: 12px;
+    border-bottom: 1px solid var(--border-color, #3e3e3e);
 }
 
 .body-type-tab {
-    padding: var(--spacing-xs) var(--spacing-sm);
+    padding: 8px 12px;
     font-size: 13px;
-    color: var(--text-secondary);
+    color: var(--text-secondary, #a0a0a0);
     cursor: pointer;
     border-bottom: 2px solid transparent;
-    transition: color var(--transition-fast), border-color var(--transition-fast);
+    transition: all 0.2s;
+    margin-right: 6px;
+}
+
+.body-type-tab:hover {
+    color: var(--text-color, #e6e6e6);
 }
 
 .body-type-tab.active {
-    color: var(--primary-color);
-    border-bottom-color: var(--primary-color);
+    color: var(--primary-color, #FF6C37);
+    border-bottom-color: var(--primary-color, #FF6C37);
 }
 
 .body-editor {
     flex: 1;
     min-height: 200px;
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-sm);
-    padding: var(--spacing-sm);
+    border: 1px solid var(--border-color, #3e3e3e);
+    border-radius: 4px;
+    padding: 12px;
     font-family: 'Roboto Mono', monospace;
     font-size: 13px;
     line-height: 1.5;
     overflow: auto;
     resize: none;
     outline: none;
-    background-color: var(--card-bg);
-    color: var(--text-color);
-    transition: border-color var(--transition-fast);
+    background-color: rgba(0, 0, 0, 0.1);
+    color: var(--text-color, #e6e6e6);
+    transition: all 0.2s;
 }
 
 .body-editor:focus {
-    border-color: var(--primary-color);
+    border-color: var(--primary-color, #FF6C37);
+    box-shadow: 0 0 0 1px rgba(255, 108, 55, 0.3);
+}
+
+/* Empty body state */
+.empty-body {
+    padding: 30px;
+    text-align: center;
+    color: var(--text-secondary, #a0a0a0);
+    font-size: 14px;
+    border: 1px dashed var(--border-color, #3e3e3e);
+    border-radius: 4px;
+    margin: 10px 0;
 }
 
 /* Script section */
 .script-section {
-    padding: var(--spacing-md);
+    padding: 16px;
     height: 100%;
 }
 
 .script-editor {
     height: 250px;
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-sm);
-    padding: var(--spacing-sm);
+    border: 1px solid var(--border-color, #3e3e3e);
+    border-radius: 4px;
+    padding: 12px;
     font-family: 'Roboto Mono', monospace;
     font-size: 13px;
     line-height: 1.5;
     overflow: auto;
     resize: none;
     outline: none;
-    background-color: var(--card-bg);
-    color: var(--text-color);
-    transition: border-color var(--transition-fast);
+    background-color: rgba(0, 0, 0, 0.1);
+    color: var(--text-color, #e6e6e6);
+    transition: all 0.2s;
 }
 
 .script-editor:focus {
-    border-color: var(--primary-color);
+    border-color: var(--primary-color, #FF6C37);
+    box-shadow: 0 0 0 1px rgba(255, 108, 55, 0.3);
 }
 
-/* Headers section - identical structure to params */
+/* Headers section - consistent with params section */
 .headers-section {
-    padding: var(--spacing-md);
-    height: 100%;
+    padding: 16px;
+    padding-bottom: 4px;
+    height: auto;
     overflow: auto;
 }
 
-/* Tests section */
-.tests-section {
-    padding: var(--spacing-md);
-    height: 100%;
-    overflow: auto;
-}
-
-/* Form section common styles */
-.form-section {
+/* Form data editor */
+.form-data-editor {
     display: flex;
     flex-direction: column;
-    gap: var(--spacing-sm);
+    gap: 10px;
 }
 
-.form-section label {
-    display: block;
-    margin-bottom: 4px;
+/* Binary upload */
+.binary-upload {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 30px;
+    border: 2px dashed var(--border-color, #3e3e3e);
+    border-radius: 4px;
+    margin: 10px 0;
+}
+
+.binary-upload input[type="file"] {
+    padding: 10px;
+}
+
+/* Response section styling */
+.response-section {
+    border-top: 1px solid var(--border-color, #3e3e3e);
+    padding: 16px;
+    background-color: var(--card-bg, #1e1e1e);
+}
+
+.response-section h3 {
+    margin-top: 0;
+    margin-bottom: 16px;
+    color: var(--text-color, #e6e6e6);
+    font-size: 16px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.loading-indicator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 30px;
+    color: var(--text-secondary, #a0a0a0);
+    font-size: 14px;
+}
+
+.loading-indicator::after {
+    content: "";
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 2px solid var(--text-secondary, #a0a0a0);
+    border-top-color: var(--primary-color, #FF6C37);
+    margin-left: 10px;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.response-error {
+    padding: 16px;
+    margin: 10px 0;
+    background-color: rgba(220, 53, 69, 0.1);
+    color: var(--danger-color, #dc3545);
+    border-radius: 4px;
     font-size: 13px;
-    font-weight: var(--font-weight-medium);
-    color: var(--text-secondary);
-}
-
-.form-section input,
-.form-section select,
-.form-section textarea {
-    width: 100%;
-    padding: var(--spacing-sm);
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-sm);
-    font-size: 13px;
-    background-color: var(--card-bg);
-    color: var(--text-color);
-    transition: border-color var(--transition-fast);
-}
-
-.form-section input:focus,
-.form-section select:focus,
-.form-section textarea:focus {
-    border-color: var(--primary-color);
-    outline: none;
 }
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
     .request-url-bar {
         flex-wrap: wrap;
-        gap: var(--spacing-sm);
+        gap: 8px;
     }
 
     .url-input {
         order: 3;
         width: 100%;
-        margin-top: var(--spacing-sm);
+        margin-top: 8px;
     }
 
     .send-btn,

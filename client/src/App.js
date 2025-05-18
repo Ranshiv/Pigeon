@@ -8,6 +8,8 @@ import Workspace from './components/Workspace';
 import PublicHome from './components/PublicHome'; // Import the new PublicHome component
 import DocumentationOverview from './components/DocumentationOverview'; // Import the DocumentationOverview component
 import { CollaborationProvider } from './context/CollaborationContext'; // Import our new CollaborationProvider
+import { ToastContainer, toast } from 'react-toastify'; // Import React Toastify
+import 'react-toastify/dist/ReactToastify.css'; // Import Toastify CSS
 import './App.css';
 
 function App() {

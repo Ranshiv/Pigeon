@@ -4,6 +4,7 @@ import { Routes, Route, useNavigate, useParams, Navigate } from 'react-router-do
 import SpotlightSection from './SpotlightSection';
 import TrendingSection from './TrendingSection';
 import AIAgentToolsSection from './AIAgentToolsSection';
+import RequestWorkspace from './RequestWorkspace';
 import RequestForm from './RequestForm';
 import ResponseDisplay from './ResponseDisplay';
 import APINetworkExplore from './APINetworkExplore';
@@ -35,7 +36,7 @@ const APINetworkSection = () => {
             });
             const data = await res.json();
             setResponse(data);
-            navigate(`requests/${request._id}`);
+            // Removed navigation to stay on the same page
         } catch (err) {
             console.error('Error sending request:', err);
         }
@@ -102,6 +103,64 @@ const APINetworkSection = () => {
         }
     };
 
+    // Direct request send handler for the unified workspace
+    const handleDirectRequest = async (requestData) => {
+        setResponse(null); // Clear previous response
+
+        try {
+            // Construct headers object
+            const headers = {};
+            requestData.headers.forEach(h => {
+                if (h.enabled && h.key) {
+                    headers[h.key] = h.value;
+                }
+            });
+
+            // Prepare request body
+            let requestBody = null;
+            if (requestData.method !== 'GET' && requestData.method !== 'HEAD') {
+                if (requestData.bodyType === 'raw' && requestData.body) {
+                    requestBody = requestData.body;
+                }
+            }
+
+            console.log(`Sending proxy request to ${requestData.url}`);
+
+            // Use proxy endpoint instead of direct request
+            const response = await fetch('/api/proxy', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    url: requestData.url,
+                    method: requestData.method,
+                    headers,
+                    body: requestBody,
+                    timeout: 30000
+                }),
+                credentials: 'include'
+            });
+
+            if (!response.ok) {
+                throw new Error(`Server responded with status ${response.status}`);
+            }
+
+            const responseData = await response.json();
+
+            setResponse(responseData);
+        } catch (err) {
+            console.error('Error making direct request:', err);
+            setResponse({
+                status: 0,
+                statusText: 'Error',
+                headers: {},
+                body: err.message,
+                error: true
+            });
+        }
+    };
+
     return (
         <div className="api-network-section">
             <div className="api-network-main-content">
@@ -113,11 +172,11 @@ const APINetworkSection = () => {
                     <Route path="ai-agent-tools" element={<AIAgentToolsSection />} />
                     <Route
                         path="requests/new"
-                        element={<RequestForm onSubmit={handleRequestCreate} onCancel={() => navigate('explore')} />}
+                        element={<UnifiedRequestWorkspace onSendRequest={handleDirectRequest} response={response} />}
                     />
                     <Route
                         path="requests/edit/:id"
-                        element={<EditRequestForm requests={requests} onSubmit={handleRequestUpdate} />}
+                        element={<EditRequestWorkspace requests={requests} onSave={handleRequestUpdate} />}
                     />
                     <Route
                         path="requests/:id"
@@ -128,6 +187,48 @@ const APINetworkSection = () => {
         </div>
     );
 };
+
+// New component that integrates request form and response display on the same page
+const UnifiedRequestWorkspace = ({ onSendRequest, response }) => {
+    // Default request with GET method
+    const defaultRequest = {
+        name: 'New Request',
+        method: 'GET',
+        url: '',
+        params: [{ enabled: true, key: '', value: '', description: '' }],
+        headers: [],
+        bodyType: 'none',
+        body: '',
+        preRequestScript: '',
+        tests: '',
+        isNew: true
+    };
+
+    return (
+        <div className="unified-request-workspace">
+            <h2 className="request-workspace-title">New Request</h2>
+            <div className="request-response-container">
+                <div className="request-form-section">
+                    <RequestForm
+                        request={defaultRequest}
+                        onSendRequest={onSendRequest}
+                    />
+                </div>
+
+                <div className="response-section">
+                    <h3>Response</h3>
+                    {response ? (
+                        <ResponseDisplay responseData={response} />
+                    ) : (
+                        <div className="empty-response-message">
+                            <p>Send a request to see the response</p>
+                        </div>
+                    )}
+                </div>
+            </div>
+        </div>
+    );
+}
 
 const RequestDetails = ({ requests, response, onSend }) => {
     const { id } = useParams();
@@ -154,12 +255,12 @@ const RequestDetails = ({ requests, response, onSend }) => {
                 Send Request
             </button>
             <button className='edit-request-button' onClick={() => navigate(`../requests/edit/${request._id}`)}>Edit</button>
-            {response && <ResponseDisplay response={response} />}
+            {response && <ResponseDisplay responseData={response} />}
         </>
     );
 };
 
-const EditRequestForm = ({ requests, onSubmit }) => {
+const EditRequestWorkspace = ({ requests, onSave }) => {
     const { id } = useParams();
     const request = requests.find((r) => r._id === id);
     const navigate = useNavigate();
@@ -168,8 +269,13 @@ const EditRequestForm = ({ requests, onSubmit }) => {
         return <div>Request not found</div>;
     }
 
+    const handleSave = (savedRequest) => {
+        onSave(savedRequest);
+        navigate(`../requests/${id}`);
+    };
+
     return (
-        <RequestForm initialValues={request} onSubmit={onSubmit} onCancel={() => navigate(`../requests/${id}`)} />
+        <RequestWorkspace initialRequest={request} onSave={handleSave} />
     );
 };
 

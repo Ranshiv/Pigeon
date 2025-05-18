@@ -1,0 +1,57 @@
+/* client/src/components/RequestWorkspace.css */
+.request-workspace-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+}
+
+.response-container {
+    margin-top: 20px;
+    flex: 1;
+    overflow: auto;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-color);
+    background-color: var(--card-bg);
+}
+
+/* Media query for larger screens to display side by side */
+@media (min-width: 1200px) {
+    .request-workspace-container {
+        flex-direction: row;
+        gap: 20px;
+    }
+
+    .request-workspace {
+        /* width: 50%; */
+        height: 100%;
+    }
+
+    .response-container {
+        width: 50%;
+        height: 100%;
+        margin-top: 0;
+    }
+}
+
+/* Loading spinner */
+.loading-spinner {
+    border: 3px solid rgba(0, 0, 0, 0.1);
+    border-radius: 50%;
+    border-top: 3px solid var(--primary-color);
+    width: 24px;
+    height: 24px;
+    animation: spin 1s linear infinite;
+    margin-right: 10px;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}

@@ -351,9 +351,41 @@ app.post('/api/requests/:id/send', ensureAuthenticated, async (req, res) => { //
     const userEnv = userEnvironments[userId];
 
     try {
-        const requestDoc = await Request.findById(req.params.id);
+        // Check if the ID is a valid MongoDB ObjectId
+        const isValidObjectId = req.params.id.match(/^[0-9a-fA-F]{24}$/);
+        let requestDoc = null;
+
+        if (isValidObjectId) {
+            // Only try to find in the database if the ID is a valid MongoDB ObjectId
+            try {
+                requestDoc = await Request.findById(req.params.id);
+            } catch (err) {
+                console.log(`Error finding request by ID: ${err.message}, will use request data from body instead`);
+            }
+        }
+
+        // If not found in Request model or ID isn't a valid ObjectId, it must be a request from a collection
         if (!requestDoc) {
-            return res.status(404).json({ message: 'Request not found' });
+            console.log(`Request ${req.params.id} not found in Request model, checking request data in body...`);
+            // Use the request data from the body instead
+            const requestData = req.body;
+
+            if (!requestData || !requestData.url) {
+                return res.status(404).json({ message: 'Request not found and no valid request data provided in body' });
+            }
+
+            // Create a compatible request object from the provided data
+            requestDoc = {
+                _id: req.params.id,
+                url: requestData.url,
+                method: requestData.method || 'GET',
+                headers: requestData.headers || [],
+                body: requestData.body || '',
+                bodyType: requestData.bodyType || 'none',
+                preRequestScript: requestData.preRequestScript || '',
+                testScript: requestData.testScript || ''
+            };
+            console.log(`Using request data from body: ${requestDoc.method} ${requestDoc.url}`);
         }
 
         const { url, method, headers, body, bodyType, preRequestScript, testScript } = requestDoc;
@@ -522,7 +554,10 @@ app.post('/api/requests/:id/send', ensureAuthenticated, async (req, res) => { //
                 timestamp: new Date(startTime), // Use the start time
                 duration: duration,
                 size: responseSize,
-                originalRequestId: requestDoc._id, // Link to the saved request
+                originalRequestId: requestDoc._id, // This could be a string ID or ObjectId
+                // Add collection info if available
+                collectionId: req.body.collectionId || null,
+                collectionRequestId: req.body.requestId || requestDoc._id,
                 // Save test results if available
                 testResults: testResults.length > 0 ? JSON.stringify(testResults) : null
             });
@@ -1624,7 +1659,8 @@ app.post('/api/collections/:id/share', ensureAuthenticated, async (req, res) => 
         // Mock successful sharing
         res.json({
             message: 'Collection shared successfully',
-            collaboration: {
+            collaboration:
+            {
                 collectionId,
                 email,
                 role,
@@ -2111,6 +2147,7 @@ app.get('/api/workspaces/:id/activity', ensureAuthenticated, async (req, res) =>
 
         // Mock activity data based on workspace ID
         let activities = [];
+
 
         switch (workspaceId) {
             case "ws1":
@@ -3644,127 +3681,6 @@ app.post('/api/collections/diff', authenticateJWT, async (req, res) => {
         }
 
         // In a real implementation, this would calculate actual diffs between collections or branches
-        // For now, we'll return mock diff data
-        const diffData = {
-            summary: {
-                added: 3,
-                modified: 2,
-                deleted: 1
-            },
-            added: [
-                {
-                    path: '/requests/0',
-                    type: 'request',
-                    value: {
-                        name: 'New GET Request',
-                        url: 'https://api.example.com/v1/users',
-                        method: 'GET',
-                        headers: [
-                            { name: 'Content-Type', value: 'application/json' }
-                        ]
-                    }
-                },
-                {
-                    path: '/requests/1',
-                    type: 'request',
-                    value: {
-                        name: 'New POST Request',
-                        url: 'https://api.example.com/v1/users',
-                        method: 'POST',
-                        headers: [
-                            { name: 'Content-Type', value: 'application/json' }
-                        ],
-                        body: { type: 'json', content: '{"name": "John Doe", "email": "john@example.com"}' }
-                    }
-                },
-                {
-                    path: '/folders/0',
-                    type: 'folder',
-                    value: {
-                        name: 'New Authentication Folder'
-                    }
-                }
-            ],
-            modified: [
-                {
-                    path: '/requests/2',
-                    type: 'request',
-                    oldValue: {
-                        name: 'Old Request Name',
-                        url: 'https://api.example.com/v1/items',
-                        method: 'GET'
-                    },
-                    newValue: {
-                        name: 'Updated Request Name',
-                        url: 'https://api.example.com/v2/items',
-                        method: 'GET',
-                        headers: [
-                            { name: 'Authorization', value: 'Bearer {{token}}' }
-                        ]
-                    },
-                    changes: [
-                        {
-                            field: 'name',
-                            oldValue: 'Old Request Name',
-                            newValue: 'Updated Request Name'
-                        },
-                        {
-                            field: 'url',
-                            oldValue: 'https://api.example.com/v1/items',
-                            newValue: 'https://api.example.com/v2/items'
-                        },
-                        {
-                            field: 'headers',
-                            oldValue: [],
-                            newValue: [{ name: 'Authorization', value: 'Bearer {{token}}' }]
-                        }
-                    ]
-                },
-                {
-                    path: '/description',
-                    type: 'metadata',
-                    oldValue: 'Old collection description',
-                    newValue: 'Updated collection description with more details',
-                    changes: [
-                        {
-                            field: 'description',
-                            oldValue: 'Old collection description',
-                            newValue: 'Updated collection description with more details'
-                        }
-                    ]
-                }
-            ],
-            deleted: [
-                {
-                    path: '/requests/3',
-                    type: 'request',
-                    value: {
-                        name: 'Deleted Request',
-                        url: 'https://api.example.com/v1/deprecated',
-                        method: 'DELETE'
-                    }
-                }
-            ]
-        };
-
-        res.json(diffData);
-    } catch (err) {
-        console.error("Error generating diff:", err);
-        res.status(500).json({ message: 'Error generating diff' });
-    }
-});
-
-// Check for merge conflicts
-app.post('/api/collections/:id/check-conflicts', authenticateJWT, async (req, res) => {
-    try {
-        const sourceCollectionId = req.params.id;
-        const { targetCollectionId, sourceBranch, targetBranch } = req.body;
-
-        if (!targetCollectionId) {
-            return res.status(400).json({ message: 'Target collection ID is required' });
-        }
-
-        // In a real implementation, this would check for actual conflicts
         // For demonstration, we'll sometimes return conflicts and sometimes not
         // to show both flows
         const hasConflicts = Math.random() > 0.5;
@@ -4099,5 +4015,106 @@ app.post('/api/collections/:id/documentation/import/openapi', ensureAuthenticate
     } catch (err) {
         console.error("Error importing documentation:", err);
         res.status(500).json({ message: 'Error importing documentation' });
+    }
+});
+
+// Add a proxy endpoint to handle external requests and bypass CORS
+app.post('/api/proxy', ensureAuthenticated, async (req, res) => {
+    const { url, method = 'GET', headers = {}, body, timeout = 30000 } = req.body;
+
+    if (!url) {
+        return res.status(400).json({ error: 'URL is required' });
+    }
+
+    console.log(`[PROXY] Receiving proxy request for: ${method} ${url}`);
+    console.log(`[PROXY] Request headers:`, JSON.stringify(headers));
+
+    try {
+        const startTime = Date.now();
+
+        // Setup request options - use node-fetch options format
+        const fetchOptions = {
+            method,
+            headers: {
+                // Filter out problematic headers
+                ...Object.fromEntries(
+                    Object.entries(headers).filter(([key]) =>
+                        !['host', 'origin', 'referer'].includes(key.toLowerCase())
+                    )
+                ),
+                // Add user-agent to avoid being blocked
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+            }
+        };
+
+        // Add body for methods that support it
+        if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(method.toUpperCase()) && body) {
+            fetchOptions.body = body;
+        }
+
+        console.log(`[PROXY] Making ${method} request to ${url}`);
+
+        // Make the request - add explicit timeout handling
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), timeout);
+        fetchOptions.signal = controller.signal;
+
+        // Make the request
+        const response = await fetch(url, fetchOptions);
+        clearTimeout(timeoutId);
+
+        const duration = Date.now() - startTime;
+
+        // Get response details
+        const responseStatus = response.status;
+        const responseStatusText = response.statusText;
+
+        // Get headers
+        const responseHeaders = {};
+        response.headers.forEach((value, name) => {
+            responseHeaders[name] = value;
+        });
+
+        console.log(`[PROXY] Received response from ${url}: ${responseStatus} ${responseStatusText}`);
+
+        // Get response body based on content type
+        const contentType = responseHeaders['content-type'] || '';
+        let responseBody;
+        let isJson = false;
+
+        const responseText = await response.text();
+        const responseSize = Buffer.byteLength(responseText, 'utf8');
+
+        if (contentType.includes('application/json')) {
+            try {
+                responseBody = JSON.parse(responseText);
+                isJson = true;
+                console.log(`[PROXY] Response is JSON, size: ${responseSize} bytes`);
+            } catch (e) {
+                responseBody = responseText;
+                console.log(`[PROXY] Failed to parse JSON response: ${e.message}`);
+            }
+        } else {
+            responseBody = responseText;
+            console.log(`[PROXY] Response is text, content-type: ${contentType}, size: ${responseSize} bytes`);
+        }
+
+        // Return the proxied response
+        return res.json({
+            status: responseStatus,
+            statusText: responseStatusText,
+            headers: responseHeaders,
+            body: responseBody,
+            isJson,
+            duration,
+            size: responseSize
+        });
+    } catch (err) {
+        console.error('[PROXY] Error:', err);
+        return res.status(500).json({
+            error: `Failed to proxy request: ${err.message}`,
+            status: 500,
+            statusText: 'Proxy Error'
+        });
     }
 });

@@ -1,25 +1,35 @@
 import React, { useState, useEffect } from 'react';
 import './RequestForm.css';
+import ResponseDisplay from './ResponseDisplay';
 
 // HTTP Methods
 const HTTP_METHODS = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD', 'OPTIONS'];
 
-const RequestForm = ({ onSendRequest, initialRequest }) => {
+const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialRequest, request }) => {
+    // Use either initialRequest or request prop (for backward compatibility)
+    const initialData = request || initialRequest || {};
+
     // Form state
-    const [method, setMethod] = useState(initialRequest?.method || 'GET');
-    const [url, setUrl] = useState(initialRequest?.url || '');
-    const [requestName, setRequestName] = useState(initialRequest?.name || 'Get Users');
+    const [method, setMethod] = useState(initialData.method || 'GET');
+    const [url, setUrl] = useState(initialData.url || '');
+    const [requestName, setRequestName] = useState(initialData.name || 'Get Users');
     const [activeTab, setActiveTab] = useState('params');
+    const [isNew] = useState(initialData.isNew || false);
+
+    // Response state - new state for storing response
+    const [responseData, setResponseData] = useState(null);
+    const [isLoading, setIsLoading] = useState(false);
+    const [responseError, setResponseError] = useState(null);
 
     // Tab content states
-    const [params, setParams] = useState(initialRequest?.params || [
+    const [params, setParams] = useState(initialData.params || [
         { enabled: true, key: 'Key', value: 'Value', description: 'Description' }
     ]);
-    const [headers, setHeaders] = useState(initialRequest?.headers || []);
-    const [bodyType, setBodyType] = useState(initialRequest?.bodyType || 'none');
-    const [bodyContent, setBodyContent] = useState(initialRequest?.body || '');
-    const [preRequestScript, setPreRequestScript] = useState(initialRequest?.preRequestScript || '');
-    const [tests, setTests] = useState(initialRequest?.tests || '');
+    const [headers, setHeaders] = useState(initialData.headers || []);
+    const [bodyType, setBodyType] = useState(initialData.bodyType || 'none');
+    const [bodyContent, setBodyContent] = useState(initialData.body || '');
+    const [preRequestScript, setPreRequestScript] = useState(initialData.preRequestScript || '');
+    const [tests, setTests] = useState(initialData.tests || '');
 
     // Handlers for form inputs
     const handleMethodChange = (e) => setMethod(e.target.value);
@@ -63,12 +73,10 @@ const RequestForm = ({ onSendRequest, initialRequest }) => {
         setHeaders(newHeaders);
     };
 
-    // Form submission handler
-    const handleSubmit = (e) => {
-        e.preventDefault();
-
+    // Save button handler
+    const handleSave = () => {
         // Build request object
-        const request = {
+        const requestData = {
             name: requestName,
             method,
             url,
@@ -77,11 +85,178 @@ const RequestForm = ({ onSendRequest, initialRequest }) => {
             bodyType,
             body: bodyContent,
             preRequestScript,
-            tests
+            tests,
+            isNew
         };
 
-        // Send request
-        onSendRequest(request);
+        // Use onSave prop if available
+        if (onSave) {
+            onSave(requestData);
+        }
+    };
+
+    // Form submission handler
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        // Build request object
+        const requestData = {
+            name: requestName,
+            method,
+            url,
+            params: params.filter(p => p.enabled && p.key),
+            headers: headers.filter(h => h.enabled && h.key),
+            bodyType,
+            body: bodyContent,
+            preRequestScript,
+            tests,
+            isNew,
+            _id: initialData._id || initialData.id
+        };
+
+        // Check for external handlers first
+        if (onSendRequest) {
+            onSendRequest(requestData);
+            return;
+        } else if (onSubmit) {
+            onSubmit(requestData);
+            return;
+        } else if (onRunRequest) {
+            onRunRequest(requestData._id || initialData._id || initialData.id);
+            return;
+        }
+
+        // If no external handlers exist, process the request directly
+        setIsLoading(true);
+        setResponseData(null);
+        setResponseError(null);
+
+        try {
+            // Prepare the request headers
+            const headerObj = {};
+            requestData.headers.forEach(h => {
+                if (h.enabled && h.key) {
+                    headerObj[h.key] = h.value;
+                }
+            });
+
+            // Prepare request body
+            let requestBody = null;
+            if (requestData.method !== 'GET' && requestData.method !== 'HEAD' && bodyType !== 'none') {
+                if (bodyType === 'raw') {
+                    requestBody = bodyContent;
+                } else if (bodyType === 'form-data' || bodyType === 'x-www-form-urlencoded') {
+                    // Form data not implemented in this version
+                    requestBody = '';
+                }
+            }
+
+            const startTime = Date.now();
+
+            // Use proxy endpoint instead of direct request
+            const response = await fetch('/api/proxy', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    url: requestData.url,
+                    method: requestData.method,
+                    headers: headerObj,
+                    body: requestBody,
+                    timeout: 30000
+                }),
+                credentials: 'include'
+            });
+
+            if (!response.ok) {
+                throw new Error(`Server responded with status ${response.status}`);
+            }
+
+            const responseData = await response.json();
+            const endTime = Date.now();
+
+            // The proxy already provides all the information we need
+            setResponseData({
+                ...responseData,
+                duration: endTime - startTime
+            });
+        } catch (err) {
+            setResponseError(err.message || "An error occurred while sending the request");
+            console.error("Request error:", err);
+        } finally {
+            setIsLoading(false);
+        }
+
+        // Save request if onSave provided
+        if (onSave) {
+            onSave(requestData);
+        }
+    };
+
+    // Send a request directly from the form
+    const handleSendRequest = async (e) => {
+        e.preventDefault();
+        setIsLoading(true);
+        setResponseError(null);
+        setResponseData(null);
+
+        // Get all form values
+        const requestData = {
+            ...request,
+            method: method,
+            url: url,
+            headers: headers,
+            params: params,
+            body: bodyContent,
+            bodyType: bodyType,
+            preRequestScript: preRequestScript,
+            tests: tests
+        };
+
+        try {
+            // Set flag in sessionStorage to indicate request was sent
+            const requestId = request._id || request.id;
+            sessionStorage.setItem(`request_${requestId}_sent`, 'true');
+
+            // Call the onSendRequest handler from parent
+            const response = await onSendRequest(requestData);
+            setResponseData(response);
+
+            // If successful, update request locally
+            // setRequest(requestData); // Uncomment if you want to update the request in the parent component
+
+            // Scroll to the response section
+            document.querySelector('.response-area')?.scrollIntoView({ behavior: 'smooth' });
+        } catch (err) {
+            console.error(err);
+            setResponseError(err.message || 'Failed to send request. Please check your inputs and try again.');
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    // Helper function to estimate response size
+    const getResponseSize = (body, headers) => {
+        let size = 0;
+
+        // Add headers size
+        if (headers) {
+            Object.entries(headers).forEach(([key, value]) => {
+                size += key.length + String(value).length;
+            });
+        }
+
+        // Add body size
+        if (body) {
+            if (typeof body === 'string') {
+                size += body.length;
+            } else {
+                size += JSON.stringify(body).length;
+            }
+        }
+
+        return size;
     };
 
     // Update URL with query parameters
@@ -122,132 +297,140 @@ const RequestForm = ({ onSendRequest, initialRequest }) => {
             case 'params':
                 return (
                     <div className="params-section">
-                        <table className="params-table">
-                            <thead>
-                                <tr>
-                                    <th width="30"></th>
-                                    <th width="30%">Key</th>
-                                    <th width="30%">Value</th>
-                                    <th width="30%">Description</th>
-                                    <th width="40"></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {params.map((param, index) => (
-                                    <tr key={`param-${index}`}>
-                                        <td>
-                                            <input
-                                                type="checkbox"
-                                                checked={param.enabled}
-                                                onChange={(e) => handleParamChange(index, 'enabled', e.target.checked)}
-                                            />
-                                        </td>
-                                        <td>
-                                            <input
-                                                type="text"
-                                                value={param.key}
-                                                onChange={(e) => handleParamChange(index, 'key', e.target.value)}
-                                                placeholder="Key"
-                                            />
-                                        </td>
-                                        <td>
-                                            <input
-                                                type="text"
-                                                value={param.value}
-                                                onChange={(e) => handleParamChange(index, 'value', e.target.value)}
-                                                placeholder="Value"
-                                            />
-                                        </td>
-                                        <td>
-                                            <input
-                                                type="text"
-                                                value={param.description}
-                                                onChange={(e) => handleParamChange(index, 'description', e.target.value)}
-                                                placeholder="Description"
-                                            />
-                                        </td>
-                                        <td>
-                                            <button
-                                                className="delete-row-btn"
-                                                onClick={() => handleRemoveParam(index)}
-                                                aria-label="Delete parameter"
-                                            >
-                                                ×
-                                            </button>
-                                        </td>
+                        <div className="table-container">
+                            <table className="params-table">
+                                <thead>
+                                    <tr>
+                                        <th width="30"></th>
+                                        <th width="30%">Key</th>
+                                        <th width="30%">Value</th>
+                                        <th width="30%">Description</th>
+                                        <th width="40"></th>
                                     </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                        <button className="add-row-btn" onClick={handleAddParam}>
-                            + Add
-                        </button>
+                                </thead>
+                                <tbody>
+                                    {params.map((param, index) => (
+                                        <tr key={`param-${index}`}>
+                                            <td>
+                                                <input
+                                                    type="checkbox"
+                                                    checked={param.enabled}
+                                                    onChange={(e) => handleParamChange(index, 'enabled', e.target.checked)}
+                                                />
+                                            </td>
+                                            <td>
+                                                <input
+                                                    type="text"
+                                                    value={param.key}
+                                                    onChange={(e) => handleParamChange(index, 'key', e.target.value)}
+                                                    placeholder="Key"
+                                                />
+                                            </td>
+                                            <td>
+                                                <input
+                                                    type="text"
+                                                    value={param.value}
+                                                    onChange={(e) => handleParamChange(index, 'value', e.target.value)}
+                                                    placeholder="Value"
+                                                />
+                                            </td>
+                                            <td>
+                                                <input
+                                                    type="text"
+                                                    value={param.description}
+                                                    onChange={(e) => handleParamChange(index, 'description', e.target.value)}
+                                                    placeholder="Description"
+                                                />
+                                            </td>
+                                            <td>
+                                                <button
+                                                    className="delete-row-btn"
+                                                    onClick={() => handleRemoveParam(index)}
+                                                    aria-label="Delete parameter"
+                                                >
+                                                    ×
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                        <div className="add-row-container">
+                            <button type="button" className="add-row-btn" onClick={handleAddParam}>
+                                <span className="add-icon">+</span> Add
+                            </button>
+                        </div>
                     </div>
                 );
 
             case 'headers':
                 return (
                     <div className="headers-section">
-                        <table className="params-table">
-                            <thead>
-                                <tr>
-                                    <th width="30"></th>
-                                    <th width="30%">Key</th>
-                                    <th width="30%">Value</th>
-                                    <th width="30%">Description</th>
-                                    <th width="40"></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {headers.map((header, index) => (
-                                    <tr key={`header-${index}`}>
-                                        <td>
-                                            <input
-                                                type="checkbox"
-                                                checked={header.enabled}
-                                                onChange={(e) => handleHeaderChange(index, 'enabled', e.target.checked)}
-                                            />
-                                        </td>
-                                        <td>
-                                            <input
-                                                type="text"
-                                                value={header.key}
-                                                onChange={(e) => handleHeaderChange(index, 'key', e.target.value)}
-                                                placeholder="Key"
-                                            />
-                                        </td>
-                                        <td>
-                                            <input
-                                                type="text"
-                                                value={header.value}
-                                                onChange={(e) => handleHeaderChange(index, 'value', e.target.value)}
-                                                placeholder="Value"
-                                            />
-                                        </td>
-                                        <td>
-                                            <input
-                                                type="text"
-                                                value={header.description}
-                                                onChange={(e) => handleHeaderChange(index, 'description', e.target.value)}
-                                                placeholder="Description"
-                                            />
-                                        </td>
-                                        <td>
-                                            <button
-                                                className="delete-row-btn"
-                                                onClick={() => handleRemoveHeader(index)}
-                                                aria-label="Delete header"
-                                            >
-                                                ×
-                                            </button>
-                                        </td>
+                        <div className="table-container">
+                            <table className="params-table">
+                                <thead>
+                                    <tr>
+                                        <th width="30"></th>
+                                        <th width="30%">Key</th>
+                                        <th width="30%">Value</th>
+                                        <th width="30%">Description</th>
+                                        <th width="40"></th>
                                     </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                        <button className="add-row-btn" onClick={handleAddHeader}>
-                            + Add
-                        </button>
+                                </thead>
+                                <tbody>
+                                    {headers.map((header, index) => (
+                                        <tr key={`header-${index}`}>
+                                            <td>
+                                                <input
+                                                    type="checkbox"
+                                                    checked={header.enabled}
+                                                    onChange={(e) => handleHeaderChange(index, 'enabled', e.target.checked)}
+                                                />
+                                            </td>
+                                            <td>
+                                                <input
+                                                    type="text"
+                                                    value={header.key}
+                                                    onChange={(e) => handleHeaderChange(index, 'key', e.target.value)}
+                                                    placeholder="Key"
+                                                />
+                                            </td>
+                                            <td>
+                                                <input
+                                                    type="text"
+                                                    value={header.value}
+                                                    onChange={(e) => handleHeaderChange(index, 'value', e.target.value)}
+                                                    placeholder="Value"
+                                                />
+                                            </td>
+                                            <td>
+                                                <input
+                                                    type="text"
+                                                    value={header.description}
+                                                    onChange={(e) => handleHeaderChange(index, 'description', e.target.value)}
+                                                    placeholder="Description"
+                                                />
+                                            </td>
+                                            <td>
+                                                <button
+                                                    className="delete-row-btn"
+                                                    onClick={() => handleRemoveHeader(index)}
+                                                    aria-label="Delete header"
+                                                >
+                                                    ×
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                        <div className="add-row-container">
+                            <button type="button" className="add-row-btn" onClick={handleAddHeader}>
+                                <span className="add-icon">+</span> Add
+                            </button>
+                        </div>
                     </div>
                 );
 
@@ -305,36 +488,38 @@ const RequestForm = ({ onSendRequest, initialRequest }) => {
 
                         {(bodyType === 'form-data' || bodyType === 'x-www-form-urlencoded') && (
                             <div className="form-data-editor">
-                                <table className="params-table">
-                                    <thead>
-                                        <tr>
-                                            <th width="30"></th>
-                                            <th width="30%">Key</th>
-                                            <th width="30%">Value</th>
-                                            <th width="30%">Description</th>
-                                            <th width="40"></th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td>
-                                                <input type="checkbox" checked={true} />
-                                            </td>
-                                            <td>
-                                                <input type="text" placeholder="Key" />
-                                            </td>
-                                            <td>
-                                                <input type="text" placeholder="Value" />
-                                            </td>
-                                            <td>
-                                                <input type="text" placeholder="Description" />
-                                            </td>
-                                            <td>
-                                                <button className="delete-row-btn">×</button>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
+                                <div className="table-container">
+                                    <table className="params-table">
+                                        <thead>
+                                            <tr>
+                                                <th width="30"></th>
+                                                <th width="30%">Key</th>
+                                                <th width="30%">Value</th>
+                                                <th width="30%">Description</th>
+                                                <th width="40"></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>
+                                                    <input type="checkbox" checked={true} />
+                                                </td>
+                                                <td>
+                                                    <input type="text" placeholder="Key" />
+                                                </td>
+                                                <td>
+                                                    <input type="text" placeholder="Value" />
+                                                </td>
+                                                <td>
+                                                    <input type="text" placeholder="Description" />
+                                                </td>
+                                                <td>
+                                                    <button className="delete-row-btn">×</button>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
                                 <button className="add-row-btn">
                                     + Add
                                 </button>
@@ -383,16 +568,6 @@ const RequestForm = ({ onSendRequest, initialRequest }) => {
     return (
         <div className="request-workspace">
             <form onSubmit={handleSubmit}>
-                {/* Request name input */}
-                <div className="request-name-area">
-                    <input
-                        type="text"
-                        className="request-name-input"
-                        value={requestName}
-                        onChange={handleNameChange}
-                        placeholder="Request name"
-                    />
-                </div>
 
                 {/* URL bar */}
                 <div className="request-url-bar">
@@ -420,7 +595,7 @@ const RequestForm = ({ onSendRequest, initialRequest }) => {
                         Send
                     </button>
 
-                    <button type="button" className="save-btn">
+                    <button type="button" className="save-btn" onClick={handleSave}>
                         Save
                     </button>
                 </div>
@@ -459,11 +634,31 @@ const RequestForm = ({ onSendRequest, initialRequest }) => {
                     </div>
                 </div>
 
-                {/* Request section content */}
-                <div className="request-sections">
-                    {renderTabContent()}
-                </div>
+                {/* Tab content (direct, without extra container) */}
+                {renderTabContent()}
             </form>
+
+            {/* Only show this response section when there's data to display */}
+            {(responseData || isLoading || responseError) && (
+                <div className="response-section">
+                    <h3>Response</h3>
+
+                    {/* Loading indicator */}
+                    {isLoading && <div className="loading-indicator">Loading...</div>}
+
+                    {/* Response data display */}
+                    {!isLoading && responseData && (
+                        <ResponseDisplay responseData={responseData} />
+                    )}
+
+                    {/* Error message */}
+                    {!isLoading && responseError && (
+                        <div className="response-error">
+                            Error: {responseError}
+                        </div>
+                    )}
+                </div>
+            )}
         </div>
     );
 };

@@ -8,7 +8,11 @@ import ResponseDisplay from './ResponseDisplay';
 import SampleDataManager from './SampleDataManager';
 import DocumentationViewer from './DocumentationViewer';
 import { useCollaboration } from '../context/CollaborationContext';
-import { FiSave, FiSettings, FiPlay, FiAlertCircle, FiCheckCircle, FiBook, FiEdit } from 'react-icons/fi';
+import {
+  FiSave, FiSettings, FiPlay, FiAlertCircle, FiCheckCircle, FiBook, FiEdit,
+  FiPlus, FiTrash2, FiDatabase, FiClock, FiGlobe, FiLock, FiUsers, FiPackage
+} from 'react-icons/fi';
+import { toast } from 'react-toastify'; // Import toast notification library
 
 function CollectionDetail() {
   const { collectionId } = useParams();
@@ -27,6 +31,8 @@ function CollectionDetail() {
   const [activeTab, setActiveTab] = useState('requests');
   const [documentation, setDocumentation] = useState(null);
   const [isLoadingDocs, setIsLoadingDocs] = useState(false);
+  const [saveSuccess, setSaveSuccess] = useState(false);
+  const [responseData, setResponseData] = useState(null);
 
   // Get collaboration context features
   const {
@@ -57,7 +63,7 @@ function CollectionDetail() {
       setRequests(data.requests || []);
 
       // Select the first request by default if available
-      if (data.requests && data.requests.length > 0) {
+      if (data.requests && data.requests.length > 0 && !selectedRequest) {
         setSelectedRequest(data.requests[0]);
       }
 
@@ -67,7 +73,7 @@ function CollectionDetail() {
       setError('Failed to load collection. Please try again later.');
       setLoading(false);
     }
-  }, [collectionId]);
+  }, [collectionId, selectedRequest]);
 
   // Fetch documentation data when the documentation tab is selected
   const fetchDocumentation = useCallback(async () => {
@@ -193,8 +199,9 @@ function CollectionDetail() {
       // Reset pending changes flag
       setPendingChanges(false);
 
-      // Show success message
-      alert('Collection saved successfully');
+      // Show success indicator briefly
+      setSaveSuccess(true);
+      setTimeout(() => setSaveSuccess(false), 2000);
 
     } catch (err) {
       console.error('Error saving collection:', err);
@@ -321,8 +328,18 @@ function CollectionDetail() {
       isNew: true
     };
 
+    // First clear any existing response data to avoid showing old responses
+    setResponseData(null);
+
+    // Set the new request as selected and ensure the form is shown
     setSelectedRequest(newRequest);
     setShowRequestForm(true);
+
+    // Make sure we're on the requests tab
+    setActiveTab('requests');
+
+    // Log for debugging
+    console.log('New request created:', newRequest);
   };
 
   // Handle saving a request
@@ -441,6 +458,71 @@ function CollectionDetail() {
     });
   };
 
+  // Send a request and get the response
+  const handleSendRequest = async (request) => {
+    try {
+      // For client-side testing, create a fallback ID if _id is missing
+      const requestId = request._id || request.id;
+
+      // Set a flag to indicate that a request has been sent
+      sessionStorage.setItem(`request_${requestId}_sent`, 'true');
+
+      const response = await fetch(`/api/requests/${requestId}/send`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        credentials: 'include',
+        // Include ALL request data in body, not just minimal information
+        body: JSON.stringify({
+          method: request.method,
+          url: request.url,
+          headers: request.headers || [],
+          params: request.params || [],
+          body: request.body || '',
+          bodyType: request.bodyType || 'none',
+          preRequestScript: request.preRequestScript || '',
+          testScript: request.testScript || '',
+          collectionId: collection._id
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`Request failed with status ${response.status}`);
+      }
+
+      const responseData = await response.json();
+
+      // Process response data to ensure all required fields are present
+      const processedResponseData = {
+        ...responseData,
+        status: responseData.status || response.status,
+        statusText: responseData.statusText || response.statusText,
+        headers: responseData.headers || {},
+        body: responseData.body || null,
+        size: responseData.size || (responseData.body ? JSON.stringify(responseData.body).length : 0),
+        duration: responseData.duration || 0,
+        testResults: responseData.testResults || []
+      };
+
+      // Save the processed response data to state
+      setResponseData(processedResponseData);
+
+      // Send activity notification about the request being sent
+      sendActivity('request_sent', {
+        requestId: requestId,
+        requestName: request.name,
+        collectionName: collection.name
+      });
+
+      return processedResponseData;
+    } catch (err) {
+      console.error('Failed to send request:', err);
+      toast.error(`Failed to send request: ${err.message}`);
+      throw err;
+    }
+  };
+
   // Collection settings modal
   const renderSettingsModal = () => {
     if (!showSettings) return null;
@@ -448,7 +530,7 @@ function CollectionDetail() {
     return (
       <div className="modal-overlay">
         <div className="settings-modal">
-          <h3>Collection Settings</h3>
+          <h3><FiSettings className="modal-icon" /> Collection Settings</h3>
 
           <form onSubmit={(e) => {
             e.preventDefault();
@@ -468,6 +550,7 @@ function CollectionDetail() {
                 name="name"
                 defaultValue={collection.name}
                 required
+                placeholder="Enter collection name"
               />
             </div>
 
@@ -478,6 +561,7 @@ function CollectionDetail() {
                 name="description"
                 defaultValue={collection.description || ''}
                 rows="4"
+                placeholder="Describe your collection"
               />
             </div>
 
@@ -559,29 +643,44 @@ function CollectionDetail() {
   if (error) {
     return (
       <div className="collection-error">
-        <h3>Error</h3>
+        <h3><FiAlertCircle className="error-icon" /> Error</h3>
         <p>{error}</p>
         <button onClick={() => navigate('/collections')}>Go Back to Collections</button>
       </div>
     );
   }
 
+  const activeUsers = getActiveUsers(collectionId);
+
   return (
     <div className="collection-detail">
       <div className="collection-header">
         <div className="collection-title">
+          <div className="title-icon">
+            <FiPackage />
+          </div>
           <h2>{collection?.name || 'Unnamed Collection'}</h2>
+          <div className="collection-visibility">
+            {collection?.isPublic ?
+              <span className="visibility-badge public"><FiGlobe /> Public</span> :
+              <span className="visibility-badge private"><FiLock /> Private</span>
+            }
+          </div>
           <div className="collaboration-wrapper">
             <ActiveCollaborators collectionId={collectionId} />
           </div>
         </div>
         <div className="collection-actions">
+          {pendingChanges && (
+            <div className="pending-changes-indicator">Unsaved changes</div>
+          )}
           <button
-            className={`action-btn ${isSaving ? 'disabled' : ''} ${pendingChanges ? 'highlight' : ''}`}
+            className={`action-btn ${isSaving ? 'disabled' : ''} ${pendingChanges ? 'highlight' : ''} ${saveSuccess ? 'success' : ''}`}
             onClick={saveCollection}
-            disabled={isSaving}
+            disabled={isSaving || !pendingChanges}
           >
-            <FiSave className="icon" /> {isSaving ? 'Saving...' : 'Save'}
+            {saveSuccess ? <FiCheckCircle className="icon" /> : <FiSave className="icon" />}
+            {isSaving ? 'Saving...' : saveSuccess ? 'Saved!' : 'Save'}
           </button>
           <button
             className={`action-btn ${isRunningAll ? 'disabled' : ''}`}
@@ -598,10 +697,13 @@ function CollectionDetail() {
 
       <div className="collection-content">
         <div className="collection-sidebar">
-          <h3>Requests</h3>
+          <h3 data-count={requests.length}>Requests</h3>
           <div className="requests-list">
             {requests.length === 0 ? (
-              <div className="no-requests">No requests found</div>
+              <div className="no-requests">
+                <FiPackage className="no-content-icon" />
+                <p>No requests found</p>
+              </div>
             ) : (
               <ul>
                 {requests.map(request => (
@@ -620,8 +722,9 @@ function CollectionDetail() {
                         e.stopPropagation();
                         handleDeleteRequest(request._id || request.id);
                       }}
+                      title="Delete request"
                     >
-                      <i className="fas fa-trash"></i>
+                      <FiTrash2 />
                     </button>
                   </li>
                 ))}
@@ -630,7 +733,7 @@ function CollectionDetail() {
           </div>
           <div className="add-request">
             <button className="add-request-btn" onClick={handleAddRequest}>
-              <i className="fas fa-plus"></i> Add Request
+              <FiPlus className="icon" /> Add Request
             </button>
           </div>
         </div>
@@ -641,7 +744,7 @@ function CollectionDetail() {
               className={`tab-btn ${activeTab === 'requests' ? 'active' : ''}`}
               onClick={() => setActiveTab('requests')}
             >
-              Requests
+              <FiPackage /> Requests
             </button>
             <button
               className={`tab-btn ${activeTab === 'documentation' ? 'active' : ''}`}
@@ -653,7 +756,7 @@ function CollectionDetail() {
               className={`tab-btn ${activeTab === 'sampleData' ? 'active' : ''}`}
               onClick={() => setActiveTab('sampleData')}
             >
-              Sample Data
+              <FiDatabase /> Sample Data
             </button>
           </div>
 
@@ -667,29 +770,33 @@ function CollectionDetail() {
                   </div>
                   <div className="collection-meta">
                     <div className="meta-item">
-                      <strong>Created by:</strong> {collection?.owner ? collection.owner : 'Unknown'}
+                      <strong>Created by</strong> {collection?.owner ? collection.owner : 'Unknown'}
                     </div>
                     <div className="meta-item">
-                      <strong>Created on:</strong> {collection?.createdAt ? new Date(collection.createdAt).toLocaleDateString() : 'Unknown'}
+                      <strong>Created on</strong> {collection?.createdAt ? new Date(collection.createdAt).toLocaleDateString() : 'Unknown'}
                     </div>
                     <div className="meta-item">
-                      <strong>Last modified:</strong> {collection?.updatedAt ? new Date(collection.updatedAt).toLocaleDateString() : 'Unknown'}
+                      <strong>Last modified</strong> {collection?.updatedAt ? new Date(collection.updatedAt).toLocaleDateString() : 'Unknown'}
                     </div>
                     <div className="meta-item">
-                      <strong>Requests:</strong> {requests.length}
+                      <strong>Requests</strong> {requests.length}
                     </div>
                     <div className="meta-item">
-                      <strong>Visibility:</strong> {collection?.isPublic ? 'Public' : 'Private'}
+                      <strong>Visibility</strong> {collection?.isPublic ? 'Public' : 'Private'}
                     </div>
                     <div className="meta-item">
-                      <strong>Active Collaborators:</strong> <div className="collaborator-count">{getActiveUsers(collectionId).length}</div>
+                      <strong>Active Collaborators</strong> <div className="collaborator-count">{activeUsers.length}</div>
                     </div>
                   </div>
 
                   <div className="real-time-info">
-                    <h4>Real-time Collaboration</h4>
+                    <h4><FiUsers className="info-icon" /> Real-time Collaboration</h4>
                     <p>This collection supports real-time collaboration. You can work together with your team members simultaneously.</p>
-                    <button className="primary-button" onClick={handleAddRequest}>Create Your First Request</button>
+                    {requests.length === 0 && (
+                      <button className="primary-button" onClick={handleAddRequest}>
+                        <FiPlus className="icon" /> Create Your First Request
+                      </button>
+                    )}
                   </div>
                 </div>
               ) : (
@@ -698,6 +805,7 @@ function CollectionDetail() {
                     <RequestForm
                       request={selectedRequest}
                       onSave={handleSaveRequest}
+                      onSendRequest={handleSendRequest}
                       onRunRequest={(requestId) => {
                         sendActivity('request_sent', {
                           requestId,
@@ -706,7 +814,11 @@ function CollectionDetail() {
                         });
                       }}
                     />
-                    <ResponseDisplay requestId={selectedRequest._id || selectedRequest.id} />
+                    {/* Pass responseData to ResponseDisplay */}
+                    <ResponseDisplay
+                      requestId={selectedRequest._id || selectedRequest.id}
+                      responseData={responseData}
+                    />
                   </div>
                 )
               )}

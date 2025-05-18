@@ -4,28 +4,38 @@ import './ResponseDisplay.css';
 import TestResultsDisplay from './TestResultsDisplay';
 import { FiCheckCircle, FiAlertCircle, FiClock, FiFileText, FiCode } from 'react-icons/fi';
 
-const ResponseDisplay = ({ requestId }) => {
-    const [response, setResponse] = useState(null);
+const ResponseDisplay = ({ requestId, responseData }) => {
+    const [response, setResponse] = useState(responseData || null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [activeTab, setActiveTab] = useState('body');
 
-    // Fetch response data when requestId changes
+    // If direct response data is passed, use it
     useEffect(() => {
-        if (requestId) {
+        if (responseData) {
+            setResponse(responseData);
+            setLoading(false);
+            setError(null);
+        }
+    }, [responseData]);
+
+    // Only fetch response data when requestId changes, a response is expected, 
+    // and no direct response data is provided
+    useEffect(() => {
+        if (requestId && !responseData && sessionStorage.getItem(`request_${requestId}_sent`) === 'true') {
             fetchResponse(requestId);
-        } else {
-            // Clear response if no requestId
+        } else if (!requestId && !responseData) {
+            // Clear response if no requestId and no direct response
             setResponse(null);
         }
-    }, [requestId]);
+    }, [requestId, responseData]);
 
     const fetchResponse = async (id) => {
         setLoading(true);
         setError(null);
 
         try {
-            const response = await fetch(`http://localhost:5001/api/requests/${id}/response`, {
+            const response = await fetch(`/api/requests/${id}/response`, {
                 credentials: 'include'
             });
 
@@ -35,9 +45,13 @@ const ResponseDisplay = ({ requestId }) => {
 
             const data = await response.json();
             setResponse(data);
+            // Clear the flag after successful fetch
+            sessionStorage.removeItem(`request_${id}_sent`);
         } catch (err) {
             console.error('Error fetching response:', err);
             setError(err.message || 'Failed to load response data');
+            // Clear the flag after error
+            sessionStorage.removeItem(`request_${id}_sent`);
         } finally {
             setLoading(false);
         }
@@ -54,7 +68,7 @@ const ResponseDisplay = ({ requestId }) => {
         return parseFloat((bytes / Math.pow(k, safeIndex)).toFixed(dm)) + ' ' + sizes[safeIndex];
     };
 
-    // Renders the response body
+    // Renders the response body with proper formatting and syntax highlighting
     const renderBody = () => {
         if (!response || !response.body) {
             return <div className="empty-body">No response body available</div>;
@@ -71,7 +85,13 @@ const ResponseDisplay = ({ requestId }) => {
                 // Format JSON
                 language = 'json';
                 if (typeof response.body === 'string') {
-                    formattedBody = JSON.stringify(JSON.parse(response.body), null, 2);
+                    try {
+                        const parsedJson = JSON.parse(response.body);
+                        formattedBody = JSON.stringify(parsedJson, null, 2);
+                    } catch (e) {
+                        formattedBody = response.body;
+                        console.warn('Failed to parse JSON response body', e);
+                    }
                 } else {
                     formattedBody = JSON.stringify(response.body, null, 2);
                 }
@@ -89,35 +109,39 @@ const ResponseDisplay = ({ requestId }) => {
         }
 
         return (
-            <pre className={`response-body-content language-${language}`}>
-                {formattedBody}
-            </pre>
+            <div className="body-content-container">
+                <pre className={`response-body-content language-${language}`}>
+                    {formattedBody}
+                </pre>
+            </div>
         );
     };
 
-    // Renders the response headers
+    // Renders the response headers in a clear, organized table
     const renderHeaders = () => {
         if (!response || !response.headers || Object.keys(response.headers).length === 0) {
             return <div className="empty-headers">No headers received</div>;
         }
 
         return (
-            <table className="response-headers-table">
-                <thead>
-                    <tr>
-                        <th>Key</th>
-                        <th>Value</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {Object.entries(response.headers).map(([key, value], index) => (
-                        <tr key={index}>
-                            <td>{key}</td>
-                            <td>{value}</td>
+            <div className="headers-content-container">
+                <table className="response-headers-table">
+                    <thead>
+                        <tr>
+                            <th>Header</th>
+                            <th>Value</th>
                         </tr>
-                    ))}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        {Object.entries(response.headers).map(([key, value], index) => (
+                            <tr key={index}>
+                                <td>{key}</td>
+                                <td>{String(value)}</td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
         );
     };
 

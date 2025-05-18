@@ -102,6 +102,9 @@ body {
   position: relative;
   z-index: 1;
   transition: background-color var(--transition-speed) ease;
+  width: 100%;
+  max-width: none;
+  /* Ensure no max width constraint */
 }
 
 /* Remove the .container class that was constraining the layout */
@@ -110,6 +113,8 @@ body {
 .App>.Routes {
   padding: var(--content-padding);
   width: 100%;
+  max-width: none;
+  /* Ensure no max width constraint */
   box-sizing: border-box;
 }
 
