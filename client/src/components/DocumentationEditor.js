@@ -471,20 +471,7 @@ const DocumentationEditor = ({ documentation, collection, onSave, isSaving }) =>
                 </div>
 
                 <div className="editor-content">
-                    {isPreview ? (
-                        <div
-                            className="documentation-preview"
-                            dangerouslySetInnerHTML={{ __html: convertMarkdownToHtml(content) }}
-                        />
-                    ) : (
-                        <textarea
-                            id="documentation-textarea"
-                            className="documentation-textarea"
-                            value={content}
-                            onChange={(e) => setContent(e.target.value)}
-                            placeholder="Write your documentation here using Markdown..."
-                        />
-                    )}
+                    <textarea value={content} onChange={(e) => setContent(e.target.value)} placeholder="Write your documentation here..."></textarea>
                 </div>
             </div>
 

@@ -9,6 +9,7 @@ const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const http = require('http');
 const path = require('path');
 const mongoose = require('mongoose');
+const axios = require('axios'); // Add axios import for proxy functionality
 const { initializeConnections } = require('./config/db');
 const User = require('./models/User');
 const { initializeSocketServer } = require('./utils/socket/socket-server');
@@ -387,6 +388,129 @@ app.delete('/api/cli-test/items/:id', (req, res) => {
 
     // Successful deletion - no content
     res.status(204).send();
+});
+
+// --- Add the proxy endpoint for making external API requests ---
+app.post('/api/proxy', async (req, res) => {
+    try {
+        const { url, method, headers, body, timeout } = req.body;
+
+        if (!url) {
+            return res.status(400).json({
+                error: true,
+                message: 'URL is required'
+            });
+        }
+
+        console.log(`Proxy request: ${method || 'GET'} ${url}`);
+
+        // Prepare headers with default User-Agent if not provided
+        const requestHeaders = { ...headers } || {};
+        if (!requestHeaders['User-Agent'] && !requestHeaders['user-agent']) {
+            requestHeaders['User-Agent'] = 'Pigeon API Client/1.0';
+        }
+
+        // Make the request with enhanced options
+        const response = await axios({
+            url,
+            method: method || 'GET',
+            headers: requestHeaders,
+            data: body || null,
+            timeout: timeout || 30000,
+            maxRedirects: 5,
+            validateStatus: () => true, // Don't throw errors on non-2xx responses
+            decompress: true, // Handle gzipped responses
+            responseType: 'json' // Default to JSON response
+        });
+
+        // Handle 403 Forbidden specifically
+        if (response.status === 403) {
+            console.log('Received 403 Forbidden response:', url);
+
+            // Provide helpful error information
+            let errorTips = [
+                "The API might require authentication",
+                "Check if an API key is required in headers or query parameters",
+                "Some APIs restrict access based on IP address or origin",
+                "The API might have rate limiting in place"
+            ];
+
+            // Check response for specific error messages
+            let errorDetails = '';
+            if (response.data) {
+                if (typeof response.data === 'string') {
+                    errorDetails = response.data;
+                } else if (typeof response.data === 'object') {
+                    errorDetails = JSON.stringify(response.data);
+                }
+            }
+
+            return res.json({
+                status: 403,
+                statusText: 'Forbidden',
+                error: true,
+                headers: response.headers,
+                body: response.data,
+                size: response.data ? JSON.stringify(response.data).length : 0,
+                errorTips: errorTips,
+                errorDetails: errorDetails
+            });
+        }
+
+        // Return a standardized response format for all other responses
+        res.json({
+            status: response.status,
+            statusText: response.statusText,
+            headers: response.headers,
+            body: response.data,
+            size: response.data ? JSON.stringify(response.data).length : 0
+        });
+
+    } catch (err) {
+        console.error('Proxy error:', err.message);
+
+        // Determine error type for better error messages
+        let errorMessage = err.message;
+        let errorTips = [];
+
+        if (err.code === 'ENOTFOUND') {
+            errorMessage = `Domain not found: ${err.hostname}`;
+            errorTips = [
+                "Check if the API URL is correct",
+                "Verify your internet connection",
+                "The API server might be down"
+            ];
+        } else if (err.code === 'ECONNREFUSED') {
+            errorMessage = `Connection refused to ${err.address}:${err.port}`;
+            errorTips = [
+                "The API server might be down or not accepting connections",
+                "Check if you're using the correct port"
+            ];
+        } else if (err.code === 'ETIMEDOUT') {
+            errorMessage = `Connection timed out to ${err.address}`;
+            errorTips = [
+                "The API server might be slow or overloaded",
+                "Try increasing the timeout value"
+            ];
+        } else if (err.response && err.response.status === 403) {
+            errorMessage = `Forbidden: Access to ${err.response.config.url} was denied`;
+            errorTips = [
+                "The API might require authentication",
+                "Check if an API key is required",
+                "Some APIs restrict access based on IP address or origin"
+            ];
+        }
+
+        res.status(err.response?.status || 500).json({
+            error: true,
+            status: err.response?.status || 0,
+            statusText: err.response?.statusText || 'Error',
+            message: errorMessage,
+            errorTips: errorTips,
+            headers: err.response?.headers || {},
+            body: err.response?.data || `Request failed: ${errorMessage}`
+        });
+    }
 });
 
 // --- STARTUP ---

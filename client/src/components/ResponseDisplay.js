@@ -1,5 +1,5 @@
 // client/src/components/ResponseDisplay.js
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './ResponseDisplay.css';
 import TestResultsDisplay from './TestResultsDisplay';
 import { FiCheckCircle, FiAlertCircle, FiClock, FiFileText, FiCode } from 'react-icons/fi';
@@ -9,6 +9,11 @@ const ResponseDisplay = ({ requestId, responseData }) => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [activeTab, setActiveTab] = useState('body');
+    const [htmlLoading, setHtmlLoading] = useState(false); // Add state for HTML loading
+    const [contentType, setContentType] = useState(null);
+
+    // Store previous response to detect changes
+    const prevResponseRef = useRef(null);
 
     // If direct response data is passed, use it
     useEffect(() => {
@@ -16,8 +21,36 @@ const ResponseDisplay = ({ requestId, responseData }) => {
             setResponse(responseData);
             setLoading(false);
             setError(null);
+
+            // Store content type
+            if (responseData.headers && responseData.headers['content-type']) {
+                setContentType(responseData.headers['content-type']);
+            }
         }
     }, [responseData]);
+
+    // Handle HTML content loading state
+    useEffect(() => {
+        // Only trigger HTML loading if we have a new HTML/XML response
+        if (response &&
+            response !== prevResponseRef.current &&
+            contentType &&
+            (contentType.includes('text/html') || contentType.includes('application/xml'))) {
+
+            setHtmlLoading(true);
+
+            // Use setTimeout to simulate async loading and give UI time to update
+            const timer = setTimeout(() => {
+                setHtmlLoading(false);
+            }, 500);
+
+            // Store current response as previous
+            prevResponseRef.current = response;
+
+            // Clear timeout on cleanup
+            return () => clearTimeout(timer);
+        }
+    }, [response, contentType]);
 
     // Only fetch response data when requestId changes, a response is expected, 
     // and no direct response data is provided
@@ -96,7 +129,7 @@ const ResponseDisplay = ({ requestId, responseData }) => {
                     formattedBody = JSON.stringify(response.body, null, 2);
                 }
             } else if (contentType && (contentType.includes('text/html') || contentType.includes('application/xml'))) {
-                // Format HTML/XML
+                // Format HTML/XML without state changes in the render function
                 language = contentType.includes('text/html') ? 'html' : 'xml';
                 formattedBody = typeof response.body === 'string' ? response.body : String(response.body);
             } else {
@@ -106,6 +139,16 @@ const ResponseDisplay = ({ requestId, responseData }) => {
         } catch (err) {
             console.warn('Error formatting response body:', err);
             formattedBody = String(response.body);
+        }
+
+        // Show loading indicator when fetching HTML content
+        if (htmlLoading && (contentType && (contentType.includes('text/html') || contentType.includes('application/xml')))) {
+            return (
+                <div className="html-loading-container">
+                    <div className="loading-spinner"></div>
+                    <span>Loading HTML content...</span>
+                </div>
+            );
         }
 
         return (

@@ -40,10 +40,13 @@ const DocumentationViewer = ({ documentation, collection }) => {
     return (
         <div className="documentation-viewer">
             <div className="documentation-header">
-                <h2>{documentation.title || `${collection.name} Documentation`}</h2>
+                <h2>{collection.name} Documentation</h2>
                 <div className="documentation-actions">
                     <div className="last-updated">
                         <FiClock className="icon" /> Last updated: {lastUpdated}
+                    </div>
+                    <div className="collection-name">
+                        <FiFileText className="icon" /> Collection: {collection.name}
                     </div>
                     <Link
                         to={`/workspace/collections/${collection._id}/documentation`}
@@ -61,66 +64,7 @@ const DocumentationViewer = ({ documentation, collection }) => {
                             <FiExternalLink className="icon" /> View Public Version
                         </a>
                     )}
-                    <button
-                        onClick={() => setShowSwagger(!showSwagger)}
-                        className={`swagger-preview-btn ${showSwagger ? 'active' : ''}`}
-                    >
-                        <FiFileText className="icon" /> {showSwagger ? 'Hide Swagger' : 'Preview Swagger'}
-                    </button>
                 </div>
-            </div>
-            <div className="documentation-content">
-                {showSwagger ? (
-                    <div className="swagger-preview">
-                        <h3>Swagger Documentation Preview</h3>
-                        <div className="swagger-container">
-                            <pre>{JSON.stringify(documentation, null, 2)}</pre>
-                        </div>
-                    </div>
-                ) : viewerReady ? (
-                    <div className="markdown-content">
-                        <ReactMarkdown
-                            remarkPlugins={[remarkGfm]}
-                            children={documentation.content}
-                            components={{
-                                // Use custom renderers for certain elements
-                                code({ node, inline, className, children, ...props }) {
-                                    const match = /language-(\w+)/.exec(className || '');
-                                    return !inline && match ? (
-                                        <div className="code-block">
-                                            <div className="code-header">
-                                                <span className="code-language">{match[1]}</span>
-                                            </div>
-                                            <pre className={`language-${match[1]}`}>
-                                                <code className={className} {...props}>
-                                                    {children}
-                                                </code>
-                                            </pre>
-                                        </div>
-                                    ) : (
-                                        <code className={className} {...props}>
-                                            {children}
-                                        </code>
-                                    );
-                                },
-                                table({ node, className, children, ...props }) {
-                                    return (
-                                        <div className="table-container">
-                                            <table className={className} {...props}>
-                                                {children}
-                                            </table>
-                                        </div>
-                                    );
-                                }
-                            }}
-                        />
-                    </div>
-                ) : (
-                    <div className="documentation-loading">
-                        <div className="spinner"></div>
-                        <p>Loading documentation viewer...</p>
-                    </div>
-                )}
             </div>
         </div>
     );

@@ -302,3 +302,30 @@
         overflow-x: auto;
     }
 }
+
+/* HTML loading container */
+.html-loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--spacing-xl);
+    height: 200px;
+    width: 100%;
+    color: var(--text-secondary, #a0a0a0);
+}
+
+.html-loading-container .loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid var(--border-color);
+    border-top-color: var(--primary-color, #FF6C37);
+    border-radius: 50%;
+    margin-bottom: var(--spacing-md);
+    animation: spin 1s linear infinite;
+}
+
+.html-loading-container span {
+    font-size: var(--font-size-base);
+    margin-top: 12px;
+}
