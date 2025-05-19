@@ -1,6 +1,6 @@
 // client/src/components/DocumentationEditor.js
 import React, { useState, useEffect } from 'react';
-import { FiSave, FiCode, FiLink, FiImage, FiTable } from 'react-icons/fi';
+import { FiSave, FiCode, FiLink, FiImage, FiTable, FiX } from 'react-icons/fi';
 import './DocumentationEditor.css';
 
 const DocumentationEditor = ({ documentation, collection, onSave, isSaving }) => {
@@ -8,6 +8,17 @@ const DocumentationEditor = ({ documentation, collection, onSave, isSaving }) =>
     const [title, setTitle] = useState('');
     const [isPreview, setIsPreview] = useState(false);
     const [endpoints, setEndpoints] = useState([]);
+
+    // Add state for image modal
+    const [showImageModal, setShowImageModal] = useState(false);
+    const [imageAlt, setImageAlt] = useState('');
+    const [imageUrl, setImageUrl] = useState('');
+    const [imageWidth, setImageWidth] = useState('');
+    const [imageHeight, setImageHeight] = useState('');
+    const [imageAlign, setImageAlign] = useState('none');
+    const [imageBorderRadius, setImageBorderRadius] = useState('0');
+    const [imageSelectionStart, setImageSelectionStart] = useState(0);
+    const [imageSelectionEnd, setImageSelectionEnd] = useState(0);
 
     // Initialize editor with existing documentation or template
     useEffect(() => {
@@ -74,8 +85,71 @@ const DocumentationEditor = ({ documentation, collection, onSave, isSaving }) =>
         onSave(docData);
     };
 
+    // Enhanced function to handle image insertion
+    const handleImageButtonClick = () => {
+        const textarea = document.getElementById('documentation-textarea');
+        if (!textarea) return;
+
+        const start = textarea.selectionStart;
+        const end = textarea.selectionEnd;
+        const selectedText = content.substring(start, end);
+
+        // Save current cursor position for later insertion
+        setImageSelectionStart(start);
+        setImageSelectionEnd(end);
+        setImageAlt(selectedText || 'image description');
+        setImageUrl('');
+        setImageWidth('');
+        setImageHeight('');
+        setImageAlign('none');
+        setImageBorderRadius('0');
+        setShowImageModal(true);
+    };
+
+    // Insert image with attributes
+    const insertCustomImage = () => {
+        const textarea = document.getElementById('documentation-textarea');
+        if (!textarea) return;
+
+        const before = content.substring(0, imageSelectionStart);
+        const after = content.substring(imageSelectionEnd);
+
+        // Build image markdown with custom attributes
+        let imageMarkdown = `![${imageAlt}](${imageUrl}`;
+
+        // Add custom attributes if provided
+        const attributes = [];
+        if (imageWidth) attributes.push(`width=${imageWidth}`);
+        if (imageHeight) attributes.push(`height=${imageHeight}`);
+        if (imageAlign !== 'none') attributes.push(`align=${imageAlign}`);
+        if (imageBorderRadius !== '0') attributes.push(`border-radius=${imageBorderRadius}`);
+
+        if (attributes.length > 0) {
+            imageMarkdown += ` "${attributes.join(' ')}"`;
+        }
+
+        imageMarkdown += ')';
+
+        const newText = `${before}${imageMarkdown}${after}`;
+        setContent(newText);
+        setShowImageModal(false);
+
+        // Reset focus and selection
+        setTimeout(() => {
+            textarea.focus();
+            const newPosition = imageSelectionStart + imageMarkdown.length;
+            textarea.setSelectionRange(newPosition, newPosition);
+        }, 0);
+    };
+
     // Insert markdown syntax for formatting
     const insertMarkdown = (syntax, placeholder = '') => {
+        // Special handling for image
+        if (syntax === 'image') {
+            handleImageButtonClick();
+            return;
+        }
+
         const textarea = document.getElementById('documentation-textarea');
         if (!textarea) return;
 
@@ -145,8 +219,7 @@ const DocumentationEditor = ({ documentation, collection, onSave, isSaving }) =>
         }, 0);
     };
 
-    // Simple markdown to HTML converter for preview
-    // In a production app, you would use a proper markdown library
+    // Enhanced markdown to HTML converter that handles image attributes
     const convertMarkdownToHtml = (markdown) => {
         let html = markdown;
 
@@ -163,8 +236,26 @@ const DocumentationEditor = ({ documentation, collection, onSave, isSaving }) =>
         html = html.replace(/```([\s\S]*?)```/gim, '<pre><code>$1</code></pre>');
         html = html.replace(/`([^`]+)`/gim, '<code>$1</code>');
 
-        // Convert links and images
-        html = html.replace(/!\[(.*?)\]\((.*?)\)/gim, '<img alt="$1" src="$2" />');
+        // Enhanced image replacement with attributes support
+        html = html.replace(/!\[(.*?)\]\((.*?)(?:\s+"(.*?)")?\)/gim, (match, alt, src, attributes) => {
+            let imgTag = `<img alt="${alt}" src="${src}"`;
+
+            if (attributes) {
+                // Parse attributes
+                const attrList = attributes.split(' ');
+                attrList.forEach(attr => {
+                    if (attr.includes('=')) {
+                        const [key, value] = attr.split('=');
+                        imgTag += ` ${key}="${value}"`;
+                    }
+                });
+            }
+
+            imgTag += ' />';
+            return imgTag;
+        });
+
+        // Convert links
         html = html.replace(/\[(.*?)\]\((.*?)\)/gim, '<a href="$2">$1</a>');
 
         // Convert lists
@@ -182,6 +273,119 @@ const DocumentationEditor = ({ documentation, collection, onSave, isSaving }) =>
         html = html.replace(/<\/p>\s*<p>/gim, '</p>\n<p>');
 
         return html;
+    };
+
+    // Image modal component
+    const renderImageModal = () => {
+        if (!showImageModal) return null;
+
+        return (
+            <div className="image-modal-overlay">
+                <div className="image-modal">
+                    <div className="image-modal-header">
+                        <h3>Insert Image</h3>
+                        <button className="close-btn" onClick={() => setShowImageModal(false)}>
+                            <FiX />
+                        </button>
+                    </div>
+                    <div className="image-modal-content">
+                        <div className="form-group">
+                            <label htmlFor="imageAlt">Alt Text</label>
+                            <input
+                                type="text"
+                                id="imageAlt"
+                                value={imageAlt}
+                                onChange={(e) => setImageAlt(e.target.value)}
+                                placeholder="Image description"
+                            />
+                        </div>
+                        <div className="form-group">
+                            <label htmlFor="imageUrl">Image URL</label>
+                            <input
+                                type="text"
+                                id="imageUrl"
+                                value={imageUrl}
+                                onChange={(e) => setImageUrl(e.target.value)}
+                                placeholder="https://example.com/image.jpg"
+                            />
+                        </div>
+                        <div className="form-row">
+                            <div className="form-group half">
+                                <label htmlFor="imageWidth">Width (px)</label>
+                                <input
+                                    type="text"
+                                    id="imageWidth"
+                                    value={imageWidth}
+                                    onChange={(e) => setImageWidth(e.target.value)}
+                                    placeholder="e.g. 300"
+                                />
+                            </div>
+                            <div className="form-group half">
+                                <label htmlFor="imageHeight">Height (px)</label>
+                                <input
+                                    type="text"
+                                    id="imageHeight"
+                                    value={imageHeight}
+                                    onChange={(e) => setImageHeight(e.target.value)}
+                                    placeholder="e.g. 200"
+                                />
+                            </div>
+                        </div>
+                        <div className="form-group">
+                            <label htmlFor="imageAlign">Alignment</label>
+                            <select
+                                id="imageAlign"
+                                value={imageAlign}
+                                onChange={(e) => setImageAlign(e.target.value)}
+                            >
+                                <option value="none">None</option>
+                                <option value="left">Left</option>
+                                <option value="center">Center</option>
+                                <option value="right">Right</option>
+                            </select>
+                        </div>
+                        <div className="form-group">
+                            <label htmlFor="imageBorderRadius">Border Radius (px)</label>
+                            <input
+                                type="text"
+                                id="imageBorderRadius"
+                                value={imageBorderRadius}
+                                onChange={(e) => setImageBorderRadius(e.target.value)}
+                                placeholder="e.g. 5 for slightly rounded, 50% for circle"
+                            />
+                        </div>
+
+                        {imageUrl && (
+                            <div className="image-preview">
+                                <h4>Preview</h4>
+                                <img
+                                    src={imageUrl}
+                                    alt={imageAlt}
+                                    style={{
+                                        width: imageWidth ? `${imageWidth}px` : 'auto',
+                                        height: imageHeight ? `${imageHeight}px` : 'auto',
+                                        borderRadius: `${imageBorderRadius}${imageBorderRadius.includes('%') ? '' : 'px'}`,
+                                        display: 'block',
+                                        marginLeft: imageAlign === 'left' ? '0' : imageAlign === 'right' ? 'auto' : imageAlign === 'center' ? 'auto' : null,
+                                        marginRight: imageAlign === 'right' ? '0' : imageAlign === 'left' ? 'auto' : imageAlign === 'center' ? 'auto' : null
+                                    }}
+                                />
+                            </div>
+                        )}
+                    </div>
+                    <div className="image-modal-actions">
+                        <button className="cancel-btn" onClick={() => setShowImageModal(false)}>Cancel</button>
+                        <button
+                            className="insert-btn"
+                            onClick={insertCustomImage}
+                            disabled={!imageUrl}
+                        >
+                            Insert Image
+                        </button>
+                    </div>
+                </div>
+            </div>
+        );
     };
 
     return (
@@ -283,6 +487,9 @@ const DocumentationEditor = ({ documentation, collection, onSave, isSaving }) =>
                     )}
                 </div>
             </div>
+
+            {/* Render the image modal */}
+            {renderImageModal()}
         </div>
     );
 };

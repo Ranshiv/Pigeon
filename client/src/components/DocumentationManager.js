@@ -1,7 +1,7 @@
 // client/src/components/DocumentationManager.js
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { FiBook, FiCode, FiDownload, FiUpload, FiSettings, FiGlobe, FiClock, FiChevronLeft, FiEdit, FiEye } from 'react-icons/fi';
+import { FiBook, FiCode, FiDownload, FiUpload, FiSettings, FiGlobe, FiClock, FiChevronLeft, FiEdit, FiEye, FiFileText } from 'react-icons/fi';
 import DocumentationEditor from './DocumentationEditor';
 import DocumentationViewer from './DocumentationViewer';
 import './DocumentationManager.css';
@@ -15,7 +15,7 @@ const DocumentationManager = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
     const [isSaving, setIsSaving] = useState(false);
-    const [view, setView] = useState('edit'); // 'edit', 'view', 'settings'
+    const [view, setView] = useState('edit'); // 'edit', 'view', 'swagger', 'settings'
 
     useEffect(() => {
         const fetchData = async () => {
@@ -71,20 +71,23 @@ const DocumentationManager = () => {
             setIsSaving(true);
             console.log("Saving documentation data:", docData);
 
-            const url = documentation
-                ? `/api/collections/${collectionId}/documentation/${documentation._id}`
-                : `/api/collections/${collectionId}/documentation`;
-
+            // Try a POST request instead of PUT
+            const url = `/api/collections/${collectionId}/documentation`;
             console.log("Saving to URL:", url);
-            const method = documentation ? 'PUT' : 'POST';
 
             const response = await fetch(url, {
-                method: method,
+                method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
                 credentials: 'include',
-                body: JSON.stringify(docData)
+                // Simplify the body structure to directly include the content
+                body: JSON.stringify({
+                    title: docData.title,
+                    content: docData.content,
+                    collectionId: collectionId,
+                    updatedAt: new Date().toISOString()
+                })
             });
 
             if (!response.ok) {
@@ -95,7 +98,12 @@ const DocumentationManager = () => {
 
             const savedDoc = await response.json();
             console.log("Documentation saved successfully:", savedDoc);
-            setDocumentation(savedDoc);
+
+            if (savedDoc.documentation) {
+                setDocumentation(savedDoc.documentation);
+            } else {
+                setDocumentation(savedDoc);
+            }
 
             // Show success message
             alert('Documentation saved successfully');
@@ -149,7 +157,55 @@ const DocumentationManager = () => {
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
         } else if (format === 'pdf') {
-            alert('PDF export feature coming soon!');
+            // For PDF generation, we'll use an approach that works in browsers
+            // First, create a hidden iframe with the HTML content
+            const htmlContent = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>${documentation.title || 'API Documentation'}</title>
+          <style>
+            body { font-family: Arial, sans-serif; line-height: 1.6; margin: 0; padding: 20px; }
+            h1 { border-bottom: 1px solid #ddd; padding-bottom: 10px; }
+            pre { background-color: #f5f5f5; padding: 10px; border-radius: 5px; overflow-x: auto; }
+            code { font-family: monospace; }
+            table { border-collapse: collapse; width: 100%; margin-bottom: 20px; }
+            th, td { border: 1px solid #ddd; padding: 8px; }
+            th { background-color: #f5f5f5; }
+            @media print {
+              body { padding: 0; }
+              pre { white-space: pre-wrap; }
+              a { text-decoration: none; color: #000; }
+            }
+          </style>
+        </head>
+        <body>
+          <h1>${documentation.title || 'API Documentation'}</h1>
+          <div>${convertToHtml(documentation.content)}</div>
+        </body>
+        </html>
+      `;
+
+            const iframe = document.createElement('iframe');
+            iframe.style.position = 'absolute';
+            iframe.style.top = '-9999px';
+            iframe.style.left = '-9999px';
+            document.body.appendChild(iframe);
+
+            iframe.contentDocument.open();
+            iframe.contentDocument.write(htmlContent);
+            iframe.contentDocument.close();
+
+            // Wait a moment for content to load, then print
+            setTimeout(() => {
+                iframe.contentWindow.focus();
+                iframe.contentWindow.print();
+
+                // Remove the iframe after some time
+                setTimeout(() => {
+                    document.body.removeChild(iframe);
+                }, 1000);
+            }, 500);
         } else if (format === 'markdown') {
             // Create a blob and download the markdown content
             const blob = new Blob([documentation.content], { type: 'text/markdown' });
@@ -157,6 +213,65 @@ const DocumentationManager = () => {
             const a = document.createElement('a');
             a.href = url;
             a.download = `${documentation.title || 'api-documentation'}.md`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        } else if (format === 'json') {
+            // Export as JSON
+            const jsonData = {
+                title: documentation.title || 'API Documentation',
+                content: documentation.content,
+                createdAt: documentation.createdAt,
+                updatedAt: documentation.updatedAt,
+                collectionId: documentation.collectionId,
+                metadata: {
+                    exportedAt: new Date().toISOString(),
+                    exportFormat: 'json',
+                    appName: 'Pigeon'
+                }
+            };
+
+            const jsonString = JSON.stringify(jsonData, null, 2);
+            const blob = new Blob([jsonString], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${documentation.title || 'api-documentation'}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        } else if (format === 'xml') {
+            // Export as XML
+            const escapeXml = (str) => {
+                return str
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;')
+                    .replace(/'/g, '&apos;');
+            };
+
+            const xmlContent = `<?xml version="1.0" encoding="UTF-8"?>
+<documentation>
+  <title>${escapeXml(documentation.title || 'API Documentation')}</title>
+  <content><![CDATA[${documentation.content}]]></content>
+  <metadata>
+    <createdAt>${documentation.createdAt || new Date().toISOString()}</createdAt>
+    <updatedAt>${documentation.updatedAt || new Date().toISOString()}</updatedAt>
+    <collectionId>${documentation.collectionId}</collectionId>
+    <exportedAt>${new Date().toISOString()}</exportedAt>
+    <exportFormat>xml</exportFormat>
+    <appName>Pigeon</appName>
+  </metadata>
+</documentation>`;
+
+            const blob = new Blob([xmlContent], { type: 'application/xml' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${documentation.title || 'api-documentation'}.xml`;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
@@ -463,7 +578,7 @@ const DocumentationManager = () => {
                             className={`view-btn ${view === 'view' ? 'active' : ''}`}
                             onClick={() => setView('view')}
                         >
-                            <FiEye /> Preview
+                            <FiEye /> View
                         </button>
                     </div>
                     <div className="action-dropdown">
@@ -474,6 +589,8 @@ const DocumentationManager = () => {
                             <button onClick={() => handleExportDocumentation('html')}>HTML</button>
                             <button onClick={() => handleExportDocumentation('pdf')}>PDF</button>
                             <button onClick={() => handleExportDocumentation('markdown')}>Markdown</button>
+                            <button onClick={() => handleExportDocumentation('json')}>JSON</button>
+                            <button onClick={() => handleExportDocumentation('xml')}>XML</button>
                         </div>
                     </div>
                     <div className="action-dropdown">
@@ -579,6 +696,13 @@ const DocumentationManager = () => {
                             <button className="cancel-btn" onClick={() => setView(documentation ? 'view' : 'edit')}>Cancel</button>
                             <button className="save-btn" onClick={() => alert('Settings changes coming soon!')}>Save Settings</button>
                         </div>
+                    </div>
+                )}
+
+                {view === 'swagger' && documentation && (
+                    <div className="swagger-viewer">
+                        <h3>API Documentation (Swagger)</h3>
+                        <pre>{JSON.stringify(documentation, null, 2)}</pre>
                     </div>
                 )}
             </div>

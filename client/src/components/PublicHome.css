@@ -228,7 +228,7 @@
 }
 
 .primary-button {
-    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-darker) 100%);
+
     color: white;
     box-shadow: 0 5px 15px rgba(0, 123, 255, 0.3);
     position: relative;
@@ -241,7 +241,7 @@
     left: -2px;
     right: -2px;
     bottom: -2px;
-    background: linear-gradient(90deg, #007bff, #6610f2, #007bff);
+  
     background-size: 400% 400%;
     z-index: -2;
     border-radius: 14px;

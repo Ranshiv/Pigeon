@@ -1,13 +1,14 @@
 // client/src/components/DocumentationViewer.js
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { FiEdit, FiClock, FiExternalLink } from 'react-icons/fi';
+import { FiEdit, FiClock, FiExternalLink, FiFileText } from 'react-icons/fi';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import './DocumentationViewer.css';
 
 const DocumentationViewer = ({ documentation, collection }) => {
     const [viewerReady, setViewerReady] = useState(false);
+    const [showSwagger, setShowSwagger] = useState(false);
 
     useEffect(() => {
         // This simulates any initialization that might be needed
@@ -23,6 +24,11 @@ const DocumentationViewer = ({ documentation, collection }) => {
         return (
             <div className="documentation-empty-state">
                 <p>No documentation to display</p>
+                <div className="documentation-actions">
+                    <Link to={`/workspace/collections/${collection?._id}/documentation`} className="create-doc-link">
+                        <FiEdit /> Create Documentation
+                    </Link>
+                </div>
             </div>
         );
     }
@@ -55,10 +61,23 @@ const DocumentationViewer = ({ documentation, collection }) => {
                             <FiExternalLink className="icon" /> View Public Version
                         </a>
                     )}
+                    <button
+                        onClick={() => setShowSwagger(!showSwagger)}
+                        className={`swagger-preview-btn ${showSwagger ? 'active' : ''}`}
+                    >
+                        <FiFileText className="icon" /> {showSwagger ? 'Hide Swagger' : 'Preview Swagger'}
+                    </button>
                 </div>
             </div>
             <div className="documentation-content">
-                {viewerReady ? (
+                {showSwagger ? (
+                    <div className="swagger-preview">
+                        <h3>Swagger Documentation Preview</h3>
+                        <div className="swagger-container">
+                            <pre>{JSON.stringify(documentation, null, 2)}</pre>
+                        </div>
+                    </div>
+                ) : viewerReady ? (
                     <div className="markdown-content">
                         <ReactMarkdown
                             remarkPlugins={[remarkGfm]}

@@ -1,0 +1,1211 @@
+// routes/collections.js
+const express = require('express');
+const router = express.Router();
+const { ObjectId } = require('mongodb');
+const { ensureAuthenticated, authenticateJWT } = require('../middleware/auth');
+const { getDb } = require('../config/db');
+
+// In-memory store for backward compatibility
+const collectionsStore = {};
+
+// Get all collections
+router.get('/', ensureAuthenticated, async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const db = getDb();
+
+        // Fetch collections from MongoDB
+        const collections = await db.collection('collections')
+            .find({ owner: userId })
+            .toArray();
+
+        // If collections exist in MongoDB, return them
+        if (collections && collections.length > 0) {
+            const collectionsWithStringIds = collections.map(collection => ({
+                ...collection,
+                _id: collection._id.toString()
+            }));
+
+            return res.json(collectionsWithStringIds);
+        }
+
+        // Mock collections data
+        const mockCollections = [
+            {
+                _id: "coll1",
+                name: "Personal API Collection",
+                description: "My personal collection of frequently used APIs",
+                isPublic: false,
+                owner: userId,
+                requestCount: 5,
+                collaborators: [],
+                createdAt: new Date(),
+                updatedAt: new Date()
+            },
+            {
+                _id: "coll2",
+                name: "Project X APIs",
+                description: "APIs used in the Project X development",
+                isPublic: false,
+                owner: userId,
+                requestCount: 12,
+                collaborators: [
+                    {
+                        email: "collaborator@example.com",
+                        role: "viewer"
+                    }
+                ],
+                createdAt: new Date(),
+                updatedAt: new Date()
+            },
+            {
+                _id: "coll3",
+                name: "Public Demo Collection",
+                description: "Public collection of demo APIs",
+                isPublic: true,
+                owner: userId,
+                requestCount: 8,
+                collaborators: [],
+                createdAt: new Date(),
+                updatedAt: new Date()
+            }
+        ];
+
+        res.json(mockCollections);
+    } catch (err) {
+        console.error("Error fetching collections:", err);
+        res.status(500).json({ message: 'Error fetching collections' });
+    }
+});
+
+// Get collections shared with the user
+router.get('/shared', ensureAuthenticated, async (req, res) => {
+    try {
+        const userId = req.user.id;
+
+        // Mock shared collections data
+        const sharedCollections = [
+            {
+                _id: "shared1",
+                name: "Team Project APIs",
+                description: "APIs used by the development team",
+                isPublic: false,
+                owner: "other-user-id",
+                requestCount: 15,
+                myRole: "viewer",
+                collaborators: [
+                    {
+                        email: req.user.email,
+                        role: "viewer"
+                    },
+                    {
+                        email: "team-lead@example.com",
+                        role: "editor"
+                    }
+                ],
+                createdAt: new Date(),
+                updatedAt: new Date()
+            },
+            {
+                _id: "shared2",
+                name: "Documentation APIs",
+                description: "APIs used for documentation generation",
+                isPublic: false,
+                owner: "another-user-id",
+                requestCount: 7,
+                myRole: "editor",
+                collaborators: [
+                    {
+                        email: req.user.email,
+                        role: "editor"
+                    }
+                ],
+                createdAt: new Date(),
+                updatedAt: new Date()
+            }
+        ];
+
+        res.json(sharedCollections);
+    } catch (err) {
+        console.error("Error fetching shared collections:", err);
+        res.status(500).json({ message: 'Error fetching shared collections' });
+    }
+});
+
+// Get a specific collection by ID
+router.get('/:id', ensureAuthenticated, async (req, res) => {
+    try {
+        const collectionId = req.params.id;
+        const userId = req.user.id;
+        const db = getDb();
+
+        console.log(`Fetching collection with ID: ${collectionId}`);
+
+        // First check for collections in MongoDB
+        try {
+            const collection = await db.collection('collections').findOne({
+                _id: new ObjectId(collectionId)
+            });
+
+            if (collection) {
+                // Add string ID and return
+                return res.json({
+                    ...collection,
+                    _id: collection._id.toString()
+                });
+            }
+        } catch (err) {
+            console.log(`Error looking up collection in MongoDB: ${err.message}`);
+        }
+
+        // Check for dynamically created collections in our store
+        if (collectionsStore) {
+            // Look through all workspace collections for this ID
+            for (const workspaceId in collectionsStore) {
+                const matchingCollection = collectionsStore[workspaceId].find(
+                    coll => coll._id === collectionId
+                );
+
+                if (matchingCollection) {
+                    console.log(`Found collection in collectionsStore for workspace ${workspaceId}`);
+                    // Add some mock requests to the collection
+                    const collectionWithRequests = {
+                        ...matchingCollection,
+                        requests: [
+                            { _id: `req-${Date.now()}-1`, name: "Get Data", method: "GET", url: "https://api.example.com/data" },
+                            { _id: `req-${Date.now()}-2`, name: "Create Item", method: "POST", url: "https://api.example.com/items" }
+                        ]
+                    };
+                    return res.json(collectionWithRequests);
+                }
+            }
+        }
+
+        // If we didn't find the collection in the store, check for static mock collections
+        let collection;
+
+        switch (collectionId) {
+            case "coll1":
+                collection = {
+                    _id: "coll1",
+                    name: "Personal API Collection",
+                    description: "My personal collection of frequently used APIs",
+                    isPublic: false,
+                    owner: userId,
+                    requests: [
+                        { _id: "req1", name: "Get Users", method: "GET", url: "https://api.example.com/users" },
+                        { _id: "req2", name: "Create User", method: "POST", url: "https://api.example.com/users" },
+                        { _id: "req3", name: "Get User by ID", method: "GET", url: "https://api.example.com/users/123" },
+                        { _id: "req4", name: "Update User", method: "PUT", url: "https://api.example.com/users/123" },
+                        { _id: "req5", name: "Delete User", method: "DELETE", url: "https://api.example.com/users/123" }
+                    ],
+                    collaborators: [],
+                    createdAt: new Date(),
+                    updatedAt: new Date()
+                };
+                break;
+            case "coll2":
+                collection = {
+                    _id: "coll2",
+                    name: "Project X APIs",
+                    description: "APIs used in the Project X development",
+                    isPublic: false,
+                    owner: userId,
+                    requests: [
+                        { _id: "req6", name: "Authentication", method: "POST", url: "https://api.example.com/auth" },
+                        { _id: "req7", name: "Get Profile", method: "GET", url: "https://api.example.com/profile" }
+                    ],
+                    collaborators: [
+                        {
+                            email: "collaborator@example.com",
+                            role: "viewer"
+                        }
+                    ],
+                    createdAt: new Date(),
+                    updatedAt: new Date()
+                };
+                break;
+            case "coll3":
+                collection = {
+                    _id: "coll3",
+                    name: "Public Demo Collection",
+                    description: "Public collection of demo APIs",
+                    isPublic: true,
+                    owner: userId,
+                    requests: [
+                        { _id: "req8", name: "Weather API", method: "GET", url: "https://api.weather.com/current" },
+                        { _id: "req9", name: "Currency Exchange", method: "GET", url: "https://api.exchange.com/rates" }
+                    ],
+                    collaborators: [],
+                    createdAt: new Date(),
+                    updatedAt: new Date()
+                };
+                break;
+            case "shared1":
+                collection = {
+                    _id: "shared1",
+                    name: "Team Project APIs",
+                    description: "APIs used by the development team",
+                    isPublic: false,
+                    owner: "other-user-id",
+                    myRole: "viewer",
+                    requests: [
+                        { _id: "req10", name: "Team Auth", method: "POST", url: "https://api.team.com/auth" },
+                        { _id: "req11", name: "Get Team Members", method: "GET", url: "https://api.team.com/members" }
+                    ],
+                    collaborators: [
+                        {
+                            email: req.user.email,
+                            role: "viewer"
+                        },
+                        {
+                            email: "team-lead@example.com",
+                            role: "editor"
+                        }
+                    ],
+                    createdAt: new Date(),
+                    updatedAt: new Date()
+                };
+                break;
+            default:
+                // Try to handle dynamically generated collection IDs (like coll100)
+                if (collectionId.startsWith('coll')) {
+                    collection = {
+                        _id: collectionId,
+                        name: `Collection ${collectionId.replace('coll', '')}`,
+                        description: "Dynamically created collection",
+                        isPublic: false,
+                        owner: userId,
+                        requests: [
+                            { _id: `req-${Date.now()}-1`, name: "Get Data", method: "GET", url: "https://api.example.com/data" },
+                            { _id: `req-${Date.now()}-2`, name: "Create Item", method: "POST", url: "https://api.example.com/items" }
+                        ],
+                        collaborators: [],
+                        createdAt: new Date(),
+                        updatedAt: new Date()
+                    };
+                } else {
+                    // If we really can't find the collection, return 404
+                    return res.status(404).json({ message: 'Collection not found' });
+                }
+        }
+
+        res.json(collection);
+    } catch (err) {
+        console.error("Error fetching collection:", err);
+        res.status(500).json({ message: 'Error fetching collection' });
+    }
+});
+
+// Create a new collection
+router.post('/', ensureAuthenticated, async (req, res) => {
+    try {
+        const { name, description, isPublic, workspaceId } = req.body;
+        const userId = req.user.id;
+        const db = getDb();
+
+        // Validate input
+        if (!name) {
+            return res.status(400).json({ message: 'Collection name is required' });
+        }
+
+        // Create a new collection document for MongoDB
+        const newCollection = {
+            name,
+            description: description || "",
+            workspaceId: workspaceId || null,
+            owner: userId,
+            isPublic: isPublic || false,
+            collaborators: [],
+            createdAt: new Date(),
+            updatedAt: new Date()
+        };
+
+        // Store in MongoDB
+        const result = await db.collection('collections').insertOne(newCollection);
+        const collectionId = result.insertedId.toString();
+
+        // Also update in-memory store for backward compatibility
+        if (workspaceId) {
+            if (!collectionsStore[workspaceId]) {
+                collectionsStore[workspaceId] = [];
+            }
+            collectionsStore[workspaceId].push({
+                ...newCollection,
+                _id: collectionId
+            });
+        }
+
+        // Return the created collection
+        res.status(201).json({
+            ...newCollection,
+            _id: collectionId
+        });
+    } catch (err) {
+        console.error("Error creating collection:", err);
+        res.status(500).json({ message: 'Error creating collection' });
+    }
+});
+
+// Update a collection
+router.put('/:id', ensureAuthenticated, async (req, res) => {
+    try {
+        const collectionId = req.params.id;
+        const { name, description, isPublic } = req.body;
+        const db = getDb();
+
+        // Validate input
+        if (!name) {
+            return res.status(400).json({ message: 'Collection name is required' });
+        }
+
+        // Update in MongoDB
+        try {
+            const collection = await db.collection('collections').findOne({
+                _id: new ObjectId(collectionId)
+            });
+
+            if (collection) {
+                await db.collection('collections').updateOne(
+                    { _id: new ObjectId(collectionId) },
+                    {
+                        $set: {
+                            name,
+                            description: description || collection.description,
+                            isPublic: isPublic !== undefined ? isPublic : collection.isPublic,
+                            updatedAt: new Date()
+                        }
+                    }
+                );
+
+                // Return updated collection
+                const updatedCollection = await db.collection('collections').findOne({
+                    _id: new ObjectId(collectionId)
+                });
+
+                return res.json({
+                    ...updatedCollection,
+                    _id: updatedCollection._id.toString()
+                });
+            }
+        } catch (err) {
+            console.log(`Error updating MongoDB collection: ${err.message}`);
+        }
+
+        // Also update in-memory store if it exists
+        let updated = false;
+        if (collectionsStore) {
+            for (const workspaceId in collectionsStore) {
+                const collectionIndex = collectionsStore[workspaceId].findIndex(
+                    coll => coll._id === collectionId
+                );
+
+                if (collectionIndex !== -1) {
+                    collectionsStore[workspaceId][collectionIndex] = {
+                        ...collectionsStore[workspaceId][collectionIndex],
+                        name,
+                        description: description || collectionsStore[workspaceId][collectionIndex].description,
+                        isPublic: isPublic !== undefined ? isPublic : collectionsStore[workspaceId][collectionIndex].isPublic,
+                        updatedAt: new Date()
+                    };
+                    updated = true;
+                    break;
+                }
+            }
+        }
+
+        // If not found in either MongoDB or in-memory store
+        if (!updated) {
+            return res.status(404).json({ message: 'Collection not found' });
+        }
+
+        // Return mock updated collection
+        res.json({
+            _id: collectionId,
+            name,
+            description: description || "Description",
+            isPublic: isPublic !== undefined ? isPublic : false,
+            updatedAt: new Date()
+        });
+    } catch (err) {
+        console.error("Error updating collection:", err);
+        res.status(500).json({ message: 'Error updating collection' });
+    }
+});
+
+// Delete a collection
+router.delete('/:id', ensureAuthenticated, async (req, res) => {
+    try {
+        const collectionId = req.params.id;
+        const db = getDb();
+
+        // Try to delete from MongoDB
+        try {
+            const result = await db.collection('collections').deleteOne({
+                _id: new ObjectId(collectionId)
+            });
+
+            if (result.deletedCount > 0) {
+                console.log(`Deleted collection ${collectionId} from MongoDB`);
+            }
+        } catch (err) {
+            console.log(`Error deleting MongoDB collection: ${err.message}`);
+        }
+
+        // Also try to delete from in-memory store
+        if (collectionsStore) {
+            for (const workspaceId in collectionsStore) {
+                const collectionIndex = collectionsStore[workspaceId].findIndex(
+                    coll => coll._id === collectionId
+                );
+
+                if (collectionIndex !== -1) {
+                    collectionsStore[workspaceId].splice(collectionIndex, 1);
+                    console.log(`Deleted collection ${collectionId} from in-memory store for workspace ${workspaceId}`);
+                    break;
+                }
+            }
+        }
+
+        // Just return success response
+        res.json({ message: 'Collection deleted successfully' });
+    } catch (err) {
+        console.error("Error deleting collection:", err);
+        res.status(500).json({ message: 'Error deleting collection' });
+    }
+});
+
+// Share a collection with another user
+router.post('/:id/share', ensureAuthenticated, async (req, res) => {
+    try {
+        const collectionId = req.params.id;
+        const { email, role } = req.body;
+
+        if (!email) {
+            return res.status(400).json({ message: 'Email is required' });
+        }
+
+        if (!['viewer', 'editor'].includes(role)) {
+            return res.status(400).json({ message: 'Invalid role. Must be either "viewer" or "editor"' });
+        }
+
+        // Mock successful sharing
+        res.json({
+            message: 'Collection shared successfully',
+            collaboration:
+            {
+                collectionId,
+                email,
+                role,
+                addedAt: new Date()
+            }
+        });
+    } catch (err) {
+        console.error("Error sharing collection:", err);
+        res.status(500).json({ message: 'Error sharing collection' });
+    }
+});
+
+// Fork a collection
+router.post('/:id/fork', ensureAuthenticated, async (req, res) => {
+    try {
+        const sourceCollectionId = req.params.id;
+        const userId = req.user.id;
+
+        // Mock creating a forked collection
+        const forkedCollection = {
+            _id: "fork" + Date.now().toString(),
+            name: "Fork of Collection",
+            description: "Forked collection from another user",
+            isPublic: false,
+            owner: userId,
+            forkedFrom: sourceCollectionId,
+            requestCount: 3,
+            collaborators: [],
+            createdAt: new Date(),
+            updatedAt: new Date()
+        };
+
+        res.status(201).json(forkedCollection);
+    } catch (err) {
+        console.error("Error forking collection:", err);
+        res.status(500).json({ message: 'Error forking collection' });
+    }
+});
+
+// Create a merge request
+router.post('/:id/merge-request', ensureAuthenticated, async (req, res) => {
+    try {
+        const sourceCollectionId = req.params.id;
+        const { targetCollectionId } = req.body;
+
+        if (!targetCollectionId) {
+            return res.status(400).json({ message: 'Target collection ID is required' });
+        }
+
+        // Mock creating a merge request
+        const mergeRequest = {
+            _id: "merge" + Date.now().toString(),
+            sourceCollectionId,
+            targetCollectionId,
+            status: "pending",
+            changes: {
+                added: 2,
+                modified: 1,
+                deleted: 0
+            },
+            createdBy: req.user.id,
+            createdAt: new Date(),
+            updatedAt: new Date()
+        };
+
+        res.status(201).json(mergeRequest);
+    } catch (err) {
+        console.error("Error creating merge request:", err);
+        res.status(500).json({ message: 'Error creating merge request' });
+    }
+});
+
+// Approve a merge request
+router.post('/merge-requests/:id/approve', ensureAuthenticated, async (req, res) => {
+    try {
+        const mergeRequestId = req.params.id;
+
+        // Mock approving a merge request
+        const approvedMergeRequest = {
+            _id: mergeRequestId,
+            status: "approved",
+            actionBy: {
+                userId: req.user.id,
+                displayName: req.user.name || "User",
+                email: req.user.email
+            },
+            updatedAt: new Date()
+        };
+
+        res.json(approvedMergeRequest);
+    } catch (err) {
+        console.error("Error approving merge request:", err);
+        res.status(500).json({ message: 'Error approving merge request' });
+    }
+});
+
+// Reject a merge request
+router.post('/merge-requests/:id/reject', ensureAuthenticated, async (req, res) => {
+    try {
+        const mergeRequestId = req.params.id;
+
+        // Mock rejecting a merge request
+        const rejectedMergeRequest = {
+            _id: mergeRequestId,
+            status: "rejected",
+            actionBy: {
+                userId: req.user.id,
+                displayName: req.user.name || "User",
+                email: req.user.email
+            },
+            updatedAt: new Date()
+        };
+
+        res.json(rejectedMergeRequest);
+    } catch (err) {
+        console.error("Error rejecting merge request:", err);
+        res.status(500).json({ message: 'Error rejecting merge request' });
+    }
+});
+
+// Get collection version history
+router.get('/:id/versions', authenticateJWT, async (req, res) => {
+    try {
+        const collectionId = req.params.id;
+
+        // In a real implementation, this would query from MongoDB
+        // For now, we'll return mock version history data
+        const versionHistory = [
+            {
+                id: `v-${Date.now()}-4`,
+                entityType: 'collection',
+                entityId: collectionId,
+                userId: req.user.id,
+                userName: req.user.name || 'Anonymous User',
+                timestamp: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000), // 2 days ago
+                message: 'Added new request',
+                type: 'commit',
+                changes: {
+                    added: [
+                        {
+                            field: 'requests',
+                            value: {
+                                id: 'req-123',
+                                name: 'Get Users',
+                                method: 'GET',
+                                url: 'https://api.example.com/users'
+                            }
+                        }
+                    ]
+                }
+            },
+            {
+                id: `v-${Date.now()}-5`,
+                entityType: 'collection',
+                entityId: collectionId,
+                userId: req.user.id,
+                userName: req.user.name || 'Anonymous User',
+                timestamp: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000), // 1 day ago
+                message: 'Updated request parameters',
+                type: 'commit',
+                changes: {
+                    modified: [
+                        {
+                            field: 'requests[0].headers',
+                            value: [
+                                { name: 'Authorization', value: 'Bearer {{token}}' },
+                                { name: 'Content-Type', value: 'application/json' }
+                            ]
+                        }
+                    ]
+                }
+            }
+        ];
+
+        res.json(versionHistory);
+    } catch (err) {
+        console.error("Error fetching collection version history:", err);
+        res.status(500).json({ message: 'Error fetching collection version history' });
+    }
+});
+
+// Save a new version for a collection
+router.post('/:id/versions', authenticateJWT, async (req, res) => {
+    try {
+        const collectionId = req.params.id;
+        const { changes, message, userId } = req.body;
+
+        if (!changes) {
+            return res.status(400).json({ message: 'Changes are required' });
+        }
+
+        // In a real implementation, this would save to MongoDB
+        // For now, we'll just create a mock version object
+        const newVersion = {
+            id: `v-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
+            entityType: 'collection',
+            entityId: collectionId,
+            userId: userId || req.user.id,
+            userName: req.user.name || 'Anonymous User',
+            timestamp: new Date(),
+            message: message || 'Updated collection',
+            type: 'commit',
+            changes
+        };
+
+        // Log the created version
+        console.log('Created new collection version:', newVersion);
+
+        res.status(201).json(newVersion);
+    } catch (err) {
+        console.error("Error saving collection version:", err);
+        res.status(500).json({ message: 'Error saving collection version' });
+    }
+});
+
+// Check for conflicts between collections
+router.get('/:id/conflicts', authenticateJWT, async (req, res) => {
+    try {
+        const sourceCollectionId = req.params.id;
+        const { targetCollectionId } = req.query;
+
+        if (!targetCollectionId) {
+            return res.status(400).json({ message: 'Target collection ID is required' });
+        }
+
+        // For this example, we'll randomly decide whether to show conflicts
+        const hasConflicts = Math.random() > 0.5;
+
+        if (!hasConflicts) {
+            // No conflicts
+            return res.json([]);
+        }
+
+        // Mock conflicts
+        const conflicts = [
+            {
+                id: `conflict-${Date.now()}-1`,
+                path: '/requests/2',
+                type: 'request',
+                source: {
+                    name: 'User Authentication',
+                    url: 'https://api.example.com/v1/auth',
+                    method: 'POST',
+                    headers: [
+                        { name: 'Content-Type', value: 'application/json' }
+                    ],
+                    body: {
+                        type: 'json',
+                        content: '{"username": "user", "password": "pass", "remember_me": true}'
+                    }
+                },
+                target: {
+                    name: 'User Authentication',
+                    url: 'https://api.example.com/v2/auth',
+                    method: 'POST',
+                    headers: [
+                        { name: 'Content-Type', value: 'application/json' },
+                        { name: 'X-API-Version', value: '2.0' }
+                    ],
+                    body: {
+                        type: 'json',
+                        content: '{"email": "user@example.com", "password": "pass"}'
+                    }
+                }
+            },
+            {
+                id: `conflict-${Date.now()}-2`,
+                path: '/environment/variables/apiKey',
+                type: 'environment',
+                source: {
+                    key: 'apiKey',
+                    value: '1234567890',
+                    description: 'API key for v1'
+                },
+                target: {
+                    key: 'apiKey',
+                    value: 'abcdefghijklmn',
+                    description: 'API key for production'
+                }
+            }
+        ];
+
+        res.json(conflicts);
+    } catch (err) {
+        console.error("Error checking for conflicts:", err);
+        res.status(500).json({ message: 'Error checking for conflicts' });
+    }
+});
+
+// Resolve merge conflicts
+router.post('/:id/resolve-conflicts', authenticateJWT, async (req, res) => {
+    try {
+        const sourceCollectionId = req.params.id;
+        const { targetCollectionId, resolutions } = req.body;
+
+        if (!targetCollectionId || !resolutions) {
+            return res.status(400).json({ message: 'Target collection ID and resolutions are required' });
+        }
+
+        // In a real implementation, this would resolve the conflicts according to the provided resolutions
+        // For now, we'll just log the resolutions and return success
+        console.log(`Resolving conflicts from ${sourceCollectionId} to ${targetCollectionId}`);
+        console.log('Resolutions:', JSON.stringify(resolutions, null, 2));
+
+        res.json({
+            message: 'Conflicts resolved successfully',
+            resolvedConflicts: Object.keys(resolutions).length
+        });
+    } catch (err) {
+        console.error("Error resolving conflicts:", err);
+        res.status(500).json({ message: 'Error resolving conflicts' });
+    }
+});
+
+// Get all sample data sets for a collection
+router.get('/:id/sample-data', ensureAuthenticated, async (req, res) => {
+    try {
+        const collectionId = req.params.id;
+
+        // Check if we have existing data stored for this collection
+        if (!global.sampleDataStore) {
+            global.sampleDataStore = {};
+        }
+
+        if (!global.sampleDataStore[collectionId]) {
+            // Initialize with some example data
+            global.sampleDataStore[collectionId] = [
+                {
+                    _id: `sample-${Date.now()}-1`,
+                    name: 'Login Credentials',
+                    collectionId,
+                    content: {
+                        username: 'testuser',
+                        password: 'password123',
+                        rememberMe: true
+                    },
+                    createdBy: req.user.id,
+                    createdAt: new Date(),
+                    updatedAt: new Date()
+                },
+                {
+                    _id: `sample-${Date.now()}-2`,
+                    name: 'User Profile Data',
+                    collectionId,
+                    content: {
+                        firstName: 'John',
+                        lastName: 'Doe',
+                        email: 'john.doe@example.com',
+                        age: 30,
+                        preferences: {
+                            theme: 'dark',
+                            notifications: true
+                        }
+                    },
+                    createdBy: req.user.id,
+                    createdAt: new Date(),
+                    updatedAt: new Date()
+                }
+            ];
+        }
+
+        res.json(global.sampleDataStore[collectionId]);
+    } catch (err) {
+        console.error("Error fetching sample data:", err);
+        res.status(500).json({ message: 'Error fetching sample data' });
+    }
+});
+
+// Create new sample dataset
+router.post('/:id/sample-data', ensureAuthenticated, async (req, res) => {
+    try {
+        const collectionId = req.params.id;
+        const { name, content } = req.body;
+
+        if (!name) {
+            return res.status(400).json({ message: 'Dataset name is required' });
+        }
+
+        // Ensure our global store exists
+        if (!global.sampleDataStore) {
+            global.sampleDataStore = {};
+        }
+
+        if (!global.sampleDataStore[collectionId]) {
+            global.sampleDataStore[collectionId] = [];
+        }
+
+        // Create new sample data set
+        const newSampleData = {
+            _id: `sample-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
+            name,
+            collectionId,
+            content: content || {},
+            createdBy: req.user.id,
+            createdAt: new Date(),
+            updatedAt: new Date()
+        };
+
+        // Add to store
+        global.sampleDataStore[collectionId].push(newSampleData);
+
+        res.status(201).json(newSampleData);
+    } catch (err) {
+        console.error("Error creating sample data:", err);
+        res.status(500).json({ message: 'Error creating sample data' });
+    }
+});
+
+// Update sample dataset
+router.put('/:collectionId/sample-data/:id', ensureAuthenticated, async (req, res) => {
+    try {
+        const collectionId = req.params.collectionId;
+        const sampleId = req.params.id;
+        const { name, content } = req.body;
+
+        // Ensure our global store exists
+        if (!global.sampleDataStore || !global.sampleDataStore[collectionId]) {
+            return res.status(404).json({ message: 'Sample data collection not found' });
+        }
+
+        // Find the sample data
+        const sampleIndex = global.sampleDataStore[collectionId].findIndex(sample => sample._id === sampleId);
+
+        if (sampleIndex === -1) {
+            return res.status(404).json({ message: 'Sample data not found' });
+        }
+
+        // Update the sample data
+        global.sampleDataStore[collectionId][sampleIndex] = {
+            ...global.sampleDataStore[collectionId][sampleIndex],
+            name: name || global.sampleDataStore[collectionId][sampleIndex].name,
+            content: content || global.sampleDataStore[collectionId][sampleIndex].content,
+            updatedAt: new Date()
+        };
+
+        res.json(global.sampleDataStore[collectionId][sampleIndex]);
+    } catch (err) {
+        console.error("Error updating sample data:", err);
+        res.status(500).json({ message: 'Error updating sample data' });
+    }
+});
+
+// Delete sample dataset
+router.delete('/:collectionId/sample-data/:id', ensureAuthenticated, async (req, res) => {
+    try {
+        const collectionId = req.params.collectionId;
+        const sampleId = req.params.id;
+
+        // Ensure our global store exists
+        if (!global.sampleDataStore || !global.sampleDataStore[collectionId]) {
+            return res.status(404).json({ message: 'Sample data collection not found' });
+        }
+
+        // Find and remove the sample data
+        const initialLength = global.sampleDataStore[collectionId].length;
+        global.sampleDataStore[collectionId] = global.sampleDataStore[collectionId].filter(sample => sample._id !== sampleId);
+
+        if (global.sampleDataStore[collectionId].length === initialLength) {
+            return res.status(404).json({ message: 'Sample data not found' });
+        }
+
+        res.json({ message: 'Sample data deleted successfully' });
+    } catch (err) {
+        console.error("Error deleting sample data:", err);
+        res.status(500).json({ message: 'Error deleting sample data' });
+    }
+});
+
+// Add documentation for a collection
+router.post('/:id/documentation', authenticateJWT, async (req, res) => {
+    try {
+        const collectionId = req.params.id;
+        const { title, content, importedFrom } = req.body;
+        const db = getDb();
+
+        if (!content) {
+            return res.status(400).json({ message: 'Documentation content is required' });
+        }
+
+        // Check if collection exists
+        const collection = await db.collection('collections').findOne({
+            _id: new ObjectId(collectionId)
+        });
+
+        if (!collection) {
+            return res.status(404).json({ message: 'Collection not found' });
+        }
+
+        // Check if documentation already exists
+        let existingDoc = await db.collection('documentation').findOne({
+            collectionId: collectionId
+        });
+
+        let docData;
+        if (existingDoc) {
+            // Update existing documentation
+            docData = {
+                title: title || existingDoc.title,
+                content: content,
+                collectionId: collectionId,
+                updatedAt: new Date(),
+                importedFrom: importedFrom || existingDoc.importedFrom || 'manual'
+            };
+
+            await db.collection('documentation').updateOne(
+                { _id: existingDoc._id },
+                { $set: docData }
+            );
+
+            docData._id = existingDoc._id.toString();
+        } else {
+            // Create new documentation
+            docData = {
+                title: title || 'API Documentation',
+                content: content,
+                collectionId: collectionId,
+                createdAt: new Date(),
+                updatedAt: new Date(),
+                importedFrom: importedFrom || 'manual'
+            };
+
+            const result = await db.collection('documentation').insertOne(docData);
+            docData._id = result.insertedId.toString();
+        }
+
+        res.json(docData);
+    } catch (err) {
+        console.error('Error saving documentation:', err);
+        res.status(500).json({ message: 'Error saving documentation' });
+    }
+});
+
+// Import OpenAPI documentation for a collection
+router.post('/:id/documentation/import/openapi', authenticateJWT, async (req, res) => {
+    try {
+        const collectionId = req.params.id;
+        const userId = req.user.id;
+        const { title, content, importedFrom } = req.body;
+        const db = getDb();
+
+        if (!content) {
+            return res.status(400).json({ message: 'Documentation content is required' });
+        }
+
+        // Check if collection exists and user has access
+        const collection = await db.collection('collections').findOne({
+            _id: new ObjectId(collectionId),
+            $or: [
+                { owner: userId },
+                { collaborators: { $elemMatch: { userId: userId, role: { $in: ['editor', 'admin'] } } } }
+            ]
+        });
+
+        if (!collection) {
+            return res.status(404).json({ message: 'Collection not found or you do not have permission to edit' });
+        }
+
+        // Check if documentation already exists
+        let existingDoc = await db.collection('documentation').findOne({
+            collectionId: collectionId
+        });
+
+        let docData;
+        if (existingDoc) {
+            // Update existing documentation
+            docData = {
+                title: title || existingDoc.title,
+                content: content,
+                collectionId: collectionId,
+                updatedAt: new Date(),
+                importedFrom: 'openapi'
+            };
+
+            await db.collection('documentation').updateOne(
+                { _id: existingDoc._id },
+                { $set: docData }
+            );
+
+            docData._id = existingDoc._id.toString();
+        } else {
+            // Create new documentation
+            docData = {
+                title: title || `${collection.name} Documentation`,
+                content: content,
+                collectionId: collectionId,
+                createdAt: new Date(),
+                updatedAt: new Date(),
+                importedFrom: 'openapi'
+            };
+
+            const result = await db.collection('documentation').insertOne(docData);
+            docData._id = result.insertedId.toString();
+        }
+
+        res.status(201).json(docData);
+    } catch (err) {
+        console.error('Error importing OpenAPI documentation:', err);
+        res.status(500).json({ message: 'Error importing OpenAPI documentation' });
+    }
+});
+
+// Get documentation for a collection
+router.get('/:id/documentation', async (req, res) => {
+    try {
+        const collectionId = req.params.id;
+        const db = getDb();
+
+        // Find documentation for this collection
+        const doc = await db.collection('documentation').findOne({
+            collectionId: collectionId
+        });
+
+        if (!doc) {
+            return res.status(404).json({ message: 'Documentation not found' });
+        }
+
+        res.json({
+            ...doc,
+            _id: doc._id.toString()
+        });
+    } catch (err) {
+        console.error('Error fetching documentation:', err);
+        res.status(500).json({ message: 'Error fetching documentation' });
+    }
+});
+
+// Get collection branches
+router.get('/:id/branches', authenticateJWT, async (req, res) => {
+    try {
+        const collectionId = req.params.id;
+
+        // In a real implementation, this would query from MongoDB
+        // For now, we'll return mock branch data
+        const branches = [
+            {
+                id: `branch-${Date.now()}-1`,
+                name: 'feature/oauth-endpoints',
+                description: 'Adding OAuth 2.0 endpoints',
+                collectionId: collectionId,
+                basedOn: 'main',
+                createdBy: req.user.id,
+                createdByName: req.user.name || 'Anonymous User',
+                createdAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000), // 7 days ago
+                lastCommit: {
+                    id: `commit-${Date.now()}-1`,
+                    message: 'Updated token endpoint',
+                    timestamp: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000) // 2 days ago
+                }
+            },
+            {
+                id: `branch-${Date.now()}-2`,
+                name: 'bugfix/rate-limiting',
+                description: 'Fix rate limiting issues on API endpoints',
+                collectionId: collectionId,
+                basedOn: 'main',
+                createdBy: req.user.id,
+                createdByName: req.user.name || 'Anonymous User',
+                createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000), // 3 days ago
+                lastCommit: {
+                    id: `commit-${Date.now()}-2`,
+                    message: 'Added proper headers for rate limits',
+                    timestamp: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000) // 1 day ago
+                }
+            }
+        ];
+
+        res.json(branches);
+    } catch (err) {
+        console.error("Error fetching collection branches:", err);
+        res.status(500).json({ message: 'Error fetching collection branches' });
+    }
+});
+
+// Create a merge request from a branch or collection to another collection
+router.post('/:id/create-merge-request', authenticateJWT, async (req, res) => {
+    try {
+        const id = req.params.id;
+        const entityType = 'collection'; // Always collection for this route
+        const { targetId, title, description, userId } = req.body;
+
+        if (!targetId) {
+            return res.status(400).json({ message: 'Target ID is required' });
+        }
+
+        // In a real implementation, this would save to MongoDB
+        // For now, we'll just create a mock merge request object and return it
+        const mergeRequest = {
+            id: `mr-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
+            sourceType: entityType,
+            sourceId: id,
+            targetType: entityType,
+            targetId,
+            title: title || `Merge ${entityType} ${id} to ${targetId}`,
+            description: description || '',
+            status: 'pending',
+            createdBy: {
+                userId: userId || req.user.id,
+                name: req.user.name || 'Anonymous User',
+                email: req.user.email || 'anonymous@example.com'
+            },
+            createdAt: new Date(),
+            updatedAt: new Date()
+        };
+
+        // Log the created merge request
+        console.log('Created new merge request:', mergeRequest);
+
+        res.status(201).json(mergeRequest);
+    } catch (err) {
+        console.error("Error creating merge request:", err);
+        res.status(500).json({ message: 'Error creating merge request', error: err.message });
+    }
+});
+
+module.exports = router;

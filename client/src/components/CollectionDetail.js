@@ -10,7 +10,8 @@ import DocumentationViewer from './DocumentationViewer';
 import { useCollaboration } from '../context/CollaborationContext';
 import {
   FiSave, FiSettings, FiPlay, FiAlertCircle, FiCheckCircle, FiBook, FiEdit,
-  FiPlus, FiTrash2, FiDatabase, FiClock, FiGlobe, FiLock, FiUsers, FiPackage
+  FiPlus, FiTrash2, FiDatabase, FiClock, FiGlobe, FiLock, FiUsers, FiPackage,
+  FiMoreVertical, FiArrowRight, FiFileText
 } from 'react-icons/fi';
 import { toast } from 'react-toastify'; // Import toast notification library
 
@@ -703,6 +704,7 @@ function CollectionDetail() {
               <div className="no-requests">
                 <FiPackage className="no-content-icon" />
                 <p>No requests found</p>
+                <small>Click "Add Request" below to create your first API request</small>
               </div>
             ) : (
               <ul>
@@ -715,7 +717,10 @@ function CollectionDetail() {
                     <span className={`method-badge ${request.method.toLowerCase()}`}>
                       {request.method}
                     </span>
-                    <span className="request-name">{request.name}</span>
+                    <div className="request-info">
+                      <span className="request-name">{request.name}</span>
+                      <small className="request-url">{request.url ? new URL(request.url).pathname : '/'}</small>
+                    </div>
                     <button
                       className="delete-btn"
                       onClick={(e) => {
@@ -764,28 +769,34 @@ function CollectionDetail() {
             <>
               {!selectedRequest && !showRequestForm ? (
                 <div className="collection-info">
-                  <h3>Collection Details</h3>
+                  <h2>Collection Details</h2>
                   <div className="collection-description">
                     {collection?.description || 'No description provided.'}
                   </div>
-                  <div className="collection-meta">
+                  <div className="collection-meta-grid">
                     <div className="meta-item">
-                      <strong>Created by</strong> {collection?.owner ? collection.owner : 'Unknown'}
+                      <label>CREATED BY</label>
+                      <div className="meta-value">{collection?.owner ? collection.owner : collection?.createdBy || 'Unknown'}</div>
                     </div>
                     <div className="meta-item">
-                      <strong>Created on</strong> {collection?.createdAt ? new Date(collection.createdAt).toLocaleDateString() : 'Unknown'}
+                      <label>CREATED ON</label>
+                      <div className="meta-value">{collection?.createdAt ? new Date(collection.createdAt).toLocaleDateString() : 'Unknown'}</div>
                     </div>
                     <div className="meta-item">
-                      <strong>Last modified</strong> {collection?.updatedAt ? new Date(collection.updatedAt).toLocaleDateString() : 'Unknown'}
+                      <label>LAST MODIFIED</label>
+                      <div className="meta-value">{collection?.updatedAt ? new Date(collection.updatedAt).toLocaleDateString() : 'Unknown'}</div>
                     </div>
                     <div className="meta-item">
-                      <strong>Requests</strong> {requests.length}
+                      <label>REQUESTS</label>
+                      <div className="meta-value">{requests.length}</div>
                     </div>
                     <div className="meta-item">
-                      <strong>Visibility</strong> {collection?.isPublic ? 'Public' : 'Private'}
+                      <label>VISIBILITY</label>
+                      <div className="meta-value">{collection?.isPublic ? 'Public' : 'Private'}</div>
                     </div>
                     <div className="meta-item">
-                      <strong>Active Collaborators</strong> <div className="collaborator-count">{activeUsers.length}</div>
+                      <label>ACTIVE COLLABORATORS</label>
+                      <div className="collaborator-count">{activeUsers.length}</div>
                     </div>
                   </div>
 
@@ -840,9 +851,14 @@ function CollectionDetail() {
                   <FiBook className="placeholder-icon" />
                   <h3>No Documentation Available</h3>
                   <p>This collection doesn't have any documentation yet.</p>
-                  <Link to={`/workspace/collections/${collectionId}/documentation`} className="create-doc-link">
-                    <FiEdit /> Create Documentation
-                  </Link>
+                  <div className="documentation-actions">
+                    <Link to={`/workspace/collections/${collectionId}/documentation`} className="create-doc-link">
+                      <FiEdit /> Create Documentation
+                    </Link>
+                    <button onClick={() => navigate(`/workspace/collections/${collectionId}/documentation/swagger`)} className="preview-swagger-btn">
+                      <FiFileText /> Preview Swagger Documentation
+                    </button>
+                  </div>
                 </div>
               )}
             </div>
