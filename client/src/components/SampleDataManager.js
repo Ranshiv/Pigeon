@@ -1,17 +1,56 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './SampleDataManager.css';
-import { FiPlus, FiTrash2, FiSave, FiDownload, FiUpload, FiCopy, FiCheck, FiCode, FiDatabase } from 'react-icons/fi';
+import {
+    FiPlus, FiTrash2, FiSave, FiDownload, FiUpload, FiCopy,
+    FiCheck, FiCode, FiDatabase, FiSearch, FiGrid, FiLayout,
+    FiFilter, FiTag, FiCoffee, FiUser, FiShoppingCart, FiCalendar,
+    FiMap, FiList, FiAlertTriangle, FiRefreshCw, FiEdit
+} from 'react-icons/fi';
 
 function SampleDataManager({ collectionId }) {
+    // Core state
     const [datasets, setDatasets] = useState([]);
     const [selectedDataset, setSelectedDataset] = useState(null);
     const [editorContent, setEditorContent] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
-    const [showNewDatasetModal, setShowNewDatasetModal] = useState(false);
-    const [newDatasetName, setNewDatasetName] = useState('');
     const [isEdited, setIsEdited] = useState(false);
+
+    // UI state
+    const [viewMode, setViewMode] = useState('editor'); // 'editor', 'split', 'preview'
+    const [showNewDatasetModal, setShowNewDatasetModal] = useState(false);
+    const [showTemplateModal, setShowTemplateModal] = useState(false);
+    const [newDatasetName, setNewDatasetName] = useState('');
+    const [searchTerm, setSearchTerm] = useState('');
+    const [jsonError, setJsonError] = useState(null);
+    const [selectedCategory, setSelectedCategory] = useState('all');
+
+    // Refs
     const fileInputRef = useRef(null);
+
+    // Sample template categories
+    const templates = [
+        {
+            id: 'user', name: 'User Profile', icon: <FiUser />,
+            sample: { name: "John Doe", email: "john@example.com", age: 30, roles: ["user", "admin"] }
+        },
+        {
+            id: 'product', name: 'Product', icon: <FiShoppingCart />,
+            sample: { id: "prod-001", name: "Sample Product", price: 29.99, inStock: true, categories: ["electronics"] }
+        },
+        {
+            id: 'event', name: 'Event', icon: <FiCalendar />,
+            sample: { title: "Team Meeting", date: "2025-05-30T10:00:00", location: "Conference Room", attendees: [] }
+        },
+        {
+            id: 'location', name: 'Location', icon: <FiMap />,
+            sample: { address: "123 Main St", city: "Anytown", state: "CA", postalCode: "12345", coordinates: { lat: 34.052235, long: -118.243683 } }
+        },
+        {
+            id: 'config', name: 'Config', icon: <FiCoffee />,
+            sample: { appName: "MyApp", version: "1.0.0", features: { darkMode: true, notifications: true, analytics: false } }
+        }
+    ];
 
     // Fetch datasets when component mounts or collectionId changes
     useEffect(() => {
@@ -19,6 +58,33 @@ function SampleDataManager({ collectionId }) {
             fetchDatasets();
         }
     }, [collectionId]);
+
+    // Validate JSON and return result
+    const validateJson = (jsonString) => {
+        try {
+            JSON.parse(jsonString);
+            setJsonError(null);
+            return true;
+        } catch (err) {
+            setJsonError(err.message);
+            return false;
+        }
+    };
+
+    // Filter datasets based on search term and category
+    const getFilteredDatasets = () => {
+        return datasets.filter(dataset => {
+            // Apply search filter
+            const matchesSearch = searchTerm === '' ||
+                dataset.name.toLowerCase().includes(searchTerm.toLowerCase());
+
+            // Apply category filter
+            const matchesCategory = selectedCategory === 'all' ||
+                (dataset.category && dataset.category === selectedCategory);
+
+            return matchesSearch && matchesCategory;
+        });
+    };
 
     // Fetch all datasets for the collection
     const fetchDatasets = async () => {
@@ -68,6 +134,24 @@ function SampleDataManager({ collectionId }) {
     const handleEditorChange = (e) => {
         setEditorContent(e.target.value);
         setIsEdited(true);
+
+        // Validate JSON as you type (but with debounce for performance)
+        clearTimeout(window.jsonValidationTimeout);
+        window.jsonValidationTimeout = setTimeout(() => {
+            validateJson(e.target.value);
+        }, 800);
+    };
+
+    // Apply a template
+    const applyTemplate = (template) => {
+        if (isEdited && !window.confirm('You have unsaved changes. Apply template anyway?')) {
+            return;
+        }
+
+        const newContent = JSON.stringify(template.sample, null, 2);
+        setEditorContent(newContent);
+        setIsEdited(true);
+        setShowTemplateModal(false);
     };
 
     // Create a new dataset
@@ -272,11 +356,18 @@ function SampleDataManager({ collectionId }) {
 
     // Format the JSON in the editor
     const handleFormatJson = () => {
-        try {
+        if (validateJson(editorContent)) {
             const contentObj = JSON.parse(editorContent);
             setEditorContent(JSON.stringify(contentObj, null, 2));
-        } catch (err) {
+        } else {
             setError('Invalid JSON format. Please check your syntax.');
+        }
+    };
+
+    // Toggle view mode (editor/split/preview)
+    const toggleViewMode = (mode) => {
+        if (mode !== viewMode) {
+            setViewMode(mode);
         }
     };
 
@@ -321,11 +412,99 @@ function SampleDataManager({ collectionId }) {
         );
     };
 
+    // Modal for selecting a template
+    const renderTemplateModal = () => {
+        if (!showTemplateModal) return null;
+
+        return (
+            <div className="modal-overlay">
+                <div className="modal-content template-modal">
+                    <h2>Select a Template</h2>
+                    <p className="modal-subtitle">Choose a template as a starting point for your sample data</p>
+
+                    <div className="template-grid">
+                        {templates.map(template => (
+                            <div
+                                key={template.id}
+                                className="template-item"
+                                onClick={() => applyTemplate(template)}
+                            >
+                                <div className="template-icon">{template.icon}</div>
+                                <div className="template-name">{template.name}</div>
+                            </div>
+                        ))}
+
+                        <div className="template-item template-custom">
+                            <div className="template-icon"><FiCode /></div>
+                            <div className="template-name">Custom</div>
+                        </div>
+                    </div>
+
+                    <div className="modal-actions">
+                        <button className="cancel-btn" onClick={() => setShowTemplateModal(false)}>
+                            Cancel
+                        </button>
+                    </div>
+                </div>
+            </div>
+        );
+    };
+
+    // Render the top toolbar shown in the screenshot
+    // Render editor toolbar with formatting and data management options
+    const renderTopToolbar = () => {
+        return (
+            <div className="top-toolbar">
+                <div className="toolbar-button-group">
+                    <button className="toolbar-button" onClick={handleFormatJson}>
+                        <FiCode className="icon" /> Format
+                    </button>
+                    <label className="toolbar-button">
+                        <FiUpload className="icon" /> Import
+                        <input
+                            type="file"
+                            accept=".json"
+                            onChange={handleImportFile}
+                            ref={fileInputRef}
+                            style={{ display: 'none' }}
+                        />
+                    </label>
+                    <button className="toolbar-button" onClick={handleExportFile}>
+                        <FiDownload className="icon" /> Export
+                    </button>
+                    <button className="toolbar-button validate" onClick={() => validateJson(editorContent)}>
+                        <FiCheck className="icon" /> Validate
+                    </button>
+                    <button
+                        className="toolbar-button save"
+                        onClick={handleSaveDataset}
+                        disabled={loading || !isEdited}
+                    >
+                        <FiSave className="icon" /> Save
+                    </button>
+                </div>
+                <button className="use-data-button" onClick={handleUseDataset} disabled={loading}>
+                    Use Data
+                </button>
+            </div>
+        );
+    };
+
     return (
         <div className="sample-data-manager">
             <div className="sample-data-header">
-                <h2><FiDatabase className="icon" /> Sample Data Manager</h2>
+                <div className="header-left">
+                    <h2><FiDatabase className="icon" /> Sample Data Manager</h2>
+                    <p className="header-subtitle">Create and manage sample data for your API requests</p>
+                </div>
                 <div className="sample-data-actions">
+                    <button
+                        className="action-btn template-btn"
+                        onClick={() => setShowTemplateModal(true)}
+                        title="Use a template to create sample data"
+                    >
+                        <FiCode className="icon" /> Templates
+                    </button>
                     <button
                         className="action-btn"
                         onClick={() => setShowNewDatasetModal(true)}
@@ -336,106 +515,153 @@ function SampleDataManager({ collectionId }) {
             </div>
 
             {error && <div className="error-message">{error}</div>}
+            {jsonError && <div className="json-error-message"><FiAlertTriangle className="icon" /> {jsonError}</div>}
 
             <div className="sample-data-content">
-                <div className="datasets-list">
-                    <h3>Datasets</h3>
-                    {datasets.length === 0 ? (
-                        <div className="no-datasets">No datasets available</div>
-                    ) : (
-                        <ul>
-                            {datasets.map(dataset => (
-                                <li
-                                    key={dataset._id}
-                                    className={selectedDataset && selectedDataset._id === dataset._id ? 'active' : ''}
-                                    onClick={() => handleSelectDataset(dataset)}
-                                >
-                                    {dataset.name}
-                                </li>
-                            ))}
-                        </ul>
-                    )}
+                <div className="datasets-sidebar">
+                    <div className="datasets-search">
+                        <div className="search-input-container">
+                            <FiSearch className="search-icon" />
+                            <input
+                                type="text"
+                                placeholder="Search datasets..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                            />
+                        </div>
+                    </div>
+
+                    <div className="dataset-categories">
+                        <button
+                            className={`category-btn ${selectedCategory === 'all' ? 'active' : ''}`}
+                            onClick={() => setSelectedCategory('all')}
+                        >
+                            All Datasets
+                        </button>
+                        <button
+                            className={`category-btn ${selectedCategory === 'user' ? 'active' : ''}`}
+                            onClick={() => setSelectedCategory('user')}
+                        >
+                            <FiUser className="icon" /> Users
+                        </button>
+                        <button
+                            className={`category-btn ${selectedCategory === 'product' ? 'active' : ''}`}
+                            onClick={() => setSelectedCategory('product')}
+                        >
+                            <FiShoppingCart className="icon" /> Products
+                        </button>
+                    </div>
+
+                    <div className="datasets-list">
+                        <h3>Datasets <span className="dataset-count">{getFilteredDatasets().length}</span></h3>
+                        {datasets.length === 0 ? (
+                            <div className="no-datasets">No datasets available</div>
+                        ) : getFilteredDatasets().length === 0 ? (
+                            <div className="no-datasets">No matching datasets</div>
+                        ) : (
+                            <ul>
+                                {getFilteredDatasets().map(dataset => (
+                                    <li
+                                        key={dataset._id}
+                                        className={selectedDataset && selectedDataset._id === dataset._id ? 'active' : ''}
+                                        onClick={() => handleSelectDataset(dataset)}
+                                    >
+                                        <span className="dataset-name">{dataset.name}</span>
+                                        <span className="dataset-size">
+                                            {dataset.content ?
+                                                `${JSON.stringify(dataset.content).length} bytes` :
+                                                '0 bytes'}
+                                        </span>
+                                    </li>
+                                ))}
+                            </ul>
+                        )}
+                    </div>
                 </div>
 
                 <div className="dataset-editor">
                     {selectedDataset ? (
                         <>
-                            <div className="editor-toolbar">
-                                <span className="dataset-name">{selectedDataset.name}</span>
-                                <div className="editor-actions">
-                                    <button
-                                        className="editor-btn"
-                                        onClick={handleFormatJson}
-                                        title="Format JSON"
-                                    >
-                                        <FiCode className="icon" />
-                                    </button>
-                                    <label className="editor-btn import-btn" title="Import JSON">
-                                        <FiUpload className="icon" />
-                                        <input
-                                            type="file"
-                                            accept=".json"
-                                            onChange={handleImportFile}
-                                            ref={fileInputRef}
+                            {/* Data editor toolbar with formatting, import/export, validation, and save options */}
+                            {renderTopToolbar()}
+
+                            <div className={`editor-container ${viewMode}-mode`}>
+                                {(viewMode === 'editor' || viewMode === 'split') && (
+                                    <div className="code-editor-container">
+                                        <textarea
+                                            className={`json-editor ${jsonError ? 'has-error' : ''}`}
+                                            value={editorContent}
+                                            onChange={handleEditorChange}
+                                            spellCheck="false"
+                                            disabled={loading}
+                                            placeholder="Enter JSON data here..."
                                         />
-                                    </label>
-                                    <button
-                                        className="editor-btn"
-                                        onClick={handleExportFile}
-                                        title="Export JSON"
-                                    >
-                                        <FiDownload className="icon" />
-                                    </button>
-                                    <button
-                                        className="editor-btn"
-                                        onClick={handleSaveDataset}
-                                        disabled={loading || !isEdited}
-                                        title="Save Dataset"
-                                    >
-                                        <FiSave className="icon" />
-                                    </button>
-                                    <button
-                                        className="editor-btn"
-                                        onClick={handleDeleteDataset}
-                                        disabled={loading}
-                                        title="Delete Dataset"
-                                    >
-                                        <FiTrash2 className="icon" />
-                                    </button>
-                                    <button
-                                        className="editor-btn use-data-btn"
-                                        onClick={handleUseDataset}
-                                        disabled={loading}
-                                        title="Use this data in requests"
-                                    >
-                                        <FiCopy className="icon" /> Use Data
-                                    </button>
-                                </div>
+                                        {jsonError && (
+                                            <div className="inline-error-message">
+                                                <FiAlertTriangle className="icon" /> {jsonError}
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+
+                                {(viewMode === 'preview' || viewMode === 'split') && (
+                                    <div className="preview-container">
+                                        <div className="preview-header">
+                                            <h3>Preview</h3>
+                                        </div>
+                                        <div className="json-preview">
+                                            {validateJson(editorContent) ? (
+                                                <div className="formatted-preview">
+                                                    {Object.entries(JSON.parse(editorContent)).map(([key, value]) => (
+                                                        <div className="preview-item" key={key}>
+                                                            <div className="preview-key">{key}:</div>
+                                                            <div className="preview-value">
+                                                                {typeof value === 'object'
+                                                                    ? JSON.stringify(value)
+                                                                    : String(value)}
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            ) : (
+                                                <div className="preview-error">
+                                                    <FiAlertTriangle className="icon" />
+                                                    <span>Invalid JSON. Fix errors to see preview.</span>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                )}
                             </div>
-                            <textarea
-                                className="json-editor"
-                                value={editorContent}
-                                onChange={handleEditorChange}
-                                spellCheck="false"
-                                disabled={loading}
-                                placeholder="Enter JSON data here..."
-                            />
                         </>
                     ) : (
                         <div className="no-dataset-selected">
-                            <p>No dataset selected. Please select a dataset from the list or create a new one.</p>
-                            <button
-                                className="action-btn"
-                                onClick={() => setShowNewDatasetModal(true)}
-                            >
-                                <FiPlus className="icon" /> Create New Dataset
-                            </button>
+                            <div className="empty-state">
+                                <FiDatabase className="empty-icon" />
+                                <h3>No Dataset Selected</h3>
+                                <p>Select a dataset from the list or create a new one to get started.</p>
+                                <div className="empty-actions">
+                                    <button
+                                        className="action-btn create-btn"
+                                        onClick={() => setShowNewDatasetModal(true)}
+                                    >
+                                        <FiPlus className="icon" /> Create New Dataset
+                                    </button>
+                                    <button
+                                        className="action-btn template-btn"
+                                        onClick={() => setShowTemplateModal(true)}
+                                    >
+                                        <FiCode className="icon" /> Use Template
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     )}
                 </div>
             </div>
 
             {renderNewDatasetModal()}
+            {renderTemplateModal()}
         </div>
     );
 }

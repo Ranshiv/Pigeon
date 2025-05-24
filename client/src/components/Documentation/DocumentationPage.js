@@ -1,8 +1,7 @@
 import React from 'react';
-import { Container, Typography, Box, Breadcrumbs, Link } from '@mui/material';
 import DocumentationViewer from './DocumentationViewer';
-import HomeIcon from '@mui/icons-material/Home';
-import DescriptionIcon from '@mui/icons-material/Description';
+import './DocumentationPage.css';
+import { FiHome, FiFileText } from 'react-icons/fi';
 
 /**
  * DocumentationPage component serves as a container for the DocumentationViewer
@@ -10,40 +9,36 @@ import DescriptionIcon from '@mui/icons-material/Description';
  */
 const DocumentationPage = () => {
     return (
-        <Container maxWidth="xl">
-            <Box my={4}>
-                <Breadcrumbs aria-label="breadcrumb" mb={2}>
-                    <Link
-                        color="inherit"
-                        href="/workspace/home"
-                        sx={{ display: 'flex', alignItems: 'center' }}
-                    >
-                        <HomeIcon sx={{ mr: 0.5, fontSize: '1.2rem' }} />
+        <div className="documentation-page">
+            <div className="documentation-page-container">
+                <nav className="documentation-breadcrumbs">
+                    <a href="/workspace/home" className="breadcrumb-link">
+                        <FiHome className="breadcrumb-icon" />
                         Home
-                    </Link>
-                    <Typography
-                        color="text.primary"
-                        sx={{ display: 'flex', alignItems: 'center' }}
-                    >
-                        <DescriptionIcon sx={{ mr: 0.5, fontSize: '1.2rem' }} />
+                    </a>
+                    <span className="breadcrumb-separator">/</span>
+                    <span className="breadcrumb-current">
+                        <FiFileText className="breadcrumb-icon" />
                         Documentation
-                    </Typography>
-                </Breadcrumbs>
+                    </span>
+                </nav>
 
-                <Typography variant="h4" component="h1" gutterBottom>
-                    API Documentation
-                </Typography>
+                <header className="documentation-page-header">
+                    <h1 className="documentation-page-title">
+                        API Documentation
+                    </h1>
 
-                <Typography variant="body1" color="text.secondary" paragraph>
-                    This documentation is automatically generated from your API requests. Use the interactive
-                    documentation below to explore your API endpoints, parameters, and response formats.
-                </Typography>
+                    <p className="documentation-page-subtitle">
+                        This documentation is automatically generated from your API requests. Use the interactive
+                        documentation below to explore your API endpoints, parameters, and response formats.
+                    </p>
+                </header>
 
-                <Box mt={4}>
+                <div className="documentation-viewer-container">
                     <DocumentationViewer />
-                </Box>
-            </Box>
-        </Container>
+                </div>
+            </div>
+        </div>
     );
 };
 

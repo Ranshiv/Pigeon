@@ -11,6 +11,8 @@ router.get('/:collectionId', ensureAuthenticated, async (req, res) => {
         const collectionId = req.params.collectionId;
         const userId = req.user.id;
 
+        console.log(`[SERVER] Getting documentation for collection ${collectionId} for user ${userId}`);
+
         // Find the collection and check if user has access
         const collection = await Collection.findOne({
             _id: collectionId,
@@ -21,14 +23,25 @@ router.get('/:collectionId', ensureAuthenticated, async (req, res) => {
         });
 
         if (!collection) {
+            console.log('[SERVER] Collection not found or access denied');
             return res.status(404).json({ message: 'Collection not found or access denied' });
         }
 
-        // If no documentation exists, return 404
-        if (!collection.documentation) {
-            return res.status(404).json({ message: 'Documentation not found' });
+        console.log('[SERVER] Collection found, checking for documentation');
+
+        // If no documentation exists or content is empty, return empty documentation object
+        // This ensures client knows documentation exists but is empty
+        if (!collection.documentation || !collection.documentation.content || collection.documentation.content.trim() === '') {
+            console.log('[SERVER] No documentation found or empty content, returning empty template');
+            return res.json({
+                title: '',
+                content: '',
+                collectionId: collectionId,
+                isNew: true
+            });
         }
 
+        console.log('[SERVER] Returning existing documentation');
         // Return the documentation directly
         res.json(collection.documentation);
     } catch (err) {
@@ -44,8 +57,13 @@ router.put('/:collectionId', ensureAuthenticated, async (req, res) => {
         const userId = req.user.id;
         const docData = req.body;
 
-        if (!docData || (!docData.content && !docData.documentation)) {
-            return res.status(400).json({ message: 'Documentation content is required' });
+        if (!docData) {
+            return res.status(400).json({ message: 'Documentation data is required' });
+        }
+
+        // Only check if the content field exists in the request, not if it's empty
+        if (docData.content === undefined && docData.documentation === undefined) {
+            return res.status(400).json({ message: 'Documentation must include content field (can be empty)' });
         }
 
         // Find the collection and check if user has access
@@ -61,10 +79,12 @@ router.put('/:collectionId', ensureAuthenticated, async (req, res) => {
             return res.status(404).json({ message: 'Collection not found or you do not have permission to edit' });
         }
 
-        // Update the documentation - support both formats
+        // Update the documentation - support both formats with careful handling of empty content
         const documentation = {
             title: docData.title || docData.documentation?.title || `${collection.name} Documentation`,
-            content: docData.content || docData.documentation?.content || '',
+            // Ensure content is always a string, even if empty
+            content: typeof docData.content === 'string' ? docData.content :
+                typeof docData.documentation?.content === 'string' ? docData.documentation.content : '',
             collectionId: collectionId,
             updatedAt: new Date()
         };
@@ -89,12 +109,15 @@ router.post('/:collectionId', ensureAuthenticated, async (req, res) => {
     try {
         const collectionId = req.params.collectionId;
         const userId = req.user.id;
-        const { title, content } = req.body;
+        // Extract all possible fields including isNew flag
+        const { title, content, isNew } = req.body;
 
         console.log(`Saving documentation for collection ${collectionId}`, { title, contentLength: content?.length });
 
-        if (!content) {
-            return res.status(400).json({ message: 'Documentation content is required' });
+        // Allow any content value, including empty strings
+        // Only check if the content field exists in the request
+        if (req.body.content === undefined) {
+            return res.status(400).json({ message: 'Documentation content field must be included in request' });
         }
 
         // Find the collection and check if user has access
@@ -113,10 +136,19 @@ router.post('/:collectionId', ensureAuthenticated, async (req, res) => {
         // Create or update the documentation
         const docData = {
             title: title || `${collection.name} Documentation`,
-            content: content,
+            // Explicitly ensure content is a string (empty string is valid)
+            content: typeof content === 'string' ? content : '',
             collectionId: collectionId,
-            updatedAt: new Date()
+            updatedAt: new Date(),
+            // If isNew was explicitly set to false, include it
+            ...(isNew === false ? { isNew: false } : {})
         };
+
+        console.log('Server creating documentation with data:', {
+            titleLength: docData.title?.length,
+            contentLength: docData.content?.length,
+            contentType: typeof docData.content
+        });
 
         // Update the collection with documentation
         if (!collection.documentation) {
@@ -136,7 +168,12 @@ router.post('/:collectionId', ensureAuthenticated, async (req, res) => {
         await collection.save();
         console.log("Collection saved successfully");
 
-        res.json(collection.documentation);
+        // Return the updated documentation with success message
+        res.json({
+            ...collection.documentation.toObject ? collection.documentation.toObject() : collection.documentation,
+            message: 'Documentation saved successfully',
+            isNew: false // After saving, it's never considered new
+        });
     } catch (err) {
         console.error('Error creating documentation:', err);
         res.status(500).json({ message: `Error creating documentation: ${err.message}` });

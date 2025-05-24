@@ -9,7 +9,7 @@ const DocumentationEditor = ({ documentation, collection, onSave, isSaving }) =>
     const [title, setTitle] = useState('');
     const [isPreview, setIsPreview] = useState(false);
     const [endpoints, setEndpoints] = useState([]);
-
+    
     // Debug log for initial render
     console.log('DocumentationEditor initial render:', {
         hasDocumentation: !!documentation,
@@ -31,41 +31,30 @@ const DocumentationEditor = ({ documentation, collection, onSave, isSaving }) =>
 
     // Initialize editor with existing documentation or blank
     useEffect(() => {
-        // CRITICAL FIX: Log the documentation details for debugging
-        console.log('DocumentationEditor MOUNT/UPDATE - Got documentation:', {
-            docExists: !!documentation,
-            content: documentation?.content,
-            contentLength: documentation?.content?.length,
-            title: documentation?.title,
-            isNew: documentation?.isNew,
-            isObject: typeof documentation === 'object',
-            collection: collection?.name,
-            timestamp: new Date().toISOString(),
-            componentKey: document.querySelector('.documentation-editor')?.getAttribute('data-key') || 'unknown'
+        // Debug: Log what documentation and collection props are received in detail
+        console.log('DocumentationEditor useEffect DETAILED:', { 
+            documentation: documentation,
+            documentationContent: documentation?.content,
+            documentationContentLength: documentation?.content?.length,
+            documentationIsNew: documentation?.isNew,
+            documentationType: typeof documentation,
+            collection: collection
         });
-
-        // Always update local state from props unconditionally
-        // Force refresh the content no matter what
-        const docContent = documentation?.content !== undefined ? documentation.content : '';
-        const docTitle = documentation?.title || (collection?.name ? `${collection.name} Documentation` : '');
-
-        console.log(`SETTING EDITOR CONTENT: "${docContent.substring(0, 50)}..."`, {
-            contentLength: docContent.length,
-            isContentEmpty: docContent === '',
-            isContentWhitespace: docContent.trim() === ''
-        });
-
-        console.log(`SETTING EDITOR TITLE: "${docTitle}"`);
-
-        // Set the state with the values - force a clean replacement to prevent stale state issues
-        setContent('');
-        setTitle('');
-
-        // Small delay before setting actual content to ensure clean re-render
-        setTimeout(() => {
-            setContent(docContent);
-            setTitle(docTitle);
-        }, 10);
+        
+        // CRITICAL FIX: Only load content if there's actual saved documentation 
+        // AND it's not marked as new AND it's not empty
+        if (documentation && 
+            documentation.content && 
+            documentation.content.trim() !== '' && 
+            documentation.isNew !== true) {
+            console.log('DECISION: Loading existing documentation content');
+            setContent(documentation.content);
+            setTitle(documentation.title || '');
+        } else {
+            // Always start with completely blank content for new documentation
+            console.log('DECISION: Starting with completely blank editor');
+            setContent('');
+            setTitle(collection?.name ? `${collection.name} Documentation` : '');
 
         // Extract endpoints from collection
         if (collection && collection.requests) {
@@ -80,9 +69,7 @@ const DocumentationEditor = ({ documentation, collection, onSave, isSaving }) =>
     }, [documentation, collection]);
 
     // Generate documentation template based on collection data
-    // This function should only be called when the user explicitly requests it
     const generateDocumentationTemplate = (collection) => {
-        console.log('generateDocumentationTemplate called manually by user');
         if (!collection) return '';
 
         // Example Swagger documentation template
@@ -91,7 +78,7 @@ const DocumentationEditor = ({ documentation, collection, onSave, isSaving }) =>
         template += `## Overview\n\n`;
         template += `This is a sample server for ${collection.name}. You can find out more about Swagger at [http://swagger.io](http://swagger.io).\n\n`;
         template += `**Version:** 1.0.0\n\n`;
-
+        
         template += `## Endpoints\n\n`;
 
         // Add some sample endpoints from collection or use generic ones
@@ -119,7 +106,7 @@ const DocumentationEditor = ({ documentation, collection, onSave, isSaving }) =>
             template += `| id | integer | Yes | ID of item to return |\n\n`;
             template += `#### Response\n\n`;
             template += `\`\`\`json\n{\n  "id": 1,\n  "name": "Item name",\n  "status": "available"\n}\n\`\`\`\n\n`;
-
+            
             template += `### Create New Item\n\n`;
             template += `\`POST /api/items\`\n\n`;
             template += `**Description:** Create a new item in the system\n\n`;
@@ -138,33 +125,14 @@ const DocumentationEditor = ({ documentation, collection, onSave, isSaving }) =>
 
     // Handle saving documentation
     const handleSave = () => {
-        // CRITICAL: Ensure content is always explicitly a string, even when empty
-        let currentContent = typeof content === 'string' ? content : '';
-
-        // If content is completely empty, add a space to avoid server validation issues
-        // This ensures the server doesn't reject empty content
-        if (currentContent === '') {
-            console.log('Empty content detected, adding a space to avoid server validation issues');
-            currentContent = ' ';
-        }
-
-        // Ensure we have a valid structure even when saving empty content
         const docData = {
-            title: title || (collection?.name ? `${collection.name} Documentation` : ''),
-            content: currentContent, // Use the possibly modified content
+            title,
+            content,
             collectionId: collection?._id,
             updatedAt: new Date().toISOString(),
-            // Only include other properties selectively to avoid potential issues
-            // with properties that might conflict with our content setting
-            id: documentation?.id,
-            _id: documentation?._id,
-            createdAt: documentation?.createdAt,
-            isNew: false, // After saving, it's no longer new
-            // Add a flag to indicate we should redirect to view mode after saving
-            redirectToView: true
+            ...(documentation || {}) // Preserve other properties if they exist
         };
 
-        console.log('Saving documentation with data:', docData);
         onSave(docData);
     };
 
@@ -471,36 +439,30 @@ const DocumentationEditor = ({ documentation, collection, onSave, isSaving }) =>
         );
     };
 
-    // Function to explicitly insert the template only when requested by user
+    // Add this function to insert the template on demand
     const handleInsertTemplate = () => {
-        console.log('handleInsertTemplate called by user clicking button');
-
         // Confirm with the user before overwriting any existing content
         if (content && content.trim() !== '') {
             if (!window.confirm('This will replace your current documentation with a Swagger example. Continue?')) {
                 return;
             }
         }
-
+        
         // Generate the Swagger template and set it
-        const template = generateDocumentationTemplate(collection);
-        console.log('Generated template length:', template.length);
-
-        setContent(template);
+        setContent(generateDocumentationTemplate(collection));
         setTitle(`${collection?.name || ''} API Documentation`);
-
+        
         // Switch to edit mode if in preview mode
         if (isPreview) {
             setIsPreview(false);
         }
-
+        
         // Let the user know template was inserted
-        console.log('Swagger example template inserted successfully');
-        alert('Swagger example template has been inserted.');
+        console.log('Swagger example template inserted');
     };
 
     return (
-        <div className="documentation-editor" data-key={`editor-instance-${Date.now()}`}>
+        <div className="documentation-editor">
             <div className="editor-header">
                 <div className="editor-title-section">
                     <input
@@ -548,7 +510,7 @@ const DocumentationEditor = ({ documentation, collection, onSave, isSaving }) =>
                             <em>I</em> Italic
                         </button>
                         <button onClick={() => insertMarkdown('header', 'Heading')}>
-                            <span style={{ fontWeight: 'bold', fontSize: '16px' }}>H</span> Heading
+                            H Heading
                         </button>
                         <button onClick={() => insertMarkdown('code', 'code')}>
                             <FiCode /> Code Block

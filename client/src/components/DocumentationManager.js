@@ -17,6 +17,106 @@ const DocumentationManager = () => {
     const [isSaving, setIsSaving] = useState(false);
     const [view, setView] = useState('edit'); // 'edit', 'view', 'swagger', 'settings'
 
+    // Listen for view changes for debugging
+    useEffect(() => {
+        console.log('View state changed to:', view);
+    }, [view]);
+
+    // Special effect to handle edit mode transitions
+    useEffect(() => {
+        if (view === 'edit' && documentation) {
+            console.log('Edit mode effect triggered with documentation:', documentation);
+            // This effect ensures documentation is properly loaded when edit mode is active
+            // and forces a re-render of the editor component
+        }
+    }, [view, documentation, documentation?._timestamp]);
+
+    // Define the switchToEditMode function to handle Edit button clicks
+    const switchToEditMode = async () => {
+        console.log('Switching to edit mode with documentation:', documentation);
+
+        // First clear the current documentation to force a clean re-render
+        setDocumentation(null);
+
+        // Set a loading state to show feedback
+        setIsLoading(true);
+
+        try {
+            console.log('Re-fetching documentation from server for edit mode');
+            const response = await fetch(`/api/collections/${collectionId}/documentation`, {
+                credentials: 'include'
+            });
+
+            if (response.ok) {
+                const freshDocData = await response.json();
+                console.log('Fresh documentation data received:', freshDocData);
+
+                // Create a complete document with all required fields
+                const updatedDoc = {
+                    ...freshDocData,
+                    title: freshDocData.title || (collection?.name ? `${collection.name} Documentation` : ''),
+                    content: freshDocData.content || '',
+                    collectionId: collectionId,
+                    isNew: false,
+                    // Add timestamp to ensure React recognizes this as a new object
+                    _timestamp: new Date().getTime()
+                };
+
+                // Set the documentation state with the fresh data
+                setDocumentation(updatedDoc);
+                console.log('Updated documentation for edit mode:', updatedDoc);
+
+                // Once documentation is set, switch to edit view
+                setTimeout(() => {
+                    setView('edit');
+                    console.log('View switched to edit mode');
+                }, 50);
+            } else {
+                console.error('Failed to refresh documentation data');
+                // Fall back to using the current documentation data
+                setDocumentation({
+                    ...(documentation || {}),
+                    isNew: false,
+                    _timestamp: new Date().getTime()
+                });
+                setView('edit');
+            }
+        } catch (err) {
+            console.error('Error refreshing documentation:', err);
+            // Fall back to using the current documentation data
+            setDocumentation({
+                ...(documentation || {}),
+                isNew: false,
+                _timestamp: new Date().getTime()
+            });
+            setView('edit');
+        } finally {
+            setTimeout(() => setIsLoading(false), 100);
+        }
+    };
+
+    // Define the switchToViewMode function to handle smooth transitions to view mode
+    const switchToViewMode = () => {
+        console.log('Switching to view mode with documentation:', documentation);
+
+        // Set loading state for visual feedback
+        setIsLoading(true);
+
+        // Brief timeout to allow UI to update before showing the view
+        setTimeout(() => {
+            setView('view');
+            setIsLoading(false);
+        }, 100);
+    };
+
+    // Special effect to handle view mode transitions
+    useEffect(() => {
+        if (view === 'view' && documentation && documentation.content) {
+            console.log('View mode effect triggered with documentation:', documentation);
+            // This effect ensures documentation is properly loaded when view mode is active
+        }
+    }, [view, documentation]);
+
     useEffect(() => {
         const fetchData = async () => {
             if (!collectionId) {
@@ -48,7 +148,30 @@ const DocumentationManager = () => {
 
                     if (documentationResponse.ok) {
                         const documentationData = await documentationResponse.json();
-                        setDocumentation(documentationData);
+                        // Only set documentation with content if it exists and is non-empty
+                        console.log('Documentation data received:', documentationData);
+
+                        if (documentationData &&
+                            ((documentationData.content && documentationData.content.trim() !== '') ||
+                                (documentationData.documentation &&
+                                    documentationData.documentation.content &&
+                                    documentationData.documentation.content.trim() !== ''))) {
+                            console.log('Setting documentation with content');
+                            setDocumentation(documentationData);
+                        } else if (documentationData && documentationData.isNew) {
+                            // For explicitly empty documentation, set it but mark it as new
+                            console.log('Setting explicitly empty documentation');
+                            setDocumentation({ ...documentationData, isNew: true });
+                        } else {
+                            console.log('Documentation is empty, keeping editor blank');
+                            // Set empty documentation structure to avoid errors when saving
+                            setDocumentation({
+                                title: '',
+                                content: '',
+                                collectionId: collectionId,
+                                isNew: true
+                            });
+                        }
                     }
                 } catch (docError) {
                     console.error('Error fetching documentation, may not exist yet:', docError);
@@ -75,42 +198,157 @@ const DocumentationManager = () => {
             const url = `/api/collections/${collectionId}/documentation`;
             console.log("Saving to URL:", url);
 
+            // Make sure we have a well-formed document to save
+            const documentToSave = {
+                title: docData.title || '',
+                // CRITICAL: Always explicitly set content as a string, even if empty
+                content: docData.content === undefined ? '' :
+                    typeof docData.content === 'string' ? docData.content : '',
+                collectionId: collectionId,
+                updatedAt: new Date().toISOString(),
+                // After saving, it's no longer new
+                isNew: false
+            };
+
+            // Log exactly what we're saving to help debug
+            console.log("Preparing to save document with content:", {
+                contentType: typeof documentToSave.content,
+                contentLength: documentToSave.content.length,
+                content: documentToSave.content.substring(0, 50) + '...'
+            });
+
             const response = await fetch(url, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
                 credentials: 'include',
-                // Simplify the body structure to directly include the content
-                body: JSON.stringify({
-                    title: docData.title,
-                    content: docData.content,
-                    collectionId: collectionId,
-                    updatedAt: new Date().toISOString()
-                })
+                body: JSON.stringify(documentToSave)
             });
 
             if (!response.ok) {
                 const errorText = await response.text();
                 console.error("Server response error:", response.status, errorText);
+
+                // Check if this is our content validation error
+                if (response.status === 400 && errorText.includes('content')) {
+                    console.error("Content validation error - attempting workaround with non-empty content");
+
+                    // Try again with a space character if empty content was rejected
+                    const retryResponse = await fetch(url, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        credentials: 'include',
+                        body: JSON.stringify({
+                            title: docData.title || '',
+                            // Add a single space if content was empty
+                            content: !docData.content || docData.content === '' ? ' ' : docData.content,
+                            collectionId: collectionId,
+                            updatedAt: new Date().toISOString(),
+                            isNew: false
+                        })
+                    });
+
+                    if (retryResponse.ok) {
+                        const savedDoc = await retryResponse.json();
+                        console.log("Documentation saved successfully with workaround:", savedDoc);
+
+                        // Process the response and update state just like a normal save
+                        if (savedDoc) {
+                            const updatedDoc = savedDoc.documentation || savedDoc;
+
+                            // First set to null to ensure a clean update
+                            setDocumentation(null);
+
+                            setTimeout(() => {
+                                // Create a complete documentation object with all required fields
+                                const completeDoc = {
+                                    ...updatedDoc,
+                                    // After saving, it should never be considered new
+                                    isNew: false,
+                                    // Ensure these fields always exist
+                                    title: updatedDoc.title || (collection?.name ? `${collection.name} Documentation` : ''),
+                                    content: updatedDoc.content || '',
+                                    collectionId: collectionId,
+                                    // Add timestamp to ensure React recognizes this as a new object
+                                    _timestamp: new Date().getTime()
+                                };
+
+                                // Set documentation state with the updated object
+                                setDocumentation(completeDoc);
+                                console.log('Updated documentation state after retry save:', completeDoc);
+
+                                // Show success message
+                                alert('Documentation saved successfully');
+
+                                // Navigate back to the same collection page
+                                navigate(`/workspace/collections/${collectionId}`);
+                            }, 50);
+
+                            // Return early from this function
+                            return;
+                        }
+                    }
+                }
+
                 throw new Error(`Failed to save documentation: ${response.status}${errorText ? ' - ' + errorText : ''}`);
             }
 
             const savedDoc = await response.json();
             console.log("Documentation saved successfully:", savedDoc);
 
-            if (savedDoc.documentation) {
-                setDocumentation(savedDoc.documentation);
-            } else {
-                setDocumentation(savedDoc);
-            }
+            // Handle different response formats safely
+            if (savedDoc) {
+                const updatedDoc = savedDoc.documentation || savedDoc;
 
-            // Show success message
-            alert('Documentation saved successfully');
+                // Force component remounting with completely new documentation object
+                // First set to null to ensure React detects the change
+                setDocumentation(null);
+
+                // Wait a moment to ensure React processes the null state
+                setTimeout(() => {
+                    // Create a complete and properly structured documentation object with unique timestamp
+                    const completeDoc = {
+                        ...updatedDoc,
+                        // After saving, it should never be considered new
+                        isNew: false,
+                        // Ensure these fields always exist
+                        title: updatedDoc.title || (collection?.name ? `${collection.name} Documentation` : ''),
+                        content: updatedDoc.content || '',
+                        collectionId: collectionId,
+                        // Add timestamp to force React to recognize this as a new object
+                        _timestamp: new Date().getTime()
+                    };
+
+                    console.log('Setting documentation with new complete object:', completeDoc);
+
+                    // Update state with the complete doc
+                    setDocumentation(completeDoc);
+
+                    // Show success message
+                    alert('Documentation saved successfully');
+
+                    // Navigate back to the same collection page
+                    navigate(`/workspace/collections/${collectionId}`);
+                }, 50);
+            } else {
+                throw new Error('Received empty response when saving documentation');
+            }
 
         } catch (err) {
             console.error('Error saving documentation:', err);
-            alert(`Failed to save documentation: ${err.message}`);
+
+            // Enhanced error logging for debugging
+            console.error('Error details:', {
+                message: err.message,
+                stack: err.stack,
+                responseText: err.responseText
+            });
+
+            // More user-friendly error message with troubleshooting suggestion
+            alert(`Failed to save documentation: ${err.message}\n\nTry making a small change to the content before saving again.`);
         } finally {
             setIsSaving(false);
         }
@@ -559,7 +797,7 @@ const DocumentationManager = () => {
                 </div>
                 <div className="documentation-title">
                     <FiBook className="doc-icon" />
-                    <h2>{collection?.name} Documentation</h2>
+                    <h2>{documentation && documentation.title ? documentation.title : `${collection?.name} Documentation`}</h2>
                     {documentation && documentation.updatedAt && (
                         <span className="last-updated">
                             <FiClock /> Last updated: {new Date(documentation.updatedAt).toLocaleString()}
@@ -570,16 +808,38 @@ const DocumentationManager = () => {
                     <div className="view-mode-toggle">
                         <button
                             className={`view-btn ${view === 'edit' ? 'active' : ''}`}
-                            onClick={() => setView('edit')}
+                            onClick={(e) => {
+                                // Prevent any default button behavior
+                                e.preventDefault();
+
+                                // Switch to edit mode handler
+                                console.log('Edit button clicked, current view state:', view);
+                                console.log('Current documentation state:', documentation);
+
+                                // Disable the button temporarily to prevent multiple clicks
+                                e.currentTarget.disabled = true;
+
+                                // Call our improved switchToEditMode function
+                                switchToEditMode()
+                                    .catch(err => console.error('Error in switchToEditMode:', err))
+                                    .finally(() => {
+                                        // Re-enable the button after a delay
+                                        setTimeout(() => {
+                                            e.currentTarget.disabled = false;
+                                        }, 500);
+                                    });
+                            }}
                         >
-                            <FiEdit /> Edit
+                            <FiEdit /> {(!documentation || !documentation.content || documentation.content.trim() === '') ? 'Create' : 'Edit'}
                         </button>
                         <button
                             className={`view-btn ${view === 'view' ? 'active' : ''}`}
-                            onClick={() => setView('view')}
+                            onClick={() => switchToViewMode()}
+                            disabled={!documentation || !documentation.content || documentation.content.trim() === ''}
                         >
                             <FiEye /> View
                         </button>
+
                     </div>
                     <div className="action-dropdown">
                         <button className="action-btn">
@@ -614,20 +874,50 @@ const DocumentationManager = () => {
             </div>
 
             <div className="documentation-content">
-                {view === 'edit' && (
-                    <DocumentationEditor
-                        documentation={documentation}
-                        collection={collection}
-                        onSave={handleSaveDocumentation}
-                        isSaving={isSaving}
-                    />
+                {view === 'edit' && documentation && !isLoading && (
+                    <>
+                        {console.log('Rendering editor with documentation:', documentation)}
+                        <DocumentationEditor
+                            // Force unique key on each render to guarantee component remounting
+                            key={`editor-${view}-${Date.now()}-${documentation._timestamp || Math.random().toString(36).substring(2, 15)}`}
+                            documentation={{
+                                ...(documentation || {}),
+                                title: documentation?.title || (collection?.name ? `${collection.name} Documentation` : ''),
+                                content: documentation?.content || '',
+                                collectionId: collectionId,
+                                isNew: !documentation || !documentation.content || documentation.content.trim() === ''
+                            }}
+                            collection={collection}
+                            onSave={handleSaveDocumentation}
+                            isSaving={isSaving}
+                        />
+                    </>
                 )}
 
-                {view === 'view' && documentation && (
-                    <DocumentationViewer
-                        documentation={documentation}
-                        collection={collection}
-                    />
+                {view === 'edit' && (isLoading || !documentation) && (
+                    <div className="documentation-loading">
+                        <div className="spinner"></div>
+                        <p>Loading editor...</p>
+                    </div>
+                )}
+
+                {view === 'view' && documentation && documentation.content && documentation.content.trim() !== '' ? (
+                    <>
+                        {console.log('Rendering viewer with documentation:', documentation)}
+                        <DocumentationViewer
+                            documentation={documentation}
+                            collection={collection}
+                        />
+                    </>
+                ) : view === 'view' && (
+                    <div className="empty-documentation-message">
+                        <FiFileText size={48} color="#ccc" />
+                        <h3>No Documentation Yet</h3>
+                        <p>Click "Create" to start writing documentation for this collection.</p>
+                        <button className="action-btn" onClick={() => setView('edit')}>
+                            <FiEdit /> Create Documentation
+                        </button>
+                    </div>
                 )}
 
                 {view === 'settings' && (
