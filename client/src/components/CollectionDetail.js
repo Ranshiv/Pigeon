@@ -10,8 +10,8 @@ import DocumentationViewer from './DocumentationViewer';
 import { useCollaboration } from '../context/CollaborationContext';
 import {
   FiSave, FiSettings, FiPlay, FiAlertCircle, FiCheckCircle, FiBook, FiEdit,
-  FiPlus, FiTrash2, FiDatabase, FiClock, FiGlobe, FiLock, FiUsers, FiPackage,
-  FiMoreVertical, FiArrowRight, FiFileText
+  FiPlus, FiTrash2, FiDatabase, FiGlobe, FiLock, FiUsers, FiPackage,
+  FiFileText
 } from 'react-icons/fi';
 import { toast } from 'react-toastify'; // Import toast notification library
 
@@ -865,7 +865,9 @@ function CollectionDetail() {
           )}
 
           {activeTab === 'sampleData' && (
-            <SampleDataManager collectionId={collectionId} />
+            <div className="sample-data-tab-content">
+              <SampleDataManager collectionId={collectionId} />
+            </div>
           )}
         </div>
       </div>
