@@ -805,42 +805,7 @@ const DocumentationManager = () => {
                     )}
                 </div>
                 <div className="documentation-actions">
-                    <div className="view-mode-toggle">
-                        <button
-                            className={`view-btn ${view === 'edit' ? 'active' : ''}`}
-                            onClick={(e) => {
-                                // Prevent any default button behavior
-                                e.preventDefault();
 
-                                // Switch to edit mode handler
-                                console.log('Edit button clicked, current view state:', view);
-                                console.log('Current documentation state:', documentation);
-
-                                // Disable the button temporarily to prevent multiple clicks
-                                e.currentTarget.disabled = true;
-
-                                // Call our improved switchToEditMode function
-                                switchToEditMode()
-                                    .catch(err => console.error('Error in switchToEditMode:', err))
-                                    .finally(() => {
-                                        // Re-enable the button after a delay
-                                        setTimeout(() => {
-                                            e.currentTarget.disabled = false;
-                                        }, 500);
-                                    });
-                            }}
-                        >
-                            <FiEdit /> {(!documentation || !documentation.content || documentation.content.trim() === '') ? 'Create' : 'Edit'}
-                        </button>
-                        <button
-                            className={`view-btn ${view === 'view' ? 'active' : ''}`}
-                            onClick={() => switchToViewMode()}
-                            disabled={!documentation || !documentation.content || documentation.content.trim() === ''}
-                        >
-                            <FiEye /> View
-                        </button>
-
-                    </div>
                     <div className="action-dropdown">
                         <button className="action-btn">
                             <FiDownload /> Export

@@ -1,6 +1,6 @@
 // client/src/components/DocumentationEditor.js
 import React, { useState, useEffect } from 'react';
-import { FiSave, FiCode, FiLink, FiImage, FiTable, FiX } from 'react-icons/fi';
+import { FiSave, FiCode, FiLink, FiImage, FiTable, FiX, FiEdit3, FiEye } from 'react-icons/fi';
 import './DocumentationEditor.css';
 
 const DocumentationEditor = ({ documentation, collection, onSave, isSaving }) => {
@@ -512,18 +512,20 @@ const DocumentationEditor = ({ documentation, collection, onSave, isSaving }) =>
                     />
                 </div>
                 <div className="editor-actions">
-                    <button
-                        className={`view-toggle ${!isPreview ? 'active' : ''}`}
-                        onClick={() => setIsPreview(false)}
-                    >
-                        Edit
-                    </button>
-                    <button
-                        className={`view-toggle ${isPreview ? 'active' : ''}`}
-                        onClick={() => setIsPreview(true)}
-                    >
-                        Preview
-                    </button>
+                    <div className="view-toggle-group">
+                        <button
+                            className={`view-toggle-btn ${!isPreview ? 'active' : ''}`}
+                            onClick={() => setIsPreview(false)}
+                        >
+                            <FiEdit3 /> Edit
+                        </button>
+                        <button
+                            className={`view-toggle-btn ${isPreview ? 'active' : ''}`}
+                            onClick={() => setIsPreview(true)}
+                        >
+                            <FiEye /> Preview
+                        </button>
+                    </div>
                     <button
                         className="save-button"
                         onClick={handleSave}
