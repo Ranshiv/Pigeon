@@ -94,19 +94,18 @@ const DocumentationSettingsVersionHistory = ({ documentation, onSettingsRestore,
                 }))
             }
         }];
-    };
-
-    // Extract settings from documentation object
+    };    // Extract settings from documentation object
     const extractSettingsFromDocumentation = (doc) => {
         return {
-            isPublic: doc?.isPublic || false,
+            isPublic: typeof doc?.isPublic === 'boolean' ? doc.isPublic : false,
             metaTitle: doc?.metaTitle || '',
             metaDescription: doc?.metaDescription || '',
             customDomain: doc?.customDomain || '',
-            allowComments: doc?.allowComments || false,
-            showLastUpdated: doc?.showLastUpdated !== false,
-            enableSearch: doc?.enableSearch !== false,
-            theme: doc?.theme || 'default'
+            allowComments: typeof doc?.allowComments === 'boolean' ? doc.allowComments : false,
+            showLastUpdated: typeof doc?.showLastUpdated === 'boolean' ? doc.showLastUpdated : true,
+            enableSearch: typeof doc?.enableSearch === 'boolean' ? doc.enableSearch : true,
+            theme: doc?.theme || 'default',
+            displayOptions: doc?.displayOptions || {}
         };
     };
 
@@ -136,12 +135,17 @@ const DocumentationSettingsVersionHistory = ({ documentation, onSettingsRestore,
     const handleVersionSelect = (version) => {
         setSelectedVersion(version);
         setExpandedVersion(expandedVersion === version.id ? null : version.id);
-    };
-
-    // Handle restore version
+    };    // Handle restore version
     const handleRestoreVersion = (version) => {
-        if (onSettingsRestore) {
-            onSettingsRestore(version.settings);
+        if (onSettingsRestore && version.settings) {
+            // Create a deep copy to prevent reference issues
+            const settingsToRestore = JSON.parse(JSON.stringify(version.settings));
+            
+            // Log the settings being restored
+            console.log('Restoring settings version:', settingsToRestore);
+            
+            // Pass settings to the parent component for restoration
+            onSettingsRestore(settingsToRestore);
         }
     };
 

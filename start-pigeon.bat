@@ -1,68 +1,64 @@
 @echo off
-echo Starting Pigeon Application...
+echo ======================================
+echo      Starting Pigeon Application
+echo ======================================
 echo.
 
-REM Check if Node.js is installed
-where node >nul 2>nul
-if %ERRORLEVEL% neq 0 (
-    echo ERROR: Node.js is not installed or not in PATH
-    echo Please install Node.js from https://nodejs.org/
-    pause
-    exit /b 1
+:: -------------------------------------------------
+:: 1. Check prerequisites (Node.js, npm, Windows Terminal)
+:: -------------------------------------------------
+where node >nul 2>nul || (
+    echo ERROR: Node.js is not installed or not in PATH.
+    echo Download: https://nodejs.org/
+    pause & exit /b 1
 )
 
-REM Check if npm is installed
-where npm >nul 2>nul
-if %ERRORLEVEL% neq 0 (
-    echo ERROR: npm is not installed or not in PATH
-    echo Please install Node.js from https://nodejs.org/
-    pause
-    exit /b 1
+where npm >nul 2>nul || (
+    echo ERROR: npm is not installed or not in PATH.
+    echo Download: https://nodejs.org/
+    pause & exit /b 1
 )
 
-echo Node.js and npm are available
-echo.
-
-REM Check if we're in the correct directory
+:: -------------------------------------------------
+:: 2. Verify we are in the project root
+:: -------------------------------------------------
 if not exist "server.js" (
-    echo ERROR: server.js not found in current directory
-    echo Please run this script from the Pigeon root directory
-    pause
-    exit /b 1
+    echo ERROR: server.js not found — run this from the Pigeon root directory.
+    pause & exit /b 1
 )
 
 if not exist "client\package.json" (
-    echo ERROR: client directory not found
-    echo Please run this script from the Pigeon root directory
-    pause
-    exit /b 1
+    echo ERROR: client\package.json not found — run this from the Pigeon root directory.
+    pause & exit /b 1
 )
 
-echo Starting Pigeon Server...
-start "Pigeon Server" cmd /k "echo Starting Pigeon Server... && node server.js"
+:: -------------------------------------------------
+:: 3. Try to use Windows Terminal for two-tab launch
+:: -------------------------------------------------
+where wt >nul 2>nul
+if %ERRORLEVEL% equ 0 (
+    echo Launching backend and frontend in one Windows Terminal window...
+    wt ^
+        new-tab -d . cmd /k "title Pigeon Server && echo Starting Pigeon Server... && node server.js" ^
+        ; new-tab -d .\client cmd /k "title Pigeon Client && echo Starting Pigeon Client... && npm start"
+    echo.
+    echo Backend → http://localhost:5001
+    echo Frontend → http://localhost:3000
+    echo Both tabs are now running inside Windows Terminal.
+    pause
+    exit /b 0
+)
 
-REM Wait a moment for the server to start
+:: -------------------------------------------------
+:: 4. Fallback: open two classic cmd windows
+:: -------------------------------------------------
+echo Windows Terminal not found — falling back to two separate windows...
+start "Pigeon Server" cmd /k "title Pigeon Server && echo Starting Pigeon Server... && node server.js"
 timeout /t 3 /nobreak >nul
-
-echo Starting Pigeon Client...
-start "Pigeon Client" cmd /k "echo Starting Pigeon Client... && cd client && npm start"
+start "Pigeon Client" cmd /k "title Pigeon Client && echo Starting Pigeon Client... && cd client && npm start"
 
 echo.
-echo ======================================
-echo Pigeon Application is starting!
-echo ======================================
-echo.
-echo Server will be running at: http://localhost:5001
-echo Client will be running at: http://localhost:3000
-echo.
-echo Two new command windows have opened:
-echo 1. Pigeon Server - Backend API server
-echo 2. Pigeon Client - React frontend
-echo.
-echo To stop the application:
-echo - Close both command windows, or
-echo - Press Ctrl+C in each window
-echo.
-echo This window can be closed safely.
-echo.
+echo Backend → http://localhost:5001
+echo Frontend → http://localhost:3000
+echo Two command windows have been opened.
 pause

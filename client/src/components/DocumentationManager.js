@@ -1,9 +1,11 @@
 // client/src/components/DocumentationManager.js
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { FiBook, FiCode, FiDownload, FiUpload, FiSettings, FiGlobe, FiClock, FiChevronLeft, FiEdit, FiEye, FiFileText } from 'react-icons/fi';
+import { FiBook, FiCode, FiDownload, FiUpload, FiSettings, FiGlobe, FiClock, FiChevronLeft, FiEdit, FiEye, FiFileText, FiHistory } from 'react-icons/fi';
 import DocumentationEditor from './DocumentationEditor';
 import DocumentationViewer from './DocumentationViewer';
+import DocumentationSettingsVersionHistory from './DocumentationSettingsVersionHistory';
+import VersionControlService from '../services/VersionControlService';
 import './DocumentationManager.css';
 
 const DocumentationManager = () => {
@@ -15,7 +17,10 @@ const DocumentationManager = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
     const [isSaving, setIsSaving] = useState(false);
-    const [view, setView] = useState('edit'); // 'edit', 'view', 'swagger', 'settings'
+    const [view, setView] = useState('edit'); // 'edit', 'view', 'swagger', 'settings', 'history'
+    const [currentSettings, setCurrentSettings] = useState(null);
+    const [originalSettings, setOriginalSettings] = useState(null);
+    const [settingsChanged, setSettingsChanged] = useState(false);
 
     // Listen for view changes for debugging
     useEffect(() => {
@@ -43,7 +48,7 @@ const DocumentationManager = () => {
 
         try {
             console.log('Re-fetching documentation from server for edit mode');
-            const response = await fetch(`/api/collections/${collectionId}/documentation`, {
+            const response = await fetch(`/collections/${collectionId}/documentation`, {
                 credentials: 'include'
             });
 
@@ -187,7 +192,84 @@ const DocumentationManager = () => {
         };
 
         fetchData();
-    }, [collectionId]);
+    }, [collectionId]);    // Initialize settings from documentation object
+    useEffect(() => {
+        if (documentation) {
+            // Extract settings from the documentation object
+            const settings = {
+                isPublic: documentation.isPublic || false,
+                metaTitle: documentation.metaTitle || '',
+                metaDescription: documentation.metaDescription || '',
+                customDomain: documentation.customDomain || '',
+                allowComments: documentation.allowComments || false,
+                showLastUpdated: documentation.showLastUpdated !== false,
+                enableSearch: documentation.enableSearch !== false,
+                theme: documentation.theme || 'default',
+                displayOptions: documentation.displayOptions || {}
+            };
+
+            setCurrentSettings(settings);
+            setOriginalSettings(JSON.parse(JSON.stringify(settings))); // Deep copy for comparison
+            setSettingsChanged(false);
+        }
+    }, [documentation]);// Handle settings change
+    const handleSettingsChange = (field, value) => {
+        setCurrentSettings(prev => {
+            // Create a proper deep copy to avoid reference issues
+            const updated = JSON.parse(JSON.stringify(prev || {}));
+
+            // Handle nested properties like 'displayOptions.showContributors'
+            if (field.includes('.')) {
+                const [parentKey, childKey] = field.split('.');
+                
+                // Initialize parent object if it doesn't exist
+                if (!updated[parentKey]) {
+                    updated[parentKey] = {};
+                }
+                
+                // Set the nested property
+                updated[parentKey][childKey] = value;
+                
+                // Log for debugging
+                console.log(`Setting nested value: ${parentKey}.${childKey} =`, value);
+            } else {
+                // Set the direct property
+                updated[field] = value;
+                console.log(`Setting value: ${field} =`, value);
+            }
+
+            // Check if settings have changed from original
+            const hasChanged = JSON.stringify(updated) !== JSON.stringify(originalSettings);
+            setSettingsChanged(hasChanged);
+            
+            if (hasChanged) {
+                console.log('Settings changed, differences detected');
+            }
+            
+            return updated;
+        });
+    };// Handle settings restore from version history
+    const handleSettingsRestore = (restoredSettings) => {
+        // Make a deep copy of restored settings to prevent reference issues
+        const settingsCopy = JSON.parse(JSON.stringify(restoredSettings));
+        
+        // Ensure displayOptions are preserved properly
+        if (!settingsCopy.displayOptions) {
+            settingsCopy.displayOptions = {};
+        }
+        
+        // Log the settings being restored for debugging
+        console.log('Restoring settings:', settingsCopy);
+        
+        // Apply restored settings to current settings
+        setCurrentSettings(settingsCopy);
+        
+        // Mark as changed to enable saving
+        setSettingsChanged(true);
+
+        // Show feedback
+        alert("Settings restored from previous version. Click 'Save Settings' to apply changes.");
+    };
 
     const handleSaveDocumentation = async (docData) => {
         try {
@@ -652,7 +734,7 @@ const DocumentationManager = () => {
                             setIsSaving(true);
                             console.log("Importing OpenAPI documentation with data:", newDocData);
 
-                            const importResponse = await fetch(`/api/collections/${collectionId}/documentation/import/openapi`, {
+                            const importResponse = await fetch(`/collections/${collectionId}/documentation/import/openapi`, {
                                 method: 'POST',
                                 headers: {
                                     'Content-Type': 'application/json'
@@ -705,7 +787,7 @@ const DocumentationManager = () => {
         }
 
         try {
-            const response = await fetch(`/api/collections/${collectionId}/documentation/publish`, {
+            const response = await fetch(`/collections/${collectionId}/documentation/publish`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -725,8 +807,73 @@ const DocumentationManager = () => {
             console.error('Error publishing documentation:', err);
             alert(`Failed to publish documentation: ${err.message}`);
         }
+    };    const handleSaveSettings = async () => {
+        if (!documentation) return;
+        try {
+            setIsSaving(true);
+            
+            // Deep clone the current settings to avoid reference issues
+            const settingsToSave = JSON.parse(JSON.stringify(currentSettings));
+            
+            console.log('Current settings before save:', settingsToSave);
+            
+            // Prepare the settings payload, preserving all existing values from currentSettings
+            // but providing defaults for missing properties
+            const settingsPayload = {
+                isPublic: typeof settingsToSave.isPublic === 'boolean' ? settingsToSave.isPublic : false,
+                metaTitle: settingsToSave.metaTitle || '',
+                metaDescription: settingsToSave.metaDescription || '',
+                customDomain: settingsToSave.customDomain || '',
+                allowComments: typeof settingsToSave.allowComments === 'boolean' ? settingsToSave.allowComments : false,
+                showLastUpdated: typeof settingsToSave.showLastUpdated === 'boolean' ? settingsToSave.showLastUpdated : true,
+                enableSearch: typeof settingsToSave.enableSearch === 'boolean' ? settingsToSave.enableSearch : true,
+                theme: settingsToSave.theme || 'default',
+                displayOptions: settingsToSave.displayOptions || {}
+            };
+            
+            console.log('Settings payload being sent to server:', settingsPayload);
+            
+            // Send PUT request to save settings
+            const response = await fetch(`/api/collections/${collectionId}/documentation/settings`, {
+                method: 'POST',
+                credentials: 'include',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(settingsPayload)
+            });
+            
+            if (!response.ok) {
+                const errText = await response.text();
+                throw new Error(`Failed to save settings: ${response.status} ${errText}`);
+            }
+            
+            const result = await response.json();
+            console.log('Settings saved successfully:', result);
+            
+            // Update documentation with saved settings while preserving currentSettings
+            if (result.documentation) {
+                // Update documentation object with the saved settings
+                setDocumentation(prev => ({ 
+                    ...prev, 
+                    ...result.documentation,
+                    // Ensure displayOptions are preserved in the documentation object
+                    displayOptions: settingsPayload.displayOptions
+                }));
+                
+                // Update the original settings reference for comparison
+                setOriginalSettings(JSON.parse(JSON.stringify(settingsPayload)));
+                setSettingsChanged(false);
+            }
+            
+            // Give user feedback and exit the Settings view
+            alert('Documentation settings saved successfully');
+            setView(documentation ? 'view' : 'edit');
+        } catch (err) {
+            console.error('Error saving documentation settings:', err);
+            alert(`Failed to save documentation settings: ${err.message}`);
+        } finally {
+            setIsSaving(false);
+        }
     };
-
     // Simple helper to convert markdown to HTML for export
     // In a real implementation, you'd use a proper markdown library
     const convertToHtml = (markdown) => {
@@ -883,9 +1030,7 @@ const DocumentationManager = () => {
                             <FiEdit /> Create Documentation
                         </button>
                     </div>
-                )}
-
-                {view === 'settings' && (
+                )}                {view === 'settings' && (
                     <div className="documentation-settings">
                         <h3>Documentation Settings</h3>
 
@@ -895,8 +1040,8 @@ const DocumentationManager = () => {
                                 <label>
                                     <input
                                         type="checkbox"
-                                        checked={documentation?.isPublic || false}
-                                        onChange={() => alert('Settings changes coming soon!')}
+                                        checked={currentSettings?.isPublic || false}
+                                        onChange={(e) => handleSettingsChange('isPublic', e.target.checked)}
                                     />
                                     Make documentation public
                                 </label>
@@ -913,8 +1058,8 @@ const DocumentationManager = () => {
                                 <input
                                     type="text"
                                     id="meta-title"
-                                    value={documentation?.metaTitle || ''}
-                                    onChange={() => alert('Settings changes coming soon!')}
+                                    value={currentSettings?.metaTitle || ''}
+                                    onChange={(e) => handleSettingsChange('metaTitle', e.target.value)}
                                     placeholder="Meta title for search engines"
                                 />
                             </div>
@@ -922,8 +1067,8 @@ const DocumentationManager = () => {
                                 <label htmlFor="meta-description">Meta Description</label>
                                 <textarea
                                     id="meta-description"
-                                    value={documentation?.metaDescription || ''}
-                                    onChange={() => alert('Settings changes coming soon!')}
+                                    value={currentSettings?.metaDescription || ''}
+                                    onChange={(e) => handleSettingsChange('metaDescription', e.target.value)}
                                     placeholder="Meta description for search engines"
                                     rows={3}
                                 ></textarea>
@@ -937,8 +1082,8 @@ const DocumentationManager = () => {
                                 <input
                                     type="text"
                                     id="custom-domain"
-                                    value={documentation?.customDomain || ''}
-                                    onChange={() => alert('Settings changes coming soon!')}
+                                    value={currentSettings?.customDomain || ''}
+                                    onChange={(e) => handleSettingsChange('customDomain', e.target.value)}
                                     placeholder="api.yourdomain.com"
                                 />
                                 <p className="setting-description">
@@ -947,10 +1092,81 @@ const DocumentationManager = () => {
                             </div>
                         </div>
 
-                        <div className="settings-actions">
-                            <button className="cancel-btn" onClick={() => setView(documentation ? 'view' : 'edit')}>Cancel</button>
-                            <button className="save-btn" onClick={() => alert('Settings changes coming soon!')}>Save Settings</button>
+                        <div className="settings-section">
+                            <h4>Display Options</h4>
+                            <div className="setting-option">
+                                <label>                                    <input
+                                        type="checkbox"
+                                        checked={Boolean(currentSettings?.displayOptions?.showContributors)}
+                                        onChange={(e) => handleSettingsChange('displayOptions.showContributors', e.target.checked)}
+                                    />
+                                    Show Contributors
+                                </label>
+                                <p className="setting-description">Display the list of contributors on the documentation page.</p>
+                            </div>
+                            <div className="setting-option">
+                                <label>
+                                    <input
+                                        type="checkbox"
+                                        checked={Boolean(currentSettings?.displayOptions?.showLastUpdated)}
+                                        onChange={(e) => handleSettingsChange('displayOptions.showLastUpdated', e.target.checked)}
+                                    />
+                                    Show Last Updated Timestamp
+                                </label>
+                                <p className="setting-description">Display when the documentation was last updated.</p>
+                            </div>
+                            <div className="setting-option">
+                                <label>
+                                    <input
+                                        type="checkbox"
+                                        checked={Boolean(currentSettings?.displayOptions?.showTableOfContents)}
+                                        onChange={(e) => handleSettingsChange('displayOptions.showTableOfContents', e.target.checked)}
+                                    />
+                                    Show Table of Contents
+                                </label>
+                                <p className="setting-description">Automatically generate and display a table of contents.</p>
+                            </div>
                         </div>
+
+                        {/* Version History Section - placed before actions */}
+                        <div style={{ margin: '32px 0' }}>
+                            <DocumentationSettingsVersionHistory
+                                documentation={documentation}
+                                collectionId={collectionId}
+                                onSettingsRestore={handleSettingsRestore}
+                            />
+                        </div>
+
+                        <div className="settings-actions">
+                            <button className="cancel-btn" onClick={() => {
+                                handleSettingsRestore(originalSettings); // Restore to original before cancelling
+                                setView(documentation ? 'view' : 'edit');
+                            }}>Cancel</button>
+                            <button
+                                className="save-btn"
+                                onClick={handleSaveSettings}
+                                disabled={!settingsChanged || isSaving}
+                            >
+                                {isSaving ? 'Saving...' : 'Save Settings'}
+                            </button>
+                        </div>
+                    </div>
+                )}
+
+                {view === 'history' && (
+                    <div className="documentation-history">
+                        <div className="history-header">
+                            <button className="back-btn" onClick={() => setView('settings')}>
+                                <FiChevronLeft /> Back to Settings
+                            </button>
+                            <h3>Settings Version History</h3>
+                        </div>
+
+                        <DocumentationSettingsVersionHistory
+                            documentation={documentation}
+                            collectionId={collectionId}
+                            onSettingsRestore={handleSettingsRestore}
+                        />
                     </div>
                 )}
 
@@ -958,6 +1174,17 @@ const DocumentationManager = () => {
                     <div className="swagger-viewer">
                         <h3>API Documentation (Swagger)</h3>
                         <pre>{JSON.stringify(documentation, null, 2)}</pre>
+                    </div>
+                )}
+
+                {view === 'version-history' && documentation && (
+                    <div className="version-history-viewer">
+                        <h3>Version History</h3>
+                        <DocumentationSettingsVersionHistory
+                            documentationId={documentation.id}
+                            collectionId={collectionId}
+                            onClose={() => setView('settings')}
+                        />
                     </div>
                 )}
             </div>

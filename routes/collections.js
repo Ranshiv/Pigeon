@@ -967,19 +967,25 @@ router.post('/:id/documentation', authenticateJWT, async (req, res) => {
     try {
         const collectionId = req.params.id;
         const { title, content, importedFrom } = req.body;
+        const userId = req.user.id;
         const db = getDb();
 
-        if (!content) {
-            return res.status(400).json({ message: 'Documentation content is required' });
+        // Allow empty content but ensure field exists
+        if (content === undefined) {
+            return res.status(400).json({ message: 'Documentation content field must be included in request' });
         }
 
-        // Check if collection exists
+        // Check if collection exists and user has access
         const collection = await db.collection('collections').findOne({
-            _id: new ObjectId(collectionId)
+            _id: new ObjectId(collectionId),
+            $or: [
+                { owner: userId },
+                { collaborators: { $elemMatch: { userId: userId, role: { $in: ['editor', 'admin'] } } } }
+            ]
         });
 
         if (!collection) {
-            return res.status(404).json({ message: 'Collection not found' });
+            return res.status(404).json({ message: 'Collection not found or you do not have permission to edit' });
         }
 
         // Check if documentation already exists
@@ -987,15 +993,21 @@ router.post('/:id/documentation', authenticateJWT, async (req, res) => {
             collectionId: collectionId
         });
 
+        // Save current content to version history before updating
+        if (existingDoc && existingDoc.content) {
+            await saveDocumentationContentVersion(db, collectionId, userId, existingDoc, 'Content updated');
+        }
+
         let docData;
         if (existingDoc) {
             // Update existing documentation
             docData = {
                 title: title || existingDoc.title,
-                content: content,
+                content: typeof content === 'string' ? content : '',
                 collectionId: collectionId,
                 updatedAt: new Date(),
-                importedFrom: importedFrom || existingDoc.importedFrom || 'manual'
+                importedFrom: importedFrom || existingDoc.importedFrom || 'manual',
+                settings: existingDoc.settings || {}
             };
 
             await db.collection('documentation').updateOne(
@@ -1007,17 +1019,21 @@ router.post('/:id/documentation', authenticateJWT, async (req, res) => {
         } else {
             // Create new documentation
             docData = {
-                title: title || 'API Documentation',
-                content: content,
+                title: title || `${collection.name} Documentation`,
+                content: typeof content === 'string' ? content : '',
                 collectionId: collectionId,
                 createdAt: new Date(),
                 updatedAt: new Date(),
-                importedFrom: importedFrom || 'manual'
+                importedFrom: importedFrom || 'manual',
+                settings: {}
             };
 
             const result = await db.collection('documentation').insertOne(docData);
             docData._id = result.insertedId.toString();
         }
+
+        // Save the new content version
+        await saveDocumentationContentVersion(db, collectionId, userId, docData, 'Content updated');
 
         res.json(docData);
     } catch (err) {
@@ -1025,6 +1041,278 @@ router.post('/:id/documentation', authenticateJWT, async (req, res) => {
         res.status(500).json({ message: 'Error saving documentation' });
     }
 });
+
+// Update documentation settings for a collection
+router.post('/:id/documentation/settings', authenticateJWT, async (req, res) => {
+    try {
+        console.log(`[DEBUG] POST /collections/${req.params.id}/documentation/settings called`);
+        console.log('[DEBUG] Request body:', req.body);
+        console.log('[DEBUG] User ID:', req.user?.id);
+
+        const collectionId = req.params.id;
+        const userId = req.user.id;
+        const settingsData = req.body;
+        const db = getDb();
+
+        if (!settingsData) {
+            return res.status(400).json({ message: 'Settings data is required' });
+        }
+
+        // Check if collection exists and user has access
+        const collection = await db.collection('collections').findOne({
+            _id: new ObjectId(collectionId),
+            $or: [
+                { owner: userId },
+                { collaborators: { $elemMatch: { userId: userId, role: { $in: ['editor', 'admin'] } } } }
+            ]
+        });
+
+        if (!collection) {
+            return res.status(404).json({ message: 'Collection not found or you do not have permission to edit' });
+        }
+
+        // Get current documentation to preserve content and create version history
+        let currentDoc = await db.collection('documentation').findOne({
+            collectionId: collectionId
+        });
+
+        // Save current settings to version history before updating
+        if (currentDoc && currentDoc.settings) {
+            await saveDocumentationSettingsVersion(db, collectionId, userId, currentDoc.settings, 'Settings updated');
+        }
+
+        // Prepare updated settings
+        const updatedSettings = {
+            isPublic: settingsData.isPublic || false,
+            metaTitle: settingsData.metaTitle || '',
+            metaDescription: settingsData.metaDescription || '',
+            customDomain: settingsData.customDomain || '',
+            allowComments: settingsData.allowComments || false,
+            showLastUpdated: settingsData.showLastUpdated !== false,
+            enableSearch: settingsData.enableSearch !== false,
+            theme: settingsData.theme || 'default',
+            displayOptions: settingsData.displayOptions || {}
+        };
+
+        let docData;
+        if (currentDoc) {
+            // Update existing documentation settings
+            docData = {
+                ...currentDoc,
+                settings: updatedSettings,
+                updatedAt: new Date()
+            };
+
+            await db.collection('documentation').updateOne(
+                { _id: currentDoc._id },
+                { $set: { settings: updatedSettings, updatedAt: new Date() } }
+            );
+        } else {
+            // Create new documentation with settings
+            docData = {
+                title: `${collection.name} Documentation`,
+                content: '',
+                collectionId: collectionId,
+                settings: updatedSettings,
+                createdAt: new Date(),
+                updatedAt: new Date()
+            };
+
+            const result = await db.collection('documentation').insertOne(docData);
+            docData._id = result.insertedId.toString();
+        }
+
+        // Save the new settings version
+        await saveDocumentationSettingsVersion(db, collectionId, userId, updatedSettings, 'Settings updated');
+
+        res.json({
+            message: 'Documentation settings updated successfully',
+            documentation: {
+                ...docData,
+                _id: docData._id?.toString() || docData._id
+            }
+        });
+    } catch (err) {
+        console.error('Error updating documentation settings:', err);
+        res.status(500).json({ message: 'Error updating documentation settings' });
+    }
+});
+
+// Update documentation settings for a collection (PUT method for compatibility)
+router.put('/:id/documentation/settings', authenticateJWT, async (req, res) => {
+    try {
+        console.log(`[DEBUG] PUT /collections/${req.params.id}/documentation/settings called`);
+        console.log('[DEBUG] Request body:', req.body);
+        console.log('[DEBUG] User ID:', req.user?.id);
+
+        const collectionId = req.params.id;
+        const userId = req.user.id;
+        const settingsData = req.body;
+        const db = getDb();
+
+        if (!settingsData) {
+            return res.status(400).json({ message: 'Settings data is required' });
+        }
+
+        // Check if collection exists and user has access
+        const collection = await db.collection('collections').findOne({
+            _id: new ObjectId(collectionId),
+            $or: [
+                { owner: userId },
+                { collaborators: { $elemMatch: { userId: userId, role: { $in: ['editor', 'admin'] } } } }
+            ]
+        });
+
+        if (!collection) {
+            return res.status(404).json({ message: 'Collection not found or you do not have permission to edit' });
+        }
+
+        // Get current documentation to preserve content and create version history
+        let currentDoc = await db.collection('documentation').findOne({
+            collectionId: collectionId
+        });
+
+        // Save current settings to version history before updating
+        if (currentDoc && currentDoc.settings) {
+            await saveDocumentationSettingsVersion(db, collectionId, userId, currentDoc.settings, 'Settings updated');
+        }
+
+        // Prepare updated settings
+        const updatedSettings = {
+            isPublic: settingsData.isPublic || false,
+            metaTitle: settingsData.metaTitle || '',
+            metaDescription: settingsData.metaDescription || '',
+            customDomain: settingsData.customDomain || '',
+            allowComments: settingsData.allowComments || false,
+            showLastUpdated: settingsData.showLastUpdated !== false,
+            enableSearch: settingsData.enableSearch !== false,
+            theme: settingsData.theme || 'default',
+            displayOptions: settingsData.displayOptions || {}
+        };
+
+        let docData;
+        if (currentDoc) {
+            // Update existing documentation settings
+            docData = {
+                ...currentDoc,
+                settings: updatedSettings,
+                updatedAt: new Date()
+            };
+
+            await db.collection('documentation').updateOne(
+                { _id: currentDoc._id },
+                { $set: { settings: updatedSettings, updatedAt: new Date() } }
+            );
+        } else {
+            // Create new documentation with settings
+            docData = {
+                title: `${collection.name} Documentation`,
+                content: '',
+                collectionId: collectionId,
+                settings: updatedSettings,
+                createdAt: new Date(),
+                updatedAt: new Date()
+            };
+
+            const result = await db.collection('documentation').insertOne(docData);
+            docData._id = result.insertedId.toString();
+        }
+
+        // Save the new settings version
+        await saveDocumentationSettingsVersion(db, collectionId, userId, updatedSettings, 'Settings updated');
+
+        res.json({
+            message: 'Documentation settings updated successfully',
+            documentation: {
+                ...docData,
+                _id: docData._id?.toString() || docData._id
+            }
+        });
+    } catch (err) {
+        console.error('Error updating documentation settings:', err);
+        res.status(500).json({ message: 'Error updating documentation settings' });
+    }
+});
+
+// Get documentation settings version history
+router.get('/:id/documentation/settings/versions', authenticateJWT, async (req, res) => {
+    try {
+        const collectionId = req.params.id;
+        const userId = req.user.id;
+        const db = getDb();
+
+        // Check if collection exists and user has access
+        const collection = await db.collection('collections').findOne({
+            _id: new ObjectId(collectionId),
+            $or: [
+                { owner: userId },
+                { collaborators: { $elemMatch: { userId: userId } } }
+            ]
+        });
+
+        if (!collection) {
+            return res.status(404).json({ message: 'Collection not found or access denied' });
+        }
+
+        // Get version history for documentation settings
+        const versions = await db.collection('documentationSettingsVersions')
+            .find({ collectionId: collectionId })
+            .sort({ timestamp: -1 })
+            .limit(50) // Limit to last 50 versions
+            .toArray();
+
+        // Convert ObjectIds to strings
+        const versionsWithStringIds = versions.map(version => ({
+            ...version,
+            _id: version._id.toString()
+        }));
+
+        res.json(versionsWithStringIds);
+    } catch (err) {
+        console.error('Error fetching documentation settings versions:', err);
+        res.status(500).json({ message: 'Error fetching version history' });
+    }
+});
+
+// Helper function to save documentation settings version
+async function saveDocumentationSettingsVersion(db, collectionId, userId, settings, message) {
+    try {
+        const versionData = {
+            collectionId: collectionId,
+            userId: userId,
+            settings: settings,
+            message: message || 'Settings updated',
+            timestamp: new Date(),
+            type: 'settings'
+        };
+
+        await db.collection('documentationSettingsVersions').insertOne(versionData);
+        console.log('Documentation settings version saved:', versionData);
+    } catch (err) {
+        console.error('Error saving documentation settings version:', err);
+    }
+}
+
+// Helper function to save documentation content version
+async function saveDocumentationContentVersion(db, collectionId, userId, docData, message) {
+    try {
+        const versionData = {
+            collectionId: collectionId,
+            userId: userId,
+            title: docData.title,
+            content: docData.content,
+            message: message || 'Content updated',
+            timestamp: new Date(),
+            type: 'content',
+            importedFrom: docData.importedFrom || 'manual'
+        };
+
+        await db.collection('documentationContentVersions').insertOne(versionData);
+        console.log('Documentation content version saved:', versionData);
+    } catch (err) {
+        console.error('Error saving documentation content version:', err);
+    }
+}
 
 // Import OpenAPI documentation for a collection
 router.post('/:id/documentation/import/openapi', authenticateJWT, async (req, res) => {

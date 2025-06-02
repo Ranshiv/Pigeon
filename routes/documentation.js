@@ -5,6 +5,39 @@ const { ensureAuthenticated } = require('../middleware/auth');
 const Collection = require('../models/Collection');
 const Request = require('../models/Request');
 
+// Helper function to find collection with proper user access check
+const findUserCollection = async (collectionId, userId, requireEdit = false) => {
+    console.log(`[DEBUG] findUserCollection: collectionId=${collectionId}, userId=${userId}, requireEdit=${requireEdit}`);
+
+    const baseQuery = {
+        _id: collectionId,
+        $or: [
+            { userId: userId },
+            { owner: userId } // Handle legacy field name
+        ]
+    };
+
+    if (requireEdit) {
+        baseQuery.$or.push({ collaborators: { $elemMatch: { userId: userId, role: { $in: ['editor', 'admin'] } } } });
+    } else {
+        baseQuery.$or.push({ collaborators: { $elemMatch: { userId: userId } } });
+    }
+
+    console.log(`[DEBUG] Query:`, JSON.stringify(baseQuery, null, 2));
+
+    const result = await Collection.findOne(baseQuery);
+    console.log(`[DEBUG] Query result:`, result ? 'Found collection' : 'No collection found');
+
+    return result;
+};
+
+// Debug middleware to log all requests to documentation routes
+router.use((req, res, next) => {
+    console.log(`[DEBUG] Documentation route: ${req.method} ${req.url}`);
+    console.log(`[DEBUG] Full path: ${req.baseUrl}${req.url}`);
+    next();
+});
+
 // Get documentation for a specific collection
 router.get('/:collectionId', ensureAuthenticated, async (req, res) => {
     try {
@@ -18,6 +51,7 @@ router.get('/:collectionId', ensureAuthenticated, async (req, res) => {
             _id: collectionId,
             $or: [
                 { userId: userId },
+                { owner: userId }, // Handle legacy field name
                 { collaborators: { $elemMatch: { userId: userId } } }
             ]
         });
@@ -297,6 +331,64 @@ router.post('/:collectionId/import/openapi', ensureAuthenticated, async (req, re
     } catch (err) {
         console.error('Error importing OpenAPI documentation:', err);
         res.status(500).json({ message: 'Error importing OpenAPI documentation' });
+    }
+});
+
+// Update documentation settings
+router.put('/:collectionId/settings', ensureAuthenticated, async (req, res) => {
+    try {
+        console.log(`[DEBUG] PUT /documentation/${req.params.collectionId}/settings called`);
+        console.log('[DEBUG] Request body:', req.body);
+        console.log('[DEBUG] User ID:', req.user?.id);
+
+        const collectionId = req.params.collectionId;
+        const userId = req.user.id;
+        const settingsData = req.body;
+
+        if (!settingsData) {
+            return res.status(400).json({ message: 'Settings data is required' });
+        }
+
+        // Find the collection and check if user has access
+        const collection = await findUserCollection(collectionId, userId, true);
+
+        if (!collection) {
+            return res.status(404).json({ message: 'Collection not found or you do not have permission to edit' });
+        }
+
+        // Initialize documentation if it doesn't exist
+        if (!collection.documentation) {
+            collection.documentation = {};
+        }
+
+        // Update documentation settings
+        collection.documentation.isPublic = settingsData.isPublic;
+        collection.documentation.metaTitle = settingsData.metaTitle;
+        collection.documentation.metaDescription = settingsData.metaDescription;
+        collection.documentation.customDomain = settingsData.customDomain;
+        collection.documentation.allowComments = settingsData.allowComments;
+        collection.documentation.showLastUpdated = settingsData.showLastUpdated;
+        collection.documentation.enableSearch = settingsData.enableSearch;
+        collection.documentation.theme = settingsData.theme || 'default';
+
+        // Handle displayOptions as a nested object
+        if (settingsData.displayOptions) {
+            collection.documentation.displayOptions = settingsData.displayOptions;
+        }
+
+        // Update timestamps
+        collection.documentation.updatedAt = new Date();
+        collection.updatedAt = new Date();
+
+        await collection.save();
+
+        res.json({
+            message: 'Documentation settings updated successfully',
+            documentation: collection.documentation
+        });
+    } catch (err) {
+        console.error('Error updating documentation settings:', err);
+        res.status(500).json({ message: 'Error updating documentation settings' });
     }
 });
 
