@@ -196,16 +196,18 @@ const DocumentationManager = () => {
     useEffect(() => {
         if (documentation) {
             // Extract settings from the documentation object
+            // Check both direct properties and nested settings object
+            const docSettings = documentation.settings || {};
             const settings = {
-                isPublic: documentation.isPublic || false,
-                metaTitle: documentation.metaTitle || '',
-                metaDescription: documentation.metaDescription || '',
-                customDomain: documentation.customDomain || '',
-                allowComments: documentation.allowComments || false,
-                showLastUpdated: documentation.showLastUpdated !== false,
-                enableSearch: documentation.enableSearch !== false,
-                theme: documentation.theme || 'default',
-                displayOptions: documentation.displayOptions || {}
+                isPublic: documentation.isPublic ?? docSettings.isPublic ?? false,
+                metaTitle: documentation.metaTitle || docSettings.metaTitle || '',
+                metaDescription: documentation.metaDescription || docSettings.metaDescription || '',
+                customDomain: documentation.customDomain || docSettings.customDomain || '',
+                allowComments: documentation.allowComments ?? docSettings.allowComments ?? false,
+                showLastUpdated: documentation.showLastUpdated ?? docSettings.showLastUpdated ?? true,
+                enableSearch: documentation.enableSearch ?? docSettings.enableSearch ?? true,
+                theme: documentation.theme || docSettings.theme || 'default',
+                displayOptions: documentation.displayOptions || docSettings.displayOptions || {}
             };
 
             setCurrentSettings(settings);
@@ -221,15 +223,15 @@ const DocumentationManager = () => {
             // Handle nested properties like 'displayOptions.showContributors'
             if (field.includes('.')) {
                 const [parentKey, childKey] = field.split('.');
-                
+
                 // Initialize parent object if it doesn't exist
                 if (!updated[parentKey]) {
                     updated[parentKey] = {};
                 }
-                
+
                 // Set the nested property
                 updated[parentKey][childKey] = value;
-                
+
                 // Log for debugging
                 console.log(`Setting nested value: ${parentKey}.${childKey} =`, value);
             } else {
@@ -241,29 +243,29 @@ const DocumentationManager = () => {
             // Check if settings have changed from original
             const hasChanged = JSON.stringify(updated) !== JSON.stringify(originalSettings);
             setSettingsChanged(hasChanged);
-            
+
             if (hasChanged) {
                 console.log('Settings changed, differences detected');
             }
-            
+
             return updated;
         });
     };// Handle settings restore from version history
     const handleSettingsRestore = (restoredSettings) => {
         // Make a deep copy of restored settings to prevent reference issues
         const settingsCopy = JSON.parse(JSON.stringify(restoredSettings));
-        
+
         // Ensure displayOptions are preserved properly
         if (!settingsCopy.displayOptions) {
             settingsCopy.displayOptions = {};
         }
-        
+
         // Log the settings being restored for debugging
         console.log('Restoring settings:', settingsCopy);
-        
+
         // Apply restored settings to current settings
         setCurrentSettings(settingsCopy);
-        
+
         // Mark as changed to enable saving
         setSettingsChanged(true);
 
@@ -807,16 +809,16 @@ const DocumentationManager = () => {
             console.error('Error publishing documentation:', err);
             alert(`Failed to publish documentation: ${err.message}`);
         }
-    };    const handleSaveSettings = async () => {
+    }; const handleSaveSettings = async () => {
         if (!documentation) return;
         try {
             setIsSaving(true);
-            
+
             // Deep clone the current settings to avoid reference issues
             const settingsToSave = JSON.parse(JSON.stringify(currentSettings));
-            
+
             console.log('Current settings before save:', settingsToSave);
-            
+
             // Prepare the settings payload, preserving all existing values from currentSettings
             // but providing defaults for missing properties
             const settingsPayload = {
@@ -830,9 +832,9 @@ const DocumentationManager = () => {
                 theme: settingsToSave.theme || 'default',
                 displayOptions: settingsToSave.displayOptions || {}
             };
-            
+
             console.log('Settings payload being sent to server:', settingsPayload);
-            
+
             // Send PUT request to save settings
             const response = await fetch(`/api/collections/${collectionId}/documentation/settings`, {
                 method: 'POST',
@@ -840,30 +842,36 @@ const DocumentationManager = () => {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(settingsPayload)
             });
-            
+
             if (!response.ok) {
                 const errText = await response.text();
                 throw new Error(`Failed to save settings: ${response.status} ${errText}`);
             }
-            
+
             const result = await response.json();
-            console.log('Settings saved successfully:', result);
-            
-            // Update documentation with saved settings while preserving currentSettings
+            console.log('Settings saved successfully:', result);            // Update documentation with saved settings while preserving currentSettings
             if (result.documentation) {
                 // Update documentation object with the saved settings
-                setDocumentation(prev => ({ 
-                    ...prev, 
+                setDocumentation(prev => ({
+                    ...prev,
                     ...result.documentation,
-                    // Ensure displayOptions are preserved in the documentation object
+                    // Ensure all settings are also available directly on the documentation object
+                    isPublic: settingsPayload.isPublic,
+                    metaTitle: settingsPayload.metaTitle,
+                    metaDescription: settingsPayload.metaDescription,
+                    customDomain: settingsPayload.customDomain,
+                    allowComments: settingsPayload.allowComments,
+                    showLastUpdated: settingsPayload.showLastUpdated,
+                    enableSearch: settingsPayload.enableSearch,
+                    theme: settingsPayload.theme,
                     displayOptions: settingsPayload.displayOptions
                 }));
-                
+
                 // Update the original settings reference for comparison
                 setOriginalSettings(JSON.parse(JSON.stringify(settingsPayload)));
                 setSettingsChanged(false);
             }
-            
+
             // Give user feedback and exit the Settings view
             alert('Documentation settings saved successfully');
             setView(documentation ? 'view' : 'edit');
@@ -1096,10 +1104,10 @@ const DocumentationManager = () => {
                             <h4>Display Options</h4>
                             <div className="setting-option">
                                 <label>                                    <input
-                                        type="checkbox"
-                                        checked={Boolean(currentSettings?.displayOptions?.showContributors)}
-                                        onChange={(e) => handleSettingsChange('displayOptions.showContributors', e.target.checked)}
-                                    />
+                                    type="checkbox"
+                                    checked={Boolean(currentSettings?.displayOptions?.showContributors)}
+                                    onChange={(e) => handleSettingsChange('displayOptions.showContributors', e.target.checked)}
+                                />
                                     Show Contributors
                                 </label>
                                 <p className="setting-description">Display the list of contributors on the documentation page.</p>

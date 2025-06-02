@@ -1094,6 +1094,12 @@ router.post('/:id/documentation/settings', authenticateJWT, async (req, res) => 
             displayOptions: settingsData.displayOptions || {}
         };
 
+        // Generate specific message about what changed
+        const changeMessage = generateSettingsChangeMessage(
+            currentDoc?.settings || {},
+            updatedSettings
+        );
+
         let docData;
         if (currentDoc) {
             // Update existing documentation settings
@@ -1123,7 +1129,7 @@ router.post('/:id/documentation/settings', authenticateJWT, async (req, res) => 
         }
 
         // Save the new settings version
-        await saveDocumentationSettingsVersion(db, collectionId, userId, updatedSettings, 'Settings updated');
+        await saveDocumentationSettingsVersion(db, collectionId, userId, updatedSettings, changeMessage);
 
         res.json({
             message: 'Documentation settings updated successfully',
@@ -1190,6 +1196,12 @@ router.put('/:id/documentation/settings', authenticateJWT, async (req, res) => {
             displayOptions: settingsData.displayOptions || {}
         };
 
+        // Generate specific message about what changed
+        const changeMessage = generateSettingsChangeMessage(
+            currentDoc?.settings || {},
+            updatedSettings
+        );
+
         let docData;
         if (currentDoc) {
             // Update existing documentation settings
@@ -1219,7 +1231,7 @@ router.put('/:id/documentation/settings', authenticateJWT, async (req, res) => {
         }
 
         // Save the new settings version
-        await saveDocumentationSettingsVersion(db, collectionId, userId, updatedSettings, 'Settings updated');
+        await saveDocumentationSettingsVersion(db, collectionId, userId, updatedSettings, changeMessage);
 
         res.json({
             message: 'Documentation settings updated successfully',
@@ -1274,6 +1286,90 @@ router.get('/:id/documentation/settings/versions', authenticateJWT, async (req, 
     }
 });
 
+// Helper function to generate specific version history messages
+function generateSettingsChangeMessage(oldSettings, newSettings) {
+    if (!oldSettings || !newSettings) {
+        return 'Settings updated';
+    }
+
+    const changes = [];
+
+    // Check visibility changes
+    if (oldSettings.isPublic !== newSettings.isPublic) {
+        changes.push(newSettings.isPublic ? 'Documentation made public' : 'Documentation made private');
+    }
+
+    // Check display options changes
+    const oldDisplayOptions = oldSettings.displayOptions || {};
+    const newDisplayOptions = newSettings.displayOptions || {};
+
+    if (oldDisplayOptions.showContributors !== newDisplayOptions.showContributors) {
+        changes.push(newDisplayOptions.showContributors ? 'Show contributors enabled' : 'Show contributors disabled');
+    }
+
+    if (oldDisplayOptions.showLastUpdated !== newDisplayOptions.showLastUpdated) {
+        changes.push(newDisplayOptions.showLastUpdated ? 'Show last updated enabled' : 'Show last updated disabled');
+    }
+
+    if (oldDisplayOptions.showTableOfContents !== newDisplayOptions.showTableOfContents) {
+        changes.push(newDisplayOptions.showTableOfContents ? 'Table of contents enabled' : 'Table of contents disabled');
+    }
+
+    // Check other setting changes
+    if (oldSettings.allowComments !== newSettings.allowComments) {
+        changes.push(newSettings.allowComments ? 'Comments enabled' : 'Comments disabled');
+    }
+
+    if (oldSettings.enableSearch !== newSettings.enableSearch) {
+        changes.push(newSettings.enableSearch ? 'Search enabled' : 'Search disabled');
+    }
+
+    if (oldSettings.metaTitle !== newSettings.metaTitle) {
+        if (!oldSettings.metaTitle && newSettings.metaTitle) {
+            changes.push('Meta title added');
+        } else if (oldSettings.metaTitle && !newSettings.metaTitle) {
+            changes.push('Meta title removed');
+        } else {
+            changes.push('Meta title updated');
+        }
+    }
+
+    if (oldSettings.metaDescription !== newSettings.metaDescription) {
+        if (!oldSettings.metaDescription && newSettings.metaDescription) {
+            changes.push('Meta description added');
+        } else if (oldSettings.metaDescription && !newSettings.metaDescription) {
+            changes.push('Meta description removed');
+        } else {
+            changes.push('Meta description updated');
+        }
+    }
+
+    if (oldSettings.customDomain !== newSettings.customDomain) {
+        if (!oldSettings.customDomain && newSettings.customDomain) {
+            changes.push('Custom domain added');
+        } else if (oldSettings.customDomain && !newSettings.customDomain) {
+            changes.push('Custom domain removed');
+        } else {
+            changes.push('Custom domain updated');
+        }
+    }
+
+    if (oldSettings.theme !== newSettings.theme) {
+        changes.push(`Theme changed to ${newSettings.theme}`);
+    }
+
+    // Return specific message or fallback
+    if (changes.length === 0) {
+        return 'Settings updated';
+    } else if (changes.length === 1) {
+        return changes[0];
+    } else if (changes.length <= 3) {
+        return changes.join(', ');
+    } else {
+        return `${changes.length} settings updated: ${changes.slice(0, 2).join(', ')} and ${changes.length - 2} more`;
+    }
+}
+
 // Helper function to save documentation settings version
 async function saveDocumentationSettingsVersion(db, collectionId, userId, settings, message) {
     try {
@@ -1303,7 +1399,7 @@ async function saveDocumentationContentVersion(db, collectionId, userId, docData
             content: docData.content,
             message: message || 'Content updated',
             timestamp: new Date(),
-            type: 'content',
+            type: 'commit',
             importedFrom: docData.importedFrom || 'manual'
         };
 

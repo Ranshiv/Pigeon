@@ -26,7 +26,7 @@ const DocumentationSettingsVersionHistory = ({ documentation, onSettingsRestore,
                 // Load version history for documentation settings
                 const entityType = 'documentation';
                 const entityId = collectionId;
-                
+
                 let settingsVersions = documentVersions[`${entityType}:${entityId}:settings`];
 
                 if (!settingsVersions || settingsVersions.length === 0) {
@@ -140,10 +140,10 @@ const DocumentationSettingsVersionHistory = ({ documentation, onSettingsRestore,
         if (onSettingsRestore && version.settings) {
             // Create a deep copy to prevent reference issues
             const settingsToRestore = JSON.parse(JSON.stringify(version.settings));
-            
+
             // Log the settings being restored
             console.log('Restoring settings version:', settingsToRestore);
-            
+
             // Pass settings to the parent component for restoration
             onSettingsRestore(settingsToRestore);
         }
@@ -244,11 +244,11 @@ const DocumentationSettingsVersionHistory = ({ documentation, onSettingsRestore,
                         <div className="version-timestamp">
                             Full timestamp: {formatTimestamp(version.timestamp)}
                         </div>
-                        
+
                         {renderSettingsChanges(version)}
 
                         <div className="version-actions-panel">
-                            <button 
+                            <button
                                 className="restore-btn"
                                 onClick={() => handleRestoreVersion(version)}
                                 title="Restore these settings"
@@ -256,9 +256,9 @@ const DocumentationSettingsVersionHistory = ({ documentation, onSettingsRestore,
                                 <FiRotateCcw size={14} />
                                 Restore Settings
                             </button>
-                            
+
                             {index < versions.length - 1 && (
-                                <button 
+                                <button
                                     className="compare-btn"
                                     onClick={() => handleCompareVersions(version, versions[index + 1])}
                                     title="Compare with previous version"
@@ -314,7 +314,7 @@ const DocumentationSettingsVersionHistory = ({ documentation, onSettingsRestore,
                     <div className="diff-modal-content">
                         <div className="diff-header">
                             <h4>Settings Comparison</h4>
-                            <button 
+                            <button
                                 className="close-diff"
                                 onClick={() => setShowDiffView(false)}
                             >
