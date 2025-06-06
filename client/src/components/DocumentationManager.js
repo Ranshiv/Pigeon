@@ -870,11 +870,20 @@ const DocumentationManager = () => {
                 // Update the original settings reference for comparison
                 setOriginalSettings(JSON.parse(JSON.stringify(settingsPayload)));
                 setSettingsChanged(false);
-            }
-
-            // Give user feedback and exit the Settings view
+            }            // Give user feedback
             alert('Documentation settings saved successfully');
-            setView(documentation ? 'view' : 'edit');
+
+            // Set loading state to show loader during transition
+            setIsLoading(true);
+
+            // Use a short timeout to allow the loader to display before redirecting
+            setTimeout(() => {
+                setView('edit');
+                // After a moment to render the edit view, turn off the loader
+                setTimeout(() => {
+                    setIsLoading(false);
+                }, 300);
+            }, 500);
         } catch (err) {
             console.error('Error saving documentation settings:', err);
             alert(`Failed to save documentation settings: ${err.message}`);
