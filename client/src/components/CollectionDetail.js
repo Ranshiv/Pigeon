@@ -567,20 +567,69 @@ function CollectionDetail() {
             </div>
 
             <div className="form-group">
-              <label htmlFor="isPublic">Visibility</label>
-              <select
-                id="isPublic"
-                name="isPublic"
-                defaultValue={collection.isPublic ? 'true' : 'false'}
-              >
-                <option value="false">Private</option>
-                <option value="true">Public</option>
-              </select>
-              <small>
-                {collection.isPublic ?
-                  "This collection is publicly accessible to anyone with the link." :
-                  "Only you and your collaborators can access this collection."}
-              </small>
+              <label>Visibility</label>
+              <div className="visibility-selector">
+                <div
+                  className={`visibility-option ${!collection.isPublic ? 'selected' : ''}`}
+                  onClick={(e) => {
+                    // Update all radio buttons
+                    const radioButtons = e.currentTarget.closest('.visibility-selector').querySelectorAll('input[type="radio"]');
+                    radioButtons.forEach(radio => radio.checked = false);
+
+                    // Check the current one
+                    const currentRadio = e.currentTarget.querySelector('input[type="radio"]');
+                    if (currentRadio) currentRadio.checked = true;
+
+                    // Update visual selection
+                    const allOptions = e.currentTarget.closest('.visibility-selector').querySelectorAll('.visibility-option');
+                    allOptions.forEach(option => option.classList.remove('selected'));
+                    e.currentTarget.classList.add('selected');
+                  }}
+                >
+                  <input
+                    type="radio"
+                    name="isPublic"
+                    value="false"
+                    defaultChecked={!collection.isPublic}
+                    style={{ display: 'none' }}
+                  />
+                  <div className="visibility-icon">🔒</div>
+                  <div>
+                    <strong>Private</strong>
+                    <p>Only you and your collaborators can access this collection</p>
+                  </div>
+                </div>
+                <div
+                  className={`visibility-option ${collection.isPublic ? 'selected' : ''}`}
+                  onClick={(e) => {
+                    // Update all radio buttons
+                    const radioButtons = e.currentTarget.closest('.visibility-selector').querySelectorAll('input[type="radio"]');
+                    radioButtons.forEach(radio => radio.checked = false);
+
+                    // Check the current one
+                    const currentRadio = e.currentTarget.querySelector('input[type="radio"]');
+                    if (currentRadio) currentRadio.checked = true;
+
+                    // Update visual selection
+                    const allOptions = e.currentTarget.closest('.visibility-selector').querySelectorAll('.visibility-option');
+                    allOptions.forEach(option => option.classList.remove('selected'));
+                    e.currentTarget.classList.add('selected');
+                  }}
+                >
+                  <input
+                    type="radio"
+                    name="isPublic"
+                    value="true"
+                    defaultChecked={collection.isPublic}
+                    style={{ display: 'none' }}
+                  />
+                  <div className="visibility-icon">🌐</div>
+                  <div>
+                    <strong>Public</strong>
+                    <p>This collection is publicly accessible to anyone with the link</p>
+                  </div>
+                </div>
+              </div>
             </div>
 
             <div className="modal-actions">

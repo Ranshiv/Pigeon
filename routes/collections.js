@@ -1271,18 +1271,137 @@ router.get('/:id/documentation/settings/versions', authenticateJWT, async (req, 
             .find({ collectionId: collectionId })
             .sort({ timestamp: -1 })
             .limit(50) // Limit to last 50 versions
-            .toArray();
-
-        // Convert ObjectIds to strings
+            .toArray();        // Convert ObjectIds to strings and add id field for frontend compatibility
         const versionsWithStringIds = versions.map(version => ({
             ...version,
-            _id: version._id.toString()
+            _id: version._id.toString(),
+            id: version._id.toString() // Add id field for frontend compatibility
         }));
 
         res.json(versionsWithStringIds);
     } catch (err) {
         console.error('Error fetching documentation settings versions:', err);
         res.status(500).json({ message: 'Error fetching version history' });
+    }
+});
+
+// Get documentation content version history
+router.get('/:id/content/versions', authenticateJWT, async (req, res) => {
+    try {
+        const collectionId = req.params.id;
+        const userId = req.user.id;
+        const db = getDb();
+
+        // Check if collection exists and user has access
+        const collection = await db.collection('collections').findOne({
+            _id: new ObjectId(collectionId),
+            $or: [
+                { owner: userId },
+                { collaborators: { $elemMatch: { userId: userId } } }
+            ]
+        });
+
+        if (!collection) {
+            return res.status(404).json({ message: 'Collection not found or access denied' });
+        }
+
+        // Get version history for documentation content
+        const versions = await db.collection('documentationContentVersions')
+            .find({ collectionId: collectionId })
+            .sort({ timestamp: -1 })
+            .limit(5) // Limit to last 5 versions as per component design
+            .toArray();
+
+        // Convert ObjectIds to strings
+        const versionsWithStringIds = versions.map(version => ({
+            ...version,
+            _id: version._id.toString(),
+            createdAt: version.timestamp // Map timestamp to createdAt for component compatibility
+        }));
+
+        res.json({ versions: versionsWithStringIds });
+    } catch (err) {
+        console.error('Error fetching documentation content versions:', err);
+        res.status(500).json({ message: 'Error fetching content version history' });
+    }
+});
+
+// Restore documentation content version
+router.post('/:id/content/restore', authenticateJWT, async (req, res) => {
+    try {
+        const collectionId = req.params.id;
+        const { versionId } = req.body;
+        const userId = req.user.id;
+        const db = getDb();
+
+        if (!versionId) {
+            return res.status(400).json({ message: 'Version ID is required' });
+        }
+
+        // Check if collection exists and user has access to edit
+        const collection = await db.collection('collections').findOne({
+            _id: new ObjectId(collectionId),
+            $or: [
+                { owner: userId },
+                { collaborators: { $elemMatch: { userId: userId, role: { $in: ['editor', 'admin'] } } } }
+            ]
+        });
+
+        if (!collection) {
+            return res.status(404).json({ message: 'Collection not found or you do not have permission to edit' });
+        }
+
+        // Find the version to restore
+        const versionToRestore = await db.collection('documentationContentVersions').findOne({
+            _id: new ObjectId(versionId),
+            collectionId: collectionId
+        });
+
+        if (!versionToRestore) {
+            return res.status(404).json({ message: 'Version not found' });
+        }
+
+        // Get current documentation
+        const currentDoc = await db.collection('documentation').findOne({
+            collectionId: collectionId
+        });
+
+        // Save current content as a new version before restoring
+        if (currentDoc && currentDoc.content) {
+            await saveDocumentationContentVersion(db, collectionId, userId, currentDoc, 'Content saved before restore');
+        }
+
+        // Update the current documentation with the restored content
+        if (currentDoc) {
+            await db.collection('documentation').updateOne(
+                { _id: currentDoc._id },
+                {
+                    $set: {
+                        content: versionToRestore.content,
+                        title: versionToRestore.title,
+                        updatedAt: new Date()
+                    }
+                }
+            );
+        } else {
+            // Create new documentation if it doesn't exist
+            const newDoc = {
+                title: versionToRestore.title,
+                content: versionToRestore.content,
+                collectionId: collectionId,
+                createdAt: new Date(),
+                updatedAt: new Date()
+            };
+            await db.collection('documentation').insertOne(newDoc);
+        }
+
+        res.json({
+            message: 'Content restored successfully',
+            content: versionToRestore.content
+        });
+    } catch (err) {
+        console.error('Error restoring documentation content version:', err);
+        res.status(500).json({ message: 'Error restoring content version' });
     }
 });
 
@@ -1374,6 +1493,7 @@ function generateSettingsChangeMessage(oldSettings, newSettings) {
 async function saveDocumentationSettingsVersion(db, collectionId, userId, settings, message) {
     try {
         const versionData = {
+            id: `settings-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`, // Unique ID for frontend
             collectionId: collectionId,
             userId: userId,
             settings: settings,

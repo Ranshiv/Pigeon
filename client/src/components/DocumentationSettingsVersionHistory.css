@@ -1,14 +1,10 @@
 /* client/src/components/DocumentationSettingsVersionHistory.css */
 .settings-version-history {
-    border: 1px solid var(--border-color, #e1e4e8);
-    border-radius: 8px;
-    background-color: var(--background-color, #ffffff);
     overflow: hidden;
 }
 
 .settings-version-history.loading,
 .settings-version-history.error {
-    padding: 24px;
     text-align: center;
 }
 
@@ -81,7 +77,7 @@
 }
 
 .version-item.selected {
-    background-color: var(--selected-bg, #fff5f2);
+    background-color: #1e1e1e;
     border-left: 3px solid var(--primary-color, #ff6c37);
 }
 
@@ -417,9 +413,9 @@
 /* Dark mode support */
 @media (prefers-color-scheme: dark) {
     .settings-version-history {
-        --background-color: #0d1117;
+        /* --background-color: #0d1117; */
         --header-bg: #161b22;
-        --details-bg: #161b22;
+        --details-bg: #171818;
         --border-color: #30363d;
         --text-primary: #c9d1d9;
         --text-muted: #8b949e;

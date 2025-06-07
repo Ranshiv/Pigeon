@@ -5,14 +5,13 @@ import { FiBook, FiCode, FiDownload, FiUpload, FiSettings, FiGlobe, FiClock, FiC
 import DocumentationEditor from './DocumentationEditor';
 import DocumentationViewer from './DocumentationViewer';
 import DocumentationSettingsVersionHistory from './DocumentationSettingsVersionHistory';
+import DocumentationContentVersionHistory from './DocumentationContentVersionHistory';
 import VersionControlService from '../services/VersionControlService';
 import './DocumentationManager.css';
 
 const DocumentationManager = () => {
     const { collectionId } = useParams();
-    const navigate = useNavigate();
-
-    const [collection, setCollection] = useState(null);
+    const navigate = useNavigate(); const [collection, setCollection] = useState(null);
     const [documentation, setDocumentation] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -21,6 +20,7 @@ const DocumentationManager = () => {
     const [currentSettings, setCurrentSettings] = useState(null);
     const [originalSettings, setOriginalSettings] = useState(null);
     const [settingsChanged, setSettingsChanged] = useState(false);
+    const [versionHistoryTab, setVersionHistoryTab] = useState('settings'); // 'settings' or 'content'
 
     // Listen for view changes for debugging
     useEffect(() => {
@@ -250,7 +250,7 @@ const DocumentationManager = () => {
 
             return updated;
         });
-    };// Handle settings restore from version history
+    };    // Handle settings restore from version history
     const handleSettingsRestore = (restoredSettings) => {
         // Make a deep copy of restored settings to prevent reference issues
         const settingsCopy = JSON.parse(JSON.stringify(restoredSettings));
@@ -271,6 +271,24 @@ const DocumentationManager = () => {
 
         // Show feedback
         alert("Settings restored from previous version. Click 'Save Settings' to apply changes.");
+    };
+
+    // Handle content restore from version history
+    const handleContentRestore = (restoredContent) => {
+        console.log('Restoring content:', restoredContent);
+
+        // Update the documentation with the restored content
+        setDocumentation(prev => ({
+            ...prev,
+            content: restoredContent,
+            _timestamp: Date.now() // Add timestamp to force editor re-render
+        }));
+
+        // Switch to edit view to show the restored content
+        setView('edit');
+
+        // Show feedback
+        alert("Content restored from previous version. The editor has been updated with the restored content.");
     };
 
     const handleSaveDocumentation = async (docData) => {
@@ -992,10 +1010,9 @@ const DocumentationManager = () => {
                     </div>
                     <button className="action-btn publish-btn" onClick={handlePublishDocumentation}>
                         <FiGlobe /> Publish
-                    </button>
-                    <button
+                    </button>                    <button
                         className={`action-btn ${view === 'settings' ? 'active' : ''}`}
-                        onClick={() => setView(view === 'settings' ? (documentation ? 'view' : 'edit') : 'settings')}
+                        onClick={() => setView(view === 'settings' ? 'edit' : 'settings')}
                     >
                         <FiSettings /> Settings
                     </button>
@@ -1143,22 +1160,45 @@ const DocumentationManager = () => {
                                 </label>
                                 <p className="setting-description">Automatically generate and display a table of contents.</p>
                             </div>
-                        </div>
-
-                        {/* Version History Section - placed before actions */}
+                        </div>                        {/* Version History Section - placed before actions */}
                         <div style={{ margin: '32px 0' }}>
-                            <DocumentationSettingsVersionHistory
-                                documentation={documentation}
-                                collectionId={collectionId}
-                                onSettingsRestore={handleSettingsRestore}
-                            />
+                            <div className="version-history-section">
+                                <h3>Version History</h3>
+                                <div className="version-history-tabs">
+                                    <button
+                                        className={`tab-btn ${versionHistoryTab === 'settings' ? 'active' : ''}`}
+                                        onClick={() => setVersionHistoryTab('settings')}
+                                    >
+                                        <FiSettings /> Settings History
+                                    </button>
+                                    <button
+                                        className={`tab-btn ${versionHistoryTab === 'content' ? 'active' : ''}`}
+                                        onClick={() => setVersionHistoryTab('content')}
+                                    >
+                                        <FiFileText /> Content History
+                                    </button>
+                                </div>
+                                <div className="version-history-content">
+                                    {versionHistoryTab === 'settings' ? (
+                                        <DocumentationSettingsVersionHistory
+                                            documentation={documentation}
+                                            collectionId={collectionId}
+                                            onSettingsRestore={handleSettingsRestore}
+                                        />
+                                    ) : (
+                                        <DocumentationContentVersionHistory
+                                            collectionId={collectionId}
+                                            onContentRestore={handleContentRestore}
+                                        />
+                                    )}
+                                </div>
+                            </div>
                         </div>
 
-                        <div className="settings-actions">
-                            <button className="cancel-btn" onClick={() => {
-                                handleSettingsRestore(originalSettings); // Restore to original before cancelling
-                                setView(documentation ? 'view' : 'edit');
-                            }}>Cancel</button>
+                        <div className="settings-actions">                            <button className="cancel-btn" onClick={() => {
+                            handleSettingsRestore(originalSettings); // Restore to original before cancelling
+                            setView('edit');
+                        }}>Cancel</button>
                             <button
                                 className="save-btn"
                                 onClick={handleSaveSettings}

@@ -2,7 +2,6 @@
 import React, { useState, useEffect } from 'react';
 import { FiClock, FiUser, FiSettings, FiRotateCcw, FiEye, FiEyeOff, FiChevronRight, FiChevronDown } from 'react-icons/fi';
 import { useCollaboration } from '../context/CollaborationContext';
-import VersionControlService from '../services/VersionControlService';
 import './DocumentationSettingsVersionHistory.css';
 
 const DocumentationSettingsVersionHistory = ({ documentation, onSettingsRestore, collectionId }) => {
@@ -14,10 +13,32 @@ const DocumentationSettingsVersionHistory = ({ documentation, onSettingsRestore,
     const [showDiffView, setShowDiffView] = useState(false);
     const [compareVersion, setCompareVersion] = useState(null);
 
-    const { documentVersions, loadVersionHistory } = useCollaboration();
-
-    // Load version history for documentation settings
+    const { documentVersions, loadVersionHistory } = useCollaboration();    // Load version history for documentation settings
     useEffect(() => {
+        // Create an initial version if none exists
+        const createInitialSettingsVersion = () => {
+            if (!documentation) return [];
+
+            const initialSettings = extractSettingsFromDocumentation(documentation);
+            return [{
+                id: `settings-${Date.now()}`,
+                timestamp: documentation.updatedAt || new Date().toISOString(),
+                userId: 'system',
+                userName: 'System',
+                message: 'Initial settings configuration',
+                type: 'settings',
+                entityType: 'documentation',
+                entityId: collectionId,
+                settings: initialSettings,
+                changes: {
+                    added: Object.keys(initialSettings).map(key => ({
+                        field: key,
+                        value: initialSettings[key]
+                    }))
+                }
+            }];
+        };
+
         const loadSettingsHistory = async () => {
             try {
                 setLoading(true);
@@ -70,31 +91,9 @@ const DocumentationSettingsVersionHistory = ({ documentation, onSettingsRestore,
         if (collectionId) {
             loadSettingsHistory();
         }
-    }, [collectionId, documentVersions, loadVersionHistory]);
+    }, [collectionId, documentVersions, loadVersionHistory, documentation]);
 
-    // Create an initial version if none exists
-    const createInitialSettingsVersion = () => {
-        if (!documentation) return [];
-
-        const initialSettings = extractSettingsFromDocumentation(documentation);
-        return [{
-            id: `settings-${Date.now()}`,
-            timestamp: documentation.updatedAt || new Date().toISOString(),
-            userId: 'system',
-            userName: 'System',
-            message: 'Initial settings configuration',
-            type: 'settings',
-            entityType: 'documentation',
-            entityId: collectionId,
-            settings: initialSettings,
-            changes: {
-                added: Object.keys(initialSettings).map(key => ({
-                    field: key,
-                    value: initialSettings[key]
-                }))
-            }
-        }];
-    };    // Extract settings from documentation object
+    // Extract settings from documentation object
     const extractSettingsFromDocumentation = (doc) => {
         return {
             isPublic: typeof doc?.isPublic === 'boolean' ? doc.isPublic : false,
@@ -129,15 +128,18 @@ const DocumentationSettingsVersionHistory = ({ documentation, onSettingsRestore,
         if (diffMins < 60) return `${diffMins} minutes ago`;
         if (diffHours < 24) return `${diffHours} hours ago`;
         return `${diffDays} days ago`;
-    };
-
-    // Handle version selection
+    };    // Handle version selection
     const handleVersionSelect = (version) => {
-        setSelectedVersion(version);
-        setExpandedVersion(expandedVersion === version.id ? null : version.id);
-    };    // Handle restore version
+        // Use id field if available, fallback to _id for backward compatibility
+        const versionId = version.id || version._id;
+        // Only toggle expansion, don't automatically set as selected
+        setExpandedVersion(expandedVersion === versionId ? null : versionId);
+    };// Handle restore version
     const handleRestoreVersion = (version) => {
         if (onSettingsRestore && version.settings) {
+            // Set this version as selected for restore operation
+            setSelectedVersion(version);
+
             // Create a deep copy to prevent reference issues
             const settingsToRestore = JSON.parse(JSON.stringify(version.settings));
 
@@ -160,61 +162,56 @@ const DocumentationSettingsVersionHistory = ({ documentation, onSettingsRestore,
         if (!version.changes) return null;
 
         return (
-            <div className="settings-changes">
-                {version.changes.added && version.changes.added.length > 0 && (
-                    <div className="changes-section added">
-                        <h5>Added Settings</h5>
-                        <ul>
-                            {version.changes.added.map((change, index) => (
-                                <li key={`added-${index}`}>
-                                    <span className="setting-name">{change.field}:</span>
-                                    <span className="setting-value added">{JSON.stringify(change.value)}</span>
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
-                )}
-
-                {version.changes.modified && version.changes.modified.length > 0 && (
-                    <div className="changes-section modified">
-                        <h5>Modified Settings</h5>
-                        <ul>
-                            {version.changes.modified.map((change, index) => (
-                                <li key={`modified-${index}`}>
-                                    <span className="setting-name">{change.field}:</span>
-                                    <span className="setting-value old">{JSON.stringify(change.oldValue)}</span>
-                                    <FiChevronRight className="arrow" />
-                                    <span className="setting-value new">{JSON.stringify(change.newValue)}</span>
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
-                )}
-
-                {version.changes.deleted && version.changes.deleted.length > 0 && (
-                    <div className="changes-section deleted">
-                        <h5>Removed Settings</h5>
-                        <ul>
-                            {version.changes.deleted.map((change, index) => (
-                                <li key={`deleted-${index}`}>
-                                    <span className="setting-name">{change.field}:</span>
-                                    <span className="setting-value deleted">{JSON.stringify(change.oldValue)}</span>
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
-                )}
+            <div className="settings-changes">                {version.changes.added && version.changes.added.length > 0 && (
+                <div className="changes-section added">
+                    <h5>Added Settings</h5>
+                    <ul>
+                        {version.changes.added.map((change, index) => (
+                            <li key={`${version.id}-added-${change.field}-${index}`}>
+                                <span className="setting-name">{change.field}:</span>
+                                <span className="setting-value added">{JSON.stringify(change.value)}</span>
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+            )}                {version.changes.modified && version.changes.modified.length > 0 && (
+                <div className="changes-section modified">
+                    <h5>Modified Settings</h5>
+                    <ul>
+                        {version.changes.modified.map((change, index) => (
+                            <li key={`${version.id}-modified-${change.field}-${index}`}>
+                                <span className="setting-name">{change.field}:</span>
+                                <span className="setting-value old">{JSON.stringify(change.oldValue)}</span>
+                                <FiChevronRight className="arrow" />
+                                <span className="setting-value new">{JSON.stringify(change.newValue)}</span>
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+            )}                {version.changes.deleted && version.changes.deleted.length > 0 && (
+                <div className="changes-section deleted">
+                    <h5>Removed Settings</h5>
+                    <ul>
+                        {version.changes.deleted.map((change, index) => (
+                            <li key={`${version.id}-deleted-${change.field}-${index}`}>
+                                <span className="setting-name">{change.field}:</span>
+                                <span className="setting-value deleted">{JSON.stringify(change.oldValue)}</span>
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+            )}
             </div>
         );
-    };
-
-    // Render version item
+    };    // Render version item
     const renderVersionItem = (version, index) => {
-        const isExpanded = expandedVersion === version.id;
-        const isSelected = selectedVersion?.id === version.id;
+        // Use id field if available, fallback to _id for backward compatibility
+        const versionId = version.id || version._id;
+        const isExpanded = expandedVersion === versionId;
+        const isSelected = selectedVersion?.id === versionId || selectedVersion?._id === versionId;
 
         return (
-            <div key={version.id} className={`version-item ${isSelected ? 'selected' : ''}`}>
+            <div key={versionId} className={`version-item ${isSelected ? 'selected' : ''}`}>
                 <div className="version-header" onClick={() => handleVersionSelect(version)}>
                     <div className="version-icon">
                         <FiSettings />
