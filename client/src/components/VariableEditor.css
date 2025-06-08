@@ -1,0 +1,384 @@
+.variable-editor {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 16px;
+    background: white;
+    border-radius: 8px;
+    border: 1px solid #e1e5e9;
+}
+
+.variable-editor h3 {
+    margin: 0 0 12px 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: #1a1a1a;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.variable-editor h3 .scope-badge {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 500;
+    text-transform: uppercase;
+}
+
+.variable-editor h3 .scope-badge.global {
+    background: #e8f5e8;
+    color: #2d7d32;
+}
+
+.variable-editor h3 .scope-badge.collection {
+    background: #e3f2fd;
+    color: #1976d2;
+}
+
+.variable-editor h3 .scope-badge.environment {
+    background: #fff3e0;
+    color: #f57c00;
+}
+
+.variable-editor h3 .scope-badge.request {
+    background: #fce4ec;
+    color: #c2185b;
+}
+
+.variable-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.variable-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    background: #f8f9fa;
+    border-radius: 6px;
+    border: 1px solid #e9ecef;
+    transition: all 0.2s ease;
+}
+
+.variable-item:hover {
+    border-color: #007bff;
+    box-shadow: 0 2px 4px rgba(0, 123, 255, 0.1);
+}
+
+.variable-item.editing {
+    background: #fff;
+    border-color: #007bff;
+    box-shadow: 0 2px 8px rgba(0, 123, 255, 0.15);
+}
+
+.variable-input {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    font-size: 14px;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    background: white;
+    transition: border-color 0.2s ease;
+}
+
+.variable-input:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+.variable-input.key {
+    max-width: 200px;
+}
+
+.variable-input.value {
+    min-width: 250px;
+}
+
+.variable-input.description {
+    max-width: 150px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+}
+
+.variable-actions {
+    display: flex;
+    gap: 8px;
+    margin-left: auto;
+}
+
+.variable-btn {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.variable-btn:hover {
+    transform: translateY(-1px);
+}
+
+.variable-btn.save {
+    background: #28a745;
+    color: white;
+}
+
+.variable-btn.save:hover {
+    background: #218838;
+}
+
+.variable-btn.cancel {
+    background: #6c757d;
+    color: white;
+}
+
+.variable-btn.cancel:hover {
+    background: #5a6268;
+}
+
+.variable-btn.edit {
+    background: #007bff;
+    color: white;
+}
+
+.variable-btn.edit:hover {
+    background: #0056b3;
+}
+
+.variable-btn.delete {
+    background: #dc3545;
+    color: white;
+}
+
+.variable-btn.delete:hover {
+    background: #c82333;
+}
+
+.add-variable {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    border: 2px dashed #ced4da;
+    border-radius: 6px;
+    background: #fafbfc;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.add-variable:hover {
+    border-color: #007bff;
+    background: #f8f9ff;
+}
+
+.add-variable.active {
+    border-color: #007bff;
+    border-style: solid;
+    background: white;
+    box-shadow: 0 2px 8px rgba(0, 123, 255, 0.15);
+}
+
+.add-variable-icon {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #007bff;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.add-variable-text {
+    color: #6c757d;
+    font-size: 14px;
+}
+
+.add-variable.active .add-variable-text {
+    color: #007bff;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 32px 16px;
+    color: #6c757d;
+}
+
+.empty-state-icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+    opacity: 0.5;
+}
+
+.empty-state-text {
+    font-size: 16px;
+    margin-bottom: 8px;
+}
+
+.empty-state-subtext {
+    font-size: 14px;
+    opacity: 0.8;
+}
+
+.variable-help {
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 6px;
+    padding: 12px;
+    margin-top: 8px;
+}
+
+.variable-help-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #495057;
+    margin-bottom: 8px;
+}
+
+.variable-help-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.variable-help-list li {
+    font-size: 13px;
+    color: #6c757d;
+    margin-bottom: 4px;
+    padding-left: 16px;
+    position: relative;
+}
+
+.variable-help-list li:before {
+    content: '•';
+    position: absolute;
+    left: 0;
+    color: #007bff;
+}
+
+.variable-preview {
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 4px;
+    padding: 8px;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    font-size: 12px;
+    color: #495057;
+    margin-top: 4px;
+    max-height: 60px;
+    overflow-y: auto;
+}
+
+.variable-type-indicator {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-right: 8px;
+    flex-shrink: 0;
+}
+
+.variable-type-indicator.string {
+    background: #28a745;
+}
+
+.variable-type-indicator.number {
+    background: #007bff;
+}
+
+.variable-type-indicator.boolean {
+    background: #ffc107;
+}
+
+.variable-type-indicator.object {
+    background: #6f42c1;
+}
+
+.variable-type-indicator.array {
+    background: #fd7e14;
+}
+
+.variable-scope-info {
+    font-size: 12px;
+    color: #6c757d;
+    margin-bottom: 16px;
+    padding: 8px 12px;
+    background: #f8f9fa;
+    border-radius: 4px;
+    border-left: 3px solid #007bff;
+}
+
+.variable-precedence {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: #6c757d;
+    margin-top: 8px;
+}
+
+.precedence-arrow {
+    color: #007bff;
+}
+
+@media (max-width: 768px) {
+    .variable-editor {
+        padding: 12px;
+        gap: 12px;
+    }
+
+    .variable-item {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+    }
+
+    .variable-input.key,
+    .variable-input.value,
+    .variable-input.description {
+        max-width: none;
+        min-width: auto;
+    }
+
+    .variable-actions {
+        margin-left: 0;
+        justify-content: flex-end;
+    }
+
+    .add-variable {
+        flex-direction: column;
+        text-align: center;
+    }
+}
+
+/* Animation for adding/removing variables */
+.variable-item-enter {
+    opacity: 0;
+    transform: translateY(-10px);
+}
+
+.variable-item-enter-active {
+    opacity: 1;
+    transform: translateY(0);
+    transition: all 0.3s ease;
+}
+
+.variable-item-exit {
+    opacity: 1;
+}
+
+.variable-item-exit-active {
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+}

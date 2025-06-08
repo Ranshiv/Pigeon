@@ -1,11 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import './RequestForm.css';
 import ResponseDisplay from './ResponseDisplay';
+import VariableEditor from './VariableEditor';
+import UnifiedVariableViewer from './UnifiedVariableViewer';
+import { interpolateRequest, resolveVariables, validateVariables, extractVariables } from '../utils/variableInterpolation';
+
+// Helper function to get the correct API base URL
+const getApiUrl = (path) => {
+    // In development, if proxy isn't working, use direct backend URL
+    const isDevelopment = process.env.NODE_ENV === 'development';
+    const baseUrl = isDevelopment ? 'http://localhost:5001' : '';
+    return `${baseUrl}${path}`;
+};
 
 // HTTP Methods
 const HTTP_METHODS = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD', 'OPTIONS'];
 
-const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialRequest, request }) => {
+const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialRequest, request,
+    collectionId, workspaceId, environmentId, collection }) => {
     // Use either initialRequest or request prop (for backward compatibility)
     const initialData = request || initialRequest || {};
 
@@ -26,18 +38,92 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
         { enabled: true, key: 'Key', value: 'Value', description: 'Description' }
     ]);
     const [headers, setHeaders] = useState(initialData.headers || []);
-    const [bodyType, setBodyType] = useState(initialData.bodyType || 'none');
-    const [bodyContent, setBodyContent] = useState(initialData.body || '');
+    const [bodyType, setBodyType] = useState(initialData.bodyType || 'none'); const [bodyContent, setBodyContent] = useState(initialData.body || '');
     const [preRequestScript, setPreRequestScript] = useState(initialData.preRequestScript || '');
-    const [tests, setTests] = useState(initialData.tests || '');
+    const [tests, setTests] = useState(initialData.tests || ''); const [variables, setVariables] = useState(initialData.variables || []);
 
-    // Handlers for form inputs
+    // Variable resolution state
+    const [resolvedVariables, setResolvedVariables] = useState({});
+    const [environmentVariables, setEnvironmentVariables] = useState({});
+    const [collectionVariables] = useState(collection?.variables || []);
+    const [globalVariables, setGlobalVariables] = useState({});
+    const [variableValidation, setVariableValidation] = useState({ isValid: true, missingVariables: [] });
+
+    // Utility function to get CSS classes for inputs with variables
+    const getVariableInputClass = (value) => {
+        if (!value) return '';
+
+        const variables = extractVariables(value);
+        if (variables.length === 0) return '';
+
+        const missingVars = variables.filter(varName => !resolvedVariables.hasOwnProperty(varName));
+
+        if (missingVars.length > 0) {
+            return 'has-missing-variables';
+        } else {
+            return 'has-variables';
+        }
+    };// Handlers for form inputs
     const handleMethodChange = (e) => setMethod(e.target.value);
     const handleUrlChange = (e) => setUrl(e.target.value);
-    const handleNameChange = (e) => setRequestName(e.target.value);
 
-    // Tab change handler
+    // Variable loading and resolution effects
+    useEffect(() => {
+        const loadVariables = async () => {
+            try {                // Load environment variables if environmentId is provided
+                if (environmentId) {
+                    const envResponse = await fetch(getApiUrl(`/api/environments/${environmentId}/variables`), {
+                        credentials: 'include'
+                    });
+                    if (envResponse.ok) {
+                        const envData = await envResponse.json();
+                        setEnvironmentVariables(envData.variables || []);
+                    }
+                }
+
+                // Load global variables if workspaceId is provided
+                if (workspaceId) {
+                    const globalResponse = await fetch(getApiUrl(`/api/workspaces/${workspaceId}/global-variables`), {
+                        credentials: 'include'
+                    });
+                    if (globalResponse.ok) {
+                        const globalData = await globalResponse.json();
+                        setGlobalVariables(globalData.variables || []);
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading variables:', error);
+            }
+        };
+
+        loadVariables();
+    }, [environmentId, workspaceId]);
+
+    // Resolve variables whenever any variable set changes
+    useEffect(() => {
+        const resolved = resolveVariables(
+            variables,
+            environmentVariables,
+            collectionVariables,
+            globalVariables
+        );
+        setResolvedVariables(resolved);
+
+        // Validate variables in current request
+        const requestData = {
+            url,
+            headers: headers.filter(h => h.enabled),
+            params: params.filter(p => p.enabled),
+            body: bodyContent
+        };
+
+        const validation = validateVariables(requestData, resolved);
+        setVariableValidation(validation);
+    }, [variables, environmentVariables, collectionVariables, globalVariables, url, headers, params, bodyContent]);    // Tab change handler
     const handleTabChange = (tab) => setActiveTab(tab);
+
+    // Name change handler
+    const handleNameChange = (e) => setRequestName(e.target.value);
 
     // Parameter handlers
     const handleParamChange = (index, field, value) => {
@@ -71,9 +157,7 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
         const newHeaders = [...headers];
         newHeaders.splice(index, 1);
         setHeaders(newHeaders);
-    };
-
-    // Save button handler
+    };    // Save button handler
     const handleSave = () => {
         // Build request object
         const requestData = {
@@ -86,6 +170,7 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
             body: bodyContent,
             preRequestScript,
             tests,
+            variables: variables.filter(v => v.key),
             isNew
         };
 
@@ -93,9 +178,7 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
         if (onSave) {
             onSave(requestData);
         }
-    };
-
-    // Form submission handler
+    };    // Form submission handler
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -110,58 +193,58 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
             body: bodyContent,
             preRequestScript,
             tests,
+            variables: variables.filter(v => v.key),
             isNew,
             _id: initialData._id || initialData.id
         };
 
+        // Apply variable interpolation to the request data
+        const interpolatedRequest = interpolateRequest(requestData, resolvedVariables);
+
         // Check for external handlers first
         if (onSendRequest) {
-            onSendRequest(requestData);
+            onSendRequest(interpolatedRequest);
             return;
         } else if (onSubmit) {
-            onSubmit(requestData);
+            onSubmit(interpolatedRequest);
             return;
         } else if (onRunRequest) {
-            onRunRequest(requestData._id || initialData._id || initialData.id);
+            onRunRequest(interpolatedRequest._id || initialData._id || initialData.id);
             return;
-        }
-
-        // If no external handlers exist, process the request directly
+        }        // If no external handlers exist, process the request directly using interpolated data
         setIsLoading(true);
         setResponseData(null);
         setResponseError(null);
 
         try {
-            // Prepare the request headers
+            // Prepare the request headers from interpolated data
             const headerObj = {};
-            requestData.headers.forEach(h => {
+            interpolatedRequest.headers.forEach(h => {
                 if (h.enabled && h.key) {
                     headerObj[h.key] = h.value;
                 }
             });
 
-            // Prepare request body
+            // Prepare request body from interpolated data
             let requestBody = null;
-            if (requestData.method !== 'GET' && requestData.method !== 'HEAD' && bodyType !== 'none') {
+            if (interpolatedRequest.method !== 'GET' && interpolatedRequest.method !== 'HEAD' && bodyType !== 'none') {
                 if (bodyType === 'raw') {
-                    requestBody = bodyContent;
+                    requestBody = interpolatedRequest.body;
                 } else if (bodyType === 'form-data' || bodyType === 'x-www-form-urlencoded') {
                     // Form data not implemented in this version
                     requestBody = '';
                 }
             }
 
-            const startTime = Date.now();
-
-            // Use proxy endpoint instead of direct request
-            const response = await fetch('/api/proxy', {
+            const startTime = Date.now();            // Use proxy endpoint with interpolated URL
+            const response = await fetch(getApiUrl('/api/proxy'), {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    url: requestData.url,
-                    method: requestData.method,
+                    url: interpolatedRequest.url,
+                    method: interpolatedRequest.method,
                     headers: headerObj,
                     body: requestBody,
                     timeout: 30000
@@ -192,74 +275,7 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
         if (onSave) {
             onSave(requestData);
         }
-    };
-
-    // Send a request directly from the form
-    const handleSendRequest = async (e) => {
-        e.preventDefault();
-        setIsLoading(true);
-        setResponseError(null);
-        setResponseData(null);
-
-        // Get all form values
-        const requestData = {
-            ...request,
-            method: method,
-            url: url,
-            headers: headers,
-            params: params,
-            body: bodyContent,
-            bodyType: bodyType,
-            preRequestScript: preRequestScript,
-            tests: tests
-        };
-
-        try {
-            // Set flag in sessionStorage to indicate request was sent
-            const requestId = request._id || request.id;
-            sessionStorage.setItem(`request_${requestId}_sent`, 'true');
-
-            // Call the onSendRequest handler from parent
-            const response = await onSendRequest(requestData);
-            setResponseData(response);
-
-            // If successful, update request locally
-            // setRequest(requestData); // Uncomment if you want to update the request in the parent component
-
-            // Scroll to the response section
-            document.querySelector('.response-area')?.scrollIntoView({ behavior: 'smooth' });
-        } catch (err) {
-            console.error(err);
-            setResponseError(err.message || 'Failed to send request. Please check your inputs and try again.');
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
-    // Helper function to estimate response size
-    const getResponseSize = (body, headers) => {
-        let size = 0;
-
-        // Add headers size
-        if (headers) {
-            Object.entries(headers).forEach(([key, value]) => {
-                size += key.length + String(value).length;
-            });
-        }
-
-        // Add body size
-        if (body) {
-            if (typeof body === 'string') {
-                size += body.length;
-            } else {
-                size += JSON.stringify(body).length;
-            }
-        }
-
-        return size;
-    };
-
-    // Update URL with query parameters
+    };    // Update URL with query parameters
     useEffect(() => {
         const updateUrlWithParams = () => {
             try {
@@ -289,7 +305,7 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
         if (url?.includes('://') && params.some(p => p.enabled && p.key)) {
             updateUrlWithParams();
         }
-    }, [params]);
+    }, [params, url]);
 
     // Render tab content based on active tab
     const renderTabContent = () => {
@@ -317,10 +333,10 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
                                                     checked={param.enabled}
                                                     onChange={(e) => handleParamChange(index, 'enabled', e.target.checked)}
                                                 />
-                                            </td>
-                                            <td>
+                                            </td>                                            <td>
                                                 <input
                                                     type="text"
+                                                    className={getVariableInputClass(param.key)}
                                                     value={param.key}
                                                     onChange={(e) => handleParamChange(index, 'key', e.target.value)}
                                                     placeholder="Key"
@@ -329,6 +345,7 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
                                             <td>
                                                 <input
                                                     type="text"
+                                                    className={getVariableInputClass(param.value)}
                                                     value={param.value}
                                                     onChange={(e) => handleParamChange(index, 'value', e.target.value)}
                                                     placeholder="Value"
@@ -387,10 +404,10 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
                                                     checked={header.enabled}
                                                     onChange={(e) => handleHeaderChange(index, 'enabled', e.target.checked)}
                                                 />
-                                            </td>
-                                            <td>
+                                            </td>                                            <td>
                                                 <input
                                                     type="text"
+                                                    className={getVariableInputClass(header.key)}
                                                     value={header.key}
                                                     onChange={(e) => handleHeaderChange(index, 'key', e.target.value)}
                                                     placeholder="Key"
@@ -399,6 +416,7 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
                                             <td>
                                                 <input
                                                     type="text"
+                                                    className={getVariableInputClass(header.value)}
                                                     value={header.value}
                                                     onChange={(e) => handleHeaderChange(index, 'value', e.target.value)}
                                                     placeholder="Value"
@@ -470,14 +488,13 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
                             </div>
                         </div>
 
-                        {bodyType === 'raw' && (
-                            <textarea
-                                className="body-editor"
-                                value={bodyContent}
-                                onChange={(e) => setBodyContent(e.target.value)}
-                                placeholder="Enter request body"
-                                spellCheck="false"
-                            />
+                        {bodyType === 'raw' && (<textarea
+                            className={`body-editor ${getVariableInputClass(bodyContent)}`}
+                            value={bodyContent}
+                            onChange={(e) => setBodyContent(e.target.value)}
+                            placeholder="Enter request body"
+                            spellCheck="false"
+                        />
                         )}
 
                         {bodyType === 'none' && (
@@ -545,9 +562,7 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
                             spellCheck="false"
                         />
                     </div>
-                );
-
-            case 'tests':
+                ); case 'tests':
                 return (
                     <div className="script-section">
                         <textarea
@@ -557,6 +572,98 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
                             placeholder="// Write test script here (JavaScript)"
                             spellCheck="false"
                         />
+                    </div>
+                ); case 'variables':
+                return (
+                    <div className="variables-section">
+                        <VariableEditor
+                            scope="request"
+                            variables={variables}
+                            onVariablesChange={setVariables}
+                            helpText="Request-level variables override collection and environment variables during execution."
+                        />
+                    </div>
+                ); case 'variable-preview':
+                return (
+                    <div className="variable-preview-section">
+                        <div className="preview-header">
+                            <h4>Variable Overview</h4>
+                            <div className="preview-status">
+                                {variableValidation.isValid ? (
+                                    <span className="status-valid">✅ All variables resolved</span>
+                                ) : (
+                                    <span className="status-invalid">⚠️ {variableValidation.missingVariables.length} missing variables</span>
+                                )}
+                            </div>
+                        </div>
+
+                        <UnifiedVariableViewer
+                            globalVariables={Array.isArray(globalVariables) ? globalVariables : Object.entries(globalVariables).map(([key, value]) => ({ key, value }))}
+                            collectionVariables={Array.isArray(collectionVariables) ? collectionVariables : Object.entries(collectionVariables).map(([key, value]) => ({ key, value }))}
+                            environmentVariables={Array.isArray(environmentVariables) ? environmentVariables : Object.entries(environmentVariables).map(([key, value]) => ({ key, value }))}
+                            requestVariables={variables}
+                            resolvedVariables={resolvedVariables}
+                            compact={true}
+                            showActions={false}
+                        />
+
+                        {!variableValidation.isValid && (
+                            <div className="missing-variables-alert">
+                                <h5>Missing Variables ({variableValidation.missingVariables.length})</h5>
+                                <p>The following variables are referenced but not defined:</p>
+                                <div className="missing-variables-list">
+                                    {variableValidation.missingVariables.map(varName => (
+                                        <code key={varName} className="missing-variable-name">{varName}</code>
+                                    ))}
+                                </div>
+                                <p className="missing-variables-help">
+                                    Define these variables in your environment, collection, or request variables.
+                                </p>
+                            </div>
+                        )}
+
+                        <div className="interpolated-preview">
+                            <h5>Request Preview (with variables)</h5>
+                            <div className="preview-url">
+                                <strong>URL:</strong>
+                                <code>{resolvedVariables ?
+                                    url.replace(/\{\{([^}]+)\}\}/g, (match, varName) =>
+                                        resolvedVariables[varName.trim()] || match
+                                    ) : url
+                                }</code>
+                            </div>
+
+                            {headers.filter(h => h.enabled && h.key).length > 0 && (
+                                <div className="preview-headers">
+                                    <strong>Headers:</strong>
+                                    <div className="header-list">
+                                        {headers.filter(h => h.enabled && h.key).map((header, index) => (
+                                            <div key={index} className="header-item">
+                                                <code>
+                                                    {header.key.replace(/\{\{([^}]+)\}\}/g, (match, varName) =>
+                                                        resolvedVariables[varName.trim()] || match
+                                                    )}:&nbsp;
+                                                    {header.value.replace(/\{\{([^}]+)\}\}/g, (match, varName) =>
+                                                        resolvedVariables[varName.trim()] || match
+                                                    )}
+                                                </code>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            {bodyType === 'raw' && bodyContent && (
+                                <div className="preview-body">
+                                    <strong>Body:</strong>
+                                    <pre className="body-preview">
+                                        {bodyContent.replace(/\{\{([^}]+)\}\}/g, (match, varName) =>
+                                            resolvedVariables[varName.trim()] || match
+                                        )}
+                                    </pre>
+                                </div>
+                            )}
+                        </div>
                     </div>
                 );
 
@@ -580,25 +687,41 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
                         {HTTP_METHODS.map(m => (
                             <option key={m} value={m}>{m}</option>
                         ))}
-                    </select>
-
-                    <input
+                    </select>                    <input
                         type="text"
-                        className="url-input"
+                        className={`url-input ${getVariableInputClass(url)}`}
                         value={url}
                         onChange={handleUrlChange}
                         placeholder="Enter request URL"
                         required
-                    />
-
-                    <button type="submit" className="send-btn">
-                        Send
+                    /><button type="submit" className="send-btn" disabled={isLoading || !variableValidation.isValid}>
+                        {isLoading ? 'Sending...' : 'Send'}
                     </button>
 
                     <button type="button" className="save-btn" onClick={handleSave}>
                         Save
                     </button>
                 </div>
+
+                {/* Variable validation display */}
+                {!variableValidation.isValid && (
+                    <div className="variable-validation-error">
+                        <div className="validation-header">
+                            <span className="validation-icon">⚠️</span>
+                            <span>Missing Variables</span>
+                        </div>
+                        <div className="missing-variables">
+                            {variableValidation.missingVariables.map(varName => (
+                                <span key={varName} className="missing-variable">
+                                    {varName}
+                                </span>
+                            ))}
+                        </div>
+                        <div className="validation-message">
+                            Please define these variables in your environment, collection, or request variables.
+                        </div>
+                    </div>
+                )}
 
                 {/* Request tabs */}
                 <div className="request-tabs">
@@ -625,12 +748,22 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
                         onClick={() => handleTabChange('pre-request-script')}
                     >
                         Pre-request Script
-                    </div>
-                    <div
+                    </div>                    <div
                         className={`request-tab ${activeTab === 'tests' ? 'active' : ''}`}
                         onClick={() => handleTabChange('tests')}
                     >
                         Tests
+                    </div>                    <div
+                        className={`request-tab ${activeTab === 'variables' ? 'active' : ''}`}
+                        onClick={() => handleTabChange('variables')}
+                    >
+                        Variables
+                    </div>
+                    <div
+                        className={`request-tab ${activeTab === 'variable-preview' ? 'active' : ''}`}
+                        onClick={() => handleTabChange('variable-preview')}
+                    >
+                        Preview
                     </div>
                 </div>
 

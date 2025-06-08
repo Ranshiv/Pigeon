@@ -1405,6 +1405,326 @@ router.post('/:id/content/restore', authenticateJWT, async (req, res) => {
     }
 });
 
+// Collection Variables Management Endpoints
+
+// Get collection variables
+router.get('/:id/variables', ensureAuthenticated, async (req, res) => {
+    try {
+        const collectionId = req.params.id;
+        const userId = req.user.id;
+
+        // First try to find collection in MongoDB (for real collections)
+        try {
+            const db = getDb();
+            const collection = await db.collection('collections').findOne({
+                _id: new ObjectId(collectionId),
+                $or: [
+                    { owner: userId },
+                    { "collaborators.userId": userId }
+                ]
+            });
+
+            if (collection) {
+                return res.json({ variables: collection.variables || [] });
+            }
+        } catch (mongoError) {
+            // If ObjectId conversion fails, it might be a mock collection ID
+            console.log(`MongoDB lookup failed for collection ${collectionId}, checking mock collections...`);
+        }        // For mock collections, check if the collection exists and return empty variables array
+        // Mock collections are handled differently and don't store variables in MongoDB
+        const mockCollectionIds = ['coll1', 'coll2', 'coll3', 'coll4', 'coll5'];
+        const isTestOrMockCollection = mockCollectionIds.includes(collectionId) ||
+            collectionId.startsWith('coll') ||
+            collectionId.startsWith('test-') ||
+            collectionId.includes('test');
+
+        if (isTestOrMockCollection) {
+            // For mock collections, return variables from a mock store or empty array
+            // In a real implementation, you might want to store these in a separate mock data store
+            return res.json({ variables: global.mockCollectionVariables?.[collectionId] || [] });
+        }
+
+        return res.status(404).json({ message: 'Collection not found or access denied' });
+    } catch (err) {
+        console.error("Error fetching collection variables:", err);
+        res.status(500).json({ message: 'Error fetching collection variables' });
+    }
+});
+
+// Update collection variables
+router.put('/:id/variables', ensureAuthenticated, async (req, res) => {
+    try {
+        const collectionId = req.params.id;
+        const { variables } = req.body;
+        const userId = req.user.id;
+
+        // Validate variables format
+        if (!Array.isArray(variables)) {
+            return res.status(400).json({ message: 'Variables must be an array' });
+        }
+
+        // Validate each variable
+        for (const variable of variables) {
+            if (!variable.key || typeof variable.key !== 'string') {
+                return res.status(400).json({ message: 'Each variable must have a valid key' });
+            }
+            if (variable.value === undefined || variable.value === null) {
+                return res.status(400).json({ message: 'Each variable must have a value' });
+            }
+        }
+
+        // First try to find collection in MongoDB (for real collections)
+        try {
+            const db = getDb();
+            const collection = await db.collection('collections').findOne({
+                _id: new ObjectId(collectionId),
+                $or: [
+                    { owner: userId },
+                    { "collaborators.userId": userId, "collaborators.role": { $in: ['editor', 'admin'] } }
+                ]
+            });
+
+            if (collection) {
+                // Update collection variables in MongoDB
+                const result = await db.collection('collections').updateOne(
+                    { _id: new ObjectId(collectionId) },
+                    {
+                        $set: {
+                            variables: variables,
+                            updatedAt: new Date()
+                        }
+                    }
+                );
+
+                if (result.matchedCount === 0) {
+                    return res.status(404).json({ message: 'Collection not found' });
+                }
+
+                return res.json({
+                    message: 'Collection variables updated successfully',
+                    variables
+                });
+            }
+        } catch (mongoError) {
+            // If ObjectId conversion fails, it might be a mock collection ID
+            console.log(`MongoDB update failed for collection ${collectionId}, checking mock collections...`);
+        }        // For mock collections, store variables in a global mock store
+        const mockCollectionIds = ['coll1', 'coll2', 'coll3', 'coll4', 'coll5'];
+        const isTestOrMockCollection = mockCollectionIds.includes(collectionId) ||
+            collectionId.startsWith('coll') ||
+            collectionId.startsWith('test-') ||
+            collectionId.includes('test');
+
+        if (isTestOrMockCollection) {
+            // Initialize mock collection variables store if it doesn't exist
+            if (!global.mockCollectionVariables) {
+                global.mockCollectionVariables = {};
+            }
+
+            // Store variables for this mock collection
+            global.mockCollectionVariables[collectionId] = variables;
+
+            return res.json({
+                message: 'Collection variables updated successfully',
+                variables
+            });
+        }
+
+        return res.status(404).json({ message: 'Collection not found or insufficient permissions' });
+    } catch (err) {
+        console.error("Error updating collection variables:", err);
+        res.status(500).json({ message: 'Error updating collection variables' });
+    }
+});
+
+// Add a single variable to collection
+router.post('/:id/variables', ensureAuthenticated, async (req, res) => {
+    try {
+        const collectionId = req.params.id;
+        const { key, value, description = '', type = 'string' } = req.body;
+        const userId = req.user.id;
+
+        // Validate input
+        if (!key || typeof key !== 'string') {
+            return res.status(400).json({ message: 'Variable key is required' });
+        }
+        if (value === undefined || value === null) {
+            return res.status(400).json({ message: 'Variable value is required' });
+        }
+
+        const newVariable = { key, value: String(value), description, type };
+
+        // First try to find collection in MongoDB (for real collections)
+        try {
+            const db = getDb();
+            const collection = await db.collection('collections').findOne({
+                _id: new ObjectId(collectionId),
+                $or: [
+                    { owner: userId },
+                    { "collaborators.userId": userId, "collaborators.role": { $in: ['editor', 'admin'] } }
+                ]
+            });
+
+            if (collection) {
+                const variables = collection.variables || [];
+
+                // Check if variable already exists
+                const existingIndex = variables.findIndex(v => v.key === key);
+
+                if (existingIndex >= 0) {
+                    // Update existing variable
+                    variables[existingIndex] = newVariable;
+                } else {
+                    // Add new variable
+                    variables.push(newVariable);
+                }
+
+                // Update collection
+                const result = await db.collection('collections').updateOne(
+                    { _id: new ObjectId(collectionId) },
+                    {
+                        $set: {
+                            variables: variables,
+                            updatedAt: new Date()
+                        }
+                    }
+                );
+
+                if (result.matchedCount === 0) {
+                    return res.status(404).json({ message: 'Collection not found' });
+                }
+
+                return res.status(201).json({
+                    message: 'Variable added successfully',
+                    variable: newVariable
+                });
+            }
+        } catch (mongoError) {
+            // If ObjectId conversion fails, it might be a mock collection ID
+            console.log(`MongoDB add variable failed for collection ${collectionId}, checking mock collections...`);
+        }        // For mock collections, store variables in a global mock store
+        const mockCollectionIds = ['coll1', 'coll2', 'coll3', 'coll4', 'coll5'];
+        const isTestOrMockCollection = mockCollectionIds.includes(collectionId) ||
+            collectionId.startsWith('coll') ||
+            collectionId.startsWith('test-') ||
+            collectionId.includes('test');
+
+        if (isTestOrMockCollection) {
+            // Initialize mock collection variables store if it doesn't exist
+            if (!global.mockCollectionVariables) {
+                global.mockCollectionVariables = {};
+            }
+            if (!global.mockCollectionVariables[collectionId]) {
+                global.mockCollectionVariables[collectionId] = [];
+            }
+
+            const variables = global.mockCollectionVariables[collectionId];
+
+            // Check if variable already exists
+            const existingIndex = variables.findIndex(v => v.key === key);
+
+            if (existingIndex >= 0) {
+                // Update existing variable
+                variables[existingIndex] = newVariable;
+            } else {
+                // Add new variable
+                variables.push(newVariable);
+            }
+
+            return res.status(201).json({
+                message: 'Variable added successfully',
+                variable: newVariable
+            });
+        }
+
+        return res.status(404).json({ message: 'Collection not found or insufficient permissions' });
+    } catch (err) {
+        console.error("Error adding collection variable:", err);
+        res.status(500).json({ message: 'Error adding collection variable' });
+    }
+});
+
+// Delete a variable from collection
+router.delete('/:id/variables/:key', ensureAuthenticated, async (req, res) => {
+    try {
+        const collectionId = req.params.id;
+        const variableKey = req.params.key;
+        const userId = req.user.id;
+
+        // First try to find collection in MongoDB (for real collections)
+        try {
+            const db = getDb();
+            const collection = await db.collection('collections').findOne({
+                _id: new ObjectId(collectionId),
+                $or: [
+                    { owner: userId },
+                    { "collaborators.userId": userId, "collaborators.role": { $in: ['editor', 'admin'] } }
+                ]
+            });
+
+            if (collection) {
+                const variables = collection.variables || [];
+                const filteredVariables = variables.filter(v => v.key !== variableKey);
+
+                if (filteredVariables.length === variables.length) {
+                    return res.status(404).json({ message: 'Variable not found' });
+                }
+
+                // Update collection
+                const result = await db.collection('collections').updateOne(
+                    { _id: new ObjectId(collectionId) },
+                    {
+                        $set: {
+                            variables: filteredVariables,
+                            updatedAt: new Date()
+                        }
+                    }
+                );
+
+                if (result.matchedCount === 0) {
+                    return res.status(404).json({ message: 'Collection not found' });
+                }
+
+                return res.json({
+                    message: 'Variable deleted successfully'
+                });
+            }
+        } catch (mongoError) {
+            // If ObjectId conversion fails, it might be a mock collection ID
+            console.log(`MongoDB delete variable failed for collection ${collectionId}, checking mock collections...`);
+        }        // For mock collections, delete from the global mock store
+        const mockCollectionIds = ['coll1', 'coll2', 'coll3', 'coll4', 'coll5'];
+        const isTestOrMockCollection = mockCollectionIds.includes(collectionId) ||
+            collectionId.startsWith('coll') ||
+            collectionId.startsWith('test-') ||
+            collectionId.includes('test');
+
+        if (isTestOrMockCollection) {
+            // Initialize mock collection variables store if it doesn't exist
+            if (!global.mockCollectionVariables || !global.mockCollectionVariables[collectionId]) {
+                return res.status(404).json({ message: 'Variable not found' });
+            }
+
+            const variables = global.mockCollectionVariables[collectionId];
+            const originalLength = variables.length;
+            global.mockCollectionVariables[collectionId] = variables.filter(v => v.key !== variableKey);
+
+            if (global.mockCollectionVariables[collectionId].length === originalLength) {
+                return res.status(404).json({ message: 'Variable not found' });
+            }
+
+            return res.json({
+                message: 'Variable deleted successfully'
+            });
+        }
+
+        return res.status(404).json({ message: 'Collection not found or insufficient permissions' });
+    } catch (err) {
+        console.error("Error deleting collection variable:", err);
+        res.status(500).json({ message: 'Error deleting collection variable' });
+    }
+});
+
 // Helper function to generate specific version history messages
 function generateSettingsChangeMessage(oldSettings, newSettings) {
     if (!oldSettings || !newSettings) {

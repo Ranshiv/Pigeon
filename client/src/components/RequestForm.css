@@ -205,6 +205,18 @@
     /* Force no shadows */
 }
 
+/* Variables section */
+.variables-section {
+    flex: 1 1 auto;
+    overflow: auto;
+    background-color: var(--card-bg, #1e1e1e);
+    min-height: 180px;
+    max-height: none;
+    padding: 16px;
+    border: none !important;
+    box-shadow: none !important;
+}
+
 /* Params section */
 .params-section,
 .headers-section {
@@ -556,6 +568,259 @@ form .headers-section {
     font-size: 13px;
 }
 
+/* Variable validation styles */
+.variable-validation-error {
+    margin: 12px 16px;
+    padding: 12px;
+    background-color: rgba(220, 53, 69, 0.1);
+    border: 1px solid rgba(220, 53, 69, 0.3);
+    border-radius: 4px;
+    color: #dc3545;
+    font-size: 14px;
+}
+
+.validation-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.validation-icon {
+    font-size: 16px;
+}
+
+.missing-variables {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 8px;
+}
+
+.missing-variable {
+    background-color: rgba(220, 53, 69, 0.2);
+    border: 1px solid rgba(220, 53, 69, 0.4);
+    border-radius: 3px;
+    padding: 2px 6px;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.validation-message {
+    font-size: 12px;
+    opacity: 0.9;
+    line-height: 1.4;
+}
+
+/* Variable interpolation indicators for input fields */
+.has-variables {
+    border-color: rgba(0, 123, 255, 0.5) !important;
+    background-color: rgba(0, 123, 255, 0.05);
+}
+
+.has-missing-variables {
+    border-color: rgba(220, 53, 69, 0.5) !important;
+    background-color: rgba(220, 53, 69, 0.05);
+}
+
+/* Enhanced Variable Preview Section */
+.variable-preview-section {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    gap: 16px;
+}
+
+.variable-preview-section .preview-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.variable-preview-section .preview-header h4 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-color, #e6e6e6);
+}
+
+.variable-preview-section .preview-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.variable-preview-section .status-valid {
+    color: var(--success-color, #22c55e);
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.variable-preview-section .status-invalid {
+    color: var(--warning-color, #f59e0b);
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+/* Missing Variables Alert */
+.missing-variables-alert {
+    padding: 16px;
+    background: rgba(245, 158, 11, 0.1);
+    border: 1px solid rgba(245, 158, 11, 0.3);
+    border-radius: 8px;
+    margin: 16px 0;
+}
+
+.missing-variables-alert h5 {
+    margin: 0 0 8px 0;
+    color: var(--warning-color, #f59e0b);
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.missing-variables-alert p {
+    margin: 8px 0;
+    font-size: 0.875rem;
+    color: var(--text-secondary, #a0a0a0);
+}
+
+.missing-variables-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 12px 0;
+}
+
+.missing-variable-name {
+    padding: 4px 8px;
+    background: rgba(245, 158, 11, 0.2);
+    border: 1px solid rgba(245, 158, 11, 0.4);
+    border-radius: 4px;
+    font-family: var(--font-mono, 'Monaco', 'Menlo', monospace);
+    font-size: 0.8rem;
+    color: var(--warning-color, #f59e0b);
+}
+
+.missing-variables-help {
+    font-size: 0.8rem;
+    color: var(--text-muted, #888);
+    font-style: italic;
+}
+
+/* Request Preview Section */
+.interpolated-preview {
+    margin-top: 24px;
+    padding: 16px;
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 8px;
+    border: 1px solid var(--border-color, #333);
+}
+
+.interpolated-preview h5 {
+    margin: 0 0 16px 0;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-color, #e6e6e6);
+}
+
+.preview-url,
+.preview-headers,
+.preview-body {
+    margin-bottom: 16px;
+}
+
+.preview-url strong,
+.preview-headers strong,
+.preview-body strong {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 0.875rem;
+    color: var(--text-secondary, #a0a0a0);
+    font-weight: 500;
+}
+
+.preview-url code {
+    display: block;
+    padding: 8px 12px;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--border-color, #333);
+    border-radius: 4px;
+    font-family: var(--font-mono, 'Monaco', 'Menlo', monospace);
+    font-size: 0.8rem;
+    color: var(--text-color, #e6e6e6);
+    word-break: break-all;
+}
+
+.header-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.header-item code {
+    display: block;
+    padding: 6px 12px;
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--border-color, #333);
+    border-radius: 4px;
+    font-family: var(--font-mono, 'Monaco', 'Menlo', monospace);
+    font-size: 0.8rem;
+    color: var(--text-color, #e6e6e6);
+}
+
+.body-preview {
+    margin: 0;
+    padding: 12px;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--border-color, #333);
+    border-radius: 4px;
+    font-family: var(--font-mono, 'Monaco', 'Menlo', monospace);
+    font-size: 0.8rem;
+    color: var(--text-color, #e6e6e6);
+    white-space: pre-wrap;
+    word-break: break-word;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+/* Unified Variable Viewer Integration */
+.variable-preview-section .unified-variable-viewer {
+    flex: 1;
+    min-height: 300px;
+    border: 1px solid var(--border-color, #333);
+    border-radius: 8px;
+    background: var(--card-bg, #1e1e1e);
+}
+
+/* Compact mode adjustments for preview */
+.variable-preview-section .unified-variable-viewer.compact {
+    min-height: 250px;
+}
+
+.variable-preview-section .unified-variable-viewer .viewer-header {
+    padding: 12px 16px;
+}
+
+.variable-preview-section .unified-variable-viewer .header-info h3 {
+    font-size: 1rem;
+}
+
+.variable-preview-section .unified-variable-viewer .variable-level {
+    margin-bottom: 8px;
+}
+
+.variable-preview-section .unified-variable-viewer .level-header {
+    padding: 8px 12px;
+}
+
+.variable-preview-section .unified-variable-viewer .variable-item {
+    padding: 6px 12px;
+    font-size: 0.8rem;
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
     .request-url-bar {
@@ -572,5 +837,19 @@ form .headers-section {
     .send-btn,
     .save-btn {
         flex: 1;
+    }
+
+    .variable-preview-section .preview-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .interpolated-preview {
+        padding: 12px;
+    }
+
+    .variable-preview-section .unified-variable-viewer {
+        min-height: 200px;
     }
 }

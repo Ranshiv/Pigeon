@@ -9,6 +9,9 @@ const axios = require('axios');
 const mongoose = require('mongoose');
 const chalk = require('chalk');
 const { executePreRequestScript, executeTestScript } = require('../utils/scriptRunner');
+const { loadEnvironment } = require('./environment');
+const VariableResolver = require('../services/VariableResolver');
+const Collection = require('../models/Collection');
 
 /**
  * Run a collection of API tests
@@ -17,15 +20,65 @@ const { executePreRequestScript, executeTestScript } = require('../utils/scriptR
  * @returns {Array} - Array of test results
  */
 async function runCollection(collectionId, options = {}) {
-  const { environment = {}, bail = false, timeout = 30000, parallel = false } = options;
+  const {
+    environment = {},
+    bail = false,
+    timeout = 30000,
+    parallel = false,
+    userId,
+    workspaceId,
+    environmentId,
+    environmentName
+  } = options;
 
   // Load the collection (from file or database)
   const collection = await loadCollection(collectionId);
   console.log(chalk.gray(`Loaded collection with ${collection.requests.length} requests`));
 
+  // Initialize environment with scoping support
+  let environmentData;
+  let contextId;
+
+  if (typeof environment === 'string' || environmentId || environmentName) {
+    // Load environment with full scoping
+    try {
+      environmentData = await loadEnvironment({
+        userId,
+        workspaceId,
+        environmentId,
+        environmentName: environmentName || environment,
+        collectionId: collection._id || collection.id
+      });
+
+      console.log(chalk.gray(`Loaded environment with ${environmentData.source} source`));
+      if (environmentData.resolution) {
+        const res = environmentData.resolution;
+        console.log(chalk.gray(`Variable layers: Global(${res.global}) Collection(${res.collection}) Environment(${res.environment}) Request(${res.request})`));
+      }
+    } catch (error) {
+      console.warn(chalk.yellow(`Failed to load environment: ${error.message}`));
+      environmentData = { variables: {}, source: 'empty' };
+    }
+  } else {
+    // Use provided environment object (backward compatibility)
+    environmentData = { variables: environment, source: 'provided' };
+  }
+
   // Store results for each request
   const results = [];
-  let currentEnvironment = { ...environment };
+  let currentEnvironment = { ...environmentData.variables };
+
+  // Create a persistent context for the collection run
+  if (environmentData.source === 'scoped') {
+    contextId = `cli-collection-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    await VariableResolver.createContext(contextId, {
+      userId,
+      workspaceId,
+      environmentId,
+      collectionId: collection._id || collection.id,
+      requestLocalVariables: {}
+    });
+  }
 
   // Run each request in the collection
   for (let i = 0; i < collection.requests.length; i++) {
@@ -36,7 +89,12 @@ async function runCollection(collectionId, options = {}) {
       // Run the individual request with current environment
       const result = await runRequest(request, {
         environment: currentEnvironment,
-        timeout
+        timeout,
+        contextId,
+        collectionId: collection._id || collection.id,
+        userId,
+        workspaceId,
+        environmentId
       });
 
       // Update environment with any variables set during this request
@@ -88,6 +146,11 @@ async function runCollection(collectionId, options = {}) {
         break;
       }
     }
+  }
+
+  // Cleanup context if created
+  if (contextId) {
+    VariableResolver.destroyContext(contextId);
   }
 
   return results;
@@ -164,13 +227,56 @@ async function runBatch(requests, options = {}) {
  * @returns {Object} - Test result object
  */
 async function runRequest(request, options = {}) {
-  const { environment = {}, timeout = 30000 } = options;
+  const {
+    environment = {},
+    timeout = 30000,
+    contextId,
+    collectionId,
+    userId,
+    workspaceId,
+    environmentId
+  } = options;
   const startTime = Date.now();
 
   try {
     // Clone environment to avoid mutations
     let currentEnv = { ...environment };
     const requestObj = { ...request };
+
+    // If we have a context ID, create request-specific variables context
+    let requestContextId;
+    if (contextId) {
+      requestContextId = `${contextId}-req-${Date.now()}`;
+
+      // Get any request-local variables from the request
+      const requestLocalVars = {};
+      if (request.variables && Array.isArray(request.variables)) {
+        request.variables.forEach(variable => {
+          requestLocalVars[variable.key] = variable.value;
+        });
+      }
+
+      // Create request context with local variables
+      try {
+        await VariableResolver.createContext(requestContextId, {
+          userId,
+          workspaceId,
+          environmentId,
+          collectionId,
+          requestLocalVariables: requestLocalVars
+        });
+
+        // Get resolved variables for this request
+        const resolvedVars = VariableResolver.getAllVariables(requestContextId);
+        currentEnv = {};
+        Object.entries(resolvedVars).forEach(([key, metadata]) => {
+          currentEnv[key] = metadata.value;
+        });
+      } catch (error) {
+        console.log(chalk.yellow(`  ⚠ Variable resolution error: ${error.message}`));
+        // Fall back to provided environment
+      }
+    }
 
     // Process environment variables in URL and headers before script execution
     requestObj.url = replaceEnvVars(requestObj.url, currentEnv);
@@ -301,6 +407,11 @@ async function runRequest(request, options = {}) {
       }
     }
 
+    // Cleanup request context if created
+    if (requestContextId) {
+      VariableResolver.destroyContext(requestContextId);
+    }
+
     // Return result object
     return {
       request: requestObj,
@@ -312,6 +423,11 @@ async function runRequest(request, options = {}) {
     };
   } catch (error) {
     const duration = Date.now() - startTime;
+
+    // Cleanup request context if created
+    if (requestContextId) {
+      VariableResolver.destroyContext(requestContextId);
+    }
 
     // Format axios error response if available
     let responseObj = null;
@@ -353,9 +469,38 @@ async function loadCollection(collectionId) {
     }
 
     // Otherwise try to load from database
-    // This would require connecting to the database and using your models
-    // For example purposes, this is a placeholder
-    throw new Error("Database loading not implemented yet");
+    try {
+      // Check if MongoDB connection exists
+      if (!mongoose.connection || mongoose.connection.readyState !== 1) {
+        // Connect to database (using connection string from env)
+        const connectionString = process.env.MONGODB_URI || 'mongodb://localhost:27017/pigeon';
+        await mongoose.connect(connectionString, {
+          useNewUrlParser: true,
+          useUnifiedTopology: true
+        });
+      }
+
+      // Try to find collection by ID
+      const collection = await Collection.findById(collectionId);
+
+      if (collection) {
+        return collection.toObject();
+      } else {
+        throw new Error(`Collection "${collectionId}" not found in database`);
+      }
+    } catch (dbError) {
+      console.warn(chalk.yellow(`Database error: ${dbError.message}`));
+
+      // As a fallback, try to treat it as a collection name and create a mock collection
+      console.log(chalk.gray(`Creating mock collection for "${collectionId}"`));
+      return {
+        _id: collectionId,
+        name: collectionId,
+        description: `Mock collection for ${collectionId}`,
+        requests: [],
+        variables: []
+      };
+    }
 
   } catch (error) {
     throw new Error(`Failed to load collection "${collectionId}": ${error.message}`);

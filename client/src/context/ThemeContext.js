@@ -10,6 +10,14 @@ export const ThemeProvider = ({ children }) => {
     useEffect(() => {
         // Apply theme class to the body element
         document.body.className = theme + '-theme';
+
+        // Also set data-theme attribute for components that use it
+        if (theme === 'dark') {
+            document.body.setAttribute('data-theme', 'dark');
+        } else {
+            document.body.removeAttribute('data-theme');
+        }
+
         // Save theme preference to localStorage
         localStorage.setItem('theme', theme);
     }, [theme]);

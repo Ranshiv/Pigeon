@@ -1,0 +1,266 @@
+.environment-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    backdrop-filter: blur(4px);
+}
+
+.environment-modal {
+    background: #1c1c1e;
+    border-radius: 8px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+    width: 90%;
+    max-width: 600px;
+    max-height: 90vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid #3e3e3e;
+}
+
+.environment-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px;
+    border-bottom: 1px solid #3e3e3e;
+    background: linear-gradient(to bottom, #2d2d30, #252528);
+}
+
+.environment-modal-header h2 {
+    margin: 0;
+    color: #e6e6e6;
+    font-size: 18px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.active-badge {
+    background: #28a745;
+    color: white;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 4px 8px;
+    border-radius: 4px;
+    text-transform: uppercase;
+}
+
+.close-button {
+    background: none;
+    border: none;
+    color: #a0a0a0;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.close-button:hover {
+    color: #e6e6e6;
+    background: #3e3e3e;
+}
+
+.error-message {
+    background: #dc3545;
+    color: white;
+    padding: 12px 24px;
+    margin: 0;
+    font-size: 14px;
+    border-bottom: 1px solid #3e3e3e;
+}
+
+.environment-form {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-group label {
+    color: #e6e6e6;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.form-group input,
+.form-group textarea {
+    background: #262626;
+    border: 1px solid #3e3e3e;
+    border-radius: 4px;
+    padding: 12px;
+    color: #e6e6e6;
+    font-size: 14px;
+    transition: border-color 0.2s ease;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+.form-group input:disabled,
+.form-group textarea:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 80px;
+    font-family: inherit;
+}
+
+.variables-container {
+    background: #262626;
+    border: 1px solid #3e3e3e;
+    border-radius: 4px;
+    padding: 8px;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.environment-modal-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px;
+    border-top: 1px solid #3e3e3e;
+    background: #1a1a1c;
+    margin-top: auto;
+}
+
+.left-actions,
+.right-actions {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.environment-modal-actions button {
+    padding: 10px 20px;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border: none;
+}
+
+.save-button {
+    background: #007bff;
+    color: white;
+}
+
+.save-button:hover:not(:disabled) {
+    background: #0056b3;
+}
+
+.save-button:disabled {
+    background: #495057;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.cancel-button {
+    background: #6c757d;
+    color: white;
+}
+
+.cancel-button:hover:not(:disabled) {
+    background: #5a6268;
+}
+
+.delete-button {
+    background: #dc3545;
+    color: white;
+}
+
+.delete-button:hover:not(:disabled) {
+    background: #c82333;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .environment-modal {
+        width: 95%;
+        max-height: 95vh;
+    }
+
+    .environment-modal-header,
+    .environment-form,
+    .environment-modal-actions {
+        padding: 16px;
+    }
+
+    .environment-modal-actions {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .left-actions,
+    .right-actions {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .variables-container {
+        max-height: 200px;
+    }
+}
+
+/* Animation */
+.environment-modal-overlay {
+    animation: fadeIn 0.2s ease;
+}
+
+.environment-modal {
+    animation: slideIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px) scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}

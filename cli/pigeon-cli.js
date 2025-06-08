@@ -39,6 +39,18 @@ const argv = yargs(hideBin(process.argv))
         describe: 'Environment name or path to environment file',
         type: 'string'
       })
+      .option('userId', {
+        describe: 'User ID for database environment access',
+        type: 'string'
+      })
+      .option('workspaceId', {
+        describe: 'Workspace ID for scoped environment access',
+        type: 'string'
+      })
+      .option('environmentId', {
+        describe: 'Environment ID for direct environment access',
+        type: 'string'
+      })
       .option('reporter', {
         alias: 'r',
         describe: 'Reporter format (json, junit, html, csv)',
@@ -96,20 +108,34 @@ async function main() {
     if (command === 'run') {
       console.log(chalk.cyan(`Running collection: ${argv.collection}`));
 
-      // Load environment variables if specified
-      let environment = {};
-      if (argv.environment) {
-        environment = await loadEnvironment(argv.environment);
-        console.log(chalk.gray(`Loaded environment: ${argv.environment}`));
+      // Prepare environment options for the new scoping system
+      const environmentOptions = {
+        environment: argv.environment,
+        environmentId: argv.environmentId,
+        environmentName: argv.environment,
+        userId: argv.userId,
+        workspaceId: argv.workspaceId,
+        bail: argv.bail,
+        timeout: argv.timeout
+      };
+
+      // Legacy support: Load environment variables if specified in the old way
+      if (argv.environment && !argv.environmentId && !argv.userId) {
+        try {
+          const envData = await loadEnvironment(argv.environment);
+          console.log(chalk.gray(`Loaded environment: ${argv.environment} (${envData.source})`));
+          environmentOptions.environment = envData.variables;
+        } catch (error) {
+          console.warn(chalk.yellow(`Failed to load environment: ${error.message}`));
+          environmentOptions.environment = {};
+        }
+      } else if (argv.environmentId || argv.userId) {
+        console.log(chalk.gray(`Using scoped environment resolution`));
       }
 
       // Run the collection
       const startTime = Date.now();
-      const results = await runCollection(argv.collection, {
-        environment,
-        bail: argv.bail,
-        timeout: argv.timeout
-      });
+      const results = await runCollection(argv.collection, environmentOptions);
       const duration = Date.now() - startTime;
 
       // Calculate summary

@@ -107,6 +107,18 @@
   margin-left: 12px;
 }
 
+/* Environment selector wrapper */
+.environment-selector-wrapper {
+  display: flex;
+  align-items: center;
+  margin-left: 16px;
+  margin-right: 16px;
+}
+
+.environment-selector-wrapper .environment-selector {
+  min-width: 200px;
+}
+
 /* Collection actions */
 .collection-actions {
   display: flex;
@@ -1107,6 +1119,58 @@
 
 .visibility-option.selected strong {
   color: var(--primary-color);
+}
+
+/* Variables tab content */
+.variables-tab-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--background-color);
+  overflow: hidden;
+}
+
+/* Override variable manager styles for dark theme */
+.variables-tab-content .collection-variables-manager {
+  background: var(--background-color);
+  color: var(--text-color);
+  border: none;
+  box-shadow: none;
+  height: 100%;
+}
+
+.variables-tab-content .collection-variables-header {
+  border-bottom-color: var(--border-color);
+}
+
+.variables-tab-content .header-title h3 {
+  color: var(--text-color);
+}
+
+.variables-tab-content .collection-name {
+  background: var(--hover-color);
+  color: var(--text-secondary);
+  border-color: var(--border-color);
+}
+
+.variables-tab-content .info-box {
+  background: var(--hover-color);
+  border-color: var(--border-color);
+}
+
+.variables-tab-content .info-content h4 {
+  color: var(--primary-color);
+}
+
+.variables-tab-content .info-content p {
+  color: var(--text-secondary);
+}
+
+.variables-tab-content .precedence-order {
+  background: rgba(255, 108, 55, 0.1);
+  color: var(--primary-color);
+  border-left-color: var(--primary-color);
 }
 
 /* Responsive styles */

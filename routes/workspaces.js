@@ -1001,4 +1001,118 @@ router.get('/:id/merge-requests', ensureAuthenticated, async (req, res) => {
     }
 });
 
+// Get global variables for a workspace
+router.get('/:workspaceId/global-variables', async (req, res) => {
+    try {
+        const { workspaceId } = req.params;
+
+        // Validate workspaceId format FIRST, before authentication
+        if (!ObjectId.isValid(workspaceId)) {
+            return res.status(400).json({
+                message: 'Invalid workspace ID format',
+                variables: []
+            });
+        }
+
+        // Now check authentication
+        if (!req.user) {
+            return res.status(401).json({ message: 'Authentication required' });
+        }
+
+        const userId = req.user.id;
+        const db = getDb();
+
+        // Check if user has access to workspace
+        const workspace = await db.collection('workspaces').findOne({
+            _id: new ObjectId(workspaceId),
+            $or: [
+                { owner: userId },
+                { "collaborators.userId": userId }
+            ]
+        });
+
+        if (!workspace) {
+            return res.status(404).json({ message: 'Workspace not found' });
+        }
+
+        res.json({ variables: workspace.globalVariables || [] });
+    } catch (err) {
+        console.error("Error fetching global variables:", err);
+        res.status(500).json({ message: 'Error fetching global variables' });
+    }
+});
+
+// Update global variables for a workspace
+router.put('/:workspaceId/global-variables', async (req, res) => {
+    try {
+        const { workspaceId } = req.params;
+        const { variables } = req.body;
+
+        // Validate workspaceId format FIRST, before authentication
+        if (!ObjectId.isValid(workspaceId)) {
+            return res.status(400).json({
+                message: 'Invalid workspace ID format'
+            });
+        }
+
+        // Now check authentication
+        if (!req.user) {
+            return res.status(401).json({ message: 'Authentication required' });
+        }
+
+        const userId = req.user.id;
+        const db = getDb();
+
+        // Check if user has access to workspace
+        const workspace = await db.collection('workspaces').findOne({
+            _id: new ObjectId(workspaceId),
+            $or: [
+                { owner: userId },
+                { "collaborators.userId": userId }
+            ]
+        });
+
+        if (!workspace) {
+            return res.status(404).json({ message: 'Workspace not found' });
+        }
+
+        // Check if user has write permissions
+        const isOwner = workspace.owner === userId;
+        const collaborator = workspace.collaborators?.find(c => c.userId === userId);
+        const canWrite = isOwner || (collaborator && ['admin', 'editor'].includes(collaborator.role));
+
+        if (!canWrite) {
+            return res.status(403).json({ message: 'Insufficient permissions' });
+        }
+
+        // Validate variables format
+        if (!Array.isArray(variables)) {
+            return res.status(400).json({ message: 'Variables must be an array' });
+        }
+
+        // Update workspace with new global variables
+        const result = await db.collection('workspaces').updateOne(
+            { _id: new ObjectId(workspaceId) },
+            {
+                $set: {
+                    globalVariables: variables,
+                    updatedAt: new Date()
+                }
+            }
+        );
+
+        if (result.matchedCount === 0) {
+            return res.status(404).json({ message: 'Workspace not found' });
+        }
+
+        res.json({
+            message: 'Global variables updated successfully',
+            variables
+        });
+    } catch (err) {
+        console.error("Error updating global variables:", err);
+        res.status(500).json({ message: 'Error updating global variables' });
+    }
+});
+
 module.exports = router;

@@ -7,6 +7,8 @@ import RequestForm from './RequestForm';
 import ResponseDisplay from './ResponseDisplay';
 import SampleDataManager from './SampleDataManager';
 import DocumentationViewer from './DocumentationViewer';
+import EnvironmentSelector from './EnvironmentSelector';
+import CollectionVariablesManager from './CollectionVariablesManager';
 import { useCollaboration } from '../context/CollaborationContext';
 import {
   FiSave, FiSettings, FiPlay, FiAlertCircle, FiCheckCircle, FiBook, FiEdit,
@@ -29,11 +31,15 @@ function CollectionDetail() {
   const [isRunningAll, setIsRunningAll] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [pendingChanges, setPendingChanges] = useState(false);
-  const [activeTab, setActiveTab] = useState('requests');
-  const [documentation, setDocumentation] = useState(null);
-  const [isLoadingDocs, setIsLoadingDocs] = useState(false);
-  const [saveSuccess, setSaveSuccess] = useState(false);
+  const [activeTab, setActiveTab] = useState('requests'); const [documentation, setDocumentation] = useState(null);
+  const [isLoadingDocs, setIsLoadingDocs] = useState(false); const [saveSuccess, setSaveSuccess] = useState(false);
   const [responseData, setResponseData] = useState(null);
+  const [selectedEnvironment, setSelectedEnvironment] = useState(() => {
+    // Restore selected environment from localStorage
+    const storageKey = `selectedEnvironment_${collectionId}`;
+    const stored = localStorage.getItem(storageKey);
+    return stored || null;
+  });
 
   // Get collaboration context features
   const {
@@ -704,22 +710,38 @@ function CollectionDetail() {
 
   return (
     <div className="collection-detail">
-      <div className="collection-header">
-        <div className="collection-title">
-          <div className="title-icon">
-            <FiPackage />
-          </div>
-          <h2>{collection?.name || 'Unnamed Collection'}</h2>
-          <div className="collection-visibility">
-            {collection?.isPublic ?
-              <span className="visibility-badge public"><FiGlobe /> Public</span> :
-              <span className="visibility-badge private"><FiLock /> Private</span>
-            }
-          </div>
-          <div className="collaboration-wrapper">
-            <ActiveCollaborators collectionId={collectionId} />
-          </div>
+      <div className="collection-header">        <div className="collection-title">
+        <div className="title-icon">
+          <FiPackage />
         </div>
+        <h2>{collection?.name || 'Unnamed Collection'}</h2>
+        <div className="collection-visibility">
+          {collection?.isPublic ?
+            <span className="visibility-badge public"><FiGlobe /> Public</span> :
+            <span className="visibility-badge private"><FiLock /> Private</span>
+          }
+        </div>        <div className="environment-selector-wrapper">
+          <EnvironmentSelector
+            selectedEnvironmentId={selectedEnvironment}
+            workspaceId={collection?.workspaceId}
+            collectionId={collectionId} onEnvironmentChange={(environmentId) => {
+              // Store selected environment ID for request execution
+              setSelectedEnvironment(environmentId);
+
+              // Persist selection to localStorage
+              const storageKey = `selectedEnvironment_${collectionId}`;
+              if (environmentId) {
+                localStorage.setItem(storageKey, environmentId);
+              } else {
+                localStorage.removeItem(storageKey);
+              }
+            }}
+          />
+        </div>
+        <div className="collaboration-wrapper">
+          <ActiveCollaborators collectionId={collectionId} />
+        </div>
+      </div>
         <div className="collection-actions">
           {pendingChanges && (
             <div className="pending-changes-indicator">Unsaved changes</div>
@@ -738,8 +760,7 @@ function CollectionDetail() {
             disabled={isRunningAll || requests.length === 0}
           >
             <FiPlay className="icon" /> {isRunningAll ? 'Running...' : 'Run All'}
-          </button>
-          <button className="action-btn" onClick={handleSettingsClick}>
+          </button>          <button className="action-btn" onClick={handleSettingsClick}>
             <FiSettings className="icon" /> Settings
           </button>
         </div>
@@ -805,12 +826,17 @@ function CollectionDetail() {
               onClick={() => setActiveTab('documentation')}
             >
               <FiBook /> Documentation
-            </button>
-            <button
+            </button>            <button
               className={`tab-btn ${activeTab === 'sampleData' ? 'active' : ''}`}
               onClick={() => setActiveTab('sampleData')}
             >
               <FiDatabase /> Sample Data
+            </button>
+            <button
+              className={`tab-btn ${activeTab === 'variables' ? 'active' : ''}`}
+              onClick={() => setActiveTab('variables')}
+            >
+              <FiSettings /> Variables
             </button>
           </div>
 
@@ -911,15 +937,21 @@ function CollectionDetail() {
                 </div>
               )}
             </div>
-          )}
-
-          {activeTab === 'sampleData' && (
+          )}          {activeTab === 'sampleData' && (
             <div className="sample-data-tab-content">
               <SampleDataManager collectionId={collectionId} />
             </div>
+          )}          {activeTab === 'variables' && (
+            <div className="variables-tab-content">
+              <CollectionVariablesManager
+                collectionId={collectionId}
+                collectionName={collection?.name}
+                workspaceId={collection?.workspaceId}
+                selectedEnvironment={selectedEnvironment}
+              />
+            </div>
           )}
-        </div>
-      </div>
+        </div>      </div>
       {renderSettingsModal()}
     </div>
   );

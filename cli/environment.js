@@ -1,19 +1,31 @@
 /**
  * Environment module for Pigeon CLI
- * Handles loading environment variables for test runs
+ * Handles loading environment variables for test runs with full scoping support
  */
 
 const fs = require('fs').promises;
 const path = require('path');
 const mongoose = require('mongoose');
+const VariableResolver = require('../services/VariableResolver');
+const Environment = require('../models/Environment');
+const Collection = require('../models/Collection');
 
 /**
- * Load an environment from file or database
- * @param {string} environmentName - Environment name or path to file
- * @returns {Promise<Object>} - Environment variables
+ * Load environment variables with full scoping support
+ * @param {string|Object} environmentInput - Environment name, path to file, or options object
+ * @param {Object} options - Additional options
+ * @returns {Promise<Object>} - Resolved environment variables with metadata
  */
-async function loadEnvironment(environmentName) {
+async function loadEnvironment(environmentInput, options = {}) {
   try {
+    // Handle options object input
+    if (typeof environmentInput === 'object') {
+      return await loadEnvironmentWithScoping(environmentInput);
+    }
+
+    // Handle string input (backward compatibility)
+    const environmentName = environmentInput;
+
     // First try to load from a file path
     if (environmentName.endsWith('.json') ||
       environmentName.endsWith('.env') ||
@@ -21,15 +33,98 @@ async function loadEnvironment(environmentName) {
       environmentName.includes('\\')) {
 
       // Handle as file path
-      return await loadEnvironmentFromFile(environmentName);
+      const fileVars = await loadEnvironmentFromFile(environmentName);
+      return { variables: fileVars, source: 'file', path: environmentName };
     }
 
     // Otherwise try to load from database
-    return await loadEnvironmentFromDatabase(environmentName);
+    const dbVars = await loadEnvironmentFromDatabase(environmentName, options);
+    return { variables: dbVars, source: 'database', name: environmentName };
   } catch (error) {
     console.warn(`Warning: Failed to load environment "${environmentName}": ${error.message}`);
     // Return empty environment in case of failure
-    return {};
+    return { variables: {}, source: 'empty', error: error.message };
+  }
+}
+
+/**
+ * Load environment with full variable scoping
+ * @param {Object} options - Environment loading options
+ * @returns {Promise<Object>} - Resolved variables with full scoping
+ */
+async function loadEnvironmentWithScoping(options = {}) {
+  const {
+    userId,
+    workspaceId,
+    environmentId,
+    environmentName,
+    collectionId,
+    requestLocalVariables = {}
+  } = options;
+
+  try {
+    // Create a context for variable resolution
+    const contextId = `cli-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+
+    let finalEnvironmentId = environmentId;
+
+    // If environment name provided instead of ID, resolve it
+    if (environmentName && !environmentId && userId) {
+      const environment = await Environment.findOne({
+        name: environmentName,
+        userId: userId,
+        workspaceId: workspaceId || null
+      });
+
+      if (environment) {
+        finalEnvironmentId = environment._id;
+      } else {
+        console.warn(`Environment "${environmentName}" not found for user`);
+      }
+    }
+
+    // Create variable resolution context
+    const context = await VariableResolver.createContext(contextId, {
+      userId,
+      workspaceId,
+      environmentId: finalEnvironmentId,
+      collectionId,
+      requestLocalVariables
+    });
+
+    // Get all resolved variables
+    const allVariables = VariableResolver.getAllVariables(contextId);
+
+    // Create final variables object with just the values
+    const resolvedVariables = {};
+    Object.entries(allVariables).forEach(([key, metadata]) => {
+      resolvedVariables[key] = metadata.value;
+    });
+
+    // Cleanup context
+    VariableResolver.destroyContext(contextId);
+
+    return {
+      variables: resolvedVariables,
+      source: 'scoped',
+      contextId,
+      layers: context.layers,
+      metadata: allVariables,
+      resolution: {
+        global: Object.keys(context.layers.global).length,
+        collection: Object.keys(context.layers.collection).length,
+        environment: Object.keys(context.layers.environment).length,
+        request: Object.keys(context.layers.request).length
+      }
+    };
+
+  } catch (error) {
+    console.error('Error loading environment with scoping:', error);
+    return {
+      variables: requestLocalVariables || {},
+      source: 'fallback',
+      error: error.message
+    };
   }
 }
 
@@ -111,9 +206,10 @@ function parseEnvFile(content) {
 /**
  * Load environment from database
  * @param {string} environmentName - Environment name
+ * @param {Object} options - Additional options
  * @returns {Promise<Object>} - Environment variables
  */
-async function loadEnvironmentFromDatabase(environmentName) {
+async function loadEnvironmentFromDatabase(environmentName, options = {}) {
   try {
     // Check if MongoDB connection exists
     if (!mongoose.connection || mongoose.connection.readyState !== 1) {
@@ -125,10 +221,17 @@ async function loadEnvironmentFromDatabase(environmentName) {
       });
     }
 
-    // Find environment by name
-    // This assumes you have an Environment model defined elsewhere
-    const Environment = mongoose.model('Environment');
-    const environment = await Environment.findOne({ name: environmentName });
+    // Build query conditions
+    const query = { name: environmentName };
+    if (options.userId) {
+      query.userId = options.userId;
+    }
+    if (options.workspaceId) {
+      query.workspaceId = options.workspaceId;
+    }
+
+    // Find environment by name and user context
+    const environment = await Environment.findOne(query);
 
     if (!environment) {
       throw new Error(`Environment "${environmentName}" not found in database`);
@@ -137,7 +240,7 @@ async function loadEnvironmentFromDatabase(environmentName) {
     // Convert from database format to flat key-value pairs
     const envVars = {};
 
-    for (const variable of environment.variables) {
+    for (const variable of environment.variables || []) {
       envVars[variable.key] = variable.value;
     }
 
