@@ -73,7 +73,7 @@
 /* Precedence Indicator */
 .precedence-indicator {
     padding: 16px 20px;
-    background: rgba(255, 108, 55, 0.05);
+    background: rgba(0,0,0, 0.05);
     border-bottom: 1px solid var(--border-color, #333);
 }
 
@@ -434,7 +434,7 @@
 
 /* Dark theme overrides */
 [data-theme="dark"] .unified-variable-viewer {
-    --background-color: #0d1117;
+    --background-color: #0c0c0c;
     --text-color: #f0f6fc;
     --text-secondary: #7d8590;
     --border-color: #21262d;

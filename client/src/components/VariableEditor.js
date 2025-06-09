@@ -17,6 +17,7 @@ const VariableEditor = ({
     const [showValues, setShowValues] = useState({});
     const [saving, setSaving] = useState(false);
     const [newVariable, setNewVariable] = useState({ key: '', value: '', description: '', type: 'string' });
+    const [showAddForm, setShowAddForm] = useState(false);
 
     useEffect(() => {
         setLocalVariables(variables);
@@ -36,6 +37,7 @@ const VariableEditor = ({
         const updatedVariables = [...localVariables, variable];
         setLocalVariables(updatedVariables);
         setNewVariable({ key: '', value: '', description: '', type: 'string' });
+        setShowAddForm(false);
 
         if (onVariablesChange) {
             onVariablesChange(updatedVariables);
@@ -165,194 +167,357 @@ const VariableEditor = ({
 
             <div className="variables-list">
                 {localVariables.length === 0 ? (
-                    <div className="no-variables">
-                        <p>No {getScopeLabel(scope).toLowerCase()} variables defined</p>
-                    </div>
-                ) : (
-                    localVariables.map((variable, index) => (
-                        <div key={variable.id || variable.key || index} className="variable-item">
-                            {editingVariable && (editingVariable.id === variable.id || editingVariable.key === variable.key) ? (
-                                <div className="variable-edit-form">
-                                    <div className="form-row">
-                                        <input
-                                            type="text"
-                                            placeholder="Variable name"
-                                            value={editingVariable.key}
-                                            onChange={(e) => setEditingVariable({
-                                                ...editingVariable,
-                                                key: e.target.value
-                                            })}
-                                            className="variable-key-input"
-                                        />
-                                        <select
-                                            value={editingVariable.type}
-                                            onChange={(e) => setEditingVariable({
-                                                ...editingVariable,
-                                                type: e.target.value
-                                            })}
-                                            className="variable-type-select"
-                                        >
-                                            <option value="string">String</option>
-                                            <option value="number">Number</option>
-                                            <option value="boolean">Boolean</option>
-                                            <option value="object">Object</option>
-                                        </select>
-                                    </div>
-
-                                    <input
-                                        type="text"
-                                        placeholder="Variable value"
-                                        value={editingVariable.value}
-                                        onChange={(e) => setEditingVariable({
-                                            ...editingVariable,
-                                            value: e.target.value
-                                        })}
-                                        className="variable-value-input"
-                                    />
-
-                                    <input
-                                        type="text"
-                                        placeholder="Description (optional)"
-                                        value={editingVariable.description || ''}
-                                        onChange={(e) => setEditingVariable({
-                                            ...editingVariable,
-                                            description: e.target.value
-                                        })}
-                                        className="variable-description-input"
-                                    />
-
-                                    <div className="edit-actions">
-                                        <button
-                                            className="save-edit-btn"
-                                            onClick={handleSaveEdit}
-                                        >
-                                            <FiSave />
-                                        </button>
-                                        <button
-                                            className="cancel-edit-btn"
-                                            onClick={() => setEditingVariable(null)}
-                                        >
-                                            <FiX />
-                                        </button>
-                                    </div>
-                                </div>
-                            ) : (
-                                <div className="variable-display">
-                                    <div className="variable-info">
-                                        <div className="variable-header">
-                                            <span className="variable-key">{variable.key}</span>
-                                            <span className="variable-type">{variable.type}</span>
-                                        </div>
-
-                                        <div className="variable-value">
-                                            <span className="value-label">Value:</span>
-                                            <div className="value-container">
-                                                <span className="value-text">
-                                                    {showValues[variable.key]
-                                                        ? variable.value
-                                                        : '•'.repeat(Math.min(variable.value?.length || 8, 20))
-                                                    }
-                                                </span>
-                                                <button
-                                                    className="toggle-visibility-btn"
-                                                    onClick={() => toggleShowValue(variable.key)}
+                    <div className="empty-state">
+                        <div className="empty-state-content">
+                            <div className="empty-state-icon">
+                                <FiEdit2 size={48} />
+                            </div>
+                            <h3>No {getScopeLabel(scope).toLowerCase()} variables yet</h3>
+                            <p>Create your first variable to get started. Variables allow you to store and reuse values across your requests.</p>
+                            {editable && !showAddForm && (
+                                <button
+                                    className="empty-state-action"
+                                    onClick={() => setShowAddForm(true)}
+                                >
+                                    <FiPlus /> Create Variable
+                                </button>
+                            )}
+                            {editable && showAddForm && (
+                                <div className="add-variable-form" style={{ marginTop: 24 }}>
+                                    <div className="form-section">
+                                        <div className="form-row">
+                                            <div className="input-group">
+                                                <label htmlFor="new-key" className="input-label">Variable Name</label>
+                                                <input
+                                                    id="new-key"
+                                                    type="text"
+                                                    placeholder="e.g., api_url, token, port"
+                                                    value={newVariable.key}
+                                                    onChange={(e) => setNewVariable({
+                                                        ...newVariable,
+                                                        key: e.target.value
+                                                    })}
+                                                    className="form-input variable-key-input"
+                                                    autoFocus
+                                                />
+                                            </div>
+                                            <div className="input-group">
+                                                <label htmlFor="new-type" className="input-label">Type</label>
+                                                <select
+                                                    id="new-type"
+                                                    value={newVariable.type}
+                                                    onChange={(e) => setNewVariable({
+                                                        ...newVariable,
+                                                        type: e.target.value
+                                                    })}
+                                                    className="form-select variable-type-select"
                                                 >
-                                                    {showValues[variable.key] ? <FiEyeOff /> : <FiEye />}
-                                                </button>
+                                                    <option value="string">String</option>
+                                                    <option value="number">Number</option>
+                                                    <option value="boolean">Boolean</option>
+                                                    <option value="object">Object</option>
+                                                </select>
                                             </div>
                                         </div>
-
-                                        {variable.description && (
-                                            <div className="variable-description">
-                                                {variable.description}
-                                            </div>
-                                        )}
+                                        <div className="input-group">
+                                            <label htmlFor="new-value" className="input-label">Value</label>
+                                            <input
+                                                id="new-value"
+                                                type="text"
+                                                placeholder="Enter the variable value"
+                                                value={newVariable.value}
+                                                onChange={(e) => setNewVariable({
+                                                    ...newVariable,
+                                                    value: e.target.value
+                                                })}
+                                                className="form-input variable-value-input"
+                                            />
+                                        </div>
+                                        <div className="input-group">
+                                            <label htmlFor="new-description" className="input-label">Description (optional)</label>
+                                            <input
+                                                id="new-description"
+                                                type="text"
+                                                placeholder="Describe what this variable is used for"
+                                                value={newVariable.description}
+                                                onChange={(e) => setNewVariable({
+                                                    ...newVariable,
+                                                    description: e.target.value
+                                                })}
+                                                className="form-input variable-description-input"
+                                            />
+                                        </div>
                                     </div>
-
-                                    {editable && (
-                                        <div className="variable-actions">
-                                            <button
-                                                className="edit-variable-btn"
-                                                onClick={() => handleEditVariable(variable)}
-                                            >
-                                                <FiEdit2 />
-                                            </button>
-                                            <button
-                                                className="delete-variable-btn"
-                                                onClick={() => handleDeleteVariable(variable.id, variable.key)}
-                                            >
-                                                <FiTrash2 />
-                                            </button>
-                                        </div>
-                                    )}
+                                    <div className="form-actions">
+                                        <button
+                                            className="btn btn-primary add-variable-btn"
+                                            onClick={handleAddVariable}
+                                            disabled={!newVariable.key.trim()}
+                                        >
+                                            <FiPlus /> Add Variable
+                                        </button>
+                                        <button
+                                            className="btn btn-secondary cancel-add-btn"
+                                            onClick={() => { setShowAddForm(false); setNewVariable({ key: '', value: '', description: '', type: 'string' }); }}
+                                        >
+                                            <FiX /> Cancel
+                                        </button>
+                                    </div>
                                 </div>
                             )}
                         </div>
-                    ))
-                )}
-            </div>
+                    </div>
+                ) : (
+                    <>
+                        <div className="variables-grid">
+                            {localVariables.map((variable, index) => (
+                                <div key={variable.id || variable.key || index} className="variable-card">
+                                    {editingVariable && (editingVariable.id === variable.id || editingVariable.key === variable.key) ? (
+                                        <div className="variable-edit-form">
+                                            <div className="form-section">
+                                                <label className="form-label">Variable Details</label>
+                                                <div className="form-row">
+                                                    <div className="input-group">
+                                                        <label htmlFor="edit-key" className="input-label">Name</label>
+                                                        <input
+                                                            id="edit-key"
+                                                            type="text"
+                                                            placeholder="e.g., api_url, token, port"
+                                                            value={editingVariable.key}
+                                                            onChange={(e) => setEditingVariable({
+                                                                ...editingVariable,
+                                                                key: e.target.value
+                                                            })}
+                                                            className="form-input variable-key-input"
+                                                        />
+                                                    </div>
+                                                    <div className="input-group">
+                                                        <label htmlFor="edit-type" className="input-label">Type</label>
+                                                        <select
+                                                            id="edit-type"
+                                                            value={editingVariable.type}
+                                                            onChange={(e) => setEditingVariable({
+                                                                ...editingVariable,
+                                                                type: e.target.value
+                                                            })}
+                                                            className="form-select variable-type-select"
+                                                        >
+                                                            <option value="string">String</option>
+                                                            <option value="number">Number</option>
+                                                            <option value="boolean">Boolean</option>
+                                                            <option value="object">Object</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
 
-            {editable && (
-                <div className="add-variable-section">
-                    <div className="add-variable-form">
-                        <div className="form-row">
-                            <input
-                                type="text"
-                                placeholder="Variable name"
-                                value={newVariable.key}
-                                onChange={(e) => setNewVariable({
-                                    ...newVariable,
-                                    key: e.target.value
-                                })}
-                                className="variable-key-input"
-                            />
-                            <select
-                                value={newVariable.type}
-                                onChange={(e) => setNewVariable({
-                                    ...newVariable,
-                                    type: e.target.value
-                                })}
-                                className="variable-type-select"
-                            >
-                                <option value="string">String</option>
-                                <option value="number">Number</option>
-                                <option value="boolean">Boolean</option>
-                                <option value="object">Object</option>
-                            </select>
+                                                <div className="input-group">
+                                                    <label htmlFor="edit-value" className="input-label">Value</label>
+                                                    <input
+                                                        id="edit-value"
+                                                        type="text"
+                                                        placeholder="Enter the variable value"
+                                                        value={editingVariable.value}
+                                                        onChange={(e) => setEditingVariable({
+                                                            ...editingVariable,
+                                                            value: e.target.value
+                                                        })}
+                                                        className="form-input variable-value-input"
+                                                    />
+                                                </div>
+
+                                                <div className="input-group">
+                                                    <label htmlFor="edit-description" className="input-label">Description (optional)</label>
+                                                    <input
+                                                        id="edit-description"
+                                                        type="text"
+                                                        placeholder="Describe what this variable is used for"
+                                                        value={editingVariable.description || ''}
+                                                        onChange={(e) => setEditingVariable({
+                                                            ...editingVariable,
+                                                            description: e.target.value
+                                                        })}
+                                                        className="form-input variable-description-input"
+                                                    />
+                                                </div>
+                                            </div>
+
+                                            <div className="form-actions">
+                                                <button
+                                                    className="btn btn-primary save-edit-btn"
+                                                    onClick={handleSaveEdit}
+                                                >
+                                                    <FiSave /> Save Changes
+                                                </button>
+                                                <button
+                                                    className="btn btn-secondary cancel-edit-btn"
+                                                    onClick={() => setEditingVariable(null)}
+                                                >
+                                                    <FiX /> Cancel
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <div className="variable-display">
+                                            <div className="variable-header">
+                                                <div className="variable-title">
+                                                    <span className="variable-key">{variable.key}</span>
+                                                    <span className="variable-type-badge" data-type={variable.type}>
+                                                        {variable.type}
+                                                    </span>
+                                                </div>
+                                                {editable && (
+                                                    <div className="variable-actions">
+                                                        <button
+                                                            className="action-btn edit-btn"
+                                                            onClick={() => handleEditVariable(variable)}
+                                                            title="Edit variable"
+                                                        >
+                                                            <FiEdit2 />
+                                                        </button>
+                                                        <button
+                                                            className="action-btn delete-btn"
+                                                            onClick={() => handleDeleteVariable(variable.id, variable.key)}
+                                                            title="Delete variable"
+                                                        >
+                                                            <FiTrash2 />
+                                                        </button>
+                                                    </div>
+                                                )}
+                                            </div>
+
+                                            <div className="variable-value-section">
+                                                <div className="value-container">
+                                                    <span className="value-text">
+                                                        {showValues[variable.key]
+                                                            ? variable.value || '<empty>'
+                                                            : '•'.repeat(Math.min(variable.value?.length || 8, 20))
+                                                        }
+                                                    </span>
+                                                    <button
+                                                        className="toggle-visibility-btn"
+                                                        onClick={() => toggleShowValue(variable.key)}
+                                                        title={showValues[variable.key] ? 'Hide value' : 'Show value'}
+                                                    >
+                                                        {showValues[variable.key] ? <FiEyeOff /> : <FiEye />}
+                                                    </button>
+                                                </div>
+                                            </div>
+
+                                            {variable.description && (
+                                                <div className="variable-description">
+                                                    <span className="description-text">{variable.description}</span>
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
+                                </div>
+                            ))}
                         </div>
 
-                        <input
-                            type="text"
-                            placeholder="Variable value"
-                            value={newVariable.value}
-                            onChange={(e) => setNewVariable({
-                                ...newVariable,
-                                value: e.target.value
-                            })}
-                            className="variable-value-input"
-                        />
+                        {editable && (
+                            <div className="add-variable-section">
+                                <div className="section-divider">
+                                    <span className="divider-text">Add New Variable</span>
+                                </div>
 
-                        <input
-                            type="text"
-                            placeholder="Description (optional)"
-                            value={newVariable.description}
-                            onChange={(e) => setNewVariable({
-                                ...newVariable,
-                                description: e.target.value
-                            })}
-                            className="variable-description-input"
-                        />
+                                {!showAddForm ? (
+                                    <button
+                                        className="create-variable-btn"
+                                        onClick={() => setShowAddForm(true)}
+                                    >
+                                        <FiPlus /> Create Variable
+                                    </button>
+                                ) : (
+                                    <div className="add-variable-form">
+                                        <div className="form-section">
+                                            <div className="form-row">
+                                                <div className="input-group">
+                                                    <label htmlFor="new-key" className="input-label">Variable Name</label>
+                                                    <input
+                                                        id="new-key"
+                                                        type="text"
+                                                        placeholder="e.g., api_url, token, port"
+                                                        value={newVariable.key}
+                                                        onChange={(e) => setNewVariable({
+                                                            ...newVariable,
+                                                            key: e.target.value
+                                                        })}
+                                                        className="form-input variable-key-input"
+                                                        autoFocus
+                                                    />
+                                                </div>
+                                                <div className="input-group">
+                                                    <label htmlFor="new-type" className="input-label">Type</label>
+                                                    <select
+                                                        id="new-type"
+                                                        value={newVariable.type}
+                                                        onChange={(e) => setNewVariable({
+                                                            ...newVariable,
+                                                            type: e.target.value
+                                                        })}
+                                                        className="form-select variable-type-select"
+                                                    >
+                                                        <option value="string">String</option>
+                                                        <option value="number">Number</option>
+                                                        <option value="boolean">Boolean</option>
+                                                        <option value="object">Object</option>
+                                                    </select>
+                                                </div>
+                                            </div>
 
-                        <button
-                            className="add-variable-btn"
-                            onClick={handleAddVariable}
-                            disabled={!newVariable.key.trim()}
-                        >
-                            <FiPlus /> Add Variable
-                        </button>
-                    </div>
-                </div>
-            )}
+                                            <div className="input-group">
+                                                <label htmlFor="new-value" className="input-label">Value</label>
+                                                <input
+                                                    id="new-value"
+                                                    type="text"
+                                                    placeholder="Enter the variable value"
+                                                    value={newVariable.value}
+                                                    onChange={(e) => setNewVariable({
+                                                        ...newVariable,
+                                                        value: e.target.value
+                                                    })}
+                                                    className="form-input variable-value-input"
+                                                />
+                                            </div>
+
+                                            <div className="input-group">
+                                                <label htmlFor="new-description" className="input-label">Description (optional)</label>
+                                                <input
+                                                    id="new-description"
+                                                    type="text"
+                                                    placeholder="Describe what this variable is used for"
+                                                    value={newVariable.description}
+                                                    onChange={(e) => setNewVariable({
+                                                        ...newVariable,
+                                                        description: e.target.value
+                                                    })}
+                                                    className="form-input variable-description-input"
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <div className="form-actions">
+                                            <button
+                                                className="btn btn-primary add-variable-btn"
+                                                onClick={handleAddVariable}
+                                                disabled={!newVariable.key.trim()}
+                                            >
+                                                <FiPlus /> Add Variable
+                                            </button>
+                                            <button
+                                                className="btn btn-secondary cancel-add-btn"
+                                                onClick={() => { setShowAddForm(false); setNewVariable({ key: '', value: '', description: '', type: 'string' }); }}
+                                            >
+                                                <FiX /> Cancel
+                                            </button>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+                    </>
+                )}
+            </div>
         </div>
     );
 };
