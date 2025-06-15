@@ -72,7 +72,7 @@ const SettingsPage = () => {
         setMessage('');
         if (!currentUser) return false;
         try {
-            const res = await fetch('/api/user/profile', {
+            const res = await fetch('/api/auth/user/profile', {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(updateData),

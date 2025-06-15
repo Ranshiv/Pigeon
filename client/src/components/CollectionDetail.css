@@ -508,96 +508,172 @@
   opacity: 0.8;
 }
 
-/* Collection info styling - updated for modern minimalist design */
+/* Collection info styling - redesigned for better structure */
 .collection-info {
-  padding: 24px;
-  max-width: 900px;
+  padding: 32px;
+  max-width: 1000px;
   margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
 }
 
 .collection-info h2 {
-  margin-top: 0;
-  margin-bottom: 16px;
-  font-size: 20px;
-  font-weight: 600;
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
   color: var(--text-color);
+  text-align: center;
+  padding-bottom: 16px;
+  border-bottom: 2px solid var(--primary-color);
+}
+
+/* Collection overview card */
+.collection-overview-card {
+  background-color: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 24px;
+  margin-bottom: 8px;
 }
 
 .collection-description {
-  margin-bottom: 24px;
-  line-height: 1.6;
+  margin: 0;
+  line-height: 1.7;
   color: var(--text-secondary);
-  font-size: 14px;
-  padding-bottom: 20px;
+  font-size: 15px;
+  text-align: center;
+  font-style: italic;
+}
+
+/* Structured metadata layout */
+.collection-metadata-section {
+  background-color: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 20px;
+  overflow: hidden;
+}
+
+.metadata-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
   border-bottom: 1px solid var(--border-color);
 }
 
-/* Modern grid layout for collection metadata */
+.metadata-icon {
+  color: var(--primary-color);
+  font-size: 18px;
+}
+
+.metadata-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-color);
+  margin: 0;
+}
+
 .collection-meta-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(6, 1fr);
   gap: 16px;
-  margin-bottom: 32px;
+  margin-bottom: 0;
+  width: 100%;
 }
 
 .meta-item {
+  background-color: #1e1e1e;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  padding: 16px;
   display: flex;
   flex-direction: column;
   gap: 8px;
+  transition: all 0.2s ease;
+  min-height: 80px;
+  min-width: 160px;
+  justify-content: space-between;
+  position: relative;
+  overflow: visible;
+}
+
+.meta-item:hover {
+  background-color: #252525;
+  border-color: rgba(255, 108, 55, 0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 .meta-item label {
   font-size: 11px;
-  font-weight: 500;
-  color: var(--text-secondary);
+  font-weight: 700;
+  color: #9ca3af;
   letter-spacing: 0.5px;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+  opacity: 0.8;
 }
 
 .meta-value {
-  font-size: 14px;
-  color: var(--text-color);
+  font-size: 15px;
+  font-weight: 500;
+  color: #ffffff;
+  line-height: 1.3;
+  word-wrap: break-word;
+  word-break: break-all;
+  overflow-wrap: break-word;
+  max-width: 100%;
 }
 
 .collaborator-count {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background-color: rgba(40, 167, 69, 0.15);
-  color: var(--success-color);
-  min-width: 22px;
-  height: 22px;
-  border-radius: 12px;
+  background-color: var(--primary-color);
+  color: white;
+  min-width: 24px;
+  height: 24px;
+  border-radius: 50%;
   font-size: 12px;
-  font-weight: 500;
+  font-weight: 600;
 }
 
-/* Updated real-time info box */
+/* Collaboration info card */
 .real-time-info {
-  background-color: rgba(0, 0, 0, 0.2);
-  padding: 20px;
-  border-radius: var(--border-radius);
+  background-color: rgba(255, 255, 255, 0.02);
   border: 1px solid var(--border-color);
-  margin-top: 20px;
+  border-radius: 8px;
+  padding: 24px;
+  text-align: center;
 }
 
 .real-time-info h4 {
-  margin-top: 0;
-  color: var(--primary-color);
-  font-size: 16px;
+  margin: 0 0 12px 0;
+  color: var(--text-color);
+  font-size: 18px;
+  font-weight: 600;
   display: flex;
   align-items: center;
-  gap: 8px;
+  justify-content: center;
+  gap: 10px;
 }
 
 .info-icon {
   color: var(--primary-color);
-  font-size: 18px;
+  font-size: 20px;
 }
 
 .real-time-info p {
-  margin-bottom: 20px;
+  margin: 0 0 20px 0;
   color: var(--text-secondary);
   font-size: 14px;
+  line-height: 1.6;
+  max-width: 500px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 /* Modern simple button for Create Your First Request */
@@ -1174,6 +1250,25 @@
 }
 
 /* Responsive styles */
+@media (max-width: 1200px) {
+  .collection-meta-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+}
+
+@media (max-width: 992px) {
+  .collection-meta-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+  }
+
+  .meta-item {
+    min-width: auto;
+    padding: 14px;
+  }
+}
+
 @media (max-width: 768px) {
   .collection-content {
     flex-direction: column;
@@ -1198,8 +1293,71 @@
     justify-content: flex-end;
   }
 
-  .collection-title {
-    max-width: 100%;
-    margin-bottom: 8px;
+  /* Responsive collection info layout */
+  .collection-info {
+    padding: 20px 16px;
+  }
+
+  .collection-meta-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+    overflow-x: visible;
+  }
+
+  .meta-item {
+    padding: 12px;
+    min-width: auto;
+    min-height: 70px;
+  }
+
+  .collection-info h2 {
+    font-size: 20px;
+  }
+
+  .collection-overview-card {
+    padding: 16px;
+  }
+
+  .collection-metadata-section {
+    padding: 16px;
+  }
+
+  .real-time-info {
+    padding: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .collection-info {
+    padding: 16px 12px;
+    gap: 16px;
+  }
+
+  .collection-info h2 {
+    font-size: 18px;
+  }
+
+  .metadata-title {
+    font-size: 14px;
+  }
+
+  .collection-meta-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    overflow-x: visible;
+  }
+
+  .meta-item {
+    padding: 12px;
+    min-height: 60px;
+    min-width: auto;
+  }
+
+  .meta-value {
+    font-size: 14px;
+  }
+
+  .meta-item label {
+    font-size: 10px;
   }
 }

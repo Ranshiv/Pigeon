@@ -12,31 +12,51 @@ const collectionsStore = {};
 router.get('/', ensureAuthenticated, async (req, res) => {
     try {
         const userId = req.user.id;
-        const db = getDb();
-
-        // Fetch collections from MongoDB
+        const db = getDb();        // Fetch collections from MongoDB
         const collections = await db.collection('collections')
             .find({ owner: userId })
             .toArray();
 
-        // If collections exist in MongoDB, return them
+        // If collections exist in MongoDB, populate owner information and return them
         if (collections && collections.length > 0) {
-            const collectionsWithStringIds = collections.map(collection => ({
-                ...collection,
-                _id: collection._id.toString()
-            }));
+            const User = require('../models/User');
+            const populatedCollections = await Promise.all(
+                collections.map(async (collection) => {
+                    let populatedCollection = { ...collection, _id: collection._id.toString() };
 
-            return res.json(collectionsWithStringIds);
-        }
+                    // Try to populate owner information
+                    if (collection.owner && ObjectId.isValid(collection.owner)) {
+                        try {
+                            const ownerUser = await User.findById(collection.owner);
+                            if (ownerUser) {
+                                populatedCollection.owner = {
+                                    _id: ownerUser._id,
+                                    displayName: ownerUser.displayName,
+                                    email: ownerUser.email
+                                };
+                            }
+                        } catch (err) {
+                            console.log('Could not populate owner for collection:', collection._id);
+                        }
+                    }
 
-        // Mock collections data
+                    return populatedCollection;
+                })
+            );
+
+            return res.json(populatedCollections);
+        }        // Mock collections data
         const mockCollections = [
             {
                 _id: "coll1",
                 name: "Personal API Collection",
                 description: "My personal collection of frequently used APIs",
                 isPublic: false,
-                owner: userId,
+                owner: {
+                    _id: userId,
+                    displayName: req.user.displayName || req.user.name || "User",
+                    email: req.user.email || "user@example.com"
+                },
                 requestCount: 5,
                 collaborators: [],
                 createdAt: new Date(),
@@ -47,7 +67,11 @@ router.get('/', ensureAuthenticated, async (req, res) => {
                 name: "Project X APIs",
                 description: "APIs used in the Project X development",
                 isPublic: false,
-                owner: userId,
+                owner: {
+                    _id: userId,
+                    displayName: req.user.displayName || req.user.name || "User",
+                    email: req.user.email || "user@example.com"
+                },
                 requestCount: 12,
                 collaborators: [
                     {
@@ -57,13 +81,16 @@ router.get('/', ensureAuthenticated, async (req, res) => {
                 ],
                 createdAt: new Date(),
                 updatedAt: new Date()
-            },
-            {
+            }, {
                 _id: "coll3",
                 name: "Public Demo Collection",
                 description: "Public collection of demo APIs",
                 isPublic: true,
-                owner: userId,
+                owner: {
+                    _id: userId,
+                    displayName: req.user.displayName || req.user.name || "User",
+                    email: req.user.email || "user@example.com"
+                },
                 requestCount: 8,
                 collaborators: [],
                 createdAt: new Date(),
@@ -139,19 +166,36 @@ router.get('/:id', ensureAuthenticated, async (req, res) => {
         const userId = req.user.id;
         const db = getDb();
 
-        console.log(`Fetching collection with ID: ${collectionId}`);
-
-        // First check for collections in MongoDB
+        console.log(`Fetching collection with ID: ${collectionId}`);        // First check for collections in MongoDB
         try {
             const collection = await db.collection('collections').findOne({
                 _id: new ObjectId(collectionId)
             });
 
             if (collection) {
+                // Try to populate owner information if it exists
+                let populatedCollection = { ...collection };
+
+                if (collection.owner && ObjectId.isValid(collection.owner)) {
+                    try {
+                        const User = require('../models/User');
+                        const ownerUser = await User.findById(collection.owner);
+                        if (ownerUser) {
+                            populatedCollection.owner = {
+                                _id: ownerUser._id,
+                                displayName: ownerUser.displayName,
+                                email: ownerUser.email
+                            };
+                        }
+                    } catch (err) {
+                        console.log('Could not populate owner information:', err.message);
+                    }
+                }
+
                 // Add string ID and return
                 return res.json({
-                    ...collection,
-                    _id: collection._id.toString()
+                    ...populatedCollection,
+                    _id: populatedCollection._id.toString()
                 });
             }
         } catch (err) {
@@ -167,10 +211,15 @@ router.get('/:id', ensureAuthenticated, async (req, res) => {
                 );
 
                 if (matchingCollection) {
-                    console.log(`Found collection in collectionsStore for workspace ${workspaceId}`);
-                    // Add some mock requests to the collection
+                    console.log(`Found collection in collectionsStore for workspace ${workspaceId}`);                    // Add some mock requests to the collection
                     const collectionWithRequests = {
                         ...matchingCollection,
+                        // Ensure owner has proper structure if it's just a string
+                        owner: typeof matchingCollection.owner === 'string' ? {
+                            _id: matchingCollection.owner,
+                            displayName: req.user.displayName || req.user.name || "User",
+                            email: req.user.email || "user@example.com"
+                        } : matchingCollection.owner,
                         requests: [
                             { _id: `req-${Date.now()}-1`, name: "Get Data", method: "GET", url: "https://api.example.com/data" },
                             { _id: `req-${Date.now()}-2`, name: "Create Item", method: "POST", url: "https://api.example.com/items" }
@@ -191,7 +240,11 @@ router.get('/:id', ensureAuthenticated, async (req, res) => {
                     name: "Personal API Collection",
                     description: "My personal collection of frequently used APIs",
                     isPublic: false,
-                    owner: userId,
+                    owner: {
+                        _id: userId,
+                        displayName: req.user.displayName || req.user.name || "User",
+                        email: req.user.email || "user@example.com"
+                    },
                     requests: [
                         { _id: "req1", name: "Get Users", method: "GET", url: "https://api.example.com/users" },
                         { _id: "req2", name: "Create User", method: "POST", url: "https://api.example.com/users" },
@@ -203,14 +256,17 @@ router.get('/:id', ensureAuthenticated, async (req, res) => {
                     createdAt: new Date(),
                     updatedAt: new Date()
                 };
-                break;
-            case "coll2":
+                break; case "coll2":
                 collection = {
                     _id: "coll2",
                     name: "Project X APIs",
                     description: "APIs used in the Project X development",
                     isPublic: false,
-                    owner: userId,
+                    owner: {
+                        _id: userId,
+                        displayName: req.user.displayName || req.user.name || "User",
+                        email: req.user.email || "user@example.com"
+                    },
                     requests: [
                         { _id: "req6", name: "Authentication", method: "POST", url: "https://api.example.com/auth" },
                         { _id: "req7", name: "Get Profile", method: "GET", url: "https://api.example.com/profile" }
@@ -224,14 +280,17 @@ router.get('/:id', ensureAuthenticated, async (req, res) => {
                     createdAt: new Date(),
                     updatedAt: new Date()
                 };
-                break;
-            case "coll3":
+                break; case "coll3":
                 collection = {
                     _id: "coll3",
                     name: "Public Demo Collection",
                     description: "Public collection of demo APIs",
                     isPublic: true,
-                    owner: userId,
+                    owner: {
+                        _id: userId,
+                        displayName: req.user.displayName || req.user.name || "User",
+                        email: req.user.email || "user@example.com"
+                    },
                     requests: [
                         { _id: "req8", name: "Weather API", method: "GET", url: "https://api.weather.com/current" },
                         { _id: "req9", name: "Currency Exchange", method: "GET", url: "https://api.exchange.com/rates" }
@@ -240,14 +299,17 @@ router.get('/:id', ensureAuthenticated, async (req, res) => {
                     createdAt: new Date(),
                     updatedAt: new Date()
                 };
-                break;
-            case "shared1":
+                break; case "shared1":
                 collection = {
                     _id: "shared1",
                     name: "Team Project APIs",
                     description: "APIs used by the development team",
                     isPublic: false,
-                    owner: "other-user-id",
+                    owner: {
+                        _id: "other-user-id",
+                        displayName: "Team Lead",
+                        email: "teamlead@example.com"
+                    },
                     myRole: "viewer",
                     requests: [
                         { _id: "req10", name: "Team Auth", method: "POST", url: "https://api.team.com/auth" },
@@ -267,15 +329,18 @@ router.get('/:id', ensureAuthenticated, async (req, res) => {
                     updatedAt: new Date()
                 };
                 break;
-            default:
-                // Try to handle dynamically generated collection IDs (like coll100)
+            default:                // Try to handle dynamically generated collection IDs (like coll100)
                 if (collectionId.startsWith('coll')) {
                     collection = {
                         _id: collectionId,
                         name: `Collection ${collectionId.replace('coll', '')}`,
                         description: "Dynamically created collection",
                         isPublic: false,
-                        owner: userId,
+                        owner: {
+                            _id: userId,
+                            displayName: req.user.displayName || req.user.name || "User",
+                            email: req.user.email || "user@example.com"
+                        },
                         requests: [
                             { _id: `req-${Date.now()}-1`, name: "Get Data", method: "GET", url: "https://api.example.com/data" },
                             { _id: `req-${Date.now()}-2`, name: "Create Item", method: "POST", url: "https://api.example.com/items" }
@@ -307,14 +372,12 @@ router.post('/', ensureAuthenticated, async (req, res) => {
         // Validate input
         if (!name) {
             return res.status(400).json({ message: 'Collection name is required' });
-        }
-
-        // Create a new collection document for MongoDB
+        }        // Create a new collection document for MongoDB
         const newCollection = {
             name,
             description: description || "",
             workspaceId: workspaceId || null,
-            owner: userId,
+            owner: userId,  // Store as ObjectId for MongoDB
             isPublic: isPublic || false,
             collaborators: [],
             createdAt: new Date(),
@@ -323,23 +386,32 @@ router.post('/', ensureAuthenticated, async (req, res) => {
 
         // Store in MongoDB
         const result = await db.collection('collections').insertOne(newCollection);
-        const collectionId = result.insertedId.toString();
-
-        // Also update in-memory store for backward compatibility
+        const collectionId = result.insertedId.toString();        // Also update in-memory store for backward compatibility
         if (workspaceId) {
             if (!collectionsStore[workspaceId]) {
                 collectionsStore[workspaceId] = [];
             }
             collectionsStore[workspaceId].push({
                 ...newCollection,
-                _id: collectionId
+                _id: collectionId,
+                // For in-memory store, use populated owner structure
+                owner: {
+                    _id: userId,
+                    displayName: req.user.displayName || req.user.name || "User",
+                    email: req.user.email || "user@example.com"
+                }
             });
         }
 
-        // Return the created collection
+        // Return the created collection with populated owner for immediate use
         res.status(201).json({
             ...newCollection,
-            _id: collectionId
+            _id: collectionId,
+            owner: {
+                _id: userId,
+                displayName: req.user.displayName || req.user.name || "User",
+                email: req.user.email || "user@example.com"
+            }
         });
     } catch (err) {
         console.error("Error creating collection:", err);

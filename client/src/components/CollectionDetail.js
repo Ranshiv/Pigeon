@@ -13,7 +13,7 @@ import { useCollaboration } from '../context/CollaborationContext';
 import {
   FiSave, FiSettings, FiPlay, FiAlertCircle, FiCheckCircle, FiBook, FiEdit,
   FiPlus, FiTrash2, FiDatabase, FiGlobe, FiLock, FiUsers, FiPackage,
-  FiFileText
+  FiFileText, FiInfo
 } from 'react-icons/fi';
 import { toast } from 'react-toastify'; // Import toast notification library
 
@@ -32,8 +32,7 @@ function CollectionDetail() {
   const [showSettings, setShowSettings] = useState(false);
   const [pendingChanges, setPendingChanges] = useState(false);
   const [activeTab, setActiveTab] = useState('requests'); const [documentation, setDocumentation] = useState(null);
-  const [isLoadingDocs, setIsLoadingDocs] = useState(false); const [saveSuccess, setSaveSuccess] = useState(false);
-  const [responseData, setResponseData] = useState(null);
+  const [isLoadingDocs, setIsLoadingDocs] = useState(false); const [saveSuccess, setSaveSuccess] = useState(false); const [responseData, setResponseData] = useState(null);
   const [selectedEnvironment, setSelectedEnvironment] = useState(() => {
     // Restore selected environment from localStorage
     const storageKey = `selectedEnvironment_${collectionId}`;
@@ -52,6 +51,34 @@ function CollectionDetail() {
     stopEditing,
     trackChanges
   } = useCollaboration();
+
+  // Helper function to get owner display name
+  const getOwnerDisplayName = (collection) => {
+    if (!collection) return 'Unknown';
+
+    // If owner is an object (populated), use displayName
+    if (collection.owner && typeof collection.owner === 'object' && collection.owner.displayName) {
+      return collection.owner.displayName;
+    }
+
+    // If owner is a string (user ID), check if it's the current user
+    if (collection.owner && typeof collection.owner === 'string') {
+      // If it matches current user ID, show current user's name
+      // Note: We would need user context for this, for now return a fallback
+      return 'Collection Owner';
+    }
+
+    // Fallback for createdBy field
+    if (collection.createdBy && typeof collection.createdBy === 'object' && collection.createdBy.displayName) {
+      return collection.createdBy.displayName;
+    }
+
+    if (collection.createdBy && typeof collection.createdBy === 'string') {
+      return 'Collection Creator';
+    }
+
+    return 'Unknown User';
+  };
 
   // Fetch collection data
   const fetchCollection = useCallback(async () => {
@@ -842,49 +869,57 @@ function CollectionDetail() {
 
           {activeTab === 'requests' && (
             <>
-              {!selectedRequest && !showRequestForm ? (
-                <div className="collection-info">
-                  <h2>Collection Details</h2>
+              {!selectedRequest && !showRequestForm ? (<div className="collection-info">
+                <h2>Collection Details</h2>
+
+                <div className="collection-overview-card">
                   <div className="collection-description">
                     {collection?.description || 'No description provided.'}
                   </div>
-                  <div className="collection-meta-grid">
+                </div>
+
+                <div className="collection-metadata-section">
+                  <div className="metadata-header">
+                    <FiInfo className="metadata-icon" />
+                    <h3 className="metadata-title">Collection Information</h3>
+                  </div>
+                  <div className="collection-meta-grid">                    <div className="meta-item">
+                    <label>Created By</label>
+                    <div className="meta-value">{getOwnerDisplayName(collection)}</div>
+                  </div>
                     <div className="meta-item">
-                      <label>CREATED BY</label>
-                      <div className="meta-value">{collection?.owner ? collection.owner : collection?.createdBy || 'Unknown'}</div>
-                    </div>
-                    <div className="meta-item">
-                      <label>CREATED ON</label>
+                      <label>Created On</label>
                       <div className="meta-value">{collection?.createdAt ? new Date(collection.createdAt).toLocaleDateString() : 'Unknown'}</div>
                     </div>
                     <div className="meta-item">
-                      <label>LAST MODIFIED</label>
+                      <label>Last Modified</label>
                       <div className="meta-value">{collection?.updatedAt ? new Date(collection.updatedAt).toLocaleDateString() : 'Unknown'}</div>
                     </div>
                     <div className="meta-item">
-                      <label>REQUESTS</label>
+                      <label>Total Requests</label>
                       <div className="meta-value">{requests.length}</div>
                     </div>
                     <div className="meta-item">
-                      <label>VISIBILITY</label>
+                      <label>Visibility</label>
                       <div className="meta-value">{collection?.isPublic ? 'Public' : 'Private'}</div>
                     </div>
                     <div className="meta-item">
-                      <label>ACTIVE COLLABORATORS</label>
+                      <label>Active Collaborators</label>
                       <div className="collaborator-count">{activeUsers.length}</div>
                     </div>
                   </div>
-
-                  <div className="real-time-info">
-                    <h4><FiUsers className="info-icon" /> Real-time Collaboration</h4>
-                    <p>This collection supports real-time collaboration. You can work together with your team members simultaneously.</p>
-                    {requests.length === 0 && (
-                      <button className="primary-button" onClick={handleAddRequest}>
-                        <FiPlus className="icon" /> Create Your First Request
-                      </button>
-                    )}
-                  </div>
                 </div>
+
+                <div className="real-time-info">
+                  <h4><FiUsers className="info-icon" /> Real-time Collaboration</h4>
+                  <p>This collection supports real-time collaboration. You can work together with your team members simultaneously.</p>
+                  {requests.length === 0 && (
+                    <button className="primary-button" onClick={handleAddRequest}>
+                      <FiPlus className="icon" /> Create Your First Request
+                    </button>
+                  )}
+                </div>
+              </div>
               ) : (
                 showRequestForm && selectedRequest && (
                   <div className="request-workspace">
