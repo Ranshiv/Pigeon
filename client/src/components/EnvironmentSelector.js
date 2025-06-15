@@ -66,7 +66,7 @@ const EnvironmentSelector = ({
 
     const handleEnvironmentSelect = (environment) => {
         setSelectedEnvironment(environment);
-        onEnvironmentChange(environment ? environment._id : null);
+        onEnvironmentChange(environment); // Pass the full environment object
         setShowDropdown(false);
     };
 
@@ -124,6 +124,10 @@ const EnvironmentSelector = ({
 
     const handleSaveEnvironment = async (environmentData) => {
         try {
+            // Remove 'id' property from each variable before sending to backend
+            const cleanedVariables = (environmentData.variables || []).map(({ id, ...rest }) => rest);
+            const cleanedEnvironmentData = { ...environmentData, variables: cleanedVariables };
+
             const path = environmentData._id
                 ? `/api/environments/${environmentData._id}`
                 : '/api/environments';
@@ -136,7 +140,7 @@ const EnvironmentSelector = ({
                     'Content-Type': 'application/json'
                 },
                 credentials: 'include',
-                body: JSON.stringify(environmentData)
+                body: JSON.stringify(cleanedEnvironmentData)
             });
 
             if (response.ok) {

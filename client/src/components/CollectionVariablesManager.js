@@ -75,14 +75,26 @@ const CollectionVariablesManager = ({
                 }
             }
 
-            // Fetch environment variables using selected environment ID
-            if (selectedEnvironment?._id) {
-                const envResponse = await fetch(`/api/environments/${selectedEnvironment._id}/variables`, {
+            // Fetch environment variables using selected environment ID (object or string)
+            let environmentId = null;
+            if (selectedEnvironment) {
+                if (typeof selectedEnvironment === 'object' && selectedEnvironment._id) {
+                    environmentId = selectedEnvironment._id;
+                } else if (typeof selectedEnvironment === 'string') {
+                    environmentId = selectedEnvironment;
+                }
+            }
+            console.log('Fetching environment variables for environmentId:', environmentId, selectedEnvironment);
+            if (environmentId) {
+                const envResponse = await fetch(`/api/environments/${environmentId}/variables`, {
                     credentials: 'include'
                 });
+                const envData = await envResponse.json();
+                console.log('Fetched environment variables response:', envData);
                 if (envResponse.ok) {
-                    const envData = await envResponse.json();
                     setEnvironmentVariables(envData.variables || []);
+                } else {
+                    console.error('Error fetching environment variables:', envData);
                 }
             }
 

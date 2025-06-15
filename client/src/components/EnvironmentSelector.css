@@ -10,11 +10,11 @@
     --env-border-primary: #e5e7eb;
     --env-border-secondary: #f3f4f6;
     --env-border-hover: #d1d5db;
-    --env-border-accent: #3b82f6;
+    --env-border-accent: #fa6a17;
     --env-text-primary: #374151;
     --env-text-secondary: #6b7280;
     --env-text-tertiary: #9ca3af;
-    --env-text-accent: #1d4ed8;
+    --env-text-accent: #ce7d2d;
     --env-text-success: #10b981;
     --env-shadow-light: rgba(0, 0, 0, 0.05);
     --env-shadow-medium: rgba(0, 0, 0, 0.08);
@@ -33,11 +33,11 @@
     --env-border-primary: #333333;
     --env-border-secondary: #2a2a2a;
     --env-border-hover: #444444;
-    --env-border-accent: #0ea5e9;
+    --env-border-accent: #e9860e;
     --env-text-primary: #ffffff;
     --env-text-secondary: #b3b3b3;
     --env-text-tertiary: #808080;
-    --env-text-accent: #0ea5e9;
+    --env-text-accent: #e9780e;
     --env-text-success: #22c55e;
     --env-shadow-light: rgba(0, 0, 0, 0.3);
     --env-shadow-medium: rgba(0, 0, 0, 0.4);

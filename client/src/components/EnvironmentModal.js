@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './EnvironmentModal.css';
 import VariableEditor from './VariableEditor';
-import { FiX, FiSave, FiTrash2, FiGlobe, FiLock, FiUsers } from 'react-icons/fi';
+import { FiX, FiSave, FiTrash2 } from 'react-icons/fi';
 
 const EnvironmentModal = ({
     isOpen,
@@ -140,6 +140,7 @@ const EnvironmentModal = ({
                                 }
                                 helpText="Define variables specific to this environment. These will be available to all requests when this environment is active."
                                 readOnly={isReadOnly}
+                                environmentId={environment ? environment._id : undefined}
                             />
                         </div>
                     </div>

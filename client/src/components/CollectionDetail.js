@@ -33,12 +33,13 @@ function CollectionDetail() {
   const [pendingChanges, setPendingChanges] = useState(false);
   const [activeTab, setActiveTab] = useState('requests'); const [documentation, setDocumentation] = useState(null);
   const [isLoadingDocs, setIsLoadingDocs] = useState(false); const [saveSuccess, setSaveSuccess] = useState(false); const [responseData, setResponseData] = useState(null);
-  const [selectedEnvironment, setSelectedEnvironment] = useState(() => {
+  const [selectedEnvironmentId, setSelectedEnvironmentId] = useState(() => {
     // Restore selected environment from localStorage
     const storageKey = `selectedEnvironment_${collectionId}`;
     const stored = localStorage.getItem(storageKey);
     return stored || null;
   });
+  const [selectedEnvironment, setSelectedEnvironment] = useState(null);
 
   // Get collaboration context features
   const {
@@ -749,16 +750,17 @@ function CollectionDetail() {
           }
         </div>        <div className="environment-selector-wrapper">
           <EnvironmentSelector
-            selectedEnvironmentId={selectedEnvironment}
+            selectedEnvironmentId={selectedEnvironmentId}
             workspaceId={collection?.workspaceId}
-            collectionId={collectionId} onEnvironmentChange={(environmentId) => {
-              // Store selected environment ID for request execution
-              setSelectedEnvironment(environmentId);
-
+            collectionId={collectionId}
+            onEnvironmentChange={(environmentObj) => {
+              // environmentObj is either the full environment object or null
+              setSelectedEnvironment(environmentObj);
+              setSelectedEnvironmentId(environmentObj ? environmentObj._id : null);
               // Persist selection to localStorage
               const storageKey = `selectedEnvironment_${collectionId}`;
-              if (environmentId) {
-                localStorage.setItem(storageKey, environmentId);
+              if (environmentObj && environmentObj._id) {
+                localStorage.setItem(storageKey, environmentObj._id);
               } else {
                 localStorage.removeItem(storageKey);
               }

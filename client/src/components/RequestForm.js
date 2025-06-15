@@ -34,9 +34,7 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
     const [responseError, setResponseError] = useState(null);
 
     // Tab content states
-    const [params, setParams] = useState(initialData.params || [
-        { enabled: true, key: 'Key', value: 'Value', description: 'Description' }
-    ]);
+    const [params, setParams] = useState(initialData.params || []);
     const [headers, setHeaders] = useState(initialData.headers || []);
     const [bodyType, setBodyType] = useState(initialData.bodyType || 'none'); const [bodyContent, setBodyContent] = useState(initialData.body || '');
     const [preRequestScript, setPreRequestScript] = useState(initialData.preRequestScript || '');
