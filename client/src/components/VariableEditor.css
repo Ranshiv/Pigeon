@@ -6,6 +6,7 @@
     color: var(--text-color, #e6e6e6);
     border-radius: 8px;
     overflow: hidden;
+    width:100%;
 }
 
 .variable-editor-header {

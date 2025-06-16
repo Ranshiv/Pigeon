@@ -162,7 +162,8 @@ const VariableEditor = ({
                     >
                         <FiSave /> {saving ? 'Saving...' : 'Save'}
                     </button>
-                )}
+                )
+                }
             </div>
 
             <div className="variables-list">

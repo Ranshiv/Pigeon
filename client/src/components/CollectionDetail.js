@@ -194,6 +194,31 @@ function CollectionDetail() {
     fetchDocumentation();
   }, [fetchDocumentation]);
 
+  // When selectedEnvironmentId changes, fetch the full environment object if needed
+  useEffect(() => {
+    async function fetchSelectedEnvironment() {
+      if (selectedEnvironmentId) {
+        try {
+          const response = await fetch(`/api/environments/${selectedEnvironmentId}`, {
+            credentials: 'include'
+          });
+          if (response.ok) {
+            const env = await response.json();
+            setSelectedEnvironment(env);
+          } else {
+            setSelectedEnvironment(null);
+          }
+        } catch (err) {
+          setSelectedEnvironment(null);
+        }
+      } else {
+        setSelectedEnvironment(null);
+      }
+    }
+    fetchSelectedEnvironment();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedEnvironmentId]);
+
   // Save collection changes to the server
   const saveCollection = async () => {
     try {
