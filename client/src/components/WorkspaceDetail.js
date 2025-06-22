@@ -4,10 +4,12 @@ import './WorkspaceDetail.css';
 import {
     FiUsers, FiPlus, FiEdit, FiTrash2, FiActivity,
     FiGitMerge, FiGitBranch, FiGitPullRequest, FiLock,
-    FiCalendar, FiBarChart2, FiPackage, FiClock, FiStar
+    FiCalendar, FiBarChart2, FiPackage, FiClock, FiStar,
+    FiGlobe
 } from 'react-icons/fi';
 import { useCollaboration } from '../context/CollaborationContext';
 import ActiveCollaborators from './ActiveCollaborators';
+import GlobalVariablesModal from './GlobalVariablesModal';
 
 const WorkspaceDetail = () => {
     const { id } = useParams();
@@ -26,6 +28,7 @@ const WorkspaceDetail = () => {
     const [inviteEmail, setInviteEmail] = useState('');
     const [inviteRole, setInviteRole] = useState('viewer');
     const [activeUsers, setActiveUsers] = useState([]);
+    const [showGlobalVariablesModal, setShowGlobalVariablesModal] = useState(false);
 
     // Access the collaboration context
     const { joinWorkspace, sendActivity, connected, getActiveUsers } = useCollaboration();
@@ -552,6 +555,11 @@ const WorkspaceDetail = () => {
                         )}
                     </div>
 
+                    {/* Add Global Variables Button */}
+                    <button className="workspace-global-vars-btn" onClick={() => setShowGlobalVariablesModal(true)}>
+                        <FiGlobe /> Global Variables
+                    </button>
+
                     {workspace.userRole === 'admin' && (
                         <>
                             <button className="workspace-edit-btn" onClick={() => navigate(`/workspace/workspaces/${id}/edit`)}>
@@ -973,6 +981,13 @@ const WorkspaceDetail = () => {
                     </div>
                 </div>
             )}
+
+            {/* Global Variables Modal */}
+            <GlobalVariablesModal
+                isOpen={showGlobalVariablesModal}
+                onClose={() => setShowGlobalVariablesModal(false)}
+                workspaceId={workspace._id}
+            />
         </div>
     );
 };

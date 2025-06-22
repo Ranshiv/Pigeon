@@ -15,7 +15,6 @@ const VariableEditor = ({
     const [localVariables, setLocalVariables] = useState(variables);
     const [editingVariable, setEditingVariable] = useState(null);
     const [showValues, setShowValues] = useState({});
-    const [saving, setSaving] = useState(false);
     const [newVariable, setNewVariable] = useState({ key: '', value: '', description: '', type: 'string' });
     const [showAddForm, setShowAddForm] = useState(false);
 
@@ -78,49 +77,6 @@ const VariableEditor = ({
         }));
     };
 
-    const saveToServer = async () => {
-        setSaving(true);
-        try {
-            let endpoint = '';
-            let payload = { variables: localVariables };
-
-            switch (scope) {
-                case 'global':
-                    endpoint = '/api/environments/global/variables';
-                    break;
-                case 'collection':
-                    endpoint = `/api/collections/${collectionId}/variables`;
-                    break;
-                case 'environment':
-                    endpoint = `/api/environments/${environmentId}/variables`;
-                    break;
-                default:
-                    console.warn('Cannot save request-level variables to server');
-                    return;
-            }
-
-            const response = await fetch(endpoint, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                credentials: 'include',
-                body: JSON.stringify(payload)
-            });
-
-            if (!response.ok) {
-                throw new Error('Failed to save variables');
-            }
-
-            console.log('Variables saved successfully');
-        } catch (error) {
-            console.error('Error saving variables:', error);
-            alert('Failed to save variables. Please try again.');
-        } finally {
-            setSaving(false);
-        }
-    };
-
     const getScopeColor = (scope) => {
         switch (scope) {
             case 'global': return '#9c27b0';
@@ -154,16 +110,7 @@ const VariableEditor = ({
                     <h3>{title || `${getScopeLabel(scope)} Variables`}</h3>
                 </div>
 
-                {editable && scope !== 'request' && (
-                    <button
-                        className="save-btn"
-                        onClick={saveToServer}
-                        disabled={saving}
-                    >
-                        <FiSave /> {saving ? 'Saving...' : 'Save'}
-                    </button>
-                )
-                }
+                {/* Removed Save button logic */}
             </div>
 
             <div className="variables-list">

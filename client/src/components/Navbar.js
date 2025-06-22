@@ -46,6 +46,11 @@ const Navbar = ({ isAuthenticated }) => {
     const [isLoadingWorkspaces, setIsLoadingWorkspaces] = useState(false);
     const searchInputRef = useRef(null);
 
+    // Debug: Log mobile menu state changes
+    useEffect(() => {
+        console.log('Mobile menu state changed to:', isMobileMenuOpen);
+    }, [isMobileMenuOpen]);
+
     // Fetch workspaces when dropdown opens and when navigating back to workspaces page
     useEffect(() => {
         if ((showWorkspaceDropdown && isAuthenticated) ||
@@ -149,17 +154,19 @@ const Navbar = ({ isAuthenticated }) => {
         };
 
         fetchUserIcon();
-    }, [isAuthenticated, location]);
-
-    // Close mobile menu when location changes with a smooth transition
+    }, [isAuthenticated, location]);    // Close mobile menu when location changes with a smooth transition
+    const prevLocationRef = useRef(location.pathname);
     useEffect(() => {
-        if (isMobileMenuOpen) {
+        // Only close menu if location actually changed and menu is open
+        if (location.pathname !== prevLocationRef.current && isMobileMenuOpen) {
             // Add a small delay before closing to allow for a smooth transition effect
             const timer = setTimeout(() => {
                 setIsMobileMenuOpen(false);
             }, 300);
+            prevLocationRef.current = location.pathname;
             return () => clearTimeout(timer);
         }
+        prevLocationRef.current = location.pathname;
     }, [location.pathname, isMobileMenuOpen]);
 
     const isActive = (path) => {
@@ -186,9 +193,7 @@ const Navbar = ({ isAuthenticated }) => {
         } catch (error) {
             console.error('Error during logout:', error);
         }
-    };
-
-    // Enhanced click outside handler with smooth transitions
+    };    // Enhanced click outside handler with smooth transitions
     useEffect(() => {
         const handleClickOutside = (event) => {
             // Don't close workspace dropdown if clicking inside it
@@ -196,6 +201,13 @@ const Navbar = ({ isAuthenticated }) => {
                 workspaceDropdownRef.current &&
                 workspaceDropdownRef.current.contains(event.target)) {
                 return;
+            }
+
+            // Close mobile menu if clicking outside of it and not on the hamburger
+            if (isMobileMenuOpen &&
+                !event.target.closest('.navbar-menu') &&
+                !event.target.closest('.hamburger')) {
+                setIsMobileMenuOpen(false);
             }
 
             // For other dropdowns
@@ -209,7 +221,7 @@ const Navbar = ({ isAuthenticated }) => {
 
         document.addEventListener('mousedown', handleClickOutside);
         return () => document.removeEventListener('mousedown', handleClickOutside);
-    }, [showProfileMenu, showApiDropdown, showWorkspaceDropdown]);
+    }, [showProfileMenu, showApiDropdown, showWorkspaceDropdown, isMobileMenuOpen]);
 
     // Handle navigation with smooth transitions
     const handleNavigation = (path) => {
@@ -232,9 +244,12 @@ const Navbar = ({ isAuthenticated }) => {
             <div className="navbar-container">
                 <div className="navbar-brand" onClick={() => handleNavigation(isAuthenticated ? '/workspace/home' : '/')}>
                     Pigeon
-                </div>
-
-                <div className="hamburger" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
+                </div>                <div className="hamburger" onClick={(e) => {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    console.log('Hamburger clicked, current state:', isMobileMenuOpen);
+                    setIsMobileMenuOpen(!isMobileMenuOpen);
+                }}>
                     {isMobileMenuOpen ? <FiX size={24} /> : <FiMenu size={24} />}
                 </div>
 
@@ -404,11 +419,14 @@ const Navbar = ({ isAuthenticated }) => {
                                             </div>
                                         </div>
                                     )}
-                                </div>
-
-                                <div className="navbar-item" onClick={() => handleNavigation('/workspace/history')}>
+                                </div>                                <div className="navbar-item" onClick={() => handleNavigation('/workspace/history')}>
                                     <span className={isActive('/workspace/history') ? 'active' : ''}>
                                         <FiClock size={18} /> History
+                                    </span>
+                                </div>                                {/* Monitoring Dashboard link */}
+                                <div className="navbar-item" onClick={() => handleNavigation('/workspace/monitoring')}>
+                                    <span className={isActive('/workspace/monitoring') ? 'active' : ''}>
+                                        <FiTrendingUp size={18} /> Monitoring
                                     </span>
                                 </div>
 

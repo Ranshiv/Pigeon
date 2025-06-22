@@ -257,8 +257,8 @@
     background-color: var(--hover-bg);
 }
 
-/* Mobile responsiveness */
-@media (max-width: 992px) {
+/* Tablet and intermediate responsiveness - enable mobile menu earlier to prevent navigation overflow */
+@media (max-width: 1225px) {
     .hamburger {
         display: flex;
     }
@@ -319,52 +319,71 @@
         visibility: visible;
         transform: none;
         box-shadow: none;
-        width: 100%;
-        margin-top: var(--spacing-xs);
-        padding-left: var(--spacing-md);
-        background-color: transparent;
         border: none;
-        margin-bottom: var(--spacing-sm);
-        display: none;
-    }
-
-    .navbar-item.has-dropdown:hover .navbar-dropdown {
-        display: block;
+        background-color: transparent;
+        padding-left: var(--spacing-lg);
+        margin-top: var(--spacing-xs);
+        pointer-events: auto;
     }
 
     .dropdown-item {
         padding: var(--spacing-xs) 0;
-        border-left: none;
-        border-radius: var(--radius-sm);
+        margin: 0;
+        border-radius: 0;
+        color: var(--text-secondary);
     }
 
-    .navbar-end {
-        margin-top: var(--spacing-md);
-        border-top: 1px solid var(--border-color);
-        padding-top: var(--spacing-md);
+    .dropdown-item:hover {
+        background-color: transparent;
+        color: var(--primary-color);
     }
 
-    .profile-menu-container {
-        width: 100%;
-    }
-
-    .profile-trigger {
-        margin: var(--spacing-xs) 0;
-    }
-
-    .profile-dropdown {
+    .profile-menu-container .profile-menu {
         position: static;
+        opacity: 1;
+        visibility: visible;
+        transform: none;
         box-shadow: none;
         border: none;
         background-color: transparent;
-        width: 100%;
+        padding-left: var(--spacing-lg);
+        margin-top: var(--spacing-xs);
     }
 
-    .login-button {
+    .profile-menu-item {
+        padding: var(--spacing-xs) 0;
+        color: var(--text-secondary);
+    }
+
+    .profile-menu-item:hover {
+        background-color: transparent;
+        color: var(--primary-color);
+    }
+
+    /* Workspace dropdown styles for mobile */
+    .workspace-selector-dropdown {
+        position: static;
+        opacity: 1;
+        visibility: visible;
+        transform: none;
+        box-shadow: none;
+        border: none;
+        background-color: transparent;
+        padding: 0;
         margin-top: var(--spacing-sm);
         width: 100%;
-        justify-content: center;
+        max-height: none;
     }
+
+    .notifications-menu {
+        width: 100%;
+        margin-bottom: var(--spacing-sm);
+    }
+}
+
+/* Legacy mobile responsiveness for devices below 992px */
+@media (max-width: 992px) {
+    /* Most styles are now handled by the 1125px breakpoint above */
 }
 
 /* Notifications menu styling */

@@ -7,6 +7,7 @@ import Home from './components/Home';
 import Workspace from './components/Workspace';
 import PublicHome from './components/PublicHome'; // Import the new PublicHome component
 import DocumentationOverview from './components/DocumentationOverview'; // Import the DocumentationOverview component
+import PublicStatusPage from './components/PublicStatusPage'; // Import public status page
 import { CollaborationProvider } from './context/CollaborationContext'; // Import our new CollaborationProvider
 import { ToastContainer, toast } from 'react-toastify'; // Import React Toastify
 import 'react-toastify/dist/ReactToastify.css'; // Import Toastify CSS
@@ -58,6 +59,7 @@ function App() {
         <Routes>
           <Route path="/" element={isAuthenticated ? <Navigate to="/workspace" /> : <PublicHome />} />
           <Route path="/workspace/*" element={isAuthenticated ? <Workspace /> : <Navigate to="/" />} />
+          <Route path="/status" element={<PublicStatusPage />} />
           <Route path="/documentation" element={<DocumentationOverview />} /> {/* Add the documentation route */}
           <Route path="*" element={<div>404 Not Found</div>} />
         </Routes>

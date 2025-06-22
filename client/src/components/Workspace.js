@@ -7,6 +7,8 @@ import CollectionsManagement from './CollectionsManagement';
 import CollectionDetail from './CollectionDetail';
 import CollectionCreate from './CollectionCreate';
 import DocumentationManager from './DocumentationManager';
+import MonitoringDashboard from './MonitoringDashboard';
+import MonitoringHistory from './MonitoringHistory';
 import './Workspace.css';
 import SettingsPage from './SettingsPage';
 import HistoryDetailsSection from './HistoryDetailsSection';
@@ -21,10 +23,9 @@ const Workspace = () => {
             {/* The order of these routes matters - more specific routes should come first */}
             <Route path="collections/new" element={<CollectionCreate />} />
             <Route path="collections/:collectionId/documentation" element={<DocumentationManager />} />
-            <Route path="collections/:collectionId" element={<CollectionDetail />} />
-            <Route path="collections" element={<CollectionsManagement />} />
-
-            <Route path="api-network/*" element={<APINetworkSection />} />
+            <Route path="collections/:collectionId" element={<CollectionDetail />} />            <Route path="collections" element={<CollectionsManagement />} />            <Route path="api-network/*" element={<APINetworkSection />} />
+            <Route path="monitoring/:id/history" element={<MonitoringHistory />} />
+            <Route path="monitoring" element={<MonitoringDashboard />} />
             <Route path="settings" element={<SettingsPage />} />
             <Route path="history/*" element={<HistoryDetailsSection />} />
 

@@ -136,6 +136,7 @@ const Footer = () => {
                         <a href="#">Privacy Policy</a>
                         <a href="#">Terms of Service</a>
                         <a href="#">Cookies</a>
+                        <Link to="/status">System Status</Link>
                     </div>
                 </div>
             </div>

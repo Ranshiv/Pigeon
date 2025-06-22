@@ -3,6 +3,7 @@ const socketIo = require('socket.io');
 
 // Store for global socket data
 const userSockets = new Map(); // Map socketId -> userData
+let ioInstance = null; // Store the io instance globally
 
 /**
  * Initialize Socket.io server
@@ -17,6 +18,9 @@ function initializeSocketServer(server) {
             credentials: true
         }
     });
+
+    // Store the io instance globally
+    ioInstance = io;
 
     // Set up connection event handlers
     io.on('connection', (socket) => {
@@ -421,5 +425,6 @@ function initializeSocketServer(server) {
 
 module.exports = {
     initializeSocketServer,
-    getUserSockets: () => userSockets
+    getUserSockets: () => userSockets,
+    getIO: () => ioInstance
 };

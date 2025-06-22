@@ -14,6 +14,9 @@ const { initializeConnections } = require('./config/db');
 const User = require('./models/User');
 const { initializeSocketServer } = require('./utils/socket/socket-server');
 
+// Import monitoring service
+const MonitoringService = require('./services/monitoring/MonitoringService');
+
 // Import all routes from the central routes module
 const routes = require('./routes');
 
@@ -516,4 +519,29 @@ app.post('/api/proxy', async (req, res) => {
 // --- STARTUP ---
 server.listen(port, () => {
     console.log(`Server listening on port ${port}`);
+
+    // Start monitoring service after server is ready
+    setTimeout(() => {
+        console.log('Starting monitoring service...');
+        MonitoringService.start();
+    }, 2000); // Give server 2 seconds to fully initialize
+});
+
+// Graceful shutdown
+process.on('SIGTERM', () => {
+    console.log('SIGTERM received, shutting down gracefully');
+    MonitoringService.stop();
+    server.close(() => {
+        console.log('Process terminated');
+        process.exit(0);
+    });
+});
+
+process.on('SIGINT', () => {
+    console.log('SIGINT received, shutting down gracefully');
+    MonitoringService.stop();
+    server.close(() => {
+        console.log('Process terminated');
+        process.exit(0);
+    });
 });
