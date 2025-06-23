@@ -102,6 +102,20 @@ const monitorSchema = new mongoose.Schema({
         alertOnRecovery: {
             type: Boolean,
             default: true
+        },
+        integrations: [{
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Integration'
+        }],
+        escalationPolicy: {
+            enabled: {
+                type: Boolean,
+                default: false
+            },
+            steps: [{
+                waitMinutes: Number,
+                integrations: [mongoose.Schema.Types.ObjectId]
+            }]
         }
     },
     currentStatus: {
@@ -130,6 +144,77 @@ const monitorSchema = new mongoose.Schema({
     averageResponseTime: {
         type: Number,
         default: 0
+    },
+    // Enhanced monitoring capabilities
+    monitoringType: {
+        type: String,
+        enum: ['http', 'ssl', 'domain', 'transaction'],
+        default: 'http'
+    },
+    sslCheck: {
+        enabled: {
+            type: Boolean,
+            default: false
+        },
+        warnDays: {
+            type: Number,
+            default: 30 // Warn when SSL expires in N days
+        },
+        expiryDate: Date,
+        issuer: String
+    },
+    domainCheck: {
+        enabled: {
+            type: Boolean,
+            default: false
+        },
+        warnDays: {
+            type: Number,
+            default: 30
+        },
+        expiryDate: Date,
+        registrar: String
+    },
+    contentValidation: {
+        enabled: {
+            type: Boolean,
+            default: false
+        },
+        expectedContent: String,
+        contentType: {
+            type: String,
+            enum: ['text', 'json', 'xml'],
+            default: 'text'
+        }
+    },
+    multiLocation: {
+        enabled: {
+            type: Boolean,
+            default: false
+        },
+        locations: [{
+            name: String,
+            region: String,
+            enabled: {
+                type: Boolean,
+                default: true
+            }
+        }]
+    },
+    slaTargets: {
+        uptimePercentage: {
+            type: Number,
+            default: 99.9
+        },
+        responseTime: {
+            type: Number,
+            default: 5000 // milliseconds
+        }
+    },
+    // Team ownership
+    teamId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Team'
     }
 }, {
     timestamps: true

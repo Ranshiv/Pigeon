@@ -95,11 +95,24 @@
 }
 
 .monitor-url {
-    font-family: 'Courier New', monospace;
-    background: #f8f9fa;
-    padding: 4px 8px;
-    border-radius: 4px;
-    font-size: 0.9rem;
+    font-family: 'SF Mono', 'Monaco', 'Menlo', 'Consolas', monospace;
+    background: var(--card-bg, #f8f9fa);
+    padding: 6px 10px;
+    border-radius: 6px;
+    border: 1px solid var(--border-color, #e9ecef);
+    font-size: 0.875rem;
+    color: var(--primary-color, #007bff);
+    transition: all 0.15s ease;
+    cursor: pointer;
+    word-break: break-all;
+    text-decoration: none;
+    display: inline-block;
+    font-weight: 500;
+}
+
+.monitor-url:hover {
+    border-color: var(--primary-color, #007bff);
+    background: var(--hover-bg, #e9ecef);
 }
 
 .monitor-status {

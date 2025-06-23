@@ -235,6 +235,362 @@ class EmailService {
 
         return await this.transporter.sendMail(mailOptions);
     }
+
+    async sendReportEmail(reportData) {
+        if (!this.transporter) {
+            console.log('Email service not configured, skipping report email');
+            return;
+        }
+
+        try {
+            const { to, subject, reportName, attachment } = reportData;
+
+            const htmlContent = this.generateReportHTML(reportName);
+            const textContent = `Please find attached the ${reportName} report.`;
+
+            const mailOptions = {
+                from: process.env.EMAIL_FROM || process.env.EMAIL_USER,
+                to,
+                subject,
+                text: textContent,
+                html: htmlContent,
+                attachments: [
+                    {
+                        filename: attachment.filename,
+                        content: attachment.content
+                    }
+                ]
+            };
+
+            const result = await this.transporter.sendMail(mailOptions);
+            console.log('Report email sent:', result.messageId);
+            return result;
+        } catch (error) {
+            console.error('Error sending report email:', error);
+            throw error;
+        }
+    }
+
+    async sendMaintenanceNotification(maintenanceData) {
+        if (!this.transporter) {
+            console.log('Email service not configured, skipping maintenance notification');
+            return;
+        }
+
+        try {
+            const { subscribers, maintenance, type } = maintenanceData; // type: 'scheduled', 'reminder', 'started', 'completed'
+
+            const subject = this.getMaintenanceSubject(maintenance, type);
+            const htmlContent = this.generateMaintenanceHTML(maintenance, type);
+            const textContent = this.generateMaintenanceText(maintenance, type);
+
+            const promises = subscribers.map(async (subscriber) => {
+                const mailOptions = {
+                    from: process.env.EMAIL_FROM || process.env.EMAIL_USER,
+                    to: subscriber.email,
+                    subject,
+                    text: textContent,
+                    html: htmlContent,
+                    headers: {
+                        'List-Unsubscribe': `<${process.env.FRONTEND_URL}/unsubscribe?token=${subscriber.unsubscribeToken}>`
+                    }
+                };
+
+                return await this.transporter.sendMail(mailOptions);
+            });
+
+            await Promise.all(promises);
+            console.log(`Maintenance notification sent to ${subscribers.length} subscribers`);
+        } catch (error) {
+            console.error('Error sending maintenance notification:', error);
+            throw error;
+        }
+    }
+
+    async sendStatusPageSubscriptionConfirmation(subscriptionData) {
+        if (!this.transporter) {
+            console.log('Email service not configured, skipping subscription confirmation');
+            return;
+        }
+
+        try {
+            const { email, verificationToken, companyName } = subscriptionData;
+
+            const subject = `Confirm your subscription to ${companyName} status updates`;
+            const verificationUrl = `${process.env.FRONTEND_URL}/status/verify?token=${verificationToken}`;
+
+            const htmlContent = `
+                <html>
+                <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+                    <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+                        <h2 style="color: #007bff;">Confirm Your Status Page Subscription</h2>
+                        <p>You've subscribed to receive status updates for ${companyName}.</p>
+                        <p>Please click the button below to confirm your subscription:</p>
+                        <div style="text-align: center; margin: 30px 0;">
+                            <a href="${verificationUrl}" 
+                               style="background-color: #007bff; color: white; padding: 12px 30px; 
+                                      text-decoration: none; border-radius: 5px; display: inline-block;">
+                                Confirm Subscription
+                            </a>
+                        </div>
+                        <p>If you didn't subscribe to these updates, you can safely ignore this email.</p>
+                        <hr style="margin: 30px 0; border: none; border-top: 1px solid #eee;">
+                        <p style="font-size: 12px; color: #666;">
+                            ${companyName} Status Page<br>
+                            Powered by Pigeon Monitoring
+                        </p>
+                    </div>
+                </body>
+                </html>
+            `;
+
+            const mailOptions = {
+                from: process.env.EMAIL_FROM || process.env.EMAIL_USER,
+                to: email,
+                subject,
+                html: htmlContent
+            };
+
+            const result = await this.transporter.sendMail(mailOptions);
+            console.log('Subscription confirmation email sent:', result.messageId);
+            return result;
+        } catch (error) {
+            console.error('Error sending subscription confirmation:', error);
+            throw error;
+        }
+    }
+
+    async sendTeamInvitation(invitationData) {
+        if (!this.transporter) {
+            console.log('Email service not configured, skipping team invitation email');
+            return;
+        }
+
+        try {
+            const { email, inviterName, teamName, inviteToken, role } = invitationData;
+
+            const subject = `You've been invited to join ${teamName} on Pigeon Monitoring`;
+            const inviteUrl = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/teams/invite/accept?token=${inviteToken}`;
+
+            const htmlContent = `
+                <html>
+                <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+                    <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+                        <div style="text-align: center; margin-bottom: 30px;">
+                            <h2 style="color: #007bff;">Team Invitation</h2>
+                        </div>
+                        
+                        <p>Hi there!</p>
+                        <p><strong>${inviterName}</strong> has invited you to join the <strong>${teamName}</strong> team on Pigeon Monitoring.</p>
+                        
+                        <div style="background: #f8f9fa; padding: 15px; border-radius: 5px; margin: 20px 0;">
+                            <p><strong>Team:</strong> ${teamName}</p>
+                            <p><strong>Role:</strong> ${role}</p>
+                            <p><strong>Invited by:</strong> ${inviterName}</p>
+                        </div>
+                        
+                        <p>By joining this team, you'll be able to collaborate on monitoring configurations, view shared dashboards, and receive team alerts.</p>
+                        
+                        <div style="text-align: center; margin: 30px 0;">
+                            <a href="${inviteUrl}" 
+                               style="background-color: #007bff; color: white; padding: 12px 30px; 
+                                      text-decoration: none; border-radius: 5px; display: inline-block;">
+                                Accept Invitation
+                            </a>
+                        </div>
+                        
+                        <p style="font-size: 14px; color: #666;">
+                            This invitation will expire in 7 days. If you don't want to join this team, you can safely ignore this email.
+                        </p>
+                        
+                        <hr style="margin: 30px 0; border: none; border-top: 1px solid #eee;">
+                        <p style="font-size: 12px; color: #666;">
+                            Pigeon Monitoring - Team Collaboration<br>
+                            If you have any questions, please contact our support team.
+                        </p>
+                    </div>
+                </body>
+                </html>
+            `;
+
+            const textContent = `
+Team Invitation
+
+Hi there!
+
+${inviterName} has invited you to join the ${teamName} team on Pigeon Monitoring.
+
+Team: ${teamName}
+Role: ${role}
+Invited by: ${inviterName}
+
+By joining this team, you'll be able to collaborate on monitoring configurations, view shared dashboards, and receive team alerts.
+
+To accept this invitation, please visit: ${inviteUrl}
+
+This invitation will expire in 7 days. If you don't want to join this team, you can safely ignore this email.
+
+--
+Pigeon Monitoring - Team Collaboration
+If you have any questions, please contact our support team.
+            `;
+
+            const mailOptions = {
+                from: process.env.EMAIL_FROM || process.env.EMAIL_USER,
+                to: email,
+                subject,
+                text: textContent,
+                html: htmlContent
+            };
+
+            const result = await this.transporter.sendMail(mailOptions);
+            console.log('Team invitation email sent:', result.messageId);
+            return result;
+        } catch (error) {
+            console.error('Error sending team invitation email:', error);
+            throw error;
+        }
+    }
+
+    generateReportHTML(reportName) {
+        return `
+            <html>
+            <head>
+                <title>${reportName}</title>
+                <style>
+                    body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+                    .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+                    .header { text-align: center; margin-bottom: 30px; }
+                    .logo { max-width: 200px; }
+                </style>
+            </head>
+            <body>
+                <div class="container">
+                    <div class="header">
+                        <h1>${reportName}</h1>
+                        <p>Your monitoring report is attached to this email.</p>
+                    </div>
+                    <p>This report contains detailed monitoring statistics and insights for your configured services.</p>
+                    <p>If you have any questions about this report, please contact our support team.</p>
+                    <hr>
+                    <p style="font-size: 12px; color: #666;">
+                        Powered by Pigeon Monitoring<br>
+                        Generated on ${new Date().toLocaleDateString()}
+                    </p>
+                </div>
+            </body>
+            </html>
+        `;
+    }
+
+    getMaintenanceSubject(maintenance, type) {
+        const emoji = {
+            scheduled: '📅',
+            reminder: '⏰',
+            started: '🔧',
+            completed: '✅'
+        };
+
+        const prefixes = {
+            scheduled: '[SCHEDULED]',
+            reminder: '[REMINDER]',
+            started: '[IN PROGRESS]',
+            completed: '[COMPLETED]'
+        };
+
+        return `${emoji[type]} ${prefixes[type]} ${maintenance.title}`;
+    }
+
+    generateMaintenanceHTML(maintenance, type) {
+        const statusColor = {
+            scheduled: '#007bff',
+            reminder: '#ffc107',
+            started: '#fd7e14',
+            completed: '#28a745'
+        };
+
+        const messages = {
+            scheduled: 'We have scheduled maintenance for the following services:',
+            reminder: 'Maintenance is starting soon for the following services:',
+            started: 'Maintenance is currently in progress for the following services:',
+            completed: 'Maintenance has been completed for the following services:'
+        };
+
+        return `
+            <html>
+            <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+                <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+                    <div style="text-align: center; margin-bottom: 30px;">
+                        <h2 style="color: ${statusColor[type]};">${maintenance.title}</h2>
+                    </div>
+                    
+                    <p>${messages[type]}</p>
+                    
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 5px; margin: 20px 0;">
+                        <h4>Maintenance Details:</h4>
+                        <p><strong>Description:</strong> ${maintenance.description}</p>
+                        <p><strong>Scheduled Start:</strong> ${new Date(maintenance.scheduledStartTime).toLocaleString()}</p>
+                        <p><strong>Scheduled End:</strong> ${new Date(maintenance.scheduledEndTime).toLocaleString()}</p>
+                        
+                        <h4>Affected Services:</h4>
+                        <ul>
+                            ${maintenance.affectedServices.map(service =>
+            `<li>${service.serviceName || 'Unknown Service'}</li>`
+        ).join('')}
+                        </ul>
+                    </div>
+                    
+                    ${type === 'completed' ? `
+                        <div style="background: #d4edda; padding: 15px; border-radius: 5px; margin: 20px 0;">
+                            <p style="color: #155724; margin: 0;">
+                                <strong>✅ Maintenance completed successfully!</strong><br>
+                                All services should now be operating normally.
+                            </p>
+                        </div>
+                    ` : ''}
+                    
+                    <p>We apologize for any inconvenience this may cause. For real-time updates, please visit our status page.</p>
+                    
+                    <hr style="margin: 30px 0; border: none; border-top: 1px solid #eee;">
+                    <p style="font-size: 12px; color: #666;">
+                        Status Page Updates<br>
+                        Powered by Pigeon Monitoring
+                    </p>
+                </div>
+            </body>
+            </html>
+        `;
+    }
+
+    generateMaintenanceText(maintenance, type) {
+        const messages = {
+            scheduled: 'We have scheduled maintenance for the following services:',
+            reminder: 'Maintenance is starting soon for the following services:',
+            started: 'Maintenance is currently in progress for the following services:',
+            completed: 'Maintenance has been completed for the following services:'
+        };
+
+        return `
+${maintenance.title}
+
+${messages[type]}
+
+Description: ${maintenance.description}
+Scheduled Start: ${new Date(maintenance.scheduledStartTime).toLocaleString()}
+Scheduled End: ${new Date(maintenance.scheduledEndTime).toLocaleString()}
+
+Affected Services:
+${maintenance.affectedServices.map(service => `- ${service.serviceName || 'Unknown Service'}`).join('\n')}
+
+${type === 'completed' ? 'Maintenance completed successfully! All services should now be operating normally.' : ''}
+
+We apologize for any inconvenience this may cause.
+
+--
+Status Page Updates
+Powered by Pigeon Monitoring
+        `;
+    }
 }
 
 module.exports = EmailService;

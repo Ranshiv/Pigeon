@@ -24,6 +24,26 @@ const MonitorForm = ({ isOpen, onClose, onSave, editMonitor = null }) => {
             alertOnRecovery: editMonitor?.alertSettings?.alertOnRecovery !== undefined ? editMonitor.alertSettings.alertOnRecovery : true,
             webhookUrl: editMonitor?.alertSettings?.webhookUrl || '',
             slackWebhook: editMonitor?.alertSettings?.slackWebhook || ''
+        },
+        // Enhanced monitoring features
+        advancedSettings: {
+            sslMonitoring: {
+                enabled: editMonitor?.advancedSettings?.sslMonitoring?.enabled || false,
+                alertBeforeExpiry: editMonitor?.advancedSettings?.sslMonitoring?.alertBeforeExpiry || 30
+            },
+            contentValidation: {
+                enabled: editMonitor?.advancedSettings?.contentValidation?.enabled || false,
+                expectedContent: editMonitor?.advancedSettings?.contentValidation?.expectedContent || '',
+                validationType: editMonitor?.advancedSettings?.contentValidation?.validationType || 'contains'
+            },
+            geoMonitoring: {
+                enabled: editMonitor?.advancedSettings?.geoMonitoring?.enabled || false,
+                locations: editMonitor?.advancedSettings?.geoMonitoring?.locations || ['us-east']
+            },
+            multiStep: {
+                enabled: editMonitor?.advancedSettings?.multiStep?.enabled || false,
+                steps: editMonitor?.advancedSettings?.multiStep?.steps || []
+            }
         }
     });
 
@@ -61,11 +81,83 @@ const MonitorForm = ({ isOpen, onClose, onSave, editMonitor = null }) => {
 
     const addHeader = () => {
         setCustomHeaders([...customHeaders, { key: '', value: '' }]);
-    };
-
-    const removeHeader = (index) => {
+    }; const removeHeader = (index) => {
         const updatedHeaders = customHeaders.filter((_, i) => i !== index);
         setCustomHeaders(updatedHeaders);
+    };
+
+    const addMultiStep = () => {
+        setFormData(prev => ({
+            ...prev,
+            advancedSettings: {
+                ...prev.advancedSettings,
+                multiStep: {
+                    ...prev.advancedSettings.multiStep,
+                    steps: [
+                        ...prev.advancedSettings.multiStep.steps,
+                        {
+                            name: '',
+                            url: '',
+                            method: 'GET',
+                            expectedStatusCode: 200,
+                            headers: [],
+                            body: '',
+                            waitTime: 1000
+                        }
+                    ]
+                }
+            }
+        }));
+    };
+
+    const removeMultiStep = (index) => {
+        setFormData(prev => ({
+            ...prev,
+            advancedSettings: {
+                ...prev.advancedSettings,
+                multiStep: {
+                    ...prev.advancedSettings.multiStep,
+                    steps: prev.advancedSettings.multiStep.steps.filter((_, i) => i !== index)
+                }
+            }
+        }));
+    };
+
+    const handleMultiStepChange = (index, field, value) => {
+        setFormData(prev => {
+            const newSteps = [...prev.advancedSettings.multiStep.steps];
+            newSteps[index] = { ...newSteps[index], [field]: value };
+
+            return {
+                ...prev,
+                advancedSettings: {
+                    ...prev.advancedSettings,
+                    multiStep: {
+                        ...prev.advancedSettings.multiStep,
+                        steps: newSteps
+                    }
+                }
+            };
+        });
+    };
+
+    const handleGeoLocationChange = (location, checked) => {
+        setFormData(prev => {
+            const newLocations = checked
+                ? [...prev.advancedSettings.geoMonitoring.locations, location]
+                : prev.advancedSettings.geoMonitoring.locations.filter(loc => loc !== location);
+
+            return {
+                ...prev,
+                advancedSettings: {
+                    ...prev.advancedSettings,
+                    geoMonitoring: {
+                        ...prev.advancedSettings.geoMonitoring,
+                        locations: newLocations
+                    }
+                }
+            };
+        });
     };
 
     const validateForm = () => {
@@ -456,6 +548,214 @@ const MonitorForm = ({ isOpen, onClose, onSave, editMonitor = null }) => {
                                 />
                             </div>
                         </div>
+                    </div>
+
+                    {/* Advanced Monitoring Settings */}
+                    <div className="form-section">
+                        <h3><FiSettings size={20} /> Advanced Monitoring Settings</h3>
+
+                        <div className="form-row">
+                            <div className="form-group">
+                                <label htmlFor="sslMonitoring.enabled">SSL Monitoring</label>
+                                <div className="checkbox-group">
+                                    <label className="checkbox-label">
+                                        <input
+                                            type="checkbox"
+                                            name="advancedSettings.sslMonitoring.enabled"
+                                            checked={formData.advancedSettings.sslMonitoring.enabled}
+                                            onChange={handleInputChange}
+                                        />
+                                        <span className="checkmark"></span>
+                                        Enable SSL certificate monitoring
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div className="form-group">
+                                <label htmlFor="sslMonitoring.alertBeforeExpiry">Alert Before Expiry (days)</label>
+                                <input
+                                    type="number"
+                                    id="sslMonitoring.alertBeforeExpiry"
+                                    name="advancedSettings.sslMonitoring.alertBeforeExpiry"
+                                    value={formData.advancedSettings.sslMonitoring.alertBeforeExpiry}
+                                    onChange={handleInputChange}
+                                    min="1"
+                                    placeholder="30"
+                                    className={errors.sslMonitoring?.alertBeforeExpiry ? 'error' : ''}
+                                />
+                                {errors.sslMonitoring?.alertBeforeExpiry && <span className="error-text">{errors.sslMonitoring.alertBeforeExpiry}</span>}
+                            </div>
+                        </div>
+
+                        <div className="form-row">
+                            <div className="form-group">
+                                <label htmlFor="contentValidation.enabled">Content Validation</label>
+                                <div className="checkbox-group">
+                                    <label className="checkbox-label">
+                                        <input
+                                            type="checkbox"
+                                            name="advancedSettings.contentValidation.enabled"
+                                            checked={formData.advancedSettings.contentValidation.enabled}
+                                            onChange={handleInputChange}
+                                        />
+                                        <span className="checkmark"></span>
+                                        Enable content validation
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div className="form-group">
+                                <label htmlFor="contentValidation.expectedContent">Expected Content</label>
+                                <input
+                                    type="text"
+                                    id="contentValidation.expectedContent"
+                                    name="advancedSettings.contentValidation.expectedContent"
+                                    value={formData.advancedSettings.contentValidation.expectedContent}
+                                    onChange={handleInputChange}
+                                    placeholder="e.g., Success"
+                                    className={errors.contentValidation?.expectedContent ? 'error' : ''}
+                                />
+                                {errors.contentValidation?.expectedContent && <span className="error-text">{errors.contentValidation.expectedContent}</span>}
+                            </div>
+                        </div>
+
+                        <div className="form-row">
+                            <div className="form-group">
+                                <label htmlFor="geoMonitoring.enabled">Geo Monitoring</label>
+                                <div className="checkbox-group">
+                                    <label className="checkbox-label">
+                                        <input
+                                            type="checkbox"
+                                            name="advancedSettings.geoMonitoring.enabled"
+                                            checked={formData.advancedSettings.geoMonitoring.enabled}
+                                            onChange={handleInputChange}
+                                        />
+                                        <span className="checkmark"></span>
+                                        Enable geo-location monitoring
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div className="form-group">
+                                <label htmlFor="geoMonitoring.locations">Locations</label>
+                                <select
+                                    id="geoMonitoring.locations"
+                                    name="advancedSettings.geoMonitoring.locations"
+                                    value={formData.advancedSettings.geoMonitoring.locations}
+                                    onChange={handleInputChange}
+                                    multiple
+                                >
+                                    <option value="us-east">US East</option>
+                                    <option value="us-west">US West</option>
+                                    <option value="eu-central">EU Central</option>
+                                    <option value="ap-south">AP South</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div className="form-row">
+                            <div className="form-group">
+                                <label htmlFor="multiStep.enabled">Multi-Step Monitoring</label>
+                                <div className="checkbox-group">
+                                    <label className="checkbox-label">
+                                        <input
+                                            type="checkbox"
+                                            name="advancedSettings.multiStep.enabled"
+                                            checked={formData.advancedSettings.multiStep.enabled}
+                                            onChange={handleInputChange}
+                                        />
+                                        <span className="checkmark"></span>
+                                        Enable multi-step monitoring
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        {formData.advancedSettings.multiStep.enabled && (
+                            <div className="multi-step-settings">
+                                <h4>Multi-Step Configuration</h4>
+
+                                {formData.advancedSettings.multiStep.steps.map((step, index) => (
+                                    <div key={index} className="multi-step-row">
+                                        <div className="form-group">
+                                            <label htmlFor={`multiStep.steps.${index}.name`}>Step Name</label>                                            <input
+                                                type="text"
+                                                id={`multiStep.steps.${index}.name`}
+                                                value={step.name}
+                                                onChange={(e) => handleMultiStepChange(index, 'name', e.target.value)}
+                                                placeholder="e.g., Database Check"
+                                            />
+                                        </div>
+
+                                        <div className="form-group">
+                                            <label htmlFor={`multiStep.steps.${index}.url`}>Request URL</label>                                            <input
+                                                type="url"
+                                                id={`multiStep.steps.${index}.url`}
+                                                value={step.url}
+                                                onChange={(e) => handleMultiStepChange(index, 'url', e.target.value)}
+                                                placeholder="https://api.example.com/step1"
+                                            />
+                                        </div>
+
+                                        <div className="form-group">
+                                            <label htmlFor={`multiStep.steps.${index}.method`}>HTTP Method</label>                                            <select
+                                                id={`multiStep.steps.${index}.method`}
+                                                value={step.method}
+                                                onChange={(e) => handleMultiStepChange(index, 'method', e.target.value)}
+                                            >
+                                                <option value="GET">GET</option>
+                                                <option value="POST">POST</option>
+                                                <option value="PUT">PUT</option>
+                                                <option value="DELETE">DELETE</option>
+                                                <option value="PATCH">PATCH</option>
+                                                <option value="HEAD">HEAD</option>
+                                            </select>
+                                        </div>
+
+                                        <div className="form-group">
+                                            <label htmlFor={`multiStep.steps.${index}.expectedStatusCode`}>Expected Status Code</label>
+                                            <div className="number-input-container">                                                <input
+                                                type="number"
+                                                id={`multiStep.steps.${index}.expectedStatusCode`}
+                                                value={step.expectedStatusCode}
+                                                onChange={(e) => handleMultiStepChange(index, 'expectedStatusCode', parseInt(e.target.value))}
+                                                min="100"
+                                                max="599"
+                                                placeholder="200"
+                                            />
+                                            </div>
+                                        </div>
+
+                                        <div className="form-group">
+                                            <label htmlFor={`multiStep.steps.${index}.expectedResponseTime`}>Max Response Time</label>
+                                            <div className="number-input-with-unit">                                                <input
+                                                type="number"
+                                                id={`multiStep.steps.${index}.expectedResponseTime`}
+                                                value={step.expectedResponseTime}
+                                                onChange={(e) => handleMultiStepChange(index, 'expectedResponseTime', parseInt(e.target.value))}
+                                                min="1000"
+                                                step="100"
+                                                placeholder="5000"
+                                            />
+                                                <span className="input-unit">ms</span>
+                                            </div>
+                                        </div>
+
+                                        <button
+                                            type="button"
+                                            onClick={() => removeMultiStep(index)}
+                                            className="remove-multi-step-btn"
+                                        >
+                                            <FiX />
+                                        </button>
+                                    </div>
+                                ))}
+
+                                <button type="button" onClick={addMultiStep} className="btn-secondary small">
+                                    Add Another Step
+                                </button>
+                            </div>
+                        )}
                     </div>
 
                     {errors.submit && (

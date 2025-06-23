@@ -78,6 +78,43 @@
     transform: translateY(-1px);
 }
 
+/* Navigation Tabs */
+.monitoring-nav {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 32px;
+    padding: 4px;
+    background: var(--card-bg);
+    border-radius: 10px;
+    border: 1px solid var(--border-color);
+    width: fit-content;
+}
+
+.nav-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--text-secondary);
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.nav-btn:hover {
+    background: var(--hover-bg);
+    color: var(--text-color);
+}
+
+.nav-btn.active {
+    background: var(--primary-color);
+    color: white;
+}
+
 /* Stats Grid */
 .stats-grid {
     display: grid;
@@ -280,9 +317,24 @@
 
 .monitor-url {
     margin: 0;
-    color: var(--text-secondary);
+    color: var(--primary-color);
     font-size: 0.875rem;
-    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    font-family: 'SF Mono', 'Monaco', 'Menlo', 'Consolas', monospace;
+    background: var(--card-bg);
+    padding: 6px 10px;
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
+    transition: all 0.15s ease;
+    cursor: pointer;
+    word-break: break-all;
+    text-decoration: none;
+    display: inline-block;
+    font-weight: 500;
+}
+
+.monitor-url:hover {
+    border-color: var(--primary-color);
+    background: var(--hover-bg);
 }
 
 .monitor-actions {

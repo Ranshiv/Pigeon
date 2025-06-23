@@ -4,7 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import {
     FiActivity, FiAlertCircle, FiCheckCircle, FiClock,
     FiPlus, FiGlobe, FiRefreshCw, FiEye, FiEdit,
-    FiTrash2, FiPause, FiPlay, FiTrendingUp
+    FiTrash2, FiPause, FiPlay, FiTrendingUp, FiBarChart,
+    FiUsers, FiSettings, FiTool
 } from 'react-icons/fi';
 import MonitorForm from './MonitorForm';
 import './MonitoringDashboard.css';
@@ -209,6 +210,40 @@ const MonitoringDashboard = () => {
                         <FiPlus /> Add Monitor
                     </button>
                 </div>
+            </div>
+
+            {/* Navigation Tabs */}
+            <div className="monitoring-nav">
+                <button
+                    className="nav-btn active"
+                    onClick={() => navigate('/workspace/monitoring')}
+                >
+                    <FiActivity /> Dashboard
+                </button>
+                <button
+                    className="nav-btn"
+                    onClick={() => navigate('/workspace/monitoring/reports')}
+                >
+                    <FiBarChart /> Reports
+                </button>
+                <button
+                    className="nav-btn"
+                    onClick={() => navigate('/workspace/monitoring/teams')}
+                >
+                    <FiUsers /> Teams
+                </button>
+                <button
+                    className="nav-btn"
+                    onClick={() => navigate('/workspace/monitoring/integrations')}
+                >
+                    <FiSettings /> Integrations
+                </button>
+                <button
+                    className="nav-btn"
+                    onClick={() => navigate('/workspace/monitoring/maintenance')}
+                >
+                    <FiTool /> Maintenance
+                </button>
             </div>
 
             {/* Stats Overview */}

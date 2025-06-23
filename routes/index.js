@@ -12,6 +12,13 @@ const historyRoutes = require('./history');
 const documentationRoutes = require('./documentation');
 const monitoringRoutes = require('./monitoring');
 
+// Import new advanced monitoring routes
+const statusPagesRoutes = require('./statusPages');
+const reportsRoutes = require('./reports');
+const integrationsRoutes = require('./integrations');
+const maintenanceRoutes = require('./maintenance');
+const teamsRoutes = require('./teams');
+
 // Register routes with their base paths
 router.use('/auth', authRoutes);
 router.use('/collections', collectionsRoutes);
@@ -21,5 +28,12 @@ router.use('/requests', requestsRoutes);
 router.use('/history', historyRoutes);
 router.use('/documentation', documentationRoutes);
 router.use('/monitoring', monitoringRoutes);
+
+// Register new advanced monitoring routes
+router.use('/status-pages', statusPagesRoutes);
+router.use('/reports', reportsRoutes);
+router.use('/integrations', integrationsRoutes);
+router.use('/maintenance', maintenanceRoutes);
+router.use('/teams', teamsRoutes);
 
 module.exports = router;
