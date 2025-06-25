@@ -54,6 +54,43 @@ router.get('/:id', ensureAuthenticated, async (req, res) => {
 // Create new maintenance window
 router.post('/', ensureAuthenticated, async (req, res) => {
     try {
+        // Validate required fields
+        const { title, description, scheduledStartTime, scheduledEndTime, affectedServices } = req.body;
+
+        if (!title || !description) {
+            return res.status(400).json({
+                message: 'Title and description are required'
+            });
+        }
+
+        if (!scheduledStartTime || !scheduledEndTime) {
+            return res.status(400).json({
+                message: 'Scheduled start time and end time are required'
+            });
+        }
+
+        // Validate dates
+        const startDate = new Date(scheduledStartTime);
+        const endDate = new Date(scheduledEndTime);
+
+        if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+            return res.status(400).json({
+                message: 'Invalid date format for scheduled times'
+            });
+        }
+
+        if (startDate >= endDate) {
+            return res.status(400).json({
+                message: 'Scheduled end time must be after start time'
+            });
+        }
+
+        if (startDate < new Date()) {
+            return res.status(400).json({
+                message: 'Scheduled start time cannot be in the past'
+            });
+        }
+
         // Get or create default workspace for user
         const { getDb } = require('../config/db');
         const db = getDb();
@@ -80,7 +117,15 @@ router.post('/', ensureAuthenticated, async (req, res) => {
         }
 
         const maintenanceData = {
-            ...req.body,
+            title,
+            description,
+            scheduledStartTime: startDate,
+            scheduledEndTime: endDate,
+            affectedServices: affectedServices || [],
+            status: req.body.status || 'scheduled',
+            isRecurring: req.body.isRecurring || false,
+            recurrencePattern: req.body.recurrencePattern,
+            notificationSettings: req.body.notificationSettings,
             userId: req.user.id,
             workspaceId: workspace._id.toString()
         };

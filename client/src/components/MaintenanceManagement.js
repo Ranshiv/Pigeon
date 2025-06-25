@@ -3,8 +3,7 @@ import React, { useState, useEffect } from 'react';
 import './MaintenanceManagement.css';
 import {
     FiTool, FiPlus, FiEdit, FiTrash2, FiClock, FiCalendar,
-    FiRepeat, FiPause, FiPlay, FiX, FiSave, FiAlertCircle,
-    FiCheckCircle, FiSettings, FiUsers, FiBell, FiEye
+    FiRepeat, FiX, FiSave, FiAlertCircle, FiSettings, FiBell, FiEye
 } from 'react-icons/fi';
 
 const MaintenanceManagement = () => {
@@ -13,6 +12,8 @@ const MaintenanceManagement = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [showCreateModal, setShowCreateModal] = useState(false);
+    const [showEditModal, setShowEditModal] = useState(false);
+    const [editingWindow, setEditingWindow] = useState(null);
     const [formData, setFormData] = useState({
         title: '',
         description: '',
@@ -34,7 +35,19 @@ const MaintenanceManagement = () => {
     useEffect(() => {
         fetchMaintenanceWindows();
         fetchMonitors();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
+
+    // Effect to update the selected window when maintenance windows are refreshed
+    useEffect(() => {
+        if (selectedWindow && maintenanceWindows.length > 0) {
+            const updatedSelectedWindow = maintenanceWindows.find(window => window._id === selectedWindow._id);
+            if (updatedSelectedWindow) {
+                setSelectedWindow(updatedSelectedWindow);
+            }
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [maintenanceWindows]);
 
     const fetchMaintenanceWindows = async () => {
         setLoading(true);
@@ -46,6 +59,14 @@ const MaintenanceManagement = () => {
             if (response.ok) {
                 const data = await response.json();
                 setMaintenanceWindows(data);
+
+                // If there's a selected window, update it with the latest data
+                if (selectedWindow) {
+                    const updatedSelectedWindow = data.find(window => window._id === selectedWindow._id);
+                    if (updatedSelectedWindow) {
+                        setSelectedWindow(updatedSelectedWindow);
+                    }
+                }
             } else {
                 setError('Failed to fetch maintenance windows');
             }
@@ -73,50 +94,89 @@ const MaintenanceManagement = () => {
 
     const createMaintenanceWindow = async () => {
         setLoading(true);
+        setError(null);
+
         try {
+            // Validate form data before submission
+            if (!formData.title.trim()) {
+                throw new Error('Title is required');
+            }
+            if (!formData.description.trim()) {
+                throw new Error('Description is required');
+            }
+            if (!formData.startTime) {
+                throw new Error('Start time is required');
+            }
+            if (!formData.endTime) {
+                throw new Error('End time is required');
+            }
+
+            // Validate and format dates
+            const startDate = new Date(formData.startTime);
+            const endDate = new Date(formData.endTime);
+
+            if (isNaN(startDate.getTime())) {
+                throw new Error('Invalid start time format');
+            }
+            if (isNaN(endDate.getTime())) {
+                throw new Error('Invalid end time format');
+            }
+            if (startDate >= endDate) {
+                throw new Error('End time must be after start time');
+            }
+            if (startDate < new Date()) {
+                throw new Error('Start time cannot be in the past');
+            }
+
+            // Map frontend fields to backend expected fields
+            const requestData = {
+                title: formData.title.trim(),
+                description: formData.description.trim(),
+                scheduledStartTime: startDate.toISOString(),
+                scheduledEndTime: endDate.toISOString(),
+                affectedServices: formData.affectedMonitors.map(monitorId => ({
+                    monitorId: monitorId,
+                    serviceName: monitors.find(m => m._id === monitorId)?.name || 'Unknown Service'
+                })),
+                isRecurring: formData.isRecurring,
+                recurrencePattern: formData.isRecurring ? formData.recurrencePattern : undefined,
+                notificationSettings: {
+                    notifySubscribers: formData.notifySubscribers,
+                    reminderMinutes: [1440, 60] // 24 hours and 1 hour before
+                }
+            };
+
             const response = await fetch('/api/maintenance', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
                 credentials: 'include',
-                body: JSON.stringify(formData)
+                body: JSON.stringify(requestData)
             });
 
             if (response.ok) {
-                await fetchMaintenanceWindows();
+                // Get the newly created maintenance window from the response
+                const newWindow = await response.json();
+
+                // Close the create modal and reset form
                 setShowCreateModal(false);
                 resetForm();
+                setError(null);
+
+                // Set the new window as the selected window
+                setSelectedWindow(newWindow);
+
+                // Refresh the maintenance windows list from server
+                await fetchMaintenanceWindows();
             } else {
                 const errorData = await response.json();
                 setError(errorData.message || 'Failed to create maintenance window');
             }
         } catch (err) {
-            setError('Error creating maintenance window: ' + err.message);
+            setError(err.message || 'Error creating maintenance window');
         } finally {
             setLoading(false);
-        }
-    };
-
-    const updateMaintenanceWindow = async (id, updates) => {
-        try {
-            const response = await fetch(`/api/maintenance/${id}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                credentials: 'include',
-                body: JSON.stringify(updates)
-            });
-
-            if (response.ok) {
-                await fetchMaintenanceWindows();
-            } else {
-                const errorData = await response.json();
-                setError(errorData.message || 'Failed to update maintenance window');
-            }
-        } catch (err) {
-            setError('Error updating maintenance window: ' + err.message);
         }
     };
 
@@ -130,10 +190,13 @@ const MaintenanceManagement = () => {
             });
 
             if (response.ok) {
-                await fetchMaintenanceWindows();
+                // If the deleted window was selected, clear the selection
                 if (selectedWindow?._id === id) {
                     setSelectedWindow(null);
                 }
+
+                // Refresh the maintenance windows list
+                await fetchMaintenanceWindows();
             } else {
                 const errorData = await response.json();
                 setError(errorData.message || 'Failed to delete maintenance window');
@@ -161,10 +224,121 @@ const MaintenanceManagement = () => {
         });
     };
 
+    const handleEditClick = (window) => {
+        setEditingWindow(window);
+        // Pre-populate form with existing data
+        setFormData({
+            title: window.title || '',
+            description: window.description || '',
+            startTime: window.scheduledStartTime ? new Date(window.scheduledStartTime).toISOString().slice(0, 16) : '',
+            endTime: window.scheduledEndTime ? new Date(window.scheduledEndTime).toISOString().slice(0, 16) : '',
+            affectedMonitors: window.affectedServices?.map(service => service.monitorId?._id || service.monitorId) || [],
+            notifySubscribers: window.notificationSettings?.notifySubscribers !== undefined ? window.notificationSettings.notifySubscribers : true,
+            isRecurring: window.isRecurring || false,
+            recurrencePattern: window.recurrencePattern || {
+                type: 'weekly',
+                interval: 1,
+                daysOfWeek: [],
+                endDate: ''
+            }
+        });
+        setShowEditModal(true);
+    };
+
+    const handleUpdateMaintenanceWindow = async () => {
+        if (!editingWindow) return;
+
+        setLoading(true);
+        setError(null);
+
+        try {
+            // Validate form data before submission
+            if (!formData.title.trim()) {
+                throw new Error('Title is required');
+            }
+            if (!formData.description.trim()) {
+                throw new Error('Description is required');
+            }
+            if (!formData.startTime) {
+                throw new Error('Start time is required');
+            }
+            if (!formData.endTime) {
+                throw new Error('End time is required');
+            }
+
+            // Validate and format dates
+            const startDate = new Date(formData.startTime);
+            const endDate = new Date(formData.endTime);
+
+            if (isNaN(startDate.getTime())) {
+                throw new Error('Invalid start time format');
+            }
+            if (isNaN(endDate.getTime())) {
+                throw new Error('Invalid end time format');
+            }
+            if (startDate >= endDate) {
+                throw new Error('End time must be after start time');
+            }
+
+            // Map frontend fields to backend expected fields
+            const requestData = {
+                title: formData.title.trim(),
+                description: formData.description.trim(),
+                scheduledStartTime: startDate.toISOString(),
+                scheduledEndTime: endDate.toISOString(),
+                affectedServices: formData.affectedMonitors.map(monitorId => ({
+                    monitorId: monitorId,
+                    serviceName: monitors.find(m => m._id === monitorId)?.name || 'Unknown Service'
+                })),
+                isRecurring: formData.isRecurring,
+                recurrencePattern: formData.isRecurring ? formData.recurrencePattern : undefined,
+                notificationSettings: {
+                    notifySubscribers: formData.notifySubscribers,
+                    reminderMinutes: [1440, 60] // 24 hours and 1 hour before
+                }
+            };
+
+            const response = await fetch(`/api/maintenance/${editingWindow._id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'include',
+                body: JSON.stringify(requestData)
+            });
+
+            if (response.ok) {
+                // Get the updated window from the server response to ensure we have latest data
+                const updatedWindow = await response.json();
+
+                // Close the edit modal and reset form
+                setShowEditModal(false);
+                setEditingWindow(null);
+                resetForm();
+                setError(null);
+
+                // Update the selected window with the fresh data
+                if (selectedWindow && selectedWindow._id === editingWindow._id) {
+                    setSelectedWindow(updatedWindow);
+                }
+
+                // Fetch updated data from server to refresh the list
+                await fetchMaintenanceWindows();
+            } else {
+                const errorData = await response.json();
+                setError(errorData.message || 'Failed to update maintenance window');
+            }
+        } catch (err) {
+            setError(err.message || 'Error updating maintenance window');
+        } finally {
+            setLoading(false);
+        }
+    };
+
     const getStatusBadge = (window) => {
         const now = new Date();
-        const start = new Date(window.startTime);
-        const end = new Date(window.endTime);
+        const start = new Date(window.scheduledStartTime);
+        const end = new Date(window.scheduledEndTime);
 
         if (now >= start && now <= end) {
             return <span className="status-badge active">Active</span>;
@@ -253,15 +427,15 @@ const MaintenanceManagement = () => {
                                 <div className="window-meta">
                                     <div className="meta-item">
                                         <FiCalendar />
-                                        <span>{formatDateTime(window.startTime)}</span>
+                                        <span>{formatDateTime(window.scheduledStartTime)}</span>
                                     </div>
                                     <div className="meta-item">
                                         <FiClock />
-                                        <span>{formatDuration(window.startTime, window.endTime)}</span>
+                                        <span>{formatDuration(window.scheduledStartTime, window.scheduledEndTime)}</span>
                                     </div>
                                     <div className="meta-item">
                                         <FiSettings />
-                                        <span>{window.affectedMonitors?.length || 0} monitors</span>
+                                        <span>{window.affectedServices?.length || 0} monitors</span>
                                     </div>
                                 </div>
                                 {window.isRecurring && (
@@ -300,7 +474,7 @@ const MaintenanceManagement = () => {
                                 <div className="detail-actions">
                                     <button
                                         className="btn-secondary"
-                                        onClick={() => setSelectedWindow({ ...selectedWindow, editing: true })}
+                                        onClick={() => handleEditClick(selectedWindow)}
                                     >
                                         <FiEdit /> Edit
                                     </button>
@@ -319,19 +493,19 @@ const MaintenanceManagement = () => {
                                     <div className="info-grid">
                                         <div className="info-item">
                                             <label>Start Time</label>
-                                            <span>{formatDateTime(selectedWindow.startTime)}</span>
+                                            <span>{formatDateTime(selectedWindow.scheduledStartTime)}</span>
                                         </div>
                                         <div className="info-item">
                                             <label>End Time</label>
-                                            <span>{formatDateTime(selectedWindow.endTime)}</span>
+                                            <span>{formatDateTime(selectedWindow.scheduledEndTime)}</span>
                                         </div>
                                         <div className="info-item">
                                             <label>Duration</label>
-                                            <span>{formatDuration(selectedWindow.startTime, selectedWindow.endTime)}</span>
+                                            <span>{formatDuration(selectedWindow.scheduledStartTime, selectedWindow.scheduledEndTime)}</span>
                                         </div>
                                         <div className="info-item">
                                             <label>Affected Monitors</label>
-                                            <span>{selectedWindow.affectedMonitors?.length || 0} monitors</span>
+                                            <span>{selectedWindow.affectedServices?.length || 0} monitors</span>
                                         </div>
                                     </div>
                                 </div>
@@ -361,17 +535,18 @@ const MaintenanceManagement = () => {
                                 <div className="info-section">
                                     <h3>Affected Monitors</h3>
                                     <div className="monitors-list">
-                                        {selectedWindow.affectedMonitors?.map(monitorId => {
-                                            const monitor = monitors.find(m => m._id === monitorId);
-                                            return monitor ? (
-                                                <div key={monitor._id} className="monitor-item">
+                                        {selectedWindow.affectedServices?.map(service => {
+                                            return (
+                                                <div key={service.monitorId?._id || service.monitorId} className="monitor-item">
                                                     <div className="monitor-info">
-                                                        <h4>{monitor.name}</h4>
-                                                        <p>{monitor.url}</p>
+                                                        <h4>{service.serviceName || service.monitorId?.name || 'Unknown Service'}</h4>
+                                                        <p>{service.monitorId?.url || 'No URL available'}</p>
                                                     </div>
                                                 </div>
-                                            ) : null;
-                                        })}
+                                            );
+                                        }) || (
+                                                <p className="no-monitors">No monitors affected</p>
+                                            )}
                                     </div>
                                 </div>
 
@@ -555,6 +730,166 @@ const MaintenanceManagement = () => {
                                 disabled={!formData.title || !formData.startTime || !formData.endTime || loading}
                             >
                                 <FiSave /> Schedule Maintenance
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Edit Maintenance Window Modal */}
+            {showEditModal && (
+                <div className="modal-overlay">
+                    <div className="modal-content large">
+                        <div className="modal-header">
+                            <h2>Edit Maintenance Window</h2>
+                            <button
+                                className="modal-close"
+                                onClick={() => {
+                                    setShowEditModal(false);
+                                    setEditingWindow(null);
+                                    resetForm();
+                                }}
+                            >
+                                <FiX />
+                            </button>
+                        </div>
+                        <div className="modal-body">
+                            <div className="form-group">
+                                <label>Maintenance Title *</label>
+                                <input
+                                    type="text"
+                                    value={formData.title}
+                                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                                    placeholder="e.g., Database Upgrade"
+                                    required
+                                />
+                            </div>
+
+                            <div className="form-group">
+                                <label>Description</label>
+                                <textarea
+                                    value={formData.description}
+                                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                                    placeholder="Describe what maintenance will be performed..."
+                                />
+                            </div>
+
+                            <div className="time-group">
+                                <div className="form-group">
+                                    <label>Start Time *</label>
+                                    <input
+                                        type="datetime-local"
+                                        value={formData.startTime}
+                                        onChange={(e) => setFormData({ ...formData, startTime: e.target.value })}
+                                        required
+                                    />
+                                </div>
+                                <div className="form-group">
+                                    <label>End Time *</label>
+                                    <input
+                                        type="datetime-local"
+                                        value={formData.endTime}
+                                        onChange={(e) => setFormData({ ...formData, endTime: e.target.value })}
+                                        required
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="form-group">
+                                <label>Affected Monitors</label>
+                                <div className="monitors-selection">
+                                    {monitors.map(monitor => (
+                                        <label key={monitor._id} className="monitor-checkbox">
+                                            <input
+                                                type="checkbox"
+                                                checked={formData.affectedMonitors.includes(monitor._id)}
+                                                onChange={() => handleMonitorSelection(monitor._id)}
+                                            />
+                                            <span>{monitor.name}</span>
+                                        </label>
+                                    ))}
+                                </div>
+                            </div>
+
+                            <div className="form-group checkbox-group">
+                                <label>
+                                    <input
+                                        type="checkbox"
+                                        checked={formData.notifySubscribers}
+                                        onChange={(e) => setFormData({ ...formData, notifySubscribers: e.target.checked })}
+                                    />
+                                    Notify subscribers about this maintenance
+                                </label>
+                            </div>
+
+                            <div className="form-group checkbox-group">
+                                <label>
+                                    <input
+                                        type="checkbox"
+                                        checked={formData.isRecurring}
+                                        onChange={(e) => setFormData({ ...formData, isRecurring: e.target.checked })}
+                                    />
+                                    Make this a recurring maintenance window
+                                </label>
+                            </div>
+
+                            {formData.isRecurring && (
+                                <div className="recurrence-section">
+                                    <h3>Recurrence Pattern</h3>
+                                    <div className="form-group">
+                                        <label>Repeat</label>
+                                        <select
+                                            value={formData.recurrencePattern.type}
+                                            onChange={(e) => setFormData({
+                                                ...formData,
+                                                recurrencePattern: {
+                                                    ...formData.recurrencePattern,
+                                                    type: e.target.value
+                                                }
+                                            })}
+                                        >
+                                            <option value="daily">Daily</option>
+                                            <option value="weekly">Weekly</option>
+                                            <option value="monthly">Monthly</option>
+                                        </select>
+                                    </div>
+
+                                    <div className="form-group">
+                                        <label>Every</label>
+                                        <input
+                                            type="number"
+                                            min="1"
+                                            value={formData.recurrencePattern.interval}
+                                            onChange={(e) => setFormData({
+                                                ...formData,
+                                                recurrencePattern: {
+                                                    ...formData.recurrencePattern,
+                                                    interval: parseInt(e.target.value)
+                                                }
+                                            })}
+                                        />
+                                        <span>{formData.recurrencePattern.type.slice(0, -2)}(s)</span>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                        <div className="modal-footer">
+                            <button
+                                className="btn-secondary"
+                                onClick={() => {
+                                    setShowEditModal(false);
+                                    setEditingWindow(null);
+                                    resetForm();
+                                }}
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                className="btn-primary"
+                                onClick={handleUpdateMaintenanceWindow}
+                                disabled={!formData.title || !formData.startTime || !formData.endTime || loading}
+                            >
+                                <FiSave /> Update Maintenance
                             </button>
                         </div>
                     </div>
