@@ -1,13 +1,16 @@
 // client/src/components/TeamsManagement.js
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './TeamsManagement.css';
 import {
-    FiUsers, FiPlus, FiEdit, FiTrash2, FiSettings, FiUserPlus,
-    FiMail, FiShield, FiEye, FiEdit3, FiKey, FiSave, FiX,
-    FiCheckCircle, FiAlertCircle, FiUserX, FiUser
+    FiUsers, FiPlus, FiEdit, FiTrash2, FiMail, FiShield,
+    FiCheckCircle, FiX, FiAlertCircle, FiSettings,
+    FiEye, FiActivity, FiBarChart, FiTool, FiUser,
+    FiUserPlus, FiUserX, FiSave
 } from 'react-icons/fi';
 
 const TeamsManagement = () => {
+    const navigate = useNavigate();
     const [teams, setTeams] = useState([]);
     const [selectedTeam, setSelectedTeam] = useState(null);
     const [loading, setLoading] = useState(false);
@@ -150,7 +153,7 @@ const TeamsManagement = () => {
     const getRoleIcon = (role) => {
         switch (role) {
             case 'admin': return <FiShield className="role-icon admin" />;
-            case 'editor': return <FiEdit3 className="role-icon editor" />;
+            case 'editor': return <FiEdit className="role-icon editor" />;
             case 'viewer': return <FiEye className="role-icon viewer" />;
             default: return <FiUser className="role-icon" />;
         }
@@ -188,6 +191,40 @@ const TeamsManagement = () => {
                     onClick={() => setShowCreateModal(true)}
                 >
                     <FiPlus /> Create Team
+                </button>
+            </div>
+
+            {/* Navigation Tabs */}
+            <div className="monitoring-nav">
+                <button
+                    className="nav-btn"
+                    onClick={() => navigate('/workspace/monitoring')}
+                >
+                    <FiActivity /> Dashboard
+                </button>
+                <button
+                    className="nav-btn"
+                    onClick={() => navigate('/workspace/monitoring/reports')}
+                >
+                    <FiBarChart /> Reports
+                </button>
+                <button
+                    className="nav-btn active"
+                    onClick={() => navigate('/workspace/monitoring/teams')}
+                >
+                    <FiUsers /> Teams
+                </button>
+                <button
+                    className="nav-btn"
+                    onClick={() => navigate('/workspace/monitoring/integrations')}
+                >
+                    <FiSettings /> Integrations
+                </button>
+                <button
+                    className="nav-btn"
+                    onClick={() => navigate('/workspace/monitoring/maintenance')}
+                >
+                    <FiTool /> Maintenance
                 </button>
             </div>
 

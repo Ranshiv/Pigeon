@@ -1,14 +1,16 @@
 // client/src/components/IntegrationsManagement.js
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './IntegrationsManagement.css';
 import {
     FiSettings, FiPlus, FiEdit, FiTrash2, FiCheck, FiX,
-    FiMail, FiMessageSquare, FiBell, FiTool, FiExternalLink,
-    FiKey, FiEye, FiEyeOff, FiRefreshCw, FiPlay,
-    FiAlertCircle, FiCheckCircle, FiClock, FiActivity
+    FiAlertCircle, FiMail, FiMessageSquare, FiBell, FiActivity,
+    FiTool, FiExternalLink, FiRefreshCw, FiPlay,
+    FiBarChart, FiUsers, FiCheckCircle, FiEye, FiEyeOff
 } from 'react-icons/fi';
 
 const IntegrationsManagement = () => {
+    const navigate = useNavigate();
     const [integrations, setIntegrations] = useState([]);
     const [selectedIntegration, setSelectedIntegration] = useState(null);
     const [loading, setLoading] = useState(false);
@@ -354,6 +356,40 @@ const IntegrationsManagement = () => {
                     onClick={() => setShowCreateModal(true)}
                 >
                     <FiPlus /> Add Integration
+                </button>
+            </div>
+
+            {/* Navigation Tabs */}
+            <div className="monitoring-nav">
+                <button
+                    className="nav-btn"
+                    onClick={() => navigate('/workspace/monitoring')}
+                >
+                    <FiActivity /> Dashboard
+                </button>
+                <button
+                    className="nav-btn"
+                    onClick={() => navigate('/workspace/monitoring/reports')}
+                >
+                    <FiBarChart /> Reports
+                </button>
+                <button
+                    className="nav-btn"
+                    onClick={() => navigate('/workspace/monitoring/teams')}
+                >
+                    <FiUsers /> Teams
+                </button>
+                <button
+                    className="nav-btn active"
+                    onClick={() => navigate('/workspace/monitoring/integrations')}
+                >
+                    <FiSettings /> Integrations
+                </button>
+                <button
+                    className="nav-btn"
+                    onClick={() => navigate('/workspace/monitoring/maintenance')}
+                >
+                    <FiTool /> Maintenance
                 </button>
             </div>
 

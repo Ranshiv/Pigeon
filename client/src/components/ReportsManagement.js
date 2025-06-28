@@ -1,14 +1,17 @@
 // client/src/components/ReportsManagement.js
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
     FiFileText, FiPlus, FiEdit, FiTrash2, FiDownload,
     FiClock, FiMail, FiCalendar, FiBarChart, FiTrendingUp,
-    FiSettings
+    FiSettings, FiActivity, FiUsers, FiTool, FiCheckCircle, FiEye
 } from 'react-icons/fi';
 import './ReportsManagement.css';
 
 const ReportsManagement = () => {
+    const navigate = useNavigate();
     const [reports, setReports] = useState([]);
+    const [selectedReport, setSelectedReport] = useState(null);
     const [templates, setTemplates] = useState([]);
     const [loading, setLoading] = useState(true);
     const [showCreateForm, setShowCreateForm] = useState(false);
@@ -40,8 +43,11 @@ const ReportsManagement = () => {
     });
 
     useEffect(() => {
-        fetchReports();
-        fetchTemplates();
+        const initializeData = async () => {
+            await fetchReports();
+            await fetchTemplates();
+        };
+        initializeData();
     }, []);
 
     const fetchReports = async () => {
@@ -68,10 +74,57 @@ const ReportsManagement = () => {
             if (response.ok) {
                 const data = await response.json();
                 setTemplates(data);
+            } else {
+                // Fallback to default templates if API fails
+                setDefaultTemplates();
             }
         } catch (error) {
             console.error('Error fetching templates:', error);
+            // Fallback to default templates if API fails
+            setDefaultTemplates();
         }
+    };
+
+    const setDefaultTemplates = () => {
+        const defaultTemplates = [
+            {
+                id: 'weekly-uptime',
+                name: 'Weekly Uptime Report',
+                description: 'Weekly summary of uptime and performance metrics',
+                type: 'uptime',
+                schedule: {
+                    frequency: 'weekly',
+                    dayOfWeek: 1,
+                    time: '09:00'
+                },
+                template: {
+                    includeExecutiveSummary: true,
+                    includeUptimeCharts: true,
+                    includePerformanceMetrics: true,
+                    includeIncidentSummary: true,
+                    includeSLACompliance: false
+                }
+            },
+            {
+                id: 'monthly-sla',
+                name: 'Monthly SLA Report',
+                description: 'Monthly SLA compliance and performance report',
+                type: 'sla',
+                schedule: {
+                    frequency: 'monthly',
+                    dayOfMonth: 1,
+                    time: '08:00'
+                },
+                template: {
+                    includeExecutiveSummary: true,
+                    includeUptimeCharts: true,
+                    includePerformanceMetrics: true,
+                    includeIncidentSummary: true,
+                    includeSLACompliance: true
+                }
+            }
+        ];
+        setTemplates(defaultTemplates);
     };
 
     const handleCreateReport = () => {
@@ -246,19 +299,51 @@ const ReportsManagement = () => {
 
     return (
         <div className="reports-management">
-            {/* Modern Header */}
             <div className="reports-header">
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', width: '100%' }}>
-                    <div className="header-content">
-                        <h1><FiFileText /> Reports & Analytics</h1>
-                        <p>Create and manage automated monitoring reports with advanced scheduling and customization</p>
-                    </div>
-                    <div className="header-actions">
-                        <button className="btn-primary" onClick={handleCreateReport}>
-                            <FiPlus /> Create Report
-                        </button>
-                    </div>
+                <div className="header-info">
+                    <h1><FiFileText /> Reports & Analytics</h1>
+                    <p>Create and manage automated monitoring reports with advanced scheduling and customization</p>
                 </div>
+                <button
+                    className="btn-primary"
+                    onClick={handleCreateReport}
+                >
+                    <FiPlus /> Create Report
+                </button>
+            </div>
+
+            {/* Navigation Tabs */}
+            <div className="monitoring-nav">
+                <button
+                    className="nav-btn"
+                    onClick={() => navigate('/workspace/monitoring')}
+                >
+                    <FiActivity /> Dashboard
+                </button>
+                <button
+                    className="nav-btn active"
+                    onClick={() => navigate('/workspace/monitoring/reports')}
+                >
+                    <FiBarChart /> Reports
+                </button>
+                <button
+                    className="nav-btn"
+                    onClick={() => navigate('/workspace/monitoring/teams')}
+                >
+                    <FiUsers /> Teams
+                </button>
+                <button
+                    className="nav-btn"
+                    onClick={() => navigate('/workspace/monitoring/integrations')}
+                >
+                    <FiSettings /> Integrations
+                </button>
+                <button
+                    className="nav-btn"
+                    onClick={() => navigate('/workspace/monitoring/maintenance')}
+                >
+                    <FiTool /> Maintenance
+                </button>
             </div>
 
             {/* Quick Start Templates */}
@@ -291,91 +376,183 @@ const ReportsManagement = () => {
                 </div>
             )}
 
-            {/* Reports Dashboard */}
-            <div className="reports-section">
-                <h3>Your Reports</h3>
-                {reports.length === 0 ? (
-                    <div className="empty-state">
-                        <FiFileText className="empty-icon" />
-                        <h4>No reports created yet</h4>
-                        <p>Create your first automated monitoring report to get insights delivered to your inbox regularly</p>
-                        <button className="btn-primary" onClick={handleCreateReport}>
-                            <FiPlus /> Create Your First Report
-                        </button>
+            <div className="reports-layout">
+                <div className="reports-list">
+                    <div className="list-header">
+                        <h3>Reports</h3>
+                        <span className="count">{reports.length} total</span>
                     </div>
-                ) : (
-                    <div className="reports-grid">
-                        {reports.map(report => (
-                            <div key={report._id} className="report-card">
-                                <div className="report-header">
-                                    <div className="report-info">
-                                        <div className="report-icon">
-                                            {getReportTypeIcon(report.type)}
-                                        </div>
-                                        <div>
-                                            <h4>{report.name}</h4>
-                                            <p>{report.type} report</p>
-                                        </div>
-                                    </div>
-                                    <div className="report-actions">
-                                        <button
-                                            className="action-btn"
-                                            onClick={() => handleGenerateReport(report._id)}
-                                            title="Generate Now"
-                                        >
-                                            <FiDownload />
-                                        </button>
-                                        <button
-                                            className="action-btn"
-                                            onClick={() => handleEditReport(report)}
-                                            title="Edit Report"
-                                        >
-                                            <FiEdit />
-                                        </button>
-                                        <button
-                                            className="action-btn delete"
-                                            onClick={() => handleDeleteReport(report._id)}
-                                            title="Delete Report"
-                                        >
-                                            <FiTrash2 />
-                                        </button>
-                                    </div>
-                                </div>
 
-                                <div className="report-details">
-                                    <div className="detail-item">
-                                        <FiClock />
-                                        <span>{getFrequencyLabel(report.schedule.frequency)} at {report.schedule.time}</span>
-                                    </div>
-                                    <div className="detail-item">
-                                        <FiMail />
-                                        <span>{report.recipients.length} recipient{report.recipients.length !== 1 ? 's' : ''}</span>
-                                    </div>
-                                    <div className="detail-item">
-                                        <FiCalendar />
-                                        <span>
-                                            {report.lastGenerated
-                                                ? `Last: ${new Date(report.lastGenerated).toLocaleDateString()}`
-                                                : 'Never generated'
-                                            }
+                    <div className="items-list">
+                        {reports.length === 0 ? (
+                            <div className="empty-state">
+                                <FiFileText className="empty-icon" />
+                                <h3>No reports created yet</h3>
+                                <p>Create your first automated monitoring report to get insights delivered to your inbox regularly</p>
+                                <button className="btn-primary" onClick={handleCreateReport}>
+                                    <FiPlus /> Create Your First Report
+                                </button>
+                            </div>
+                        ) : (
+                            reports.map(report => (
+                                <div 
+                                    key={report._id} 
+                                    className={`item ${selectedReport?._id === report._id ? 'active' : ''}`}
+                                    onClick={() => setSelectedReport(report)}
+                                >
+                                    <div className="item-header">
+                                        <h4>{report.name}</h4>
+                                        <span className={`status-badge ${report.isActive ? 'active' : 'inactive'}`}>
+                                            {report.isActive ? 'Active' : 'Inactive'}
                                         </span>
                                     </div>
+                                    <div className="item-meta">
+                                        <div className="meta-item">
+                                            <FiClock />
+                                            <span>{getFrequencyLabel(report.schedule.frequency)}</span>
+                                        </div>
+                                        <div className="meta-item">
+                                            <FiMail />
+                                            <span>{report.recipients.length} recipient{report.recipients.length !== 1 ? 's' : ''}</span>
+                                        </div>
+                                        <div className="meta-item">
+                                            <FiBarChart />
+                                            <span>{report.type}</span>
+                                        </div>
+                                    </div>
                                 </div>
+                            ))
+                        )}
+                    </div>
+                </div>
 
-                                <div className="report-status">
-                                    <span className={`status-badge ${report.isActive ? 'active' : 'inactive'}`}>
-                                        {report.isActive ? 'Active' : 'Inactive'}
+                <div className="report-details">
+                    {selectedReport ? (
+                        <div className="detail-content">
+                            <div className="detail-header">
+                                <div className="detail-info">
+                                    <h2>{selectedReport.name}</h2>
+                                    <span className={`status-badge ${selectedReport.isActive ? 'active' : 'inactive'}`}>
+                                        {selectedReport.isActive ? 'Active' : 'Inactive'}
                                     </span>
-                                    {report.nextScheduled && (
-                                        <span className="next-run">
-                                            Next: {new Date(report.nextScheduled).toLocaleDateString()}
-                                        </span>
-                                    )}
+                                </div>
+                                <div className="detail-actions">
+                                    <button
+                                        className="btn-secondary"
+                                        onClick={() => handleGenerateReport(selectedReport._id)}
+                                        title="Generate Now"
+                                    >
+                                        <FiDownload /> Generate
+                                    </button>
+                                    <button
+                                        className="btn-secondary"
+                                        onClick={() => handleEditReport(selectedReport)}
+                                    >
+                                        <FiEdit /> Edit
+                                    </button>
+                                    <button
+                                        className="btn-secondary delete"
+                                        onClick={() => handleDeleteReport(selectedReport._id)}
+                                    >
+                                        <FiTrash2 /> Delete
+                                    </button>
                                 </div>
                             </div>
-                        ))}
-                    </div>
-                )}
+
+                            <div className="detail-body">
+                                <div className="info-section">
+                                    <h3>Details</h3>
+                                    <div className="info-grid">
+                                        <div className="info-item">
+                                            <label>Report Type</label>
+                                            <span>{selectedReport.type}</span>
+                                        </div>
+                                        <div className="info-item">
+                                            <label>Frequency</label>
+                                            <span>{getFrequencyLabel(selectedReport.schedule.frequency)} at {selectedReport.schedule.time}</span>
+                                        </div>
+                                        <div className="info-item">
+                                            <label>Recipients</label>
+                                            <span>{selectedReport.recipients.length} recipient{selectedReport.recipients.length !== 1 ? 's' : ''}</span>
+                                        </div>
+                                        <div className="info-item">
+                                            <label>Last Generated</label>
+                                            <span>
+                                                {selectedReport.lastGenerated
+                                                    ? new Date(selectedReport.lastGenerated).toLocaleDateString()
+                                                    : 'Never generated'
+                                                }
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {selectedReport.nextScheduled && (
+                                    <div className="info-section">
+                                        <h3>Next Run</h3>
+                                        <p>{new Date(selectedReport.nextScheduled).toLocaleString()}</p>
+                                    </div>
+                                )}
+
+                                <div className="info-section">
+                                    <h3>Recipients</h3>
+                                    <div className="recipients-list">
+                                        {selectedReport.recipients.map((recipient, index) => (
+                                            <div key={index} className="recipient-item">
+                                                <div className="recipient-info">
+                                                    <span className="email">{recipient.email}</span>
+                                                    <span className="format">{recipient.format?.toUpperCase()}</span>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                <div className="info-section">
+                                    <h3>Report Content</h3>
+                                    <div className="content-options">
+                                        {selectedReport.template?.includeExecutiveSummary && (
+                                            <div className="content-item enabled">
+                                                <FiCheckCircle />
+                                                <span>Executive Summary</span>
+                                            </div>
+                                        )}
+                                        {selectedReport.template?.includeUptimeCharts && (
+                                            <div className="content-item enabled">
+                                                <FiCheckCircle />
+                                                <span>Uptime Charts</span>
+                                            </div>
+                                        )}
+                                        {selectedReport.template?.includePerformanceMetrics && (
+                                            <div className="content-item enabled">
+                                                <FiCheckCircle />
+                                                <span>Performance Metrics</span>
+                                            </div>
+                                        )}
+                                        {selectedReport.template?.includeIncidentSummary && (
+                                            <div className="content-item enabled">
+                                                <FiCheckCircle />
+                                                <span>Incident Summary</span>
+                                            </div>
+                                        )}
+                                        {selectedReport.template?.includeSLACompliance && (
+                                            <div className="content-item enabled">
+                                                <FiCheckCircle />
+                                                <span>SLA Compliance</span>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="no-selection">
+                            <FiEye className="empty-icon" />
+                            <h3>Select a Report</h3>
+                            <p>Choose a report from the list to view details and manage settings</p>
+                        </div>
+                    )}
+                </div>
             </div>
 
             {/* Create/Edit Report Modal */}

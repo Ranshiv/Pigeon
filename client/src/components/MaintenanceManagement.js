@@ -1,12 +1,15 @@
 // client/src/components/MaintenanceManagement.js
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './MaintenanceManagement.css';
 import {
     FiTool, FiPlus, FiEdit, FiTrash2, FiClock, FiCalendar,
-    FiRepeat, FiX, FiSave, FiAlertCircle, FiSettings, FiBell, FiEye
+    FiRepeat, FiX, FiSave, FiAlertCircle, FiSettings, FiBell, FiEye,
+    FiActivity, FiBarChart, FiUsers
 } from 'react-icons/fi';
 
 const MaintenanceManagement = () => {
+    const navigate = useNavigate();
     const [maintenanceWindows, setMaintenanceWindows] = useState([]);
     const [selectedWindow, setSelectedWindow] = useState(null);
     const [loading, setLoading] = useState(false);
@@ -398,6 +401,40 @@ const MaintenanceManagement = () => {
                 </button>
             </div>
 
+            {/* Navigation Tabs */}
+            <div className="monitoring-nav">
+                <button
+                    className="nav-btn"
+                    onClick={() => navigate('/workspace/monitoring')}
+                >
+                    <FiActivity /> Dashboard
+                </button>
+                <button
+                    className="nav-btn"
+                    onClick={() => navigate('/workspace/monitoring/reports')}
+                >
+                    <FiBarChart /> Reports
+                </button>
+                <button
+                    className="nav-btn"
+                    onClick={() => navigate('/workspace/monitoring/teams')}
+                >
+                    <FiUsers /> Teams
+                </button>
+                <button
+                    className="nav-btn"
+                    onClick={() => navigate('/workspace/monitoring/integrations')}
+                >
+                    <FiSettings /> Integrations
+                </button>
+                <button
+                    className="nav-btn active"
+                    onClick={() => navigate('/workspace/monitoring/maintenance')}
+                >
+                    <FiTool /> Maintenance
+                </button>
+            </div>
+
             {error && (
                 <div className="error-banner">
                     <FiAlertCircle />
@@ -412,7 +449,19 @@ const MaintenanceManagement = () => {
                         <h3>Maintenance Windows</h3>
                         <span className="count">{maintenanceWindows.length} total</span>
                     </div>
-
+                    {maintenanceWindows.length === 0 && (
+                        <div className="empty-state">
+                            <FiTool className="empty-icon" />
+                            <h3>No Maintenance Windows</h3>
+                            <p>Schedule your first maintenance window to notify users about planned downtime</p>
+                            <button
+                                className="btn-primary"
+                                onClick={() => setShowCreateModal(true)}
+                            >
+                                <FiPlus /> Schedule Maintenance
+                            </button>
+                        </div>
+                    )}
                     <div className="windows-list">
                         {maintenanceWindows.map(window => (
                             <div
@@ -448,19 +497,7 @@ const MaintenanceManagement = () => {
                         ))}
                     </div>
 
-                    {maintenanceWindows.length === 0 && (
-                        <div className="empty-state">
-                            <FiTool className="empty-icon" />
-                            <h3>No Maintenance Windows</h3>
-                            <p>Schedule your first maintenance window to notify users about planned downtime</p>
-                            <button
-                                className="btn-primary"
-                                onClick={() => setShowCreateModal(true)}
-                            >
-                                <FiPlus /> Schedule Maintenance
-                            </button>
-                        </div>
-                    )}
+                    
                 </div>
 
                 <div className="maintenance-details">
@@ -595,124 +632,145 @@ const MaintenanceManagement = () => {
                             </button>
                         </div>
                         <div className="modal-body">
-                            <div className="form-group">
-                                <label>Maintenance Title *</label>
-                                <input
-                                    type="text"
-                                    value={formData.title}
-                                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                                    placeholder="e.g., Database Upgrade"
-                                    required
-                                />
-                            </div>
-
-                            <div className="form-group">
-                                <label>Description</label>
-                                <textarea
-                                    value={formData.description}
-                                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                                    placeholder="Describe what maintenance will be performed..."
-                                />
-                            </div>
-
-                            <div className="time-group">
+                            <div className="form-section">
+                                <h4 className="form-section-title">Basic Information</h4>
                                 <div className="form-group">
-                                    <label>Start Time *</label>
+                                    <label>Maintenance Title*</label>
                                     <input
-                                        type="datetime-local"
-                                        value={formData.startTime}
-                                        onChange={(e) => setFormData({ ...formData, startTime: e.target.value })}
+                                        type="text"
+                                        value={formData.title}
+                                        onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                                        placeholder="e.g., Database Upgrade"
                                         required
                                     />
                                 </div>
+
                                 <div className="form-group">
-                                    <label>End Time *</label>
-                                    <input
-                                        type="datetime-local"
-                                        value={formData.endTime}
-                                        onChange={(e) => setFormData({ ...formData, endTime: e.target.value })}
-                                        required
+                                    <label>Description*</label>
+                                    <textarea
+                                        value={formData.description}
+                                        onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                                        placeholder="Describe what maintenance will be performed..."
                                     />
                                 </div>
                             </div>
 
-                            <div className="form-group">
-                                <label>Affected Monitors</label>
-                                <div className="monitors-selection">
-                                    {monitors.map(monitor => (
-                                        <label key={monitor._id} className="monitor-checkbox">
-                                            <input
-                                                type="checkbox"
-                                                checked={formData.affectedMonitors.includes(monitor._id)}
-                                                onChange={() => handleMonitorSelection(monitor._id)}
-                                            />
-                                            <span>{monitor.name}</span>
-                                        </label>
-                                    ))}
-                                </div>
-                            </div>
-
-                            <div className="form-group checkbox-group">
-                                <label>
-                                    <input
-                                        type="checkbox"
-                                        checked={formData.notifySubscribers}
-                                        onChange={(e) => setFormData({ ...formData, notifySubscribers: e.target.checked })}
-                                    />
-                                    Notify subscribers about this maintenance
-                                </label>
-                            </div>
-
-                            <div className="form-group checkbox-group">
-                                <label>
-                                    <input
-                                        type="checkbox"
-                                        checked={formData.isRecurring}
-                                        onChange={(e) => setFormData({ ...formData, isRecurring: e.target.checked })}
-                                    />
-                                    Make this a recurring maintenance window
-                                </label>
-                            </div>
-
-                            {formData.isRecurring && (
-                                <div className="recurrence-section">
-                                    <h3>Recurrence Pattern</h3>
-                                    <div className="form-group">
-                                        <label>Repeat</label>
-                                        <select
-                                            value={formData.recurrencePattern.type}
-                                            onChange={(e) => setFormData({
-                                                ...formData,
-                                                recurrencePattern: {
-                                                    ...formData.recurrencePattern,
-                                                    type: e.target.value
-                                                }
-                                            })}
-                                        >
-                                            <option value="daily">Daily</option>
-                                            <option value="weekly">Weekly</option>
-                                            <option value="monthly">Monthly</option>
-                                        </select>
-                                    </div>
-
-                                    <div className="form-group">
-                                        <label>Every</label>
+                            <div className="form-section">
+                                <h4 className="form-section-title">Schedule</h4>
+                                <div className="time-inputs-row">
+                                    <div className="time-input-group">
+                                        <label>Start Time *</label>
                                         <input
-                                            type="number"
-                                            min="1"
-                                            value={formData.recurrencePattern.interval}
-                                            onChange={(e) => setFormData({
-                                                ...formData,
-                                                recurrencePattern: {
-                                                    ...formData.recurrencePattern,
-                                                    interval: parseInt(e.target.value)
-                                                }
-                                            })}
+                                            type="datetime-local"
+                                            value={formData.startTime}
+                                            onChange={(e) => setFormData({ ...formData, startTime: e.target.value })}
+                                            required
                                         />
-                                        <span>{formData.recurrencePattern.type.slice(0, -2)}(s)</span>
+                                    </div>
+                                    <div className="time-input-group">
+                                        <label>End Time *</label>
+                                        <input
+                                            type="datetime-local"
+                                            value={formData.endTime}
+                                            onChange={(e) => setFormData({ ...formData, endTime: e.target.value })}
+                                            required
+                                        />
                                     </div>
                                 </div>
-                            )}
+                            </div>
+
+                            <div className="form-section">
+                                <h4 className="form-section-title">Affected Services</h4>
+                                <div className="form-group">
+                                    <label>Select Monitors</label>
+                                    <div className="monitors-selection">
+                                        {monitors.map(monitor => (
+                                            <label key={monitor._id} className="monitor-checkbox">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={formData.affectedMonitors.includes(monitor._id)}
+                                                    onChange={() => handleMonitorSelection(monitor._id)}
+                                                />
+                                                <span>{monitor.name}</span>
+                                            </label>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="form-section">
+                                <h4 className="form-section-title">Notification Settings</h4>
+                                <div className="checkbox-section">
+                                    <div className="checkbox-group">
+                                        <input
+                                            type="checkbox"
+                                            id="notify-subscribers"
+                                            checked={formData.notifySubscribers}
+                                            onChange={(e) => setFormData({ ...formData, notifySubscribers: e.target.checked })}
+                                        />
+                                        <label htmlFor="notify-subscribers">
+                                            Notify subscribers about this maintenance
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="form-section">
+                                <h4 className="form-section-title">Recurrence (Optional)</h4>
+                                <div className="checkbox-section">
+                                    <div className="checkbox-group">
+                                        <input
+                                            type="checkbox"
+                                            id="is-recurring"
+                                            checked={formData.isRecurring}
+                                            onChange={(e) => setFormData({ ...formData, isRecurring: e.target.checked })}
+                                        />
+                                        <label htmlFor="is-recurring">
+                                            Make this a recurring maintenance window
+                                        </label>
+                                    </div>
+                                </div>
+
+                                {formData.isRecurring && (
+                                    <div className="recurrence-section">
+                                        <h3>Recurrence Pattern</h3>
+                                        <div className="form-group">
+                                            <label>Repeat</label>
+                                            <select
+                                                value={formData.recurrencePattern.type}
+                                                onChange={(e) => setFormData({
+                                                    ...formData,
+                                                    recurrencePattern: {
+                                                        ...formData.recurrencePattern,
+                                                        type: e.target.value
+                                                    }
+                                                })}
+                                            >
+                                                <option value="daily">Daily</option>
+                                                <option value="weekly">Weekly</option>
+                                                <option value="monthly">Monthly</option>
+                                            </select>
+                                        </div>
+
+                                        <div className="form-group">
+                                            <label>Every</label>
+                                            <input
+                                                type="number"
+                                                min="1"
+                                                value={formData.recurrencePattern.interval}
+                                                onChange={(e) => setFormData({
+                                                    ...formData,
+                                                    recurrencePattern: {
+                                                        ...formData.recurrencePattern,
+                                                        interval: parseInt(e.target.value)
+                                                    }
+                                                })}
+                                            />
+                                            <span>{formData.recurrencePattern.type.slice(0, -2)}(s)</span>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
                         </div>
                         <div className="modal-footer">
                             <button
@@ -754,124 +812,145 @@ const MaintenanceManagement = () => {
                             </button>
                         </div>
                         <div className="modal-body">
-                            <div className="form-group">
-                                <label>Maintenance Title *</label>
-                                <input
-                                    type="text"
-                                    value={formData.title}
-                                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                                    placeholder="e.g., Database Upgrade"
-                                    required
-                                />
-                            </div>
-
-                            <div className="form-group">
-                                <label>Description</label>
-                                <textarea
-                                    value={formData.description}
-                                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                                    placeholder="Describe what maintenance will be performed..."
-                                />
-                            </div>
-
-                            <div className="time-group">
+                            <div className="form-section">
+                                <h4 className="form-section-title">Basic Information</h4>
                                 <div className="form-group">
-                                    <label>Start Time *</label>
+                                    <label>Maintenance Title *</label>
                                     <input
-                                        type="datetime-local"
-                                        value={formData.startTime}
-                                        onChange={(e) => setFormData({ ...formData, startTime: e.target.value })}
+                                        type="text"
+                                        value={formData.title}
+                                        onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                                        placeholder="e.g., Database Upgrade"
                                         required
                                     />
                                 </div>
+
                                 <div className="form-group">
-                                    <label>End Time *</label>
-                                    <input
-                                        type="datetime-local"
-                                        value={formData.endTime}
-                                        onChange={(e) => setFormData({ ...formData, endTime: e.target.value })}
-                                        required
+                                    <label>Description</label>
+                                    <textarea
+                                        value={formData.description}
+                                        onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                                        placeholder="Describe what maintenance will be performed..."
                                     />
                                 </div>
                             </div>
 
-                            <div className="form-group">
-                                <label>Affected Monitors</label>
-                                <div className="monitors-selection">
-                                    {monitors.map(monitor => (
-                                        <label key={monitor._id} className="monitor-checkbox">
-                                            <input
-                                                type="checkbox"
-                                                checked={formData.affectedMonitors.includes(monitor._id)}
-                                                onChange={() => handleMonitorSelection(monitor._id)}
-                                            />
-                                            <span>{monitor.name}</span>
-                                        </label>
-                                    ))}
-                                </div>
-                            </div>
-
-                            <div className="form-group checkbox-group">
-                                <label>
-                                    <input
-                                        type="checkbox"
-                                        checked={formData.notifySubscribers}
-                                        onChange={(e) => setFormData({ ...formData, notifySubscribers: e.target.checked })}
-                                    />
-                                    Notify subscribers about this maintenance
-                                </label>
-                            </div>
-
-                            <div className="form-group checkbox-group">
-                                <label>
-                                    <input
-                                        type="checkbox"
-                                        checked={formData.isRecurring}
-                                        onChange={(e) => setFormData({ ...formData, isRecurring: e.target.checked })}
-                                    />
-                                    Make this a recurring maintenance window
-                                </label>
-                            </div>
-
-                            {formData.isRecurring && (
-                                <div className="recurrence-section">
-                                    <h3>Recurrence Pattern</h3>
-                                    <div className="form-group">
-                                        <label>Repeat</label>
-                                        <select
-                                            value={formData.recurrencePattern.type}
-                                            onChange={(e) => setFormData({
-                                                ...formData,
-                                                recurrencePattern: {
-                                                    ...formData.recurrencePattern,
-                                                    type: e.target.value
-                                                }
-                                            })}
-                                        >
-                                            <option value="daily">Daily</option>
-                                            <option value="weekly">Weekly</option>
-                                            <option value="monthly">Monthly</option>
-                                        </select>
-                                    </div>
-
-                                    <div className="form-group">
-                                        <label>Every</label>
+                            <div className="form-section">
+                                <h4 className="form-section-title">Schedule</h4>
+                                <div className="time-inputs-row">
+                                    <div className="time-input-group">
+                                        <label>Start Time *</label>
                                         <input
-                                            type="number"
-                                            min="1"
-                                            value={formData.recurrencePattern.interval}
-                                            onChange={(e) => setFormData({
-                                                ...formData,
-                                                recurrencePattern: {
-                                                    ...formData.recurrencePattern,
-                                                    interval: parseInt(e.target.value)
-                                                }
-                                            })}
+                                            type="datetime-local"
+                                            value={formData.startTime}
+                                            onChange={(e) => setFormData({ ...formData, startTime: e.target.value })}
+                                            required
                                         />
-                                        <span>{formData.recurrencePattern.type.slice(0, -2)}(s)</span>
+                                    </div>
+                                    <div className="time-input-group">
+                                        <label>End Time *</label>
+                                        <input
+                                            type="datetime-local"
+                                            value={formData.endTime}
+                                            onChange={(e) => setFormData({ ...formData, endTime: e.target.value })}
+                                            required
+                                        />
                                     </div>
                                 </div>
-                            )}
+                            </div>
+
+                            <div className="form-section">
+                                <h4 className="form-section-title">Affected Services</h4>
+                                <div className="form-group">
+                                    <label>Select Monitors</label>
+                                    <div className="monitors-selection">
+                                        {monitors.map(monitor => (
+                                            <label key={monitor._id} className="monitor-checkbox">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={formData.affectedMonitors.includes(monitor._id)}
+                                                    onChange={() => handleMonitorSelection(monitor._id)}
+                                                />
+                                                <span>{monitor.name}</span>
+                                            </label>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="form-section">
+                                <h4 className="form-section-title">Notification Settings</h4>
+                                <div className="checkbox-section">
+                                    <div className="checkbox-group">
+                                        <input
+                                            type="checkbox"
+                                            id="edit-notify-subscribers"
+                                            checked={formData.notifySubscribers}
+                                            onChange={(e) => setFormData({ ...formData, notifySubscribers: e.target.checked })}
+                                        />
+                                        <label htmlFor="edit-notify-subscribers">
+                                            Notify subscribers about this maintenance
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="form-section">
+                                <h4 className="form-section-title">Recurrence (Optional)</h4>
+                                <div className="checkbox-section">
+                                    <div className="checkbox-group">
+                                        <input
+                                            type="checkbox"
+                                            id="edit-is-recurring"
+                                            checked={formData.isRecurring}
+                                            onChange={(e) => setFormData({ ...formData, isRecurring: e.target.checked })}
+                                        />
+                                        <label htmlFor="edit-is-recurring">
+                                            Make this a recurring maintenance window
+                                        </label>
+                                    </div>
+                                </div>
+
+                                {formData.isRecurring && (
+                                    <div className="recurrence-section">
+                                        <h3>Recurrence Pattern</h3>
+                                        <div className="form-group">
+                                            <label>Repeat</label>
+                                            <select
+                                                value={formData.recurrencePattern.type}
+                                                onChange={(e) => setFormData({
+                                                    ...formData,
+                                                    recurrencePattern: {
+                                                        ...formData.recurrencePattern,
+                                                        type: e.target.value
+                                                    }
+                                                })}
+                                            >
+                                                <option value="daily">Daily</option>
+                                                <option value="weekly">Weekly</option>
+                                                <option value="monthly">Monthly</option>
+                                            </select>
+                                        </div>
+
+                                        <div className="form-group">
+                                            <label>Every</label>
+                                            <input
+                                                type="number"
+                                                min="1"
+                                                value={formData.recurrencePattern.interval}
+                                                onChange={(e) => setFormData({
+                                                    ...formData,
+                                                    recurrencePattern: {
+                                                        ...formData.recurrencePattern,
+                                                        interval: parseInt(e.target.value)
+                                                    }
+                                                })}
+                                            />
+                                            <span>{formData.recurrencePattern.type.slice(0, -2)}(s)</span>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
                         </div>
                         <div className="modal-footer">
                             <button
