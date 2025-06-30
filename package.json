@@ -6,7 +6,9 @@
     "pigeon": "./cli/pigeon-cli.js"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
     "cli": "node ./cli/pigeon-cli.js"
   },
   "keywords": [
@@ -21,6 +23,7 @@
   "description": "API Testing and Automation Tool with CI/CD Integration",
   "dependencies": {
     "@apidevtools/swagger-parser": "^10.1.1",
+    "@shadcn/ui": "^0.0.4",
     "axios": "^1.10.0",
     "canvas": "^3.1.1",
     "chalk": "^4.1.2",
@@ -29,12 +32,14 @@
     "cors": "^2.8.5",
     "crypto": "^1.0.1",
     "dotenv": "^16.4.7",
+    "ejs": "^3.1.10",
     "express": "^4.21.2",
     "express-session": "^1.18.1",
     "html-pdf-node": "^1.0.8",
     "js-yaml": "^4.1.0",
     "mongodb": "^6.14.2",
     "mongoose": "^8.12.1",
+    "multer": "^2.0.1",
     "node-cron": "^3.0.3",
     "node-fetch": "^3.3.2",
     "nodemailer": "^6.9.8",

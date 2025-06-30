@@ -1,0 +1,141 @@
+/* client/src/components/OAuthCallback.css */
+.oauth-callback-container {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #1e1e1e 0%, #2a2a2a 100%);
+    color: #e6e6e6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", sans-serif;
+    padding: 20px;
+}
+
+.oauth-callback-content {
+    text-align: center;
+    max-width: 500px;
+    width: 100%;
+    background: rgba(255, 255, 255, 0.05);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    border-radius: 16px;
+    padding: 40px 30px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.logo {
+    font-size: 28px;
+    font-weight: 600;
+    color: #ff6c37;
+    margin-bottom: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.status {
+    margin: 30px 0;
+    padding: 20px;
+    border-radius: 12px;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    flex-direction: column;
+}
+
+.status-icon {
+    font-size: 48px;
+    margin-bottom: 10px;
+}
+
+.status-message {
+    font-size: 18px;
+    font-weight: 500;
+}
+
+.success {
+    background: rgba(34, 197, 94, 0.1);
+    border: 1px solid rgba(34, 197, 94, 0.3);
+    color: #22c55e;
+}
+
+.error {
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    color: #ef4444;
+}
+
+.loading {
+    background: rgba(59, 130, 246, 0.1);
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    color: #3b82f6;
+}
+
+.instructions {
+    margin-top: 25px;
+    color: #b3b3b3;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.instructions p {
+    margin-bottom: 20px;
+}
+
+.close-button {
+    background: #ff6c37;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.close-button:hover {
+    background: #e55b2b;
+    transform: translateY(-1px);
+}
+
+.close-button:active {
+    transform: translateY(0);
+}
+
+/* Loading animation for the loading state */
+.loading .status-icon {
+    animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Responsive design */
+@media (max-width: 600px) {
+    .oauth-callback-content {
+        padding: 30px 20px;
+        margin: 10px;
+    }
+
+    .logo {
+        font-size: 24px;
+    }
+
+    .status-icon {
+        font-size: 36px;
+    }
+
+    .status-message {
+        font-size: 16px;
+    }
+}

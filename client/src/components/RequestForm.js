@@ -36,9 +36,40 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
     // Tab content states
     const [params, setParams] = useState(initialData.params || []);
     const [headers, setHeaders] = useState(initialData.headers || []);
-    const [bodyType, setBodyType] = useState(initialData.bodyType || 'none'); const [bodyContent, setBodyContent] = useState(initialData.body || '');
+    const [bodyType, setBodyType] = useState(initialData.bodyType || 'none');
+    const [bodyContent, setBodyContent] = useState(initialData.body || '');
     const [preRequestScript, setPreRequestScript] = useState(initialData.preRequestScript || '');
-    const [tests, setTests] = useState(initialData.tests || ''); const [variables, setVariables] = useState(initialData.variables || []);
+    const [tests, setTests] = useState(initialData.tests || '');
+    const [variables, setVariables] = useState(initialData.variables || []);
+
+    // Authentication state
+    const [authConfig, setAuthConfig] = useState(initialData.authConfig || {
+        type: 'No Auth',
+        bearer: { token: '' },
+        basic: { username: '', password: '' },
+        apiKey: { key: '', value: '', location: 'header' },
+        oauth2: {
+            grantType: 'authorization_code',
+            clientId: '',
+            clientSecret: '',
+            authUrl: '',
+            tokenUrl: '',
+            scope: '',
+            redirectUri: '',
+            accessToken: '',
+            refreshToken: '',
+            tokenStatus: 'not_authenticated'
+        }
+    });
+
+    // SSL configuration state
+    const [sslConfig, setSSLConfig] = useState(initialData.sslConfig || {
+        verifyCert: true,
+        allowSelfSigned: false,
+        clientCert: null,
+        clientKey: null,
+        passphrase: ''
+    });
 
     // Variable resolution state
     const [resolvedVariables, setResolvedVariables] = useState({});
@@ -155,7 +186,283 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
         const newHeaders = [...headers];
         newHeaders.splice(index, 1);
         setHeaders(newHeaders);
-    };    // Save button handler
+    };    // OAuth 2.0 handlers
+    const handleAuthConfigChange = (field, value) => {
+        setAuthConfig(prev => ({
+            ...prev,
+            [field]: value
+        }));
+    };
+
+    const handleOAuth2ConfigChange = (field, value) => {
+        setAuthConfig(prev => ({
+            ...prev,
+            oauth2: {
+                ...prev.oauth2,
+                [field]: value
+            }
+        }));
+    };
+
+    const handleBasicAuthChange = (field, value) => {
+        setAuthConfig(prev => ({
+            ...prev,
+            basic: {
+                ...prev.basic,
+                [field]: value
+            }
+        }));
+    };
+
+    const handleBearerTokenChange = (value) => {
+        setAuthConfig(prev => ({
+            ...prev,
+            bearer: { token: value }
+        }));
+    };
+
+    const handleApiKeyChange = (field, value) => {
+        setAuthConfig(prev => ({
+            ...prev,
+            apiKey: {
+                ...prev.apiKey,
+                [field]: value
+            }
+        }));
+    };
+
+    const handleOAuth2Authorize = async () => {
+        try {
+            const { oauth2 } = authConfig;
+
+            // Call backend to generate proper auth URL with state management
+            const response = await fetch('/api/oauth/authorize', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    clientId: oauth2.clientId,
+                    clientSecret: oauth2.clientSecret,
+                    authUrl: oauth2.authUrl,
+                    tokenUrl: oauth2.tokenUrl,
+                    redirectUri: oauth2.redirectUri || 'http://localhost:3000/oauth/callback',
+                    scope: oauth2.scope || ''
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to generate authorization URL');
+            }
+
+            const { authUrl } = await response.json();
+
+            // Open authorization window
+            const popup = window.open(authUrl, 'oauth2', 'width=600,height=600');
+
+            // Listen for the callback
+            const messageListener = async (event) => {
+                if (event.origin !== window.location.origin) return;
+
+                if (event.data.type === 'OAUTH_CALLBACK') {
+                    popup?.close();
+                    window.removeEventListener('message', messageListener);
+
+                    if (event.data.code) {
+                        await handleOAuth2TokenExchange(event.data.code, event.data.state);
+                    } else {
+                        console.error('OAuth authorization failed:', event.data.error);
+                        setAuthConfig(prev => ({
+                            ...prev,
+                            oauth2: {
+                                ...prev.oauth2,
+                                tokenStatus: 'error'
+                            }
+                        }));
+                    }
+                }
+            };
+
+            window.addEventListener('message', messageListener);
+
+            // Update status
+            setAuthConfig(prev => ({
+                ...prev,
+                oauth2: {
+                    ...prev.oauth2,
+                    tokenStatus: 'authorizing'
+                }
+            }));
+
+        } catch (error) {
+            console.error('OAuth authorization error:', error);
+            setAuthConfig(prev => ({
+                ...prev,
+                oauth2: {
+                    ...prev.oauth2,
+                    tokenStatus: 'error'
+                }
+            }));
+        }
+    };
+
+    const handleOAuth2TokenExchange = async (code, state) => {
+        try {
+            const response = await fetch('/api/oauth/exchange', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    code,
+                    state,
+                    clientId: authConfig.oauth2.clientId,
+                    clientSecret: authConfig.oauth2.clientSecret,
+                    redirectUri: authConfig.oauth2.redirectUri || 'http://localhost:3000/oauth/callback',
+                    tokenUrl: authConfig.oauth2.tokenUrl
+                })
+            });
+
+            if (response.ok) {
+                const tokens = await response.json();
+                setAuthConfig(prev => ({
+                    ...prev,
+                    oauth2: {
+                        ...prev.oauth2,
+                        accessToken: tokens.access_token,
+                        refreshToken: tokens.refresh_token,
+                        tokenStatus: 'authenticated'
+                    }
+                }));
+            } else {
+                throw new Error('Token exchange failed');
+            }
+        } catch (error) {
+            console.error('Token exchange error:', error);
+            setAuthConfig(prev => ({
+                ...prev,
+                oauth2: {
+                    ...prev.oauth2,
+                    tokenStatus: 'error'
+                }
+            }));
+        }
+    };
+
+    const handleOAuth2Refresh = async () => {
+        try {
+            const response = await fetch('/api/oauth/refresh', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    refreshToken: authConfig.oauth2.refreshToken,
+                    clientId: authConfig.oauth2.clientId,
+                    clientSecret: authConfig.oauth2.clientSecret,
+                    tokenUrl: authConfig.oauth2.tokenUrl
+                })
+            });
+
+            if (response.ok) {
+                const tokens = await response.json();
+                setAuthConfig(prev => ({
+                    ...prev,
+                    oauth2: {
+                        ...prev.oauth2,
+                        accessToken: tokens.access_token,
+                        refreshToken: tokens.refresh_token || prev.oauth2.refreshToken,
+                        tokenStatus: 'authenticated'
+                    }
+                }));
+            } else {
+                throw new Error('Token refresh failed');
+            }
+        } catch (error) {
+            console.error('Token refresh error:', error);
+            setAuthConfig(prev => ({
+                ...prev,
+                oauth2: {
+                    ...prev.oauth2,
+                    tokenStatus: 'error'
+                }
+            }));
+        }
+    };
+
+    const handleOAuth2Clear = () => {
+        setAuthConfig(prev => ({
+            ...prev,
+            oauth2: {
+                ...prev.oauth2,
+                accessToken: '',
+                refreshToken: '',
+                tokenStatus: 'not_authenticated'
+            }
+        }));
+    };
+
+    // SSL configuration handlers
+    const handleSSLConfigChange = (field, value) => {
+        setSSLConfig(prev => ({
+            ...prev,
+            [field]: value
+        }));
+    };
+
+    const handleCertificateUpload = async (type, file) => {
+        try {
+            const formData = new FormData();
+            formData.append('certificate', file);
+            formData.append('type', type);
+
+            const response = await fetch('/api/certificates/upload', {
+                method: 'POST',
+                body: formData
+            });
+
+            if (response.ok) {
+                const result = await response.json();
+                setSSLConfig(prev => ({
+                    ...prev,
+                    [type]: {
+                        filename: file.name,
+                        size: file.size,
+                        data: result.data,
+                        info: result.info
+                    }
+                }));
+            } else {
+                throw new Error('Certificate upload failed');
+            }
+        } catch (error) {
+            console.error('Certificate upload error:', error);
+            alert(`Failed to upload certificate: ${error.message}`);
+        }
+    };
+
+    const handleTestSSLConnection = async () => {
+        try {
+            if (!url) {
+                alert('Please enter a URL first');
+                return;
+            }
+
+            const response = await fetch('/api/certificates/test', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    url,
+                    sslConfig
+                })
+            });
+
+            const result = await response.json();
+            alert(`SSL Test Result: ${result.valid ? 'Valid' : 'Invalid'}\nDetails: ${result.details}`);
+        } catch (error) {
+            console.error('SSL test error:', error);
+            alert(`SSL test failed: ${error.message}`);
+        }
+    };
+
+    // ...existing code...
+    // Save button handler
     const handleSave = () => {
         // Build request object
         const requestData = {
@@ -169,6 +476,8 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
             preRequestScript,
             tests,
             variables: variables.filter(v => v.key),
+            authConfig,
+            sslConfig,
             isNew
         };
 
@@ -192,6 +501,8 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
             preRequestScript,
             tests,
             variables: variables.filter(v => v.key),
+            authConfig,
+            sslConfig,
             isNew,
             _id: initialData._id || initialData.id
         };
@@ -665,6 +976,358 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
                     </div>
                 );
 
+            case 'authorization':
+                return (
+                    <div className="auth-section">
+                        <div className="auth-config">
+                            <div className="auth-type-selector">
+                                <label htmlFor="auth-type">Authentication Type:</label>
+                                <select
+                                    id="auth-type"
+                                    value={authConfig.type}
+                                    onChange={(e) => handleAuthConfigChange('type', e.target.value)}
+                                    className="auth-type-select"
+                                >
+                                    <option value="No Auth">No Auth</option>
+                                    <option value="Bearer Token">Bearer Token</option>
+                                    <option value="Basic Auth">Basic Auth</option>
+                                    <option value="API Key">API Key</option>
+                                    <option value="OAuth 2.0">OAuth 2.0</option>
+                                </select>
+                            </div>
+
+                            {authConfig.type === 'Bearer Token' && (
+                                <div className="auth-form">
+                                    <div className="form-group">
+                                        <label htmlFor="bearer-token">Token:</label>
+                                        <input
+                                            id="bearer-token"
+                                            type="text"
+                                            value={authConfig.bearer.token}
+                                            onChange={(e) => handleBearerTokenChange(e.target.value)}
+                                            placeholder="Enter bearer token"
+                                            className="auth-input"
+                                        />
+                                    </div>
+                                </div>
+                            )}
+
+                            {authConfig.type === 'Basic Auth' && (
+                                <div className="auth-form">
+                                    <div className="form-group">
+                                        <label htmlFor="basic-username">Username:</label>
+                                        <input
+                                            id="basic-username"
+                                            type="text"
+                                            value={authConfig.basic.username}
+                                            onChange={(e) => handleBasicAuthChange('username', e.target.value)}
+                                            placeholder="Username"
+                                            className="auth-input"
+                                        />
+                                    </div>
+                                    <div className="form-group">
+                                        <label htmlFor="basic-password">Password:</label>
+                                        <input
+                                            id="basic-password"
+                                            type="password"
+                                            value={authConfig.basic.password}
+                                            onChange={(e) => handleBasicAuthChange('password', e.target.value)}
+                                            placeholder="Password"
+                                            className="auth-input"
+                                        />
+                                    </div>
+                                </div>
+                            )}
+
+                            {authConfig.type === 'API Key' && (
+                                <div className="auth-form">
+                                    <div className="form-group">
+                                        <label htmlFor="api-key">Key:</label>
+                                        <input
+                                            id="api-key"
+                                            type="text"
+                                            value={authConfig.apiKey.key}
+                                            onChange={(e) => handleApiKeyChange('key', e.target.value)}
+                                            placeholder="API key name"
+                                            className="auth-input"
+                                        />
+                                    </div>
+                                    <div className="form-group">
+                                        <label htmlFor="api-value">Value:</label>
+                                        <input
+                                            id="api-value"
+                                            type="text"
+                                            value={authConfig.apiKey.value}
+                                            onChange={(e) => handleApiKeyChange('value', e.target.value)}
+                                            placeholder="API key value"
+                                            className="auth-input"
+                                        />
+                                    </div>
+                                    <div className="form-group">
+                                        <label htmlFor="api-location">Add to:</label>
+                                        <select
+                                            id="api-location"
+                                            value={authConfig.apiKey.location}
+                                            onChange={(e) => handleApiKeyChange('location', e.target.value)}
+                                            className="auth-select"
+                                        >
+                                            <option value="header">Header</option>
+                                            <option value="query">Query Params</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            )}
+
+                            {authConfig.type === 'OAuth 2.0' && (
+                                <div className="auth-form oauth-form">
+                                    <div className="oauth-status">
+                                        <div className={`status-indicator ${authConfig.oauth2.tokenStatus}`}>
+                                            {authConfig.oauth2.tokenStatus === 'authenticated' ? '🟢' :
+                                                authConfig.oauth2.tokenStatus === 'authorizing' ? '🟡' :
+                                                    authConfig.oauth2.tokenStatus === 'error' ? '🔴' : '⚪'}
+                                        </div>
+                                        <span className="status-text">
+                                            {authConfig.oauth2.tokenStatus === 'authenticated' ? 'Authenticated' :
+                                                authConfig.oauth2.tokenStatus === 'authorizing' ? 'Authorizing...' :
+                                                    authConfig.oauth2.tokenStatus === 'error' ? 'Authentication Error' :
+                                                        'Not Authenticated'}
+                                        </span>
+                                    </div>
+
+                                    <div className="form-row">
+                                        <div className="form-group">
+                                            <label htmlFor="oauth-grant-type">Grant Type:</label>
+                                            <select
+                                                id="oauth-grant-type"
+                                                value={authConfig.oauth2.grantType}
+                                                onChange={(e) => handleOAuth2ConfigChange('grantType', e.target.value)}
+                                                className="auth-select"
+                                            >
+                                                <option value="authorization_code">Authorization Code</option>
+                                                <option value="client_credentials">Client Credentials</option>
+                                            </select>
+                                        </div>
+                                        <div className="form-group">
+                                            <label htmlFor="oauth-client-id">Client ID:</label>
+                                            <input
+                                                id="oauth-client-id"
+                                                type="text"
+                                                value={authConfig.oauth2.clientId}
+                                                onChange={(e) => handleOAuth2ConfigChange('clientId', e.target.value)}
+                                                placeholder="Client ID"
+                                                className="auth-input"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div className="form-row">
+                                        <div className="form-group">
+                                            <label htmlFor="oauth-client-secret">Client Secret:</label>
+                                            <input
+                                                id="oauth-client-secret"
+                                                type="password"
+                                                value={authConfig.oauth2.clientSecret}
+                                                onChange={(e) => handleOAuth2ConfigChange('clientSecret', e.target.value)}
+                                                placeholder="Client Secret"
+                                                className="auth-input"
+                                            />
+                                        </div>
+                                        <div className="form-group">
+                                            <label htmlFor="oauth-scope">Scope:</label>
+                                            <input
+                                                id="oauth-scope"
+                                                type="text"
+                                                value={authConfig.oauth2.scope}
+                                                onChange={(e) => handleOAuth2ConfigChange('scope', e.target.value)}
+                                                placeholder="read write"
+                                                className="auth-input"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div className="form-row">
+                                        <div className="form-group">
+                                            <label htmlFor="oauth-auth-url">Auth URL:</label>
+                                            <input
+                                                id="oauth-auth-url"
+                                                type="url"
+                                                value={authConfig.oauth2.authUrl}
+                                                onChange={(e) => handleOAuth2ConfigChange('authUrl', e.target.value)}
+                                                placeholder="https://example.com/oauth/authorize"
+                                                className="auth-input"
+                                            />
+                                        </div>
+                                        <div className="form-group">
+                                            <label htmlFor="oauth-token-url">Token URL:</label>
+                                            <input
+                                                id="oauth-token-url"
+                                                type="url"
+                                                value={authConfig.oauth2.tokenUrl}
+                                                onChange={(e) => handleOAuth2ConfigChange('tokenUrl', e.target.value)}
+                                                placeholder="https://example.com/oauth/token"
+                                                className="auth-input"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div className="form-group">
+                                        <label htmlFor="oauth-redirect-uri">Redirect URI:</label>
+                                        <input
+                                            id="oauth-redirect-uri"
+                                            type="url"
+                                            value={authConfig.oauth2.redirectUri}
+                                            onChange={(e) => handleOAuth2ConfigChange('redirectUri', e.target.value)}
+                                            placeholder="http://localhost:3000/oauth/callback"
+                                            className="auth-input"
+                                        />
+                                    </div>
+
+                                    <div className="oauth-actions">
+                                        <button
+                                            type="button"
+                                            className="btn-primary"
+                                            onClick={handleOAuth2Authorize}
+                                            disabled={!authConfig.oauth2.clientId || !authConfig.oauth2.authUrl}
+                                        >
+                                            Authorize
+                                        </button>
+                                        {authConfig.oauth2.refreshToken && (
+                                            <button
+                                                type="button"
+                                                className="btn-secondary"
+                                                onClick={handleOAuth2Refresh}
+                                            >
+                                                Refresh Token
+                                            </button>
+                                        )}
+                                        <button
+                                            type="button"
+                                            className="btn-secondary"
+                                            onClick={handleOAuth2Clear}
+                                        >
+                                            Clear Tokens
+                                        </button>
+                                    </div>
+
+                                    {authConfig.oauth2.accessToken && (
+                                        <div className="token-display">
+                                            <label>Access Token:</label>
+                                            <input
+                                                type="text"
+                                                value={authConfig.oauth2.accessToken}
+                                                readOnly
+                                                className="token-input"
+                                            />
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                );
+
+            case 'ssl':
+                return (
+                    <div className="ssl-section">
+                        <div className="ssl-config">
+                            <div className="ssl-options">
+                                <div className="form-group">
+                                    <label className="checkbox-label">
+                                        <input
+                                            type="checkbox"
+                                            checked={sslConfig.verifyCert}
+                                            onChange={(e) => handleSSLConfigChange('verifyCert', e.target.checked)}
+                                        />
+                                        <span>Verify SSL certificates</span>
+                                    </label>
+                                </div>
+                                <div className="form-group">
+                                    <label className="checkbox-label">
+                                        <input
+                                            type="checkbox"
+                                            checked={sslConfig.allowSelfSigned}
+                                            onChange={(e) => handleSSLConfigChange('allowSelfSigned', e.target.checked)}
+                                        />
+                                        <span>Allow self-signed certificates</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div className="certificate-upload">
+                                <h4>Client Certificates</h4>
+                                <div className="cert-upload-section">
+                                    <div className="form-group">
+                                        <label htmlFor="client-cert">Client Certificate (.crt, .pem):</label>
+                                        <div className="file-upload">
+                                            <input
+                                                id="client-cert"
+                                                type="file"
+                                                accept=".crt,.pem,.cert"
+                                                onChange={(e) => {
+                                                    const file = e.target.files[0];
+                                                    if (file) handleCertificateUpload('clientCert', file);
+                                                }}
+                                                className="file-input"
+                                            />
+                                            {sslConfig.clientCert && (
+                                                <div className="file-info">
+                                                    <span className="file-name">{sslConfig.clientCert.filename}</span>
+                                                    <span className="file-size">({Math.round(sslConfig.clientCert.size / 1024)} KB)</span>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    <div className="form-group">
+                                        <label htmlFor="client-key">Client Key (.key, .pem):</label>
+                                        <div className="file-upload">
+                                            <input
+                                                id="client-key"
+                                                type="file"
+                                                accept=".key,.pem"
+                                                onChange={(e) => {
+                                                    const file = e.target.files[0];
+                                                    if (file) handleCertificateUpload('clientKey', file);
+                                                }}
+                                                className="file-input"
+                                            />
+                                            {sslConfig.clientKey && (
+                                                <div className="file-info">
+                                                    <span className="file-name">{sslConfig.clientKey.filename}</span>
+                                                    <span className="file-size">({Math.round(sslConfig.clientKey.size / 1024)} KB)</span>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    <div className="form-group">
+                                        <label htmlFor="cert-passphrase">Passphrase (if required):</label>
+                                        <input
+                                            id="cert-passphrase"
+                                            type="password"
+                                            value={sslConfig.passphrase}
+                                            onChange={(e) => handleSSLConfigChange('passphrase', e.target.value)}
+                                            placeholder="Certificate passphrase"
+                                            className="ssl-input"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="ssl-actions">
+                                <button
+                                    type="button"
+                                    className="btn-secondary"
+                                    onClick={handleTestSSLConnection}
+                                    disabled={!url}
+                                >
+                                    Test SSL Connection
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                );
+
             default:
                 return null;
         }
@@ -736,10 +1399,22 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
                         Headers
                     </div>
                     <div
+                        className={`request-tab ${activeTab === 'authorization' ? 'active' : ''}`}
+                        onClick={() => handleTabChange('authorization')}
+                    >
+                        🔒 Authorization
+                    </div>
+                    <div
                         className={`request-tab ${activeTab === 'body' ? 'active' : ''}`}
                         onClick={() => handleTabChange('body')}
                     >
                         Body
+                    </div>
+                    <div
+                        className={`request-tab ${activeTab === 'ssl' ? 'active' : ''}`}
+                        onClick={() => handleTabChange('ssl')}
+                    >
+                        🛡️ SSL
                     </div>
                     <div
                         className={`request-tab ${activeTab === 'pre-request-script' ? 'active' : ''}`}

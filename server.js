@@ -124,6 +124,12 @@ app.get('/auth/google/callback',
     }
 );
 
+// OAuth 2.0 callback route for API authentication
+app.get('/oauth/callback', (req, res) => {
+    // Serve the OAuth callback HTML page
+    res.sendFile(path.join(__dirname, 'client', 'public', 'oauth-callback.html'));
+});
+
 // --- API Cache and Popular APIs ---
 // Cache for API data
 let apiCache = {

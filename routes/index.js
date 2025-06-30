@@ -19,6 +19,10 @@ const integrationsRoutes = require('./integrations');
 const maintenanceRoutes = require('./maintenance');
 const teamsRoutes = require('./teams');
 
+// Import authentication and certificate management routes
+const oauthRoutes = require('./oauth');
+const certificatesRoutes = require('./certificates');
+
 // Register routes with their base paths
 router.use('/auth', authRoutes);
 router.use('/collections', collectionsRoutes);
@@ -35,5 +39,9 @@ router.use('/reports', reportsRoutes);
 router.use('/integrations', integrationsRoutes);
 router.use('/maintenance', maintenanceRoutes);
 router.use('/teams', teamsRoutes);
+
+// Register authentication and certificate management routes
+router.use('/oauth', oauthRoutes);
+router.use('/certificates', certificatesRoutes);
 
 module.exports = router;

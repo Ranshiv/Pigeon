@@ -1,22 +1,20 @@
 // client/src/App.js
 import React, { useState, useEffect } from 'react';
-import { Routes, Route, useNavigate, Navigate } from 'react-router-dom'; // Import Navigate
+import { Routes, Route, Navigate } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
-import Home from './components/Home';
 import Workspace from './components/Workspace';
-import PublicHome from './components/PublicHome'; // Import the new PublicHome component
-import DocumentationOverview from './components/DocumentationOverview'; // Import the DocumentationOverview component
-import PublicStatusPage from './components/PublicStatusPage'; // Import public status page
-import EnhancedPublicStatusPage from './components/EnhancedPublicStatusPage'; // Import enhanced public status page
-import { CollaborationProvider } from './context/CollaborationContext'; // Import our new CollaborationProvider
-import { ToastContainer, toast } from 'react-toastify'; // Import React Toastify
-import 'react-toastify/dist/ReactToastify.css'; // Import Toastify CSS
+import PublicHome from './components/PublicHome';
+import DocumentationOverview from './components/DocumentationOverview';
+import PublicStatusPage from './components/PublicStatusPage';
+import EnhancedPublicStatusPage from './components/EnhancedPublicStatusPage';
+import OAuthCallback from './components/OAuthCallback';
+import { CollaborationProvider } from './context/CollaborationContext';
+import 'react-toastify/dist/ReactToastify.css';
 import './App.css';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const navigate = useNavigate();
 
   useEffect(() => {
     // Check authentication status on app load
@@ -63,6 +61,7 @@ function App() {
           <Route path="/status" element={<PublicStatusPage />} />
           <Route path="/status/:workspaceId" element={<EnhancedPublicStatusPage />} />
           <Route path="/documentation" element={<DocumentationOverview />} /> {/* Add the documentation route */}
+          <Route path="/oauth/callback" element={<OAuthCallback />} /> {/* OAuth callback route */}
           <Route path="*" element={<div>404 Not Found</div>} />
         </Routes>
         <Footer />

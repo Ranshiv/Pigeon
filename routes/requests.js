@@ -6,6 +6,12 @@ const Request = require('../models/Request');
 const History = require('../models/History');
 const fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args));
 const { executePreRequestScript, executeTestScript } = require('../utils/scriptRunner');
+const AuthenticationService = require('../services/AuthenticationService');
+const CertificateManager = require('../services/CertificateManager');
+
+// Initialize services
+const authService = new AuthenticationService();
+const certificateManager = new CertificateManager();
 
 // Store for user environments
 const userEnvironments = {};
@@ -201,7 +207,51 @@ router.post('/:id/send', ensureAuthenticated, async (req, res) => {
             }
         }
 
-        const externalResponse = await fetch(requestWithScriptChanges.url || url, fetchOptions);
+        // --- Apply Authentication Configuration ---
+        let finalRequestConfig = {
+            url: requestWithScriptChanges.url || url,
+            headers: fetchOptions.headers,
+            method: fetchOptions.method,
+            body: fetchOptions.body
+        };
+
+        // Get auth and SSL config from request body or document
+        const authConfig = req.body.authConfig || requestDoc.authConfig;
+        const sslConfig = req.body.sslConfig || requestDoc.sslConfig;
+
+        if (authConfig && authConfig.type !== 'No Auth') {
+            try {
+                finalRequestConfig = await authService.applyAuthentication(finalRequestConfig, authConfig);
+                console.log(`Applied ${authConfig.type} authentication`);
+            } catch (authError) {
+                console.error('Authentication error:', authError.message);
+                return res.status(401).json({
+                    error: 'Authentication failed',
+                    message: authError.message,
+                    authRequired: true
+                });
+            }
+        }
+
+        // --- Apply SSL Configuration ---
+        if (sslConfig) {
+            try {
+                finalRequestConfig = certificateManager.applySSLConfiguration(finalRequestConfig, sslConfig);
+                console.log('Applied SSL configuration');
+            } catch (sslError) {
+                console.error('SSL configuration error:', sslError.message);
+                return res.status(400).json({
+                    error: 'SSL configuration failed',
+                    message: sslError.message
+                });
+            }
+        }
+
+        // Update fetchOptions with final configuration
+        fetchOptions.headers = finalRequestConfig.headers;
+        fetchOptions.agent = finalRequestConfig.agent;
+
+        const externalResponse = await fetch(finalRequestConfig.url, fetchOptions);
         const duration = Date.now() - startTime;
 
         // --- Process Response ---

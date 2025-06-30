@@ -598,7 +598,7 @@
     cursor: pointer;
     font-weight: 500;
     color: var(--text-color);
-    
+
 }
 
 .checkbox-group input[type="checkbox"] {
@@ -630,20 +630,21 @@
     margin-bottom: 8px;
 }
 
-.monitor-checkbox:hover {
-    background: var(--hover-bg);
-}
-
 .monitor-checkbox input[type="checkbox"] {
-    width: 18px;
-    height: 18px;
+    width: 16px;
+    height: 16px;
     margin: 0;
     accent-color: var(--primary-color);
+    vertical-align: middle;
+    /* Ensures text aligns with checkbox */
 }
 
 .monitor-checkbox span {
     font-weight: 500;
     color: var(--text-color);
+    line-height: 1.2;
+    /* Matches checkbox alignment */
+    padding-left: 6px;
 }
 
 /* Recurrence Section */
