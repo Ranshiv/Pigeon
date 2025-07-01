@@ -37,24 +37,39 @@ router.post('/upload', ensureAuthenticated, upload.fields([
         const certificateFile = req.files?.certificate?.[0];
         const privateKeyFile = req.files?.privateKey?.[0];
 
-        if (!certificateFile) {
+        console.log('Upload request received:', {
+            workspaceId,
+            name,
+            hasCertFile: !!certificateFile,
+            hasKeyFile: !!privateKeyFile,
+            files: req.files
+        });
+
+        // Check if at least one file is provided
+        if (!certificateFile && !privateKeyFile) {
+            console.log('No files provided');
             return res.status(400).json({
-                error: 'Certificate file is required'
+                error: 'At least one file (certificate or private key) is required'
             });
         }
 
         if (!workspaceId || !name) {
+            console.log('Missing required fields:', { workspaceId, name });
             return res.status(400).json({
                 error: 'Workspace ID and certificate name are required'
             });
         }
 
-        // Process certificate file
-        const certContent = await certificateManager.processCertificateFile({
-            buffer: certificateFile.buffer,
-            originalname: certificateFile.originalname
-        });
+        // Process certificate file if provided
+        let certContent = null;
+        if (certificateFile) {
+            certContent = await certificateManager.processCertificateFile({
+                buffer: certificateFile.buffer,
+                originalname: certificateFile.originalname
+            });
+        }
 
+        // Process private key file if provided
         let keyContent = null;
         if (privateKeyFile) {
             keyContent = await certificateManager.processCertificateFile({
@@ -74,7 +89,7 @@ router.post('/upload', ensureAuthenticated, upload.fields([
             }
         }
 
-        // Store certificate
+        // Store certificate (allow partial uploads)
         const certificate = await certificateManager.storeCertificate(workspaceId, {
             name,
             cert: certContent,
@@ -95,8 +110,8 @@ router.post('/upload', ensureAuthenticated, upload.fields([
     } catch (error) {
         console.error('Certificate upload error:', error);
         res.status(400).json({
-            error: 'Failed to upload certificate',
-            message: error.message
+            error: 'Certificate upload error',
+            message: error.message || error.toString()
         });
     }
 });

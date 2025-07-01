@@ -406,15 +406,71 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
         }));
     };
 
+    // File validation helper
+    const validateCertificateFile = (file, type) => {
+        const validExtensions = type === 'clientCert'
+            ? ['.crt', '.pem', '.cert', '.cer']
+            : ['.key', '.pem'];
+
+        const isValidExtension = validExtensions.some(ext =>
+            file.name.toLowerCase().endsWith(ext)
+        );
+
+        if (!isValidExtension) {
+            return {
+                valid: false,
+                error: `Invalid file type. Expected: ${validExtensions.join(', ')}`
+            };
+        }
+
+        // Check file size (max 10MB)
+        if (file.size > 10 * 1024 * 1024) {
+            return {
+                valid: false,
+                error: 'File size too large. Maximum 10MB allowed.'
+            };
+        }
+
+        return { valid: true };
+    };
+
     const handleCertificateUpload = async (type, file) => {
         try {
-            const formData = new FormData();
-            formData.append('certificate', file);
-            formData.append('type', type);
+            // Validate file first
+            const validation = validateCertificateFile(file, type);
+            if (!validation.valid) {
+                alert(validation.error);
+                return;
+            }
 
-            const response = await fetch('/api/certificates/upload', {
+            // Set loading state
+            setSSLConfig(prev => ({
+                ...prev,
+                [`${type}Loading`]: true
+            }));
+
+            const formData = new FormData();
+
+            // Add the file with the correct field name
+            if (type === 'clientCert') {
+                formData.append('certificate', file);
+            } else if (type === 'clientKey') {
+                formData.append('privateKey', file);
+            }
+
+            // Add required metadata
+            formData.append('workspaceId', workspaceId || 'default');
+            formData.append('name', `${type}_${Date.now()}`);
+
+            // Add passphrase if provided
+            if (sslConfig.passphrase) {
+                formData.append('passphrase', sslConfig.passphrase);
+            }
+
+            const response = await fetch(getApiUrl('/api/certificates/upload'), {
                 method: 'POST',
-                body: formData
+                body: formData,
+                credentials: 'include'
             });
 
             if (response.ok) {
@@ -424,16 +480,29 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
                     [type]: {
                         filename: file.name,
                         size: file.size,
-                        data: result.data,
-                        info: result.info
-                    }
+                        certificateId: result.certificate.id,
+                        info: result.certificate,
+                        uploadedAt: new Date().toISOString()
+                    },
+                    [`${type}Loading`]: false
                 }));
+
+                // Show success message (replace alert with better UX)
+                console.log(`${type === 'clientCert' ? 'Certificate' : 'Private key'} uploaded successfully!`);
             } else {
-                throw new Error('Certificate upload failed');
+                const errorData = await response.json();
+                throw new Error(errorData.message || errorData.error || 'Upload failed');
             }
         } catch (error) {
             console.error('Certificate upload error:', error);
-            alert(`Failed to upload certificate: ${error.message}`);
+            setSSLConfig(prev => ({
+                ...prev,
+                [`${type}Loading`]: false,
+                [`${type}Error`]: error.message
+            }));
+
+            // Show error message
+            alert(`Failed to upload ${type === 'clientCert' ? 'certificate' : 'private key'}: ${error.message}`);
         }
     };
 
@@ -642,7 +711,8 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
                                                     checked={param.enabled}
                                                     onChange={(e) => handleParamChange(index, 'enabled', e.target.checked)}
                                                 />
-                                            </td>                                            <td>
+                                            </td>
+                                            <td>
                                                 <input
                                                     type="text"
                                                     className={getVariableInputClass(param.key)}
@@ -713,7 +783,8 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
                                                     checked={header.enabled}
                                                     onChange={(e) => handleHeaderChange(index, 'enabled', e.target.checked)}
                                                 />
-                                            </td>                                            <td>
+                                            </td>
+                                            <td>
                                                 <input
                                                     type="text"
                                                     className={getVariableInputClass(header.key)}
@@ -1256,9 +1327,48 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
                             <div className="certificate-upload">
                                 <h4>Client Certificates</h4>
                                 <div className="cert-upload-section">
-                                    <div className="form-group">
-                                        <label htmlFor="client-cert">Client Certificate (.crt, .pem):</label>
-                                        <div className="file-upload">
+                                    {/* Client Certificate Upload */}
+                                    <div className="cert-upload-container">
+                                        <label className="cert-upload-label">
+                                            <span className="cert-type-title">
+                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                                                    <polyline points="14,2 14,8 20,8" />
+                                                    <line x1="16" y1="13" x2="8" y2="13" />
+                                                    <line x1="16" y1="17" x2="8" y2="17" />
+                                                    <polyline points="10,9 9,9 8,9" />
+                                                </svg>
+                                                Client Certificate
+                                            </span>
+                                            <span className="cert-file-types">(.crt, .pem, .cert)</span>
+                                        </label>
+
+                                        <div
+                                            className={`cert-drop-zone ${sslConfig.clientCert ? 'has-file' : ''}`}
+                                            onClick={() => !sslConfig.clientCert && !sslConfig.clientCertLoading && document.getElementById('client-cert').click()}
+                                            onDrop={(e) => {
+                                                e.preventDefault();
+                                                e.currentTarget.classList.remove('drag-over');
+                                                const file = e.dataTransfer.files[0];
+                                                if (file && ['.crt', '.pem', '.cert'].some(ext => file.name.toLowerCase().endsWith(ext))) {
+                                                    handleCertificateUpload('clientCert', file);
+                                                }
+                                            }}
+                                            onDragOver={(e) => {
+                                                e.preventDefault();
+                                                e.currentTarget.classList.add('drag-over');
+                                            }}
+                                            onDragEnter={(e) => {
+                                                e.preventDefault();
+                                                e.currentTarget.classList.add('drag-over');
+                                            }}
+                                            onDragLeave={(e) => {
+                                                e.preventDefault();
+                                                if (!e.currentTarget.contains(e.relatedTarget)) {
+                                                    e.currentTarget.classList.remove('drag-over');
+                                                }
+                                            }}
+                                        >
                                             <input
                                                 id="client-cert"
                                                 type="file"
@@ -1267,20 +1377,114 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
                                                     const file = e.target.files[0];
                                                     if (file) handleCertificateUpload('clientCert', file);
                                                 }}
-                                                className="file-input"
+                                                className="cert-file-input"
+                                                hidden
                                             />
-                                            {sslConfig.clientCert && (
-                                                <div className="file-info">
-                                                    <span className="file-name">{sslConfig.clientCert.filename}</span>
-                                                    <span className="file-size">({Math.round(sslConfig.clientCert.size / 1024)} KB)</span>
+
+                                            {sslConfig.clientCertLoading ? (
+                                                <div className="drop-zone-content">
+                                                    <div className="upload-icon uploading">
+                                                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                                            <path d="M21 12a9 9 0 11-6.219-8.56" />
+                                                        </svg>
+                                                    </div>
+                                                    <div className="upload-text">
+                                                        <span className="upload-primary">Uploading certificate...</span>
+                                                        <span className="upload-secondary">Please wait</span>
+                                                    </div>
+                                                </div>
+                                            ) : !sslConfig.clientCert ? (
+                                                <div className="drop-zone-content">
+                                                    <div className="upload-icon">
+                                                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                                                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                                            <polyline points="7,10 12,15 17,10" />
+                                                            <line x1="12" y1="15" x2="12" y2="3" />
+                                                        </svg>
+                                                    </div>
+                                                    <div className="upload-text">
+                                                        <span className="upload-primary">Drop certificate file here</span>
+                                                        <span className="upload-secondary">or click to browse</span>
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                <div className="uploaded-file">
+                                                    <div className="file-icon">
+                                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                                            <path d="M9 12l2 2 4-4" />
+                                                            <path d="M21 12c.552 0 1-.448 1-1V8a2 2 0 00-2-2h-5L9 3H4a2 2 0 00-2 2v13a2 2 0 002 2h16a2 2 0 002-2v-1c0-.552-.448-1-1-1z" />
+                                                        </svg>
+                                                    </div>
+                                                    <div className="file-details">
+                                                        <div className="file-name">{sslConfig.clientCert.filename}</div>
+                                                        <div className="file-meta">
+                                                            <span className="file-size">{Math.round(sslConfig.clientCert.size / 1024)} KB</span>
+                                                            {sslConfig.clientCert.info && (
+                                                                <span className="cert-validity">
+                                                                    Valid until: {new Date(sslConfig.clientCert.info.validTo).toLocaleDateString()}
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                    <button
+                                                        type="button"
+                                                        className="remove-file-btn"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            setSSLConfig(prev => ({ ...prev, clientCert: null }));
+                                                        }}
+                                                        title="Remove certificate"
+                                                    >
+                                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                                            <line x1="18" y1="6" x2="6" y2="18" />
+                                                            <line x1="6" y1="6" x2="18" y2="18" />
+                                                        </svg>
+                                                    </button>
                                                 </div>
                                             )}
                                         </div>
                                     </div>
 
-                                    <div className="form-group">
-                                        <label htmlFor="client-key">Client Key (.key, .pem):</label>
-                                        <div className="file-upload">
+                                    {/* Client Key Upload */}
+                                    <div className="cert-upload-container">
+                                        <label className="cert-upload-label">
+                                            <span className="cert-type-title">
+                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                                                    <circle cx="12" cy="16" r="1" />
+                                                    <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                                                </svg>
+                                                Private Key
+                                            </span>
+                                            <span className="cert-file-types">(.key, .pem)</span>
+                                        </label>
+
+                                        <div
+                                            className={`cert-drop-zone ${sslConfig.clientKey ? 'has-file' : ''}`}
+                                            onClick={() => !sslConfig.clientKey && !sslConfig.clientKeyLoading && document.getElementById('client-key').click()}
+                                            onDrop={(e) => {
+                                                e.preventDefault();
+                                                e.currentTarget.classList.remove('drag-over');
+                                                const file = e.dataTransfer.files[0];
+                                                if (file && ['.key', '.pem'].some(ext => file.name.toLowerCase().endsWith(ext))) {
+                                                    handleCertificateUpload('clientKey', file);
+                                                }
+                                            }}
+                                            onDragOver={(e) => {
+                                                e.preventDefault();
+                                                e.currentTarget.classList.add('drag-over');
+                                            }}
+                                            onDragEnter={(e) => {
+                                                e.preventDefault();
+                                                e.currentTarget.classList.add('drag-over');
+                                            }}
+                                            onDragLeave={(e) => {
+                                                e.preventDefault();
+                                                if (!e.currentTarget.contains(e.relatedTarget)) {
+                                                    e.currentTarget.classList.remove('drag-over');
+                                                }
+                                            }}
+                                        >
                                             <input
                                                 id="client-key"
                                                 type="file"
@@ -1289,27 +1493,99 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
                                                     const file = e.target.files[0];
                                                     if (file) handleCertificateUpload('clientKey', file);
                                                 }}
-                                                className="file-input"
+                                                className="cert-file-input"
+                                                hidden
                                             />
-                                            {sslConfig.clientKey && (
-                                                <div className="file-info">
-                                                    <span className="file-name">{sslConfig.clientKey.filename}</span>
-                                                    <span className="file-size">({Math.round(sslConfig.clientKey.size / 1024)} KB)</span>
+
+                                            {sslConfig.clientKeyLoading ? (
+                                                <div className="drop-zone-content">
+                                                    <div className="upload-icon uploading">
+                                                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                                            <path d="M21 12a9 9 0 11-6.219-8.56" />
+                                                        </svg>
+                                                    </div>
+                                                    <div className="upload-text">
+                                                        <span className="upload-primary">Uploading private key...</span>
+                                                        <span className="upload-secondary">Please wait</span>
+                                                    </div>
+                                                </div>
+                                            ) : !sslConfig.clientKey ? (
+                                                <div className="drop-zone-content">
+                                                    <div className="upload-icon">
+                                                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                                                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                                            <polyline points="7,10 12,15 17,10" />
+                                                            <line x1="12" y1="15" x2="12" y2="3" />
+                                                        </svg>
+                                                    </div>
+                                                    <div className="upload-text">
+                                                        <span className="upload-primary">Drop private key here</span>
+                                                        <span className="upload-secondary">or click to browse</span>
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                <div className="uploaded-file">
+                                                    <div className="file-icon">
+                                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                                            <path d="M9 12l2 2 4-4" />
+                                                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                                                            <circle cx="12" cy="16" r="1" />
+                                                        </svg>
+                                                    </div>
+                                                    <div className="file-details">
+                                                        <div className="file-name">{sslConfig.clientKey.filename}</div>
+                                                        <div className="file-meta">
+                                                            <span className="file-size">{Math.round(sslConfig.clientKey.size / 1024)} KB</span>
+                                                            <span className="key-status">Encrypted</span>
+                                                        </div>
+                                                    </div>
+                                                    <button
+                                                        type="button"
+                                                        className="remove-file-btn"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            setSSLConfig(prev => ({ ...prev, clientKey: null }));
+                                                        }}
+                                                        title="Remove private key"
+                                                    >
+                                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                                            <line x1="18" y1="6" x2="6" y2="18" />
+                                                            <line x1="6" y1="6" x2="18" y2="18" />
+                                                        </svg>
+                                                    </button>
                                                 </div>
                                             )}
                                         </div>
                                     </div>
 
-                                    <div className="form-group">
-                                        <label htmlFor="cert-passphrase">Passphrase (if required):</label>
-                                        <input
-                                            id="cert-passphrase"
-                                            type="password"
-                                            value={sslConfig.passphrase}
-                                            onChange={(e) => handleSSLConfigChange('passphrase', e.target.value)}
-                                            placeholder="Certificate passphrase"
-                                            className="ssl-input"
-                                        />
+                                    {/* Passphrase Input */}
+                                    <div className="form-group passphrase-group">
+                                        <label htmlFor="cert-passphrase" className="passphrase-label">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                                                <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                                            </svg>
+                                            Certificate Passphrase
+                                            <span className="optional-label">(optional)</span>
+                                        </label>
+                                        <div className="passphrase-input-container">
+                                            <input
+                                                id="cert-passphrase"
+                                                type="password"
+                                                value={sslConfig.passphrase}
+                                                onChange={(e) => handleSSLConfigChange('passphrase', e.target.value)}
+                                                placeholder="Enter passphrase if your certificate is encrypted"
+                                                className="passphrase-input"
+                                            />
+                                            {sslConfig.passphrase && (
+                                                <div className="passphrase-strength">
+                                                    <div className="strength-indicator">
+                                                        <div className="strength-bar" />
+                                                    </div>
+                                                    <span className="strength-text">Protected</span>
+                                                </div>
+                                            )}
+                                        </div>
                                     </div>
                                 </div>
                             </div>

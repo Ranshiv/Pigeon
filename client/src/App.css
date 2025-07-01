@@ -93,9 +93,9 @@ body.dark-theme {
   --danger-border-hover: #8f2020;
   --danger-text: #f87171;
   --info-color: #17a2b8;
-  --method-get: #7d69cb;
+  --method-get: #eb5c1a;
   /* GET - purple */
-  --method-post: #ff6c37;
+  --method-post: #ff7b00;
   /* POST - orange */
   --method-put: #4fade6;
   /* PUT - blue */

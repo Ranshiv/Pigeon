@@ -18,13 +18,27 @@ class CertificateManager {
             key: certificateData.key,
             passphrase: certificateData.passphrase,
             createdAt: new Date().toISOString(),
-            expiresAt: this.extractExpirationDate(certificateData.cert)
+            expiresAt: certificateData.cert ? this.extractExpirationDate(certificateData.cert) : null
         };
 
-        // Validate certificate before storing
-        const validation = await this.validateCertificate(cert);
-        if (!validation.valid) {
-            throw new Error(`Invalid certificate: ${validation.error}`);
+        // Validate certificate if provided
+        if (certificateData.cert) {
+            const validation = await this.validateCertificate(cert);
+            if (!validation.valid) {
+                throw new Error(`Invalid certificate: ${validation.error}`);
+            }
+        }
+
+        // Validate key format if provided
+        if (certificateData.key) {
+            try {
+                // Basic validation to ensure it's a valid key format
+                if (!certificateData.key.includes('-----BEGIN') || !certificateData.key.includes('PRIVATE KEY-----')) {
+                    throw new Error('Invalid private key format');
+                }
+            } catch (error) {
+                throw new Error(`Invalid private key: ${error.message}`);
+            }
         }
 
         this.certificates.set(cert.id, cert);
@@ -283,3 +297,4 @@ class CertificateManager {
 }
 
 module.exports = CertificateManager;
+
