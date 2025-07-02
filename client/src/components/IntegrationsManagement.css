@@ -536,6 +536,157 @@
     border-color: var(--primary-color);
 }
 
+/* Configuration Note */
+.config-note {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 16px;
+    margin-bottom: 20px;
+    background: #e8f4fd;
+    border: 1px solid #b8daff;
+    border-radius: 8px;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.dark-theme .config-note {
+    background: #1a2332;
+    border-color: #2c3e50;
+    color: #e1e8ed;
+}
+
+.note-icon {
+    font-size: 18px;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.note-content {
+    flex: 1;
+}
+
+.note-content strong {
+    color: var(--text-color);
+    font-weight: 600;
+}
+
+.note-content a {
+    color: #007bff;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.note-content a:hover {
+    text-decoration: underline;
+}
+
+/* Enhanced Smart Setup Styling for Different Integration Types */
+.config-note[data-integration="teams"] {
+    background: linear-gradient(135deg, #f3f2ff 0%, #e5e3ff 100%);
+    border-color: #6264a7;
+}
+
+.dark-theme .config-note[data-integration="teams"] {
+    background: linear-gradient(135deg, #1a1a2e 0%, #252547 100%);
+    border-color: #6264a7;
+}
+
+.config-note[data-integration="discord"] {
+    background: linear-gradient(135deg, #f7f7fe 0%, #ededff 100%);
+    border-color: #5865f2;
+}
+
+.dark-theme .config-note[data-integration="discord"] {
+    background: linear-gradient(135deg, #1e1f2e 0%, #2c2d42 100%);
+    border-color: #5865f2;
+}
+
+.config-note[data-integration="slack"] {
+    background: linear-gradient(135deg, #f8fffe 0%, #eafff8 100%);
+    border-color: #4a154b;
+}
+
+.dark-theme .config-note[data-integration="slack"] {
+    background: linear-gradient(135deg, #1a2e1e 0%, #254725 100%);
+    border-color: #4a154b;
+}
+
+.config-note[data-integration="jira"] {
+    background: linear-gradient(135deg, #f4f8ff 0%, #e6f3ff 100%);
+    border-color: #0052cc;
+}
+
+.dark-theme .config-note[data-integration="jira"] {
+    background: linear-gradient(135deg, #1a2332 0%, #253347 100%);
+    border-color: #0052cc;
+}
+
+.config-note[data-integration="webhook"] {
+    background: linear-gradient(135deg, #f8fff8 0%, #e8ffe8 100%);
+    border-color: #4caf50;
+}
+
+.dark-theme .config-note[data-integration="webhook"] {
+    background: linear-gradient(135deg, #1e2e1e 0%, #254725 100%);
+    border-color: #4caf50;
+}
+
+/* Smart Setup Steps Styling */
+.config-note ol {
+    margin: 8px 0;
+    padding-left: 20px;
+}
+
+.config-note ol li {
+    margin: 6px 0;
+    line-height: 1.4;
+}
+
+.config-note ol li strong {
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+.config-note ul {
+    margin: 8px 0;
+    padding-left: 20px;
+}
+
+.config-note ul li {
+    margin: 4px 0;
+    line-height: 1.4;
+}
+
+.config-note code {
+    background: rgba(0, 0, 0, 0.1);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+    font-size: 13px;
+}
+
+.dark-theme .config-note code {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* Tip boxes within config notes */
+.config-note .tip-box {
+    margin-top: 8px;
+    padding: 8px;
+    border-radius: 4px;
+    font-size: 13px;
+}
+
+.config-note .security-box {
+    background: rgba(255, 193, 7, 0.1);
+    border-left: 3px solid #ffc107;
+}
+
+.dark-theme .config-note .security-box {
+    background: rgba(255, 193, 7, 0.15);
+}
+
 /* Animations */
 @keyframes spin {
     from {

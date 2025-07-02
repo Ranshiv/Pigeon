@@ -25,7 +25,7 @@ class EmailService {
             return null;
         }
 
-        return nodemailer.createTransporter(emailConfig);
+        return nodemailer.createTransport(emailConfig);
     }
 
     async sendMonitorAlert(alertData) {

@@ -4,6 +4,7 @@ const fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fet
 const Monitor = require('../../models/Monitor');
 const HealthCheck = require('../../models/HealthCheck');
 const EmailService = require('../EmailService');
+const IntegrationService = require('../IntegrationService');
 const { getIO } = require('../../utils/socket/socket-server');
 
 class MonitoringService {
@@ -11,6 +12,12 @@ class MonitoringService {
         this.activeJobs = new Map();
         this.isRunning = false;
         this.emailService = new EmailService();
+        this.integrationService = new IntegrationService();
+
+        // Rate limiting for alerts
+        this.alertRateLimit = new Map(); // integrationId -> { count, resetTime, lastAlert }
+        this.maxAlertsPerHour = 10;
+        this.alertCooldown = 5 * 60 * 1000; // 5 minutes cooldown between duplicate alerts
     }
 
     // Start the monitoring service
@@ -252,7 +259,7 @@ class MonitoringService {
         }
     }
 
-    // Check and send alerts
+    // Check and send alerts with rate limiting
     async checkAndSendAlerts(monitor, healthCheck) {
         try {
             const shouldAlert = this.shouldSendAlert(monitor, healthCheck);
@@ -279,6 +286,9 @@ class MonitoringService {
                     await this.sendSlackAlert(monitor.alertSettings.slackWebhook, alertData);
                 }
 
+                // Send integration alerts with rate limiting
+                await this.sendIntegrationAlerts(monitor, alertData);
+
                 // Mark alert as sent
                 await HealthCheck.findByIdAndUpdate(healthCheck._id || healthCheck.monitorId, {
                     alertSent: true
@@ -287,6 +297,91 @@ class MonitoringService {
         } catch (error) {
             console.error('Error sending alerts:', error);
         }
+    }
+
+    // Send alerts to configured integrations with rate limiting
+    async sendIntegrationAlerts(monitor, alertData) {
+        try {
+            // Get active integrations for the workspace
+            const Integration = require('../../models/Integration');
+            const integrations = await Integration.find({
+                workspaceId: monitor.workspaceId,
+                isActive: true,
+                'configuration.enabledEvents': {
+                    $in: [
+                        'monitor_down',
+                        'monitor_up',
+                        'monitor_degraded'
+                    ]
+                }
+            });
+
+            const alertPromises = integrations.map(async (integration) => {
+                // Check rate limits
+                if (!this.canSendAlert(integration._id, alertData)) {
+                    console.log(`Rate limit exceeded for integration ${integration.name} (${integration.type})`);
+                    return;
+                }
+
+                try {
+                    await this.integrationService.sendAlertWithRetry(integration, alertData);
+                    this.updateAlertRateLimit(integration._id);
+                } catch (error) {
+                    console.error(`Failed to send alert via ${integration.type}:`, error);
+                }
+            });
+
+            await Promise.allSettled(alertPromises);
+        } catch (error) {
+            console.error('Error sending integration alerts:', error);
+        }
+    }
+
+    // Check if alert can be sent based on rate limits
+    canSendAlert(integrationId, alertData) {
+        const now = Date.now();
+        const rateInfo = this.alertRateLimit.get(integrationId.toString());
+
+        if (!rateInfo) {
+            return true; // No previous alerts, allow
+        }
+
+        // Reset hourly counter if needed
+        if (now > rateInfo.resetTime) {
+            rateInfo.count = 0;
+            rateInfo.resetTime = now + (60 * 60 * 1000); // Reset in 1 hour
+        }
+
+        // Check hourly limit
+        if (rateInfo.count >= this.maxAlertsPerHour) {
+            return false;
+        }
+
+        // Check cooldown for duplicate alerts
+        if (rateInfo.lastAlert &&
+            (now - rateInfo.lastAlert) < this.alertCooldown &&
+            rateInfo.lastAlertType === alertData.alertType) {
+            return false;
+        }
+
+        return true;
+    }
+
+    // Update rate limit tracking
+    updateAlertRateLimit(integrationId) {
+        const now = Date.now();
+        const key = integrationId.toString();
+        const existing = this.alertRateLimit.get(key) || {
+            count: 0,
+            resetTime: now + (60 * 60 * 1000)
+        };
+
+        this.alertRateLimit.set(key, {
+            count: existing.count + 1,
+            resetTime: existing.resetTime,
+            lastAlert: now,
+            lastAlertType: 'monitor_alert'
+        });
     }
 
     // Determine if alert should be sent

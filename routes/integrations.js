@@ -79,6 +79,61 @@ router.post('/', ensureAuthenticated, async (req, res) => {
             workspaceId: workspace._id.toString()
         };
 
+        // Apply smart defaults for email integration
+        if (integrationData.type === 'email') {
+            const config = integrationData.configuration || {};
+
+            // Auto-fill missing email fields with user's email
+            if (!config.fromEmail && req.user.email) {
+                config.fromEmail = req.user.email;
+                console.log('Auto-filled fromEmail with user email:', req.user.email);
+            }
+
+            if (!config.smtpUser && req.user.email) {
+                config.smtpUser = req.user.email;
+                console.log('Auto-filled smtpUser with user email:', req.user.email);
+            }
+
+            // Auto-detect SMTP settings based on email provider
+            if (!config.smtpHost && req.user.email) {
+                if (req.user.email.includes('@gmail.com')) {
+                    config.smtpHost = 'smtp.gmail.com';
+                    console.log('Auto-detected Gmail, setting SMTP host to smtp.gmail.com');
+                } else if (req.user.email.includes('@outlook.com') || req.user.email.includes('@hotmail.com') || req.user.email.includes('@live.com')) {
+                    config.smtpHost = 'smtp-mail.outlook.com';
+                    console.log('Auto-detected Outlook, setting SMTP host to smtp-mail.outlook.com');
+                } else if (req.user.email.includes('@yahoo.com')) {
+                    config.smtpHost = 'smtp.mail.yahoo.com';
+                    console.log('Auto-detected Yahoo, setting SMTP host to smtp.mail.yahoo.com');
+                } else {
+                    // Default to Gmail for unknown providers
+                    config.smtpHost = 'smtp.gmail.com';
+                    console.log('Unknown provider, defaulting to Gmail SMTP settings');
+                }
+            }
+
+            // Set default SMTP port
+            if (!config.smtpPort) {
+                config.smtpPort = 587;
+            }
+
+            // Set default TLS
+            if (config.useTls === undefined) {
+                config.useTls = true;
+            }
+
+            integrationData.configuration = config;
+        }
+
+        // Log integration data for debugging
+        console.log('Creating integration:', {
+            type: integrationData.type,
+            name: integrationData.name,
+            userId: integrationData.userId,
+            configKeys: integrationData.configuration ? Object.keys(integrationData.configuration) : 'none',
+            autoFilled: integrationData.type === 'email' ? 'email fields auto-detected' : 'none'
+        });
+
         const integration = new Integration(integrationData);
         await integration.save();
 
@@ -157,7 +212,8 @@ router.post('/:id/test', ensureAuthenticated, async (req, res) => {
             monitor: {
                 _id: 'test',
                 name: 'Test Monitor',
-                url: 'https://example.com'
+                url: 'https://example.com',
+                userId: req.user.id // Add the real user ID for email testing
             },
             healthCheck: {
                 status: 'failure',
@@ -169,7 +225,8 @@ router.post('/:id/test', ensureAuthenticated, async (req, res) => {
         };
 
         // Send test alert
-        await IntegrationService.sendAlert(integration, testAlertData);
+        const integrationService = new IntegrationService();
+        await integrationService.sendAlert(integration, testAlertData);
 
         res.json({ message: 'Test alert sent successfully' });
     } catch (error) {
