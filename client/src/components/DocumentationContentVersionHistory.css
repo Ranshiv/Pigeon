@@ -267,7 +267,7 @@
 }
 
 [data-theme="dark"] .versions-list {
-  background-color: var(--dark-background-color, #1a202c);
+  background-color: var(--dark-background-color, #1e1e20);
   border-color: var(--dark-border-color, #4a5568);
 }
 

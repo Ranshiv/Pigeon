@@ -23,6 +23,10 @@ const teamsRoutes = require('./teams');
 const oauthRoutes = require('./oauth');
 const certificatesRoutes = require('./certificates');
 
+// Import API prototyping and versioning routes
+const apiVersionsRoutes = require('./apiVersions');
+const mockServersRoutes = require('./mockServers');
+
 // Register routes with their base paths
 router.use('/auth', authRoutes);
 router.use('/collections', collectionsRoutes);
@@ -43,5 +47,9 @@ router.use('/teams', teamsRoutes);
 // Register authentication and certificate management routes
 router.use('/oauth', oauthRoutes);
 router.use('/certificates', certificatesRoutes);
+
+// Register API prototyping and versioning routes
+router.use('/api-versions', apiVersionsRoutes);
+router.use('/mock-servers', mockServersRoutes);
 
 module.exports = router;

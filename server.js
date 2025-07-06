@@ -399,16 +399,52 @@ app.delete('/api/cli-test/items/:id', (req, res) => {
     res.status(204).send();
 });
 
-// --- Add the proxy endpoint for making external API requests ---
+// --- Add the proxy endpoint for making external API requests and mock server support ---
 app.post('/api/proxy', async (req, res) => {
     try {
-        const { url, method, headers, body, timeout } = req.body;
+        const { url, method, headers, body, timeout, mockServerId } = req.body;
 
         if (!url) {
             return res.status(400).json({
                 error: true,
                 message: 'URL is required'
             });
+        }
+
+        // Check if this is a mock server request
+        if (mockServerId) {
+            try {
+                const MockServerService = require('./services/MockServerService');
+
+                // Extract path from URL
+                const urlObj = new URL(url);
+                const path = urlObj.pathname;
+
+                const mockResponse = await MockServerService.handleMockRequest(
+                    mockServerId,
+                    path,
+                    method || 'GET',
+                    urlObj.searchParams,
+                    body,
+                    headers || {}
+                );
+
+                return res.json({
+                    status: mockResponse.status,
+                    statusText: 'OK',
+                    headers: mockResponse.headers,
+                    body: mockResponse.body,
+                    size: JSON.stringify(mockResponse.body).length,
+                    isMock: true
+                });
+            } catch (mockError) {
+                console.error('Mock server error:', mockError);
+                return res.status(500).json({
+                    error: true,
+                    message: `Mock server error: ${mockError.message}`,
+                    isMock: true
+                });
+            }
         }
 
         console.log(`Proxy request: ${method || 'GET'} ${url}`);

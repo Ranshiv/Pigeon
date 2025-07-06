@@ -1,0 +1,452 @@
+/* client/src/components/MockServerManager.css */
+
+.mock-server-manager {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 20px;
+    margin-top: 16px;
+}
+
+.mock-server-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid var(--border-color, #e0e0e0);
+}
+
+.header-info h3 {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-primary, #333);
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.header-info p {
+    margin: 5px 0 0 0;
+    color: var(--text-secondary, #666);
+    font-size: 13px;
+}
+
+.create-mock-btn {
+    background: var(--primary-color, #ff6c37);
+    color: white;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 500;
+    font-size: 12px;
+    transition: all 0.2s;
+}
+
+.create-mock-btn:hover {
+    background: var(--primary-hover, #e55a2b);
+    transform: translateY(-1px);
+}
+
+.create-mock-form {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 25px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.form-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.form-header h4 {
+    margin: 0;
+    color: #1a202c;
+}
+
+.header-actions {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.close-btn {
+    background: var(--hover-bg, #e2e8f0);
+    color: var(--text-secondary, #666);
+    border: 1px solid var(--border-color, #e0e0e0);
+    padding: 8px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 500;
+    font-size: 12px;
+    transition: all 0.2s;
+}
+
+.close-btn:hover {
+    background: var(--hover-bg, #d1d5db);
+    color: var(--text-color, #333);
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
+    color: #374151;
+    font-size: 13px;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    font-size: 13px;
+    transition: border-color 0.2s;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: #10b981;
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+}
+
+.form-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid #e2e8f0;
+}
+
+.form-actions button {
+    padding: 8px 16px;
+    border-radius: 4px;
+    border: 1px solid;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 13px;
+    transition: all 0.2s;
+}
+
+.form-actions button[type="button"] {
+    background: white;
+    color: #64748b;
+    border-color: #d1d5db;
+}
+
+.form-actions button[type="submit"],
+.form-actions button:not([type="button"]) {
+    background: #10b981;
+    color: white;
+    border-color: #10b981;
+}
+
+.form-actions button:hover {
+    transform: translateY(-1px);
+}
+
+.empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: #64748b;
+}
+
+.empty-state h4 {
+    margin: 15px 0 10px 0;
+    color: #374151;
+}
+
+.mock-servers-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.mock-server-card {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 20px;
+    transition: all 0.2s;
+}
+
+.mock-server-card:hover {
+    border-color: #10b981;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.server-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 20px;
+}
+
+.server-info h4 {
+    margin: 0 0 5px 0;
+    color: #1a202c;
+    font-size: 16px;
+}
+
+.server-info p {
+    margin: 0 0 10px 0;
+    color: #64748b;
+    font-size: 14px;
+}
+
+.server-meta {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    font-size: 12px;
+}
+
+.server-meta span {
+    color: #64748b;
+}
+
+.status {
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-weight: 500;
+}
+
+.status.active {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.status.inactive {
+    background: #fef2f2;
+    color: #dc2626;
+}
+
+.server-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.action-btn {
+    padding: 6px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    background: white;
+    color: #374151;
+    cursor: pointer;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    transition: all 0.2s;
+    font-weight: 500;
+}
+
+.action-btn:hover {
+    border-color: #10b981;
+    color: #10b981;
+}
+
+.action-btn.delete:hover {
+    border-color: #ef4444;
+    color: #ef4444;
+}
+
+.action-btn.small {
+    padding: 4px 8px;
+    font-size: 11px;
+}
+
+.endpoints-section {
+    border-top: 1px solid #e2e8f0;
+    padding-top: 15px;
+}
+
+.endpoints-section h5 {
+    margin: 0 0 10px 0;
+    color: #1a202c;
+    font-size: 14px;
+}
+
+.no-endpoints {
+    color: #64748b;
+    font-style: italic;
+    font-size: 13px;
+}
+
+.endpoints-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.endpoint-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    background: #f8fafc;
+    border-radius: 4px;
+    border: 1px solid #e2e8f0;
+}
+
+.endpoint-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 12px;
+}
+
+.method {
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-weight: bold;
+    color: white;
+    min-width: 45px;
+    text-align: center;
+}
+
+.method.get {
+    background: #10b981;
+}
+
+.method.post {
+    background: #3b82f6;
+}
+
+.method.put {
+    background: #f59e0b;
+}
+
+.method.delete {
+    background: #ef4444;
+}
+
+.method.patch {
+    background: #8b5cf6;
+}
+
+.path {
+    font-family: monospace;
+    color: #374151;
+    font-weight: 500;
+}
+
+.endpoint-info span:not(.method):not(.path) {
+    color: #64748b;
+}
+
+.delay {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+}
+
+.endpoint-actions {
+    display: flex;
+    gap: 5px;
+}
+
+.endpoint-form {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    padding: 15px;
+    margin-top: 15px;
+}
+
+.endpoint-form h5 {
+    margin: 0 0 15px 0;
+    color: #1a202c;
+    font-size: 14px;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 100px 1fr 80px;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.mock-server-loading,
+.mock-server-error {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 200px;
+    color: #64748b;
+}
+
+.spinner {
+    width: 30px;
+    height: 30px;
+    border: 3px solid #e5e7eb;
+    border-top: 3px solid #10b981;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 10px;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.mock-server-error h4 {
+    color: #ef4444;
+    margin-bottom: 5px;
+}
+
+@media (max-width: 768px) {
+    .mock-server-header {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .server-header {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+
+    .endpoint-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .endpoint-info {
+        flex-wrap: wrap;
+    }
+}

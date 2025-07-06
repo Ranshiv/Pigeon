@@ -8,6 +8,14 @@
 			"label": "Start React Client",
 			"problemMatcher": [],
 			"type": "shell"
+		},
+		{
+			"command": "node server.js",
+			"group": "build",
+			"isBackground": true,
+			"label": "Start Pigeon Server",
+			"problemMatcher": [],
+			"type": "shell"
 		}
 	]
 }

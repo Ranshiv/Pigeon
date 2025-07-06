@@ -1,12 +1,12 @@
 // client/src/components/DocumentationManager.js
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { FiBook, FiCode, FiDownload, FiUpload, FiSettings, FiGlobe, FiClock, FiChevronLeft, FiEdit, FiEye, FiFileText, FiHistory } from 'react-icons/fi';
+import { FiBook, FiDownload, FiUpload, FiSettings, FiGlobe, FiClock, FiChevronLeft, FiEdit, FiFileText, FiGitBranch } from 'react-icons/fi';
 import DocumentationEditor from './DocumentationEditor';
 import DocumentationViewer from './DocumentationViewer';
 import DocumentationSettingsVersionHistory from './DocumentationSettingsVersionHistory';
 import DocumentationContentVersionHistory from './DocumentationContentVersionHistory';
-import VersionControlService from '../services/VersionControlService';
+import ApiVersionManager from './ApiVersionManager';
 import './DocumentationManager.css';
 
 const DocumentationManager = () => {
@@ -16,7 +16,7 @@ const DocumentationManager = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
     const [isSaving, setIsSaving] = useState(false);
-    const [view, setView] = useState('edit'); // 'edit', 'view', 'swagger', 'settings', 'history'
+    const [view, setView] = useState('edit'); // 'edit', 'view', 'swagger', 'settings', 'history', 'api-versions'
     const [currentSettings, setCurrentSettings] = useState(null);
     const [originalSettings, setOriginalSettings] = useState(null);
     const [settingsChanged, setSettingsChanged] = useState(false);
@@ -35,84 +35,6 @@ const DocumentationManager = () => {
             // and forces a re-render of the editor component
         }
     }, [view, documentation, documentation?._timestamp]);
-
-    // Define the switchToEditMode function to handle Edit button clicks
-    const switchToEditMode = async () => {
-        console.log('Switching to edit mode with documentation:', documentation);
-
-        // First clear the current documentation to force a clean re-render
-        setDocumentation(null);
-
-        // Set a loading state to show feedback
-        setIsLoading(true);
-
-        try {
-            console.log('Re-fetching documentation from server for edit mode');
-            const response = await fetch(`/collections/${collectionId}/documentation`, {
-                credentials: 'include'
-            });
-
-            if (response.ok) {
-                const freshDocData = await response.json();
-                console.log('Fresh documentation data received:', freshDocData);
-
-                // Create a complete document with all required fields
-                const updatedDoc = {
-                    ...freshDocData,
-                    title: freshDocData.title || (collection?.name ? `${collection.name} Documentation` : ''),
-                    content: freshDocData.content || '',
-                    collectionId: collectionId,
-                    isNew: false,
-                    // Add timestamp to ensure React recognizes this as a new object
-                    _timestamp: new Date().getTime()
-                };
-
-                // Set the documentation state with the fresh data
-                setDocumentation(updatedDoc);
-                console.log('Updated documentation for edit mode:', updatedDoc);
-
-                // Once documentation is set, switch to edit view
-                setTimeout(() => {
-                    setView('edit');
-                    console.log('View switched to edit mode');
-                }, 50);
-            } else {
-                console.error('Failed to refresh documentation data');
-                // Fall back to using the current documentation data
-                setDocumentation({
-                    ...(documentation || {}),
-                    isNew: false,
-                    _timestamp: new Date().getTime()
-                });
-                setView('edit');
-            }
-        } catch (err) {
-            console.error('Error refreshing documentation:', err);
-            // Fall back to using the current documentation data
-            setDocumentation({
-                ...(documentation || {}),
-                isNew: false,
-                _timestamp: new Date().getTime()
-            });
-            setView('edit');
-        } finally {
-            setTimeout(() => setIsLoading(false), 100);
-        }
-    };
-
-    // Define the switchToViewMode function to handle smooth transitions to view mode
-    const switchToViewMode = () => {
-        console.log('Switching to view mode with documentation:', documentation);
-
-        // Set loading state for visual feedback
-        setIsLoading(true);
-
-        // Brief timeout to allow UI to update before showing the view
-        setTimeout(() => {
-            setView('view');
-            setIsLoading(false);
-        }, 100);
-    };
 
     // Special effect to handle view mode transitions
     useEffect(() => {
@@ -644,6 +566,20 @@ const DocumentationManager = () => {
                                 throw new Error('Invalid OpenAPI/Swagger specification');
                             }
 
+                            // Ask user for import options
+                            const createApiVersion = window.confirm(
+                                'Would you like to create an API version from this OpenAPI specification?\n\n' +
+                                'This will create a new API version that can be used for versioning and mock server features.'
+                            );
+
+                            let createMockServer = false;
+                            if (createApiVersion) {
+                                createMockServer = window.confirm(
+                                    'Would you also like to create a mock server with endpoints from this OpenAPI spec?\n\n' +
+                                    'This will automatically generate mock endpoints based on the API specification.'
+                                );
+                            }
+
                             // Generate documentation from OpenAPI spec
                             let docContent = `# ${specData.info?.title || 'API Documentation'}\n\n`;
 
@@ -743,11 +679,14 @@ const DocumentationManager = () => {
                                 });
                             }
 
-                            // Create new documentation object
+                            // Create new documentation object with enhanced data
                             const newDocData = {
                                 title: `${specData.info?.title || collection?.name} Documentation`,
                                 content: docContent,
-                                importedFrom: 'openapi'
+                                importedFrom: 'openapi',
+                                openApiSpec: specData,
+                                createApiVersion: createApiVersion,
+                                createMockServer: createMockServer
                             };
 
                             // Use the specific import endpoint for OpenAPI/Swagger
@@ -769,13 +708,28 @@ const DocumentationManager = () => {
                                 throw new Error(`Failed to import documentation: ${importResponse.status}${errorText ? ' - ' + errorText : ''}`);
                             }
 
-                            const savedDoc = await importResponse.json();
-                            console.log("Documentation imported successfully:", savedDoc);
+                            const savedData = await importResponse.json();
+                            console.log("Documentation imported successfully:", savedData);
+
+                            // Extract documentation from response
+                            const savedDoc = savedData.documentation || savedData;
                             setDocumentation(savedDoc);
                             setIsSaving(false);
 
+                            // Build success message
+                            let successMessage = 'OpenAPI documentation imported successfully!';
+                            if (savedData.apiVersion) {
+                                successMessage += `\n\nAPI Version "${savedData.apiVersion.version}" created successfully.`;
+                            }
+                            if (savedData.mockServer) {
+                                successMessage += `\n\nMock server "${savedData.mockServer.name}" created with ${savedData.mockServer.endpoints?.length || 0} endpoints.`;
+                            }
+                            if (savedData.warnings && savedData.warnings.length > 0) {
+                                successMessage += `\n\nWarnings:\n${savedData.warnings.join('\n')}`;
+                            }
+
                             // Show success message
-                            alert('OpenAPI documentation imported successfully');
+                            alert(successMessage);
 
                             // Switch to view mode to see the imported documentation
                             setView('view');
@@ -1016,6 +970,12 @@ const DocumentationManager = () => {
                     >
                         <FiSettings /> Settings
                     </button>
+                    <button
+                        className={`action-btn ${view === 'api-versions' ? 'active' : ''}`}
+                        onClick={() => setView(view === 'api-versions' ? 'edit' : 'api-versions')}
+                    >
+                        <FiGitBranch /> API Versions
+                    </button>
                 </div>
             </div>
 
@@ -1225,6 +1185,13 @@ const DocumentationManager = () => {
                             onSettingsRestore={handleSettingsRestore}
                         />
                     </div>
+                )}
+
+                {view === 'api-versions' && (
+                    <ApiVersionManager
+                        collectionId={collectionId}
+                        collection={collection}
+                    />
                 )}
 
                 {view === 'swagger' && documentation && (

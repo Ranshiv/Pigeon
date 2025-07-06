@@ -4,6 +4,8 @@ const router = express.Router();
 const { ObjectId } = require('mongodb');
 const { ensureAuthenticated, authenticateJWT } = require('../middleware/auth');
 const { getDb } = require('../config/db');
+const ApiVersioningService = require('../services/ApiVersioningService');
+const MockServerService = require('../services/MockServerService');
 
 // In-memory store for backward compatibility
 const collectionsStore = {};
@@ -1927,7 +1929,7 @@ router.post('/:id/documentation/import/openapi', authenticateJWT, async (req, re
     try {
         const collectionId = req.params.id;
         const userId = req.user.id;
-        const { title, content, importedFrom } = req.body;
+        const { title, content, importedFrom, openApiSpec, createApiVersion, createMockServer } = req.body;
         const db = getDb();
 
         if (!content) {
@@ -1984,7 +1986,64 @@ router.post('/:id/documentation/import/openapi', authenticateJWT, async (req, re
             docData._id = result.insertedId.toString();
         }
 
-        res.status(201).json(docData);
+        let responseData = { documentation: docData };
+
+        // Optional: Create API version from OpenAPI spec
+        if (createApiVersion && openApiSpec) {
+            try {
+                const versionNumber = openApiSpec.info?.version || '1.0.0';
+                const apiVersionData = {
+                    collectionId: collectionId,
+                    version: versionNumber,
+                    description: `API version imported from OpenAPI spec: ${openApiSpec.info?.title || 'Unknown'}`,
+                    specification: openApiSpec,
+                    isActive: true,
+                    changelog: `Imported from OpenAPI specification`,
+                    createdBy: userId
+                };
+
+                const apiVersion = await ApiVersioningService.createVersion(apiVersionData);
+                responseData.apiVersion = apiVersion;
+
+                // Optional: Create mock server for the API version
+                if (createMockServer) {
+                    const mockServerData = {
+                        collectionId: collectionId,
+                        versionId: apiVersion._id,
+                        name: `Mock Server for ${openApiSpec.info?.title || collection.name} v${versionNumber}`,
+                        description: `Mock server generated from OpenAPI spec`,
+                        baseUrl: `http://localhost:3001/mock/${apiVersion._id}`,
+                        mockEndpoints: []
+                    };
+
+                    // Generate mock endpoints from OpenAPI paths
+                    if (openApiSpec.paths) {
+                        Object.entries(openApiSpec.paths).forEach(([path, methods]) => {
+                            Object.entries(methods).forEach(([method, operation]) => {
+                                const endpoint = {
+                                    method: method.toUpperCase(),
+                                    path: path,
+                                    responseCode: 200,
+                                    responseBody: MockServerService.generateMockResponse(operation),
+                                    headers: { 'Content-Type': 'application/json' },
+                                    description: operation.summary || operation.description || `${method.toUpperCase()} ${path}`
+                                };
+                                mockServerData.mockEndpoints.push(endpoint);
+                            });
+                        });
+                    }
+
+                    const mockServer = await MockServerService.createMockServer(mockServerData, userId);
+                    responseData.mockServer = mockServer;
+                }
+            } catch (versionError) {
+                console.error('Error creating API version or mock server:', versionError);
+                // Don't fail the entire import if version/mock creation fails
+                responseData.warnings = [`Failed to create API version or mock server: ${versionError.message}`];
+            }
+        }
+
+        res.status(201).json(responseData);
     } catch (err) {
         console.error('Error importing OpenAPI documentation:', err);
         res.status(500).json({ message: 'Error importing OpenAPI documentation' });
