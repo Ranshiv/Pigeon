@@ -1,13 +1,40 @@
 // client/src/components/DocumentationManager.js
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { FiBook, FiDownload, FiUpload, FiSettings, FiGlobe, FiClock, FiChevronLeft, FiEdit, FiFileText, FiGitBranch } from 'react-icons/fi';
+import { FiBook, FiDownload, FiUpload, FiSettings, FiGlobe, FiClock, FiChevronLeft, FiEdit, FiFileText, FiGitBranch, FiGrid } from 'react-icons/fi';
 import DocumentationEditor from './DocumentationEditor';
 import DocumentationViewer from './DocumentationViewer';
 import DocumentationSettingsVersionHistory from './DocumentationSettingsVersionHistory';
 import DocumentationContentVersionHistory from './DocumentationContentVersionHistory';
 import ApiVersionManager from './ApiVersionManager';
+import VisualApiDesigner from './VisualApiDesigner/VisualApiDesigner';
 import './DocumentationManager.css';
+
+// Helper function to safely parse JSON
+const safeJSONParse = (data, fallback = null) => {
+    if (!data || typeof data !== 'string') {
+        return fallback;
+    }
+
+    try {
+        return JSON.parse(data);
+    } catch (error) {
+        console.error('JSON Parse Error:', error);
+        console.error('Invalid data:', data);
+        return fallback;
+    }
+};
+
+// Helper to validate if a string is valid JSON
+const isValidJSON = (str) => {
+    if (!str || typeof str !== 'string') return false;
+    try {
+        JSON.parse(str);
+        return true;
+    } catch (e) {
+        return false;
+    }
+};
 
 const DocumentationManager = () => {
     const { collectionId } = useParams();
@@ -16,7 +43,7 @@ const DocumentationManager = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
     const [isSaving, setIsSaving] = useState(false);
-    const [view, setView] = useState('edit'); // 'edit', 'view', 'swagger', 'settings', 'history', 'api-versions'
+    const [view, setView] = useState('edit'); // 'edit', 'view', 'swagger', 'settings', 'history', 'api-versions', 'visual-designer'
     const [currentSettings, setCurrentSettings] = useState(null);
     const [originalSettings, setOriginalSettings] = useState(null);
     const [settingsChanged, setSettingsChanged] = useState(false);
@@ -77,6 +104,17 @@ const DocumentationManager = () => {
                         const documentationData = await documentationResponse.json();
                         // Only set documentation with content if it exists and is non-empty
                         console.log('Documentation data received:', documentationData);
+                        console.log('Documentation content type:', typeof documentationData?.content);
+                        console.log('Documentation content value:', documentationData?.content);
+
+                        // Validate content if it exists
+                        if (documentationData?.content && typeof documentationData.content === 'string') {
+                            if (!isValidJSON(documentationData.content) && documentationData.content.trim() !== '') {
+                                console.warn('Documentation content is not valid JSON:', documentationData.content);
+                                // Clean the content or provide a fallback
+                                documentationData.content = '';
+                            }
+                        }
 
                         if (documentationData &&
                             ((documentationData.content && documentationData.content.trim() !== '') ||
@@ -558,8 +596,11 @@ const DocumentationManager = () => {
                         const content = event.target.result;
 
                         try {
-                            // Parse JSON content
-                            const specData = JSON.parse(content);
+                            // Parse JSON content with error handling
+                            const specData = safeJSONParse(content, null);
+                            if (!specData) {
+                                throw new Error('Invalid JSON format in the uploaded file');
+                            }
 
                             // Basic validation for OpenAPI spec
                             if (!specData.openapi && !specData.swagger) {
@@ -976,6 +1017,12 @@ const DocumentationManager = () => {
                     >
                         <FiGitBranch /> API Versions
                     </button>
+                    <button
+                        className={`action-btn ${view === 'visual-designer' ? 'active' : ''}`}
+                        onClick={() => setView(view === 'visual-designer' ? 'edit' : 'visual-designer')}
+                    >
+                        <FiGrid /> Visual Designer
+                    </button>
                 </div>
             </div>
 
@@ -1210,6 +1257,29 @@ const DocumentationManager = () => {
                             onClose={() => setView('settings')}
                         />
                     </div>
+                )}
+
+                {view === 'visual-designer' && (
+                    <VisualApiDesigner
+                        collectionId={collectionId}
+                        onSpecUpdate={(spec) => {
+                            // Update the documentation with the generated OpenAPI spec
+                            setDocumentation(prev => ({
+                                ...prev,
+                                content: JSON.stringify(spec, null, 2),
+                                contentType: 'openapi'
+                            }));
+                        }}
+                        initialSpec={(() => {
+                            if (!documentation?.content) return null;
+
+                            if (typeof documentation.content === 'string') {
+                                return safeJSONParse(documentation.content, null);
+                            }
+
+                            return documentation.content;
+                        })()}
+                    />
                 )}
             </div>
         </div>

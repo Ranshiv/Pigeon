@@ -102,3 +102,6 @@ Thumbs.db
 *.pkg
 *.deb
 *.rpm
+
+#md files
+PENDING_FEATURES_COMPREHENSIVE_GUIDE.md
