@@ -1,9 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import './RequestForm.css';
 import ResponseDisplay from './ResponseDisplay';
 import VariableEditor from './VariableEditor';
 import UnifiedVariableViewer from './UnifiedVariableViewer';
 import { interpolateRequest, resolveVariables, validateVariables, extractVariables } from '../utils/variableInterpolation';
+import { PostRequestScriptService } from './VisualApiDesigner/services/PostRequestScriptService';
+import { VisualizationDebugger } from './VisualApiDesigner/services/VisualizationDebugger';
+import { ExportService } from './VisualApiDesigner/services/ExportService';
+import { AuthVisualizationService } from './VisualApiDesigner/services/AuthVisualizationService';
+import { NetworkFlowService } from './VisualApiDesigner/services/NetworkFlowService';
 
 // Helper function to get the correct API base URL
 const getApiUrl = (path) => {
@@ -77,6 +82,22 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
     const [collectionVariables] = useState(collection?.variables || []);
     const [globalVariables, setGlobalVariables] = useState({});
     const [variableValidation, setVariableValidation] = useState({ isValid: true, missingVariables: [] });
+
+    // Advanced features state
+    const [showVisualizationDebugger, setShowVisualizationDebugger] = useState(false);
+    const [postRequestScriptResults, setPostRequestScriptResults] = useState(null);
+    const [authFlowVisualization, setAuthFlowVisualization] = useState(null);
+    const [networkFlowData, setNetworkFlowData] = useState(null);
+    const [debugConsoleOutput, setDebugConsoleOutput] = useState([]);
+    const [exportOptions, setExportOptions] = useState({
+        format: 'png',
+        quality: 1.0,
+        includeMetadata: true
+    });
+    const [exportPreview, setExportPreview] = useState(null);
+
+    // Debug console state
+    const [activeDebugTab, setActiveDebugTab] = useState('console');
 
     // Utility function to get CSS classes for inputs with variables
     const getVariableInputClass = (value) => {
@@ -530,7 +551,6 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
         }
     };
 
-    // ...existing code...
     // Save button handler
     const handleSave = () => {
         // Build request object
@@ -684,6 +704,248 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
             updateUrlWithParams();
         }
     }, [params, url]);
+
+    // Initialize services
+    useEffect(() => {
+        PostRequestScriptService.initialize();
+        // Remove VisualizationDebugger.initialize() since we implement our own debug console
+        // VisualizationDebugger.initialize();
+        AuthVisualizationService.initialize();
+    }, []);
+
+    // Handle post-request script execution
+    const handlePostRequestScript = useCallback(async (response) => {
+        if (!tests.trim()) return;
+
+        try {
+            const result = await PostRequestScriptService.executePostRequestScript(
+                tests,
+                response,
+                {
+                    url,
+                    method,
+                    headers: headers.filter(h => h.enabled && h.key),
+                    body: bodyContent
+                },
+                resolvedVariables || {}
+            );
+
+            setPostRequestScriptResults(result);
+
+            // If visualizations were created, show them
+            if (result.visualizations && result.visualizations.length > 0) {
+                // Trigger visualization display
+                window.dispatchEvent(new CustomEvent('pigeon:showVisualizations', {
+                    detail: { visualizations: result.visualizations }
+                }));
+            }
+
+        } catch (error) {
+            console.error('Post-request script execution failed:', error);
+            setPostRequestScriptResults({
+                success: false,
+                errors: [error.message],
+                visualizations: []
+            });
+        }
+    }, [tests, url, method, headers, bodyContent, resolvedVariables]);
+
+    // Handle authentication flow visualization
+    const handleAuthFlowVisualization = useCallback(() => {
+        if (authConfig.type === 'No Auth') return;
+
+        try {
+            const containerId = 'auth-flow-container';
+            const flowType = authConfig.type.toLowerCase().replace(/\s+/g, '_');
+
+            const cy = AuthVisualizationService.createInteractiveAuthFlow(
+                containerId,
+                flowType,
+                authConfig
+            );
+
+            setAuthFlowVisualization(cy);
+        } catch (error) {
+            console.error('Auth flow visualization failed:', error);
+        }
+    }, [authConfig]);
+
+    // Handle export functionality
+    const handleExport = useCallback(async (element, format) => {
+        try {
+            const result = await ExportService.exportVisualization(element, format, exportOptions);
+            console.log('Export completed:', result);
+        } catch (error) {
+            console.error('Export failed:', error);
+        }
+    }, [exportOptions]);
+
+    // Generate export preview content
+    const generateExportPreview = useCallback(async (format) => {
+        try {
+            const requestData = {
+                method,
+                url,
+                headers: headers.filter(h => h.enabled && h.key && h.value),
+                body: bodyType !== 'none' ? bodyContent : null,
+                name: requestName
+            };
+
+            let preview = null;
+
+            switch (format) {
+                case 'postman':
+                    const postmanCollection = {
+                        info: {
+                            name: 'Pigeon API Collection',
+                            schema: 'https://schema.getpostman.com/json/collection/v2.1.0/collection.json'
+                        },
+                        item: [{
+                            name: requestData.name,
+                            request: {
+                                method: requestData.method,
+                                url: requestData.url,
+                                header: requestData.headers.map(h => ({
+                                    key: h.key,
+                                    value: h.value,
+                                    enabled: h.enabled !== false
+                                })),
+                                body: requestData.body ? {
+                                    mode: 'raw',
+                                    raw: requestData.body
+                                } : undefined
+                            }
+                        }]
+                    };
+                    preview = {
+                        title: 'Postman Collection',
+                        content: JSON.stringify(postmanCollection, null, 2),
+                        copyable: true
+                    };
+                    break;
+
+                case 'curl':
+                    let curlCommand = `curl -X ${requestData.method} "${requestData.url}"`;
+
+                    // Add headers
+                    requestData.headers.forEach(header => {
+                        if (header.key && header.value) {
+                            curlCommand += ` \\\n  -H "${header.key}: ${header.value}"`;
+                        }
+                    });
+
+                    // Add body
+                    if (requestData.body && requestData.body.trim()) {
+                        curlCommand += ` \\\n  -d '${requestData.body.replace(/'/g, `'"'"'`)}'`;
+                    }
+
+                    preview = {
+                        title: 'cURL Command',
+                        content: curlCommand,
+                        copyable: true
+                    };
+                    break;
+
+                case 'openapi':
+                    let urlObj;
+                    try {
+                        urlObj = new URL(requestData.url);
+                    } catch (error) {
+                        // Handle invalid URL
+                        preview = {
+                            title: 'OpenAPI Specification',
+                            content: 'Error: Invalid URL. Please provide a valid URL to generate OpenAPI spec.',
+                            copyable: false
+                        };
+                        break;
+                    }
+
+                    const path = urlObj.pathname;
+
+                    const openApiSpec = {
+                        openapi: '3.0.0',
+                        info: {
+                            title: 'API Documentation',
+                            version: '1.0.0'
+                        },
+                        servers: [{
+                            url: `${urlObj.protocol}//${urlObj.host}`
+                        }],
+                        paths: {
+                            [path]: {
+                                [requestData.method.toLowerCase()]: {
+                                    summary: `${requestData.method} ${path}`,
+                                    parameters: requestData.headers.map(h => ({
+                                        name: h.key,
+                                        in: 'header',
+                                        required: false,
+                                        schema: { type: 'string' }
+                                    })),
+                                    requestBody: requestData.body ? {
+                                        required: true,
+                                        content: {
+                                            'application/json': {
+                                                schema: { type: 'object' }
+                                            }
+                                        }
+                                    } : undefined,
+                                    responses: {
+                                        '200': {
+                                            description: 'Success',
+                                            content: {
+                                                'application/json': {
+                                                    schema: { type: 'object' }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    };
+
+                    preview = {
+                        title: 'OpenAPI Specification',
+                        content: JSON.stringify(openApiSpec, null, 2),
+                        copyable: true
+                    };
+                    break;
+
+                case 'share':
+                    const shareData = {
+                        method: requestData.method,
+                        url: requestData.url,
+                        headers: requestData.headers,
+                        body: requestData.body
+                    };
+
+                    const shareUrl = `${window.location.origin}/share?data=${encodeURIComponent(btoa(JSON.stringify(shareData)))}`;
+
+                    preview = {
+                        title: 'Shareable Link',
+                        content: shareUrl,
+                        copyable: true
+                    };
+                    break;
+
+                default:
+                    preview = {
+                        title: 'Unknown Format',
+                        content: 'Preview not available for this format',
+                        copyable: false
+                    };
+            }
+
+            setExportPreview(preview);
+        } catch (error) {
+            console.error('Export preview generation failed:', error);
+            setExportPreview({
+                title: 'Error',
+                content: `Failed to generate preview: ${error.message}`,
+                copyable: false
+            });
+        }
+    }, [method, url, headers, bodyType, bodyContent, requestName]);
 
     // Render tab content based on active tab
     const renderTabContent = () => {
@@ -945,13 +1207,81 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
                 ); case 'tests':
                 return (
                     <div className="script-section">
+                        <div className="script-header">
+                            <h4>Tests & Post-Request Scripts</h4>
+                            <div className="script-actions">
+                                <button
+                                    className="btn btn-small"
+                                    onClick={() => setShowVisualizationDebugger(!showVisualizationDebugger)}
+                                >
+                                    🔍 Debug Console
+                                </button>
+                                <button
+                                    className="btn btn-small"
+                                    onClick={() => {
+                                        const templates = PostRequestScriptService.getScriptTemplates();
+                                        // Show template selector modal
+                                        console.log('Available templates:', templates);
+                                    }}
+                                >
+                                    📋 Templates
+                                </button>
+                            </div>
+                        </div>
                         <textarea
                             className="script-editor"
                             value={tests}
                             onChange={(e) => setTests(e.target.value)}
-                            placeholder="// Write test script here (JavaScript)"
+                            placeholder="// Write test script here (JavaScript)
+// Examples:
+// pm.test('Status code is 200', function () {
+//     pm.response.to.have.status(200);
+// });
+
+// pm.visualizer.set(`
+//     <h3>Response Data</h3>
+//     <pre>{{json response}}</pre>
+// `, pm.response.json());"
                             spellCheck="false"
                         />
+
+                        {/* Post-request script results */}
+                        {postRequestScriptResults && (
+                            <div className="script-results">
+                                <h5>Script Results</h5>
+                                <div className={`result-status ${postRequestScriptResults.success ? 'success' : 'error'}`}>
+                                    {postRequestScriptResults.success ? '✅ Success' : '❌ Failed'}
+                                </div>
+
+                                {postRequestScriptResults.errors.length > 0 && (
+                                    <div className="script-errors">
+                                        <h6>Errors:</h6>
+                                        {postRequestScriptResults.errors.map((error, index) => (
+                                            <div key={index} className="error-item">{error}</div>
+                                        ))}
+                                    </div>
+                                )}
+
+                                {postRequestScriptResults.visualizations.length > 0 && (
+                                    <div className="script-visualizations">
+                                        <h6>Visualizations Created:</h6>
+                                        <div className="visualization-list">
+                                            {postRequestScriptResults.visualizations.map((viz, index) => (
+                                                <div key={index} className="visualization-item">
+                                                    <span>{viz.name || `Visualization ${index + 1}`}</span>
+                                                    <button
+                                                        className="btn btn-small"
+                                                        onClick={() => handleExport(viz, 'png')}
+                                                    >
+                                                        Export
+                                                    </button>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        )}
                     </div>
                 ); case 'variables':
                 return (
@@ -1050,6 +1380,8 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
             case 'authorization':
                 return (
                     <div className="auth-section">
+
+
                         <div className="auth-config">
                             <div className="auth-type-selector">
                                 <label htmlFor="auth-type">Authentication Type:</label>
@@ -1067,6 +1399,15 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
                                 </select>
                             </div>
 
+                            {/* Auth flow visualization container */}
+                            {authFlowVisualization && (
+                                <div className="auth-flow-container">
+                                    <h5>Authentication Flow</h5>
+                                    <div id="auth-flow-container" style={{ height: '400px', border: '1px solid #ddd', marginTop: '10px' }}></div>
+                                </div>
+                            )}
+
+                            {/* Existing auth configuration forms */}
                             {authConfig.type === 'Bearer Token' && (
                                 <div className="auth-form">
                                     <div className="form-group">
@@ -1604,6 +1945,715 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
                     </div>
                 );
 
+            case 'network-flow':
+                return (
+                    <div className="network-flow-section">
+                        <div className="network-flow-header">
+                            <div className="flow-title-section">
+                                <h4>Network Flow Visualization</h4>
+                                <p className="flow-subtitle">Visualize your request journey through the network</p>
+                            </div>
+                            <div className="flow-actions">
+                                <button
+                                    className="flow-btn primary"
+                                    onClick={async () => {
+                                        try {
+                                            // Initialize the NetworkFlowService first
+                                            await NetworkFlowService.initialize();
+
+                                            // Clear any existing content
+                                            const container = document.getElementById('network-flow-diagram');
+                                            if (container) {
+                                                container.innerHTML = '';
+                                            }
+
+                                            // Get current request details
+                                            const currentUrl = url;
+                                            const currentMethod = method;
+                                            const currentHeaders = {};
+
+                                            // Extract headers from header inputs
+                                            headers.forEach(header => {
+                                                if (header.enabled && header.key && header.value) {
+                                                    currentHeaders[header.key] = header.value;
+                                                }
+                                            });
+
+                                            // Create the flow diagram with request details
+                                            const flowData = await NetworkFlowService.createRealtimeFlow(
+                                                'network-flow-diagram',
+                                                {
+                                                    animate: true,
+                                                    requestUrl: currentUrl,
+                                                    requestMethod: currentMethod,
+                                                    headers: currentHeaders,
+                                                    requestBody: bodyContent
+                                                }
+                                            );
+
+                                            console.log('Flow diagram generated successfully:', flowData);
+                                            setNetworkFlowData(flowData);
+                                        } catch (error) {
+                                            console.error('Error generating flow:', error);
+                                            // Show error in the container
+                                            const container = document.getElementById('network-flow-diagram');
+                                            if (container) {
+                                                container.innerHTML = `
+                                                    <div class="flow-error-state">
+                                                        <div class="error-icon">⚠️</div>
+                                                        <h4>Error generating flow diagram</h4>
+                                                        <p>${error.message}</p>
+                                                        <p>Please check the console for more details.</p>
+                                                    </div>
+                                                `;
+                                            }
+                                        }
+                                    }}
+                                >
+                                    <span className="btn-icon">🔄</span>
+                                    Generate Flow
+                                </button>
+                                <button
+                                    className="flow-btn secondary"
+                                    onClick={async () => {
+                                        try {
+                                            // Initialize the NetworkFlowService first
+                                            await NetworkFlowService.initialize();
+
+                                            // Clear any existing content
+                                            const container = document.getElementById('network-flow-diagram');
+                                            if (container) {
+                                                container.innerHTML = '';
+                                            }
+
+                                            // Create API spec from current request
+                                            const apiSpec = {
+                                                paths: {
+                                                    [url || '/api/endpoint']: {
+                                                        [method.toLowerCase()]: {
+                                                            summary: `${method} ${url}`,
+                                                            responses: {
+                                                                '200': { description: 'Success' }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            };
+
+                                            // Generate topology
+                                            const topology = NetworkFlowService.generateNetworkTopology(apiSpec);
+                                            console.log('Network topology generated:', topology);
+
+                                            if (topology.nodes && topology.edges && topology.nodes.length > 0) {
+                                                // Create flow diagram
+                                                const flowDiagram = NetworkFlowService.createApiFlowDiagram(
+                                                    'network-flow-diagram',
+                                                    topology.nodes,
+                                                    topology.edges
+                                                );
+                                                setNetworkFlowData(flowDiagram);
+                                                console.log('Request flow visualization created successfully');
+                                            } else {
+                                                // Show no data message
+                                                const container = document.getElementById('network-flow-diagram');
+                                                if (container) {
+                                                    container.innerHTML = `
+                                                        <div class="flow-empty-state">
+                                                            <div class="empty-icon">📊</div>
+                                                            <h4>No topology data available</h4>
+                                                            <p>Try using the "Generate Flow" button instead.</p>
+                                                        </div>
+                                                    `;
+                                                }
+                                            }
+                                        } catch (error) {
+                                            console.error('Error visualizing request:', error);
+                                            // Show error in the container
+                                            const container = document.getElementById('network-flow-diagram');
+                                            if (container) {
+                                                container.innerHTML = `
+                                                    <div class="flow-error-state">
+                                                        <div class="error-icon">⚠️</div>
+                                                        <h4>Error visualizing request</h4>
+                                                        <p>${error.message}</p>
+                                                        <p>Please check the console for more details.</p>
+                                                    </div>
+                                                `;
+                                            }
+                                        }
+                                    }}
+                                >
+                                    <span className="btn-icon">📊</span>
+                                    Visualize Request
+                                </button>
+                            </div>
+                        </div>
+
+                        <div className="flow-content">
+                            <div className="flow-diagram-container">
+                                <div className="diagram-header">
+                                    <h5>Request Flow</h5>
+                                    <div className="diagram-controls">
+                                        <button
+                                            className="control-btn"
+                                            title="Zoom In"
+                                            onClick={() => {
+                                                const cy = NetworkFlowService.instances.get('network-flow-diagram');
+                                                if (cy) {
+                                                    const currentZoom = cy.zoom();
+                                                    cy.zoom(currentZoom * 1.2);
+                                                }
+                                            }}
+                                        >
+                                            <span>🔍</span>
+                                        </button>
+                                        <button
+                                            className="control-btn"
+                                            title="Fit to Screen"
+                                            onClick={() => {
+                                                const cy = NetworkFlowService.instances.get('network-flow-diagram');
+                                                if (cy) {
+                                                    cy.fit();
+                                                }
+                                            }}
+                                        >
+                                            <span>⛶</span>
+                                        </button>
+                                        <button
+                                            className="control-btn"
+                                            title="Reset"
+                                            onClick={() => {
+                                                const cy = NetworkFlowService.instances.get('network-flow-diagram');
+                                                if (cy) {
+                                                    cy.zoom(1);
+                                                    cy.center();
+                                                }
+                                            }}
+                                        >
+                                            <span>↺</span>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div id="network-flow-diagram" className="flow-diagram">
+                                    <div className="flow-empty-state">
+                                        <div className="empty-icon">🌐</div>
+                                        <h4>Ready to visualize</h4>
+                                        <p>Click "Generate Flow" to create a visual representation of your request flow</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="flow-details">
+                                <div className="details-header">
+                                    <h5>Flow Details</h5>
+                                    <div className="flow-status">
+                                        <span className="status-indicator ready"></span>
+                                        <span className="status-text">Ready</span>
+                                    </div>
+                                </div>
+                                <div className="flow-steps">
+                                    <div className="flow-step">
+                                        <div className="step-number">1</div>
+                                        <div className="step-content">
+                                            <h6>Request Preparation</h6>
+                                            <p>Validate headers and body</p>
+                                        </div>
+                                    </div>
+                                    <div className="flow-step">
+                                        <div className="step-number">2</div>
+                                        <div className="step-content">
+                                            <h6>DNS Resolution</h6>
+                                            <p>Resolve domain to IP address</p>
+                                        </div>
+                                    </div>
+                                    <div className="flow-step">
+                                        <div className="step-number">3</div>
+                                        <div className="step-content">
+                                            <h6>TCP Connection</h6>
+                                            <p>Establish connection to server</p>
+                                        </div>
+                                    </div>
+                                    <div className="flow-step">
+                                        <div className="step-number">4</div>
+                                        <div className="step-content">
+                                            <h6>HTTP Request</h6>
+                                            <p>Send request to endpoint</p>
+                                        </div>
+                                    </div>
+                                    <div className="flow-step">
+                                        <div className="step-number">5</div>
+                                        <div className="step-content">
+                                            <h6>Response Processing</h6>
+                                            <p>Parse and display response</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                );
+
+            case 'debug-console':
+                return (
+                    <div className="debug-console-section">
+                        <div className="debug-console-header">
+                            <div className="debug-title">
+                                <div className="debug-icon">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M20 4L3 11L10 13.5L12.5 20L20 4Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                    </svg>
+                                </div>
+                                <h4>Debug Console</h4>
+                                <div className="debug-status">
+                                    <span className="status-indicator"></span>
+                                    Ready
+                                </div>
+                            </div>
+                            <div className="debug-actions">
+                                <button
+                                    className="debug-btn debug-btn-primary"
+                                    onClick={() => {
+                                        try {
+                                            const debugSessionId = 'request-debug-' + Date.now();
+                                            console.log(`🔍 Debug session started for ${method} ${url}`, {
+                                                sessionId: debugSessionId,
+                                                method,
+                                                url,
+                                                headers: headers.filter(h => h.enabled),
+                                                body: bodyType !== 'none' ? bodyContent : null
+                                            });
+
+                                            // Try to use VisualizationDebugger if available, but don't fail if not
+                                            if (typeof VisualizationDebugger !== 'undefined' && VisualizationDebugger.startSession) {
+                                                VisualizationDebugger.startSession(
+                                                    debugSessionId,
+                                                    document.getElementById('network-flow-diagram'),
+                                                    { method, url, headers: headers.filter(h => h.enabled), body: bodyType !== 'none' ? bodyContent : null }
+                                                );
+                                                VisualizationDebugger.log(`Debug session started for ${method} ${url}`, 'info');
+                                            }
+                                        } catch (error) {
+                                            console.error('Error starting debug session:', error);
+                                        }
+                                    }}
+                                >
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <circle cx="11" cy="11" r="8" stroke="currentColor" strokeWidth="2" />
+                                        <path d="M21 21l-4.35-4.35" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                    </svg>
+                                    Debug Request
+                                </button>
+                                <button
+                                    className="debug-btn debug-btn-secondary"
+                                    onClick={() => {
+                                        try {
+                                            const performanceSessionId = 'performance-' + Date.now();
+                                            console.log('📊 Performance monitoring started', {
+                                                sessionId: performanceSessionId,
+                                                responseData: responseData
+                                            });
+
+                                            // Try to use VisualizationDebugger if available, but don't fail if not
+                                            if (typeof VisualizationDebugger !== 'undefined' && VisualizationDebugger.startPerformanceMonitoring) {
+                                                VisualizationDebugger.startPerformanceMonitoring(performanceSessionId);
+                                                VisualizationDebugger.log('Performance monitoring started', 'info', responseData);
+                                            }
+                                        } catch (error) {
+                                            console.error('Error starting performance monitoring:', error);
+                                        }
+                                    }}
+                                    disabled={!responseData}
+                                >
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M3 3v5h5M21 21v-5h-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                        <path d="M21 7a9 9 0 00-9-9 9.75 9.75 0 00-6.74 2.74L3 8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                        <path d="M3 17a9 9 0 009 9 9.75 9.75 0 006.74-2.74L21 16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                    </svg>
+                                    Analyze Performance
+                                </button>
+                                <button
+                                    className="debug-btn debug-btn-ghost"
+                                    onClick={() => {
+                                        console.clear();
+                                        console.log('Debug console cleared');
+                                    }}
+                                >
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m3 0v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6h14z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                    </svg>
+                                    Clear
+                                </button>
+                            </div>
+                        </div>
+
+                        <div className="debug-tabs">
+                            <button
+                                className={`debug-tab ${activeDebugTab === 'console' ? 'debug-tab-active' : ''}`}
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    setActiveDebugTab('console');
+                                }}
+                            >
+                                Console
+                            </button>
+                            <button
+                                className={`debug-tab ${activeDebugTab === 'network' ? 'debug-tab-active' : ''}`}
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    setActiveDebugTab('network');
+                                }}
+                            >
+                                Network
+                            </button>
+                            <button
+                                className={`debug-tab ${activeDebugTab === 'performance' ? 'debug-tab-active' : ''}`}
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    setActiveDebugTab('performance');
+                                }}
+                            >
+                                Performance
+                            </button>
+                            <button
+                                className={`debug-tab ${activeDebugTab === 'sources' ? 'debug-tab-active' : ''}`}
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    setActiveDebugTab('sources');
+                                }}
+                            >
+                                Sources
+                            </button>
+                        </div>
+
+                        <div className="debug-content">
+                            {activeDebugTab === 'console' && (
+                                <>
+                                    <div className="debug-output">
+                                        <div className="console-toolbar">
+                                            <div className="console-filters">
+                                                <button className="filter-btn filter-active">All</button>
+                                                <button className="filter-btn">Errors</button>
+                                                <button className="filter-btn">Warnings</button>
+                                                <button className="filter-btn">Info</button>
+                                                <button className="filter-btn">Debug</button>
+                                            </div>
+                                            <div className="console-controls">
+                                                <button className="control-btn" title="Settings">
+                                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                        <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="2" />
+                                                        <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z" stroke="currentColor" strokeWidth="2" />
+                                                    </svg>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div className="console-output">
+                                            <div className="console-entry console-entry-info">
+                                                <div className="console-timestamp">[{new Date().toLocaleTimeString()}]</div>
+                                                <div className="console-level">INFO</div>
+                                                <div className="console-message">Debug console initialized and ready</div>
+                                            </div>
+                                            <div className="console-entry console-entry-system">
+                                                <div className="console-timestamp">[{new Date().toLocaleTimeString()}]</div>
+                                                <div className="console-level">SYSTEM</div>
+                                                <div className="console-message">Use the debug actions above to analyze your request</div>
+                                            </div>
+                                            <div className="console-entry console-entry-debug">
+                                                <div className="console-timestamp">[{new Date().toLocaleTimeString()}]</div>
+                                                <div className="console-level">DEBUG</div>
+                                                <div className="console-message">Ready for {method} request to {url || 'undefined URL'}</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="debug-sidebar">
+                                        <div className="debug-info-panel">
+                                            <h5>Request Overview</h5>
+                                            <div className="info-grid">
+                                                <div className="info-item">
+                                                    <div className="info-label">Method</div>
+                                                    <div className="info-value method-badge method-{method.toLowerCase()}">{method}</div>
+                                                </div>
+                                                <div className="info-item">
+                                                    <div className="info-label">URL</div>
+                                                    <div className="info-value url-display">{url || 'No URL specified'}</div>
+                                                </div>
+                                                <div className="info-item">
+                                                    <div className="info-label">Headers</div>
+                                                    <div className="info-value">{headers.filter(h => h.enabled).length} active</div>
+                                                </div>
+                                                <div className="info-item">
+                                                    <div className="info-label">Body Type</div>
+                                                    <div className="info-value body-type-badge">{bodyType}</div>
+                                                </div>
+                                                <div className="info-item">
+                                                    <div className="info-label">Has Body</div>
+                                                    <div className="info-value">
+                                                        <span className={`status-badge ${bodyType !== 'none' && bodyContent ? 'status-yes' : 'status-no'}`}>
+                                                            {bodyType !== 'none' && bodyContent ? 'Yes' : 'No'}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </>
+                            )}
+
+                            {activeDebugTab === 'network' && (
+                                <div className="network-debug-content">
+                                    <div className="network-overview">
+                                        <h5>Network Analysis</h5>
+                                        <div className="network-info">
+                                            <div className="network-item">
+                                                <div className="network-label">Target URL</div>
+                                                <div className="network-value">{url || 'No URL specified'}</div>
+                                            </div>
+                                            <div className="network-item">
+                                                <div className="network-label">Protocol</div>
+                                                <div className="network-value">{url ? (url.startsWith('https') ? 'HTTPS' : 'HTTP') : 'Unknown'}</div>
+                                            </div>
+                                            <div className="network-item">
+                                                <div className="network-label">Request Headers</div>
+                                                <div className="network-value">{headers.filter(h => h.enabled).length} headers</div>
+                                            </div>
+                                            <div className="network-item">
+                                                <div className="network-label">Expected Response</div>
+                                                <div className="network-value">Pending request...</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="network-timeline">
+                                        <h6>Request Timeline</h6>
+                                        <div className="timeline-placeholder">
+                                            <div className="timeline-message">Send a request to see network timeline</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {activeDebugTab === 'performance' && (
+                                <div className="performance-debug-content">
+                                    <div className="debug-metrics-panel">
+                                        <h5>Performance Metrics</h5>
+                                        <div className="metrics-grid">
+                                            <div className="metric-item">
+                                                <div className="metric-value">--</div>
+                                                <div className="metric-label">Response Time</div>
+                                            </div>
+                                            <div className="metric-item">
+                                                <div className="metric-value">--</div>
+                                                <div className="metric-label">Network Time</div>
+                                            </div>
+                                            <div className="metric-item">
+                                                <div className="metric-value">--</div>
+                                                <div className="metric-label">Status Code</div>
+                                            </div>
+                                            <div className="metric-item">
+                                                <div className="metric-value">--</div>
+                                                <div className="metric-label">Content Size</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="performance-analysis">
+                                        <h6>Performance Analysis</h6>
+                                        <div className="analysis-placeholder">
+                                            <div className="analysis-message">Send a request to see performance analysis</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {activeDebugTab === 'sources' && (
+                                <div className="sources-debug-content">
+                                    <div className="sources-overview">
+                                        <h5>Request Sources</h5>
+                                        <div className="sources-info">
+                                            <div className="source-category">
+                                                <h6>Configuration</h6>
+                                                <div className="source-item">
+                                                    <span className="source-label">Method:</span>
+                                                    <span className="source-value">{method}</span>
+                                                </div>
+                                                <div className="source-item">
+                                                    <span className="source-label">Body Type:</span>
+                                                    <span className="source-value">{bodyType}</span>
+                                                </div>
+                                                <div className="source-item">
+                                                    <span className="source-label">Auth Type:</span>
+                                                    <span className="source-value">{authConfig.type}</span>
+                                                </div>
+                                            </div>
+                                            <div className="source-category">
+                                                <h6>Variables</h6>
+                                                <div className="variables-list">
+                                                    {Object.keys(resolvedVariables).length > 0 ? (
+                                                        Object.entries(resolvedVariables).map(([key, value]) => (
+                                                            <div key={key} className="variable-item">
+                                                                <span className="variable-key">{key}:</span>
+                                                                <span className="variable-value">{String(value)}</span>
+                                                            </div>
+                                                        ))
+                                                    ) : (
+                                                        <div className="no-variables">No variables defined</div>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                );
+
+            case 'export-options':
+                return (
+                    <div className="export-options-section">
+                        <div className="export-header">
+                            <h4>Export & Share Options</h4>
+                            <div className="export-actions">
+                                <button
+                                    className="btn btn-small"
+                                    onClick={() => {
+                                        const requestData = {
+                                            method,
+                                            url,
+                                            headers: headers.filter(h => h.enabled),
+                                            body: bodyType !== 'none' ? bodyContent : null
+                                        };
+                                        ExportService.exportRequest(requestData, 'postman');
+                                    }}
+                                >
+                                    📤 Export to Postman
+                                </button>
+                                <button
+                                    className="btn btn-small"
+                                    onClick={() => {
+                                        const requestData = {
+                                            method,
+                                            url,
+                                            headers: headers.filter(h => h.enabled),
+                                            body: bodyType !== 'none' ? bodyContent : null
+                                        };
+                                        ExportService.exportRequest(requestData, 'curl');
+                                    }}
+                                >
+                                    📋 Export as cURL
+                                </button>
+                                <button
+                                    className="btn btn-small"
+                                    onClick={() => {
+                                        const requestData = {
+                                            method,
+                                            url,
+                                            headers: headers.filter(h => h.enabled),
+                                            body: bodyType !== 'none' ? bodyContent : null
+                                        };
+                                        ExportService.exportRequest(requestData, 'openapi');
+                                    }}
+                                >
+                                    📄 Export as OpenAPI
+                                </button>
+                            </div>
+                        </div>
+
+                        <div className="export-content">
+                            <div className="export-formats">
+                                <h5>Export Formats</h5>
+                                <div className="format-grid">
+                                    <div className="format-item"
+                                        onClick={() => generateExportPreview('postman')}
+                                        role="button"
+                                        tabIndex={0}
+                                        onKeyDown={(e) => e.key === 'Enter' && generateExportPreview('postman')}>
+                                        <div className="format-icon">📤</div>
+                                        <div className="format-details">
+                                            <div className="format-name">Postman</div>
+                                            <div className="format-description">Collection file</div>
+                                        </div>
+                                    </div>
+                                    <div className="format-item"
+                                        onClick={() => generateExportPreview('curl')}
+                                        role="button"
+                                        tabIndex={0}
+                                        onKeyDown={(e) => e.key === 'Enter' && generateExportPreview('curl')}>
+                                        <div className="format-icon">📋</div>
+                                        <div className="format-details">
+                                            <div className="format-name">cURL</div>
+                                            <div className="format-description">Terminal command</div>
+                                        </div>
+                                    </div>
+                                    <div className="format-item"
+                                        onClick={() => generateExportPreview('openapi')}
+                                        role="button"
+                                        tabIndex={0}
+                                        onKeyDown={(e) => e.key === 'Enter' && generateExportPreview('openapi')}>
+                                        <div className="format-icon">📄</div>
+                                        <div className="format-details">
+                                            <div className="format-name">OpenAPI</div>
+                                            <div className="format-description">API specification</div>
+                                        </div>
+                                    </div>
+                                    <div className="format-item"
+                                        onClick={() => generateExportPreview('share')}
+                                        role="button"
+                                        tabIndex={0}
+                                        onKeyDown={(e) => e.key === 'Enter' && generateExportPreview('share')}>
+                                        <div className="format-icon">🔗</div>
+                                        <div className="format-details">
+                                            <div className="format-name">Share</div>
+                                            <div className="format-description">Shareable link</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="export-preview">
+                                <h5>Preview</h5>
+                                <div className="preview-container">
+                                    {exportPreview ? (
+                                        <>
+                                            <div className="preview-header">
+                                                <h6 className="preview-title">{exportPreview.title}</h6>
+                                                <div className="preview-actions">
+                                                    {exportPreview.copyable && (
+                                                        <button
+                                                            className="preview-btn"
+                                                            onClick={() => navigator.clipboard.writeText(exportPreview.content)}
+                                                            title="Copy to clipboard"
+                                                        >
+                                                            📋 Copy
+                                                        </button>
+                                                    )}
+                                                    <button
+                                                        className="preview-btn"
+                                                        onClick={() => setExportPreview(null)}
+                                                        title="Clear preview"
+                                                    >
+                                                        ✕ Clear
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <div className="preview-content">
+                                                <pre className="preview-code">{exportPreview.content}</pre>
+                                            </div>
+                                        </>
+                                    ) : (
+                                        <div className="preview-empty">
+                                            <div className="preview-empty-icon">📋</div>
+                                            <p className="preview-empty-text">Select an export format to preview</p>
+                                            <p className="preview-empty-hint">Click on any format above to see the generated output</p>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                );
+
             default:
                 return null;
         }
@@ -1713,6 +2763,24 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
                         onClick={() => handleTabChange('variable-preview')}
                     >
                         Preview
+                    </div>
+                    <div
+                        className={`request-tab ${activeTab === 'network-flow' ? 'active' : ''}`}
+                        onClick={() => handleTabChange('network-flow')}
+                    >
+                        🌐 Network Flow
+                    </div>
+                    <div
+                        className={`request-tab ${activeTab === 'debug-console' ? 'active' : ''}`}
+                        onClick={() => handleTabChange('debug-console')}
+                    >
+                        🔍 Debug Console
+                    </div>
+                    <div
+                        className={`request-tab ${activeTab === 'export-options' ? 'active' : ''}`}
+                        onClick={() => handleTabChange('export-options')}
+                    >
+                        📁 Export
                     </div>
                 </div>
 

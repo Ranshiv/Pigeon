@@ -7,7 +7,6 @@ import DocumentationViewer from './DocumentationViewer';
 import DocumentationSettingsVersionHistory from './DocumentationSettingsVersionHistory';
 import DocumentationContentVersionHistory from './DocumentationContentVersionHistory';
 import ApiVersionManager from './ApiVersionManager';
-import VisualApiDesigner from './VisualApiDesigner/VisualApiDesigner';
 import './DocumentationManager.css';
 
 // Helper function to safely parse JSON
@@ -1260,26 +1259,16 @@ const DocumentationManager = () => {
                 )}
 
                 {view === 'visual-designer' && (
-                    <VisualApiDesigner
-                        collectionId={collectionId}
-                        onSpecUpdate={(spec) => {
-                            // Update the documentation with the generated OpenAPI spec
-                            setDocumentation(prev => ({
-                                ...prev,
-                                content: JSON.stringify(spec, null, 2),
-                                contentType: 'openapi'
-                            }));
-                        }}
-                        initialSpec={(() => {
-                            if (!documentation?.content) return null;
-
-                            if (typeof documentation.content === 'string') {
-                                return safeJSONParse(documentation.content, null);
-                            }
-
-                            return documentation.content;
-                        })()}
-                    />
+                    <div className="visual-designer-removed">
+                        <div className="migration-notice">
+                            <h3>🎨 Visual API Designer Moved</h3>
+                            <p>The Visual API Designer has been moved to the "Add Request" page for better integration with the request workflow.</p>
+                            <p>You can now find it as a tab in the request form after creating a new request.</p>
+                            <Link to="/workspaces/requests/new" className="migration-link">
+                                Go to Request Form →
+                            </Link>
+                        </div>
+                    </div>
                 )}
             </div>
         </div>

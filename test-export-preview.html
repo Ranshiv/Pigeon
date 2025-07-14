@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Export Preview Test</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #f5f5f5;
+      }
+      .test-container {
+        background: white;
+        border-radius: 8px;
+        padding: 20px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+      h1 {
+        color: #333;
+        border-bottom: 2px solid #007bff;
+        padding-bottom: 10px;
+      }
+      .test-item {
+        margin-bottom: 30px;
+        padding: 15px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+      }
+      .test-item h3 {
+        margin-top: 0;
+        color: #007bff;
+      }
+      .status {
+        padding: 5px 10px;
+        border-radius: 3px;
+        font-weight: bold;
+        margin: 10px 0;
+      }
+      .status.pass {
+        background-color: #d4edda;
+        color: #155724;
+      }
+      .status.fail {
+        background-color: #f8d7da;
+        color: #721c24;
+      }
+      .instructions {
+        background-color: #e9ecef;
+        padding: 15px;
+        border-radius: 4px;
+        margin: 20px 0;
+      }
+      .instructions h3 {
+        margin-top: 0;
+        color: #495057;
+      }
+      code {
+        background-color: #f8f9fa;
+        padding: 2px 4px;
+        border-radius: 3px;
+        font-family: monospace;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="test-container">
+      <h1>Export Preview Container Test</h1>
+
+      <div class="instructions">
+        <h3>Test Instructions:</h3>
+        <ol>
+          <li>
+            Navigate to the Pigeon application at
+            <a href="http://localhost:3000" target="_blank"
+              >http://localhost:3000</a
+            >
+          </li>
+          <li>
+            Open the RequestForm component (create a new request or open an
+            existing one)
+          </li>
+          <li>Click on the <code>📁 Export</code> tab</li>
+          <li>Test each export format item by clicking on them</li>
+          <li>
+            Verify that the export preview shows the correct content for each
+            format
+          </li>
+          <li>Check that the "Copy to Clipboard" button works</li>
+          <li>Return to this page and mark the tests as pass/fail</li>
+        </ol>
+      </div>
+
+      <div class="test-item">
+        <h3>Test 1: Export Tab Visibility</h3>
+        <p>Check that the Export tab is visible in the request form tabs.</p>
+        <div class="status" id="test1">Not Tested</div>
+        <button onclick="markTest('test1', 'pass')">Pass</button>
+        <button onclick="markTest('test1', 'fail')">Fail</button>
+      </div>
+
+      <div class="test-item">
+        <h3>Test 2: Export Format Items</h3>
+        <p>
+          Verify that all export format items are displayed (Postman, cURL,
+          OpenAPI, Share Link).
+        </p>
+        <div class="status" id="test2">Not Tested</div>
+        <button onclick="markTest('test2', 'pass')">Pass</button>
+        <button onclick="markTest('test2', 'fail')">Fail</button>
+      </div>
+
+      <div class="test-item">
+        <h3>Test 3: Postman Export Preview</h3>
+        <p>
+          Click on "Postman Collection" and verify it shows a valid JSON
+          collection structure.
+        </p>
+        <div class="status" id="test3">Not Tested</div>
+        <button onclick="markTest('test3', 'pass')">Pass</button>
+        <button onclick="markTest('test3', 'fail')">Fail</button>
+      </div>
+
+      <div class="test-item">
+        <h3>Test 4: cURL Export Preview</h3>
+        <p>
+          Click on "cURL Command" and verify it shows a properly formatted cURL
+          command.
+        </p>
+        <div class="status" id="test4">Not Tested</div>
+        <button onclick="markTest('test4', 'pass')">Pass</button>
+        <button onclick="markTest('test4', 'fail')">Fail</button>
+      </div>
+
+      <div class="test-item">
+        <h3>Test 5: OpenAPI Export Preview</h3>
+        <p>
+          Click on "OpenAPI Spec" and verify it shows a valid OpenAPI
+          specification.
+        </p>
+        <div class="status" id="test5">Not Tested</div>
+        <button onclick="markTest('test5', 'pass')">Pass</button>
+        <button onclick="markTest('test5', 'fail')">Fail</button>
+      </div>
+
+      <div class="test-item">
+        <h3>Test 6: Share Link Export Preview</h3>
+        <p>Click on "Share Link" and verify it shows a shareable URL.</p>
+        <div class="status" id="test6">Not Tested</div>
+        <button onclick="markTest('test6', 'pass')">Pass</button>
+        <button onclick="markTest('test6', 'fail')">Fail</button>
+      </div>
+
+      <div class="test-item">
+        <h3>Test 7: Copy to Clipboard</h3>
+        <p>
+          For each export format, test that the "Copy to Clipboard" button works
+          correctly.
+        </p>
+        <div class="status" id="test7">Not Tested</div>
+        <button onclick="markTest('test7', 'pass')">Pass</button>
+        <button onclick="markTest('test7', 'fail')">Fail</button>
+      </div>
+
+      <div class="test-item">
+        <h3>Test 8: Dynamic Content</h3>
+        <p>
+          Change the request method, URL, headers, or body, then verify the
+          export preview updates accordingly.
+        </p>
+        <div class="status" id="test8">Not Tested</div>
+        <button onclick="markTest('test8', 'pass')">Pass</button>
+        <button onclick="markTest('test8', 'fail')">Fail</button>
+      </div>
+
+      <div class="test-item">
+        <h3>Test 9: Error Handling</h3>
+        <p>
+          Test with an invalid URL or malformed data to verify error handling
+          works.
+        </p>
+        <div class="status" id="test9">Not Tested</div>
+        <button onclick="markTest('test9', 'pass')">Pass</button>
+        <button onclick="markTest('test9', 'fail')">Fail</button>
+      </div>
+
+      <div class="test-item">
+        <h3>Test Summary</h3>
+        <p>Overall test results:</p>
+        <div id="summary">No tests completed yet</div>
+      </div>
+    </div>
+
+    <script>
+      function markTest(testId, result) {
+        const statusElement = document.getElementById(testId);
+        statusElement.className = `status ${result}`;
+        statusElement.textContent = result === "pass" ? "PASS" : "FAIL";
+        updateSummary();
+      }
+
+      function updateSummary() {
+        const tests = [
+          "test1",
+          "test2",
+          "test3",
+          "test4",
+          "test5",
+          "test6",
+          "test7",
+          "test8",
+          "test9",
+        ];
+        let passed = 0;
+        let failed = 0;
+        let notTested = 0;
+
+        tests.forEach((testId) => {
+          const element = document.getElementById(testId);
+          if (element.textContent === "PASS") {
+            passed++;
+          } else if (element.textContent === "FAIL") {
+            failed++;
+          } else {
+            notTested++;
+          }
+        });
+
+        const summary = document.getElementById("summary");
+        summary.innerHTML = `
+                <strong>Passed:</strong> ${passed}<br>
+                <strong>Failed:</strong> ${failed}<br>
+                <strong>Not Tested:</strong> ${notTested}
+            `;
+      }
+    </script>
+  </body>
+</html>

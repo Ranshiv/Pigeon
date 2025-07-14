@@ -1,7 +1,13 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { VisualizationEngine } from '../services/VisualizationEngine';
 import TemplateLibraryManager from '../services/TemplateLibraryManager';
+import { NetworkFlowService } from '../services/NetworkFlowService';
+import { VisualizationDebugger } from '../services/VisualizationDebugger';
+import { PostRequestScriptService } from '../services/PostRequestScriptService';
+import { ExportService } from '../services/ExportService';
+import { AuthVisualizationService } from '../services/AuthVisualizationService';
 import ChartRenderer from './ChartRenderer';
+import NetworkFlowRenderer from './NetworkFlowRenderer';
 import './VisualizationTab.css';
 
 const VisualizationTab = ({
@@ -20,6 +26,14 @@ const VisualizationTab = ({
     const [templateLibrary, setTemplateLibrary] = useState([]);
     const [suggestedCharts, setSuggestedCharts] = useState([]);
     const visualizationContainerRef = useRef(null);
+
+    // New state for advanced features
+    const [showNetworkFlow, setShowNetworkFlow] = useState(false);
+    const [showAuthFlow, setShowAuthFlow] = useState(false);
+    const [postRequestScript, setPostRequestScript] = useState('');
+    const [scriptOutput, setScriptOutput] = useState(null);
+    const [isDebugging, setIsDebugging] = useState(false);
+    const [activeTab, setActiveTab] = useState('visualizations'); // 'visualizations', 'network', 'auth', 'scripts'
 
     // Sample data for testing when no API response is available
     const sampleData = React.useMemo(() => ({
@@ -230,6 +244,20 @@ const VisualizationTab = ({
                         type={chartConfig.type}
                         data={chartConfig.data}
                         options={chartConfig.options}
+                        width={600}
+                        height={400}
+                    />
+                </div>
+            );
+        }
+
+        // If it's a network flow visualization, render using NetworkFlowRenderer
+        if (visualization.type === 'network' && visualization.data) {
+            return (
+                <div className="network-visualization">
+                    <NetworkFlowRenderer
+                        data={visualization.data}
+                        options={visualization.options}
                         width={600}
                         height={400}
                     />

@@ -14,6 +14,7 @@ const SpecPreview = ({
     const [generatedSpec, setGeneratedSpec] = useState(null);
     const [isGenerating, setIsGenerating] = useState(false);
     const [error, setError] = useState(null);
+    const [isExporting, setIsExporting] = useState(false);
 
     // Switch to visualization tab when visualization context is provided
     useEffect(() => {
@@ -125,30 +126,62 @@ const SpecPreview = ({
     };
 
     const formatYaml = (obj) => {
-        // Simple YAML formatter
+        // Simple YAML formatter with better error handling
         const yamlLines = [];
 
         const addLine = (key, value, indent = 0) => {
             const spaces = '  '.repeat(indent);
-            if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
+
+            if (value === null || value === undefined) {
+                yamlLines.push(`${spaces}${key}: null`);
+            } else if (Array.isArray(value)) {
+                if (value.length === 0) {
+                    yamlLines.push(`${spaces}${key}: []`);
+                } else {
+                    yamlLines.push(`${spaces}${key}:`);
+                    value.forEach(item => {
+                        if (typeof item === 'object' && item !== null) {
+                            yamlLines.push(`${spaces}  -`);
+                            Object.entries(item).forEach(([k, v]) => {
+                                addLine(k, v, indent + 2);
+                            });
+                        } else {
+                            const itemStr = typeof item === 'string' ? item : JSON.stringify(item);
+                            yamlLines.push(`${spaces}  - ${itemStr}`);
+                        }
+                    });
+                }
+            } else if (typeof value === 'object' && value !== null) {
                 yamlLines.push(`${spaces}${key}:`);
                 Object.entries(value).forEach(([k, v]) => {
                     addLine(k, v, indent + 1);
                 });
             } else {
-                yamlLines.push(`${spaces}${key}: ${JSON.stringify(value)}`);
+                const valueStr = typeof value === 'string' ? value : JSON.stringify(value);
+                yamlLines.push(`${spaces}${key}: ${valueStr}`);
             }
         };
 
-        Object.entries(obj).forEach(([key, value]) => {
-            addLine(key, value);
-        });
-
-        return yamlLines.join('\n');
+        try {
+            Object.entries(obj).forEach(([key, value]) => {
+                addLine(key, value);
+            });
+            return yamlLines.join('\n');
+        } catch (error) {
+            console.error('YAML formatting error:', error);
+            return `# Error formatting YAML: ${error.message}\n# Falling back to JSON\n${JSON.stringify(obj, null, 2)}`;
+        }
     };
 
     const handleExport = async (format) => {
-        if (!generatedSpec) return;
+        if (!generatedSpec) {
+            console.error('No generated spec available for export');
+            setError('No specification available to export');
+            return;
+        }
+
+        setIsExporting(true);
+        setError(null);
 
         try {
             let content;
@@ -167,26 +200,56 @@ const SpecPreview = ({
                     mimeType = 'application/x-yaml';
                     break;
                 default:
-                    throw new Error('Unsupported format');
+                    throw new Error(`Unsupported format: ${format}`);
             }
 
+            console.log('Exporting spec:', { format, filename, contentLength: content.length });
+
+            // Create blob and download
             const blob = new Blob([content], { type: mimeType });
             const url = URL.createObjectURL(blob);
+
+            // Create download link
             const a = document.createElement('a');
             a.href = url;
             a.download = filename;
+            a.style.display = 'none';
+
+            // Add to DOM, click, and remove
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
+
+            // Clean up
             URL.revokeObjectURL(url);
+
+            console.log('Export completed successfully');
 
             if (onExport) {
                 onExport(generatedSpec, format);
             }
         } catch (err) {
+            console.error('Export failed:', err);
             setError(`Export failed: ${err.message}`);
+        } finally {
+            setIsExporting(false);
         }
     };
+
+    // Debug function to check spec state
+    const debugSpecState = () => {
+        console.log('=== SpecPreview Debug Info ===');
+        console.log('Generated spec:', generatedSpec);
+        console.log('Nodes:', nodes);
+        console.log('Edges:', edges);
+        console.log('Is generating:', isGenerating);
+        console.log('Error:', error);
+        console.log('Preview mode:', previewMode);
+        console.log('=============================');
+    };
+
+    // Add debug button in development
+    const isDevelopment = process.env.NODE_ENV === 'development';
 
     const renderPreview = () => {
         if (isGenerating) {
@@ -280,25 +343,48 @@ const SpecPreview = ({
                     </div>
 
                     <div className="export-buttons" role="group" aria-label="Export options">
+                        {isDevelopment && (
+                            <button
+                                onClick={debugSpecState}
+                                title="Debug specification state"
+                                style={{ background: '#6b7280', fontSize: '12px', padding: '8px 12px' }}
+                            >
+                                🐛 Debug
+                            </button>
+                        )}
                         <button
                             onClick={() => handleExport('json')}
-                            disabled={!generatedSpec}
+                            disabled={!generatedSpec || isExporting}
                             title="Export specification as JSON file"
                             aria-label="Export as JSON"
                         >
-                            � JSON
+                            {isExporting ? '⏳' : '📥'} JSON
                         </button>
                         <button
                             onClick={() => handleExport('yaml')}
-                            disabled={!generatedSpec}
+                            disabled={!generatedSpec || isExporting}
                             title="Export specification as YAML file"
                             aria-label="Export as YAML"
                         >
-                            � YAML
+                            {isExporting ? '⏳' : '📥'} YAML
                         </button>
                     </div>
                 </div>
             </div>
+
+            {error && (
+                <div className="preview-error-banner">
+                    <div className="error-icon">⚠️</div>
+                    <span className="error-message">{error}</span>
+                    <button
+                        className="error-dismiss"
+                        onClick={() => setError(null)}
+                        title="Dismiss error"
+                    >
+                        ×
+                    </button>
+                </div>
+            )}
 
             <div
                 className="preview-content"
@@ -324,6 +410,15 @@ const SpecPreview = ({
                         <span>Parameters:</span>
                         <span>{Object.keys(generatedSpec.components?.parameters || {}).length}</span>
                     </div>
+                </div>
+            )}
+
+            {isDevelopment && (
+                <div className="debug-info">
+                    <h4>Debug Info</h4>
+                    <button onClick={debugSpecState} title="Debug spec state">
+                        📊 Debug Spec State
+                    </button>
                 </div>
             )}
         </div>
