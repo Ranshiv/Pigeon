@@ -51,7 +51,7 @@
     "passport": "^0.7.0",
     "passport-google-oauth20": "^2.0.0",
     "pdfkit": "^0.17.1",
-    "puppeteer": "^24.10.0",
+    "puppeteer": "^24.14.0",
     "socket.io": "^4.8.1",
     "ssl-checker": "^2.0.10",
     "whois": "^2.14.2",

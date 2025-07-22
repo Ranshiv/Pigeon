@@ -401,24 +401,58 @@ app.delete('/api/cli-test/items/:id', (req, res) => {
 
 // --- Add the proxy endpoint for making external API requests and mock server support ---
 app.post('/api/proxy', async (req, res) => {
-    try {
-        const { url, method, headers, body, timeout, mockServerId } = req.body;
+    // Debug logging setup - declare these at function scope
+    const { url, method, headers, body, timeout, mockServerId, debug, debugSessionId } = req.body;
+    const debugLogs = [];
+    const isDebugging = debug === true;
 
+    const addDebugLog = (level, message, data = null) => {
+        if (isDebugging) {
+            debugLogs.push({
+                timestamp: new Date().toISOString(),
+                level: level,
+                message: message,
+                data: data,
+                sessionId: debugSessionId
+            });
+            console.log(`[DEBUG:${debugSessionId}] ${level.toUpperCase()}: ${message}`, data || '');
+        }
+    };
+
+    try {
         if (!url) {
             return res.status(400).json({
                 error: true,
-                message: 'URL is required'
+                message: 'URL is required',
+                debugLogs: isDebugging ? debugLogs : undefined
             });
+        }
+
+        if (isDebugging) {
+            addDebugLog('info', `Starting proxy request: ${method || 'GET'} ${url}`);
+            addDebugLog('debug', `Debug session: ${debugSessionId}`);
+            addDebugLog('debug', `Request headers:`, headers);
+            if (body) {
+                addDebugLog('debug', `Request body:`, body);
+            }
         }
 
         // Check if this is a mock server request
         if (mockServerId) {
+            if (isDebugging) {
+                addDebugLog('info', `Mock server request detected: ${mockServerId}`);
+            }
+
             try {
                 const MockServerService = require('./services/MockServerService');
 
                 // Extract path from URL
                 const urlObj = new URL(url);
                 const path = urlObj.pathname;
+
+                if (isDebugging) {
+                    addDebugLog('debug', `Mock server path: ${path}`);
+                }
 
                 const mockResponse = await MockServerService.handleMockRequest(
                     mockServerId,
@@ -429,31 +463,55 @@ app.post('/api/proxy', async (req, res) => {
                     headers || {}
                 );
 
+                if (isDebugging) {
+                    addDebugLog('success', `Mock response generated: ${mockResponse.status}`);
+                    addDebugLog('debug', `Mock response body:`, mockResponse.body);
+                }
+
                 return res.json({
                     status: mockResponse.status,
                     statusText: 'OK',
                     headers: mockResponse.headers,
                     body: mockResponse.body,
                     size: JSON.stringify(mockResponse.body).length,
-                    isMock: true
+                    isMock: true,
+                    debugLogs: isDebugging ? debugLogs : undefined
                 });
             } catch (mockError) {
                 console.error('Mock server error:', mockError);
+
+                if (isDebugging) {
+                    addDebugLog('error', `Mock server error: ${mockError.message}`, { error: mockError.message });
+                }
+
                 return res.status(500).json({
                     error: true,
                     message: `Mock server error: ${mockError.message}`,
-                    isMock: true
+                    isMock: true,
+                    debugLogs: isDebugging ? debugLogs : undefined
                 });
             }
         }
 
         console.log(`Proxy request: ${method || 'GET'} ${url}`);
 
+        if (isDebugging) {
+            addDebugLog('info', `Making external API request to: ${url}`);
+        }
+
         // Prepare headers with default User-Agent if not provided
         const requestHeaders = { ...headers } || {};
         if (!requestHeaders['User-Agent'] && !requestHeaders['user-agent']) {
             requestHeaders['User-Agent'] = 'Pigeon API Client/1.0';
         }
+
+        if (isDebugging) {
+            addDebugLog('debug', `Final request headers:`, requestHeaders);
+            addDebugLog('debug', `Request timeout: ${timeout || 30000}ms`);
+        }
+
+        // Track request timing
+        const requestStartTime = Date.now();
 
         // Make the request with enhanced options
         const response = await axios({
@@ -468,9 +526,23 @@ app.post('/api/proxy', async (req, res) => {
             responseType: 'json' // Default to JSON response
         });
 
+        const requestEndTime = Date.now();
+        const requestDuration = requestEndTime - requestStartTime;
+
+        if (isDebugging) {
+            addDebugLog('info', `Request completed in ${requestDuration}ms`);
+            addDebugLog('success', `Response status: ${response.status} ${response.statusText}`);
+            addDebugLog('debug', `Response headers:`, response.headers);
+            addDebugLog('debug', `Response size: ${response.data ? JSON.stringify(response.data).length : 0} bytes`);
+        }
+
         // Handle 403 Forbidden specifically
         if (response.status === 403) {
             console.log('Received 403 Forbidden response:', url);
+
+            if (isDebugging) {
+                addDebugLog('warn', `403 Forbidden response from ${url}`);
+            }
 
             // Provide helpful error information
             let errorTips = [
@@ -490,6 +562,11 @@ app.post('/api/proxy', async (req, res) => {
                 }
             }
 
+            if (isDebugging) {
+                addDebugLog('debug', `403 error details:`, errorDetails);
+                addDebugLog('info', `Suggested solutions:`, errorTips);
+            }
+
             return res.json({
                 status: 403,
                 statusText: 'Forbidden',
@@ -498,7 +575,8 @@ app.post('/api/proxy', async (req, res) => {
                 body: response.data,
                 size: response.data ? JSON.stringify(response.data).length : 0,
                 errorTips: errorTips,
-                errorDetails: errorDetails
+                errorDetails: errorDetails,
+                debugLogs: isDebugging ? debugLogs : undefined
             });
         }
 
@@ -508,11 +586,20 @@ app.post('/api/proxy', async (req, res) => {
             statusText: response.statusText,
             headers: response.headers,
             body: response.data,
-            size: response.data ? JSON.stringify(response.data).length : 0
+            size: response.data ? JSON.stringify(response.data).length : 0,
+            debugLogs: isDebugging ? debugLogs : undefined
         });
 
     } catch (err) {
         console.error('Proxy error:', err.message);
+
+        if (isDebugging) {
+            addDebugLog('error', `Proxy request failed: ${err.message}`, {
+                error: err.message,
+                code: err.code,
+                stack: err.stack
+            });
+        }
 
         // Determine error type for better error messages
         let errorMessage = err.message;
@@ -546,6 +633,10 @@ app.post('/api/proxy', async (req, res) => {
             ];
         }
 
+        if (isDebugging) {
+            addDebugLog('debug', `Error analysis: ${errorMessage}`, { errorTips });
+        }
+
         res.status(err.response?.status || 500).json({
             error: true,
             status: err.response?.status || 0,
@@ -553,7 +644,8 @@ app.post('/api/proxy', async (req, res) => {
             message: errorMessage,
             errorTips: errorTips,
             headers: err.response?.headers || {},
-            body: err.response?.data || `Request failed: ${errorMessage}`
+            body: err.response?.data || `Request failed: ${errorMessage}`,
+            debugLogs: isDebugging ? debugLogs : undefined
         });
     }
 });
@@ -569,10 +661,135 @@ server.listen(port, () => {
     }, 2000); // Give server 2 seconds to fully initialize
 });
 
+// --- Browser Console Capture API Endpoints ---
+const BrowserConsoleService = require('./services/BrowserConsoleService');
+
+// Start browser console capture for a website
+app.post('/api/console-capture/start', async (req, res) => {
+    try {
+        const { sessionId, url } = req.body;
+
+        if (!sessionId || !url) {
+            return res.status(400).json({
+                error: true,
+                message: 'sessionId and url are required'
+            });
+        }
+
+        console.log(`Starting console capture for ${url} (session: ${sessionId})`);
+
+        // Create callback to send logs to VisualizationDebugger
+        const callback = (logEntry) => {
+            // This could be extended to send via WebSocket for real-time updates
+            console.log(`Console Log [${logEntry.type}]:`, logEntry.message);
+        };
+
+        const result = await BrowserConsoleService.startCapture(sessionId, url, callback);
+
+        res.json(result);
+    } catch (error) {
+        console.error('Console capture start error:', error);
+        res.status(500).json({
+            error: true,
+            message: error.message
+        });
+    }
+});
+
+// Get recent console logs from a capture session
+app.get('/api/console-capture/:sessionId/logs', async (req, res) => {
+    try {
+        const { sessionId } = req.params;
+        const since = parseInt(req.query.since) || 0;
+
+        const allLogs = BrowserConsoleService.getSessionLogs(sessionId);
+
+        // Filter logs by timestamp if 'since' parameter is provided
+        const filteredLogs = since > 0
+            ? allLogs.filter(log => new Date(log.timestamp).getTime() > since)
+            : allLogs;
+
+        res.json({
+            success: true,
+            sessionId,
+            logs: filteredLogs,
+            totalLogs: allLogs.length,
+            isActive: BrowserConsoleService.activeSessions.has(sessionId)
+        });
+    } catch (error) {
+        console.error('Console capture logs error:', error);
+        res.status(500).json({
+            error: true,
+            message: error.message
+        });
+    }
+});
+
+// Stop console capture for a session
+app.post('/api/console-capture/:sessionId/stop', async (req, res) => {
+    try {
+        const { sessionId } = req.params;
+
+        const result = await BrowserConsoleService.stopCapture(sessionId);
+        res.json(result);
+    } catch (error) {
+        console.error('Console capture stop error:', error);
+        res.status(500).json({
+            error: true,
+            message: error.message
+        });
+    }
+});
+
+// Execute script in captured page
+app.post('/api/console-capture/:sessionId/execute', async (req, res) => {
+    try {
+        const { sessionId } = req.params;
+        const { script } = req.body;
+
+        if (!script) {
+            return res.status(400).json({
+                error: true,
+                message: 'script is required'
+            });
+        }
+
+        // This functionality would need to be added to BrowserConsoleService
+        res.status(501).json({
+            error: true,
+            message: 'Script execution not yet implemented'
+        });
+    } catch (error) {
+        console.error('Console capture execute error:', error);
+        res.status(500).json({
+            error: true,
+            message: error.message
+        });
+    }
+});
+
+// Get all active console capture sessions
+app.get('/api/console-capture/sessions', (req, res) => {
+    try {
+        const sessions = BrowserConsoleService.getActiveSessions();
+        res.json({
+            success: true,
+            sessions
+        });
+    } catch (error) {
+        console.error('Console capture sessions error:', error);
+        res.status(500).json({
+            error: true,
+            message: error.message
+        });
+    }
+});
+
 // Graceful shutdown
 process.on('SIGTERM', () => {
     console.log('SIGTERM received, shutting down gracefully');
     MonitoringService.stop();
+    BrowserConsoleService.cleanup();
     server.close(() => {
         console.log('Process terminated');
         process.exit(0);
@@ -582,6 +799,7 @@ process.on('SIGTERM', () => {
 process.on('SIGINT', () => {
     console.log('SIGINT received, shutting down gracefully');
     MonitoringService.stop();
+    BrowserConsoleService.cleanup();
     server.close(() => {
         console.log('Process terminated');
         process.exit(0);

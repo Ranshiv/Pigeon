@@ -97,7 +97,9 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
     const [exportPreview, setExportPreview] = useState(null);
 
     // Debug console state
-    const [activeDebugTab, setActiveDebugTab] = useState('console');
+    const [currentDebugSession, setCurrentDebugSession] = useState(null);
+    const [consoleFilter, setConsoleFilter] = useState('all');
+    const [consoleSearchTerm, setConsoleSearchTerm] = useState('');
 
     // Utility function to get CSS classes for inputs with variables
     const getVariableInputClass = (value) => {
@@ -609,12 +611,34 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
         } else if (onRunRequest) {
             onRunRequest(interpolatedRequest._id || initialData._id || initialData.id);
             return;
-        }        // If no external handlers exist, process the request directly using interpolated data
+        }
+
+        // If no external handlers exist, process the request directly using interpolated data
         setIsLoading(true);
         setResponseData(null);
         setResponseError(null);
 
+        // Add debug console integration
+        const debugSessionId = currentDebugSession?.id;
+        const isDebugging = debugSessionId && typeof VisualizationDebugger !== 'undefined';
+
+        // Declare requestId at function scope so it's available in catch block
+        let requestId = null;
+
         try {
+            // Log request start in debug console
+            if (isDebugging) {
+                VisualizationDebugger.addLog(debugSessionId, 'info', `🚀 Executing ${interpolatedRequest.method} request to ${interpolatedRequest.url}`);
+                VisualizationDebugger.addLog(debugSessionId, 'debug', `⏱️ Request started at ${new Date().toLocaleTimeString()}`);
+                VisualizationDebugger.addNetworkRequest(debugSessionId, {
+                    id: `req-${Date.now()}`,
+                    method: interpolatedRequest.method,
+                    url: interpolatedRequest.url,
+                    status: 'pending',
+                    startTime: Date.now()
+                });
+            }
+
             // Prepare the request headers from interpolated data
             const headerObj = {};
             interpolatedRequest.headers.forEach(h => {
@@ -622,6 +646,11 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
                     headerObj[h.key] = h.value;
                 }
             });
+
+            // Log headers in debug console
+            if (isDebugging && Object.keys(headerObj).length > 0) {
+                VisualizationDebugger.addLog(debugSessionId, 'info', `📋 Request headers:`, headerObj);
+            }
 
             // Prepare request body from interpolated data
             let requestBody = null;
@@ -634,7 +663,20 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
                 }
             }
 
-            const startTime = Date.now();            // Use proxy endpoint with interpolated URL
+            // Log request body in debug console
+            if (isDebugging && requestBody) {
+                VisualizationDebugger.addLog(debugSessionId, 'info', `📤 Request body:`, requestBody);
+            }
+
+            const startTime = Date.now();
+            requestId = `req-${startTime}`;
+
+            // Log that we're making the actual HTTP request
+            if (isDebugging) {
+                VisualizationDebugger.addLog(debugSessionId, 'info', `📡 Sending HTTP request via proxy...`);
+            }
+
+            // Use proxy endpoint with interpolated URL and debug flag
             const response = await fetch(getApiUrl('/api/proxy'), {
                 method: 'POST',
                 headers: {
@@ -645,7 +687,9 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
                     method: interpolatedRequest.method,
                     headers: headerObj,
                     body: requestBody,
-                    timeout: 30000
+                    timeout: 30000,
+                    debug: isDebugging, // Enable debug logging on backend
+                    debugSessionId: debugSessionId
                 }),
                 credentials: 'include'
             });
@@ -654,17 +698,73 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
                 throw new Error(`Server responded with status ${response.status}`);
             }
 
+            // Log that we received a response
+            if (isDebugging) {
+                VisualizationDebugger.addLog(debugSessionId, 'info', `📥 Received response, parsing data...`);
+            }
+
             const responseData = await response.json();
             const endTime = Date.now();
 
             // The proxy already provides all the information we need
-            setResponseData({
+            const finalResponseData = {
                 ...responseData,
                 duration: endTime - startTime
-            });
+            };
+
+            // Log response in debug console
+            if (isDebugging) {
+                VisualizationDebugger.addLog(debugSessionId, 'success', `✅ Response received: ${finalResponseData.status} ${finalResponseData.statusText} (${finalResponseData.duration}ms)`);
+                VisualizationDebugger.addLog(debugSessionId, 'info', `📥 Response body:`, finalResponseData.body);
+
+                // Update network request with completion
+                VisualizationDebugger.updateNetworkRequest(debugSessionId, requestId, {
+                    status: 'completed',
+                    statusCode: finalResponseData.status,
+                    statusText: finalResponseData.statusText,
+                    endTime: endTime,
+                    duration: finalResponseData.duration,
+                    size: finalResponseData.size,
+                    headers: finalResponseData.headers
+                });
+            }
+
+            setResponseData(finalResponseData);
+
+            // Process backend debug logs if provided (removed verbose console logging)
+            if (finalResponseData.debugLogs && finalResponseData.debugLogs.length > 0 && isDebugging) {
+                finalResponseData.debugLogs.forEach((log) => {
+                    VisualizationDebugger.addLog(debugSessionId, log.level || 'info', `🔧 Backend: ${log.message}`, log.data);
+                });
+            }
+
         } catch (err) {
-            setResponseError(err.message || "An error occurred while sending the request");
+            const errorMessage = err.message || "An error occurred while sending the request";
+            setResponseError(errorMessage);
+
+            // Log error in debug console
+            if (isDebugging) {
+                VisualizationDebugger.addLog(debugSessionId, 'error', `❌ Request failed: ${errorMessage}`);
+                VisualizationDebugger.updateNetworkRequest(debugSessionId, requestId, {
+                    status: 'failed',
+                    error: errorMessage,
+                    endTime: Date.now()
+                });
+            }
             console.error("Request error:", err);
+
+            // Add error to debug logs using VisualizationDebugger
+            if (typeof VisualizationDebugger !== 'undefined') {
+                VisualizationDebugger.log(
+                    `Request failed: ${errorMessage}`,
+                    'error',
+                    {
+                        error: errorMessage,
+                        url: interpolatedRequest.url,
+                        method: interpolatedRequest.method
+                    }
+                );
+            }
         } finally {
             setIsLoading(false);
         }
@@ -708,10 +808,66 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
     // Initialize services
     useEffect(() => {
         PostRequestScriptService.initialize();
-        // Remove VisualizationDebugger.initialize() since we implement our own debug console
-        // VisualizationDebugger.initialize();
+        // Initialize VisualizationDebugger for modern debug experience
+        if (typeof VisualizationDebugger !== 'undefined') {
+            VisualizationDebugger.initialize();
+            // Clean up any existing popup panels on component mount
+            VisualizationDebugger.removePopupPanels();
+        }
         AuthVisualizationService.initialize();
-    }, []);
+    }, []); // Remove activeTab dependency to prevent re-running
+
+    // Separate useEffect for debug tab functionality
+    useEffect(() => {
+        if (activeTab !== 'debug-console') return;
+
+        // Use a timeout to ensure DOM elements are ready
+        const timeoutId = setTimeout(() => {
+            const debugTabs = document.querySelectorAll('.debug-tab');
+            const debugPanels = document.querySelectorAll('.debug-panel');
+
+            if (debugTabs.length === 0) return; // Exit if no debug tabs found
+
+            // Check if event listeners are already attached
+            const firstTab = debugTabs[0];
+            if (firstTab.getAttribute('data-listeners-attached') === 'true') {
+                return; // Listeners already attached, don't add again
+            }
+
+            // Create click handler function
+            const handleTabClick = function () {
+                // Remove active class from all tabs and panels
+                debugTabs.forEach(t => t.classList.remove('active'));
+                debugPanels.forEach(p => p.classList.remove('active'));
+
+                // Add active class to clicked tab
+                this.classList.add('active');
+
+                // Show corresponding panel
+                const tabName = this.getAttribute('data-tab');
+                const targetPanel = document.getElementById(`${tabName}-panel`);
+                if (targetPanel) {
+                    targetPanel.classList.add('active');
+                }
+
+                // Use VisualizationDebugger's tab switching if available
+                if (typeof VisualizationDebugger !== 'undefined' && VisualizationDebugger.switchTab) {
+                    VisualizationDebugger.switchTab(tabName);
+                }
+            };
+
+            // Add event listeners and mark them as attached
+            debugTabs.forEach(tab => {
+                tab.addEventListener('click', handleTabClick);
+                tab.setAttribute('data-listeners-attached', 'true');
+            });
+        }, 100); // Small delay to ensure DOM is ready
+
+        // Cleanup function
+        return () => {
+            clearTimeout(timeoutId);
+        };
+    }, [activeTab]);
 
     // Handle post-request script execution
     const handlePostRequestScript = useCallback(async (response) => {
@@ -2194,8 +2350,17 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
                 );
 
             case 'debug-console':
+                // Ensure VisualizationDebugger is initialized when this tab is shown
+                if (typeof VisualizationDebugger !== 'undefined') {
+                    VisualizationDebugger.initialize();
+                    // Explicitly hide any popup panels since we're using the integrated console
+                    VisualizationDebugger.hidePopupPanel();
+                    // Also remove any popup panels from DOM completely
+                    VisualizationDebugger.removePopupPanels();
+                }
+
                 return (
-                    <div className="debug-console-section">
+                    <div className="debug-console-section" id="visualization-debugger-container">
                         <div className="debug-console-header">
                             <div className="debug-title">
                                 <div className="debug-icon">
@@ -2211,26 +2376,64 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
                             </div>
                             <div className="debug-actions">
                                 <button
+                                    type="button"
                                     className="debug-btn debug-btn-primary"
                                     onClick={() => {
                                         try {
-                                            const debugSessionId = 'request-debug-' + Date.now();
-                                            console.log(`🔍 Debug session started for ${method} ${url}`, {
-                                                sessionId: debugSessionId,
+                                            const debugSessionId = `${method.toLowerCase()}-${encodeURIComponent(url || "no-url")}-${Date.now()}`;
+                                            const sessionData = {
                                                 method,
                                                 url,
                                                 headers: headers.filter(h => h.enabled),
-                                                body: bodyType !== 'none' ? bodyContent : null
-                                            });
+                                                body: bodyType !== 'none' ? bodyContent : null,
+                                                bodyType,
+                                                authConfig,
+                                                timestamp: Date.now()
+                                            };
 
-                                            // Try to use VisualizationDebugger if available, but don't fail if not
-                                            if (typeof VisualizationDebugger !== 'undefined' && VisualizationDebugger.startSession) {
-                                                VisualizationDebugger.startSession(
+                                            // Make sure the debug panel is visible
+                                            if (typeof VisualizationDebugger !== 'undefined') {
+                                                VisualizationDebugger.showDebugPanel();
+
+                                                // Create a new session
+                                                const session = VisualizationDebugger.startSession(
                                                     debugSessionId,
-                                                    document.getElementById('network-flow-diagram'),
-                                                    { method, url, headers: headers.filter(h => h.enabled), body: bodyType !== 'none' ? bodyContent : null }
+                                                    document.getElementById('visualization-debugger-container'),
+                                                    sessionData
                                                 );
-                                                VisualizationDebugger.log(`Debug session started for ${method} ${url}`, 'info');
+                                                setCurrentDebugSession(session);
+
+                                                // Add a clear instruction to user
+                                                VisualizationDebugger.addLog(debugSessionId, 'info', `🎯 Debug session active. Click "Send" button to see request logs.`);
+                                                VisualizationDebugger.addLog(debugSessionId, 'info', `💻 Type 'help' in the console input below for available commands.`);
+
+                                                // Ensure console input is set up
+                                                setTimeout(() => {
+                                                    VisualizationDebugger.setupConsoleInput();
+                                                }, 1000);
+
+                                                // Start browser console capture for external websites
+                                                if (url && url !== 'no-url' && url.startsWith('http')) {
+                                                    setTimeout(async () => {
+                                                        const success = await VisualizationDebugger.startBrowserConsoleCapture(url);
+                                                        if (success) {
+                                                            VisualizationDebugger.addLog(debugSessionId, 'success', `🌐 Now capturing real-time console logs from ${url}`);
+                                                            VisualizationDebugger.addLog(debugSessionId, 'info', `💡 Browser console output (console.log, errors, warnings) will appear here in real-time`);
+                                                        } else {
+                                                            VisualizationDebugger.addLog(debugSessionId, 'warn', `⚠️ Could not start browser console capture for ${url}`);
+                                                            VisualizationDebugger.addLog(debugSessionId, 'info', `💡 You can still see Pigeon internal logs and proxy request/response data`);
+                                                        }
+                                                    }, 1000);
+                                                } else {
+                                                    VisualizationDebugger.addLog(debugSessionId, 'info', `💡 Enter a valid HTTP/HTTPS URL to capture external website console logs`);
+                                                }
+
+                                                // Test console interception with sample logs
+                                                setTimeout(() => {
+                                                    console.log("Test console.log - this should appear in debug console");
+                                                    console.warn("Test console.warn - this should appear in debug console");
+                                                    console.error("Test console.error - this should appear in debug console");
+                                                }, 1000);
                                             }
                                         } catch (error) {
                                             console.error('Error starting debug session:', error);
@@ -2241,270 +2444,233 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
                                         <circle cx="11" cy="11" r="8" stroke="currentColor" strokeWidth="2" />
                                         <path d="M21 21l-4.35-4.35" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                                     </svg>
-                                    Debug Request
+                                    Start Debugging
                                 </button>
                                 <button
-                                    className="debug-btn debug-btn-secondary"
-                                    onClick={() => {
-                                        try {
-                                            const performanceSessionId = 'performance-' + Date.now();
-                                            console.log('📊 Performance monitoring started', {
-                                                sessionId: performanceSessionId,
-                                                responseData: responseData
-                                            });
-
-                                            // Try to use VisualizationDebugger if available, but don't fail if not
-                                            if (typeof VisualizationDebugger !== 'undefined' && VisualizationDebugger.startPerformanceMonitoring) {
-                                                VisualizationDebugger.startPerformanceMonitoring(performanceSessionId);
-                                                VisualizationDebugger.log('Performance monitoring started', 'info', responseData);
-                                            }
-                                        } catch (error) {
-                                            console.error('Error starting performance monitoring:', error);
-                                        }
-                                    }}
-                                    disabled={!responseData}
-                                >
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M3 3v5h5M21 21v-5h-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                                        <path d="M21 7a9 9 0 00-9-9 9.75 9.75 0 00-6.74 2.74L3 8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                                        <path d="M3 17a9 9 0 009 9 9.75 9.75 0 006.74-2.74L21 16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                                    </svg>
-                                    Analyze Performance
-                                </button>
-                                <button
+                                    type="button"
                                     className="debug-btn debug-btn-ghost"
                                     onClick={() => {
-                                        console.clear();
-                                        console.log('Debug console cleared');
+                                        // Use VisualizationDebugger to clear the console
+                                        if (typeof VisualizationDebugger !== 'undefined') {
+                                            VisualizationDebugger.clearConsole();
+                                        }
                                     }}
                                 >
                                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                         <path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m3 0v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6h14z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                                     </svg>
-                                    Clear
+                                    Clear Console
+                                </button>
+                                <button
+                                    type="button"
+                                    className="debug-btn debug-btn-ghost"
+                                    onClick={() => {
+                                        // Test console interception
+                                        if (typeof VisualizationDebugger !== 'undefined') {
+                                            VisualizationDebugger.activateConsoleCapture();
+
+                                            // Test with actual console calls
+                                            setTimeout(() => {
+                                                console.log("✅ Test log message - this should appear in debug console");
+                                                console.warn("⚠️ Test warning message");
+                                                console.error("❌ Test error message");
+                                                console.log("Demo object:", { test: "data", number: 42 });
+                                            }, 500);
+                                        }
+                                    }}
+                                >
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M9 12l2 2 4-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                        <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" />
+                                    </svg>
+                                    Test Console Capture
+                                </button>
+                                <button
+                                    type="button"
+                                    className="debug-btn debug-btn-accent"
+                                    onClick={async () => {
+                                        // Toggle browser console capture
+                                        if (typeof VisualizationDebugger !== 'undefined') {
+                                            if (VisualizationDebugger._browserCaptureSession) {
+                                                await VisualizationDebugger.stopBrowserConsoleCapture();
+                                            } else if (url && url !== 'no-url' && url.startsWith('http')) {
+                                                const success = await VisualizationDebugger.startBrowserConsoleCapture(url);
+                                                if (success) {
+                                                    VisualizationDebugger.addLog(currentDebugSession?.id, 'success', `🌐 Browser console capture started for ${url}`);
+                                                } else {
+                                                    VisualizationDebugger.addLog(currentDebugSession?.id, 'error', `❌ Failed to start browser console capture`);
+                                                }
+                                            } else {
+                                                VisualizationDebugger.addLog(currentDebugSession?.id, 'warn', `⚠️ Enter a valid HTTP/HTTPS URL to capture website console logs`);
+                                            }
+                                        }
+                                    }}
+                                >
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 11-7.778 7.778 5.5 5.5 0 017.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                    </svg>
+                                    {(typeof VisualizationDebugger !== 'undefined' && VisualizationDebugger._browserCaptureSession) ? 'Stop Website Capture' : 'Capture Website Console'}
                                 </button>
                             </div>
                         </div>
 
-                        <div className="debug-tabs">
-                            <button
-                                className={`debug-tab ${activeDebugTab === 'console' ? 'debug-tab-active' : ''}`}
-                                onClick={(e) => {
-                                    e.preventDefault();
-                                    e.stopPropagation();
-                                    setActiveDebugTab('console');
-                                }}
-                            >
-                                Console
-                            </button>
-                            <button
-                                className={`debug-tab ${activeDebugTab === 'network' ? 'debug-tab-active' : ''}`}
-                                onClick={(e) => {
-                                    e.preventDefault();
-                                    e.stopPropagation();
-                                    setActiveDebugTab('network');
-                                }}
-                            >
-                                Network
-                            </button>
-                            <button
-                                className={`debug-tab ${activeDebugTab === 'performance' ? 'debug-tab-active' : ''}`}
-                                onClick={(e) => {
-                                    e.preventDefault();
-                                    e.stopPropagation();
-                                    setActiveDebugTab('performance');
-                                }}
-                            >
-                                Performance
-                            </button>
-                            <button
-                                className={`debug-tab ${activeDebugTab === 'sources' ? 'debug-tab-active' : ''}`}
-                                onClick={(e) => {
-                                    e.preventDefault();
-                                    e.stopPropagation();
-                                    setActiveDebugTab('sources');
-                                }}
-                            >
-                                Sources
-                            </button>
-                        </div>
-
                         <div className="debug-content">
-                            {activeDebugTab === 'console' && (
-                                <>
-                                    <div className="debug-output">
-                                        <div className="console-toolbar">
-                                            <div className="console-filters">
-                                                <button className="filter-btn filter-active">All</button>
-                                                <button className="filter-btn">Errors</button>
-                                                <button className="filter-btn">Warnings</button>
-                                                <button className="filter-btn">Info</button>
-                                                <button className="filter-btn">Debug</button>
-                                            </div>
-                                            <div className="console-controls">
-                                                <button className="control-btn" title="Settings">
-                                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                        <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="2" />
-                                                        <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z" stroke="currentColor" strokeWidth="2" />
-                                                    </svg>
-                                                </button>
-                                            </div>
+                            <div className="debug-tabs">
+                                <button type="button" className="debug-tab active" data-tab="console">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                        <rect x="2" y="4" width="20" height="16" rx="2" ry="2"></rect>
+                                        <line x1="8" y1="12" x2="16" y2="12"></line>
+                                        <line x1="8" y1="16" x2="14" y2="16"></line>
+                                        <line x1="2" y1="8" x2="22" y2="8"></line>
+                                    </svg>
+                                    <span>Console</span>
+                                </button>
+                                <button type="button" className="debug-tab" data-tab="network">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                        <circle cx="12" cy="12" r="10"></circle>
+                                        <path d="M2 12h20"></path>
+                                        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                                    </svg>
+                                    <span>Network</span>
+                                </button>
+                                <button type="button" className="debug-tab" data-tab="performance">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                        <path d="M12 20v-6"></path>
+                                        <path d="M6 20v-12"></path>
+                                        <path d="M18 20V8"></path>
+                                    </svg>
+                                    <span>Performance</span>
+                                </button>
+                                <button className="debug-tab" data-tab="elements">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                        <line x1="3" y1="9" x2="21" y2="9"></line>
+                                        <line x1="9" y1="21" x2="9" y2="9"></line>
+                                    </svg>
+                                    <span>Elements</span>
+                                </button>
+                            </div>
+                            <div className="debug-panels">
+                                <div className="debug-panel active" id="console-panel">
+                                    <div className="console-filters">
+                                        <div className="filter-group">
+                                            <button
+                                                type="button"
+                                                className={`filter-btn ${consoleFilter === 'all' ? 'active' : ''}`}
+                                                onClick={() => {
+                                                    setConsoleFilter('all');
+                                                    if (typeof VisualizationDebugger !== 'undefined') {
+                                                        VisualizationDebugger.setFilter('all');
+                                                    }
+                                                }}
+                                            >
+                                                All
+                                            </button>
+                                            <button
+                                                type="button"
+                                                className={`filter-btn ${consoleFilter === 'info' ? 'active' : ''}`}
+                                                onClick={() => {
+                                                    setConsoleFilter('info');
+                                                    if (typeof VisualizationDebugger !== 'undefined') {
+                                                        VisualizationDebugger.setFilter('info');
+                                                    }
+                                                }}
+                                            >
+                                                Info
+                                            </button>
+                                            <button
+                                                type="button"
+                                                className={`filter-btn ${consoleFilter === 'warn' ? 'active' : ''}`}
+                                                onClick={() => {
+                                                    setConsoleFilter('warn');
+                                                    if (typeof VisualizationDebugger !== 'undefined') {
+                                                        VisualizationDebugger.setFilter('warn');
+                                                    }
+                                                }}
+                                            >
+                                                Warnings
+                                            </button>
+                                            <button
+                                                type="button"
+                                                className={`filter-btn ${consoleFilter === 'error' ? 'active' : ''}`}
+                                                onClick={() => {
+                                                    setConsoleFilter('error');
+                                                    if (typeof VisualizationDebugger !== 'undefined') {
+                                                        VisualizationDebugger.setFilter('error');
+                                                    }
+                                                }}
+                                            >
+                                                Errors
+                                            </button>
+                                            <button
+                                                type="button"
+                                                className={`filter-btn ${consoleFilter === 'debug' ? 'active' : ''}`}
+                                                onClick={() => {
+                                                    setConsoleFilter('debug');
+                                                    if (typeof VisualizationDebugger !== 'undefined') {
+                                                        VisualizationDebugger.setFilter('debug');
+                                                    }
+                                                }}
+                                            >
+                                                Debug
+                                            </button>
                                         </div>
-                                        <div className="console-output">
-                                            <div className="console-entry console-entry-info">
-                                                <div className="console-timestamp">[{new Date().toLocaleTimeString()}]</div>
-                                                <div className="console-level">INFO</div>
-                                                <div className="console-message">Debug console initialized and ready</div>
-                                            </div>
-                                            <div className="console-entry console-entry-system">
-                                                <div className="console-timestamp">[{new Date().toLocaleTimeString()}]</div>
-                                                <div className="console-level">SYSTEM</div>
-                                                <div className="console-message">Use the debug actions above to analyze your request</div>
-                                            </div>
-                                            <div className="console-entry console-entry-debug">
-                                                <div className="console-timestamp">[{new Date().toLocaleTimeString()}]</div>
-                                                <div className="console-level">DEBUG</div>
-                                                <div className="console-message">Ready for {method} request to {url || 'undefined URL'}</div>
-                                            </div>
+                                        <div className="search-box">
+                                            <input
+                                                type="text"
+                                                placeholder="Filter logs..."
+                                                value={consoleSearchTerm}
+                                                onChange={(e) => setConsoleSearchTerm(e.target.value)}
+                                            />
                                         </div>
                                     </div>
-                                    <div className="debug-sidebar">
-                                        <div className="debug-info-panel">
-                                            <h5>Request Overview</h5>
-                                            <div className="info-grid">
-                                                <div className="info-item">
-                                                    <div className="info-label">Method</div>
-                                                    <div className="info-value method-badge method-{method.toLowerCase()}">{method}</div>
-                                                </div>
-                                                <div className="info-item">
-                                                    <div className="info-label">URL</div>
-                                                    <div className="info-value url-display">{url || 'No URL specified'}</div>
-                                                </div>
-                                                <div className="info-item">
-                                                    <div className="info-label">Headers</div>
-                                                    <div className="info-value">{headers.filter(h => h.enabled).length} active</div>
-                                                </div>
-                                                <div className="info-item">
-                                                    <div className="info-label">Body Type</div>
-                                                    <div className="info-value body-type-badge">{bodyType}</div>
-                                                </div>
-                                                <div className="info-item">
-                                                    <div className="info-label">Has Body</div>
-                                                    <div className="info-value">
-                                                        <span className={`status-badge ${bodyType !== 'none' && bodyContent ? 'status-yes' : 'status-no'}`}>
-                                                            {bodyType !== 'none' && bodyContent ? 'Yes' : 'No'}
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                            </div>
+                                    <div className="modern-debug-placeholder">
+                                        <div className="modern-debug-message">
+                                            <h3>🔍 Modern Debug Console</h3>
+                                            <p>Click "Start Debugging" to use the enhanced debug console with advanced filtering capabilities</p>
                                         </div>
                                     </div>
-                                </>
-                            )}
-
-                            {activeDebugTab === 'network' && (
-                                <div className="network-debug-content">
-                                    <div className="network-overview">
-                                        <h5>Network Analysis</h5>
-                                        <div className="network-info">
-                                            <div className="network-item">
-                                                <div className="network-label">Target URL</div>
-                                                <div className="network-value">{url || 'No URL specified'}</div>
-                                            </div>
-                                            <div className="network-item">
-                                                <div className="network-label">Protocol</div>
-                                                <div className="network-value">{url ? (url.startsWith('https') ? 'HTTPS' : 'HTTP') : 'Unknown'}</div>
-                                            </div>
-                                            <div className="network-item">
-                                                <div className="network-label">Request Headers</div>
-                                                <div className="network-value">{headers.filter(h => h.enabled).length} headers</div>
-                                            </div>
-                                            <div className="network-item">
-                                                <div className="network-label">Expected Response</div>
-                                                <div className="network-value">Pending request...</div>
-                                            </div>
-                                        </div>
+                                    <div className="console-input">
+                                        <input
+                                            type="text"
+                                            id="console-input"
+                                            placeholder="Enter command (type 'help' for available commands)..."
+                                            onKeyDown={(e) => {
+                                                if (e.key === 'Enter') {
+                                                    e.preventDefault();
+                                                    e.stopPropagation();
+                                                    // Let VisualizationDebugger handle the command
+                                                    return false;
+                                                }
+                                            }}
+                                        />
                                     </div>
-                                    <div className="network-timeline">
-                                        <h6>Request Timeline</h6>
-                                        <div className="timeline-placeholder">
-                                            <div className="timeline-message">Send a request to see network timeline</div>
+                                </div>
+                                <div className="debug-panel" id="network-panel">
+                                    <div className="network-requests" id="network-requests">
+                                        <div className="empty-state">
+                                            <h4>📡 Network Requests</h4>
+                                            <p>Start debugging to see network request details</p>
                                         </div>
                                     </div>
                                 </div>
-                            )}
-
-                            {activeDebugTab === 'performance' && (
-                                <div className="performance-debug-content">
-                                    <div className="debug-metrics-panel">
-                                        <h5>Performance Metrics</h5>
-                                        <div className="metrics-grid">
-                                            <div className="metric-item">
-                                                <div className="metric-value">--</div>
-                                                <div className="metric-label">Response Time</div>
-                                            </div>
-                                            <div className="metric-item">
-                                                <div className="metric-value">--</div>
-                                                <div className="metric-label">Network Time</div>
-                                            </div>
-                                            <div className="metric-item">
-                                                <div className="metric-value">--</div>
-                                                <div className="metric-label">Status Code</div>
-                                            </div>
-                                            <div className="metric-item">
-                                                <div className="metric-value">--</div>
-                                                <div className="metric-label">Content Size</div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className="performance-analysis">
-                                        <h6>Performance Analysis</h6>
-                                        <div className="analysis-placeholder">
-                                            <div className="analysis-message">Send a request to see performance analysis</div>
+                                <div className="debug-panel" id="performance-panel">
+                                    <div className="performance-metrics" id="performance-metrics">
+                                        <div className="empty-state">
+                                            <h4>⚡ Performance Metrics</h4>
+                                            <p>Start debugging to see performance data</p>
                                         </div>
                                     </div>
                                 </div>
-                            )}
-
-                            {activeDebugTab === 'sources' && (
-                                <div className="sources-debug-content">
-                                    <div className="sources-overview">
-                                        <h5>Request Sources</h5>
-                                        <div className="sources-info">
-                                            <div className="source-category">
-                                                <h6>Configuration</h6>
-                                                <div className="source-item">
-                                                    <span className="source-label">Method:</span>
-                                                    <span className="source-value">{method}</span>
-                                                </div>
-                                                <div className="source-item">
-                                                    <span className="source-label">Body Type:</span>
-                                                    <span className="source-value">{bodyType}</span>
-                                                </div>
-                                                <div className="source-item">
-                                                    <span className="source-label">Auth Type:</span>
-                                                    <span className="source-value">{authConfig.type}</span>
-                                                </div>
-                                            </div>
-                                            <div className="source-category">
-                                                <h6>Variables</h6>
-                                                <div className="variables-list">
-                                                    {Object.keys(resolvedVariables).length > 0 ? (
-                                                        Object.entries(resolvedVariables).map(([key, value]) => (
-                                                            <div key={key} className="variable-item">
-                                                                <span className="variable-key">{key}:</span>
-                                                                <span className="variable-value">{String(value)}</span>
-                                                            </div>
-                                                        ))
-                                                    ) : (
-                                                        <div className="no-variables">No variables defined</div>
-                                                    )}
-                                                </div>
-                                            </div>
+                                <div className="debug-panel" id="elements-panel">
+                                    <div className="elements-tree" id="elements-tree">
+                                        <div className="empty-state">
+                                            <h4>🏗️ Request Elements</h4>
+                                            <p>Start debugging to inspect request structure</p>
                                         </div>
                                     </div>
                                 </div>
-                            )}
+                            </div>
                         </div>
                     </div>
                 );
@@ -2679,6 +2845,14 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
                         className={`url-input ${getVariableInputClass(url)}`}
                         value={url}
                         onChange={handleUrlChange}
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                                e.preventDefault();
+                                if (!isLoading) {
+                                    handleSubmit(e);
+                                }
+                            }
+                        }}
                         placeholder="Enter request URL"
                         required
                     /><button type="submit" className="send-btn" disabled={isLoading || !variableValidation.isValid}>

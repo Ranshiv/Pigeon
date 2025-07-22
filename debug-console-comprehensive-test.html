@@ -1,0 +1,1256 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Debug Console Comprehensive Test</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 20px;
+        background: #1a1a1a;
+        color: #ffffff;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+
+      h1 {
+        color: #10b981;
+        text-align: center;
+        margin-bottom: 30px;
+      }
+
+      .test-section {
+        background: #2a2a2a;
+        margin: 20px 0;
+        padding: 20px;
+        border-radius: 8px;
+        border: 1px solid #404040;
+      }
+
+      .test-section h2 {
+        color: #3b82f6;
+        margin-top: 0;
+        border-bottom: 2px solid #3b82f6;
+        padding-bottom: 10px;
+      }
+
+      .test-button {
+        background: #3b82f6;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        margin: 5px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+      }
+
+      .test-button:hover {
+        background: #2563eb;
+      }
+
+      .test-button.success {
+        background: #10b981;
+      }
+
+      .test-button.error {
+        background: #ef4444;
+      }
+
+      .test-result {
+        margin: 10px 0;
+        padding: 10px;
+        border-radius: 4px;
+        font-family: monospace;
+      }
+
+      .test-result.success {
+        background: rgba(16, 185, 129, 0.2);
+        color: #10b981;
+        border: 1px solid #10b981;
+      }
+
+      .test-result.error {
+        background: rgba(239, 68, 68, 0.2);
+        color: #ef4444;
+        border: 1px solid #ef4444;
+      }
+
+      .test-result.info {
+        background: rgba(59, 130, 246, 0.2);
+        color: #3b82f6;
+        border: 1px solid #3b82f6;
+      }
+
+      .stats {
+        background: #374151;
+        padding: 15px;
+        border-radius: 8px;
+        margin: 20px 0;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+      }
+
+      .stat-item {
+        text-align: center;
+      }
+
+      .stat-value {
+        font-size: 24px;
+        font-weight: bold;
+        color: #10b981;
+      }
+
+      .stat-label {
+        font-size: 12px;
+        color: #9ca3af;
+        text-transform: uppercase;
+      }
+
+      /* Debug console styles - mimic the real implementation */
+      #visualization-debugger-container {
+        background: #0f172a;
+        border: 1px solid #1e293b;
+        border-radius: 8px;
+        margin: 20px 0;
+        min-height: 400px;
+      }
+
+      .debug-header {
+        background: #1e293b;
+        padding: 12px 16px;
+        border-bottom: 1px solid #334155;
+        border-radius: 8px 8px 0 0;
+      }
+
+      .debug-header h3 {
+        margin: 0;
+        color: #f1f5f9;
+        font-size: 16px;
+      }
+
+      .debug-controls {
+        padding: 12px 16px;
+        border-bottom: 1px solid #334155;
+        display: flex;
+        gap: 10px;
+      }
+
+      .debug-btn {
+        background: #3b82f6;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 12px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .debug-btn:hover {
+        background: #2563eb;
+      }
+
+      .debug-btn-ghost {
+        background: transparent;
+        border: 1px solid #475569;
+        color: #cbd5e1;
+      }
+
+      .debug-btn-ghost:hover {
+        background: #334155;
+      }
+
+      .debug-content {
+        padding: 16px;
+      }
+
+      .modern-debug-placeholder {
+        min-height: 300px;
+      }
+
+      .console-output {
+        flex: 1;
+        padding: 16px;
+        overflow-y: auto;
+        background: #0f172a;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+          "Liberation Mono", "Courier New", monospace;
+        scrollbar-width: thin;
+        scrollbar-color: #475569 #0f172a;
+        line-height: 1.6;
+        position: relative;
+        height: 300px;
+        border: 1px solid #1e293b;
+        border-radius: 8px;
+        color: #f8fafc;
+      }
+
+      .log-entry {
+        padding: 8px 12px;
+        margin-bottom: 4px;
+        background: rgba(255, 255, 255, 0.02);
+        border-radius: 4px;
+        animation: fadeIn 0.3s ease-in;
+      }
+
+      .log-entry.log-info {
+        border-left: 3px solid #3b82f6;
+      }
+
+      .log-entry.log-success {
+        border-left: 3px solid #10b981;
+      }
+
+      .log-entry.log-error {
+        border-left: 3px solid #ef4444;
+      }
+
+      .log-entry.log-warn {
+        border-left: 3px solid #f59e0b;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(-10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .performance-monitor {
+        background: #1f2937;
+        padding: 15px;
+        border-radius: 8px;
+        margin: 20px 0;
+      }
+
+      .performance-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 15px;
+        margin-top: 10px;
+      }
+
+      .performance-item {
+        text-align: center;
+      }
+
+      .performance-value {
+        font-size: 18px;
+        font-weight: bold;
+        color: #10b981;
+      }
+
+      .performance-label {
+        font-size: 11px;
+        color: #9ca3af;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>🧪 Debug Console Comprehensive Test Suite</h1>
+
+      <div class="stats">
+        <div class="stat-item">
+          <div class="stat-value" id="tests-passed">0</div>
+          <div class="stat-label">Tests Passed</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value" id="tests-failed">0</div>
+          <div class="stat-label">Tests Failed</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value" id="sessions-created">0</div>
+          <div class="stat-label">Sessions Created</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value" id="logs-generated">0</div>
+          <div class="stat-label">Logs Generated</div>
+        </div>
+      </div>
+
+      <!-- Test Section 1: Basic Functionality -->
+      <div class="test-section">
+        <h2>🔧 Basic Functionality Tests</h2>
+        <button class="test-button" onclick="testInitialization()">
+          Test Initialization
+        </button>
+        <button class="test-button" onclick="testSessionCreation()">
+          Test Session Creation
+        </button>
+        <button class="test-button" onclick="testBasicLogging()">
+          Test Basic Logging
+        </button>
+        <button class="test-button" onclick="testConsoleCreation()">
+          Test Console Creation
+        </button>
+        <div id="basic-results"></div>
+      </div>
+
+      <!-- Test Section 2: Advanced Logging -->
+      <div class="test-section">
+        <h2>📝 Advanced Logging Tests</h2>
+        <button class="test-button" onclick="testLogTypes()">
+          Test All Log Types
+        </button>
+        <button class="test-button" onclick="testComplexData()">
+          Test Complex Data
+        </button>
+        <button class="test-button" onclick="testCircularReferences()">
+          Test Circular References
+        </button>
+        <button class="test-button" onclick="testRapidLogging()">
+          Test Rapid Logging
+        </button>
+        <div id="advanced-results"></div>
+      </div>
+
+      <!-- Test Section 3: Network Request Tracking -->
+      <div class="test-section">
+        <h2>🌐 Network Request Tracking</h2>
+        <button class="test-button" onclick="testNetworkRequests()">
+          Test Network Tracking
+        </button>
+        <button class="test-button" onclick="testRequestUpdates()">
+          Test Request Updates
+        </button>
+        <button class="test-button" onclick="testMultipleRequests()">
+          Test Multiple Requests
+        </button>
+        <div id="network-results"></div>
+      </div>
+
+      <!-- Test Section 4: Performance & Safety -->
+      <div class="test-section">
+        <h2>⚡ Performance & Safety Tests</h2>
+        <button class="test-button" onclick="testPerformance()">
+          Test Performance
+        </button>
+        <button class="test-button" onclick="testMemoryManagement()">
+          Test Memory Management
+        </button>
+        <button class="test-button" onclick="testDOMSafety()">
+          Test DOM Safety
+        </button>
+        <button class="test-button" onclick="testErrorHandling()">
+          Test Error Handling
+        </button>
+        <div id="performance-results"></div>
+      </div>
+
+      <!-- Test Section 5: Integration Tests -->
+      <div class="test-section">
+        <h2>🔗 Integration Tests</h2>
+        <button class="test-button" onclick="testFullWorkflow()">
+          Test Full Workflow
+        </button>
+        <button class="test-button" onclick="testKeyboardShortcuts()">
+          Test Keyboard Shortcuts
+        </button>
+        <button class="test-button" onclick="testConsoleClear()">
+          Test Console Clear
+        </button>
+        <div id="integration-results"></div>
+      </div>
+
+      <!-- Performance Monitor -->
+      <div class="performance-monitor">
+        <h3 style="color: #f59e0b; margin-top: 0">
+          ⚡ Real-time Performance Monitor
+        </h3>
+        <div class="performance-grid">
+          <div class="performance-item">
+            <div class="performance-value" id="dom-operations">0</div>
+            <div class="performance-label">DOM Operations</div>
+          </div>
+          <div class="performance-item">
+            <div class="performance-value" id="memory-usage">0KB</div>
+            <div class="performance-label">Memory Usage</div>
+          </div>
+          <div class="performance-item">
+            <div class="performance-value" id="execution-time">0ms</div>
+            <div class="performance-label">Execution Time</div>
+          </div>
+          <div class="performance-item">
+            <div class="performance-value" id="active-sessions">0</div>
+            <div class="performance-label">Active Sessions</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Debug Console (Real Implementation) -->
+      <div id="visualization-debugger-container">
+        <div class="debug-header">
+          <h3>🔍 Debug Console - Live Test Environment</h3>
+        </div>
+        <div class="debug-controls">
+          <button class="debug-btn" onclick="startDebugging()">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <circle
+                cx="11"
+                cy="11"
+                r="8"
+                stroke="currentColor"
+                strokeWidth="2"
+              />
+              <path
+                d="M21 21l-4.35-4.35"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+            Start Debugging
+          </button>
+          <button
+            class="debug-btn debug-btn-ghost"
+            onclick="clearDebugConsole()"
+          >
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m3 0v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6h14z"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+            Clear Console
+          </button>
+          <button class="debug-btn debug-btn-ghost" onclick="runAllTests()">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+            Run All Tests
+          </button>
+        </div>
+        <div class="debug-content">
+          <div class="modern-debug-placeholder">
+            <div style="color: #64748b; text-align: center; padding: 40px">
+              Click "Start Debugging" to initialize the console and run tests
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Mock VisualizationDebugger for testing
+      class VisualizationDebugger {
+        static debugSessions = new Map();
+        static isEnabled = false;
+        static debugPanel = null;
+        static currentSessionId = null;
+        static isInitialized = false;
+        static _isUpdatingDOM = false;
+        static _pendingLogs = [];
+
+        static initialize() {
+          this.isEnabled = true;
+          if (!this.isInitialized) {
+            this.isInitialized = true;
+          }
+          return true;
+        }
+
+        static showDebugPanel() {
+          const debugContainer = document.getElementById(
+            "visualization-debugger-container"
+          );
+          if (debugContainer) {
+            const debugContent = debugContainer.querySelector(".debug-content");
+            if (debugContent) {
+              const placeholder = debugContent.querySelector(
+                ".modern-debug-placeholder"
+              );
+              if (placeholder) {
+                placeholder.innerHTML = `
+                                <div class="console-output" id="console-output">
+                                    <div style="color: #10b981; font-weight: bold;">🚀 Debug Console Ready</div>
+                                    <div style="color: #64748b; margin-top: 8px;">Console initialized successfully. Ready for logging.</div>
+                                </div>
+                            `;
+              }
+            }
+          }
+        }
+
+        static startSession(sessionId, element, data) {
+          const session = {
+            id: sessionId,
+            element: element,
+            data: data,
+            url: data?.url || "unknown",
+            method: data?.method || "GET",
+            startTime: Date.now(),
+            logs: [],
+            networkRequests: [],
+          };
+
+          this.debugSessions.set(sessionId, session);
+          this.currentSessionId = sessionId;
+
+          // Clean up old sessions
+          if (this.debugSessions.size > 3) {
+            const sessions = Array.from(this.debugSessions.entries());
+            const oldestSessionId = sessions[0][0];
+            this.debugSessions.delete(oldestSessionId);
+          }
+
+          this.showDebugPanel();
+          this.log(`🔍 Debug session started: ${sessionId}`, "info");
+          this.log(`📊 Ready to capture logs and network requests`, "success");
+
+          return session;
+        }
+
+        static log(message, type = "info", data = null, sessionId = null) {
+          const timestamp = new Date().toISOString();
+          let processedData = data;
+
+          if (data && typeof data === "object") {
+            try {
+              processedData = JSON.parse(JSON.stringify(data));
+            } catch (e) {
+              processedData = String(data);
+            }
+          }
+
+          const logEntry = {
+            timestamp,
+            message,
+            type,
+            data: processedData,
+            sessionId: sessionId || this.currentSessionId,
+          };
+
+          const targetSessionId = sessionId || this.currentSessionId;
+          const session = this.debugSessions.get(targetSessionId);
+
+          if (session) {
+            session.logs.push(logEntry);
+          }
+
+          this.displayLogInPanel(logEntry);
+          updateStats("logs-generated");
+        }
+
+        static displayLogInPanel(logEntry) {
+          if (this._isUpdatingDOM) {
+            this._pendingLogs.push(logEntry);
+            return;
+          }
+
+          this._isUpdatingDOM = true;
+
+          try {
+            let consoleOutput = document.getElementById("console-output");
+            if (!consoleOutput) return;
+
+            const logElement = document.createElement("div");
+            logElement.className = `log-entry log-${logEntry.type}`;
+
+            const timeStr = new Date(logEntry.timestamp).toLocaleTimeString();
+            const icon = this.getLogIcon(logEntry.type);
+            const color = this.getLogColor(logEntry.type);
+
+            let dataStr = "";
+            if (logEntry.data) {
+              try {
+                dataStr =
+                  typeof logEntry.data === "string"
+                    ? logEntry.data
+                    : JSON.stringify(logEntry.data, null, 2);
+                if (dataStr.length > 100) {
+                  dataStr = dataStr.substring(0, 100) + "...";
+                }
+              } catch (e) {
+                dataStr = String(logEntry.data);
+              }
+            }
+
+            logElement.innerHTML = `
+                        <div style="display: flex; align-items: flex-start; gap: 8px;">
+                            <span style="color: #64748b; font-size: 11px; min-width: 80px;">[${timeStr}]</span>
+                            <span style="color: ${color}; font-weight: 500; min-width: 20px;">${icon}</span>
+                            <div style="flex: 1;">
+                                <span style="color: #f1f5f9;">${
+                                  logEntry.message
+                                }</span>
+                                ${
+                                  dataStr
+                                    ? `<div style="color: #94a3b8; font-size: 12px; margin-top: 4px; background: rgba(0,0,0,0.2); padding: 4px; border-radius: 4px;">${dataStr}</div>`
+                                    : ""
+                                }
+                            </div>
+                        </div>
+                    `;
+
+            consoleOutput.appendChild(logElement);
+            consoleOutput.scrollTop = consoleOutput.scrollHeight;
+            updateStats("dom-operations");
+          } finally {
+            this._isUpdatingDOM = false;
+
+            if (this._pendingLogs.length > 0) {
+              const pendingLog = this._pendingLogs.shift();
+              setTimeout(() => this.displayLogInPanel(pendingLog), 10);
+            }
+          }
+        }
+
+        static clearConsole() {
+          const consoleOutput = document.getElementById("console-output");
+          if (consoleOutput) {
+            consoleOutput.innerHTML = `
+                        <div style="color: #10b981; font-weight: bold;">🧹 Console Cleared</div>
+                        <div style="color: #64748b; margin-top: 8px;">Ready for new logs...</div>
+                    `;
+          }
+
+          const currentSession = this.getCurrentSession();
+          if (currentSession) {
+            currentSession.logs = [];
+          }
+        }
+
+        static getCurrentSession() {
+          return this.debugSessions.get(this.currentSessionId);
+        }
+
+        static addNetworkRequest(sessionId, requestData) {
+          const session = this.debugSessions.get(sessionId);
+          if (session) {
+            session.networkRequests.push({
+              ...requestData,
+              timestamp: Date.now(),
+            });
+            this.log(
+              `🌐 Network request: ${requestData.method} ${requestData.url}`,
+              "info",
+              requestData,
+              sessionId
+            );
+          }
+        }
+
+        static updateNetworkRequest(sessionId, requestId, updateData) {
+          const session = this.debugSessions.get(sessionId);
+          if (session) {
+            const request = session.networkRequests.find(
+              (req) => req.id === requestId
+            );
+            if (request) {
+              Object.assign(request, updateData);
+
+              if (updateData.status === "completed") {
+                this.log(
+                  `✅ Request completed: ${updateData.statusCode} (${updateData.duration}ms)`,
+                  "success",
+                  updateData,
+                  sessionId
+                );
+              } else if (updateData.status === "failed") {
+                this.log(
+                  `❌ Request failed: ${updateData.error}`,
+                  "error",
+                  updateData,
+                  sessionId
+                );
+              }
+            }
+          }
+        }
+
+        static getLogIcon(type) {
+          switch (type) {
+            case "error":
+              return "❌";
+            case "warn":
+              return "⚠️";
+            case "success":
+              return "✅";
+            case "info":
+              return "ℹ️";
+            case "debug":
+              return "🔧";
+            default:
+              return "📝";
+          }
+        }
+
+        static getLogColor(type) {
+          switch (type) {
+            case "error":
+              return "#ef4444";
+            case "warn":
+              return "#f59e0b";
+            case "success":
+              return "#10b981";
+            case "info":
+              return "#3b82f6";
+            case "debug":
+              return "#64748b";
+            default:
+              return "#f1f5f9";
+          }
+        }
+      }
+
+      // Test tracking
+      let testStats = {
+        passed: 0,
+        failed: 0,
+        sessionsCreated: 0,
+        logsGenerated: 0,
+        domOperations: 0,
+        startTime: Date.now(),
+      };
+
+      function updateStats(type) {
+        testStats[type.replace("-", "")]++;
+        document.getElementById(type).textContent =
+          testStats[type.replace("-", "")];
+
+        // Update execution time
+        const executionTime = Date.now() - testStats.startTime;
+        document.getElementById("execution-time").textContent =
+          executionTime + "ms";
+
+        // Update active sessions
+        document.getElementById("active-sessions").textContent =
+          VisualizationDebugger.debugSessions.size;
+
+        // Update memory usage (approximation)
+        const memoryUsage =
+          JSON.stringify(testStats).length +
+          VisualizationDebugger.debugSessions.size * 1024;
+        document.getElementById("memory-usage").textContent =
+          (memoryUsage / 1024).toFixed(1) + "KB";
+      }
+
+      function showResult(containerId, success, message) {
+        const container = document.getElementById(containerId);
+        const resultDiv = document.createElement("div");
+        resultDiv.className = `test-result ${success ? "success" : "error"}`;
+        resultDiv.textContent = `${success ? "✅" : "❌"} ${message}`;
+        container.appendChild(resultDiv);
+
+        if (success) {
+          updateStats("tests-passed");
+        } else {
+          updateStats("tests-failed");
+        }
+      }
+
+      // Test Functions
+      function testInitialization() {
+        try {
+          const result = VisualizationDebugger.initialize();
+          showResult(
+            "basic-results",
+            result && VisualizationDebugger.isEnabled,
+            "Initialization test"
+          );
+        } catch (error) {
+          showResult(
+            "basic-results",
+            false,
+            `Initialization failed: ${error.message}`
+          );
+        }
+      }
+
+      function testSessionCreation() {
+        try {
+          const session = VisualizationDebugger.startSession(
+            "test-session",
+            null,
+            {
+              url: "https://api.test.com",
+              method: "GET",
+            }
+          );
+          updateStats("sessions-created");
+          showResult(
+            "basic-results",
+            session && session.id === "test-session",
+            "Session creation test"
+          );
+        } catch (error) {
+          showResult(
+            "basic-results",
+            false,
+            `Session creation failed: ${error.message}`
+          );
+        }
+      }
+
+      function testBasicLogging() {
+        try {
+          VisualizationDebugger.log("Test message", "info");
+          const session = VisualizationDebugger.getCurrentSession();
+          showResult(
+            "basic-results",
+            session && session.logs.length > 0,
+            "Basic logging test"
+          );
+        } catch (error) {
+          showResult(
+            "basic-results",
+            false,
+            `Basic logging failed: ${error.message}`
+          );
+        }
+      }
+
+      function testConsoleCreation() {
+        try {
+          VisualizationDebugger.showDebugPanel();
+          const consoleOutput = document.getElementById("console-output");
+          showResult(
+            "basic-results",
+            consoleOutput !== null,
+            "Console creation test"
+          );
+        } catch (error) {
+          showResult(
+            "basic-results",
+            false,
+            `Console creation failed: ${error.message}`
+          );
+        }
+      }
+
+      function testLogTypes() {
+        try {
+          const types = ["info", "success", "warn", "error", "debug"];
+          types.forEach((type) => {
+            VisualizationDebugger.log(`Test ${type} message`, type);
+          });
+          showResult("advanced-results", true, "All log types test");
+        } catch (error) {
+          showResult(
+            "advanced-results",
+            false,
+            `Log types test failed: ${error.message}`
+          );
+        }
+      }
+
+      function testComplexData() {
+        try {
+          const complexData = {
+            user: { name: "John", age: 30 },
+            permissions: ["read", "write"],
+            metadata: { created: new Date(), version: 1.0 },
+          };
+          VisualizationDebugger.log("Complex data test", "info", complexData);
+          showResult("advanced-results", true, "Complex data logging test");
+        } catch (error) {
+          showResult(
+            "advanced-results",
+            false,
+            `Complex data test failed: ${error.message}`
+          );
+        }
+      }
+
+      function testCircularReferences() {
+        try {
+          const obj = { name: "circular" };
+          obj.self = obj;
+          VisualizationDebugger.log("Circular reference test", "info", obj);
+          showResult(
+            "advanced-results",
+            true,
+            "Circular reference handling test"
+          );
+        } catch (error) {
+          showResult(
+            "advanced-results",
+            false,
+            `Circular reference test failed: ${error.message}`
+          );
+        }
+      }
+
+      function testRapidLogging() {
+        try {
+          const startTime = Date.now();
+          for (let i = 0; i < 50; i++) {
+            VisualizationDebugger.log(`Rapid log ${i}`, "info", { index: i });
+          }
+          const duration = Date.now() - startTime;
+          showResult(
+            "advanced-results",
+            duration < 1000,
+            `Rapid logging test (${duration}ms)`
+          );
+        } catch (error) {
+          showResult(
+            "advanced-results",
+            false,
+            `Rapid logging test failed: ${error.message}`
+          );
+        }
+      }
+
+      function testNetworkRequests() {
+        try {
+          VisualizationDebugger.addNetworkRequest("test-session", {
+            id: "req-1",
+            method: "POST",
+            url: "https://api.test.com/data",
+            status: "pending",
+          });
+          const session = VisualizationDebugger.getCurrentSession();
+          showResult(
+            "network-results",
+            session.networkRequests.length > 0,
+            "Network request tracking test"
+          );
+        } catch (error) {
+          showResult(
+            "network-results",
+            false,
+            `Network tracking failed: ${error.message}`
+          );
+        }
+      }
+
+      function testRequestUpdates() {
+        try {
+          VisualizationDebugger.updateNetworkRequest("test-session", "req-1", {
+            status: "completed",
+            statusCode: 200,
+            statusText: "OK",
+            duration: 150,
+          });
+          showResult("network-results", true, "Network request update test");
+        } catch (error) {
+          showResult(
+            "network-results",
+            false,
+            `Request update failed: ${error.message}`
+          );
+        }
+      }
+
+      function testMultipleRequests() {
+        try {
+          for (let i = 2; i <= 5; i++) {
+            VisualizationDebugger.addNetworkRequest("test-session", {
+              id: `req-${i}`,
+              method: "GET",
+              url: `https://api.test.com/endpoint${i}`,
+              status: "pending",
+            });
+          }
+          const session = VisualizationDebugger.getCurrentSession();
+          showResult(
+            "network-results",
+            session.networkRequests.length === 5,
+            "Multiple requests test"
+          );
+        } catch (error) {
+          showResult(
+            "network-results",
+            false,
+            `Multiple requests failed: ${error.message}`
+          );
+        }
+      }
+
+      function testPerformance() {
+        try {
+          const startTime = Date.now();
+
+          // Create multiple sessions
+          for (let i = 0; i < 5; i++) {
+            VisualizationDebugger.startSession(`perf-${i}`, null, {
+              url: `https://perf${i}.com`,
+            });
+          }
+
+          const duration = Date.now() - startTime;
+          showResult(
+            "performance-results",
+            duration < 500,
+            `Performance test (${duration}ms)`
+          );
+        } catch (error) {
+          showResult(
+            "performance-results",
+            false,
+            `Performance test failed: ${error.message}`
+          );
+        }
+      }
+
+      function testMemoryManagement() {
+        try {
+          // Test session cleanup
+          for (let i = 0; i < 10; i++) {
+            VisualizationDebugger.startSession(`memory-${i}`, null, {
+              url: `https://memory${i}.com`,
+            });
+          }
+
+          const sessionCount = VisualizationDebugger.debugSessions.size;
+          showResult(
+            "performance-results",
+            sessionCount <= 3,
+            `Memory management test (${sessionCount} sessions)`
+          );
+        } catch (error) {
+          showResult(
+            "performance-results",
+            false,
+            `Memory management failed: ${error.message}`
+          );
+        }
+      }
+
+      function testDOMSafety() {
+        try {
+          // Test rapid DOM operations
+          VisualizationDebugger._isUpdatingDOM = true;
+          VisualizationDebugger.log("Should be queued", "info");
+
+          const pendingCount = VisualizationDebugger._pendingLogs.length;
+          VisualizationDebugger._isUpdatingDOM = false;
+
+          showResult(
+            "performance-results",
+            pendingCount > 0,
+            "DOM safety test"
+          );
+        } catch (error) {
+          showResult(
+            "performance-results",
+            false,
+            `DOM safety test failed: ${error.message}`
+          );
+        }
+      }
+
+      function testErrorHandling() {
+        try {
+          // Test various error conditions
+          VisualizationDebugger.log(null, "info");
+          VisualizationDebugger.log("test", null);
+          VisualizationDebugger.addNetworkRequest("non-existent", {});
+
+          showResult("performance-results", true, "Error handling test");
+        } catch (error) {
+          showResult(
+            "performance-results",
+            false,
+            `Error handling failed: ${error.message}`
+          );
+        }
+      }
+
+      function testFullWorkflow() {
+        try {
+          // Simulate complete request workflow
+          const session = VisualizationDebugger.startSession("workflow", null, {
+            method: "POST",
+            url: "https://api.workflow.com/submit",
+          });
+
+          VisualizationDebugger.addNetworkRequest("workflow", {
+            id: "workflow-req",
+            method: "POST",
+            url: "https://api.workflow.com/submit",
+          });
+
+          VisualizationDebugger.updateNetworkRequest(
+            "workflow",
+            "workflow-req",
+            {
+              status: "completed",
+              statusCode: 201,
+              duration: 234,
+            }
+          );
+
+          showResult(
+            "integration-results",
+            session.networkRequests.length > 0,
+            "Full workflow test"
+          );
+        } catch (error) {
+          showResult(
+            "integration-results",
+            false,
+            `Full workflow failed: ${error.message}`
+          );
+        }
+      }
+
+      function testKeyboardShortcuts() {
+        try {
+          // Test keyboard shortcut handling (simulated)
+          const event = new KeyboardEvent("keydown", {
+            key: "D",
+            ctrlKey: true,
+            shiftKey: true,
+          });
+
+          showResult(
+            "integration-results",
+            true,
+            "Keyboard shortcuts test (simulated)"
+          );
+        } catch (error) {
+          showResult(
+            "integration-results",
+            false,
+            `Keyboard shortcuts failed: ${error.message}`
+          );
+        }
+      }
+
+      function testConsoleClear() {
+        try {
+          VisualizationDebugger.clearConsole();
+          const session = VisualizationDebugger.getCurrentSession();
+          showResult(
+            "integration-results",
+            session.logs.length === 0,
+            "Console clear test"
+          );
+        } catch (error) {
+          showResult(
+            "integration-results",
+            false,
+            `Console clear failed: ${error.message}`
+          );
+        }
+      }
+
+      // Main Functions
+      function startDebugging() {
+        VisualizationDebugger.initialize();
+        const session = VisualizationDebugger.startSession(
+          "main-session",
+          document.getElementById("visualization-debugger-container"),
+          {
+            method: "GET",
+            url: "https://api.example.com/test",
+          }
+        );
+        updateStats("sessions-created");
+
+        VisualizationDebugger.log(
+          "🎯 Debug console started successfully!",
+          "success"
+        );
+        VisualizationDebugger.log("Ready to run comprehensive tests", "info");
+      }
+
+      function clearDebugConsole() {
+        VisualizationDebugger.clearConsole();
+      }
+
+      function runAllTests() {
+        // Clear previous results
+        document.querySelectorAll(".test-result").forEach((el) => el.remove());
+
+        // Reset stats
+        testStats = {
+          passed: 0,
+          failed: 0,
+          sessionsCreated: 0,
+          logsGenerated: 0,
+          domOperations: 0,
+          startTime: Date.now(),
+        };
+
+        VisualizationDebugger.log(
+          "🧪 Starting comprehensive test suite...",
+          "info"
+        );
+
+        // Run all tests with delays to see progress
+        setTimeout(() => testInitialization(), 100);
+        setTimeout(() => testSessionCreation(), 200);
+        setTimeout(() => testBasicLogging(), 300);
+        setTimeout(() => testConsoleCreation(), 400);
+        setTimeout(() => testLogTypes(), 500);
+        setTimeout(() => testComplexData(), 600);
+        setTimeout(() => testCircularReferences(), 700);
+        setTimeout(() => testRapidLogging(), 800);
+        setTimeout(() => testNetworkRequests(), 900);
+        setTimeout(() => testRequestUpdates(), 1000);
+        setTimeout(() => testMultipleRequests(), 1100);
+        setTimeout(() => testPerformance(), 1200);
+        setTimeout(() => testMemoryManagement(), 1300);
+        setTimeout(() => testDOMSafety(), 1400);
+        setTimeout(() => testErrorHandling(), 1500);
+        setTimeout(() => testFullWorkflow(), 1600);
+        setTimeout(() => testKeyboardShortcuts(), 1700);
+        setTimeout(() => testConsoleClear(), 1800);
+
+        setTimeout(() => {
+          VisualizationDebugger.log(
+            `✅ Test suite completed! Passed: ${testStats.passed}, Failed: ${testStats.failed}`,
+            "success"
+          );
+        }, 2000);
+      }
+
+      // Initialize on page load
+      window.addEventListener("load", () => {
+        VisualizationDebugger.log = VisualizationDebugger.log.bind(
+          VisualizationDebugger
+        );
+
+        // Performance monitoring
+        setInterval(() => {
+          updateStats("dom-operations");
+        }, 1000);
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Debug Console Design Test</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 20px;
+        background: #1a1a1a;
+        color: #ffffff;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+
+      h1 {
+        color: #10b981;
+        text-align: center;
+        margin-bottom: 30px;
+      }
+
+      .test-section {
+        background: #2a2a2a;
+        margin: 20px 0;
+        padding: 20px;
+        border-radius: 8px;
+        border: 1px solid #404040;
+      }
+
+      .test-section h2 {
+        color: #3b82f6;
+        margin-top: 0;
+        border-bottom: 2px solid #3b82f6;
+        padding-bottom: 10px;
+      }
+
+      /* Enhanced Console Input - Clean Modern Design */
+      .console-input {
+        border-top: 1px solid #21262d;
+        padding: 12px 16px;
+        background: #0d1117;
+        position: relative;
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+        border-radius: 8px;
+        margin: 20px 0;
+      }
+
+      .console-input::before {
+        content: "❯";
+        color: #58a6ff;
+        font-family: "SF Mono", Monaco, "Cascadia Code", "Roboto Mono", Consolas,
+          "Courier New", monospace;
+        font-size: 14px;
+        font-weight: 600;
+        margin-right: 12px;
+        line-height: 1;
+      }
+
+      .console-input input {
+        flex: 1;
+        background: transparent;
+        border: none;
+        color: #f0f6fc;
+        font-family: "SF Mono", Monaco, "Cascadia Code", "Roboto Mono", Consolas,
+          "Courier New", monospace;
+        font-size: 13px;
+        padding: 0;
+        outline: none;
+        line-height: 1.4;
+      }
+
+      .console-input input::placeholder {
+        color: #6e7681;
+        font-style: italic;
+      }
+
+      .console-input input:focus::placeholder {
+        color: #484f58;
+      }
+
+      /* Modern Debug Console Container */
+      .debug-console-container {
+        flex: 1;
+        padding: 0;
+        overflow-y: auto;
+        background: #0f1419;
+        font-family: "SF Mono", "Monaco", "Inconsolata", "Roboto Mono",
+          "Source Code Pro", monospace;
+        line-height: 1.6;
+        position: relative;
+        height: 320px;
+        border: 1px solid #1e2328;
+        border-radius: 8px;
+        color: #e6e6e6;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12), 0 1px 3px rgba(0, 0, 0, 0.08);
+        margin: 20px 0;
+      }
+
+      /* Welcome Message */
+      .console-welcome-message {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 24px;
+        margin: 16px;
+        background: #161b22;
+        border: 1px solid #21262d;
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      }
+
+      .welcome-icon {
+        font-size: 20px;
+        line-height: 1;
+        opacity: 0.9;
+        color: #58a6ff;
+      }
+
+      .welcome-content {
+        flex: 1;
+      }
+
+      .welcome-title {
+        color: #f0f6fc;
+        font-weight: 600;
+        font-size: 15px;
+        margin-bottom: 6px;
+        letter-spacing: -0.01em;
+      }
+
+      .welcome-subtitle {
+        color: #8b949e;
+        font-size: 13px;
+        line-height: 1.5;
+        font-weight: 400;
+      }
+
+      /* Log Entries */
+      .log-entry {
+        padding: 12px 16px;
+        margin-bottom: 1px;
+        border-radius: 4px;
+        transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        border-left: 3px solid transparent;
+        background: transparent;
+      }
+
+      .log-entry:hover {
+        background: #161b22;
+        border-left-color: #30363d;
+      }
+
+      .log-entry-content {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+      }
+
+      .log-timestamp {
+        color: #6e7681;
+        font-size: 11px;
+        min-width: 65px;
+        font-weight: 500;
+        letter-spacing: 0.01em;
+        opacity: 0.8;
+      }
+
+      .log-icon {
+        min-width: 18px;
+        font-size: 13px;
+        line-height: 1.2;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .log-message {
+        flex: 1;
+        color: #e6e6e6;
+        font-size: 13px;
+        line-height: 1.5;
+        font-weight: 400;
+      }
+
+      /* Log type colors */
+      .log-info .log-icon {
+        color: #58a6ff;
+      }
+      .log-info {
+        border-left-color: #1f6feb;
+      }
+
+      .log-success .log-icon {
+        color: #3fb950;
+      }
+      .log-success {
+        border-left-color: #238636;
+      }
+
+      .log-warn .log-icon {
+        color: #d29922;
+      }
+      .log-warn {
+        border-left-color: #bf8700;
+      }
+
+      .log-error .log-icon {
+        color: #f85149;
+      }
+      .log-error {
+        border-left-color: #da3633;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>🎨 Debug Console Design Test</h1>
+
+      <!-- Test Section 1: Console Input -->
+      <div class="test-section">
+        <h2>Enhanced Console Input</h2>
+        <p>Modern console input with clean styling and interactive prompt</p>
+        <div class="console-input">
+          <input
+            type="text"
+            placeholder="Type commands like 'clear', 'help', or 'test'..."
+          />
+        </div>
+      </div>
+
+      <!-- Test Section 2: Debug Console Container -->
+      <div class="test-section">
+        <h2>Modern Debug Console Container</h2>
+        <p>Clean debug console with welcome message and sample log entries</p>
+        <div class="debug-console-container">
+          <div class="console-welcome-message">
+            <div class="welcome-icon">🔧</div>
+            <div class="welcome-content">
+              <div class="welcome-title">Debug Console Initialized</div>
+              <div class="welcome-subtitle">
+                Start debugging to see request/response logs, network activity,
+                and system events
+              </div>
+            </div>
+          </div>
+
+          <!-- Sample log entries -->
+          <div class="log-entry log-info">
+            <div class="log-entry-content">
+              <div class="log-timestamp">14:23:45</div>
+              <div class="log-icon">ℹ</div>
+              <div class="log-message">Session started successfully</div>
+            </div>
+          </div>
+
+          <div class="log-entry log-success">
+            <div class="log-entry-content">
+              <div class="log-timestamp">14:23:47</div>
+              <div class="log-icon">✓</div>
+              <div class="log-message">API request completed</div>
+            </div>
+          </div>
+
+          <div class="log-entry log-warn">
+            <div class="log-entry-content">
+              <div class="log-timestamp">14:23:49</div>
+              <div class="log-icon">⚠</div>
+              <div class="log-message">Deprecated endpoint detected</div>
+            </div>
+          </div>
+
+          <div class="log-entry log-error">
+            <div class="log-entry-content">
+              <div class="log-timestamp">14:23:52</div>
+              <div class="log-icon">✗</div>
+              <div class="log-message">Network timeout error</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Test Section 3: Responsive Console Input -->
+      <div class="test-section">
+        <h2>Responsive Design</h2>
+        <p>Console components adapt well to different screen sizes</p>
+        <div style="max-width: 400px">
+          <div class="console-input">
+            <input type="text" placeholder="Smaller viewport test..." />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Add some interactive functionality
+      document.querySelectorAll(".console-input input").forEach((input) => {
+        input.addEventListener("keypress", function (e) {
+          if (e.key === "Enter") {
+            console.log("Command entered:", this.value);
+            this.value = "";
+          }
+        });
+
+        input.addEventListener("focus", function () {
+          this.parentElement.style.borderColor = "#3b82f6";
+          this.parentElement.style.boxShadow =
+            "0 0 0 2px rgba(59, 130, 246, 0.2)";
+        });
+
+        input.addEventListener("blur", function () {
+          this.parentElement.style.borderColor = "#21262d";
+          this.parentElement.style.boxShadow = "none";
+        });
+      });
+    </script>
+  </body>
+</html>

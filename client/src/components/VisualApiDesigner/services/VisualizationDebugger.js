@@ -7,76 +7,148 @@ export class VisualizationDebugger {
     static debugSessions = new Map();
     static isEnabled = false;
     static debugPanel = null;
+    static currentSessionId = null;
+    static isInitialized = false;
+
+    // DOM operation management to prevent freezing
+    static _isUpdatingDOM = false;
+    static _pendingLogs = [];
+
+    // Console interception
+    static _originalConsole = {};
+    static _consoleInterceptionActive = false;
+
+    // Browser console capture for external websites
+    static _browserCaptureSession = null;
+    static _browserCapturePolling = null;
+
+    // Log filtering
+    static _currentFilter = 'all';
+    static _filterCallbacks = new Set();
 
     /**
      * Initialize the debugging system
      */
     static initialize() {
         this.isEnabled = true;
-        this.createDebugPanel();
-        this.setupKeyboardShortcuts();
-        console.log('🔍 Visualization Debugger initialized');
+
+        if (!this.isInitialized) {
+            this.setupKeyboardShortcuts();
+            this.setupConsoleInterception();
+            this.isInitialized = true;
+        }
+
+        const requestFormDebugContainer = document.getElementById('visualization-debugger-container');
+        if (requestFormDebugContainer) {
+            this.hidePopupPanel();
+            return;
+        }
+
+        if (!this.debugPanel) {
+            this.createDebugPanel();
+        }
     }
 
     /**
-     * Create debug panel UI
+     * Setup console interception to capture browser console events
      */
-    static createDebugPanel() {
-        // Create debug panel container
-        const panel = document.createElement('div');
-        panel.id = 'viz-debug-panel';
-        panel.className = 'viz-debug-panel hidden';
+    static setupConsoleInterception() {
+        if (this._consoleInterceptionActive) {
+            return; // Already setup
+        }
 
-        panel.innerHTML = `
-            <div class="debug-header">
-                <h3>🔍 Visualization Debugger</h3>
-                <div class="debug-controls">
-                    <button class="debug-btn" id="debug-clear">Clear</button>
-                    <button class="debug-btn" id="debug-export">Export</button>
-                    <button class="debug-btn close-btn" id="debug-close">×</button>
-                </div>
-            </div>
-            <div class="debug-content">
-                <div class="debug-tabs">
-                    <button class="debug-tab active" data-tab="console">Console</button>
-                    <button class="debug-tab" data-tab="elements">Elements</button>
-                    <button class="debug-tab" data-tab="network">Network</button>
-                    <button class="debug-tab" data-tab="performance">Performance</button>
-                    <button class="debug-tab" data-tab="templates">Templates</button>
-                </div>
-                <div class="debug-panels">
-                    <div class="debug-panel active" id="console-panel">
-                        <div class="console-output" id="console-output"></div>
-                        <div class="console-input">
-                            <input type="text" id="console-input" placeholder="Enter command..." />
-                        </div>
-                    </div>
-                    <div class="debug-panel" id="elements-panel">
-                        <div class="elements-tree" id="elements-tree"></div>
-                    </div>
-                    <div class="debug-panel" id="network-panel">
-                        <div class="network-requests" id="network-requests"></div>
-                    </div>
-                    <div class="debug-panel" id="performance-panel">
-                        <div class="performance-metrics" id="performance-metrics"></div>
-                    </div>
-                    <div class="debug-panel" id="templates-panel">
-                        <div class="template-editor" id="template-editor"></div>
-                    </div>
-                </div>
-            </div>
-        `;
+        // Store original console methods
+        this._originalConsole = {
+            log: console.log.bind(console),
+            error: console.error.bind(console),
+            warn: console.warn.bind(console),
+            info: console.info.bind(console),
+            debug: console.debug.bind(console)
+        };
 
-        // Add styles
-        const styles = document.createElement('style');
-        styles.textContent = this.getDebugPanelStyles();
-        document.head.appendChild(styles);
+        // Override console methods to intercept and capture logs
+        const self = this;
 
-        document.body.appendChild(panel);
-        this.debugPanel = panel;
+        console.log = function (...args) {
+            self._originalConsole.log(...args);
+            self._captureConsoleEvent('info', args);
+        };
 
-        // Add event listeners
-        this.setupPanelEventListeners();
+        console.error = function (...args) {
+            self._originalConsole.error(...args);
+            self._captureConsoleEvent('error', args);
+        };
+
+        console.warn = function (...args) {
+            self._originalConsole.warn(...args);
+            self._captureConsoleEvent('warn', args);
+        };
+
+        console.info = function (...args) {
+            self._originalConsole.info(...args);
+            self._captureConsoleEvent('info', args);
+        };
+
+        console.debug = function (...args) {
+            self._originalConsole.debug(...args);
+            self._captureConsoleEvent('debug', args);
+        };
+
+        this._consoleInterceptionActive = true;
+
+        // Log that interception is active
+        this.log('🔍 Browser console interception activated', 'success');
+    }
+
+    /**
+     * Capture console events and display them in debug console
+     */
+    static _captureConsoleEvent(type, args) {
+        if (!this.currentSessionId || !this.debugSessions.has(this.currentSessionId)) {
+            return; // No active debug session
+        }
+
+        // Format the console arguments
+        let message = '';
+        let data = null;
+
+        if (args.length === 1) {
+            if (typeof args[0] === 'string') {
+                message = args[0];
+            } else {
+                message = 'Console Output';
+                data = args[0];
+            }
+        } else if (args.length > 1) {
+            message = args[0] || 'Console Output';
+            data = args.slice(1);
+        }
+
+        // Add icon based on type
+        const typeIcon = type === 'error' ? '🔴' : type === 'warn' ? '🟡' : type === 'debug' ? '🔧' : '🔵';
+
+        // Log the captured console event
+        this.log(`${typeIcon} Browser Console: ${message}`, type, data);
+    }
+
+    /**
+     * Restore original console methods
+     */
+    static restoreConsole() {
+        if (!this._consoleInterceptionActive) {
+            return;
+        }
+
+        console.log = this._originalConsole.log;
+        console.error = this._originalConsole.error;
+        console.warn = this._originalConsole.warn;
+        console.info = this._originalConsole.info;
+        console.debug = this._originalConsole.debug;
+
+        this._consoleInterceptionActive = false;
+
+        // Use original console.log to avoid infinite loop
+        this._originalConsole.log('🔍 Browser console interception deactivated');
     }
 
     /**
@@ -84,23 +156,54 @@ export class VisualizationDebugger {
      */
     static setupKeyboardShortcuts() {
         document.addEventListener('keydown', (e) => {
-            // F12 or Ctrl+Shift+I to toggle debug panel
-            if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && e.key === 'I')) {
+            // Only use Ctrl+Shift+D for our debug panel to avoid conflicts with browser dev tools
+            if (e.ctrlKey && e.shiftKey && e.key === 'D') {
                 e.preventDefault();
+
+                const requestFormDebugContainer = document.getElementById('visualization-debugger-container');
+                if (requestFormDebugContainer) {
+                    requestFormDebugContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    return;
+                }
+
                 this.toggleDebugPanel();
             }
         });
     }
 
     /**
+     * Create debug panel UI
+     */
+    static createDebugPanel() {
+        const panel = document.createElement('div');
+        panel.id = 'viz-debug-panel';
+        panel.className = 'viz-debug-panel hidden';
+        panel.innerHTML = '<div>Debug Panel - Simplified Version</div>';
+
+        document.body.appendChild(panel);
+        this.debugPanel = panel;
+    }
+
+    /**
      * Toggle debug panel visibility
      */
     static toggleDebugPanel() {
+        const requestFormDebugContainer = document.getElementById('visualization-debugger-container');
+        if (requestFormDebugContainer) {
+            return;
+        }
+
         if (!this.debugPanel) return;
 
-        this.debugPanel.classList.toggle('hidden');
-        if (!this.debugPanel.classList.contains('hidden')) {
-            this.refreshDebugInfo();
+        const isHidden = this.debugPanel.classList.contains('hidden');
+
+        if (isHidden) {
+            this.debugPanel.style.pointerEvents = 'auto';
+            this.debugPanel.style.visibility = 'visible';
+            this.debugPanel.classList.remove('hidden');
+        } else {
+            this.debugPanel.classList.add('hidden');
+            this.debugPanel.style.pointerEvents = 'none';
         }
     }
 
@@ -108,36 +211,706 @@ export class VisualizationDebugger {
      * Show debug panel
      */
     static showDebugPanel() {
+        const requestFormDebugContainer = document.getElementById('visualization-debugger-container');
+        if (requestFormDebugContainer) {
+            this.removePopupPanels();
+
+            const debugContent = requestFormDebugContainer.querySelector('.debug-content');
+            if (debugContent) {
+                const placeholder = debugContent.querySelector('.modern-debug-placeholder');
+                if (placeholder) {
+                    // Add modern debug console styles
+                    this.addModernDebugStyles();
+
+                    placeholder.innerHTML = `
+                        <div class="debug-console-container" id="console-output" ">
+                            <div class="console-welcome-message">
+                                <div class="welcome-icon">�</div>
+                                <div class="welcome-content">
+                                    <div class="welcome-title">Debug Console Initialized</div>
+                                    <div class="welcome-subtitle">Start debugging to see request/response logs, network activity, and system events</div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+            }
+
+            // Setup console input event listeners
+            setTimeout(() => this.setupConsoleInput(), 500);
+
+            return;
+        }
+
+        if (!this.debugPanel) {
+            this.createDebugPanel();
+        }
+
+        this.debugPanel.style.pointerEvents = 'auto';
+        this.debugPanel.style.visibility = 'visible';
         this.debugPanel.classList.remove('hidden');
-        this.logToConsole('🔍 Debug panel opened', 'info');
     }
 
     /**
-     * Hide debug panel
+     * Hide any existing popup debug panel
      */
-    static hideDebugPanel() {
-        this.debugPanel.classList.add('hidden');
+    static hidePopupPanel() {
+        if (this.debugPanel) {
+            this.debugPanel.classList.add('hidden');
+            this.debugPanel.style.pointerEvents = 'none';
+        }
+    }
+
+    /**
+     * Completely remove popup panels from DOM
+     */
+    static removePopupPanels() {
+        const existingPanels = document.querySelectorAll('#viz-debug-panel');
+        existingPanels.forEach((panel) => {
+            panel.remove();
+        });
+
+        this.debugPanel = null;
+    }
+
+    /**
+     * Add modern debug console styles
+     */
+    static addModernDebugStyles() {
+        // Prevent duplicate styles
+        if (document.querySelector('style[data-debug-modern-styles]')) {
+            return;
+        }
+
+        const style = document.createElement('style');
+        style.setAttribute('data-debug-modern-styles', 'true');
+        style.textContent = `
+            /* Modern Debug Console Styles - Clean & Minimal Design */
+            .debug-console-container {
+                flex: 1;
+                padding: 0;
+                overflow-y: auto;
+                background: #0f1419;
+                font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', 'Source Code Pro', monospace;
+                line-height: 1.6;
+                position: relative;
+                height: 320px;
+                border: 1px solid #1e2328;
+                border-radius: 8px;
+                color: #e6e6e6;
+                margin-top:18 px;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12), 0 1px 3px rgba(0, 0, 0, 0.08);
+            }
+
+            /* Enhanced Scrollbar Design */
+            .debug-console-container::-webkit-scrollbar {
+                width: 6px;
+            }
+
+            .debug-console-container::-webkit-scrollbar-track {
+                background: transparent;
+                border-radius: 3px;
+            }
+
+            .debug-console-container::-webkit-scrollbar-thumb {
+                background: #3a4248;
+                border-radius: 3px;
+                transition: background-color 0.2s ease;
+            }
+
+            .debug-console-container::-webkit-scrollbar-thumb:hover {
+                background: #4a5258;
+            }
+
+            /* Welcome Message - Refined Design */
+            .console-welcome-message {
+                display: flex;
+                align-items: center;
+                gap: 16px;
+                padding: 24px;
+                margin: 16px;
+                background: #161b22;
+                border: 1px solid #21262d;
+                border-radius: 8px;
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            }
+
+            .welcome-icon {
+                font-size: 20px;
+                line-height: 1;
+                opacity: 0.9;
+                color: #58a6ff;
+            }
+
+            .welcome-content {
+                flex: 1;
+            }
+
+            .welcome-title {
+                color: #f0f6fc;
+                font-weight: 600;
+                font-size: 15px;
+                margin-bottom: 6px;
+                letter-spacing: -0.01em;
+            }
+
+            .welcome-subtitle {
+                color: #8b949e;
+                font-size: 13px;
+                line-height: 1.5;
+                font-weight: 400;
+            }
+
+            /* Log Entry - Clean Modern Design */
+            .log-entry {
+                padding: 12px 16px;
+                margin-bottom: 1px;
+                border-radius: 4px;
+                transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+                position: relative;
+                border-left: 3px solid transparent;
+                background: transparent;
+            }
+
+            .log-entry:hover {
+                background: #161b22;
+                border-left-color: #30363d;
+            }
+
+            .log-entry-content {
+                display: flex;
+                align-items: flex-start;
+                gap: 12px;
+            }
+
+            /* Improved Timestamp */
+            .log-timestamp {
+                color: #6e7681;
+                font-size: 11px;
+                min-width: 65px;
+                font-weight: 500;
+                letter-spacing: 0.01em;
+                opacity: 0.8;
+            }
+
+            /* Log Icons - Better Sizing */
+            .log-icon {
+                min-width: 18px;
+                font-size: 13px;
+                line-height: 1.2;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            /* Log Message - Better Typography */
+            .log-message {
+                flex: 1;
+                color: #e6e6e6;
+                font-size: 13px;
+                line-height: 1.5;
+                font-weight: 400;
+            }
+
+            /* Log Data - Refined Design */
+            .log-data {
+                margin-top: 8px;
+                padding: 12px;
+                background: #0d1117;
+                border: 1px solid #21262d;
+                border-radius: 4px;
+                font-size: 12px;
+                color: #8b949e;
+                white-space: pre-wrap;
+                font-family: inherit;
+                box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
+            }
+
+            /* Log Type Styles - Modern Color Palette */
+            .log-info .log-icon { 
+                color: #58a6ff; 
+            }
+            .log-success .log-icon { 
+                color: #3fb950; 
+            }
+            .log-warn .log-icon { 
+                color: #d29922; 
+            }
+            .log-error .log-icon { 
+                color: #f85149; 
+            }
+            .log-debug .log-icon { 
+                color: #a5a5f5; 
+            }
+
+            /* Clean Border Indicators */
+            .log-info { 
+                border-left-color: #1f6feb;
+            }
+            .log-success { 
+                border-left-color: #238636;
+            }
+            .log-warn { 
+                border-left-color: #bf8700;
+            }
+            .log-error { 
+                border-left-color: #da3633;
+            }
+            .log-debug { 
+                border-left-color: #6f42c1;
+            }
+
+            .log-info:hover { 
+                background: rgba(31, 111, 235, 0.05);
+                border-left-color: #58a6ff;
+            }
+            .log-success:hover { 
+                background: rgba(35, 134, 54, 0.05);
+                border-left-color: #3fb950;
+            }
+            .log-warn:hover { 
+                background: rgba(191, 135, 0, 0.05);
+                border-left-color: #d29922;
+            }
+            .log-error:hover { 
+                background: rgba(218, 54, 51, 0.05);
+                border-left-color: #f85149;
+            }
+            .log-debug:hover { 
+                background: rgba(111, 66, 193, 0.05);
+                border-left-color: #a5a5f5;
+            }
+
+            /* Smooth Entry Animation */
+            @keyframes slideInFade {
+                from {
+                    opacity: 0;
+                    transform: translateY(-2px) scale(0.98);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0) scale(1);
+                }
+            }
+
+            .log-entry-new {
+                animation: slideInFade 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            }
+
+            /* Enhanced Focus States for Accessibility */
+            .debug-console-container:focus-within {
+                border-color: #1f6feb;
+                box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15), 0 0 0 3px rgba(31, 111, 235, 0.1);
+            }
+
+            /* Responsive Design Improvements */
+            @media (max-width: 768px) {
+                .debug-console-container {
+                    height: 280px;
+                }
+                
+                .console-welcome-message {
+                    padding: 16px;
+                    gap: 12px;
+                    margin: 12px;
+                }
+                
+                .log-entry {
+                    padding: 10px 12px;
+                }
+                
+                .log-entry-content {
+                    gap: 8px;
+                }
+                
+                .log-timestamp {
+                    min-width: 55px;
+                    font-size: 10px;
+                }
+            }
+
+            /* Console Input Container - Clean Design */
+            .console-input-container {
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                background: #0d1117;
+                border-top: 1px solid #21262d;
+                padding: 12px 16px;
+                display: flex;
+                align-items: center;
+                gap: 12px;
+            }
+
+            .console-input-container::before {
+                content: '❯';
+                color: #58a6ff;
+                font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+                font-size: 14px;
+                font-weight: 600;
+                line-height: 1;
+                flex-shrink: 0;
+            }
+
+            .console-input-container input {
+                flex: 1;
+                background: transparent;
+                border: none;
+                color: #f0f6fc;
+                font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+                font-size: 13px;
+                padding: 0;
+                outline: none;
+                line-height: 1.4;
+            }
+
+            .console-input-container input::placeholder {
+                color: #6e7681;
+                font-style: italic;
+            }
+
+            .console-input-container input:focus::placeholder {
+                color: #484f58;
+            }
+
+            /* Print Styles */
+            @media print {
+                .debug-console-container {
+                    background: white !important;
+                    color: black !important;
+                    border: 1px solid #ccc !important;
+                    box-shadow: none !important;
+                }
+                
+                .log-entry {
+                    background: white !important;
+                    border-left: 2px solid #666 !important;
+                }
+                
+                .log-message, .log-data {
+                    color: black !important;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    }
+
+    /**
+     * Start debugging session for a visualization
+     */
+    static startSession(visualizationId, element, data) {
+        if (this.debugSessions.has(visualizationId)) {
+            this.debugSessions.delete(visualizationId);
+        }
+
+        const session = {
+            id: visualizationId,
+            element: element,
+            data: data,
+            url: data?.url || 'unknown',
+            method: data?.method || 'GET',
+            startTime: Date.now(),
+            logs: [],
+            performance: {
+                renderTime: 0,
+                memoryUsage: 0,
+                domNodes: 0,
+                requestTime: 0,
+                responseSize: 0,
+                networkTime: 0,
+                statusCode: null
+            },
+            errors: [],
+            warnings: [],
+            networkRequests: [],
+            responseData: null
+        };
+
+        this.debugSessions.set(visualizationId, session);
+        this.currentSessionId = visualizationId;
+
+        // Clean up old sessions to prevent memory leaks
+        if (this.debugSessions.size > 3) {
+            const sessions = Array.from(this.debugSessions.entries());
+            const oldestSessionId = sessions[0][0];
+            this.debugSessions.delete(oldestSessionId);
+        }
+
+        if (!this.debugPanel) {
+            this.createDebugPanel();
+        }
+
+        // Show the debug panel and ensure console output area exists
+        this.showDebugPanel();
+
+        // Ensure console interception is active for this session
+        if (!this._consoleInterceptionActive) {
+            this.setupConsoleInterception();
+        }
+
+        // Log session start with less verbose static data
+        this.log(`🔍 Debug session started | Session ID: ${visualizationId}`, 'info');
+        this.log(`⏰ Ready at: ${new Date().toLocaleTimeString()}`, 'info');
+        this.log(`📊 Browser console capture is active - console.log/error/warn events will appear here`, 'success');
+        this.log(`🌐 Click "Send" to make requests and see logs`, 'info');
+
+        return session;
+    }
+
+    /**
+     * Log debug message for specific session
+     */
+    static log(message, type = 'info', data = null, sessionId = null) {
+        const timestamp = new Date().toISOString();
+
+        let processedData = data;
+        if (data && typeof data === 'object') {
+            try {
+                processedData = JSON.parse(JSON.stringify(data));
+            } catch (e) {
+                processedData = String(data);
+            }
+        }
+
+        const logEntry = {
+            timestamp,
+            message,
+            type,
+            data: processedData,
+            sessionId: sessionId || this.currentSessionId,
+            stack: new Error().stack
+        };
+
+        const targetSessionId = sessionId || this.currentSessionId;
+        const session = this.debugSessions.get(targetSessionId);
+
+        if (session) {
+            session.logs.push(logEntry);
+        }
+
+        // Always display logs for active debugging sessions
+        if (targetSessionId && this.debugSessions.has(targetSessionId)) {
+            this.displayLogInPanel(logEntry);
+        }
+
+        // Also log important messages to browser console
+        if (type === 'error' || type === 'warn') {
+            console.log(`[VizDebug:${type}] ${message}`, data);
+        }
+    }
+
+    /**
+     * Display log entry in debug panel
+     */
+    static displayLogInPanel(logEntry) {
+        if (this._isUpdatingDOM) {
+            this._pendingLogs.push(logEntry);
+            return;
+        }
+
+        // Check if log should be shown based on current filter
+        if (!this.shouldShowLog(logEntry)) {
+            return; // Skip this log entry due to filter
+        }
+
+        this._isUpdatingDOM = true;
+
+        try {
+            let consoleOutput = document.getElementById('console-output');
+
+            if (!consoleOutput) {
+                // Try to create the console output area if it doesn't exist
+                const debugContainer = document.getElementById('visualization-debugger-container');
+                if (debugContainer) {
+                    const debugContent = debugContainer.querySelector('.debug-content');
+                    if (debugContent) {
+                        const placeholder = debugContent.querySelector('.modern-debug-placeholder');
+                        if (placeholder) {
+                            // Add modern debug console styles
+                            this.addModernDebugStyles();
+
+                            placeholder.innerHTML = `
+                                <div class="debug-console-container" id="console-output"></div>
+                            `;
+                            consoleOutput = document.getElementById('console-output');
+                        }
+                    }
+                }
+            }
+
+            if (!consoleOutput) {
+                return;
+            }
+
+            const logElement = document.createElement('div');
+            logElement.className = `log-entry log-${logEntry.type}`;
+
+            const timeStr = new Date(logEntry.timestamp).toLocaleTimeString();
+            const typeIcon = this.getLogIcon(logEntry.type);
+
+            let dataStr = '';
+            if (logEntry.data) {
+                try {
+                    dataStr = typeof logEntry.data === 'string' ? logEntry.data : JSON.stringify(logEntry.data, null, 2);
+                    if (dataStr.length > 200) {
+                        dataStr = dataStr.substring(0, 200) + '...';
+                    }
+                } catch (e) {
+                    dataStr = String(logEntry.data);
+                }
+            }
+
+            logElement.innerHTML = `
+                <div class="log-entry-content">
+                    <span class="log-timestamp">${timeStr}</span>
+                    <span class="log-icon">${typeIcon}</span>
+                    <div class="log-message">
+                        ${logEntry.message}
+                        ${dataStr ? `<div class="log-data">${dataStr}</div>` : ''}
+                    </div>
+                </div>
+            `;
+
+            // Add new entry animation
+            logElement.classList.add('log-entry-new');
+            setTimeout(() => logElement.classList.remove('log-entry-new'), 200);
+
+            consoleOutput.appendChild(logElement);
+            consoleOutput.scrollTop = consoleOutput.scrollHeight;
+
+        } finally {
+            this._isUpdatingDOM = false;
+
+            // Process pending logs (limit to prevent overflow)
+            if (this._pendingLogs.length > 0) {
+                const pendingLog = this._pendingLogs.shift();
+                setTimeout(() => this.displayLogInPanel(pendingLog), 10);
+            }
+        }
+    }
+
+    /**
+     * Get color for log type
+     */
+    static getLogColor(type) {
+        switch (type) {
+            case 'error': return '#ef4444';
+            case 'warn': return '#f59e0b';
+            case 'success': return '#22c55e';
+            case 'info': return '#3b82f6';
+            case 'debug': return '#8b5cf6';
+            default: return '#ffffff';
+        }
+    }
+
+    /**
+     * Get icon for log type
+     */
+    static getLogIcon(type) {
+        switch (type) {
+            case 'error': return '●';
+            case 'warn': return '●';
+            case 'success': return '●';
+            case 'info': return '●';
+            case 'debug': return '●';
+            default: return '●';
+        }
+    }
+
+    /**
+     * Clear console
+     */
+    static clearConsole() {
+        const consoleOutput = document.getElementById('console-output');
+        if (consoleOutput) {
+            consoleOutput.innerHTML = `
+    <div style="display: flex; align-items: center; justify-content: center; min-height: 200px; padding: 40px 20px;">
+        <div style="text-align: center; background: #161b22; border: 1px solid #21262d; border-radius: 12px; padding: 32px 40px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); max-width: 400px; width: 100%;">
+            <div style="font-size: 32px; margin-bottom: 16px; line-height: 1;">🧹</div>
+            <div style="color: #f0f6fc; font-weight: 600; font-size: 16px; margin-bottom: 8px; letter-spacing: -0.01em;">Console Cleared</div>
+            <div style="color: #8b949e; font-size: 14px; line-height: 1.5; font-weight: 400;">Ready for new logs...</div>
+        </div>`;
+        }
+
+        const currentSession = this.getCurrentSession();
+        if (currentSession) {
+            currentSession.logs = [];
+        }
+    }
+
+    /**
+     * Get current session
+     */
+    static getCurrentSession() {
+        return this.debugSessions.get(this.currentSessionId);
+    }
+
+    /**
+     * Add log entry (alias for log method)
+     */
+    static addLog(sessionId, type, message, data) {
+        this.log(message, type, data, sessionId);
+    }
+
+    /**
+     * Add network request to session
+     */
+    static addNetworkRequest(sessionId, requestData) {
+        const session = this.debugSessions.get(sessionId);
+        if (session) {
+            session.networkRequests.push({
+                ...requestData,
+                timestamp: Date.now()
+            });
+
+            this.log(`🌐 Network request initiated: ${requestData.method || 'GET'} ${requestData.url || requestData.id}`, 'info', requestData, sessionId);
+        }
+    }
+
+    /**
+     * Update network request with response data
+     */
+    static updateNetworkRequest(sessionId, requestId, updateData) {
+        const session = this.debugSessions.get(sessionId);
+        if (session) {
+            const request = session.networkRequests.find(req => req.id === requestId);
+            if (request) {
+                Object.assign(request, updateData);
+
+                if (updateData.status === 'completed') {
+                    this.log(`✅ Network request completed: ${updateData.statusCode} ${updateData.statusText} (${updateData.duration}ms)`, 'success', updateData, sessionId);
+                } else if (updateData.status === 'failed') {
+                    this.log(`❌ Network request failed: ${updateData.error}`, 'error', updateData, sessionId);
+                }
+            }
+        }
     }
 
     /**
      * Switch debug tab
      */
     static switchTab(tabName) {
-        // Update tab buttons
-        const tabs = document.querySelectorAll('.debug-tab');
+        const debugPanel = document.getElementById('viz-debug-panel');
+        if (!debugPanel) {
+            return;
+        }
+
+        const tabs = debugPanel.querySelectorAll('.debug-tab');
         if (tabs.length > 0) {
             tabs.forEach(tab => {
                 tab.classList.remove('active');
+                tab.classList.remove('debug-tab-active');
             });
         }
 
-        const targetTab = document.querySelector(`[data-tab="${tabName}"]`);
+        const targetTab = debugPanel.querySelector(`.debug-tab[data-tab="${tabName}"]`);
         if (targetTab) {
             targetTab.classList.add('active');
+            targetTab.classList.add('debug-tab-active');
         }
 
-        // Update panels
-        const panels = document.querySelectorAll('.debug-panel');
+        const panels = debugPanel.querySelectorAll('.debug-panel');
         if (panels.length > 0) {
             panels.forEach(panel => {
                 panel.classList.remove('active');
@@ -147,534 +920,437 @@ export class VisualizationDebugger {
         const targetPanel = document.getElementById(`${tabName}-panel`);
         if (targetPanel) {
             targetPanel.classList.add('active');
-        }
-
-        // Load tab content
-        this.loadTabContent(tabName);
-    }
-
-    /**
-     * Load content for specific tab
-     */
-    static loadTabContent(tabName) {
-        switch (tabName) {
-            case 'elements':
-                this.loadElementsTree();
-                break;
-            case 'network':
-                this.loadNetworkRequests();
-                break;
-            case 'performance':
-                this.loadPerformanceMetrics();
-                break;
-            case 'templates':
-                this.loadTemplateEditor();
-                break;
-            default:
-                // Console tab is default, no action needed
-                break;
+            targetPanel.style.pointerEvents = 'auto';
+            targetPanel.style.display = 'flex';
+            targetPanel.style.opacity = '1';
         }
     }
 
     /**
-     * Start debugging session for a visualization
+     * Hide debug panel
      */
-    static startSession(visualizationId, element, data) {
-        const session = {
-            id: visualizationId,
-            element: element,
-            data: data,
-            startTime: Date.now(),
-            logs: [],
-            performance: {
-                renderTime: 0,
-                memoryUsage: 0,
-                domNodes: 0
-            },
-            errors: [],
-            warnings: []
+    static hideDebugPanel() {
+        if (this.debugPanel) {
+            this.debugPanel.classList.add('hidden');
+            this.debugPanel.style.pointerEvents = 'none';
+        }
+    }
+
+    /**
+     * Clear console and activate interception for demo/testing
+     */
+    static activateConsoleCapture() {
+        if (!this._consoleInterceptionActive) {
+            this.setupConsoleInterception();
+        }
+
+        // Create a temporary session if none exists
+        if (!this.currentSessionId) {
+            this.startSession('demo-session', document.body, {
+                url: 'console-capture-demo',
+                method: 'DEMO'
+            });
+        }
+
+        this.log('🎯 Console capture activated - try console.log("test") in browser console', 'info');
+    }
+
+    /**
+     * Start capturing console logs from external website
+     */
+    static async startBrowserConsoleCapture(url) {
+        if (!url || url === 'no-url') {
+            this.log('⚠️ Cannot capture console logs - no valid URL provided', 'warn');
+            return false;
+        }
+
+        try {
+            // Stop any existing browser capture
+            await this.stopBrowserConsoleCapture();
+
+            const sessionId = `browser-${this.currentSessionId || 'default'}`;
+
+            this.log(`🌐 Starting browser console capture for: ${url}`, 'info');
+
+            const response = await fetch('/api/console-capture/start', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    sessionId,
+                    url
+                })
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                this._browserCaptureSession = {
+                    sessionId,
+                    url,
+                    lastLogTime: Date.now()
+                };
+
+                // Display initial logs if any
+                if (result.initialLogs && result.initialLogs.length > 0) {
+                    result.initialLogs.forEach(log => {
+                        this.displayExternalWebsiteLog(log);
+                    });
+                }
+
+                // Start polling for new logs
+                this.startBrowserCapturePolling();
+
+                this.log(`✅ Browser console capture started successfully`, 'success');
+                this.log(`📊 Capturing real-time console logs from ${url}`, 'info');
+
+                return true;
+            } else {
+                this.log(`❌ Failed to start browser console capture: ${result.error}`, 'error');
+                return false;
+            }
+
+        } catch (error) {
+            this.log(`❌ Error starting browser console capture: ${error.message}`, 'error');
+            return false;
+        }
+    }
+
+    /**
+     * Stop browser console capture
+     */
+    static async stopBrowserConsoleCapture() {
+        if (!this._browserCaptureSession) {
+            return;
+        }
+
+        try {
+            // Stop polling
+            if (this._browserCapturePolling) {
+                clearInterval(this._browserCapturePolling);
+                this._browserCapturePolling = null;
+            }
+
+            // Stop capture session on server
+            const response = await fetch(`/api/console-capture/${this._browserCaptureSession.sessionId}/stop`, {
+                method: 'POST'
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                this.log(`🛑 Browser console capture stopped (captured ${result.totalLogs} logs)`, 'info');
+            } else {
+                this.log(`⚠️ Error stopping browser console capture: ${result.error}`, 'warn');
+            }
+
+        } catch (error) {
+            this.log(`⚠️ Error stopping browser console capture: ${error.message}`, 'warn');
+        } finally {
+            this._browserCaptureSession = null;
+        }
+    }
+
+    /**
+     * Start polling for new browser console logs
+     */
+    static startBrowserCapturePolling() {
+        if (this._browserCapturePolling) {
+            clearInterval(this._browserCapturePolling);
+        }
+
+        this._browserCapturePolling = setInterval(async () => {
+            if (!this._browserCaptureSession) {
+                clearInterval(this._browserCapturePolling);
+                this._browserCapturePolling = null;
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/console-capture/${this._browserCaptureSession.sessionId}/logs?since=${this._browserCaptureSession.lastLogTime}`);
+                const result = await response.json();
+
+                if (result.success && result.logs && result.logs.length > 0) {
+                    result.logs.forEach(log => {
+                        this.displayExternalWebsiteLog(log);
+                    });
+
+                    // Update last log time
+                    const lastLog = result.logs[result.logs.length - 1];
+                    this._browserCaptureSession.lastLogTime = new Date(lastLog.timestamp).getTime();
+                }
+
+            } catch (error) {
+                console.error('Error polling browser console logs:', error);
+            }
+        }, 1000); // Poll every second
+    }
+
+    /**
+     * Display external website console log in debug panel
+     */
+    static displayExternalWebsiteLog(log) {
+        // Skip empty or undefined messages
+        const logText = log.text || log.message || '';
+        if (!logText || logText === 'undefined' || logText === 'null' || logText.trim() === '') {
+            return;
+        }
+
+        const typeMapping = {
+            'log': 'info',
+            'info': 'info',
+            'warn': 'warn',
+            'warning': 'warn',
+            'error': 'error',
+            'debug': 'debug'
         };
 
-        this.debugSessions.set(visualizationId, session);
-        this.log(`🔍 Debug session started for: ${visualizationId}`, 'info');
+        const mappedType = typeMapping[log.type] || 'info';
+        const websiteIcon = '🌐';
+        const typeIcon = this.getLogIcon(mappedType);
 
-        // Start performance monitoring
-        this.startPerformanceMonitoring(visualizationId);
+        // Format the message with website context
+        let message = `${websiteIcon} ${typeIcon} Website Console: ${logText}`;
 
-        return session;
-    }
-
-    /**
-     * Log debug message
-     */
-    static log(message, type = 'info', data = null) {
-        const timestamp = new Date().toISOString();
-        const logEntry = {
-            timestamp,
-            message,
-            type,
-            data,
-            stack: new Error().stack
-        };
-
-        // Store in current session if any
-        const currentSession = Array.from(this.debugSessions.values())[0];
-        if (currentSession) {
-            currentSession.logs.push(logEntry);
+        // Include location info if available and valid
+        if (log.location && log.location.url && log.location.url !== 'undefined') {
+            try {
+                const urlObj = new URL(log.location.url);
+                if (urlObj.hostname) {
+                    message += ` (from ${urlObj.hostname})`;
+                }
+            } catch (e) {
+                // If URL parsing fails, include raw URL only if it looks valid
+                if (log.location.url && log.location.url.length > 0 && log.location.url !== 'undefined') {
+                    message += ` (from ${log.location.url})`;
+                }
+            }
         }
 
-        // Display in debug panel
-        this.displayLogInPanel(logEntry);
+        // Prepare additional data
+        let data = null;
+        if (log.args && log.args.length > 0) {
+            data = {
+                args: log.args,
+                location: log.location,
+                source: log.source
+            };
+        }
 
-        // Also log to browser console
-        console.log(`[VizDebug:${type}] ${message}`, data);
+        // Log the external website console event
+        this.log(message, mappedType, data);
     }
 
     /**
-     * Display log entry in debug panel
+     * Stop all debugging and restore console
      */
-    static displayLogInPanel(logEntry) {
+    static stopDebugging() {
+        // Clear all sessions
+        this.debugSessions.clear();
+        this.currentSessionId = null;
+
+        // Stop browser console capture
+        this.stopBrowserConsoleCapture();
+
+        // Restore original console
+        this.restoreConsole();
+
+        // Hide debug panel
+        this.hideDebugPanel();
+
+        this.log('🛑 Debug session ended - console restored', 'info');
+    }
+
+    /**
+     * Set console filter
+     */
+    static setFilter(filterType) {
+        this._currentFilter = filterType;
+
+        // Notify filter callbacks
+        this._filterCallbacks.forEach(callback => {
+            try {
+                callback(filterType);
+            } catch (error) {
+                console.error('Filter callback error:', error);
+            }
+        });
+
+        // Re-render console with new filter
+        this.refreshConsoleDisplay();
+    }
+
+    /**
+     * Register filter change callback
+     */
+    static onFilterChange(callback) {
+        this._filterCallbacks.add(callback);
+        return () => this._filterCallbacks.delete(callback);
+    }
+
+    /**
+     * Get current filter
+     */
+    static getCurrentFilter() {
+        return this._currentFilter;
+    }
+
+    /**
+     * Check if log entry should be shown based on current filter
+     */
+    static shouldShowLog(logEntry) {
+        if (this._currentFilter === 'all') {
+            return true;
+        }
+
+        // Map log types for filtering
+        const logType = logEntry.type;
+        if (this._currentFilter === 'warn' && logType === 'warn') {
+            return true;
+        }
+        if (this._currentFilter === 'error' && logType === 'error') {
+            return true;
+        }
+        if (this._currentFilter === 'info' && (logType === 'info' || logType === 'success')) {
+            return true;
+        }
+        if (this._currentFilter === 'debug' && logType === 'debug') {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Refresh console display with current filter
+     */
+    static refreshConsoleDisplay() {
         const consoleOutput = document.getElementById('console-output');
-        if (!consoleOutput) return;
+        if (!consoleOutput) {
+            return;
+        }
+
+        // Clear current display
+        consoleOutput.innerHTML = `
+            <div ></div>
+            <div ></div>
+        `;
+
+        // Get current session logs
+        const session = this.getCurrentSession();
+        if (session && session.logs) {
+            // Temporarily disable DOM update protection to rebuild console
+            const originalIsUpdating = this._isUpdatingDOM;
+            this._isUpdatingDOM = false;
+
+            session.logs.forEach(logEntry => {
+                if (this.shouldShowLog(logEntry)) {
+                    this._renderLogEntry(logEntry);
+                }
+            });
+
+            this._isUpdatingDOM = originalIsUpdating;
+        }
+    }
+
+    /**
+     * Render a single log entry (used by refreshConsoleDisplay)
+     */
+    static _renderLogEntry(logEntry) {
+        const consoleOutput = document.getElementById('console-output');
+        if (!consoleOutput) {
+            return;
+        }
 
         const logElement = document.createElement('div');
-        logElement.className = `console-entry ${logEntry.type}`;
+        logElement.className = `log-entry log-${logEntry.type}`;
+        logElement.style.cssText = `
+            // padding:  12px;
+            border-left: 3px solid ${this.getLogColor(logEntry.type)};
+            margin-bottom: 4px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 4px;
+            animation: fadeIn 0.3s ease-in;
+        `;
 
-        const timeElement = document.createElement('span');
-        timeElement.className = 'console-time';
-        timeElement.textContent = new Date(logEntry.timestamp).toLocaleTimeString();
+        const timeStr = new Date(logEntry.timestamp).toLocaleTimeString();
+        const typeIcon = this.getLogIcon(logEntry.type);
 
-        const messageElement = document.createElement('span');
-        messageElement.className = 'console-message';
-        messageElement.textContent = logEntry.message;
-
-        logElement.appendChild(timeElement);
-        logElement.appendChild(messageElement);
-
+        let dataStr = '';
         if (logEntry.data) {
-            const dataElement = document.createElement('div');
-            dataElement.className = 'console-data';
-            dataElement.textContent = JSON.stringify(logEntry.data, null, 2);
-            logElement.appendChild(dataElement);
+            try {
+                dataStr = typeof logEntry.data === 'string' ? logEntry.data : JSON.stringify(logEntry.data, null, 2);
+                if (dataStr.length > 200) {
+                    dataStr = dataStr.substring(0, 200) + '...';
+                }
+            } catch (e) {
+                dataStr = String(logEntry.data);
+            }
         }
+
+        logElement.innerHTML = `
+            <div style="display: flex; align-items: flex-start; gap: 8px;">
+                <span style="color: #64748b; font-size: 11px; min-width: 80px;">[${timeStr}]</span>
+                <span style="color: ${this.getLogColor(logEntry.type)}; font-weight: 500; min-width: 20px;">${typeIcon}</span>
+                <div style="flex: 1;">
+                    <span style="color: #f1f5f9;">${logEntry.message}</span>
+                    ${dataStr ? `<div style="color: #94a3b8; font-size: 12px; margin-top: 4px; padding: 8px; background: rgba(0,0,0,0.2); border-radius: 4px; white-space: pre-wrap;">${dataStr}</div>` : ''}
+                </div>
+            </div>
+        `;
 
         consoleOutput.appendChild(logElement);
         consoleOutput.scrollTop = consoleOutput.scrollHeight;
     }
 
     /**
-     * Inspect visualization element
-     */
-    static inspectElement(element) {
-        if (!element) return;
-
-        const inspection = {
-            tagName: element.tagName,
-            className: element.className,
-            id: element.id,
-            attributes: {},
-            styles: {},
-            children: element.children.length,
-            textContent: element.textContent?.substring(0, 100),
-            boundingRect: element.getBoundingClientRect(),
-            computedStyles: window.getComputedStyle(element)
-        };
-
-        // Get attributes
-        Array.from(element.attributes).forEach(attr => {
-            inspection.attributes[attr.name] = attr.value;
-        });
-
-        // Get relevant styles
-        const relevantStyles = [
-            'width', 'height', 'display', 'position', 'background-color',
-            'color', 'font-size', 'margin', 'padding', 'border'
-        ];
-
-        relevantStyles.forEach(prop => {
-            inspection.styles[prop] = inspection.computedStyles.getPropertyValue(prop);
-        });
-
-        this.displayElementInspection(inspection);
-        return inspection;
-    }
-
-    /**
-     * Display element inspection in debug panel
-     */
-    static displayElementInspection(inspection) {
-        const elementsPanel = document.getElementById('elements-panel');
-        if (!elementsPanel) return;
-
-        elementsPanel.innerHTML = `
-            <div class="element-inspection">
-                <h4>&lt;${inspection.tagName.toLowerCase()}&gt;</h4>
-                
-                <div class="inspection-section">
-                    <h5>Attributes</h5>
-                    <div class="attributes-list">
-                        ${Object.entries(inspection.attributes).map(([key, value]) => `
-                            <div class="attribute-item">
-                                <span class="attr-key">${key}:</span>
-                                <span class="attr-value">"${value}"</span>
-                            </div>
-                        `).join('')}
-                    </div>
-                </div>
-
-                <div class="inspection-section">
-                    <h5>Computed Styles</h5>
-                    <div class="styles-list">
-                        ${Object.entries(inspection.styles).map(([key, value]) => `
-                            <div class="style-item">
-                                <span class="style-key">${key}:</span>
-                                <span class="style-value">${value}</span>
-                            </div>
-                        `).join('')}
-                    </div>
-                </div>
-
-                <div class="inspection-section">
-                    <h5>Dimensions</h5>
-                    <div class="dimensions-info">
-                        <p>Width: ${inspection.boundingRect.width}px</p>
-                        <p>Height: ${inspection.boundingRect.height}px</p>
-                        <p>Children: ${inspection.children}</p>
-                    </div>
-                </div>
-            </div>
-        `;
-    }
-
-    /**
-     * Start performance monitoring
-     */
-    static startPerformanceMonitoring(visualizationId) {
-        const session = this.debugSessions.get(visualizationId);
-        if (!session) return;
-
-        // Monitor render time
-        const renderStart = performance.now();
-
-        // Use MutationObserver to track DOM changes
-        const observer = new MutationObserver((mutations) => {
-            const renderEnd = performance.now();
-            session.performance.renderTime = renderEnd - renderStart;
-
-            // Count DOM nodes
-            session.performance.domNodes = session.element?.querySelectorAll('*').length || 0;
-
-            // Update performance panel
-            this.updatePerformancePanel(session);
-        });
-
-        if (session.element) {
-            observer.observe(session.element, {
-                childList: true,
-                subtree: true,
-                attributes: true
-            });
-        }
-
-        // Monitor memory usage (approximate)
-        if (performance.memory) {
-            session.performance.memoryUsage = performance.memory.usedJSHeapSize;
-        }
-    }
-
-    /**
-     * Update performance panel
-     */
-    static updatePerformancePanel(session) {
-        const performancePanel = document.getElementById('performance-panel');
-        if (!performancePanel) return;
-
-        performancePanel.innerHTML = `
-            <div class="performance-metrics">
-                <div class="metric-item">
-                    <span class="metric-label">Render Time:</span>
-                    <span class="metric-value">${session.performance.renderTime.toFixed(2)}ms</span>
-                </div>
-                <div class="metric-item">
-                    <span class="metric-label">DOM Nodes:</span>
-                    <span class="metric-value">${session.performance.domNodes}</span>
-                </div>
-                <div class="metric-item">
-                    <span class="metric-label">Memory Usage:</span>
-                    <span class="metric-value">${(session.performance.memoryUsage / 1024 / 1024).toFixed(2)}MB</span>
-                </div>
-                <div class="metric-item">
-                    <span class="metric-label">Session Duration:</span>
-                    <span class="metric-value">${((Date.now() - session.startTime) / 1000).toFixed(1)}s</span>
-                </div>
-            </div>
-        `;
-    }
-
-    /**
-     * Monitor network requests for visualization resources
-     */
-    static monitorNetworkRequests() {
-        const originalFetch = window.fetch;
-        const originalXHR = window.XMLHttpRequest;
-
-        // Override fetch
-        window.fetch = async function (...args) {
-            const startTime = performance.now();
-            const response = await originalFetch.apply(this, args);
-            const endTime = performance.now();
-
-            VisualizationDebugger.logNetworkRequest({
-                url: args[0],
-                method: args[1]?.method || 'GET',
-                status: response.status,
-                duration: endTime - startTime,
-                type: 'fetch'
-            });
-
-            return response;
-        };
-
-        // Override XMLHttpRequest
-        const originalOpen = originalXHR.prototype.open;
-        originalXHR.prototype.open = function (method, url) {
-            this._debugInfo = { method, url, startTime: performance.now() };
-            return originalOpen.apply(this, arguments);
-        };
-
-        const originalSend = originalXHR.prototype.send;
-        originalXHR.prototype.send = function () {
-            const self = this;
-            this.addEventListener('loadend', function () {
-                if (self._debugInfo) {
-                    VisualizationDebugger.logNetworkRequest({
-                        url: self._debugInfo.url,
-                        method: self._debugInfo.method,
-                        status: self.status,
-                        duration: performance.now() - self._debugInfo.startTime,
-                        type: 'xhr'
-                    });
-                }
-            });
-            return originalSend.apply(this, arguments);
-        };
-    }
-
-    /**
-     * Log network request
-     */
-    static logNetworkRequest(request) {
-        const networkPanel = document.getElementById('network-panel');
-        if (!networkPanel) return;
-
-        const requestElement = document.createElement('div');
-        requestElement.className = `network-request status-${Math.floor(request.status / 100)}xx`;
-        requestElement.innerHTML = `
-            <div class="request-info">
-                <span class="request-method">${request.method}</span>
-                <span class="request-url">${request.url}</span>
-                <span class="request-status">${request.status}</span>
-                <span class="request-duration">${request.duration.toFixed(2)}ms</span>
-            </div>
-        `;
-
-        networkPanel.appendChild(requestElement);
-    }
-
-    /**
-     * Analyze template for issues
-     */
-    static analyzeTemplate(template, data) {
-        const issues = [];
-
-        // Check for undefined variables
-        const variablePattern = /\{\{([^}]+)\}\}/g;
-        let match;
-        while ((match = variablePattern.exec(template)) !== null) {
-            const variable = match[1].trim();
-            if (!this.hasNestedProperty(data, variable)) {
-                issues.push({
-                    type: 'warning',
-                    message: `Undefined variable: ${variable}`,
-                    line: template.substring(0, match.index).split('\n').length
-                });
-            }
-        }
-
-        // Check for potential XSS vulnerabilities
-        if (template.includes('<script>')) {
-            issues.push({
-                type: 'error',
-                message: 'Potential XSS vulnerability: script tag detected',
-                line: template.split('\n').findIndex(line => line.includes('<script>')) + 1
-            });
-        }
-
-        // Check for large data objects
-        if (JSON.stringify(data).length > 100000) {
-            issues.push({
-                type: 'warning',
-                message: 'Large data object may impact performance',
-                line: 0
-            });
-        }
-
-        return issues;
-    }
-
-    /**
-     * Check if object has nested property
-     */
-    static hasNestedProperty(obj, path) {
-        return path.split('.').reduce((current, prop) => {
-            return current && current[prop];
-        }, obj) !== undefined;
-    }
-
-    /**
-     * Export debug session
-     */
-    static exportDebugSession(sessionId) {
-        const session = this.debugSessions.get(sessionId);
-        if (!session) return null;
-
-        const exportData = {
-            id: session.id,
-            startTime: session.startTime,
-            duration: Date.now() - session.startTime,
-            logs: session.logs,
-            performance: session.performance,
-            errors: session.errors,
-            warnings: session.warnings,
-            exportedAt: new Date().toISOString()
-        };
-
-        // Create download link
-        const blob = new Blob([JSON.stringify(exportData, null, 2)], {
-            type: 'application/json'
-        });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `debug-session-${sessionId}-${Date.now()}.json`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-
-        return exportData;
-    }
-
-    /**
-     * Clear debug session
-     */
-    static clearSession(sessionId) {
-        if (sessionId) {
-            this.debugSessions.delete(sessionId);
-        } else {
-            this.debugSessions.clear();
-        }
-
-        // Clear debug panel
-        const consoleOutput = document.getElementById('console-output');
-        if (consoleOutput) {
-            consoleOutput.innerHTML = '';
-        }
-    }
-
-    /**
-     * Refresh debug info
-     */
-    static refreshDebugInfo() {
-        this.debugSessions.forEach((session, id) => {
-            this.updatePerformancePanel(session);
-        });
-    }
-
-    /**
-     * Setup panel event listeners
-     */
-    static setupPanelEventListeners() {
-        if (!this.debugPanel) return;
-
-        // Tab switching - only for tabs within the debug panel
-        this.debugPanel.querySelectorAll('.debug-tab').forEach(tab => {
-            tab.addEventListener('click', () => {
-                this.switchTab(tab.dataset.tab);
-            });
-        });
-
-        // Console input
-        const consoleInput = this.debugPanel.querySelector('#console-input');
-        if (consoleInput) {
-            consoleInput.addEventListener('keypress', (event) => {
-                if (event.key === 'Enter') {
-                    this.executeCommand(event.target.value);
-                    event.target.value = '';
-                }
-            });
-        }
-
-        // Close button
-        const closeBtn = this.debugPanel.querySelector('#debug-close');
-        if (closeBtn) {
-            closeBtn.addEventListener('click', () => {
-                this.hideDebugPanel();
-            });
-        }
-
-        // Clear button
-        const clearBtn = this.debugPanel.querySelector('#debug-clear');
-        if (clearBtn) {
-            clearBtn.addEventListener('click', () => {
-                this.clearConsole();
-            });
-        }
-
-        // Export button
-        const exportBtn = this.debugPanel.querySelector('#debug-export');
-        if (exportBtn) {
-            exportBtn.addEventListener('click', () => {
-                this.exportDebugData();
-            });
-        }
-    }
-
-    /**
-     * Execute debug command
+     * Execute debug command from console input
      */
     static executeCommand(command) {
         try {
+            if (!command || command.trim() === '') {
+                return;
+            }
+
             // Parse command
             const [cmd, ...args] = command.trim().split(' ');
 
-            switch (cmd) {
+            // Log the command being executed
+            this.log(`💻 Executing command: ${command}`, 'info');
+
+            switch (cmd.toLowerCase()) {
                 case 'help':
                     this.showHelp();
                     break;
                 case 'sessions':
                     this.showSessions();
                     break;
-                case 'inspect':
-                    this.inspectVisualization(args[0]);
-                    break;
-                case 'performance':
-                    this.showPerformanceData(args[0]);
-                    break;
-                case 'templates':
-                    this.showTemplateData(args[0]);
-                    break;
-                case 'export':
-                    this.exportSession(args[0]);
-                    break;
                 case 'clear':
                     this.clearConsole();
                     break;
+                case 'status':
+                    this.showStatus();
+                    break;
+                case 'filter':
+                    if (args[0]) {
+                        this.setFilter(args[0]);
+                        this.log(`🔍 Filter set to: ${args[0]}`, 'success');
+                    } else {
+                        this.log(`🔍 Current filter: ${this._currentFilter}`, 'info');
+                    }
+                    break;
+                case 'export':
+                    this.exportLogs();
+                    break;
+                case 'test':
+                    this.testCommand();
+                    break;
                 default:
-                    this.logToConsole(`❌ Unknown command: ${cmd}. Type 'help' for available commands.`, 'error');
+                    this.log(`❌ Unknown command: ${cmd}. Type 'help' for available commands.`, 'error');
             }
         } catch (error) {
-            this.logToConsole(`❌ Error executing command: ${error.message}`, 'error');
+            this.log(`❌ Error executing command: ${error.message}`, 'error');
         }
     }
 
@@ -685,329 +1361,178 @@ export class VisualizationDebugger {
         const commands = [
             'help - Show this help message',
             'sessions - List all debug sessions',
-            'inspect <sessionId> - Inspect visualization details',
-            'performance <sessionId> - Show performance metrics',
-            'templates <sessionId> - Show template information',
-            'export <sessionId> - Export session data',
-            'clear - Clear console output'
+            'clear - Clear the console output',
+            'status - Show debugger status',
+            'filter <type> - Set log filter (all, info, warn, error, debug)',
+            'export - Export console logs',
+            'test - Run test commands'
         ];
 
-        this.logToConsole('📚 Available commands:', 'info');
-        commands.forEach(cmd => this.logToConsole(`  ${cmd}`, 'info'));
-    }
-
-    /**
-     * Show active sessions
-     */
-    static showSessions() {
-        const sessions = Array.from(this.debugSessions.entries());
-        this.logToConsole(`📋 Active sessions (${sessions.length}):`, 'info');
-
-        sessions.forEach(([id, session]) => {
-            const duration = Date.now() - session.startTime;
-            this.logToConsole(`  ${id} - ${duration}ms ago`, 'info');
+        this.log('📚 Available Commands:', 'info');
+        commands.forEach(cmd => {
+            this.log(`  • ${cmd}`, 'info');
         });
     }
 
     /**
-     * Inspect visualization
+     * Show active debug sessions
      */
-    static inspectVisualization(sessionId) {
-        const session = this.debugSessions.get(sessionId);
-        if (!session) {
-            this.logToConsole(`❌ Session not found: ${sessionId}`, 'error');
+    static showSessions() {
+        if (this.debugSessions.size === 0) {
+            this.log('📊 No active debug sessions', 'info');
             return;
         }
 
-        this.logToConsole(`🔍 Inspecting session: ${sessionId}`, 'info', session);
+        this.log(`📊 Active Debug Sessions (${this.debugSessions.size}):`, 'info');
+        this.debugSessions.forEach((session, sessionId) => {
+            const logCount = session.logs ? session.logs.length : 0;
+            const isActive = sessionId === this.currentSessionId ? ' (ACTIVE)' : '';
+            this.log(`  • ${sessionId}: ${logCount} logs${isActive}`, 'info');
+        });
     }
 
     /**
-     * Load elements tree
+     * Show debugger status
      */
-    static loadElementsTree() {
-        const elementsTree = document.getElementById('elements-tree');
-        elementsTree.innerHTML = '<div class="loading">Loading elements...</div>';
-
-        // TODO: Implement elements tree visualization
-        setTimeout(() => {
-            elementsTree.innerHTML = '<div class="placeholder">Elements tree will be implemented here</div>';
-        }, 500);
+    static showStatus() {
+        this.log('🔍 Debugger Status:', 'info');
+        this.log(`  • Enabled: ${this.isEnabled}`, 'info');
+        this.log(`  • Initialized: ${this.isInitialized}`, 'info');
+        this.log(`  • Current Session: ${this.currentSessionId || 'None'}`, 'info');
+        this.log(`  • Total Sessions: ${this.debugSessions.size}`, 'info');
+        this.log(`  • Current Filter: ${this._currentFilter}`, 'info');
+        this.log(`  • Console Interception: ${this._consoleInterceptionActive}`, 'info');
+        this.log(`  • Browser Capture: ${this._browserCaptureSession ? 'Active' : 'Inactive'}`, 'info');
     }
 
     /**
-     * Load network requests
+     * Export console logs
      */
-    static loadNetworkRequests() {
-        const networkRequests = document.getElementById('network-requests');
-        networkRequests.innerHTML = '<div class="loading">Loading network requests...</div>';
+    static exportLogs() {
+        const session = this.getCurrentSession();
+        if (!session || !session.logs || session.logs.length === 0) {
+            this.log('📁 No logs to export', 'warn');
+            return;
+        }
 
-        // TODO: Implement network requests tracking
-        setTimeout(() => {
-            networkRequests.innerHTML = '<div class="placeholder">Network requests will be tracked here</div>';
-        }, 500);
-    }
+        try {
+            const logsData = {
+                sessionId: this.currentSessionId,
+                exportTime: new Date().toISOString(),
+                totalLogs: session.logs.length,
+                logs: session.logs
+            };
 
-    /**
-     * Load performance metrics
-     */
-    static loadPerformanceMetrics() {
-        const performanceMetrics = document.getElementById('performance-metrics');
-        performanceMetrics.innerHTML = '<div class="loading">Loading performance metrics...</div>';
+            const dataStr = JSON.stringify(logsData, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(dataBlob);
 
-        // TODO: Implement performance metrics display
-        setTimeout(() => {
-            performanceMetrics.innerHTML = '<div class="placeholder">Performance metrics will be displayed here</div>';
-        }, 500);
-    }
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `debug-logs-${this.currentSessionId}-${new Date().toISOString().slice(0, 10)}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
 
-    /**
-     * Load template editor
-     */
-    static loadTemplateEditor() {
-        const templateEditor = document.getElementById('template-editor');
-        templateEditor.innerHTML = '<div class="loading">Loading template editor...</div>';
-
-        // TODO: Implement template editor
-        setTimeout(() => {
-            templateEditor.innerHTML = '<div class="placeholder">Template editor will be implemented here</div>';
-        }, 500);
-    }
-
-    /**
-     * Clear console
-     */
-    static clearConsole() {
-        const consoleOutput = document.getElementById('console-output');
-        if (consoleOutput) {
-            consoleOutput.innerHTML = '';
+            this.log(`📁 Exported ${session.logs.length} logs to file`, 'success');
+        } catch (error) {
+            this.log(`❌ Export failed: ${error.message}`, 'error');
         }
     }
 
     /**
-     * Export debug data
+     * Run test commands
      */
-    static exportDebugData() {
-        const debugData = {
-            sessions: Array.from(this.debugSessions.entries()),
-            timestamp: new Date().toISOString(),
-            version: '1.0.0'
-        };
-
-        const blob = new Blob([JSON.stringify(debugData, null, 2)], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `viz-debug-${Date.now()}.json`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-
-        this.logToConsole('📥 Debug data exported', 'info');
+    static testCommand() {
+        this.log('🧪 Running test commands...', 'info');
+        setTimeout(() => {
+            this.log('✅ Test info message', 'info');
+        }, 500);
+        setTimeout(() => {
+            this.log('⚠️ Test warning message', 'warn');
+        }, 1000);
+        setTimeout(() => {
+            this.log('❌ Test error message', 'error');
+        }, 1500);
+        setTimeout(() => {
+            this.log('🔧 Test debug message', 'debug');
+        }, 2000);
+        setTimeout(() => {
+            this.log('🎉 Test completed successfully!', 'success');
+        }, 2500);
     }
 
     /**
-     * Get debug panel styles
+     * Setup console input event listeners
      */
-    static getDebugPanelStyles() {
-        return `
-            .viz-debug-panel {
-                position: fixed;
-                bottom: 0;
-                left: 0;
-                right: 0;
-                height: 400px;
-                background: #1a1d23;
-                border-top: 2px solid #ff6c37;
-                z-index: 10000;
-                display: flex;
-                flex-direction: column;
-                font-family: 'Courier New', monospace;
-                font-size: 12px;
-                transition: transform 0.3s ease;
+    static setupConsoleInput() {
+        const setupWithRetry = (attempts = 0, maxAttempts = 10) => {
+            const consoleInput = document.getElementById('console-input');
+
+            if (consoleInput) {
+                console.log('🎯 Setting up console input event listeners');
+
+                // Remove existing listeners to prevent duplicates
+                consoleInput.replaceWith(consoleInput.cloneNode(true));
+                const newConsoleInput = document.getElementById('console-input');
+
+                newConsoleInput.addEventListener('keypress', (event) => {
+                    if (event.key === 'Enter') {
+                        event.preventDefault();
+                        const command = event.target.value.trim();
+                        if (command) {
+                            console.log(`📝 Executing command: ${command}`);
+                            this.executeCommand(command);
+                            event.target.value = '';
+                        }
+                    }
+                });
+
+                // Add focus styling
+                newConsoleInput.addEventListener('focus', () => {
+                    newConsoleInput.style.borderColor = '#3b82f6';
+                    newConsoleInput.style.boxShadow = '0 0 0 2px rgba(59, 130, 246, 0.2)';
+                });
+
+                newConsoleInput.addEventListener('blur', () => {
+                    newConsoleInput.style.borderColor = '#374151';
+                    newConsoleInput.style.boxShadow = 'none';
+                });
+
+                // Add placeholder animation
+                newConsoleInput.addEventListener('input', () => {
+                    if (newConsoleInput.value.length > 0) {
+                        newConsoleInput.style.backgroundColor = '#1f2937';
+                    } else {
+                        newConsoleInput.style.backgroundColor = '#111827';
+                    }
+                });
+
+                console.log('✅ Console input event listeners attached successfully');
+
+            } else if (attempts < maxAttempts) {
+                console.log(`⏳ Console input not found, retrying... (${attempts + 1}/${maxAttempts})`);
+                setTimeout(() => setupWithRetry(attempts + 1, maxAttempts), 200);
+            } else {
+                console.error('❌ Failed to find console input element after maximum attempts');
+                // Try to log to debug console if available
+                if (this.currentSessionId) {
+                    this.log('⚠️ Console input setup failed - Enter key commands may not work', 'warn');
+                }
             }
-            
-            .viz-debug-panel.hidden {
-                transform: translateY(100%);
-            }
-            
-            .debug-header {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                padding: 8px 16px;
-                background: #21252b;
-                border-bottom: 1px solid #2c3035;
-            }
-            
-            .debug-header h3 {
-                margin: 0;
-                color: #e1e5e9;
-                font-size: 14px;
-            }
-            
-            .debug-controls {
-                display: flex;
-                gap: 8px;
-            }
-            
-            .debug-btn {
-                background: #3a3f47;
-                border: none;
-                color: #e1e5e9;
-                padding: 4px 8px;
-                border-radius: 4px;
-                cursor: pointer;
-                font-size: 11px;
-            }
-            
-            .debug-btn:hover {
-                background: #ff6c37;
-            }
-            
-            .debug-btn.close-btn {
-                background: #dc3545;
-                padding: 4px 8px;
-                font-weight: bold;
-            }
-            
-            .debug-content {
-                flex: 1;
-                display: flex;
-                flex-direction: column;
-            }
-            
-            .debug-tabs {
-                display: flex;
-                background: #21252b;
-                border-bottom: 1px solid #2c3035;
-            }
-            
-            .debug-tab {
-                background: none;
-                border: none;
-                color: #8b92a5;
-                padding: 8px 16px;
-                cursor: pointer;
-                font-size: 11px;
-                border-bottom: 2px solid transparent;
-            }
-            
-            .debug-tab.active {
-                color: #ff6c37;
-                border-bottom-color: #ff6c37;
-            }
-            
-            .debug-tab:hover {
-                background: #2c3035;
-            }
-            
-            .debug-panels {
-                flex: 1;
-                position: relative;
-            }
-            
-            .debug-panel {
-                position: absolute;
-                top: 0;
-                left: 0;
-                right: 0;
-                bottom: 0;
-                display: none;
-                flex-direction: column;
-            }
-            
-            .debug-panel.active {
-                display: flex;
-            }
-            
-            .console-output {
-                flex: 1;
-                padding: 8px;
-                overflow-y: auto;
-                background: #1a1d23;
-            }
-            
-            .console-entry {
-                margin-bottom: 4px;
-                display: flex;
-                align-items: flex-start;
-                gap: 8px;
-            }
-            
-            .console-entry.error {
-                color: #f87171;
-            }
-            
-            .console-entry.warn {
-                color: #fbbf24;
-            }
-            
-            .console-entry.info {
-                color: #60a5fa;
-            }
-            
-            .timestamp {
-                color: #6b7280;
-                font-size: 10px;
-                white-space: nowrap;
-            }
-            
-            .log-type {
-                color: #9ca3af;
-                font-size: 10px;
-                font-weight: bold;
-                white-space: nowrap;
-            }
-            
-            .message {
-                color: #e1e5e9;
-                flex: 1;
-            }
-            
-            .log-data {
-                display: block;
-                margin-top: 4px;
-                padding: 4px;
-                background: #111827;
-                border-radius: 2px;
-                font-size: 10px;
-                color: #d1d5db;
-                white-space: pre-wrap;
-            }
-            
-            .console-input {
-                border-top: 1px solid #2c3035;
-                padding: 8px;
-                background: #21252b;
-            }
-            
-            .console-input input {
-                width: 100%;
-                background: #1a1d23;
-                border: 1px solid #2c3035;
-                color: #e1e5e9;
-                padding: 4px 8px;
-                border-radius: 4px;
-                font-family: 'Courier New', monospace;
-                font-size: 12px;
-            }
-            
-            .console-input input:focus {
-                outline: none;
-                border-color: #ff6c37;
-            }
-            
-            .placeholder, .loading {
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                height: 100%;
-                color: #6b7280;
-                font-style: italic;
-            }
-        `;
+        };
+
+        setupWithRetry();
+    }
+
+    /**
+     * Cleanup method for when debugger is disabled
+     */
+    static cleanup() {
+        this.stopDebugging();
+        this.isEnabled = false;
+        this.isInitialized = false;
     }
 }
 
