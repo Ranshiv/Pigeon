@@ -99,7 +99,6 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
     // Debug console state
     const [currentDebugSession, setCurrentDebugSession] = useState(null);
     const [consoleFilter, setConsoleFilter] = useState('all');
-    const [consoleSearchTerm, setConsoleSearchTerm] = useState('');
 
     // Utility function to get CSS classes for inputs with variables
     const getVariableInputClass = (value) => {
@@ -2405,12 +2404,7 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
 
                                                 // Add a clear instruction to user
                                                 VisualizationDebugger.addLog(debugSessionId, 'info', `🎯 Debug session active. Click "Send" button to see request logs.`);
-                                                VisualizationDebugger.addLog(debugSessionId, 'info', `💻 Type 'help' in the console input below for available commands.`);
-
-                                                // Ensure console input is set up
-                                                setTimeout(() => {
-                                                    VisualizationDebugger.setupConsoleInput();
-                                                }, 1000);
+                                                VisualizationDebugger.addLog(debugSessionId, 'info', `💻 Use the filter buttons and search box above to filter logs.`);
 
                                                 // Start browser console capture for external websites
                                                 if (url && url !== 'no-url' && url.startsWith('http')) {
@@ -2616,11 +2610,16 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
                                             </button>
                                         </div>
                                         <div className="search-box">
+                                            <span className="search-icon">🔍</span>
                                             <input
                                                 type="text"
-                                                placeholder="Filter logs..."
-                                                value={consoleSearchTerm}
-                                                onChange={(e) => setConsoleSearchTerm(e.target.value)}
+                                                placeholder="Search logs..."
+                                                className="search-input"
+                                                onChange={(e) => {
+                                                    if (typeof VisualizationDebugger !== 'undefined') {
+                                                        VisualizationDebugger.applyTextFilter(e.target.value.trim().toLowerCase());
+                                                    }
+                                                }}
                                             />
                                         </div>
                                     </div>

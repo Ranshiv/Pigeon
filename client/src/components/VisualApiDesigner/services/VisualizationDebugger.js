@@ -108,6 +108,16 @@ export class VisualizationDebugger {
             return; // No active debug session
         }
 
+        // Skip capturing our own debug logs to avoid infinite loops and clutter
+        if (args.length > 0 && typeof args[0] === 'string') {
+            const message = args[0];
+            if (message.includes('[VisualizationDebugger]') ||
+                message.includes('🎯 Setting up console input') ||
+                message.includes('📝 Executing command:')) {
+                return; // Skip our own debug messages
+            }
+        }
+
         // Format the console arguments
         let message = '';
         let data = null;
@@ -223,21 +233,20 @@ export class VisualizationDebugger {
                     this.addModernDebugStyles();
 
                     placeholder.innerHTML = `
-                        <div class="debug-console-container" id="console-output" ">
-                            <div class="console-welcome-message">
-                                <div class="welcome-icon">�</div>
-                                <div class="welcome-content">
-                                    <div class="welcome-title">Debug Console Initialized</div>
-                                    <div class="welcome-subtitle">Start debugging to see request/response logs, network activity, and system events</div>
+                        <div class="debug-console-container">
+                            <div id="console-output" class="console-logs-container">
+                                <div class="console-welcome-message">
+                                    <div class="welcome-icon">🚀</div>
+                                    <div class="welcome-content">
+                                        <div class="welcome-title">Debug Console Initialized</div>
+                                        <div class="welcome-subtitle">Start debugging to see request/response logs, network activity, and system events</div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     `;
                 }
             }
-
-            // Setup console input event listeners
-            setTimeout(() => this.setupConsoleInput(), 500);
 
             return;
         }
@@ -277,10 +286,9 @@ export class VisualizationDebugger {
      * Add modern debug console styles
      */
     static addModernDebugStyles() {
-        // Prevent duplicate styles
-        if (document.querySelector('style[data-debug-modern-styles]')) {
-            return;
-        }
+        // Remove any existing styles first to ensure fresh CSS
+        const existingStyles = document.querySelectorAll('style[data-debug-modern-styles]');
+        existingStyles.forEach(style => style.remove());
 
         const style = document.createElement('style');
         style.setAttribute('data-debug-modern-styles', 'true');
@@ -288,37 +296,51 @@ export class VisualizationDebugger {
             /* Modern Debug Console Styles - Clean & Minimal Design */
             .debug-console-container {
                 flex: 1;
-                padding: 0;
-                overflow-y: auto;
-                background: #0f1419;
+                display: flex;
+                flex-direction: column;
+                justify-content: flex-start;
+                align-items: stretch;
+                overflow: hidden;
+                max-height: 400px; /* Ensure container has defined height for scrolling */
                 font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', 'Source Code Pro', monospace;
                 line-height: 1.6;
                 position: relative;
-                height: 320px;
-                border: 1px solid #1e2328;
-                border-radius: 8px;
                 color: #e6e6e6;
-                margin-top:18 px;
-                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12), 0 1px 3px rgba(0, 0, 0, 0.08);
+                margin-top: 0px; /* Remove margin to prevent content cutoff */
+                height: 100%;
+                min-height: 300px;
+            }
+
+            /* Console logs container - this holds all the log entries */
+            .console-logs-container {
+                flex: 1;
+                padding: 8px 0 0 0; /* Add top padding and bottom padding for console input */
+                overflow-y: auto;
+                display: flex;
+                flex-direction: column;
+                justify-content: flex-start;
+                align-items: stretch;
+                height: 100%;
+                min-height: 0;
             }
 
             /* Enhanced Scrollbar Design */
-            .debug-console-container::-webkit-scrollbar {
+            .console-logs-container::-webkit-scrollbar {
                 width: 6px;
             }
 
-            .debug-console-container::-webkit-scrollbar-track {
+            .console-logs-container::-webkit-scrollbar-track {
                 background: transparent;
                 border-radius: 3px;
             }
 
-            .debug-console-container::-webkit-scrollbar-thumb {
+            .console-logs-container::-webkit-scrollbar-thumb {
                 background: #3a4248;
                 border-radius: 3px;
                 transition: background-color 0.2s ease;
             }
 
-            .debug-console-container::-webkit-scrollbar-thumb:hover {
+            .console-logs-container::-webkit-scrollbar-thumb:hover {
                 background: #4a5258;
             }
 
@@ -327,8 +349,8 @@ export class VisualizationDebugger {
                 display: flex;
                 align-items: center;
                 gap: 16px;
-                padding: 24px;
-                margin: 16px;
+                padding: 16px 24px; /* Reduced top/bottom padding */
+                margin: 8px 16px 16px 16px; /* Reduced top margin */
                 background: #161b22;
                 border: 1px solid #21262d;
                 border-radius: 8px;
@@ -366,10 +388,13 @@ export class VisualizationDebugger {
                 padding: 12px 16px;
                 margin-bottom: 1px;
                 border-radius: 4px;
-                transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+                transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
                 position: relative;
                 border-left: 3px solid transparent;
                 background: transparent;
+                opacity: 1;
+                display: block;
+                transform: translateY(0);
             }
 
             .log-entry:hover {
@@ -655,6 +680,12 @@ export class VisualizationDebugger {
         this.log(`📊 Browser console capture is active - console.log/error/warn events will appear here`, 'success');
         this.log(`🌐 Click "Send" to make requests and see logs`, 'info');
 
+        // Add some sample logs of different types for testing filters
+        this.log(`✅ Debug console initialized successfully`, 'success');
+        this.log(`⚠️ This is a sample warning message`, 'warn');
+        this.log(`❌ This is a sample error message`, 'error');
+        this.log(`🔧 This is a sample debug message`, 'debug');
+
         return session;
     }
 
@@ -707,11 +738,6 @@ export class VisualizationDebugger {
         if (this._isUpdatingDOM) {
             this._pendingLogs.push(logEntry);
             return;
-        }
-
-        // Check if log should be shown based on current filter
-        if (!this.shouldShowLog(logEntry)) {
-            return; // Skip this log entry due to filter
         }
 
         this._isUpdatingDOM = true;
@@ -777,7 +803,12 @@ export class VisualizationDebugger {
             setTimeout(() => logElement.classList.remove('log-entry-new'), 200);
 
             consoleOutput.appendChild(logElement);
-            consoleOutput.scrollTop = consoleOutput.scrollHeight;
+
+            // Auto-scroll to bottom using the scrollable container
+            const consoleContainer = document.querySelector('.debug-console-container');
+            if (consoleContainer) {
+                consoleContainer.scrollTop = consoleContainer.scrollHeight;
+            }
 
         } finally {
             this._isUpdatingDOM = false;
@@ -825,12 +856,13 @@ export class VisualizationDebugger {
         const consoleOutput = document.getElementById('console-output');
         if (consoleOutput) {
             consoleOutput.innerHTML = `
-    <div style="display: flex; align-items: center; justify-content: center; min-height: 200px; padding: 40px 20px;">
+    <div style="display: flex; align-items: flex-start; justify-content: flex-start; min-height: 200px; padding: 20px;">
         <div style="text-align: center; background: #161b22; border: 1px solid #21262d; border-radius: 12px; padding: 32px 40px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); max-width: 400px; width: 100%;">
             <div style="font-size: 32px; margin-bottom: 16px; line-height: 1;">🧹</div>
             <div style="color: #f0f6fc; font-weight: 600; font-size: 16px; margin-bottom: 8px; letter-spacing: -0.01em;">Console Cleared</div>
             <div style="color: #8b949e; font-size: 14px; line-height: 1.5; font-weight: 400;">Ready for new logs...</div>
-        </div>`;
+        </div>
+    </div>`;
         }
 
         const currentSession = this.getCurrentSession();
@@ -888,7 +920,7 @@ export class VisualizationDebugger {
     }
 
     /**
-     * Switch debug tab
+     * Switch debug tab and filter logs
      */
     static switchTab(tabName) {
         const debugPanel = document.getElementById('viz-debug-panel');
@@ -923,6 +955,100 @@ export class VisualizationDebugger {
             targetPanel.style.pointerEvents = 'auto';
             targetPanel.style.display = 'flex';
             targetPanel.style.opacity = '1';
+        }
+
+        // Apply log filtering based on tab selection
+        this.setLogFilter(tabName.toLowerCase());
+    }
+
+    /**
+     * Set log filter and update display
+     */
+    static setLogFilter(filterType) {
+        // This is an alias for setFilter to maintain compatibility
+        this.setFilter(filterType);
+    }
+
+    /**
+     * Apply current log filter to console display
+     */
+    static applyLogFilter() {
+        const consoleOutput = document.getElementById('console-output');
+        if (!consoleOutput) {
+            return;
+        }
+
+        const logEntries = consoleOutput.querySelectorAll('.log-entry');
+
+        logEntries.forEach((entry, index) => {
+            const shouldShow = this.shouldShowLogEntry(entry);
+
+            if (shouldShow) {
+                // Show with fade-in animation
+                entry.style.display = 'block';
+                setTimeout(() => {
+                    entry.style.opacity = '1';
+                    entry.style.transform = 'translateY(0)';
+                }, index * 10); // Stagger the animations
+            } else {
+                // Hide with fade-out animation
+                entry.style.opacity = '0';
+                entry.style.transform = 'translateY(-10px)';
+                setTimeout(() => {
+                    entry.style.display = 'none';
+                }, 250); // Wait for animation to complete
+            }
+        });
+
+        // Scroll to bottom after filtering
+        setTimeout(() => {
+            this.scrollToBottom();
+        }, 300);
+    }
+
+    /**
+     * Determine if log entry should be shown based on current filter
+     */
+    static shouldShowLogEntry(logEntry) {
+        if (this._currentFilter === 'all') {
+            return true;
+        }
+
+        const logClasses = logEntry.className;
+
+        // Map filter types to log classes
+        const filterMap = {
+            'info': 'log-info',
+            'warn': 'log-warn',
+            'error': 'log-error',
+            'debug': 'log-debug',
+            'success': 'log-success'
+        };
+
+        const targetClass = filterMap[this._currentFilter];
+        if (!targetClass) {
+            return true; // Show all if unknown filter
+        }
+
+        return logClasses.includes(targetClass);
+    }
+
+    /**
+     * Scroll console to bottom
+     */
+    static scrollToBottom() {
+        const consoleContainer = document.querySelector('.debug-console-container');
+        if (consoleContainer) {
+            setTimeout(() => {
+                // Ensure scrolling works by setting scrollTop multiple times
+                const maxScroll = consoleContainer.scrollHeight - consoleContainer.clientHeight;
+                consoleContainer.scrollTop = maxScroll;
+
+                // Force a second scroll attempt in case the first didn't work
+                requestAnimationFrame(() => {
+                    consoleContainer.scrollTop = consoleContainer.scrollHeight;
+                });
+            }, 50);
         }
     }
 
@@ -1177,8 +1303,8 @@ export class VisualizationDebugger {
             }
         });
 
-        // Re-render console with new filter
-        this.refreshConsoleDisplay();
+        // Apply filter to existing logs immediately
+        this.applyLogFilter();
     }
 
     /**
@@ -1232,10 +1358,7 @@ export class VisualizationDebugger {
         }
 
         // Clear current display
-        consoleOutput.innerHTML = `
-            <div ></div>
-            <div ></div>
-        `;
+        consoleOutput.innerHTML = '';
 
         // Get current session logs
         const session = this.getCurrentSession();
@@ -1244,13 +1367,17 @@ export class VisualizationDebugger {
             const originalIsUpdating = this._isUpdatingDOM;
             this._isUpdatingDOM = false;
 
+            // Render ALL logs first, then apply filter
             session.logs.forEach(logEntry => {
-                if (this.shouldShowLog(logEntry)) {
-                    this._renderLogEntry(logEntry);
-                }
+                this._renderLogEntry(logEntry);
             });
 
             this._isUpdatingDOM = originalIsUpdating;
+
+            // Apply current filter after rendering
+            setTimeout(() => {
+                this.applyLogFilter();
+            }, 50);
         }
     }
 
@@ -1266,7 +1393,7 @@ export class VisualizationDebugger {
         const logElement = document.createElement('div');
         logElement.className = `log-entry log-${logEntry.type}`;
         logElement.style.cssText = `
-            // padding:  12px;
+            padding: 12px;
             border-left: 3px solid ${this.getLogColor(logEntry.type)};
             margin-bottom: 4px;
             background: rgba(255, 255, 255, 0.02);
@@ -1301,7 +1428,18 @@ export class VisualizationDebugger {
         `;
 
         consoleOutput.appendChild(logElement);
-        consoleOutput.scrollTop = consoleOutput.scrollHeight;
+
+        // Apply current filter to the new element
+        if (!this.shouldShowLogEntry(logElement)) {
+            logElement.style.display = 'none';
+            logElement.style.opacity = '0';
+        }
+
+        // Auto-scroll to bottom using the scrollable container
+        const consoleContainer = document.querySelector('.debug-console-container');
+        if (consoleContainer) {
+            consoleContainer.scrollTop = consoleContainer.scrollHeight;
+        }
     }
 
     /**
@@ -1365,13 +1503,14 @@ export class VisualizationDebugger {
             'status - Show debugger status',
             'filter <type> - Set log filter (all, info, warn, error, debug)',
             'export - Export console logs',
-            'test - Run test commands'
+            'test - Generate sample logs to test filtering'
         ];
 
         this.log('📚 Available Commands:', 'info');
         commands.forEach(cmd => {
             this.log(`  • ${cmd}`, 'info');
         });
+        this.log('💡 Tip: Try "test" command then use the filter buttons (All, Info, Warnings, Errors, Debug) to test filtering!', 'success');
     }
 
     /**
@@ -1464,66 +1603,138 @@ export class VisualizationDebugger {
     }
 
     /**
-     * Setup console input event listeners
+     * Setup console filter event listeners
      */
-    static setupConsoleInput() {
+    static setupConsoleFilter() {
         const setupWithRetry = (attempts = 0, maxAttempts = 10) => {
-            const consoleInput = document.getElementById('console-input');
+            const filterInput = document.getElementById('console-filter-input');
+            const clearBtn = document.getElementById('clear-filter-btn');
 
-            if (consoleInput) {
-                console.log('🎯 Setting up console input event listeners');
-
+            if (filterInput && clearBtn) {
                 // Remove existing listeners to prevent duplicates
-                consoleInput.replaceWith(consoleInput.cloneNode(true));
-                const newConsoleInput = document.getElementById('console-input');
+                filterInput.replaceWith(filterInput.cloneNode(true));
+                clearBtn.replaceWith(clearBtn.cloneNode(true));
 
-                newConsoleInput.addEventListener('keypress', (event) => {
+                const newFilterInput = document.getElementById('console-filter-input');
+                const newClearBtn = document.getElementById('clear-filter-btn');
+
+                // Handle enter key press for filtering
+                newFilterInput.addEventListener('keypress', (event) => {
                     if (event.key === 'Enter') {
                         event.preventDefault();
-                        const command = event.target.value.trim();
-                        if (command) {
-                            console.log(`📝 Executing command: ${command}`);
-                            this.executeCommand(command);
-                            event.target.value = '';
-                        }
+                        const filterText = event.target.value.trim().toLowerCase();
+                        this.applyTextFilter(filterText);
                     }
+                });
+
+                // Handle input for real-time filtering (debounced)
+                let filterTimeout;
+                newFilterInput.addEventListener('input', (event) => {
+                    clearTimeout(filterTimeout);
+                    filterTimeout = setTimeout(() => {
+                        const filterText = event.target.value.trim().toLowerCase();
+                        this.applyTextFilter(filterText);
+                    }, 300);
+                });
+
+                // Handle clear button
+                newClearBtn.addEventListener('click', (event) => {
+                    event.preventDefault();
+                    newFilterInput.value = '';
+                    this.applyTextFilter('');
+                    newFilterInput.focus();
                 });
 
                 // Add focus styling
-                newConsoleInput.addEventListener('focus', () => {
-                    newConsoleInput.style.borderColor = '#3b82f6';
-                    newConsoleInput.style.boxShadow = '0 0 0 2px rgba(59, 130, 246, 0.2)';
-                });
-
-                newConsoleInput.addEventListener('blur', () => {
-                    newConsoleInput.style.borderColor = '#374151';
-                    newConsoleInput.style.boxShadow = 'none';
-                });
-
-                // Add placeholder animation
-                newConsoleInput.addEventListener('input', () => {
-                    if (newConsoleInput.value.length > 0) {
-                        newConsoleInput.style.backgroundColor = '#1f2937';
-                    } else {
-                        newConsoleInput.style.backgroundColor = '#111827';
+                newFilterInput.addEventListener('focus', () => {
+                    const wrapper = newFilterInput.closest('.filter-input-wrapper');
+                    if (wrapper) {
+                        wrapper.style.borderColor = '#58a6ff';
+                        wrapper.style.boxShadow = '0 0 0 2px rgba(88, 166, 255, 0.1)';
                     }
                 });
 
-                console.log('✅ Console input event listeners attached successfully');
+                newFilterInput.addEventListener('blur', () => {
+                    const wrapper = newFilterInput.closest('.filter-input-wrapper');
+                    if (wrapper) {
+                        wrapper.style.borderColor = '#30363d';
+                        wrapper.style.boxShadow = 'none';
+                    }
+                });
+
+                // Log successful setup
+                if (this.currentSessionId) {
+                    this.log('🎯 Filter input setup complete - type to filter logs, press Enter to apply', 'info');
+                }
 
             } else if (attempts < maxAttempts) {
-                console.log(`⏳ Console input not found, retrying... (${attempts + 1}/${maxAttempts})`);
                 setTimeout(() => setupWithRetry(attempts + 1, maxAttempts), 200);
             } else {
-                console.error('❌ Failed to find console input element after maximum attempts');
                 // Try to log to debug console if available
                 if (this.currentSessionId) {
-                    this.log('⚠️ Console input setup failed - Enter key commands may not work', 'warn');
+                    this.log('⚠️ Filter input setup failed - filtering may not work', 'warn');
                 }
             }
         };
 
         setupWithRetry();
+    }
+
+    /**
+     * Apply text-based filter to log entries
+     */
+    static applyTextFilter(filterText) {
+        const consoleOutput = document.getElementById('console-output');
+        if (!consoleOutput) {
+            return;
+        }
+
+        const logEntries = consoleOutput.querySelectorAll('.log-entry');
+        let visibleCount = 0;
+
+        logEntries.forEach((entry) => {
+            const logMessage = entry.querySelector('.log-message');
+            if (!logMessage) {
+                return;
+            }
+
+            const messageText = logMessage.textContent.toLowerCase();
+            const shouldShow = !filterText || messageText.includes(filterText);
+
+            if (shouldShow) {
+                entry.style.display = 'block';
+                entry.style.opacity = '1';
+                visibleCount++;
+            } else {
+                entry.style.display = 'none';
+                entry.style.opacity = '0';
+            }
+        });
+
+        // Show filter result message
+        this.showFilterResult(filterText, visibleCount, logEntries.length);
+
+        // Scroll to bottom after filtering
+        setTimeout(() => {
+            this.scrollToBottom();
+        }, 100);
+    }
+
+    /**
+     * Show filter result message
+     */
+    static showFilterResult(filterText, visibleCount, totalCount) {
+        if (!this.currentSessionId) return;
+
+        if (filterText) {
+            if (visibleCount === 0) {
+                this.log(`🔍 No logs match filter "${filterText}"`, 'info');
+            } else {
+                this.log(`🔍 Showing ${visibleCount} of ${totalCount} logs for "${filterText}"`, 'info');
+            }
+        } else if (visibleCount < totalCount) {
+            this.log(`🔍 Filter cleared - showing all ${totalCount} logs`, 'info');
+        }
     }
 
     /**
@@ -1534,6 +1745,11 @@ export class VisualizationDebugger {
         this.isEnabled = false;
         this.isInitialized = false;
     }
+}
+
+// Make VisualizationDebugger globally available for testing
+if (typeof window !== 'undefined') {
+    window.VisualizationDebugger = VisualizationDebugger;
 }
 
 export default VisualizationDebugger;
