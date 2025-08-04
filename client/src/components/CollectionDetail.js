@@ -9,11 +9,12 @@ import SampleDataManager from './SampleDataManager';
 import DocumentationViewer from './DocumentationViewer';
 import EnvironmentSelector from './EnvironmentSelector';
 import CollectionVariablesManager from './CollectionVariablesManager';
+import VisualApiDesigner from './VisualApiDesigner/VisualApiDesigner';
 import { useCollaboration } from '../context/CollaborationContext';
 import {
   FiSave, FiSettings, FiPlay, FiAlertCircle, FiCheckCircle, FiBook, FiEdit,
   FiPlus, FiTrash2, FiDatabase, FiGlobe, FiLock, FiUsers, FiPackage,
-  FiFileText, FiInfo
+  FiFileText, FiInfo, FiGrid
 } from 'react-icons/fi';
 import { toast } from 'react-toastify'; // Import toast notification library
 
@@ -892,6 +893,12 @@ function CollectionDetail() {
             >
               <FiSettings /> Variables
             </button>
+            <button
+              className={`tab-btn ${activeTab === 'designer' ? 'active' : ''}`}
+              onClick={() => setActiveTab('designer')}
+            >
+              <FiGrid /> API Designer
+            </button>
           </div>
 
           {activeTab === 'requests' && (
@@ -1010,6 +1017,23 @@ function CollectionDetail() {
                 collectionName={collection?.name}
                 workspaceId={collection?.workspaceId}
                 selectedEnvironment={selectedEnvironment}
+              />
+            </div>
+          )}
+
+          {activeTab === 'designer' && (
+            <div className="designer-tab-content">
+              <VisualApiDesigner
+                collectionId={collectionId}
+                requests={requests}
+                onRequestsUpdate={setRequests}
+                collection={collection}
+                collaborationContext={{
+                  sendActivity,
+                  getActiveUsers,
+                  joinCollection,
+                  leaveCollection
+                }}
               />
             </div>
           )}

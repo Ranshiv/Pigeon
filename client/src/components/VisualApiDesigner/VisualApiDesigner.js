@@ -8,15 +8,24 @@ import {
     FiCode,
     FiEye
 } from 'react-icons/fi';
-import DesignCanvas from './components/DesignCanvas_new';
+import DesignCanvas from './components/DesignCanvas';
 import ComponentPalette from './components/ComponentPalette';
 import PropertiesPanel from './components/PropertiesPanel';
 import SpecPreview from './components/SpecPreview';
+import ValidationPanel from './components/ValidationPanel';
 import useDesignerState from './hooks/useDesignerState';
 import useSpecGeneration from './hooks/useSpecGeneration';
 import './VisualApiDesigner.css';
 
-const VisualApiDesigner = ({ collectionId, onSpecUpdate, initialSpec = null }) => {
+const VisualApiDesigner = ({
+    collectionId,
+    onSpecUpdate,
+    initialSpec = null,
+    requests = [],
+    onRequestsUpdate,
+    collection,
+    collaborationContext
+}) => {
     const designerState = useDesignerState(initialSpec);
     const {
         nodes,
@@ -37,6 +46,48 @@ const VisualApiDesigner = ({ collectionId, onSpecUpdate, initialSpec = null }) =
     const [viewMode, setViewMode] = useState('design'); // 'design', 'preview', 'split'
     const [saveStatus, setSaveStatus] = useState('saved'); // 'saved', 'saving', 'unsaved'
     const [visualizationContext, setVisualizationContext] = useState(null); // For handling visualization requests
+    const [isInitialized, setIsInitialized] = useState(false);
+
+    // Initialize designer with collection requests
+    useEffect(() => {
+        if (requests && requests.length > 0 && !isInitialized) {
+            // Convert collection requests to designer nodes
+            const convertedNodes = requests.map((request, index) => ({
+                id: `request-${request._id || request.id || index}`,
+                type: 'endpoint',
+                position: { x: 100 + (index % 3) * 200, y: 100 + Math.floor(index / 3) * 150 },
+                data: {
+                    method: request.method || 'GET',
+                    path: request.url ? new URL(request.url).pathname : '/',
+                    name: request.name || 'Unnamed Request',
+                    description: request.description || '',
+                    requestId: request._id || request.id
+                }
+            }));
+
+            // Add nodes to designer
+            convertedNodes.forEach(node => addNode(node.type, node.position, node.data));
+            setIsInitialized(true);
+        }
+    }, [requests, isInitialized, addNode]);
+
+    // Handle collaboration events
+    useEffect(() => {
+        if (collaborationContext && collectionId) {
+            // Join collection for real-time collaboration
+            collaborationContext.joinCollection(collectionId);
+
+            // Send activity when designer is opened
+            collaborationContext.sendActivity('designer_opened', {
+                collectionId,
+                collectionName: collection?.name
+            });
+
+            return () => {
+                collaborationContext.leaveCollection(collectionId);
+            };
+        }
+    }, [collaborationContext, collectionId, collection?.name]);
 
     const saveDesign = useCallback(async () => {
         try {
@@ -94,17 +145,13 @@ const VisualApiDesigner = ({ collectionId, onSpecUpdate, initialSpec = null }) =
     }, [isDirty, handleAutoSave]);
 
     // Handler functions for component interactions
-    const handleAddComponent = useCallback((componentType) => {
-        const newComponent = {
-            type: componentType,
-            position: { x: Math.random() * 300 + 100, y: Math.random() * 200 + 100 },
-            data: {}
-        };
-        addNode(newComponent);
-    }, [addNode]);
+    const handleDragStart = useCallback((componentData) => {
+        // Only track drag start, don't create nodes here
+        // Node creation happens in useDragAndDrop on drop
+    }, []);
 
-    const handleElementSelect = useCallback((element) => {
-        selectNode(element?.id || null);
+    const handleElementSelect = useCallback((elementId) => {
+        selectNode(elementId);
     }, [selectNode]);
 
     const handleElementUpdate = useCallback((elementId, updates) => {
@@ -292,10 +339,18 @@ const VisualApiDesigner = ({ collectionId, onSpecUpdate, initialSpec = null }) =
         }
     };
 
+    const handleVisualizationIssueClick = useCallback((issue) => {
+        // Navigate to the problematic node or section
+        if (issue.nodeId) {
+            selectNode(issue.nodeId);
+        }
+        console.log('Validation issue clicked:', issue);
+    }, [selectNode]);
+
     const renderDesignView = () => (
         <div className="design-workspace">
             <div className="workspace-left">
-                <ComponentPalette onDragStart={handleAddComponent} />
+                <ComponentPalette onDragStart={handleDragStart} />
             </div>
 
             <div className="workspace-center">
@@ -307,6 +362,7 @@ const VisualApiDesigner = ({ collectionId, onSpecUpdate, initialSpec = null }) =
                     onNodeUpdate={handleElementUpdate}
                     onNodeDelete={handleElementDelete}
                     onVisualize={handleVisualize}
+                    onNodeAdd={addNode}
                 />
             </div>
 
@@ -328,20 +384,11 @@ const VisualApiDesigner = ({ collectionId, onSpecUpdate, initialSpec = null }) =
                 {renderMainContent()}
             </div>
 
-            {/* Status bar */}
-            <div className="designer-status-bar">
-                <div className="status-left">
-                    <span className={`save-status ${saveStatus}`}>
-                        {saveStatus === 'saved' && '✓ Saved'}
-                        {saveStatus === 'saving' && '⏳ Saving...'}
-                        {saveStatus === 'unsaved' && '● Unsaved changes'}
-                    </span>
-                </div>
-                <div className="status-right">
-                    <span>{designerState.elements?.length || 0} elements</span>
-                    <span>{validationErrors.length} validation errors</span>
-                </div>
-            </div>
+            {/* Validation Panel */}
+            <ValidationPanel
+                validationErrors={validationErrors}
+                onValidationIssueClick={handleVisualizationIssueClick}
+            />
         </div>
     );
 };

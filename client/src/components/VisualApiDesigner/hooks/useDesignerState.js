@@ -17,6 +17,7 @@ const useDesignerState = (initialState = {}) => {
 
     // Node operations
     const addNode = useCallback((nodeData) => {
+        console.log('useDesignerState: addNode called with:', nodeData);
         const newNode = {
             id: `node-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
             type: nodeData.type || 'default',
@@ -24,6 +25,7 @@ const useDesignerState = (initialState = {}) => {
             data: nodeData.data || {},
             ...nodeData
         };
+        console.log('useDesignerState: creating newNode:', newNode);
 
         setState(prevState => {
             const newState = {
@@ -31,6 +33,7 @@ const useDesignerState = (initialState = {}) => {
                 nodes: [...prevState.nodes, newNode],
                 isDirty: true
             };
+            console.log('useDesignerState: updated state with nodes:', newState.nodes);
             return addToHistory(newState, prevState);
         });
 
@@ -81,11 +84,16 @@ const useDesignerState = (initialState = {}) => {
     }, []);
 
     const selectNode = useCallback((nodeId) => {
-        setState(prevState => ({
-            ...prevState,
-            selectedNode: prevState.nodes.find(node => node.id === nodeId) || null,
-            selectedEdge: null
-        }));
+        console.log('useDesignerState: selectNode called with nodeId:', nodeId);
+        setState(prevState => {
+            const selectedNode = prevState.nodes.find(node => node.id === nodeId) || null;
+            console.log('useDesignerState: found selectedNode:', selectedNode);
+            return {
+                ...prevState,
+                selectedNode: selectedNode,
+                selectedEdge: null
+            };
+        });
     }, []);
 
     // Edge operations

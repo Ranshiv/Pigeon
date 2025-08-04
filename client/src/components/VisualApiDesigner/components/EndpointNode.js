@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { ApiResponseMockService } from '../services/ApiResponseMockService';
+import './ModernNodeStyles.css';
 
 const EndpointNode = ({
     id,
@@ -27,8 +28,9 @@ const EndpointNode = ({
 
     const style = {
         transform: CSS.Transform.toString(transform),
-        transition,
-        opacity: isDragging ? 0.6 : 1,
+        transition: isDragging ? 'none' : transition,
+        opacity: isDragging ? 0.8 : 1,
+        zIndex: isDragging ? 1000 : 1,
     };
 
     const { path, method, summary, deprecated } = data || {};
@@ -114,94 +116,122 @@ const EndpointNode = ({
             style={style}
             {...attributes}
             {...listeners}
-            className={`endpoint-node ${selected ? 'selected' : ''} ${isDragging ? 'dragging' : ''}`}
+            className={`modern-endpoint-node ${selected ? 'selected' : ''} ${isDragging ? 'dragging' : ''}`}
             onClick={handleClick}
             onDoubleClick={handleDoubleClick}
         >
-            <div className="node-header">
-                <div
-                    className="method-badge"
-                    style={{ backgroundColor: getMethodColor(method) }}
-                >
-                    {method || 'GET'}
-                </div>
-                <div className="node-title">
-                    <div className="endpoint-path">{path || '/endpoint'}</div>
-                    {deprecated && <span className="deprecated-badge">DEPRECATED</span>}
-                </div>
-                <div className="node-controls">
-                    {/* Test API Button */}
-                    <button
-                        className={`test-api-btn ${isTestingApi ? 'testing' : ''}`}
-                        onClick={handleTestApi}
-                        disabled={isTestingApi}
-                        title="Test API endpoint"
-                    >
-                        {isTestingApi ? '⏳' : '▶️'}
-                    </button>
-
-                    {lastTestResult && (
-                        <button
-                            className="visualize-btn"
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                if (onVisualize) {
-                                    onVisualize(id, lastTestResult);
-                                }
-                            }}
-                            title="Visualize response data"
+            <div className="node-card">
+                <div className="node-header">
+                    <div className="node-icon-wrapper">
+                        <div
+                            className="method-badge"
+                            style={{ backgroundColor: getMethodColor(method) }}
                         >
-                            📊
-                        </button>
-                    )}
-
-                    {onDelete && (
-                        <button
-                            className="delete-btn"
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                onDelete();
-                            }}
-                            title="Delete endpoint"
-                        >
-                            ×
-                        </button>
-                    )}
-                </div>
-            </div>
-
-            {summary && (
-                <div className="node-summary">
-                    {summary}
-                </div>
-            )}
-
-            {/* API Test Result Indicator */}
-            {lastTestResult && (
-                <div className="api-test-result">
-                    <div
-                        className="status-indicator"
-                        style={{ backgroundColor: getStatusColor(lastTestResult.status) }}
-                    >
-                        {lastTestResult.status}
+                            {method || 'GET'}
+                        </div>
                     </div>
-                    <span className="response-time">{lastTestResult.responseTime}ms</span>
-                    <span className="response-size">{Math.round(lastTestResult.size / 1024)}KB</span>
-                </div>
-            )}
+                    <div className="node-info">
+                        <div className="node-title">
+                            <h4 className="endpoint-path">{path || '/endpoint'}</h4>
+                            <div className="endpoint-meta">
+                                {deprecated && <span className="deprecated-badge">DEPRECATED</span>}
+                                {summary && <span className="endpoint-summary">{summary}</span>}
+                            </div>
+                        </div>
+                    </div>
+                    <div className="node-controls">
+                        {/* Test API Button */}
+                        <button
+                            className={`test-api-btn ${isTestingApi ? 'testing' : ''}`}
+                            onClick={handleTestApi}
+                            disabled={isTestingApi}
+                            title="Test API endpoint"
+                        >
+                            {isTestingApi ? (
+                                <svg className="spin" width="12" height="12" viewBox="0 0 12 12" fill="currentColor">
+                                    <path d="M6 1a5 5 0 0 1 5 5h-1a4 4 0 0 0-4-4V1z"/>
+                                </svg>
+                            ) : (
+                                <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor">
+                                    <path d="M3 2l6 4-6 4V2z"/>
+                                </svg>
+                            )}
+                        </button>
 
-            <div className="node-handles">
-                <div className="handle handle-input" title="Connect input">
-                    <div className="handle-dot"></div>
+                        {lastTestResult && (
+                            <button
+                                className="visualize-btn"
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    if (onVisualize) {
+                                        onVisualize(id, lastTestResult);
+                                    }
+                                }}
+                                title="Visualize response data"
+                            >
+                                <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor">
+                                    <path d="M1 8h2l1-3 2 6 2-4 1 2h2"/>
+                                </svg>
+                            </button>
+                        )}
+
+                        {onDelete && (
+                            <button
+                                className="delete-btn"
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    onDelete();
+                                }}
+                                title="Delete endpoint"
+                            >
+                                <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor">
+                                    <path d="M9 3L3 9M3 3l6 6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+                                </svg>
+                            </button>
+                        )}
+                    </div>
                 </div>
-                <div className="handle handle-output" title="Connect output">
-                    <div className="handle-dot"></div>
+
+                {/* API Test Result Indicator */}
+                {lastTestResult && (
+                    <div className="api-test-result">
+                        <div
+                            className="status-indicator"
+                            style={{ backgroundColor: getStatusColor(lastTestResult.status) }}
+                        >
+                            {lastTestResult.status}
+                        </div>
+                        <div className="result-details">
+                            <span className="response-time">{lastTestResult.responseTime}ms</span>
+                            <span className="response-size">{Math.round(lastTestResult.size / 1024)}KB</span>
+                        </div>
+                    </div>
+                )}
+
+                <div className="node-footer">
+                    <div className="node-meta">
+                        <span className="endpoint-type">API Endpoint</span>
+                        {lastTestResult && (
+                            <span className="last-tested">
+                                Tested {new Date(lastTestResult.timestamp).toLocaleTimeString()}
+                            </span>
+                        )}
+                    </div>
                 </div>
+
+                <div className="node-handles">
+                    <div className="handle handle-input" title="Connect input">
+                        <div className="handle-dot"></div>
+                    </div>
+                    <div className="handle handle-output" title="Connect output">
+                        <div className="handle-dot"></div>
+                    </div>
+                </div>
+
+                {selected && (
+                    <div className="selection-indicator"></div>
+                )}
             </div>
-
-            {selected && (
-                <div className="selection-outline"></div>
-            )}
         </div>
     );
 };

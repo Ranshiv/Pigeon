@@ -8,7 +8,6 @@ import RequestWorkspace from './RequestWorkspace';
 import RequestForm from './RequestForm';
 import ResponseDisplay from './ResponseDisplay';
 import APINetworkExplore from './APINetworkExplore';
-import VisualApiDesigner from './VisualApiDesigner/VisualApiDesigner';
 import './APINetworkSection.css';
 
 const APINetworkSection = () => {
@@ -227,19 +226,7 @@ const UnifiedRequestWorkspace = ({ onSendRequest, response }) => {
                     )}
                 </div>
 
-                {/* Visual API Designer section - moved here after Preview section */}
-                <div className="visual-api-designer-section">
-                    <h3>🎨 Visual API Designer</h3>
-                    <VisualApiDesigner
-                        collectionId={defaultRequest.collectionId}
-                        onSpecUpdate={(spec) => {
-                            // Update the request with the generated OpenAPI spec
-                            console.log('OpenAPI spec generated:', spec);
-                            // You can handle the spec update here if needed
-                        }}
-                        initialSpec={null}
-                    />
-                </div>
+
             </div>
         </div>
     );

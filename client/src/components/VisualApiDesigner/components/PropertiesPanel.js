@@ -1,4 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { FiSettings, FiTrash2, FiCheck, FiX, FiInfo } from 'react-icons/fi';
+
+/**
+ * PropertiesPanel - Enhanced right sidebar for component configuration
+ * Follows Clean Code principles:
+ * - SRP: Only handles property editing and validation
+ * - Extracted property renderers for each component type
+ * - Clear separation of concerns between UI and logic
+ */
 
 const PropertiesPanel = ({ selectedNode, onNodeUpdate, onDeleteNode }) => {
     const [properties, setProperties] = useState({});
@@ -14,16 +23,16 @@ const PropertiesPanel = ({ selectedNode, onNodeUpdate, onDeleteNode }) => {
         }
     }, [selectedNode]);
 
-    const handlePropertyChange = (key, value) => {
+    const handlePropertyChange = useCallback((key, value) => {
         const newProperties = { ...properties, [key]: value };
         setProperties(newProperties);
 
         if (onNodeUpdate && selectedNode) {
             onNodeUpdate(selectedNode.id, newProperties);
         }
-    };
+    }, [properties, onNodeUpdate, selectedNode]);
 
-    const validateProperty = (key, value) => {
+    const validateProperty = useCallback((key, value) => {
         const newErrors = { ...errors };
 
         switch (key) {
@@ -53,83 +62,178 @@ const PropertiesPanel = ({ selectedNode, onNodeUpdate, onDeleteNode }) => {
         }
 
         setErrors(newErrors);
-    };
+    }, [errors]);
 
-    const handleInputChange = (key, value) => {
+    // Enhanced input change handler with validation
+    const handleInputChange = useCallback((key, value) => {
         handlePropertyChange(key, value);
         validateProperty(key, value);
-    };
+    }, [handlePropertyChange, validateProperty]);
+
+    // Enhanced form field component following SRP
+    const FormField = useCallback(({ label, children, error, required = false, helpText }) => (
+        <div className={`form-field ${error ? 'has-error' : ''}`}>
+            <label className="form-label">
+                {label}
+                {required && <span className="required-indicator">*</span>}
+                {helpText && (
+                    <span className="help-icon" title={helpText}>
+                        <FiInfo size={14} />
+                    </span>
+                )}
+            </label>
+            <div className="form-input-wrapper">
+                {children}
+            </div>
+            {error && (
+                <div className="error-message">
+                    <FiX size={12} />
+                    {error}
+                </div>
+            )}
+        </div>
+    ), []);
+
+    // Enhanced input component with validation states
+    const FormInput = useCallback(({ type = 'text', value, onChange, placeholder, error, ...props }) => (
+        <input
+            type={type}
+            value={value || ''}
+            onChange={(e) => onChange(e.target.value)}
+            placeholder={placeholder}
+            className={`form-input ${error ? 'error' : ''}`}
+            {...props}
+        />
+    ), []);
+
+    // Enhanced select component
+    const FormSelect = useCallback(({ value, onChange, options, error, ...props }) => (
+        <select
+            value={value || ''}
+            onChange={(e) => onChange(e.target.value)}
+            className={`form-select ${error ? 'error' : ''}`}
+            {...props}
+        >
+            {options.map(option => (
+                <option key={option.value} value={option.value}>
+                    {option.label}
+                </option>
+            ))}
+        </select>
+    ), []);
+
+    // Enhanced textarea component
+    const FormTextarea = useCallback(({ value, onChange, placeholder, rows = 3, error, ...props }) => (
+        <textarea
+            value={value || ''}
+            onChange={(e) => onChange(e.target.value)}
+            placeholder={placeholder}
+            rows={rows}
+            className={`form-textarea ${error ? 'error' : ''}`}
+            {...props}
+        />
+    ), []);
+
+    // Enhanced checkbox component
+    const FormCheckbox = useCallback(({ checked, onChange, label, ...props }) => (
+        <label className="form-checkbox-wrapper">
+            <input
+                type="checkbox"
+                checked={checked || false}
+                onChange={(e) => onChange(e.target.checked)}
+                className="form-checkbox"
+                {...props}
+            />
+            <span className="checkbox-custom">
+                {checked && <FiCheck size={12} />}
+            </span>
+            <span className="checkbox-label">{label}</span>
+        </label>
+    ), []);
 
     const renderEndpointProperties = () => (
-        <div className="property-group">
-            <h4>Endpoint Configuration</h4>
+        <div className="properties-form">
+            <div className="form-section">
+                <h4 className="section-title">
+                    <FiSettings size={16} />
+                    Endpoint Configuration
+                </h4>
 
-            <div className="property-field">
-                <label>Path</label>
-                <input
-                    type="text"
-                    value={properties.path || ''}
-                    onChange={(e) => handleInputChange('path', e.target.value)}
-                    placeholder="/api/resource"
-                    className={errors.path ? 'error' : ''}
-                />
-                {errors.path && <span className="error-message">{errors.path}</span>}
-            </div>
-
-            <div className="property-field">
-                <label>Method</label>
-                <select
-                    value={properties.method || 'GET'}
-                    onChange={(e) => handleInputChange('method', e.target.value)}
-                    className={errors.method ? 'error' : ''}
+                <FormField
+                    label="Name"
+                    required
+                    error={errors.name}
+                    helpText="Display name for this endpoint"
                 >
-                    <option value="GET">GET</option>
-                    <option value="POST">POST</option>
-                    <option value="PUT">PUT</option>
-                    <option value="DELETE">DELETE</option>
-                    <option value="PATCH">PATCH</option>
-                    <option value="HEAD">HEAD</option>
-                    <option value="OPTIONS">OPTIONS</option>
-                </select>
-                {errors.method && <span className="error-message">{errors.method}</span>}
+                    <FormInput
+                        value={properties.name}
+                        onChange={(value) => handleInputChange('name', value)}
+                        placeholder="My Endpoint"
+                        error={errors.name}
+                    />
+                </FormField>
+
+                <FormField
+                    label="Description"
+                    helpText="Brief description of what this endpoint does"
+                >
+                    <FormTextarea
+                        value={properties.description}
+                        onChange={(value) => handleInputChange('description', value)}
+                        placeholder="Describe the endpoint functionality..."
+                        rows={3}
+                    />
+                </FormField>
             </div>
 
-            <div className="property-field">
-                <label>Summary</label>
-                <input
-                    type="text"
-                    value={properties.summary || ''}
-                    onChange={(e) => handleInputChange('summary', e.target.value)}
-                    placeholder="Brief description"
-                />
+            <div className="form-section">
+                <h4 className="section-title">HTTP Configuration</h4>
+
+                <div className="form-row">
+                    <FormField
+                        label="HTTP Method"
+                        required
+                        error={errors.method}
+                    >
+                        <FormSelect
+                            value={properties.method}
+                            onChange={(value) => handleInputChange('method', value)}
+                            options={[
+                                { value: 'GET', label: 'GET' },
+                                { value: 'POST', label: 'POST' },
+                                { value: 'PUT', label: 'PUT' },
+                                { value: 'DELETE', label: 'DELETE' },
+                                { value: 'PATCH', label: 'PATCH' },
+                                { value: 'HEAD', label: 'HEAD' },
+                                { value: 'OPTIONS', label: 'OPTIONS' }
+                            ]}
+                            error={errors.method}
+                        />
+                    </FormField>
+                </div>
+
+                <FormField
+                    label="Path"
+                    required
+                    error={errors.path}
+                    helpText="API endpoint path (e.g., /api/users/{id})"
+                >
+                    <FormInput
+                        value={properties.path}
+                        onChange={(value) => handleInputChange('path', value)}
+                        placeholder="/api/endpoint"
+                        error={errors.path}
+                    />
+                </FormField>
             </div>
 
-            <div className="property-field">
-                <label>Description</label>
-                <textarea
-                    value={properties.description || ''}
-                    onChange={(e) => handleInputChange('description', e.target.value)}
-                    placeholder="Detailed description"
-                    rows={3}
-                />
-            </div>
+            <div className="form-section">
+                <h4 className="section-title">Options</h4>
 
-            <div className="property-field">
-                <label>Tags</label>
-                <input
-                    type="text"
-                    value={properties.tags ? properties.tags.join(', ') : ''}
-                    onChange={(e) => handleInputChange('tags', e.target.value.split(',').map(tag => tag.trim()))}
-                    placeholder="tag1, tag2, tag3"
-                />
-            </div>
-
-            <div className="property-field">
-                <label>Deprecated</label>
-                <input
-                    type="checkbox"
-                    checked={properties.deprecated || false}
-                    onChange={(e) => handleInputChange('deprecated', e.target.checked)}
+                <FormCheckbox
+                    checked={properties.deprecated}
+                    onChange={(value) => handleInputChange('deprecated', value)}
+                    label="Deprecated"
                 />
             </div>
         </div>
@@ -291,44 +395,46 @@ const PropertiesPanel = ({ selectedNode, onNodeUpdate, onDeleteNode }) => {
         }
     };
 
-    if (!selectedNode) {
-        return (
-            <div className="properties-panel">
-                <div className="properties-header">
-                    <h3>Properties</h3>
-                </div>
-                <div className="no-selection">
-                    <p>Select a component to view its properties</p>
-                </div>
-            </div>
-        );
-    }
+    // Remove the separate no-selection return since it's now handled in the main return
 
     return (
         <div className="properties-panel">
             <div className="properties-header">
-                <h3>Properties</h3>
-                <div className="selected-node-info">
-                    <span className="node-type">{selectedNode.type}</span>
-                    {selectedNode.data?.name && (
-                        <span className="node-name">{selectedNode.data.name}</span>
-                    )}
-                </div>
+                <h3 className="panel-title">Properties</h3>
+                {selectedNode && (
+                    <div className="selected-node-badge">
+                        <span className="node-type-badge">{selectedNode.type}</span>
+                    </div>
+                )}
             </div>
 
             <div className="properties-content">
-                {renderPropertiesByType()}
+                {selectedNode ? (
+                    <>
+                        {renderPropertiesByType()}
 
-                <div className="property-actions">
-                    {onDeleteNode && (
-                        <button
-                            className="delete-button"
-                            onClick={() => onDeleteNode(selectedNode.id)}
-                        >
-                            Delete Component
-                        </button>
-                    )}
-                </div>
+                        <div className="properties-actions">
+                            {onDeleteNode && (
+                                <button
+                                    className="delete-button"
+                                    onClick={() => onDeleteNode(selectedNode.id)}
+                                    title="Delete this component"
+                                >
+                                    <FiTrash2 size={16} />
+                                    Delete
+                                </button>
+                            )}
+                        </div>
+                    </>
+                ) : (
+                    <div className="no-selection">
+                        <div className="no-selection-content">
+                            <FiInfo size={48} className="no-selection-icon" />
+                            <h4>Select a component to view its properties</h4>
+                            <p>Click on any component in the canvas to configure its settings</p>
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );

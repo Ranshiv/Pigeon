@@ -130,70 +130,6 @@ button[class*="add"],
     /* Remove max-width constraint */
 }
 
-/* Visual API Designer Section */
-.visual-api-designer-section {
-    flex: 1 1 auto;
-    overflow: hidden;
-    background-color: var(--card-bg, #1e1e1e);
-    min-height: 500px;
-    max-height: none;
-    border: none !important;
-    box-shadow: none !important;
-    margin-top: 16px;
-    border-radius: 8px;
-    border: 1px solid var(--border-color, #3e3e3e);
-}
-
-.visual-api-designer-section h3 {
-    margin: 0;
-    padding: 16px;
-    background: var(--card-bg, #1e1e1e);
-    border-bottom: 1px solid var(--border-color, #3e3e3e);
-    color: var(--text-color, #e6e6e6);
-    font-size: 16px;
-    font-weight: 600;
-}
-
-.visual-api-designer-section .visual-api-designer {
-    height: calc(100% - 60px);
-    border-radius: 0;
-}
-
-/* Ensure Visual API Designer integrates well with UnifiedRequestWorkspace */
-.visual-api-designer-section .visual-designer-toolbar {
-    background: var(--card-bg, #1e1e1e);
-    border-bottom: 1px solid var(--border-color, #3e3e3e);
-    color: var(--text-color, #e6e6e6);
-}
-
-.visual-api-designer-section .toolbar-btn {
-    background: var(--card-bg, #1e1e1e);
-    border: 1px solid var(--border-color, #3e3e3e);
-    color: var(--text-color, #e6e6e6);
-}
-
-.visual-api-designer-section .toolbar-btn:hover {
-    background: var(--primary-color, #FF6C37);
-    border-color: var(--primary-color, #FF6C37);
-    color: white;
-}
-
-.visual-api-designer-section .component-palette,
-.visual-api-designer-section .properties-panel {
-    background: var(--card-bg, #1e1e1e);
-    border-color: var(--border-color, #3e3e3e);
-}
-
-.visual-api-designer-section .design-canvas {
-    background: var(--bg-secondary, #2d2d2d);
-}
-
-.visual-api-designer-section .designer-status-bar {
-    background: var(--card-bg, #1e1e1e);
-    border-top: 1px solid var(--border-color, #3e3e3e);
-    color: var(--text-color, #e6e6e6);
-}
-
 /* Responsive styles for smaller screens */
 @media (max-width: 768px) {
     .request-response-container {
@@ -201,13 +137,8 @@ button[class*="add"],
     }
 
     .request-form-section,
-    .response-section,
-    .visual-api-designer-section {
+    .response-section {
         width: 100%;
         min-height: 400px;
-    }
-
-    .visual-api-designer-section {
-        min-height: 600px;
     }
 }
