@@ -1,9 +1,14 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { ApiResponseMockService } from '../services/ApiResponseMockService';
-import './ModernNodeStyles.css';
+import { FiGlobe, FiChevronRight, FiCode } from 'react-icons/fi';
+import './EndpointNode.css';
 
+/**
+ * EndpointNode component - Enhanced with modern UI
+ * Follows Clean Code principles with proper component structure
+ * and enhanced visualizations
+ */
 const EndpointNode = ({
     id,
     data,
@@ -11,8 +16,7 @@ const EndpointNode = ({
     onSelect,
     onUpdate,
     onDelete,
-    onApiTest, // New prop for handling API test results
-    onVisualize // New prop for visualizing API responses
+    onVisualize
 }) => {
     const {
         attributes,
@@ -23,29 +27,57 @@ const EndpointNode = ({
         isDragging
     } = useSortable({ id });
 
-    const [isTestingApi, setIsTestingApi] = useState(false);
-    const [lastTestResult, setLastTestResult] = useState(null);
-
     const style = {
         transform: CSS.Transform.toString(transform),
-        transition: isDragging ? 'none' : transition,
-        opacity: isDragging ? 0.8 : 1,
-        zIndex: isDragging ? 1000 : 1,
+        transition,
+        opacity: isDragging ? 0.6 : 1,
     };
 
-    const { path, method, summary, deprecated } = data || {};
+    const {
+        path,
+        summary,
+        description,
+        method = 'get',
+        deprecated = false,
+        parameters = [],
+        responses = {}
+    } = data || {};
 
-    const getMethodColor = (method) => {
-        const colors = {
-            'GET': '#4CAF50',
-            'POST': '#2196F3',
-            'PUT': '#FF9800',
-            'DELETE': '#F44336',
-            'PATCH': '#9C27B0',
-            'HEAD': '#607D8B',
-            'OPTIONS': '#795548'
-        };
-        return colors[method?.toUpperCase()] || '#666666';
+    // Format HTTP method for display
+    const httpMethod = method ? method.toUpperCase() : 'GET';
+
+    // Get method color class
+    const getMethodClass = () => {
+        switch (httpMethod.toLowerCase()) {
+            case 'get': return 'get';
+            case 'post': return 'post';
+            case 'put': return 'put';
+            case 'delete': return 'delete';
+            case 'patch': return 'patch';
+            default: return '';
+        }
+    };
+
+    // Get status badges to display
+    const getStatusBadges = () => {
+        const badges = [];
+
+        if (deprecated) {
+            badges.push(<span key="deprecated" className="status-badge deprecated">Deprecated</span>);
+        }
+
+        if (parameters && parameters.length > 0) {
+            badges.push(<span key="params" className="status-badge">{parameters.length} Params</span>);
+        }
+
+        if (responses && Object.keys(responses).length > 0) {
+            const successResponse = Object.keys(responses).find(code => code.startsWith('2'));
+            if (successResponse) {
+                badges.push(<span key="success" className="status-badge active">{successResponse}</span>);
+            }
+        }
+
+        return badges;
     };
 
     const handleClick = (e) => {
@@ -60,54 +92,11 @@ const EndpointNode = ({
         // Enable inline editing or open properties panel
     };
 
-    const handleTestApi = async (e) => {
+    const handleVisualize = (e) => {
         e.stopPropagation();
-
-        if (!data) return;
-
-        setIsTestingApi(true);
-
-        try {
-            // Simulate API call delay
-            await new Promise(resolve => setTimeout(resolve, 500 + Math.random() * 1000));
-
-            // Generate mock response
-            const mockResponse = ApiResponseMockService.generateMockResponse(data);
-
-            // Store the response
-            ApiResponseMockService.storeResponse(id, mockResponse);
-            setLastTestResult(mockResponse);
-
-            // Notify parent component
-            if (onApiTest) {
-                onApiTest(id, mockResponse);
-            }
-
-        } catch (error) {
-            const errorResponse = {
-                status: 500,
-                statusText: 'Internal Server Error',
-                data: { error: 'Failed to test API endpoint' },
-                responseTime: 0,
-                size: 0,
-                timestamp: new Date().toISOString()
-            };
-
-            setLastTestResult(errorResponse);
-
-            if (onApiTest) {
-                onApiTest(id, errorResponse);
-            }
-        } finally {
-            setIsTestingApi(false);
+        if (onVisualize) {
+            onVisualize(data);
         }
-    };
-
-    const getStatusColor = (status) => {
-        if (status >= 200 && status < 300) return '#28a745';
-        if (status >= 300 && status < 400) return '#ffc107';
-        if (status >= 400) return '#dc3545';
-        return '#6c757d';
     };
 
     return (
@@ -116,122 +105,86 @@ const EndpointNode = ({
             style={style}
             {...attributes}
             {...listeners}
-            className={`modern-endpoint-node ${selected ? 'selected' : ''} ${isDragging ? 'dragging' : ''}`}
+            className={`endpoint-node-modern ${selected ? 'selected' : ''} ${isDragging ? 'dragging' : ''}`}
             onClick={handleClick}
             onDoubleClick={handleDoubleClick}
         >
-            <div className="node-card">
-                <div className="node-header">
-                    <div className="node-icon-wrapper">
-                        <div
-                            className="method-badge"
-                            style={{ backgroundColor: getMethodColor(method) }}
-                        >
-                            {method || 'GET'}
+            <div className="node-card-outer">
+                <div className="node-card-header">
+                    <div className="node-card-icon">
+                        <div className="icon-bg">
+                            <FiGlobe size={16} />
                         </div>
                     </div>
-                    <div className="node-info">
-                        <div className="node-title">
-                            <h4 className="endpoint-path">{path || '/endpoint'}</h4>
-                            <div className="endpoint-meta">
-                                {deprecated && <span className="deprecated-badge">DEPRECATED</span>}
-                                {summary && <span className="endpoint-summary">{summary}</span>}
+                    <span className="node-card-type-badge">HTTP Endpoint</span>
+                    {data?.status && (
+                        <span className="node-card-status">{data.status}</span>
+                    )}
+                </div>
+
+                <div className="node-card-content">
+                    <div className="node-card-title">
+                        {summary || "REST API Endpoint"}
+                    </div>
+
+                    <div className="node-card-desc">
+                        {description || "Define your API endpoint here"}
+                    </div>
+
+                    <div className="endpoint-details">
+                        <span className={`http-method ${getMethodClass()}`}>
+                            {httpMethod}
+                        </span>
+                        {path && <span className="endpoint-path">{path}</span>}
+                    </div>
+
+                    {(deprecated || parameters?.length > 0 || Object.keys(responses || {}).length > 0) && (
+                        <div className="endpoint-status">
+                            {getStatusBadges()}
+                        </div>
+                    )}
+                </div>
+
+                {/* Expandable section for parameters */}
+                {parameters?.length > 0 && (
+                    <div className="node-card-children">
+                        <div className="node-body">
+                            <div className="parameters-list">
+                                {parameters.slice(0, 3).map((param, index) => (
+                                    <div key={index} className="parameter-item">
+                                        <span className="parameter-name">{param.name}</span>
+                                        {param.required && <span className="parameter-required">*</span>}
+                                        <span className="parameter-type">{param.schema?.type || 'string'}</span>
+                                    </div>
+                                ))}
+                                {parameters.length > 3 && (
+                                    <div className="parameter-more">
+                                        <FiChevronRight size={12} /> {parameters.length - 3} more parameters
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </div>
-                    <div className="node-controls">
-                        {/* Test API Button */}
-                        <button
-                            className={`test-api-btn ${isTestingApi ? 'testing' : ''}`}
-                            onClick={handleTestApi}
-                            disabled={isTestingApi}
-                            title="Test API endpoint"
-                        >
-                            {isTestingApi ? (
-                                <svg className="spin" width="12" height="12" viewBox="0 0 12 12" fill="currentColor">
-                                    <path d="M6 1a5 5 0 0 1 5 5h-1a4 4 0 0 0-4-4V1z"/>
-                                </svg>
-                            ) : (
-                                <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor">
-                                    <path d="M3 2l6 4-6 4V2z"/>
-                                </svg>
-                            )}
-                        </button>
-
-                        {lastTestResult && (
-                            <button
-                                className="visualize-btn"
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    if (onVisualize) {
-                                        onVisualize(id, lastTestResult);
-                                    }
-                                }}
-                                title="Visualize response data"
-                            >
-                                <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor">
-                                    <path d="M1 8h2l1-3 2 6 2-4 1 2h2"/>
-                                </svg>
-                            </button>
-                        )}
-
-                        {onDelete && (
-                            <button
-                                className="delete-btn"
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    onDelete();
-                                }}
-                                title="Delete endpoint"
-                            >
-                                <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor">
-                                    <path d="M9 3L3 9M3 3l6 6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-                                </svg>
-                            </button>
-                        )}
-                    </div>
-                </div>
-
-                {/* API Test Result Indicator */}
-                {lastTestResult && (
-                    <div className="api-test-result">
-                        <div
-                            className="status-indicator"
-                            style={{ backgroundColor: getStatusColor(lastTestResult.status) }}
-                        >
-                            {lastTestResult.status}
-                        </div>
-                        <div className="result-details">
-                            <span className="response-time">{lastTestResult.responseTime}ms</span>
-                            <span className="response-size">{Math.round(lastTestResult.size / 1024)}KB</span>
-                        </div>
-                    </div>
                 )}
 
-                <div className="node-footer">
-                    <div className="node-meta">
-                        <span className="endpoint-type">API Endpoint</span>
-                        {lastTestResult && (
-                            <span className="last-tested">
-                                Tested {new Date(lastTestResult.timestamp).toLocaleTimeString()}
-                            </span>
-                        )}
+                {/* Actions footer */}
+                {onVisualize && (
+                    <div className="node-card-footer">
+                        <button
+                            className="node-action-btn"
+                            onClick={handleVisualize}
+                            title="Visualize endpoint"
+                        >
+                            <FiCode size={14} />
+                            <span>Visualize</span>
+                        </button>
                     </div>
-                </div>
-
-                <div className="node-handles">
-                    <div className="handle handle-input" title="Connect input">
-                        <div className="handle-dot"></div>
-                    </div>
-                    <div className="handle handle-output" title="Connect output">
-                        <div className="handle-dot"></div>
-                    </div>
-                </div>
-
-                {selected && (
-                    <div className="selection-indicator"></div>
                 )}
             </div>
+
+            {selected && (
+                <div className="selection-outline"></div>
+            )}
         </div>
     );
 };

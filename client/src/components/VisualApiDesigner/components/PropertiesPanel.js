@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { FiSettings, FiTrash2, FiCheck, FiX, FiInfo } from 'react-icons/fi';
+import './PropertiesPanel.css';
 
 /**
  * PropertiesPanel - Enhanced right sidebar for component configuration
@@ -400,7 +401,10 @@ const PropertiesPanel = ({ selectedNode, onNodeUpdate, onDeleteNode }) => {
     return (
         <div className="properties-panel">
             <div className="properties-header">
-                <h3 className="panel-title">Properties</h3>
+                <h3 className="panel-title">
+                    <FiSettings className="icon" />
+                    Properties
+                </h3>
                 {selectedNode && (
                     <div className="selected-node-badge">
                         <span className="node-type-badge">{selectedNode.type}</span>
@@ -428,11 +432,11 @@ const PropertiesPanel = ({ selectedNode, onNodeUpdate, onDeleteNode }) => {
                     </>
                 ) : (
                     <div className="no-selection">
-                        <div className="no-selection-content">
-                            <FiInfo size={48} className="no-selection-icon" />
-                            <h4>Select a component to view its properties</h4>
-                            <p>Click on any component in the canvas to configure its settings</p>
-                        </div>
+                        <FiInfo size={48} className="no-selection-icon" />
+                        <h4 className="no-selection-title">No Component Selected</h4>
+                        <p className="no-selection-desc">
+                            Select a component from the canvas to view and edit its properties.
+                        </p>
                     </div>
                 )}
             </div>

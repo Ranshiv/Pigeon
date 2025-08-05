@@ -1,4 +1,7 @@
 import React from 'react';
+import EndpointNode from '../components/EndpointNode';
+import SchemaNode from '../components/SchemaNode';
+import ResourceNode from '../components/ResourceNode';
 import {
     FiGlobe,
     FiFolderPlus,
@@ -7,9 +10,9 @@ import {
     FiLock,
     FiInfo,
     FiTag,
-    FiTrash2,
     FiMoreVertical
 } from 'react-icons/fi';
+import '../components/CommonNodes.css';
 
 /**
  * Factory function to create enhanced node renderers with professional UI
@@ -86,6 +89,8 @@ const createNodeRenderer = (selectedNode, onNodeSelect, onNodeUpdate, onNodeDele
     return (node) => {
         const isSelected = selectedNode?.id === node.id;
         const nodeProps = {
+            id: node.id,
+            data: node.data || {},
             selected: isSelected,
             onSelect: () => onNodeSelect(node.id),
             onUpdate: (updates) => onNodeUpdate(node.id, updates),
@@ -93,63 +98,82 @@ const createNodeRenderer = (selectedNode, onNodeSelect, onNodeUpdate, onNodeDele
             onVisualize: onVisualize ? (data) => onVisualize(node.id, data) : undefined
         };
 
-        // Get component configuration with fallback
-        const componentConfig = COMPONENT_TYPES[node.type] || COMPONENT_TYPES.default;
-        const IconComponent = componentConfig.icon;
+        // Render specific node types with modern components
+        switch (node.type) {
+            case 'endpoint':
+                return <EndpointNode {...nodeProps} />;
+            case 'schema':
+                return <SchemaNode {...nodeProps} />;
+            case 'resource':
+                return <ResourceNode {...nodeProps} />;
+            default:
+                // Fallback to legacy renderer for other types
+                return renderLegacyNode(node, nodeProps);
+        }
+    };
+};
 
-        // Extract node data with proper defaults
-        const displayName = node.data?.name || node.name || componentConfig.name;
-        const description = node.data?.description || node.description;
-        const method = node.data?.method;
-        const path = node.data?.path;
+// Legacy renderer for backwards compatibility
+const renderLegacyNode = (node, nodeProps) => {
+    const componentConfig = COMPONENT_TYPES[node.type] || COMPONENT_TYPES.default;
+    const IconComponent = componentConfig.icon;
+    const isSelected = nodeProps.selected;
 
-        // Enhanced professional node renderer
-        return (
-            <div
-                className={`enhanced-node ${node.type}-node ${isSelected ? 'selected' : ''}`}
-                onClick={(e) => {
-                    console.log('Node clicked in renderer:', node.id); // Debug log
-                    e.stopPropagation();
-                    if (nodeProps.onSelect) {
-                        nodeProps.onSelect();
-                    }
-                }}
-                style={{
-                    '--node-color': componentConfig.color,
-                    '--node-bg-color': componentConfig.bgColor,
-                    '--node-border-color': componentConfig.borderColor,
-                    pointerEvents: 'auto' // Ensure pointer events work
-                }}
-            >
-                {/* Node Header with Icon and Type */}
-                <div className="enhanced-node-header">
-                    <div className="node-icon-container">
-                        <IconComponent size={16} />
+    // Extract node data with proper defaults
+    const displayName = node.data?.name || node.name || componentConfig.name;
+    const description = node.data?.description || node.description || `Define REST API endpoint`;
+    const method = node.data?.method;
+    const path = node.data?.path;
+
+
+    // Get status badge text based on node type
+    const getStatusText = () => {
+        switch (node.type) {
+            case 'info': return 'API';
+            case 'security': return 'AUTH';
+            case 'tag': return 'TAG';
+            case 'parameter': return 'PARAM';
+            default: return 'ACTIVE';
+        }
+    };
+
+    // Enhanced professional node renderer with dark theme (Screenshot 2 style)
+    return (
+        <div
+            className={`endpoint-node-modern ${node.type}-node ${isSelected ? 'selected' : ''}`}
+            onClick={(e) => {
+                e.stopPropagation();
+                if (nodeProps.onSelect) {
+                    nodeProps.onSelect();
+                }
+            }}
+        >
+            {/* Node Card Structure */}
+            <div className="node-card-outer">
+                <div className="node-card-header">
+                    <div className="node-card-icon">
+                        <div className="icon-bg">
+                            <IconComponent size={16} />
+                        </div>
                     </div>
-                    <div className="node-type-badge">
+                    <div className="node-card-type-badge">
                         {componentConfig.name}
                     </div>
-                    {isSelected && (
-                        <button
-                            className="node-delete-btn"
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                nodeProps.onDelete();
-                            }}
-                            title="Delete component"
-                        >
-                            <FiTrash2 size={14} />
-                        </button>
-                    )}
+                    <div className="node-card-status">
+                        {getStatusText()}
+                    </div>
                 </div>
 
-                {/* Node Content */}
-                <div className="enhanced-node-content">
-                    <div className="node-title">
+                <div className="node-card-content">
+                    <div className="node-card-title">
                         {displayName}
                     </div>
 
-                    {/* Endpoint-specific content */}
+                    <div className="node-card-desc">
+                        {description}
+                    </div>
+
+                    {/* Method & Path (only for endpoint type) */}
                     {node.type === 'endpoint' && method && (
                         <div className="endpoint-details">
                             <span className={`method-badge ${method.toLowerCase()}`}>
@@ -158,37 +182,23 @@ const createNodeRenderer = (selectedNode, onNodeSelect, onNodeUpdate, onNodeDele
                             {path && <span className="endpoint-path">{path}</span>}
                         </div>
                     )}
-
-                    {/* Schema-specific content */}
-                    {node.type === 'schema' && (
-                        <div className="schema-details">
-                            <span className="schema-type">Data Structure</span>
-                        </div>
-                    )}
-
-                    {/* Description */}
-                    {description && (
-                        <div className="node-description">
-                            {description}
-                        </div>
-                    )}
-                </div>
-
-                {/* Selection Indicator */}
-                {isSelected && <div className="selection-indicator" />}
-
-                {/* Status Indicators */}
-                <div className="node-status">
-                    {node.data?.deprecated && (
-                        <span className="status-badge deprecated">Deprecated</span>
-                    )}
-                    {node.metadata?.snapToGrid && (
-                        <span className="status-badge snapped">Snapped</span>
-                    )}
                 </div>
             </div>
-        );
-    };
+
+            {/* Selection Outline */}
+            {isSelected && <div className="selection-outline"></div>}
+
+            {/* Status Indicators */}
+            <div className="node-status">
+                {node.data?.deprecated && (
+                    <span className="status-badge deprecated">Deprecated</span>
+                )}
+                {node.metadata?.snapToGrid && (
+                    <span className="status-badge snapped">Snapped</span>
+                )}
+            </div>
+        </div>
+    );
 };
 
 // Export both as named and default export for flexibility

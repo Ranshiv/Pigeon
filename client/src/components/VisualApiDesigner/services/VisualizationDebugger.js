@@ -552,14 +552,30 @@ export class VisualizationDebugger {
     }
 
     /**
-     * Get active session ID
+     * Get active session ID or create a default one if none exists
      */
     static getActiveSessionId() {
         if (this.currentSessionId) return this.currentSessionId;
+
         if (this.debugSessions.size > 0) {
             return Array.from(this.debugSessions.keys())[0];
         }
-        return null;
+
+        // If no sessions exist, create a default one
+        const defaultSessionId = `default-session-${Date.now()}`;
+
+        // Create a minimal session object
+        this.debugSessions.set(defaultSessionId, {
+            id: defaultSessionId,
+            startTime: Date.now(),
+            logs: [],
+            networkRequests: []
+        });
+
+        // Set as current session
+        this.currentSessionId = defaultSessionId;
+
+        return defaultSessionId;
     }
     static debugSessions = new Map();
     static isEnabled = false;
@@ -596,6 +612,13 @@ export class VisualizationDebugger {
             this.setupKeyboardShortcuts();
             this.setupConsoleInterception();
             VisualizationDebugger.setupNetworkInterception();
+
+            // Create a default debug session if none exists
+            if (this.debugSessions.size === 0) {
+                const defaultSessionId = this.getActiveSessionId();
+                this.log('🔍 Debug console initialized', 'info', null, defaultSessionId);
+            }
+
             this.isInitialized = true;
         }
     }
@@ -1660,11 +1683,11 @@ export class VisualizationDebugger {
      */
     static getLogIcon(type) {
         switch (type) {
-            case 'error': return '●';
-            case 'warn': return '●';
-            case 'success': return '●';
-            case 'info': return '●';
-            case 'debug': return '●';
+            case 'error': return '❌';
+            case 'warn': return '⚠️';
+            case 'success': return '✅';
+            case 'info': return 'ℹ️';
+            case 'debug': return '🔍';
             default: return '●';
         }
     }
@@ -3011,6 +3034,8 @@ export class VisualizationDebugger {
 
     /**
      * Start capturing console logs from external website
+     * 
+     * NOTE: This functionality has been optimized to prevent excessive logging issues.
      */
     static async startBrowserConsoleCapture(url) {
         if (!url || url === 'no-url') {
@@ -3022,9 +3047,11 @@ export class VisualizationDebugger {
             // Stop any existing browser capture
             await this.stopBrowserConsoleCapture();
 
-            const sessionId = `browser-${this.currentSessionId || 'default'}`;
+            // Use current debug session or default
+            const debugSessionId = this.currentSessionId || this.getActiveSessionId() || 'default-session';
+            const sessionId = `browser-${debugSessionId}`;
 
-            this.log(`🌐 Starting browser console capture for: ${url}`, 'info');
+            this.log(`🌐 Starting browser console capture for: ${url}`, 'info', null, debugSessionId);
 
             const response = await fetch('/api/console-capture/start', {
                 method: 'POST',
@@ -3049,22 +3076,21 @@ export class VisualizationDebugger {
                 // Display initial logs if any
                 if (result.initialLogs && result.initialLogs.length > 0) {
                     result.initialLogs.forEach(log => {
-                        this.displayExternalWebsiteLog(log);
+                        this.displayExternalWebsiteLog(log, debugSessionId);
                     });
                 }
 
-                // Start polling for new logs
+                // Start polling with controlled frequency
                 this.startBrowserCapturePolling();
 
-                this.log(`✅ Browser console capture started successfully`, 'success');
-                this.log(`📊 Capturing real-time console logs from ${url}`, 'info');
+                this.log(`✅ Browser console capture started successfully`, 'success', null, debugSessionId);
+                this.log(`📊 Capturing real-time console logs from ${url}`, 'info', null, debugSessionId);
 
                 return true;
             } else {
                 this.log(`❌ Failed to start browser console capture: ${result.error}`, 'error');
                 return false;
             }
-
         } catch (error) {
             this.log(`❌ Error starting browser console capture: ${error.message}`, 'error');
             return false;
@@ -3108,48 +3134,100 @@ export class VisualizationDebugger {
 
     /**
      * Start polling for new browser console logs
+     * OPTIMIZED to prevent excessive logging and network requests
      */
     static startBrowserCapturePolling() {
+        // Clear any existing polling
         if (this._browserCapturePolling) {
             clearInterval(this._browserCapturePolling);
+            this._browserCapturePolling = null;
         }
 
-        this._browserCapturePolling = setInterval(async () => {
-            if (!this._browserCaptureSession) {
-                clearInterval(this._browserCapturePolling);
-                this._browserCapturePolling = null;
-                return;
-            }
+        // Make sure we have an active session
+        if (!this._browserCaptureSession || !this._browserCaptureSession.sessionId) {
+            console.log("[VisualizationDebugger] No browser capture session found, skipping polling");
+            return;
+        }
 
+        // Get the session ID for logging
+        const debugSessionId = this.currentSessionId || this.getActiveSessionId();
+
+        // Set a reasonable polling interval (5 seconds instead of every 1 second)
+        // This reduces network requests by 80% while still providing updates
+        const pollingInterval = 5000;
+
+        this.log(`📡 Starting browser console capture polling (every ${pollingInterval / 1000}s)`, 'debug', null, debugSessionId);
+
+        // Store the polling function for reuse
+        const pollingFunction = async () => {
             try {
-                const response = await fetch(`/api/console-capture/${this._browserCaptureSession.sessionId}/logs?since=${this._browserCaptureSession.lastLogTime}`);
+                // Make sure we still have an active session
+                if (!this._browserCaptureSession || !this._browserCaptureSession.sessionId) {
+                    return;
+                }
+
+                // Limit requests per session to prevent overloading
+                const now = Date.now();
+                if (this._browserCaptureSession.lastRequestTime &&
+                    now - this._browserCaptureSession.lastRequestTime < pollingInterval) {
+                    return;
+                }
+
+                this._browserCaptureSession.lastRequestTime = now;
+
+                // Fetch new logs since last check
+                const response = await fetch(`/api/console-capture/${this._browserCaptureSession.sessionId}/logs?since=${this._browserCaptureSession.lastLogTime}`, {
+                    method: 'GET'
+                });
+
                 const result = await response.json();
 
                 if (result.success && result.logs && result.logs.length > 0) {
-                    result.logs.forEach(log => {
-                        this.displayExternalWebsiteLog(log);
-                    });
-
                     // Update last log time
-                    const lastLog = result.logs[result.logs.length - 1];
-                    this._browserCaptureSession.lastLogTime = new Date(lastLog.timestamp).getTime();
-                }
+                    this._browserCaptureSession.lastLogTime = Date.now();
 
+                    // Display new logs (limit to 50 at a time to prevent flooding)
+                    const logsToShow = result.logs.slice(0, 50);
+                    if (logsToShow.length > 0) {
+                        // Use the session ID from the browser capture session
+                        const sessionIdForLogs = this._browserCaptureSession.sessionId.replace('browser-', '');
+
+                        logsToShow.forEach(log => {
+                            this.displayExternalWebsiteLog(log, sessionIdForLogs);
+                        });
+
+                        // If we had to limit logs, show a message
+                        if (result.logs.length > 50) {
+                            this.log(`⚠️ Showing only 50 of ${result.logs.length} new logs to prevent flooding`, 'warn', null, sessionIdForLogs);
+                        }
+                    }
+                }
             } catch (error) {
-                console.error('Error polling browser console logs:', error);
+                console.warn('[VizDebugger] Error polling for console logs:', error);
+                // If we encounter errors, slow down polling to avoid error spamming
+                if (this._browserCapturePolling) {
+                    clearInterval(this._browserCapturePolling);
+                    this._browserCapturePolling = setInterval(pollingFunction, pollingInterval * 2);
+                }
             }
-        }, 1000); // Poll every second
+        };
+
+        // Start the polling with our function
+        this._browserCapturePolling = setInterval(pollingFunction, pollingInterval);
     }
 
     /**
      * Display external website console log in debug panel
      */
-    static displayExternalWebsiteLog(log) {
+    static displayExternalWebsiteLog(log, debugSessionId = null) {
         // Skip empty or undefined messages
         const logText = log.text || log.message || '';
         if (!logText || logText === 'undefined' || logText === 'null' || logText.trim() === '') {
             return;
         }
+
+        // Use provided session ID or try to get the current active session
+        const sessionId = debugSessionId || this.currentSessionId || this.getActiveSessionId() || 'default-session';
 
         const typeMapping = {
             'log': 'info',
@@ -3183,17 +3261,18 @@ export class VisualizationDebugger {
         }
 
         // Prepare additional data
-        let data = null;
+        let data = log.data || null;
         if (log.args && log.args.length > 0) {
             data = {
                 args: log.args,
                 location: log.location,
-                source: log.source
+                source: log.source,
+                ...(data || {})
             };
         }
 
-        // Log the external website console event
-        this.log(message, mappedType, data);
+        // Add log entry to the session - use only one logging method
+        this.addLog(sessionId, mappedType, message, data);
     }
 
     /**

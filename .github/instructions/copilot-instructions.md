@@ -12,6 +12,7 @@ Pigeon is a comprehensive API testing platform with advanced visualization capab
 - Response data visualization using Chart.js and Handlebars templates
 - Real-time collaboration with Socket.io client
 - Component-based architecture with 50+ specialized components
+- Modern UI components using @dnd-kit for drag-and-drop functionality
 
 **CLI** (`cli/`): Node.js command-line tool for CI/CD integration, supporting collection execution and multiple report formats (JSON, JUnit, HTML, CSV).
 
@@ -28,6 +29,7 @@ Pigeon is a comprehensive API testing platform with advanced visualization capab
 - Socket.io rooms for workspace/collection-scoped collaboration via `utils/socket/socket-server.js`
 - Active user tracking, typing indicators, and live activity feeds
 - Join/leave patterns: `joinWorkspace(id)`, `joinCollection(id)` in `CollaborationContext.js`
+- Socket authentication with user profile data for consistent overlay display
 
 ### Visual API Designer Architecture
 
@@ -35,12 +37,14 @@ Pigeon is a comprehensive API testing platform with advanced visualization capab
 - **Node-based API modeling**: Drag-and-drop components with real-time OpenAPI spec generation
 - **Component hierarchy**: `DesignCanvas`, `ComponentPalette`, `PropertiesPanel`, `SpecPreview`
 - **State management**: Custom hooks `useDesignerState`, `useSpecGeneration` for complex canvas operations
+- **Modern node components**: Using @dnd-kit/sortable for enhanced drag-and-drop capabilities
 
 ### Database Architecture
 
 - MongoDB with Mongoose ODMs in `models/` directory
 - Key models: `Workspace`, `Collection`, `Request`, `Environment`, `User`, `ApiVersion`, `MockServer`
 - String-based IDs used consistently in client-server communication
+- Rich schema validation with custom methods and virtuals
 
 ## Development Workflow
 
@@ -117,6 +121,27 @@ const { addNode, generateSpec } = useDesignerState();
 addNode(componentType, position) → updateSpec() → render SpecPreview
 ```
 
+### Modern Node Components
+
+**@dnd-kit Integration** for drag-and-drop operations:
+
+```javascript
+// EndpointNode.js pattern
+const { attributes, listeners, setNodeRef, transform, transition } =
+  useSortable({ id });
+return (
+  <div
+    ref={setNodeRef}
+    style={{ transform: CSS.Transform.toString(transform), transition }}
+    {...attributes}
+    {...listeners}
+    className={`endpoint-node-modern ${selected ? "selected" : ""}`}
+  >
+    {/* Node content */}
+  </div>
+);
+```
+
 ### Visualization Engine
 
 **Template-based rendering** using Handlebars:
@@ -156,6 +181,7 @@ getActiveUsers(workspaceId); // Returns current collaborators
 - React Context for collaboration state (`CollaborationContext.js`)
 - Local component state for UI interactions
 - Fetch-based API calls with credential inclusion for CORS
+- History tracking for undo/redo operations in designer components
 
 ## Testing & CLI Integration
 
@@ -260,6 +286,7 @@ const { validateSpec, exportSpec } = useSpecGeneration();
 - `client/src/components/VisualApiDesigner/VisualApiDesigner.js` - Main designer interface
 - `client/src/components/VisualApiDesigner/hooks/useDesignerState.js` - Canvas state management
 - `client/src/components/VisualApiDesigner/components/DesignCanvas_new.js` - Cytoscape integration
+- `client/src/components/VisualApiDesigner/components/EndpointNode.js` - Modern node implementation
 
 **Visualization & Charts**:
 

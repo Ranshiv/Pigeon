@@ -3,12 +3,17 @@ import {
     FiZoomIn,
     FiZoomOut,
     FiMaximize,
-    FiRefreshCw
+    FiRefreshCw,
+    FiGrid,
+    FiDownload,
+    FiEye
 } from 'react-icons/fi';
 import { ZOOM_CONFIG } from '../constants/designCanvasConstants';
+import './CanvasControls.css';
 
 /**
  * CanvasControls component handles zoom and canvas manipulation controls
+ * Enhanced modern UI with improved user experience
  * Follows SRP by only managing canvas view controls
  */
 const CanvasControls = ({
@@ -16,53 +21,111 @@ const CanvasControls = ({
     onZoomIn,
     onZoomOut,
     onFitToScreen,
-    onResetView
+    onResetView,
+    onToggleGrid,
+    onExport,
+    onPreview,
+    showGrid = false,
+    className = ''
 }) => {
     const isZoomInDisabled = zoom >= ZOOM_CONFIG.MAX_ZOOM;
     const isZoomOutDisabled = zoom <= ZOOM_CONFIG.MIN_ZOOM;
 
+    // Define keyboard shortcuts for tooltips
+    const zoomInShortcut = "Ctrl+Plus";
+    const zoomOutShortcut = "Ctrl+Minus";
+    const fitScreenShortcut = "Ctrl+0";
+
     return (
-        <div className="canvas-controls">
-            <div className="zoom-controls">
+        <div className={`canvas-controls ${className}`}>
+            <div className="controls-group">
                 <button
-                    className="zoom-btn"
+                    className={`control-btn ${isZoomOutDisabled ? 'disabled' : ''}`}
                     onClick={onZoomOut}
                     disabled={isZoomOutDisabled}
-                    title="Zoom out"
-                    aria-label="Zoom out"
+                    title={`Zoom Out (${zoomOutShortcut})`}
+                    aria-label="Zoom Out"
                 >
-                    <FiZoomOut />
+                    <FiZoomOut className="icon" />
                 </button>
-                <span className="zoom-level">{zoom}%</span>
+
+                <div className="zoom-indicator" title={`Current zoom: ${zoom}%`}>
+                    <span className="zoom-value">{zoom}%</span>
+                </div>
+
                 <button
-                    className="zoom-btn"
+                    className={`control-btn ${isZoomInDisabled ? 'disabled' : ''}`}
                     onClick={onZoomIn}
                     disabled={isZoomInDisabled}
-                    title="Zoom in"
-                    aria-label="Zoom in"
+                    title={`Zoom In (${zoomInShortcut})`}
+                    aria-label="Zoom In"
                 >
-                    <FiZoomIn />
+                    <FiZoomIn className="icon" />
                 </button>
             </div>
 
-            <div className="canvas-actions">
+            <div className="controls-divider"></div>
+
+            <div className="controls-group">
                 <button
-                    className="canvas-btn"
+                    className="control-btn"
                     onClick={onFitToScreen}
-                    title="Fit to screen"
+                    title={`Fit to Screen (${fitScreenShortcut})`}
+                    aria-label="Fit to Screen"
                 >
-                    <FiMaximize />
-                    Fit to Screen
+                    <FiMaximize className="icon" />
                 </button>
+
                 <button
-                    className="canvas-btn"
+                    className="control-btn"
                     onClick={onResetView}
-                    title="Reset view"
+                    title="Reset View"
+                    aria-label="Reset View"
                 >
-                    <FiRefreshCw />
-                    Reset View
+                    <FiRefreshCw className="icon" />
                 </button>
+
+                {onToggleGrid && (
+                    <button
+                        className={`control-btn ${showGrid ? 'active' : ''}`}
+                        onClick={onToggleGrid}
+                        title={showGrid ? "Hide Grid" : "Show Grid"}
+                        aria-label={showGrid ? "Hide Grid" : "Show Grid"}
+                        aria-pressed={showGrid}
+                    >
+                        <FiGrid className="icon" />
+                    </button>
+                )}
             </div>
+
+            {(onExport || onPreview) && (
+                <>
+                    <div className="controls-divider"></div>
+                    <div className="controls-group">
+                        {onExport && (
+                            <button
+                                className="control-btn"
+                                onClick={onExport}
+                                title="Export"
+                                aria-label="Export"
+                            >
+                                <FiDownload className="icon" />
+                            </button>
+                        )}
+
+                        {onPreview && (
+                            <button
+                                className="control-btn"
+                                onClick={onPreview}
+                                title="Preview"
+                                aria-label="Preview"
+                            >
+                                <FiEye className="icon" />
+                            </button>
+                        )}
+                    </div>
+                </>
+            )}
         </div>
     );
 };

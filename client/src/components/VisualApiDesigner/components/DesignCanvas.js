@@ -25,7 +25,6 @@ import {
     QUICK_ACTIONS
 } from '../constants/designCanvasConstants';
 import '../VisualApiDesigner.css';
-import './EnhancedCanvasStyles.css';
 
 // Draggable wrapper component for nodes with optimized physics and resize functionality
 const DraggableNode = ({ id, children, style, className, isDragging, onResize }) => {

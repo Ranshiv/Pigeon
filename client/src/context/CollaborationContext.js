@@ -67,7 +67,7 @@ export const CollaborationProvider = ({ children }) => {
 
     // Set up event listeners
     socketInstance.on('connect', () => {
-      console.log('Socket connected!', socketInstance.id);
+      // Reduce logging to prevent console spam
       setConnected(true);
       setConnectionError(null);
       setIsReconnecting(false);
@@ -80,11 +80,9 @@ export const CollaborationProvider = ({ children }) => {
         rooms: Array.from(roomsRef.current) // Send rooms to rejoin if reconnecting
       }, (response) => {
         if (response && response.success) {
-          console.log('Socket authenticated successfully');
-
-          // Rejoin rooms if we were in any
+          // Rejoining rooms if we were in any
           if (roomsRef.current.size > 0) {
-            console.log('Rejoining previous rooms after reconnection');
+            // Silently rejoin without logging
           }
         } else {
           console.error('Socket authentication failed:', response?.message || 'Unknown error');
@@ -93,7 +91,7 @@ export const CollaborationProvider = ({ children }) => {
     });
 
     socketInstance.on('disconnect', (reason) => {
-      console.log('Socket disconnected:', reason);
+      // Reduce logging to prevent console spam
       setConnected(false);
 
       // Don't clear active rooms on disconnect - we'll try to rejoin on reconnect
@@ -105,12 +103,16 @@ export const CollaborationProvider = ({ children }) => {
     });
 
     socketInstance.on('reconnecting', (attemptNumber) => {
-      console.log(`Socket reconnecting... Attempt ${attemptNumber}`);
+      // Only log after multiple attempts to reduce noise
+      if (attemptNumber > 3) {
+        console.log(`Socket reconnecting... Attempt ${attemptNumber}`);
+      }
       setIsReconnecting(true);
       setReconnectAttempts(attemptNumber);
     });
 
     socketInstance.on('reconnect_failed', () => {
+      // Keep error logging for important connection issues
       console.error('Socket reconnection failed');
       setConnectionError('Failed to reconnect to collaboration server');
       setIsReconnecting(false);
@@ -125,7 +127,7 @@ export const CollaborationProvider = ({ children }) => {
     socketInstance.on('userJoined', ({ userId, user, timestamp }) => {
       if (!currentRoom) return;
 
-      console.log('User joined:', userId, 'in room:', currentRoom);
+      // Remove excessive logging that fills up the console
       setActiveRooms(prev => {
         const updatedRooms = { ...prev };
         if (!updatedRooms[currentRoom]) {
@@ -151,7 +153,7 @@ export const CollaborationProvider = ({ children }) => {
     socketInstance.on('userLeft', ({ userId }) => {
       if (!currentRoom) return;
 
-      console.log('User left:', userId, 'from room:', currentRoom);
+      // Remove excessive logging that fills up the console
       setActiveRooms(prev => {
         const updatedRooms = { ...prev };
         if (updatedRooms[currentRoom]) {
@@ -172,7 +174,7 @@ export const CollaborationProvider = ({ children }) => {
 
     // Listen for active users events (matches server's "activeUsers" event)
     socketInstance.on('activeUsers', ({ room, users }) => {
-      console.log('Received active users for room', room, ':', users);
+      // Remove excessive logging that fills up the console
       setActiveRooms(prev => ({
         ...prev,
         [room]: users.map(user => ({
@@ -187,7 +189,7 @@ export const CollaborationProvider = ({ children }) => {
 
     // Listen for typing indicator events
     socketInstance.on('typingIndicator', ({ userId, user, isTyping, room }) => {
-      console.log(`User ${userId} ${isTyping ? 'started' : 'stopped'} typing in ${room}`);
+      // Remove excessive logging that fills up the console
 
       setTypingUsers(prev => {
         const updated = { ...prev };
@@ -213,52 +215,31 @@ export const CollaborationProvider = ({ children }) => {
       });
     });
 
-    // Listen for document version change events
-    socketInstance.on('documentVersionChanged', ({ entityType, entityId, version, userId }) => {
-      console.log(`Document version changed: ${entityType}:${entityId} by user ${userId}`);
+    // Listen for document version changed events
+    socketInstance.on('documentVersionChanged', ({ entityType, entityId, userId, version, changes }) => {
+      // Remove excessive logging that fills up the console
 
-      // Update version history for this document
+      // Update version in state
       setDocumentVersions(prev => ({
         ...prev,
-        [`${entityType}:${entityId}`]: [
-          ...(prev[`${entityType}:${entityId}`] || []),
-          version
-        ]
-      }));
-
-      // Check for conflicts with local pending changes
-      const documentKey = `${entityType}:${entityId}`;
-      if (pendingChanges[documentKey]) {
-        // Detect if our pending changes conflict with the received version
-        const conflict = VersionControlService.detectConflicts(
-          pendingChanges[documentKey].changes,
-          version.changes
-        );
-
-        if (conflict) {
-          setMergeConflicts(prev => ({
-            ...prev,
-            [documentKey]: {
-              localChanges: pendingChanges[documentKey],
-              remoteChanges: version,
-              resolved: false
-            }
-          }));
+        [`${entityType}:${entityId}`]: {
+          ...prev[`${entityType}:${entityId}`],
+          latestVersion: version
         }
-      }
+      }));
     });
 
     // Listen for merge request events
     socketInstance.on('mergeRequestCreated', ({ mergeRequest }) => {
-      console.log('New merge request created:', mergeRequest);
+      // Remove excessive logging - handle UI notifications only
       // You can handle UI notifications here
     });
 
     // Listen for merge completion events
     socketInstance.on('mergeCompleted', ({ sourceId, targetId, success, conflicts }) => {
-      console.log(`Merge ${success ? 'completed' : 'failed'} from ${sourceId} to ${targetId}`);
+      // Only log failures and conflicts, not every merge operation
       if (!success && conflicts) {
-        console.log('Merge conflicts:', conflicts);
+        console.error('Merge conflicts detected:', conflicts);
         // Handle conflicts in the UI
       }
     });

@@ -24,7 +24,7 @@ function initializeSocketServer(server) {
 
     // Set up connection event handlers
     io.on('connection', (socket) => {
-        console.log('User connected:', socket.id);
+        // Remove excessive logging
 
         // Track user rooms (workspaces/collections they are in)
         const userRooms = new Set();
@@ -55,7 +55,7 @@ function initializeSocketServer(server) {
                     rooms: userRooms
                 });
 
-                console.log(`User authenticated: ${authenticatedUser.name} (${socket.id})`);
+                // Remove excessive logging
 
                 // Send successful authentication response
                 if (callback) {
@@ -120,7 +120,7 @@ function initializeSocketServer(server) {
                 });
             }
 
-            console.log(`User ${socket.id} joined room ${roomName}`);
+            // Remove excessive logging to prevent console spam
         };
 
         // Helper function to leave a room and notify others
@@ -160,7 +160,7 @@ function initializeSocketServer(server) {
                 });
             }
 
-            console.log(`User ${socket.id} left room ${roomName}`);
+            // Remove excessive logging to prevent console spam
         };
 
         // Helper function to get active users in a room

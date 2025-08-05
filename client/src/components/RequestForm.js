@@ -812,6 +812,31 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
             VisualizationDebugger.initialize();
             // Clean up any existing popup panels on component mount
             VisualizationDebugger.removePopupPanels();
+
+            // Create a default debug session if none exists
+            const debugSessionId = 'default-debug-session-' + Date.now();
+            const debugContainer = document.getElementById('visualization-debugger-container');
+
+            if (debugContainer) {
+                // Initialize a default session for console logs
+                const sessionData = {
+                    url: window.location.href,
+                    method: 'GET',
+                    title: 'Debug Console'
+                };
+
+                const session = VisualizationDebugger.startSession(
+                    debugSessionId,
+                    debugContainer,
+                    sessionData
+                );
+
+                // Set the current debug session
+                setCurrentDebugSession(session);
+
+                // Add initial welcome message
+                VisualizationDebugger.addLog(debugSessionId, 'info', `🎯 Debug console initialized and ready to capture logs`);
+            }
         }
         AuthVisualizationService.initialize();
     }, []); // Remove activeTab dependency to prevent re-running
@@ -2483,19 +2508,39 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
                                     type="button"
                                     className="debug-btn debug-btn-accent"
                                     onClick={async () => {
-                                        // Toggle browser console capture
+                                        // Toggle browser console capture with optimized polling
                                         if (typeof VisualizationDebugger !== 'undefined') {
                                             if (VisualizationDebugger._browserCaptureSession) {
                                                 await VisualizationDebugger.stopBrowserConsoleCapture();
                                             } else if (url && url !== 'no-url' && url.startsWith('http')) {
                                                 const success = await VisualizationDebugger.startBrowserConsoleCapture(url);
                                                 if (success) {
-                                                    VisualizationDebugger.addLog(currentDebugSession?.id, 'success', `🌐 Browser console capture started for ${url}`);
+                                                    if (currentDebugSession?.id) {
+                                                        VisualizationDebugger.log(`🌐 Browser console capture started for ${url}`, 'success');
+                                                    }
+
+                                                    // Add a message in the UI about optimized capture
+                                                    const consoleOutput = document.getElementById('console-output');
+                                                    if (consoleOutput) {
+                                                        const message = document.createElement('div');
+                                                        message.className = 'log-entry log-info';
+                                                        message.innerHTML = `
+                                                            <div class="log-time">${new Date().toLocaleTimeString()}</div>
+                                                            <div class="log-icon">ℹ️</div>
+                                                            <div class="log-message">Console capture started with optimized polling (every 5s) to prevent excessive logging</div>
+                                                        `;
+                                                        consoleOutput.appendChild(message);
+                                                        consoleOutput.scrollTop = consoleOutput.scrollHeight;
+                                                    }
                                                 } else {
-                                                    VisualizationDebugger.addLog(currentDebugSession?.id, 'error', `❌ Failed to start browser console capture`);
+                                                    if (currentDebugSession?.id) {
+                                                        VisualizationDebugger.log(`❌ Failed to start browser console capture`, 'error');
+                                                    }
                                                 }
                                             } else {
-                                                VisualizationDebugger.addLog(currentDebugSession?.id, 'warn', `⚠️ Enter a valid HTTP/HTTPS URL to capture website console logs`);
+                                                if (currentDebugSession?.id) {
+                                                    VisualizationDebugger.log(`⚠️ Enter a valid HTTP/HTTPS URL to capture website console logs`, 'warn');
+                                                }
                                             }
                                         }
                                     }}

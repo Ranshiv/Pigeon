@@ -105,3 +105,6 @@ Thumbs.db
 
 #md files
 PENDING_FEATURES_COMPREHENSIVE_GUIDE.mdclient/build/ 
+
+#empty file remover
+scripts/remove-empty-files.js
