@@ -89,7 +89,7 @@ const PropertiesPanel = ({ selectedNode, onNodeUpdate, onDeleteNode }) => {
             {error && (
                 <div className="error-message">
                     <FiX size={12} />
-                    {error}
+                    <span>{error}</span>
                 </div>
             )}
         </div>
@@ -241,120 +241,150 @@ const PropertiesPanel = ({ selectedNode, onNodeUpdate, onDeleteNode }) => {
     );
 
     const renderSchemaProperties = () => (
-        <div className="property-group">
-            <h4>Schema Configuration</h4>
+        <div className="properties-form">
+            <div className="form-section">
+                <h4 className="section-title">
+                    <FiSettings size={16} />
+                    Schema Configuration
+                </h4>
 
-            <div className="property-field">
-                <label>Name</label>
-                <input
-                    type="text"
-                    value={properties.name || ''}
-                    onChange={(e) => handleInputChange('name', e.target.value)}
-                    placeholder="Schema name"
-                    className={errors.name ? 'error' : ''}
-                />
-                {errors.name && <span className="error-message">{errors.name}</span>}
-            </div>
-
-            <div className="property-field">
-                <label>Type</label>
-                <select
-                    value={properties.type || 'object'}
-                    onChange={(e) => handleInputChange('type', e.target.value)}
+                <FormField
+                    label="Name"
+                    required
+                    error={errors.name}
+                    helpText="Name of the schema object"
                 >
-                    <option value="object">Object</option>
-                    <option value="array">Array</option>
-                    <option value="string">String</option>
-                    <option value="number">Number</option>
-                    <option value="integer">Integer</option>
-                    <option value="boolean">Boolean</option>
-                </select>
-            </div>
-
-            <div className="property-field">
-                <label>Description</label>
-                <textarea
-                    value={properties.description || ''}
-                    onChange={(e) => handleInputChange('description', e.target.value)}
-                    placeholder="Schema description"
-                    rows={2}
-                />
-            </div>
-
-            {properties.type === 'object' && (
-                <div className="property-field">
-                    <label>Required Fields</label>
-                    <input
-                        type="text"
-                        value={properties.required ? properties.required.join(', ') : ''}
-                        onChange={(e) => handleInputChange('required', e.target.value.split(',').map(field => field.trim()))}
-                        placeholder="field1, field2, field3"
+                    <FormInput
+                        value={properties.name || ''}
+                        onChange={(value) => handleInputChange('name', value)}
+                        placeholder="Schema name"
+                        error={errors.name}
                     />
-                </div>
-            )}
+                </FormField>
+
+                <FormField
+                    label="Type"
+                    helpText="Data type for this schema"
+                >
+                    <FormSelect
+                        value={properties.type || 'object'}
+                        onChange={(value) => handleInputChange('type', value)}
+                        options={[
+                            { value: 'object', label: 'Object' },
+                            { value: 'array', label: 'Array' },
+                            { value: 'string', label: 'String' },
+                            { value: 'number', label: 'Number' },
+                            { value: 'integer', label: 'Integer' },
+                            { value: 'boolean', label: 'Boolean' }
+                        ]}
+                    />
+                </FormField>
+
+                <FormField
+                    label="Description"
+                    helpText="Describe the purpose of this schema"
+                >
+                    <FormTextarea
+                        value={properties.description || ''}
+                        onChange={(value) => handleInputChange('description', value)}
+                        placeholder="Define data structure"
+                        rows={3}
+                    />
+                </FormField>
+
+                {properties.type === 'object' && (
+                    <FormField
+                        label="Required Fields"
+                        helpText="Comma-separated list of required fields"
+                    >
+                        <FormInput
+                            value={properties.required ? properties.required.join(', ') : ''}
+                            onChange={(value) => handleInputChange('required', value.split(',').map(field => field.trim()))}
+                            placeholder="field1, field2, field3"
+                        />
+                    </FormField>
+                )}
+            </div>
         </div>
     );
 
     const renderParameterProperties = () => (
-        <div className="property-group">
-            <h4>Parameter Configuration</h4>
+        <div className="properties-form">
+            <div className="form-section">
+                <h4 className="section-title">
+                    <FiSettings size={16} />
+                    Parameter Configuration
+                </h4>
 
-            <div className="property-field">
-                <label>Name</label>
-                <input
-                    type="text"
-                    value={properties.name || ''}
-                    onChange={(e) => handleInputChange('name', e.target.value)}
-                    placeholder="Parameter name"
-                    className={errors.name ? 'error' : ''}
-                />
-                {errors.name && <span className="error-message">{errors.name}</span>}
-            </div>
-
-            <div className="property-field">
-                <label>In</label>
-                <select
-                    value={properties.in || 'query'}
-                    onChange={(e) => handleInputChange('in', e.target.value)}
+                <FormField
+                    label="Name"
+                    required
+                    error={errors.name}
+                    helpText="Parameter name"
                 >
-                    <option value="query">Query</option>
-                    <option value="path">Path</option>
-                    <option value="header">Header</option>
-                    <option value="cookie">Cookie</option>
-                </select>
-            </div>
+                    <FormInput
+                        value={properties.name || ''}
+                        onChange={(value) => handleInputChange('name', value)}
+                        placeholder="Parameter name"
+                        error={errors.name}
+                    />
+                </FormField>
 
-            <div className="property-field">
-                <label>Type</label>
-                <select
-                    value={properties.type || 'string'}
-                    onChange={(e) => handleInputChange('type', e.target.value)}
+                <FormField
+                    label="In"
+                    helpText="Location of the parameter"
                 >
-                    <option value="string">String</option>
-                    <option value="number">Number</option>
-                    <option value="integer">Integer</option>
-                    <option value="boolean">Boolean</option>
-                    <option value="array">Array</option>
-                </select>
-            </div>
+                    <FormSelect
+                        value={properties.in || 'query'}
+                        onChange={(value) => handleInputChange('in', value)}
+                        options={[
+                            { value: 'query', label: 'Query' },
+                            { value: 'path', label: 'Path' },
+                            { value: 'header', label: 'Header' },
+                            { value: 'cookie', label: 'Cookie' }
+                        ]}
+                    />
+                </FormField>
 
-            <div className="property-field">
-                <label>Required</label>
-                <input
-                    type="checkbox"
-                    checked={properties.required || false}
-                    onChange={(e) => handleInputChange('required', e.target.checked)}
-                />
-            </div>
+                <FormField
+                    label="Type"
+                    helpText="Data type for this parameter"
+                >
+                    <FormSelect
+                        value={properties.type || 'string'}
+                        onChange={(value) => handleInputChange('type', value)}
+                        options={[
+                            { value: 'string', label: 'String' },
+                            { value: 'number', label: 'Number' },
+                            { value: 'integer', label: 'Integer' },
+                            { value: 'boolean', label: 'Boolean' },
+                            { value: 'array', label: 'Array' }
+                        ]}
+                    />
+                </FormField>
 
-            <div className="property-field">
-                <label>Description</label>
-                <textarea
-                    value={properties.description || ''}
-                    onChange={(e) => handleInputChange('description', e.target.value)}
-                    placeholder="Parameter description"
-                    rows={2}
-                />
+                <FormField
+                    label="Required"
+                    helpText="Is this parameter required"
+                >
+                    <FormCheckbox
+                        checked={properties.required || false}
+                        onChange={(value) => handleInputChange('required', value)}
+                        label="Required parameter"
+                    />
+                </FormField>
+
+                <FormField
+                    label="Description"
+                    helpText="Describe the parameter's purpose"
+                >
+                    <FormTextarea
+                        value={properties.description || ''}
+                        onChange={(value) => handleInputChange('description', value)}
+                        placeholder="Parameter description"
+                        rows={2}
+                    />
+                </FormField>
             </div>
         </div>
     );
@@ -371,25 +401,36 @@ const PropertiesPanel = ({ selectedNode, onNodeUpdate, onDeleteNode }) => {
                 return renderParameterProperties();
             default:
                 return (
-                    <div className="property-group">
-                        <h4>Generic Properties</h4>
-                        <div className="property-field">
-                            <label>Name</label>
-                            <input
-                                type="text"
-                                value={properties.name || ''}
-                                onChange={(e) => handleInputChange('name', e.target.value)}
-                                placeholder="Component name"
-                            />
-                        </div>
-                        <div className="property-field">
-                            <label>Description</label>
-                            <textarea
-                                value={properties.description || ''}
-                                onChange={(e) => handleInputChange('description', e.target.value)}
-                                placeholder="Component description"
-                                rows={2}
-                            />
+                    <div className="properties-form">
+                        <div className="form-section">
+                            <h4 className="section-title">
+                                <FiSettings size={16} />
+                                Generic Properties
+                            </h4>
+                            <FormField
+                                label="Name"
+                                required
+                                error={errors.name}
+                                helpText="Name of this element"
+                            >
+                                <FormInput
+                                    value={properties.name || ''}
+                                    onChange={(value) => handleInputChange('name', value)}
+                                    placeholder="Component name"
+                                    error={errors.name}
+                                />
+                            </FormField>
+                            <FormField
+                                label="Description"
+                                helpText="Describe the purpose of this element"
+                            >
+                                <FormTextarea
+                                    value={properties.description || ''}
+                                    onChange={(value) => handleInputChange('description', value)}
+                                    placeholder="Component description"
+                                    rows={3}
+                                />
+                            </FormField>
                         </div>
                     </div>
                 );
@@ -402,12 +443,16 @@ const PropertiesPanel = ({ selectedNode, onNodeUpdate, onDeleteNode }) => {
         <div className="properties-panel">
             <div className="properties-header">
                 <h3 className="panel-title">
-                    <FiSettings className="icon" />
+                    <div className="panel-icon-container">
+                        <FiSettings className="icon" />
+                    </div>
                     Properties
                 </h3>
                 {selectedNode && (
                     <div className="selected-node-badge">
-                        <span className="node-type-badge">{selectedNode.type}</span>
+                        <span className={`node-type-badge ${selectedNode.type}`}>
+                            {selectedNode.type?.toUpperCase()}
+                        </span>
                     </div>
                 )}
             </div>
@@ -421,10 +466,14 @@ const PropertiesPanel = ({ selectedNode, onNodeUpdate, onDeleteNode }) => {
                             {onDeleteNode && (
                                 <button
                                     className="delete-button"
-                                    onClick={() => onDeleteNode(selectedNode.id)}
+                                    onClick={() => {
+                                        if (window.confirm("Are you sure you want to delete this component? This action cannot be undone.")) {
+                                            onDeleteNode(selectedNode.id);
+                                        }
+                                    }}
                                     title="Delete this component"
                                 >
-                                    <FiTrash2 size={16} />
+                                    <FiTrash2 size={18} />
                                     Delete
                                 </button>
                             )}
@@ -432,7 +481,9 @@ const PropertiesPanel = ({ selectedNode, onNodeUpdate, onDeleteNode }) => {
                     </>
                 ) : (
                     <div className="no-selection">
-                        <FiInfo size={48} className="no-selection-icon" />
+                        <div className="no-selection-icon-container">
+                            <FiInfo size={40} className="no-selection-icon" />
+                        </div>
                         <h4 className="no-selection-title">No Component Selected</h4>
                         <p className="no-selection-desc">
                             Select a component from the canvas to view and edit its properties.

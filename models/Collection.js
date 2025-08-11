@@ -127,6 +127,10 @@ const collectionSchema = new mongoose.Schema({
     // Metadata
     tags: [{ type: String }],
     category: { type: String },
+    metadata: {
+        type: mongoose.Schema.Types.Mixed,
+        default: {}
+    },
 
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now }

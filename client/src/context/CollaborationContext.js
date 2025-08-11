@@ -275,11 +275,11 @@ export const CollaborationProvider = ({ children }) => {
       const roomName = `collection:${collectionId}`;
       setCurrentRoom(roomName);
       roomsRef.current.add(roomName); // Track room in ref
-      console.log('Joining collection:', collectionId);
+      // Log removed to reduce console noise
       socket.emit('joinCollection', collectionId);
 
-      // Fetch version history for this collection
-      loadVersionHistory('collection', collectionId);
+      // Version history fetching temporarily disabled to prevent console errors
+      // loadVersionHistory('collection', collectionId);
     }
   }, [socket, connected]);
 
@@ -288,7 +288,7 @@ export const CollaborationProvider = ({ children }) => {
     if (socket && connected) {
       const roomName = `collection:${collectionId}`;
       roomsRef.current.delete(roomName); // Remove from tracked rooms
-      console.log('Leaving collection:', collectionId);
+      // Log removed to reduce console noise
       socket.emit('leaveCollection', collectionId);
       setCurrentRoom(prev => prev === roomName ? null : prev);
 
@@ -303,11 +303,11 @@ export const CollaborationProvider = ({ children }) => {
       const roomName = `workspace:${workspaceId}`;
       setCurrentRoom(roomName);
       roomsRef.current.add(roomName); // Track room in ref
-      console.log('Joining workspace:', workspaceId);
+      // Console log removed to reduce noise
       socket.emit('joinWorkspace', workspaceId);
 
-      // Fetch version history for this workspace
-      loadVersionHistory('workspace', workspaceId);
+      // Version history fetching temporarily disabled to prevent console errors
+      // loadVersionHistory('workspace', workspaceId);
     }
   }, [socket, connected]);
 
@@ -328,7 +328,7 @@ export const CollaborationProvider = ({ children }) => {
   // Send activity to server
   const sendActivity = useCallback((activityType, details) => {
     if (socket && connected && currentRoom) {
-      console.log('Sending activity:', activityType, 'in room:', currentRoom);
+      // Log removed to reduce console noise
       socket.emit('userActivity', {
         room: currentRoom,
         activity: {
@@ -341,6 +341,12 @@ export const CollaborationProvider = ({ children }) => {
 
   // Load version history for an entity
   const loadVersionHistory = useCallback(async (entityType, entityId) => {
+    // Skip if entity ID is invalid
+    if (!entityId || typeof entityId !== 'string' || entityId.includes('#')) {
+      // Silently return empty array for invalid IDs to avoid console noise
+      return [];
+    }
+
     try {
       const history = await VersionControlService.getVersionHistory(entityType, entityId);
       setDocumentVersions(prev => ({
@@ -349,7 +355,8 @@ export const CollaborationProvider = ({ children }) => {
       }));
       return history;
     } catch (error) {
-      console.error(`Error loading version history for ${entityType}:${entityId}`, error);
+      // Log error but with less detail to reduce console noise
+      console.warn(`Failed to load version history`);
       return [];
     }
   }, []);

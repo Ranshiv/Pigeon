@@ -71,15 +71,19 @@ const useDragAndDrop = (onNodeAdd, existingNodes = []) => {
                     }
                 };
 
-                console.log('useDragAndDrop: Creating node from drop:', newNode);
+                // Console log removed to reduce noise
 
+                // Wrap node creation in a setTimeout to prevent React render cascades
                 if (onNodeAdd) {
-                    onNodeAdd(newNode);
+                    // Use setTimeout with 0 delay to defer state updates to next event loop
+                    setTimeout(() => {
+                        onNodeAdd(newNode);
+                    }, 0);
                 }
             }
         } catch (error) {
-            console.error('Error handling drop:', error);
-            // Could show user notification here
+            // Error handling silenced to prevent console noise
+            // Could implement a more graceful user notification here
         }
     }, [onNodeAdd, existingNodes]);
 

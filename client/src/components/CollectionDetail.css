@@ -204,7 +204,75 @@
   border-right: 1px solid var(--border-color);
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  position: relative;
+  transition: width 0.3s ease, min-width 0.3s ease;
+}
+
+.collection-sidebar.collapsed {
+  width: 45px;
+  min-width: 45px;
+  overflow: visible;
+  background-color: rgba(38, 38, 38, 0.95);
+}
+
+.collection-sidebar .sidebar-toggle {
+  position: absolute;
+  bottom: 15px;
+  right: -12px;
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--sidebar-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  cursor: pointer;
+  z-index: 100;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  color: var(--text-secondary);
+  opacity: 0.9;
+}
+
+.collection-sidebar.collapsed .sidebar-toggle {
+  color: var(--primary-color);
+  animation: pulse 2s infinite;
+  bottom: 15px;
+}
+
+/* Add a slight bounce animation when hovering over the toggle */
+.collection-sidebar .sidebar-toggle:hover {
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+}
+
+.collection-sidebar:hover .sidebar-toggle {
+  opacity: 1;
+}
+
+.sidebar-label {
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 500;
+  position: relative;
+  width: 100%;
+  text-align: center;
+  padding-top: 15px;
+}
+
+.vertical-text {
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  transform: rotate(180deg);
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(180deg);
+  white-space: nowrap;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: #a0a0a0;
 }
 
 .collection-sidebar h3 {
@@ -378,6 +446,27 @@
   margin-right: 8px;
 }
 
+/* Adjustments for collapsed sidebar */
+.collection-sidebar.collapsed .add-request {
+  padding: 10px 0;
+  display: flex;
+  justify-content: center;
+}
+
+.collection-sidebar.collapsed .add-request-btn {
+  width: 30px;
+  height: 30px;
+  min-width: 30px;
+  border-radius: 50%;
+  padding: 0;
+  justify-content: center;
+}
+
+.collection-sidebar.collapsed .add-request-btn .icon {
+  margin-right: 0;
+  font-size: 16px;
+}
+
 /* Improved delete button styling */
 .delete-btn {
   background: transparent;
@@ -415,53 +504,75 @@
   height: 100%;
 }
 
-/* Collection main tabs - new improved styling */
+/* Clean, modern tab navigation - Simplified and refined */
 .tab-navigation {
-  display: flex;
+  display: flex !important;
   padding: 0;
-  background-color: var(--sidebar-bg, #262626);
-  border-bottom: 2px solid var(--border-color, #3e3e3e);
+  background: #2a2a2d;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  position: relative;
+  z-index: 10;
+  min-height: 48px;
+  flex-shrink: 0;
 }
 
 .tab-btn {
-  display: inline-flex;
+  display: inline-flex !important;
   align-items: center;
-  padding: 12px 20px;
-  background: none;
+  justify-content: center;
+  padding: 12px 24px;
+  background: transparent;
   border: none;
-  color: var(--text-secondary, #a0a0a0);
-  font-size: 14px;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 13px;
   font-weight: 500;
   cursor: pointer;
   position: relative;
-  transition: all 0.25s ease;
-  border-right: 1px solid rgba(62, 62, 62, 0.5);
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  letter-spacing: 0.2px;
+  min-height: 48px;
+  flex-shrink: 0;
+  border-bottom: 2px solid transparent;
 }
 
 .tab-btn:hover {
-  color: var(--text-color, #e6e6e6);
-  background-color: rgba(255, 255, 255, 0.03);
+  color: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.05);
+  border-bottom-color: rgba(255, 108, 55, 0.5);
 }
 
 .tab-btn.active {
-  color: var(--primary-color, #FF6C37);
-  background-color: var(--background-color, #1c1c1e);
-}
-
-.tab-btn.active::after {
-  content: '';
-  position: absolute;
-  bottom: -2px;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background-color: var(--primary-color, #FF6C37);
+  color: #ffffff !important;
+  background: rgba(255, 108, 55, 0.1) !important;
+  font-weight: 600;
+  border-bottom-color: var(--primary-color);
 }
 
 .tab-btn .fi,
 .tab-btn i {
   margin-right: 8px;
-  font-size: 16px;
+  font-size: 14px;
+  opacity: 0.8;
+  transition: opacity 0.2s ease;
+}
+
+.tab-btn:hover .fi,
+.tab-btn:hover i {
+  opacity: 1;
+}
+
+.tab-btn.active .fi,
+.tab-btn.active i {
+  opacity: 1 !important;
+  color: var(--primary-color);
+}
+
+/* Focus states for accessibility */
+.tab-btn:focus-visible {
+  outline: 2px solid var(--primary-color);
+  outline-offset: -2px;
+  border-radius: 3px;
 }
 
 /* Request workspace styling - improved with better padding and contrast */

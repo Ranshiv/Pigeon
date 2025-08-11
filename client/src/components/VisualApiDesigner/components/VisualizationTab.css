@@ -910,10 +910,10 @@
     }
 }
 
-/* Specification Preview Button Styles */
+/* Specification Preview Button Styles - Modernized UI */
 
 /* Spec Preview Container - Clean Modern Style */
-.spec-preview {
+.spec-preview.modern {
     height: 100%;
     display: flex;
     flex-direction: column;
@@ -921,12 +921,19 @@
     color: #e1e5e9;
     border-radius: 12px;
     overflow: hidden;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
     border: 1px solid #3a3f47;
+    position: relative;
+}
+
+/* Glass effect utility class - simplified */
+.glass-effect {
+    background-color: #21252b;
+    border-bottom: 1px solid #3a3f47;
 }
 
 /* Preview Header - Clean Modern Style */
-.preview-header {
+.spec-preview.modern .preview-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -934,37 +941,46 @@
     background: #21252b;
     border-bottom: 1px solid #3a3f47;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    position: relative;
+    z-index: 2;
 }
 
-.preview-header h3 {
+.spec-preview.modern .preview-header h3 {
     margin: 0;
     font-size: 20px;
     font-weight: 600;
     color: #ffffff;
-    letter-spacing: -0.025em;
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
-.preview-controls {
+.spec-preview.modern .preview-header .header-icon {
+    color: #ff6c37;
+}
+
+.spec-preview.modern .preview-controls {
     display: flex;
     align-items: center;
     gap: 24px;
 }
 
 /* Format Toggle Buttons - Clean Modern UI */
-.format-toggle {
+.spec-preview.modern .format-toggle {
     display: flex;
     background: #21252b;
     border: 1px solid #3a3f47;
     border-radius: 8px;
     padding: 4px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
 }
 
-.format-toggle button {
+.spec-preview.modern .format-btn {
     display: flex;
     align-items: center;
-    gap: 6px;
-    padding: 8px 14px;
+    gap: 8px;
+    padding: 10px 16px;
     border: none;
     background: transparent;
     color: #8b92a5;
@@ -974,33 +990,42 @@
     border-radius: 6px;
     transition: all 0.2s ease;
     white-space: nowrap;
-    min-width: 70px;
+    min-width: 80px;
     justify-content: center;
 }
 
-.format-toggle button:hover {
+.spec-preview.modern .format-btn:hover {
     color: #ffffff;
     background: #2a2f36;
 }
 
-.format-toggle button.active {
+.spec-preview.modern .format-btn.active {
     background: #ff6c37;
     color: #ffffff;
-    font-weight: 600;
-    box-shadow: 0 1px 3px rgba(255, 108, 55, 0.3);
+    font-weight: 500;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
-.format-toggle button.active:hover {
+.spec-preview.modern .format-btn.active:hover {
     background: #e55a2b;
 }
 
+.spec-preview.modern .format-btn.active:active {
+    transform: translateY(1px);
+}
+
+.spec-preview.modern .format-btn .btn-icon {
+    font-size: 16px;
+}
+
 /* Export Buttons - Clean Modern UI */
-.export-buttons {
+.spec-preview.modern .export-buttons {
     display: flex;
     gap: 8px;
 }
 
-.export-buttons button {
+.spec-preview.modern .export-btn,
+.spec-preview.modern .debug-btn {
     display: flex;
     align-items: center;
     gap: 8px;
@@ -1014,50 +1039,71 @@
     cursor: pointer;
     transition: all 0.2s ease;
     white-space: nowrap;
-    min-width: 100px;
+    min-width: 110px;
     justify-content: center;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-.export-buttons button:hover {
-    background: #3a3f47;
+.spec-preview.modern .export-btn:hover,
+.spec-preview.modern .debug-btn:hover {
+    background: #383e4a;
     border-color: #5a6068;
     color: #ffffff;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
-.export-buttons button:active {
+.spec-preview.modern .export-btn:active,
+.spec-preview.modern .debug-btn:active {
     transform: translateY(1px);
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
-.export-buttons button:disabled {
-    opacity: 0.5;
+.spec-preview.modern .debug-btn {
+    background: #3a3f47;
+    border-color: #4b5058;
+}
+
+.spec-preview.modern .export-btn:disabled {
+    opacity: 0.6;
     cursor: not-allowed;
-    transform: none;
-    background: #1a1d23;
+    background: #1e222a;
     border-color: #2c3035;
     color: #6b7280;
     box-shadow: none;
 }
 
-.export-buttons button:disabled:hover {
+.spec-preview.modern .export-btn:disabled:hover {
     transform: none;
     box-shadow: none;
-    background: #1a1d23;
-    border-color: #2c3035;
-    color: #6b7280;
+}
+
+.spec-preview.modern .export-btn.success {
+    background: #10b981;
+    border-color: #059669;
+    color: white;
+}
+
+.spec-preview.modern .btn-icon {
+    font-size: 16px;
+}
+
+.spec-preview.modern .spinning {
+    animation: spin 1.2s linear infinite;
 }
 
 /* Preview Content Area - Clean Modern Style */
-.preview-content {
+.spec-preview.modern .preview-content {
     flex: 1;
     padding: 24px;
     overflow: auto;
     background: #1a1d23;
+    position: relative;
 }
 
-.spec-content {
+.spec-preview.modern .spec-content-container {
+    position: relative;
+}
+
+.spec-preview.modern .spec-content {
     background: #21252b;
     border: 1px solid #3a3f47;
     border-radius: 8px;
@@ -1071,32 +1117,71 @@
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-.spec-content code {
-    color: inherit;
-    background: none;
-    padding: 0;
-    font-family: inherit;
+.spec-preview.modern .spec-actions {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    opacity: 0;
+    transition: opacity 0.2s ease;
 }
 
-/* Preview Loading State */
-.preview-loading {
+.spec-preview.modern .spec-content-container:hover .spec-actions {
+    opacity: 1;
+}
+
+.spec-preview.modern .copy-btn {
+    background: #2a2f36;
+    border: 1px solid #404650;
+    border-radius: 6px;
+    color: #e1e5e9;
+    padding: 6px 12px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.spec-preview.modern .copy-btn:hover {
+    background: #383e4a;
+    color: white;
+}
+
+/* Preview Loading State - Clean Modern */
+.spec-preview.modern .preview-loading {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     height: 100%;
     color: #8b92a5;
-    padding: 40px 20px;
+    padding: 60px 20px;
 }
 
-.preview-loading .spinner {
-    width: 32px;
-    height: 32px;
-    border: 3px solid #3a3f47;
-    border-top: 3px solid #ff6c37;
-    border-radius: 50%;
+.spec-preview.modern .spinner-container {
+    position: relative;
+    width: 50px;
+    height: 50px;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.spec-preview.modern .spinner {
+    font-size: 32px;
+    color: #ff6c37;
     animation: spin 1s linear infinite;
-    margin-bottom: 16px;
+}
+
+.spec-preview.modern .preview-loading p {
+    margin: 0 0 8px;
+    font-size: 16px;
+    font-weight: 500;
+    color: #e1e5e9;
+}
+
+.spec-preview.modern .loading-subtitle {
+    font-size: 14px;
+    color: #8b92a5;
 }
 
 .preview-loading p {
@@ -1105,89 +1190,378 @@
     color: #8b92a5;
 }
 
-/* Preview Error State */
-.preview-error {
+@keyframes pulse {
+    0% {
+        transform: scale(0.8);
+        opacity: 0.6;
+    }
+
+    50% {
+        transform: scale(1.2);
+        opacity: 0.8;
+    }
+
+    100% {
+        transform: scale(0.8);
+        opacity: 0.6;
+    }
+}
+
+/* Preview Error State - Clean Modern UI */
+.spec-preview.modern .preview-error {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     height: 100%;
-    padding: 40px 20px;
+    padding: 60px 20px;
     text-align: center;
 }
 
-.preview-error h4 {
-    margin: 0 0 12px 0;
+.spec-preview.modern .error-icon-large {
+    font-size: 44px;
+    color: #f87171;
+    margin-bottom: 16px;
+}
+
+.spec-preview.modern .preview-error h4 {
+    margin: 0 0 16px 0;
     font-size: 18px;
     color: #f87171;
     font-weight: 600;
 }
 
-.preview-error p {
-    margin: 0;
-    color: #8b92a5;
-    max-width: 400px;
-    line-height: 1.5;
+.spec-preview.modern .preview-error p {
+    margin: 0 0 24px;
+    color: #a0a9bc;
+    max-width: 450px;
+    line-height: 1.6;
+    font-size: 14px;
 }
 
-/* Preview Empty State */
-.preview-empty {
+.spec-preview.modern .retry-button {
+    background-color: rgba(248, 113, 113, 0.15);
+    color: #f87171;
+    border: 1px solid rgba(248, 113, 113, 0.3);
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.spec-preview.modern .retry-button:hover {
+    background-color: rgba(248, 113, 113, 0.25);
+}
+
+/* Preview Empty State - Clean Modern UI */
+.spec-preview.modern .preview-empty {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     height: 100%;
-    padding: 40px 20px;
+    padding: 60px 20px;
     text-align: center;
     color: #8b92a5;
 }
 
-.preview-empty p {
-    margin: 0;
-    font-size: 16px;
+.spec-preview.modern .empty-icon {
+    font-size: 42px;
+    color: #8b92a5;
+    margin-bottom: 20px;
+    border: 2px dashed rgba(139, 146, 165, 0.3);
+    width: 84px;
+    height: 84px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(255, 255, 255, 0.02);
+}
+
+.spec-preview.modern .empty-title {
+    margin: 0 0 12px;
+    font-size: 18px;
     line-height: 1.5;
+    color: #e1e5e9;
+    font-weight: 500;
+}
+
+.spec-preview.modern .empty-description {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.6;
+    color: #8b92a5;
+    max-width: 400px;
 }
 
 /* Preview Stats - Enhanced Modern Style */
-.preview-stats {
+.spec-preview.modern .preview-stats {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
-    padding: 20px 32px;
-    background: linear-gradient(135deg, #1a1d23 0%, #14171b 100%);
+    gap: 24px;
+    padding: 16px 24px;
+    background: #21252b;
     border-top: 1px solid #3a3f47;
     font-size: 14px;
     color: #8b92a5;
-    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.1);
 }
 
-.stat {
+.spec-preview.modern .stat-card {
     display: flex;
     align-items: center;
-    gap: 10px;
-    padding: 8px 16px;
-    background: rgba(255, 255, 255, 0.02);
+    gap: 12px;
+    padding: 10px 16px;
+    background: #2a2f36;
     border-radius: 8px;
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    border: 1px solid #404650;
+    transition: all 0.2s ease;
+    min-width: 140px;
+}
+
+.spec-preview.modern .stat-card:hover {
+    background: #383e4a;
+    border-color: #5a6068;
+}
+
+.spec-preview.modern .stat-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: rgba(255, 108, 55, 0.1);
+    color: #ff6c37;
+    font-size: 16px;
+}
+
+.spec-preview.modern .stat-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.spec-preview.modern .stat-label {
+    font-size: 12px;
+    color: #a0a9bc;
+    margin-bottom: 2px;
+    font-weight: 500;
+}
+
+.spec-preview.modern .stat-value {
+    font-size: 16px;
+    font-weight: 500;
+    color: #ffffff;
+}
+
+/* Error Banner */
+.spec-preview.modern .preview-error-banner {
+    display: flex;
+    align-items: center;
+    padding: 12px 24px;
+    background: rgba(248, 113, 113, 0.15);
+    border-bottom: 1px solid rgba(248, 113, 113, 0.3);
+    color: #f87171;
+    gap: 12px;
+    animation: slideDown 0.3s ease forwards;
+}
+
+.spec-preview.modern .error-icon {
+    display: flex;
+    font-size: 16px;
+}
+
+.spec-preview.modern .error-message {
+    font-size: 14px;
+    flex: 1;
+}
+
+.spec-preview.modern .error-dismiss {
+    background: transparent;
+    border: none;
+    color: #f87171;
+    font-size: 18px;
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
     transition: all 0.2s ease;
 }
 
-.stat:hover {
-    background: rgba(255, 255, 255, 0.04);
-    border-color: rgba(255, 108, 55, 0.2);
+.spec-preview.modern .error-dismiss:hover {
+    background: rgba(248, 113, 113, 0.2);
 }
 
-.stat span:first-child {
-    font-weight: 500;
-    color: #c9d1d9;
-    font-size: 13px;
+@keyframes slideDown {
+    from {
+        transform: translateY(-100%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
 }
 
-.stat span:last-child {
-    font-weight: 600;
-    color: #ff6c37;
-    font-size: 14px;
-    text-shadow: 0 1px 2px rgba(255, 108, 55, 0.3);
+/* Enhanced Responsive Design for Specification Preview Buttons */
+@media (max-width: 1024px) {
+    .spec-preview.modern .preview-header {
+        padding: 18px 24px;
+    }
+
+    .spec-preview.modern .preview-header h3 {
+        font-size: 20px;
+    }
+
+    .spec-preview.modern .preview-controls {
+        gap: 16px;
+    }
+
+    .spec-preview.modern .format-btn {
+        padding: 8px 14px;
+        font-size: 13px;
+        min-width: 70px;
+    }
+
+    .spec-preview.modern .export-btn,
+    .spec-preview.modern .debug-btn {
+        padding: 8px 14px;
+        font-size: 13px;
+        min-width: 90px;
+    }
+
+    .spec-preview.modern .preview-stats {
+        padding: 16px 24px;
+        flex-wrap: wrap;
+    }
+
+    .spec-preview.modern .stat-card {
+        min-width: 120px;
+        padding: 8px 16px;
+    }
+
+    .spec-preview.modern .stat-value {
+        font-size: 15px;
+    }
+}
+
+@media (max-width: 768px) {
+    .spec-preview.modern .preview-header {
+        padding: 16px 20px;
+        flex-direction: column;
+        gap: 16px;
+        align-items: flex-start;
+    }
+
+    .spec-preview.modern .preview-controls {
+        width: 100%;
+        flex-direction: column;
+        gap: 16px;
+        align-items: stretch;
+    }
+
+    .spec-preview.modern .format-toggle {
+        max-width: none;
+        width: 100%;
+    }
+
+    .spec-preview.modern .export-buttons {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .spec-preview.modern .format-btn {
+        flex: 1;
+        padding: 10px 8px;
+    }
+
+    .spec-preview.modern .export-btn,
+    .spec-preview.modern .debug-btn {
+        flex: 1;
+        padding: 10px 8px;
+    }
+
+    .spec-preview.modern .preview-content {
+        padding: 16px;
+    }
+
+    .spec-preview.modern .spec-content {
+        padding: 16px;
+        font-size: 12px;
+    }
+
+    .spec-preview.modern .preview-stats {
+        gap: 12px;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .spec-preview.modern .stat-card {
+        min-width: 100px;
+        padding: 8px 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .spec-preview.modern .preview-header h3 {
+        font-size: 18px;
+    }
+
+    .spec-preview.modern .format-toggle {
+        padding: 3px;
+    }
+
+    .spec-preview.modern .format-btn {
+        padding: 8px 6px;
+        font-size: 12px;
+        min-width: auto;
+        gap: 4px;
+    }
+
+    .spec-preview.modern .btn-icon {
+        font-size: 14px;
+    }
+
+    .spec-preview.modern .export-btn,
+    .spec-preview.modern .debug-btn {
+        padding: 8px 6px;
+        font-size: 12px;
+        min-width: auto;
+    }
+
+    .spec-preview.modern .preview-stats {
+        padding: 12px 16px;
+        justify-content: space-around;
+    }
+
+    .spec-preview.modern .stat-card {
+        flex-direction: column;
+        padding: 8px;
+        min-width: 80px;
+        gap: 6px;
+    }
+
+    .spec-preview.modern .stat-icon {
+        width: 28px;
+        height: 28px;
+    }
+
+    .spec-preview.modern .stat-content {
+        align-items: center;
+    }
+
+    .spec-preview.modern .stat-value {
+        font-size: 14px;
+    }
 }
 
 /* Responsive Design */
@@ -1576,12 +1950,7 @@
 }
 
 /* Enhanced Focus States for Specification Preview Buttons */
-.format-toggle button:focus,
-.export-buttons button:focus {
-    outline: 2px solid #ff6c37;
-    outline-offset: 3px;
-    box-shadow: 0 0 0 4px rgba(255, 108, 55, 0.2);
-}
+
 
 .format-toggle button:focus:not(.active) {
     background: rgba(255, 108, 55, 0.1);

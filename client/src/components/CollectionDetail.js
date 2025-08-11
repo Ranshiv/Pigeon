@@ -14,7 +14,7 @@ import { useCollaboration } from '../context/CollaborationContext';
 import {
   FiSave, FiSettings, FiPlay, FiAlertCircle, FiCheckCircle, FiBook, FiEdit,
   FiPlus, FiTrash2, FiDatabase, FiGlobe, FiLock, FiUsers, FiPackage,
-  FiFileText, FiInfo, FiGrid
+  FiFileText, FiInfo, FiGrid, FiChevronLeft, FiChevronRight
 } from 'react-icons/fi';
 import { toast } from 'react-toastify'; // Import toast notification library
 
@@ -41,6 +41,22 @@ function CollectionDetail() {
     return stored || null;
   });
   const [selectedEnvironment, setSelectedEnvironment] = useState(null);
+  const [requestSidebarCollapsed, setRequestSidebarCollapsed] = useState(false);
+
+  // Add keyboard shortcut for toggling the requests sidebar
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      // Alt + Q to toggle requests sidebar
+      if (e.altKey && e.key === 'q') {
+        setRequestSidebarCollapsed(prev => !prev);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
 
   // Get collaboration context features
   const {
@@ -822,48 +838,71 @@ function CollectionDetail() {
       </div>
 
       <div className="collection-content">
-        <div className="collection-sidebar">
-          <h3 data-count={requests.length}>Requests</h3>
-          <div className="requests-list">
-            {requests.length === 0 ? (
-              <div className="no-requests">
-                <FiPackage className="no-content-icon" />
-                <p>No requests found</p>
-                <small>Click "Add Request" below to create your first API request</small>
-              </div>
-            ) : (
-              <ul>
-                {requests.map(request => (
-                  <li
-                    key={request._id || request.id}
-                    className={`request-item ${selectedRequest && (selectedRequest._id === request._id || selectedRequest.id === request.id) ? 'active' : ''}`}
-                    onClick={() => handleSelectRequest(request)}
-                  >
-                    <span className={`method-badge ${request.method.toLowerCase()}`}>
-                      {request.method}
-                    </span>
-                    <div className="request-info">
-                      <span className="request-name">{request.name}</span>
-                      <small className="request-url">{request.url ? new URL(request.url).pathname : '/'}</small>
-                    </div>
-                    <button
-                      className="delete-btn"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleDeleteRequest(request._id || request.id);
-                      }}
-                      title="Delete request"
-                    >
-                      <FiTrash2 />
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            )}
+        <div className={`collection-sidebar ${requestSidebarCollapsed ? 'collapsed' : ''}`}>
+          {/* Toggle button for sidebar collapse/expand */}
+          <div
+            className="sidebar-toggle"
+            onClick={() => setRequestSidebarCollapsed(!requestSidebarCollapsed)}
+            title={requestSidebarCollapsed ? "Expand Requests (Alt+Q)" : "Collapse Requests (Alt+Q)"}
+            aria-label={requestSidebarCollapsed ? "Expand Requests" : "Collapse Requests"}
+          >
+            {requestSidebarCollapsed ? <FiChevronRight size={14} /> : <FiChevronLeft size={14} />}
           </div>
+
+          {!requestSidebarCollapsed && <h3 data-count={requests.length}>Requests</h3>}
+          {requestSidebarCollapsed && (
+            <div className="sidebar-label vertical-text">
+              REQUESTS
+            </div>
+          )}
+
+          {!requestSidebarCollapsed && (
+            <div className="requests-list">
+              {requests.length === 0 ? (
+                <div className="no-requests">
+                  <FiPackage className="no-content-icon" />
+                  <p>No requests found</p>
+                  <small>Click "Add Request" below to create your first API request</small>
+                </div>
+              ) : (
+                <ul>
+                  {requests.map(request => (
+                    <li
+                      key={request._id || request.id}
+                      className={`request-item ${selectedRequest && (selectedRequest._id === request._id || selectedRequest.id === request.id) ? 'active' : ''}`}
+                      onClick={() => handleSelectRequest(request)}
+                    >
+                      <span className={`method-badge ${request.method.toLowerCase()}`}>
+                        {request.method}
+                      </span>
+                      <div className="request-info">
+                        <span className="request-name">{request.name}</span>
+                        <small className="request-url">{request.url ? new URL(request.url).pathname : '/'}</small>
+                      </div>
+                      <button
+                        className="delete-btn"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDeleteRequest(request._id || request.id);
+                        }}
+                        title="Delete request"
+                      >
+                        <FiTrash2 />
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          )}
+
           <div className="add-request">
-            <button className="add-request-btn" onClick={handleAddRequest}>
-              <FiPlus className="icon" /> Add Request
+            <button
+              className="add-request-btn"
+              onClick={handleAddRequest}
+            >
+              <FiPlus className="icon" />
+              {!requestSidebarCollapsed && 'Add Request'}
             </button>
           </div>
         </div>

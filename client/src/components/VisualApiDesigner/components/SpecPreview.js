@@ -1,5 +1,14 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import VisualizationTab from './VisualizationTab';
+import {
+    FiFileText,
+    FiDownload,
+    FiAlertTriangle,
+    FiLoader,
+    FiCode,
+    FiCheckCircle,
+    FiBarChart2
+} from 'react-icons/fi';
 
 const SpecPreview = ({
     nodes = [],
@@ -15,6 +24,7 @@ const SpecPreview = ({
     const [isGenerating, setIsGenerating] = useState(false);
     const [error, setError] = useState(null);
     const [isExporting, setIsExporting] = useState(false);
+    const [exportSuccess, setExportSuccess] = useState(false);
 
     // Switch to visualization tab when visualization context is provided
     useEffect(() => {
@@ -180,7 +190,7 @@ const SpecPreview = ({
             return;
         }
 
-        setIsExporting(true);
+        setIsExporting(format); // Track which format is being exported
         setError(null);
 
         try {
@@ -225,6 +235,9 @@ const SpecPreview = ({
 
             console.log('Export completed successfully');
 
+            // Show success state for the specific format
+            setExportSuccess(format);
+
             if (onExport) {
                 onExport(generatedSpec, format);
             }
@@ -255,8 +268,11 @@ const SpecPreview = ({
         if (isGenerating) {
             return (
                 <div className="preview-loading">
-                    <div className="spinner"></div>
+                    <div className="spinner-container">
+                        <FiLoader className="spinner" aria-hidden="true" />
+                    </div>
                     <p>Generating specification...</p>
+                    <span className="loading-subtitle">Analyzing API structure</span>
                 </div>
             );
         }
@@ -264,8 +280,34 @@ const SpecPreview = ({
         if (error) {
             return (
                 <div className="preview-error">
+                    <div className="error-icon-large">
+                        <FiAlertTriangle aria-hidden="true" />
+                    </div>
                     <h4>Generation Error</h4>
                     <p>{error}</p>
+                    <button
+                        className="retry-button"
+                        onClick={() => {
+                            setIsGenerating(true);
+                            setError(null);
+                            setTimeout(() => {
+                                const generateSpecAsync = async () => {
+                                    try {
+                                        const spec = await generateOpenAPISpec(nodes, edges);
+                                        setGeneratedSpec(spec);
+                                    } catch (err) {
+                                        setError(err.message);
+                                        setGeneratedSpec(null);
+                                    } finally {
+                                        setIsGenerating(false);
+                                    }
+                                };
+                                generateSpecAsync();
+                            }, 500);
+                        }}
+                    >
+                        Try Again
+                    </button>
                 </div>
             );
         }
@@ -273,7 +315,13 @@ const SpecPreview = ({
         if (!generatedSpec) {
             return (
                 <div className="preview-empty">
-                    <p>Add components to the canvas to generate specification</p>
+                    <div className="empty-icon">
+                        <FiCode aria-hidden="true" />
+                    </div>
+                    <p className="empty-title">No API Specification Available</p>
+                    <p className="empty-description">
+                        Add endpoints, schemas, or parameters to the canvas to generate a specification
+                    </p>
                 </div>
             );
         }
@@ -297,76 +345,149 @@ const SpecPreview = ({
             : formatYaml(generatedSpec);
 
         return (
-            <pre className="spec-content">
-                <code>{content}</code>
-            </pre>
+            <div className="spec-content-container">
+                <pre className="spec-content">
+                    <code>{content}</code>
+                </pre>
+                <div className="spec-actions">
+                    <button
+                        className="copy-btn"
+                        onClick={() => {
+                            navigator.clipboard.writeText(content)
+                                .then(() => {
+                                    const copyBtn = document.querySelector('.copy-btn');
+                                    copyBtn.innerHTML = '<span>Copied!</span>';
+                                    setTimeout(() => {
+                                        copyBtn.innerHTML = '<span>Copy</span>';
+                                    }, 2000);
+                                })
+                                .catch(err => {
+                                    console.error('Copy failed:', err);
+                                });
+                        }}
+                        title="Copy to clipboard"
+                        aria-label="Copy specification to clipboard"
+                    >
+                        <span>Copy</span>
+                    </button>
+                </div>
+            </div>
         );
     };
 
+    // Handle export success feedback
+    useEffect(() => {
+        if (exportSuccess) {
+            const timer = setTimeout(() => {
+                setExportSuccess(false);
+            }, 3000);
+            return () => clearTimeout(timer);
+        }
+    }, [exportSuccess]);
+
+    // Modified export handler with success feedback
+    const handleExportWithFeedback = async (format) => {
+        await handleExport(format);
+        setExportSuccess(true); // Show success state after successful export
+    };
+
     return (
-        <div className="spec-preview">
-            <div className="preview-header">
-                <h3>Specification Preview</h3>
+        <div className="spec-preview modern">
+            <div className="preview-header glass-effect">
+                <h3>
+                    <FiCode className="header-icon" aria-hidden="true" />
+                    Specification Preview
+                </h3>
 
                 <div className="preview-controls">
-                    <div className="format-toggle" role="tablist" aria-label="Format options">
+                    <div
+                        className="format-toggle"
+                        role="tablist"
+                        aria-label="Format options"
+                    >
                         <button
-                            className={previewMode === 'json' ? 'active' : ''}
+                            className={`format-btn ${previewMode === 'json' ? 'active' : ''}`}
                             onClick={() => setPreviewMode('json')}
                             role="tab"
                             aria-selected={previewMode === 'json'}
                             aria-controls="spec-preview-content"
                             title="View specification in JSON format"
+                            aria-label="JSON format"
                         >
-                            📋 JSON
+                            <FiFileText className="btn-icon" aria-hidden="true" />
+                            <span>JSON</span>
                         </button>
                         <button
-                            className={previewMode === 'yaml' ? 'active' : ''}
+                            className={`format-btn ${previewMode === 'yaml' ? 'active' : ''}`}
                             onClick={() => setPreviewMode('yaml')}
                             role="tab"
                             aria-selected={previewMode === 'yaml'}
                             aria-controls="spec-preview-content"
                             title="View specification in YAML format"
+                            aria-label="YAML format"
                         >
-                            📝 YAML
+                            <FiCode className="btn-icon" aria-hidden="true" />
+                            <span>YAML</span>
                         </button>
                         <button
-                            className={previewMode === 'visualization' ? 'active' : ''}
+                            className={`format-btn ${previewMode === 'visualization' ? 'active' : ''}`}
                             onClick={() => setPreviewMode('visualization')}
                             role="tab"
                             aria-selected={previewMode === 'visualization'}
                             aria-controls="spec-preview-content"
                             title="View interactive data visualizations"
+                            aria-label="Visualizations view"
                         >
-                            📊 Visualizations
+                            <FiBarChart2 className="btn-icon" aria-hidden="true" />
+                            <span>Visualizations</span>
                         </button>
                     </div>
 
-                    <div className="export-buttons" role="group" aria-label="Export options">
+                    <div
+                        className="export-buttons"
+                        role="group"
+                        aria-label="Export options"
+                    >
                         {isDevelopment && (
                             <button
+                                className="debug-btn"
                                 onClick={debugSpecState}
                                 title="Debug specification state"
-                                style={{ background: '#6b7280', fontSize: '12px', padding: '8px 12px' }}
+                                aria-label="Debug specification"
                             >
-                                🐛 Debug
+                                <FiCode className="btn-icon" aria-hidden="true" />
+                                <span>Debug</span>
                             </button>
                         )}
                         <button
-                            onClick={() => handleExport('json')}
+                            className={`export-btn ${exportSuccess === 'json' ? 'success' : ''}`}
+                            onClick={() => handleExportWithFeedback('json')}
                             disabled={!generatedSpec || isExporting}
                             title="Export specification as JSON file"
                             aria-label="Export as JSON"
                         >
-                            {isExporting ? '⏳' : '📥'} JSON
+                            {isExporting === 'json' ? (
+                                <><FiLoader className="btn-icon spinning" aria-hidden="true" /> Exporting...</>
+                            ) : exportSuccess === 'json' ? (
+                                <><FiCheckCircle className="btn-icon" aria-hidden="true" /> Exported</>
+                            ) : (
+                                <><FiDownload className="btn-icon" aria-hidden="true" /> JSON</>
+                            )}
                         </button>
                         <button
-                            onClick={() => handleExport('yaml')}
+                            className={`export-btn ${exportSuccess === 'yaml' ? 'success' : ''}`}
+                            onClick={() => handleExportWithFeedback('yaml')}
                             disabled={!generatedSpec || isExporting}
                             title="Export specification as YAML file"
                             aria-label="Export as YAML"
                         >
-                            {isExporting ? '⏳' : '📥'} YAML
+                            {isExporting === 'yaml' ? (
+                                <><FiLoader className="btn-icon spinning" aria-hidden="true" /> Exporting...</>
+                            ) : exportSuccess === 'yaml' ? (
+                                <><FiCheckCircle className="btn-icon" aria-hidden="true" /> Exported</>
+                            ) : (
+                                <><FiDownload className="btn-icon" aria-hidden="true" /> YAML</>
+                            )}
                         </button>
                     </div>
                 </div>
@@ -374,14 +495,17 @@ const SpecPreview = ({
 
             {error && (
                 <div className="preview-error-banner">
-                    <div className="error-icon">⚠️</div>
+                    <div className="error-icon">
+                        <FiAlertTriangle aria-hidden="true" />
+                    </div>
                     <span className="error-message">{error}</span>
                     <button
                         className="error-dismiss"
                         onClick={() => setError(null)}
                         title="Dismiss error"
+                        aria-label="Dismiss error"
                     >
-                        ×
+                        <span aria-hidden="true">×</span>
                     </button>
                 </div>
             )}
@@ -397,18 +521,33 @@ const SpecPreview = ({
             </div>
 
             {generatedSpec && (
-                <div className="preview-stats">
-                    <div className="stat">
-                        <span>Paths:</span>
-                        <span>{Object.keys(generatedSpec.paths || {}).length}</span>
+                <div className="preview-stats glass-effect">
+                    <div className="stat-card">
+                        <div className="stat-icon">
+                            <FiCode aria-hidden="true" />
+                        </div>
+                        <div className="stat-content">
+                            <span className="stat-label">Paths</span>
+                            <span className="stat-value">{Object.keys(generatedSpec.paths || {}).length}</span>
+                        </div>
                     </div>
-                    <div className="stat">
-                        <span>Schemas:</span>
-                        <span>{Object.keys(generatedSpec.components?.schemas || {}).length}</span>
+                    <div className="stat-card">
+                        <div className="stat-icon">
+                            <FiFileText aria-hidden="true" />
+                        </div>
+                        <div className="stat-content">
+                            <span className="stat-label">Schemas</span>
+                            <span className="stat-value">{Object.keys(generatedSpec.components?.schemas || {}).length}</span>
+                        </div>
                     </div>
-                    <div className="stat">
-                        <span>Parameters:</span>
-                        <span>{Object.keys(generatedSpec.components?.parameters || {}).length}</span>
+                    <div className="stat-card">
+                        <div className="stat-icon">
+                            <FiBarChart2 aria-hidden="true" />
+                        </div>
+                        <div className="stat-content">
+                            <span className="stat-label">Parameters</span>
+                            <span className="stat-value">{Object.keys(generatedSpec.components?.parameters || {}).length}</span>
+                        </div>
                     </div>
                 </div>
             )}
@@ -416,8 +555,14 @@ const SpecPreview = ({
             {isDevelopment && (
                 <div className="debug-info">
                     <h4>Debug Info</h4>
-                    <button onClick={debugSpecState} title="Debug spec state">
-                        📊 Debug Spec State
+                    <button
+                        className="debug-btn"
+                        onClick={debugSpecState}
+                        title="Debug spec state"
+                        aria-label="Debug specification state"
+                    >
+                        <FiCode className="btn-icon" aria-hidden="true" />
+                        <span>Debug Spec State</span>
                     </button>
                 </div>
             )}

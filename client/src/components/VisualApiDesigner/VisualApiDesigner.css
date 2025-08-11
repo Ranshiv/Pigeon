@@ -12,6 +12,7 @@
     right: 0;
     bottom: 0;
     z-index: 2;
+    backdrop-filter: blur(1px);
 }
 
 .empty-state-content {
@@ -99,6 +100,31 @@
 
 /* Visual API Designer Styling - Dark Theme to Match Screenshot */
 
+/* Responsive design improvements for collapsible sidebars */
+@media (max-width: 1400px) {
+    .workspace-left:not(.collapsed) {
+        width: 240px;
+        min-width: 240px;
+    }
+
+    .workspace-right:not(.collapsed) {
+        width: 280px;
+        min-width: 280px;
+    }
+}
+
+@media (max-width: 1100px) {
+    .workspace-left:not(.collapsed) {
+        width: 220px;
+        min-width: 220px;
+    }
+
+    .workspace-right:not(.collapsed) {
+        width: 260px;
+        min-width: 260px;
+    }
+}
+
 .visual-api-designer {
     --designer-primary: #FF6C37;
     --designer-primary-hover: #e85d2a;
@@ -117,6 +143,8 @@
     /* Dark theme colors to match screenshot */
     --designer-bg: #1e1e1e;
     --designer-card: #2d2d2d;
+    --designer-card-rgb: 45, 45, 45;
+    /* RGB value of #2d2d2d for rgba usage */
     --designer-border: #404040;
     --designer-border-light: #333333;
     --designer-text-primary: #ffffff;
@@ -191,13 +219,13 @@
 
 .positioned-node.selected {
     transform: translate(-50%, -50%) scale(1.05);
-    filter: drop-shadow(0 0 8px var(--designer-primary));
+    /* Removed the orange drop-shadow */
     border: 2px solid var(--designer-primary) !important;
 }
 
 .positioned-node.selected .node-element {
     border-color: var(--designer-primary) !important;
-    box-shadow: 0 0 0 2px rgba(255, 108, 55, 0.3) !important;
+    /* Removed the orange box-shadow */
 }
 
 .positioned-node.dragging {
@@ -257,12 +285,7 @@
     z-index: 15;
 }
 
-/* Show resize handles on hover or when selected */
-.positioned-node:hover .resize-handle,
-.positioned-node.selected .resize-handle,
-.positioned-node.resizing .resize-handle {
-    opacity: 1;
-}
+
 
 /* Corner handles */
 .resize-handle.resize-nw {
@@ -530,7 +553,7 @@
 
 .enhanced-node.selected {
     border-color: var(--node-color, var(--designer-primary));
-    box-shadow: 0 0 0 2px rgba(255, 108, 55, 0.2), 0 2px 8px rgba(0, 0, 0, 0.15);
+    /* Removed the orange shadow */
 }
 
 /* Enhanced Node Header */
@@ -740,31 +763,31 @@
 .enhanced-node.endpoint-node {
     --node-color: #10B981;
     --node-bg-color: #ECFDF5;
-    --node-border-color: #6EE7B7;
+    --node-border-color: #009e5f;
 }
 
 .enhanced-node.resource-node {
-    --node-color: #3B82F6;
+    --node-color: #862356;
     --node-bg-color: #EFF6FF;
-    --node-border-color: #93C5FD;
+    --node-border-color: #ff005d;
 }
 
 .enhanced-node.schema-node {
     --node-color: #8B5CF6;
     --node-bg-color: #F5F3FF;
-    --node-border-color: #C4B5FD;
+    --node-border-color: #0f004a;
 }
 
 .enhanced-node.parameter-node {
-    --node-color: #F59E0B;
-    --node-bg-color: #FFFBEB;
-    --node-border-color: #FCD34D;
+    --node-color: #3d7045;
+    --node-bg-color: #ebffed;
+    --node-border-color: #26ff00;
 }
 
 .enhanced-node.security-node {
-    --node-color: #EF4444;
+    --node-color: #6a1f6a;
     --node-bg-color: #FEF2F2;
-    --node-border-color: #FCA5A5;
+    --node-border-color: #b300ff;
 }
 
 .enhanced-node.info-node {
@@ -774,9 +797,9 @@
 }
 
 .enhanced-node.tag-node {
-    --node-color: #84CC16;
+    --node-color: #7e2860;
     --node-bg-color: #F7FEE7;
-    --node-border-color: #BEF264;
+    --node-border-color: #ff52c2;
 }
 
 /* Dark theme adjustments for enhanced nodes */
@@ -990,10 +1013,24 @@
     min-width: 260px;
     max-width: 320px;
     background: var(--designer-card);
-    overflow-y: auto;
     border-right: 1px solid var(--designer-border);
     display: flex;
     flex-direction: column;
+    position: relative;
+    transition: width 0.3s ease, min-width 0.3s ease;
+}
+
+/* Show toggle button clearly when hovering over the sidebar edge */
+.workspace-left:hover .sidebar-toggle,
+.workspace-right:hover .sidebar-toggle {
+    opacity: 1;
+}
+
+.workspace-left.collapsed {
+    width: 28px;
+    min-width: 28px;
+    overflow: visible;
+    background-color: rgba(var(--designer-card-rgb), 0.85);
 }
 
 .workspace-center {
@@ -1011,10 +1048,147 @@
     min-width: 280px;
     max-width: 350px;
     background: var(--designer-card);
-    overflow-y: auto;
     border-left: 1px solid var(--designer-border);
     display: flex;
     flex-direction: column;
+    position: relative;
+    transition: width 0.3s ease, min-width 0.3s ease;
+}
+
+.workspace-right.collapsed {
+    width: 28px;
+    min-width: 28px;
+    overflow: visible;
+    background-color: rgba(var(--designer-card-rgb), 0.85);
+}
+
+.sidebar-label {
+    color: var(--designer-text-secondary);
+    font-size: 13px;
+    font-weight: 500;
+    position: relative;
+    width: 100%;
+    text-align: center;
+    padding-top: 15px;
+}
+
+.vertical-text {
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    transform: rotate(180deg);
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(180deg);
+    white-space: nowrap;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.sidebar-toggle {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 22px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--designer-card);
+    border: 1px solid var(--designer-border);
+    border-radius: 4px;
+    cursor: pointer;
+    z-index: 100;
+    /* Increased z-index to ensure visibility */
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    color: var(--designer-text-muted);
+    opacity: 0.9;
+    /* Make it slightly transparent by default */
+}
+
+/* Add pulsing effect for collapsed sidebars */
+.workspace-left.collapsed .sidebar-toggle,
+.workspace-right.collapsed .sidebar-toggle {
+    color: var(--designer-primary);
+    animation: pulse 2s infinite;
+}
+
+/* Make toggle buttons more visible when not collapsed */
+.workspace-left:not(.collapsed) .sidebar-toggle {
+    right: -12px;
+    /* Slightly more visible */
+    box-shadow: -2px 0 5px rgba(0, 0, 0, 0.15);
+    opacity: 0.85;
+}
+
+.workspace-right:not(.collapsed) .sidebar-toggle {
+    left: -12px;
+    /* Slightly more visible */
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.15);
+    opacity: 0.85;
+}
+
+.sidebar-toggle:hover {
+    background: var(--designer-accent-hover);
+    color: var(--designer-text-light);
+}
+
+.left-toggle {
+    right: -11px;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+.right-toggle {
+    left: -11px;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+/* Ensure toggle buttons are always visible */
+.sidebar-toggle:hover {
+    opacity: 1;
+    background: var(--designer-accent-hover);
+    color: var(--designer-text-light);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Pulse animation for sidebar toggles */
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(255, 108, 55, 0.4);
+    }
+
+    70% {
+        box-shadow: 0 0 0 6px rgba(255, 108, 55, 0);
+    }
+
+    100% {
+        box-shadow: 0 0 0 0 rgba(255, 108, 55, 0);
+    }
+}
+
+/* Add a small visual indicator to show keyboard shortcut */
+.sidebar-toggle::after {
+    content: attr(title);
+    position: absolute;
+    bottom: -30px;
+    padding: 5px 8px;
+    background: rgba(0, 0, 0, 0.75);
+    border-radius: 4px;
+    color: #fff;
+    font-size: 12px;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s, visibility 0.2s;
+    pointer-events: none;
+}
+
+.sidebar-toggle:hover::after {
+    opacity: 1;
+    visibility: visible;
 }
 
 /* Canvas Drop Zones - Dark Theme */
@@ -1024,6 +1198,18 @@
     position: relative;
     background: var(--designer-canvas-bg);
     overflow: hidden;
+}
+
+/* Base grid that is NOT scaled with content; ensures background always visible */
+.design-canvas>.base-grid {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    background-image:
+        linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+    background-size: 20px 20px;
 }
 
 .canvas-drop-zones {
@@ -1833,6 +2019,148 @@
     border-color: var(--designer-primary-hover);
     background: var(--designer-primary);
     transform: scale(1.2);
+}
+
+/* Connection handles for linking nodes - Screenshot 2 style */
+.conn-handle {
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    border: none;
+    background: #FF6C37;
+    cursor: crosshair;
+    z-index: 20;
+    opacity: 0;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(255, 108, 55, 0.3);
+}
+
+.conn-handle::before {
+    content: '';
+    width: 8px;
+    height: 8px;
+    background: white;
+    border-radius: 50%;
+    transform: scale(0.6);
+    transition: transform 0.15s ease;
+}
+
+.positioned-node:hover .conn-handle {
+    opacity: 1;
+}
+
+.conn-handle:hover {
+    background: #e85d2a;
+    box-shadow: 0 4px 12px rgba(255, 108, 55, 0.5);
+}
+
+.conn-handle:hover::before {
+    transform: scale(0.8);
+}
+
+.conn-in {
+    left: -8px;
+    top: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.conn-out {
+    right: -8px;
+    top: 50%;
+    transform: translate(50%, -50%);
+}
+
+/* Edge styling - Screenshot 2 style */
+.edges-layer .edge-path {
+    stroke: #FF6C37;
+    stroke-width: 2;
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
+    cursor: pointer;
+}
+
+.edges-layer .edge-path.default {
+    stroke: #FF6C37;
+    opacity: 0.8;
+}
+
+.edges-layer .edge-path.smooth {
+    stroke: #FF6C37;
+    opacity: 0.9;
+}
+
+.edges-layer .edge-path.preview {
+    stroke: #FF6C37;
+    stroke-dasharray: 8 4;
+    opacity: 0.7;
+    animation: dashFlow 1s linear infinite;
+}
+
+.edges-layer .edge-path.selected {
+    stroke: #FF6C37;
+    stroke-width: 3;
+    filter: drop-shadow(0 0 8px rgba(255, 108, 55, 0.8));
+    opacity: 1;
+}
+
+/* Edge labels */
+.edge-label {
+    font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    font-size: 11px;
+    fill: #ffffff;
+    paint-order: stroke;
+    stroke: rgba(0, 0, 0, 0.6);
+    stroke-width: 3px;
+    letter-spacing: 0.2px;
+}
+
+/* Node highlight when connectable */
+.positioned-node.can-connect {
+    outline: 2px dashed #22c55e;
+    outline-offset: 2px;
+}
+
+/* Edge context menu */
+.edge-context-menu {
+    background: var(--designer-card);
+    border: 1px solid var(--designer-border);
+    border-radius: 8px;
+    box-shadow: var(--designer-shadow-lg);
+    padding: 6px;
+    min-width: 140px;
+}
+
+.edge-context-menu .edge-menu-item {
+    width: 100%;
+    background: transparent;
+    border: none;
+    color: var(--designer-text-primary);
+    text-align: left;
+    padding: 8px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.edge-context-menu .edge-menu-item:hover {
+    background: var(--designer-component-bg);
+}
+
+.edge-context-menu .edge-menu-item.destructive:hover {
+    background: rgba(220, 53, 69, 0.15);
+    color: #ffb0b8;
+}
+
+@keyframes dashFlow {
+    0% {
+        stroke-dashoffset: 0;
+    }
+
+    100% {
+        stroke-dashoffset: 12;
+    }
 }
 
 /* Selection Outline */
@@ -3089,8 +3417,10 @@
     border-bottom: 1px solid var(--designer-border-light);
 }
 
-.form-section:last-child {
-    border-bottom: none;
+
+.properties-form .form-section:hover {
+    border-color: transparent;
+    box-shadow: none;
 }
 
 .section-title {

@@ -1,0 +1,164 @@
+/* Additional border styling for API Designer nodes */
+
+/* Node containers with border styling */
+.node-container {
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 16px;
+}
+
+/* Endpoint node border */
+.node-container.endpoint {
+    border: 2px solid #3a9b5c;
+}
+
+/* Schema node border */
+.node-container.schema {
+    border: 2px solid #357abd;
+}
+
+/* Parameter node border */
+.node-container.parameter {
+    border: 2px solid #389f40;
+}
+
+/* Resource node border */
+.node-container.resource {
+    border: 2px solid #b01a51;
+}
+
+/* Info node border */
+.node-container.info {
+    border: 2px solid #4aa3ae;
+}
+
+/* Security node border */
+.node-container.security {
+    border: 2px solid #9427b2;
+}
+
+/* Tag node border */
+.node-container.tag {
+    border: 2px solid #a12a55;
+}
+
+/* Fix for direct element node styling */
+.endpoint-node,
+.schema-node,
+.parameter-node,
+.resource-node,
+.info-node,
+.security-node,
+.tag-node {
+    border-width: 2px !important;
+    border-style: solid !important;
+    overflow: hidden !important;
+    border-radius: 8px !important;
+}
+
+.endpoint-node {
+    border-color: #3a9b5c !important;
+}
+
+.schema-node {
+    border-color: #357abd !important;
+}
+
+.parameter-node {
+    border-color: #389f40 !important;
+}
+
+.resource-node {
+    border-color: #b01a51 !important;
+}
+
+.info-node {
+    border-color: #4aa3ae !important;
+}
+
+.security-node {
+    border-color: #9427b2 !important;
+}
+
+.tag-node {
+    border-color: #a12a55 !important;
+}
+
+/* Enhanced node styling with colored borders */
+.enhanced-node.endpoint-node {
+    border-color: #3a9b5c !important;
+}
+
+.enhanced-node.schema-node {
+    border-color: #357abd !important;
+}
+
+.enhanced-node.parameter-node {
+    border-color: #389f40 !important;
+}
+
+.enhanced-node.resource-node {
+    border-color: #b01a51 !important;
+}
+
+.enhanced-node.info-node {
+    border-color: #4aa3ae !important;
+}
+
+.enhanced-node.security-node {
+    border-color: #9427b2 !important;
+}
+
+.enhanced-node.tag-node {
+    border-color: #a12a55 !important;
+}
+
+/* Remove all orange shadows from selected nodes */
+.positioned-node.selected,
+.endpoint-node.selected,
+.schema-node.selected,
+.parameter-node.selected,
+.resource-node.selected,
+.info-node.selected,
+.security-node.selected,
+.tag-node.selected,
+.enhanced-node.selected,
+.node-container.selected,
+.node-element.selected {
+    filter: none !important;
+    box-shadow: none !important;
+    -webkit-filter: none !important;
+    -moz-filter: none !important;
+    text-shadow: none !important;
+}
+
+/* Ensure node elements also don't have a shadow */
+.positioned-node.selected .node-element,
+.endpoint-node.selected .node-element,
+.schema-node.selected .node-element,
+.parameter-node.selected .node-element,
+.resource-node.selected .node-element,
+.info-node.selected .node-element,
+.security-node.selected .node-element,
+.tag-node.selected .node-element,
+.enhanced-node.selected .node-element,
+.node-container.selected .node-element,
+.node-element.selected * {
+    filter: none !important;
+    box-shadow: none !important;
+    -webkit-filter: none !important;
+    -moz-filter: none !important;
+    text-shadow: none !important;
+}
+
+/* Make sure all shadows are overridden with a higher specificity */
+*[class*="node"].selected,
+*[class*="node"].selected *,
+*[class*="node"] .node-element.selected,
+*[class*="node"] .node-element.selected * {
+    filter: none !important;
+    box-shadow: none !important;
+    -webkit-filter: none !important;
+    -moz-filter: none !important;
+    text-shadow: none !important;
+}

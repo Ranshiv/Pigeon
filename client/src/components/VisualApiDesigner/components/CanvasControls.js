@@ -44,7 +44,7 @@ const CanvasControls = ({
                     onClick={onZoomOut}
                     disabled={isZoomOutDisabled}
                     title={`Zoom Out (${zoomOutShortcut})`}
-                    aria-label="Zoom Out"
+                    aria-label="Zoom Out" Style="margin-right:5px;"
                 >
                     <FiZoomOut className="icon" />
                 </button>
@@ -58,7 +58,7 @@ const CanvasControls = ({
                     onClick={onZoomIn}
                     disabled={isZoomInDisabled}
                     title={`Zoom In (${zoomInShortcut})`}
-                    aria-label="Zoom In"
+                    aria-label="Zoom In" Style="margin-left:5px;"
                 >
                     <FiZoomIn className="icon" />
                 </button>
@@ -71,7 +71,7 @@ const CanvasControls = ({
                     className="control-btn"
                     onClick={onFitToScreen}
                     title={`Fit to Screen (${fitScreenShortcut})`}
-                    aria-label="Fit to Screen"
+                    aria-label="Fit to Screen" 
                 >
                     <FiMaximize className="icon" />
                 </button>
@@ -80,7 +80,7 @@ const CanvasControls = ({
                     className="control-btn"
                     onClick={onResetView}
                     title="Reset View"
-                    aria-label="Reset View"
+                    aria-label="Reset View" Style="margin-left:10px;"
                 >
                     <FiRefreshCw className="icon" />
                 </button>

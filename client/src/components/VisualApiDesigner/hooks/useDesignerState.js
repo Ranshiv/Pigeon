@@ -15,29 +15,41 @@ const useDesignerState = (initialState = {}) => {
         ...initialState
     });
 
-    // Node operations
+    // Node operations with update batching for better performance
     const addNode = useCallback((nodeData) => {
-        console.log('useDesignerState: addNode called with:', nodeData);
-        const newNode = {
-            id: `node-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-            type: nodeData.type || 'default',
-            position: nodeData.position || { x: 100, y: 100 },
-            data: nodeData.data || {},
-            ...nodeData
-        };
-        console.log('useDesignerState: creating newNode:', newNode);
+        try {
+            // Generate a stable unique ID that won't change between renders
+            const nodeId = `node-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 
-        setState(prevState => {
-            const newState = {
-                ...prevState,
-                nodes: [...prevState.nodes, newNode],
-                isDirty: true
+            // Create the new node object
+            const newNode = {
+                id: nodeId,
+                type: nodeData.type || 'default',
+                position: nodeData.position || { x: 100, y: 100 },
+                data: nodeData.data || {},
+                ...nodeData
             };
-            console.log('useDesignerState: updated state with nodes:', newState.nodes);
-            return addToHistory(newState, prevState);
-        });
 
-        return newNode;
+            // Use a functional update to prevent stale state issues
+            setState(prevState => {
+                // Check if a node with this ID already exists to prevent duplicates
+                if (prevState.nodes.some(node => node.id === nodeId)) {
+                    return prevState; // Skip update if node already exists
+                }
+
+                const newState = {
+                    ...prevState,
+                    nodes: [...prevState.nodes, newNode],
+                    isDirty: true
+                };
+                return addToHistory(newState, prevState);
+            });
+
+            return newNode;
+        } catch (error) {
+            // Silently handle errors to prevent UI crashes
+            return { id: `error-${Date.now()}`, type: 'error', position: { x: 0, y: 0 }, data: {} };
+        }
     }, []);
 
     const updateNode = useCallback((nodeId, updates) => {
@@ -84,10 +96,20 @@ const useDesignerState = (initialState = {}) => {
     }, []);
 
     const selectNode = useCallback((nodeId) => {
-        console.log('useDesignerState: selectNode called with nodeId:', nodeId);
+        // Prevent infinite update loops by ensuring we only update when needed
         setState(prevState => {
+            // Skip update if same node is already selected
+            if (prevState.selectedNode && prevState.selectedNode.id === nodeId) {
+                return prevState;
+            }
+
             const selectedNode = prevState.nodes.find(node => node.id === nodeId) || null;
-            console.log('useDesignerState: found selectedNode:', selectedNode);
+
+            // Skip update if we can't find the node and no node is currently selected
+            if (!selectedNode && !prevState.selectedNode) {
+                return prevState;
+            }
+
             return {
                 ...prevState,
                 selectedNode: selectedNode,

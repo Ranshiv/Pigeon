@@ -27,6 +27,9 @@ const certificatesRoutes = require('./certificates');
 const apiVersionsRoutes = require('./apiVersions');
 const mockServersRoutes = require('./mockServers');
 
+// Import Visual API Designer routes
+const visualDesignerRoutes = require('./visualDesigner');
+
 // Register routes with their base paths
 router.use('/auth', authRoutes);
 router.use('/collections', collectionsRoutes);
@@ -51,5 +54,8 @@ router.use('/certificates', certificatesRoutes);
 // Register API prototyping and versioning routes
 router.use('/api-versions', apiVersionsRoutes);
 router.use('/mock-servers', mockServersRoutes);
+
+// Register Visual API Designer routes
+router.use('/visual-designer', visualDesignerRoutes);
 
 module.exports = router;

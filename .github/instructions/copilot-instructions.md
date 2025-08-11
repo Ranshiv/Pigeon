@@ -4,15 +4,80 @@
 
 Pigeon is a comprehensive API testing platform with advanced visualization capabilities. The system consists of:
 
-**Server** (`server.js`): Express.js backend with Socket.io for real-time features, MongoDB for persistence, and Google OAuth authentication via Passport.js.
+**Server** (`server.js`): Express.js backend with Socket.io for real-time features, MongoDB for persistence, and Google OAuth authentication### Visual API Designer
+
+- `client/src/components/VisualApiDesigner/VisualApiDesigner.js` - Main designer interface
+- `client/src/components/VisualApiDesigner/hooks/useDesignerState.js` - Canvas state management
+- `client/src/components/VisualApiDesigner/components/DesignCanvas_new.js` - Cytoscape integration
+- `client/src/components/VisualApiDesigner/components/EndpointNode.js` - Modern node implementation
+
+### Modern UI Libraries Installation
+
+```bash
+# Install ReactBits for animated UI components
+cd client && npm install @reactbits/core @reactbits/animations
+
+# Install HeroUI for accessible UI components
+cd client && npm install @heroui/react
+
+# Install LiveKit for real-time collaboration
+cd client && npm install livekit-client livekit-server-sdk
+```
+
+### UI Libraries Configuration
+
+```javascript
+// client/src/providers/HeroUIProvider.js
+import { createTheme, HeroUIProvider } from "@heroui/react";
+
+const lightTheme = createTheme({
+  type: "light",
+  theme: {
+    colors: {
+      primary: "#0070F3",
+      secondary: "#7928CA",
+      // Custom colors matching Pigeon branding
+    },
+  },
+});
+
+export const AppHeroUIProvider = ({ children }) => (
+  <HeroUIProvider theme={lightTheme}>{children}</HeroUIProvider>
+);
+
+// client/src/providers/LiveKitProvider.js
+import { LiveKitRoom } from "livekit-react";
+
+export const LiveKitProvider = ({ children, workspaceId, token }) => {
+  // Only wrap with LiveKit when in a workspace context
+  if (!workspaceId || !token) return children;
+
+  return (
+    <LiveKitRoom
+      url={process.env.REACT_APP_LIVEKIT_URL}
+      token={token}
+      options={{ adaptiveStream: true, dynacast: true }}
+    >
+      {children}
+    </LiveKitRoom>
+  );
+};
+```
+
+**Visualization & Charts**:
+
+- `client/src/components/ResponseDisplay.js` - Template rendering and chart integration
+- `services/visualization/` - Backend data processing for visualization
+- Chart.js integration patterns in React componentst.js.
 
 **Client** (`client/`): React SPA built with Create React App + CRACO, featuring:
 
 - Visual API Designer with Cytoscape.js for interactive API flow diagrams
 - Response data visualization using Chart.js and Handlebars templates
-- Real-time collaboration with Socket.io client
+- Real-time collaboration with LiveKit and Socket.io for scalable WebRTC capabilities
 - Component-based architecture with 50+ specialized components
-- Modern UI components using @dnd-kit for drag-and-drop functionality
+- Modern UI components using ReactBits for animations and HeroUI for accessible interfaces
+- Advanced drag-and-drop functionality with enhanced user experience
 
 **CLI** (`cli/`): Node.js command-line tool for CI/CD integration, supporting collection execution and multiple report formats (JSON, JUnit, HTML, CSV).
 
@@ -26,10 +91,13 @@ Pigeon is a comprehensive API testing platform with advanced visualization capab
 
 ### Real-Time Collaboration
 
+- LiveKit WebRTC infrastructure for high-performance video/audio collaboration
 - Socket.io rooms for workspace/collection-scoped collaboration via `utils/socket/socket-server.js`
 - Active user tracking, typing indicators, and live activity feeds
 - Join/leave patterns: `joinWorkspace(id)`, `joinCollection(id)` in `CollaborationContext.js`
-- Socket authentication with user profile data for consistent overlay display
+- Advanced user presence with LiveKit Rooms and Participants model
+- Selective Forwarding Unit (SFU) architecture for scalable real-time communication
+- Socket and WebRTC authentication with user profile data for consistent overlay display
 
 ### Visual API Designer Architecture
 
@@ -37,7 +105,8 @@ Pigeon is a comprehensive API testing platform with advanced visualization capab
 - **Node-based API modeling**: Drag-and-drop components with real-time OpenAPI spec generation
 - **Component hierarchy**: `DesignCanvas`, `ComponentPalette`, `PropertiesPanel`, `SpecPreview`
 - **State management**: Custom hooks `useDesignerState`, `useSpecGeneration` for complex canvas operations
-- **Modern node components**: Using @dnd-kit/sortable for enhanced drag-and-drop capabilities
+- **Modern node components**: Using ReactBits animations and transitions for fluid user experiences
+- **Accessible UI elements**: HeroUI components for consistent, accessible interface design
 
 ### Database Architecture
 
@@ -123,23 +192,73 @@ addNode(componentType, position) → updateSpec() → render SpecPreview
 
 ### Modern Node Components
 
-**@dnd-kit Integration** for drag-and-drop operations:
+**ReactBits Integration** for animated, interactive components:
 
 ```javascript
-// EndpointNode.js pattern
-const { attributes, listeners, setNodeRef, transform, transition } =
-  useSortable({ id });
-return (
-  <div
-    ref={setNodeRef}
-    style={{ transform: CSS.Transform.toString(transform), transition }}
-    {...attributes}
-    {...listeners}
-    className={`endpoint-node-modern ${selected ? "selected" : ""}`}
-  >
-    {/* Node content */}
-  </div>
-);
+// EndpointNode.js pattern with ReactBits
+import { Card, Animation, InteractiveElement } from "@reactbits/core";
+
+const EndpointNode = ({ id, selected, data }) => {
+  return (
+    <Animation type="fadeIn" duration={300}>
+      <InteractiveElement
+        dragId={id}
+        onClick={handleSelect}
+        className={`endpoint-node-modern ${selected ? "selected" : ""}`}
+      >
+        <Card elevation={selected ? "elevated" : "flat"}>
+          <div className="endpoint-header">
+            <span className="method">{data.method}</span>
+            <span className="path">{data.path}</span>
+          </div>
+        </Card>
+      </InteractiveElement>
+    </Animation>
+  );
+};
+```
+
+### UI Components with HeroUI
+
+**Modern Select Component**:
+
+```javascript
+// EndpointSelector.js pattern with HeroUI
+import { Select, SelectItem, SelectSection } from "@heroui/react";
+
+const EndpointSelector = ({ endpoints, onSelect, selectedEndpoint }) => {
+  // Group endpoints by tag
+  const endpointsByTag = groupEndpointsByTag(endpoints);
+
+  return (
+    <Select
+      label="Select Endpoint"
+      placeholder="Choose an API endpoint"
+      selectedKeys={selectedEndpoint ? [selectedEndpoint.id] : []}
+      onSelectionChange={(keys) => {
+        const selected = endpoints.find((e) => e.id === Array.from(keys)[0]);
+        onSelect(selected);
+      }}
+    >
+      {Object.entries(endpointsByTag).map(([tag, endpoints]) => (
+        <SelectSection title={tag} key={tag}>
+          {endpoints.map((endpoint) => (
+            <SelectItem
+              key={endpoint.id}
+              startContent={
+                <span className={`method-tag ${endpoint.method.toLowerCase()}`}>
+                  {endpoint.method}
+                </span>
+              }
+            >
+              {endpoint.path}
+            </SelectItem>
+          ))}
+        </SelectSection>
+      ))}
+    </Select>
+  );
+};
 ```
 
 ### Visualization Engine
@@ -165,15 +284,48 @@ const rendered = VisualizationEngine.set(template, responseData);
 
 ### Real-Time Events
 
-Socket.io event patterns in collaboration context:
+LiveKit and Socket.io integration in collaboration context:
 
 ```javascript
-// Join workspace for collaboration
-joinWorkspace(workspaceId);
-sendActivity("workspace_view", { workspaceId, workspaceName });
+// Initialize LiveKit room connection
+import { Room, RoomEvent, LocalParticipant } from "livekit-client";
 
-// Active user tracking
-getActiveUsers(workspaceId); // Returns current collaborators
+const room = new Room({
+  adaptiveStream: true,
+  dynacast: true,
+  reconnect: true,
+});
+
+// Join workspace for collaboration with video/audio
+const joinWorkspace = async (workspaceId) => {
+  // Socket.io for messaging and presence
+  socket.emit("join_room", { roomId: workspaceId });
+  sendActivity("workspace_view", { workspaceId, workspaceName });
+
+  // LiveKit for rich collaboration features
+  await room.connect(process.env.LIVEKIT_URL, token);
+  room.localParticipant.setMetadata(
+    JSON.stringify({
+      userId: user.id,
+      name: user.displayName,
+      avatar: user.photoURL,
+      role: user.role,
+    })
+  );
+
+  // Handle real-time collaboration events
+  room.on(RoomEvent.ParticipantConnected, handleParticipantJoined);
+  room.on(RoomEvent.DataReceived, handleCollaborationData);
+};
+
+// Active user tracking with enhanced presence
+const getActiveUsers = (workspaceId) => {
+  const socketUsers = socket.getConnectedUsers(workspaceId);
+  const livekitParticipants = room.participants;
+
+  // Merge presence data from both sources
+  return mergePresenceData(socketUsers, livekitParticipants);
+};
 ```
 
 ### State Management
@@ -234,6 +386,14 @@ client/src/components/
 │   └── utils/                  # Canvas utilities
 ├── monitoring/                 # API monitoring components
 ├── Documentation/              # API documentation tools
+├── ui/                         # HeroUI customized components
+│   ├── Select/                 # Custom select components
+│   ├── Button/                 # Styled buttons
+│   └── themes/                 # Light/dark theme configurations
+├── collaboration/              # Real-time collaboration features
+│   ├── LiveKitProvider.js      # LiveKit integration setup
+│   ├── CollaborationContext.js # Context for real-time state
+│   └── hooks/                  # Custom hooks for collaboration
 └── [ComponentName].js/.css     # Co-located styles pattern
 ```
 
@@ -271,6 +431,32 @@ const { validateSpec, exportSpec } = useSpecGeneration();
 - **User serialization** includes workspace permissions
 - **Credential inclusion** required: `credentials: 'include'` in all fetch calls
 - **MongoDB session storage** with automatic cleanup
+
+## Modern UI Libraries Benefits
+
+### ReactBits Benefits
+
+- **90+ animated, interactive components** that enhance user experience
+- **Optimized rendering** through smart component architecture
+- **Fluid animations and transitions** for a more engaging interface
+- **Consistent animation patterns** across the application
+- **Developer-friendly API** for building dynamic interfaces quickly
+
+### HeroUI Benefits
+
+- **Built on Tailwind CSS** for consistent styling without runtime CSS
+- **Fully accessible components** using React Aria for WCAG compliance
+- **Dark/light mode support** with automatic theme detection
+- **Extensive component library** (30+) with full TypeScript support
+- **Modern, clean design aesthetic** with consistent branding
+
+### LiveKit Benefits
+
+- **Production-ready WebRTC** infrastructure for real-time collaboration
+- **More reliable than basic Socket.io** for video/audio collaboration
+- **Selective Forwarding Unit (SFU)** architecture for better scaling
+- **Pre-built SDKs** for React, React Native, iOS, and Android
+- **Advanced features** like connection recovery and adaptive streaming quality
 
 ## Key Files for Feature Development
 

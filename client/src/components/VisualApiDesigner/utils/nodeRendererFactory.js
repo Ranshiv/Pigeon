@@ -157,7 +157,7 @@ const renderLegacyNode = (node, nodeProps) => {
                         </div>
                     </div>
                     <div className="node-card-type-badge">
-                        {componentConfig.name}
+                        {node.type || componentConfig.name}
                     </div>
                     <div className="node-card-status">
                         {getStatusText()}
@@ -166,7 +166,11 @@ const renderLegacyNode = (node, nodeProps) => {
 
                 <div className="node-card-content">
                     <div className="node-card-title">
-                        {displayName}
+                        {node.type === 'endpoint' ? 'HTTP Endpoint' :
+                            node.type === 'schema' ? 'HTTP Schema' :
+                                node.type === 'security' ? 'SECURITY' :
+                                    node.type === 'info' ? 'INFO' :
+                                        displayName}
                     </div>
 
                     <div className="node-card-desc">

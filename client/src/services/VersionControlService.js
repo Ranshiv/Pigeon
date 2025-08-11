@@ -185,6 +185,12 @@ const createBranch = (baseVersionId, branchName, userId) => {
  */
 const getVersionHistory = async (entityType, entityId) => {
     try {
+        // If entityId contains a '#' character, it's likely truncated or malformed
+        if (!entityId || entityId.includes('#')) {
+            console.warn(`Skipping version history fetch for invalid ${entityType} ID: ${entityId}`);
+            return [];
+        }
+
         const response = await fetch(`http://localhost:5001/api/${entityType}s/${entityId}/versions`, {
             credentials: 'include'
         });
@@ -195,7 +201,7 @@ const getVersionHistory = async (entityType, entityId) => {
 
         return await response.json();
     } catch (error) {
-        console.error('Error fetching version history:', error);
+        // Error is logged by the caller, no need to log again here
         return [];
     }
 };

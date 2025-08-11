@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useRef, useEffect } from 'react';
+import React, { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import {
     DndContext,
     DragOverlay,
@@ -15,7 +15,14 @@ import {
 } from '@dnd-kit/sortable';
 import {
     FiPlus,
-    FiGrid
+    FiGrid,
+    FiDatabase,
+    FiLock,
+    FiInfo,
+    FiList,
+    FiServer,
+    FiTag,
+    FiBookOpen
 } from 'react-icons/fi';
 import CanvasControls from './CanvasControls';
 import useZoom from '../hooks/useZoom';
@@ -27,7 +34,7 @@ import {
 import '../VisualApiDesigner.css';
 
 // Draggable wrapper component for nodes with optimized physics and resize functionality
-const DraggableNode = ({ id, children, style, className, isDragging, onResize }) => {
+const DraggableNode = ({ id, children, style, className, isDragging, onResize, onClick }) => {
     const { attributes, listeners, setNodeRef, transform } = useDraggable({
         id: id,
     });
@@ -162,6 +169,10 @@ const DraggableNode = ({ id, children, style, className, isDragging, onResize })
             }}
             style={optimizedStyle}
             className={`${className} ${isDragging ? 'dragging' : ''} ${isResizing ? 'resizing' : ''}`}
+            onClick={(e) => {
+                e.stopPropagation();
+                onClick && onClick(e);
+            }}
             {...attributes}
         >
             {/* Drag handle - only this area triggers drag */}
@@ -240,14 +251,20 @@ const DesignCanvas = ({
     nodes = [],
     edges = [],
     selectedNode,
+    selectedEdge,
     onNodeSelect,
     onNodeUpdate,
     onNodeDelete,
     onVisualize,
-    onNodeAdd
+    onNodeAdd,
+    onEdgeAdd,
+    onEdgeDelete,
+    onEdgeSelect
 }) => {
     const [activeId, setActiveId] = useState(null);
+    const [dragDelta, setDragDelta] = useState({ x: 0, y: 0 });
     const canvasRef = useRef(null);
+    const [edgeMenu, setEdgeMenu] = useState(null); // {x, y, edgeId}
 
     // Custom hooks for separation of concerns
     const { zoom, zoomIn, zoomOut, fitToScreen, resetView } = useZoom();
@@ -269,6 +286,13 @@ const DesignCanvas = ({
         })
     ); const handleDragStart = useCallback((event) => {
         setActiveId(event.active.id);
+        setDragDelta({ x: 0, y: 0 });
+    }, []);
+
+    const handleDragMove = useCallback((event) => {
+        if (!event || !event.active) return;
+        const d = event.delta || { x: 0, y: 0 };
+        setDragDelta({ x: d.x || 0, y: d.y || 0 });
     }, []);
 
     // Handle node position updates during drag
@@ -296,6 +320,7 @@ const DesignCanvas = ({
         }
 
         setActiveId(null);
+        setDragDelta({ x: 0, y: 0 });
     }, [nodes, onNodeUpdate]);
 
     const handleDragEnd = useCallback((event) => {
@@ -321,12 +346,7 @@ const DesignCanvas = ({
         setActiveId(null);
     }, [nodes, handleNodeDragEnd]);
 
-    const handleCanvasClick = useCallback((event) => {
-        if (event.target.classList.contains('design-canvas-content') ||
-            event.target.classList.contains('canvas-grid')) {
-            onNodeSelect && onNodeSelect(null);
-        }
-    }, [onNodeSelect]);
+    // removed here; redefined after connection state
 
     // Handle component resize
     const handleNodeResize = useCallback((nodeId, dimensions) => {
@@ -340,6 +360,24 @@ const DesignCanvas = ({
         }
     }, [onNodeUpdate]);
 
+
+    // Connection (edge) creation state
+    const [connectingFrom, setConnectingFrom] = useState(null); // node id
+    const [mousePos, setMousePos] = useState(null);
+    const [hoverTargetId, setHoverTargetId] = useState(null); // highlight valid target under cursor
+
+    const handleCanvasClick = useCallback((event) => {
+        if (event.target.classList.contains('design-canvas-content') ||
+            event.target.classList.contains('canvas-grid')) {
+            onNodeSelect && onNodeSelect(null);
+            setEdgeMenu(null);
+            if (connectingFrom) {
+                setConnectingFrom(null);
+                setMousePos(null);
+                setHoverTargetId(null);
+            }
+        }
+    }, [onNodeSelect, connectingFrom]);
 
     // Render positioned node (Screenshot 2 style) with drag capability
     const renderPositionedNode = useCallback((node) => {
@@ -355,7 +393,7 @@ const DesignCanvas = ({
                 id={node.id}
                 isDragging={isDragging}
                 onResize={handleNodeResize}
-                className={`positioned-node enhanced-node ${node.type}-node${isSelected ? ' selected' : ''}`}
+                className={`positioned-node enhanced-node ${node.type}-node${isSelected ? ' selected' : ''}${hoverTargetId === node.id ? ' can-connect' : ''}`}
                 style={{
                     position: 'absolute',
                     left: position.x,
@@ -365,31 +403,91 @@ const DesignCanvas = ({
                     transform: 'translate(-50%, -50%)',
                     zIndex: isSelected ? 10 : 1
                 }}
-                onClick={null}
+                onClick={() => {
+                    // If in keyboard-connect mode, clicking a node completes the edge
+                    if (connectingFrom && connectingFrom !== node.id && onEdgeAdd) {
+                        const source = nodes.find(n => n.id === connectingFrom);
+                        const label = (source?.type === 'parameter' && node.type === 'endpoint') ? 'param' : null;
+                        const data = label ? { label } : {};
+                        onEdgeAdd({ source: connectingFrom, target: node.id, type: 'orthogonal', data });
+                        setConnectingFrom(null);
+                        setMousePos(null);
+                        setHoverTargetId(null);
+                        return;
+                    }
+                    onNodeSelect && onNodeSelect(node.id)
+                }}
             >
                 {/* Enhanced Card UI */}
                 <div className="node-card-outer">
-                  <div className="node-card-header">
-                    {/* Example: icon, type badge, status */}
-                    <span className="node-card-icon" aria-label="Node type icon">
-                      {/* Use Feather icon or node.icon if available */}
-                      <span className="icon-bg"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><path d="M8 12h8" /><path d="M12 8v8" /></svg></span>
-                    </span>
-                    <span className="node-card-type-badge">{node.label || node.type || 'api endpoint'}</span>
-                    {node.status && <span className={`node-card-status node-status-${node.status.toLowerCase()}`}>{node.status}</span>}
-                  </div>
-                  <div className="node-card-content">
-                    <div className="node-card-title">{node.title || 'HTTP Endpoint'}</div>
-                    <div className="node-card-desc">{node.description || 'Define REST API endpoint'}</div>
-                  </div>
-                  {/* Render the original node content below for extensibility */}
-                  <div className="node-card-children">
-                    {renderNode(node)}
-                  </div>
+                    {/* connection handles */}
+                    <button
+                        className="conn-handle conn-out"
+                        title="Drag to connect"
+                        onMouseDown={(e) => {
+                            e.stopPropagation();
+                            setConnectingFrom(node.id);
+                        }}
+                    />
+                    <button
+                        className="conn-handle conn-in"
+                        title="Connect here"
+                        onMouseUp={(e) => {
+                            e.stopPropagation();
+                            if (connectingFrom && connectingFrom !== node.id && onEdgeAdd) {
+                                const source = nodes.find(n => n.id === connectingFrom);
+                                const label = (source?.type === 'parameter' && node.type === 'endpoint') ? 'param' : null;
+                                const data = label ? { label } : {};
+                                onEdgeAdd({ source: connectingFrom, target: node.id, type: 'orthogonal', data });
+                            }
+                            setConnectingFrom(null);
+                            setMousePos(null);
+                            setHoverTargetId(null);
+                        }}
+                    />
+                    <div className="node-card-header">
+                        {/* Example: icon, type badge, status */}
+                        <span className="node-card-icon" aria-label="Node type icon">
+                            {/* Use Feather icon based on node type */}
+                            <span className={`icon-bg icon-${node.type}`}>
+                                {node.type === 'endpoint' && <FiServer size={18} />}
+                                {node.type === 'schema' && <FiDatabase size={18} />}
+                                {node.type === 'parameter' && <FiList size={18} />}
+                                {node.type === 'security' && <FiLock size={18} />}
+                                {node.type === 'info' && <FiInfo size={18} />}
+                                {node.type === 'resource' && <FiServer size={18} />}
+                                {node.type === 'tag' && <FiTag size={18} />}
+                                {(!node.type || !['endpoint', 'schema', 'parameter', 'security', 'info', 'resource', 'tag'].includes(node.type)) &&
+                                    <FiBookOpen size={18} />}
+                            </span>
+                        </span>
+                        <span className="node-card-type-badge">{
+                            node.type === 'endpoint' ? 'ENDPOINT' :
+                                node.type === 'schema' ? 'SCHEMA' :
+                                    node.type === 'security' ? 'SECURITY' :
+                                        node.type === 'info' ? 'INFO' :
+                                            node.type?.toUpperCase() || 'COMPONENT'
+                        }</span>
+                        {node.status && <span className={`node-card-status node-status-${node.status.toLowerCase()}`}>{node.status}</span>}
+                    </div>
+                    <div className="node-card-content">
+                        <div className="node-card-title">{
+                            node.type === 'endpoint' ? 'HTTP Endpoint' :
+                                node.type === 'schema' ? 'HTTP Schema' :
+                                    node.type === 'security' ? 'SECURITY' :
+                                        node.type === 'info' ? 'INFO' :
+                                            node.title || node.type || 'Component'
+                        }</div>
+                        <div className="node-card-desc">{node.description || 'Define REST API endpoint'}</div>
+                    </div>
+                    {/* Render the original node content below for extensibility */}
+                    <div className="node-card-children">
+                        {renderNode(node)}
+                    </div>
                 </div>
             </DraggableNode>
         );
-    }, [selectedNode, renderNode, activeId, handleNodeResize]);
+    }, [selectedNode, renderNode, activeId, handleNodeResize, onNodeSelect, onEdgeAdd, connectingFrom, hoverTargetId, nodes]);
 
     // Keyboard delete support for selected node
     useEffect(() => {
@@ -408,8 +506,170 @@ const DesignCanvas = ({
         return () => window.removeEventListener('keydown', handleKeyDown);
     }, [selectedNode, onNodeDelete]);
 
+    // Keyboard delete support for selected edge
+    useEffect(() => {
+        const handleKeyDown = (e) => {
+            if (!selectedEdge || !selectedEdge.id) return;
+            const tag = document.activeElement?.tagName;
+            if (tag === 'INPUT' || tag === 'TEXTAREA' || document.activeElement?.isContentEditable) return;
+            if (e.key === 'Delete' || e.key === 'Backspace') {
+                onEdgeDelete && onEdgeDelete(selectedEdge.id);
+            }
+        };
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [selectedEdge, onEdgeDelete]);
+
+    // Helpers to compute positions for anchors and centers
+    const getNodeCenter = (node) => {
+        const base = node.position || { x: 0, y: 0 };
+        const pos = node.id === activeId ? { x: base.x + dragDelta.x, y: base.y + dragDelta.y } : base;
+        return { x: pos.x, y: pos.y };
+    };
+
+    // Get anchor point at a specific side of a node (left, right, top, bottom)
+    const getAnchor = (node, side) => {
+        const center = getNodeCenter(node);
+        const dim = node.dimensions || { width: 240, height: 128 };
+        switch (side) {
+            case 'left':
+                return { x: center.x - dim.width / 2, y: center.y };
+            case 'right':
+                return { x: center.x + dim.width / 2, y: center.y };
+            case 'top':
+                return { x: center.x, y: center.y - dim.height / 2 };
+            case 'bottom':
+                return { x: center.x, y: center.y + dim.height / 2 };
+            default:
+                return center;
+        }
+    };
+
+    // Compute side-aware anchors (left/right/top/bottom) and orthogonal path with an outer gap so elbows avoid nodes
+    const svgPathForEdge = (fromNode, toNode) => {
+        const EDGE_GAP = 14; // pixels outside node boundary for elbows
+
+        // Effective centers (include in-flight drag)
+        const fc = getNodeCenter(fromNode);
+        const tc = getNodeCenter(toNode);
+        const dx = tc.x - fc.x;
+        const dy = tc.y - fc.y;
+
+        const horizontalPreferred = Math.abs(dx) >= Math.abs(dy);
+        const fromSide = horizontalPreferred ? (dx >= 0 ? 'right' : 'left') : (dy >= 0 ? 'bottom' : 'top');
+        const toSide = horizontalPreferred ? (dx >= 0 ? 'left' : 'right') : (dy >= 0 ? 'top' : 'bottom');
+
+        const s = getAnchor(fromNode, fromSide);
+        const t = getAnchor(toNode, toSide);
+
+        // Outward offsets based on side
+        const sOut = { ...s };
+        const tOut = { ...t };
+        if (fromSide === 'right') sOut.x += EDGE_GAP;
+        if (fromSide === 'left') sOut.x -= EDGE_GAP;
+        if (fromSide === 'top') sOut.y -= EDGE_GAP;
+        if (fromSide === 'bottom') sOut.y += EDGE_GAP;
+
+        if (toSide === 'right') tOut.x += EDGE_GAP;
+        if (toSide === 'left') tOut.x -= EDGE_GAP;
+        if (toSide === 'top') tOut.y -= EDGE_GAP;
+        if (toSide === 'bottom') tOut.y += EDGE_GAP;
+
+        if (horizontalPreferred) {
+            const midX = (sOut.x + tOut.x) / 2;
+            return `M ${s.x} ${s.y} L ${sOut.x} ${sOut.y} L ${midX} ${sOut.y} L ${midX} ${tOut.y} L ${tOut.x} ${tOut.y} L ${t.x} ${t.y}`;
+        } else {
+            const midY = (sOut.y + tOut.y) / 2;
+            return `M ${s.x} ${s.y} L ${sOut.x} ${sOut.y} L ${sOut.x} ${midY} L ${tOut.x} ${midY} L ${tOut.x} ${tOut.y} L ${t.x} ${t.y}`;
+        }
+    };
+
+    const handleMouseMove = useCallback((e) => {
+        if (!connectingFrom || !canvasRef.current) return;
+        const rect = canvasRef.current.getBoundingClientRect();
+        const pos = { x: (e.clientX - rect.left) / (zoom / 100), y: (e.clientY - rect.top) / (zoom / 100) };
+        setMousePos(pos);
+        // Determine potential target under cursor to highlight
+        const target = (nodes || []).find(n => {
+            const dim = n.dimensions || { width: 240, height: 128 };
+            const p = n.position || { x: 0, y: 0 };
+            const left = p.x - dim.width / 2;
+            const top = p.y - dim.height / 2;
+            const right = p.x + dim.width / 2;
+            const bottom = p.y + dim.height / 2;
+            return pos.x >= left && pos.x <= right && pos.y >= top && pos.y <= bottom;
+        });
+        setHoverTargetId(target && target.id !== connectingFrom ? target.id : null);
+    }, [connectingFrom, zoom, nodes]);
+
+    const handleMouseUp = useCallback((e) => {
+        if (!connectingFrom) return;
+        // Find node under cursor to connect to
+        const target = (nodes || []).find(n => {
+            const dim = n.dimensions || { width: 240, height: 128 };
+            const pos = n.position || { x: 0, y: 0 };
+            const left = pos.x - dim.width / 2;
+            const top = pos.y - dim.height / 2;
+            const right = pos.x + dim.width / 2;
+            const bottom = pos.y + dim.height / 2;
+            const pt = mousePos;
+            return pt && pt.x >= left && pt.x <= right && pt.y >= top && pt.y <= bottom;
+        });
+        if (target && target.id !== connectingFrom && onEdgeAdd) {
+            const source = nodes.find(n => n.id === connectingFrom);
+            const label = (source?.type === 'parameter' && target.type === 'endpoint') ? 'param' : null;
+            const data = label ? { label } : {};
+            onEdgeAdd({ source: connectingFrom, target: target.id, type: 'orthogonal', data });
+        }
+        setConnectingFrom(null);
+        setMousePos(null);
+        setHoverTargetId(null);
+    }, [connectingFrom, nodes, mousePos, onEdgeAdd]);
+
+    useEffect(() => {
+        if (connectingFrom) {
+            document.addEventListener('mousemove', handleMouseMove);
+            document.addEventListener('mouseup', handleMouseUp);
+            return () => {
+                document.removeEventListener('mousemove', handleMouseMove);
+                document.removeEventListener('mouseup', handleMouseUp);
+            };
+        }
+    }, [connectingFrom, handleMouseMove, handleMouseUp]);
+
+    // Keyboard connect: press "c" to start connecting from selected node
+    useEffect(() => {
+        const onKey = (e) => {
+            if ((e.key === 'c' || e.key === 'C') && selectedNode?.id) {
+                setConnectingFrom(prev => prev ? null : selectedNode.id);
+            }
+        };
+        window.addEventListener('keydown', onKey);
+        return () => window.removeEventListener('keydown', onKey);
+    }, [selectedNode]);
+
+    // Compute dynamic content size so background/edges expand with far-away nodes
+    const contentSize = useMemo(() => {
+        if (!nodes || nodes.length === 0) return { width: '100%', height: '100%' };
+        const PADDING = 300;
+        let maxX = 0;
+        let maxY = 0;
+        for (const n of nodes) {
+            const pos = n.position || { x: 0, y: 0 };
+            const dim = n.dimensions || { width: 240, height: 128 };
+            // nodes are centered at position with translate(-50%, -50%)
+            const right = pos.x + dim.width / 2;
+            const bottom = pos.y + dim.height / 2;
+            if (right > maxX) maxX = right;
+            if (bottom > maxY) maxY = bottom;
+        }
+        return { width: Math.max(1200, maxX + PADDING), height: Math.max(800, maxY + PADDING) };
+    }, [nodes]);
+
     return (
         <div className="design-canvas">
+            {/* Non-scaled base grid so background always fills viewport even when zoomed out */}
+            <div className="canvas-grid base-grid" aria-hidden="true" />
             <CanvasControls
                 zoom={zoom}
                 onZoomIn={zoomIn}
@@ -422,12 +682,19 @@ const DesignCanvas = ({
                 sensors={sensors}
                 collisionDetection={closestCenter}
                 onDragStart={handleDragStart}
+                onDragMove={handleDragMove}
                 onDragEnd={handleDragEnd}
             >
                 <div
                     ref={canvasRef}
                     className={`design-canvas-content flexible-canvas ${isDragOver ? 'drag-over' : ''}`}
-                    style={{ transform: `scale(${zoom / 100})` }}
+                    style={{
+                        transform: `scale(${zoom / 100})`,
+                        transformOrigin: '0 0',
+                        minWidth: contentSize.width,
+                        minHeight: contentSize.height,
+                        background: 'transparent'
+                    }}
                     onClick={handleCanvasClick}
                     onDrop={(e) => handleDrop(e, canvasRef)}
                     onDragOver={(e) => handleDragOver(e, canvasRef)}
@@ -438,8 +705,103 @@ const DesignCanvas = ({
                     {/* Snap grid overlay for drag feedback */}
                     <div className={`snap-grid ${showGrid ? 'visible' : ''}`} />
 
-                    {/* Grid background for visual guidance */}
+                    {/* Grid background for visual guidance (scaled with content) */}
                     <div className="canvas-grid" />
+
+                    {/* SVG edges below nodes but above grid */}
+                    <svg className="edges-layer" width="100%" height="100%" style={{ position: 'absolute', left: 0, top: 0, zIndex: 1 }}>
+                        {/* Define arrow marker for connection lines */}
+                        <defs>
+                            <marker
+                                id="arrow-head"
+                                viewBox="0 0 10 10"
+                                refX="8"
+                                refY="5"
+                                markerWidth="6"
+                                markerHeight="6"
+                                orient="auto-start-reverse">
+                                <path d="M 0 0 L 10 5 L 0 10 z" fill="#FF6C37" />
+                            </marker>
+                        </defs>
+                        {/* Existing edges */}
+                        {edges && edges.map(edge => {
+                            const s = nodes.find(n => n.id === edge.source);
+                            const t = nodes.find(n => n.id === edge.target);
+                            if (!s || !t) return null;
+                            const p = svgPathForEdge(s, t);
+                            // Approximate label position as midpoint between chosen anchors
+                            const fc = getNodeCenter(s);
+                            const tc = getNodeCenter(t);
+                            const dx = tc.x - fc.x;
+                            const dy = tc.y - fc.y;
+                            const horizontalPreferred = Math.abs(dx) >= Math.abs(dy);
+                            const fromSide = horizontalPreferred ? (dx >= 0 ? 'right' : 'left') : (dy >= 0 ? 'bottom' : 'top');
+                            const toSide = horizontalPreferred ? (dx >= 0 ? 'left' : 'right') : (dy >= 0 ? 'top' : 'bottom');
+                            const sp = getAnchor(s, fromSide);
+                            const tp = getAnchor(t, toSide);
+                            const midX = (sp.x + tp.x) / 2;
+                            const midY = (sp.y + tp.y) / 2;
+                            return (
+                                <g key={edge.id}>
+                                    <path
+                                        d={p}
+                                        className={`edge-path ${edge.type || 'default'} ${selectedEdge && selectedEdge.id === edge.id ? 'selected' : ''}`}
+                                        strokeWidth={2}
+                                        fill="none"
+                                        style={{ pointerEvents: 'stroke', strokeLinejoin: 'round', strokeLinecap: 'round' }}
+                                        markerEnd="url(#arrow-head)"
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            setEdgeMenu(null);
+                                            onEdgeSelect && onEdgeSelect(edge.id);
+                                        }}
+                                        onContextMenu={(e) => {
+                                            e.preventDefault();
+                                            e.stopPropagation();
+                                            setEdgeMenu({ x: e.clientX, y: e.clientY, edgeId: edge.id });
+                                            onEdgeSelect && onEdgeSelect(edge.id);
+                                        }}
+                                    />
+                                    {edge?.data?.label && edge.data.label !== 'link' && (
+                                        <g className="edge-label-group">
+                                            <text x={midX} y={midY - 6} className="edge-label" textAnchor="middle" dominantBaseline="ideographic">
+                                                {edge.data.label}
+                                            </text>
+                                        </g>
+                                    )}
+                                </g>
+                            );
+                        })}
+
+                        {/* Temporary connection preview */}
+                        {connectingFrom && mousePos && (() => {
+                            const s = nodes.find(n => n.id === connectingFrom);
+                            if (!s) return null;
+                            // Orthogonal preview that exits on the nearest side and heads toward the cursor with outer gap
+                            const EDGE_GAP = 14;
+                            const sc = getNodeCenter(s);
+                            const dx = mousePos.x - sc.x;
+                            const dy = mousePos.y - sc.y;
+                            const horizontalPreferred = Math.abs(dx) >= Math.abs(dy);
+                            const fromSide = horizontalPreferred ? (dx >= 0 ? 'right' : 'left') : (dy >= 0 ? 'bottom' : 'top');
+                            const sourcePos = getAnchor(s, fromSide);
+                            const sOut = { ...sourcePos };
+                            if (fromSide === 'right') sOut.x += EDGE_GAP;
+                            if (fromSide === 'left') sOut.x -= EDGE_GAP;
+                            if (fromSide === 'top') sOut.y -= EDGE_GAP;
+                            if (fromSide === 'bottom') sOut.y += EDGE_GAP;
+
+                            let pPrev;
+                            if (horizontalPreferred) {
+                                const midX = (sOut.x + mousePos.x) / 2;
+                                pPrev = `M ${sourcePos.x} ${sourcePos.y} L ${sOut.x} ${sOut.y} L ${midX} ${sOut.y} L ${midX} ${mousePos.y} L ${mousePos.x} ${mousePos.y}`;
+                            } else {
+                                const midY = (sOut.y + mousePos.y) / 2;
+                                pPrev = `M ${sourcePos.x} ${sourcePos.y} L ${sOut.x} ${sOut.y} L ${sOut.x} ${midY} L ${mousePos.x} ${midY} L ${mousePos.x} ${mousePos.y}`;
+                            }
+                            return <path d={pPrev} className="edge-path preview" strokeWidth={2} fill="none" style={{ pointerEvents: 'none', strokeLinejoin: 'round', strokeLinecap: 'round' }} markerEnd="url(#arrow-head)" />;
+                        })()}
+                    </svg>
 
                     {/* Positioned nodes (Screenshot 2 style) */}
                     {nodes.map((node) => renderPositionedNode(node))}
@@ -494,6 +856,38 @@ const DesignCanvas = ({
                     {null}
                 </DragOverlay>
             </DndContext>
+
+            {/* Edge context menu */}
+            {edgeMenu && (
+                <div
+                    className="edge-context-menu"
+                    style={{ position: 'fixed', left: edgeMenu.x, top: edgeMenu.y, zIndex: 10000 }}
+                    onClick={(e) => e.stopPropagation()}
+                >
+                    <button
+                        className="edge-menu-item"
+                        onClick={() => {
+                            const label = window.prompt('Edge label', (edges.find(e => e.id === edgeMenu.edgeId)?.data?.label) || '');
+                            if (label != null) {
+                                // Use onEdgeSelect then update via a lightweight hack: delete+add same endpoints with label
+                                const edge = edges.find(e => e.id === edgeMenu.edgeId);
+                                if (edge) {
+                                    onEdgeDelete && onEdgeDelete(edge.id);
+                                    onEdgeAdd && onEdgeAdd({ source: edge.source, target: edge.target, type: edge.type || 'orthogonal', data: { ...edge.data, label } });
+                                }
+                            }
+                            setEdgeMenu(null);
+                        }}
+                    >Edit label</button>
+                    <button
+                        className="edge-menu-item destructive"
+                        onClick={() => {
+                            onEdgeDelete && onEdgeDelete(edgeMenu.edgeId);
+                            setEdgeMenu(null);
+                        }}
+                    >Delete</button>
+                </div>
+            )}
         </div>
     );
 };
