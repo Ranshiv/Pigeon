@@ -3269,7 +3269,7 @@ input:checked+.slider:before {
 .preview-container {
     min-height: 280px;
     border: 1px solid var(--border-color, #333);
-    border-radius: 6px;
+
     padding: 16px;
     background: var(--input-bg, #2d2d2d);
     display: flex;

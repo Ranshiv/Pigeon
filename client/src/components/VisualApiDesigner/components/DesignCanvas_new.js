@@ -23,7 +23,7 @@ const DesignCanvas = ({
         const y = event.clientY - rect.top;
 
         if (onNodeAdd) {
-            onNodeAdd({ type: componentType }, { x, y });
+            onNodeAdd({ type: componentType, position: { x, y } });
         }
         setIsDragOver(false);
     }, [onNodeAdd]);
@@ -122,7 +122,7 @@ const DesignCanvas = ({
                                 className="drop-zone-add-btn"
                                 onClick={() => {
                                     if (onNodeAdd && zone.acceptedTypes.length > 0) {
-                                        onNodeAdd({ type: zone.acceptedTypes[0] }, { x: 200, y: 100 });
+                                        onNodeAdd({ type: zone.acceptedTypes[0], position: { x: 200, y: 100 } });
                                     }
                                 }}
                                 title={`Add ${zone.title}`}

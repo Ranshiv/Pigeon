@@ -171,6 +171,55 @@
     line-height: 1.5;
 }
 
+/* Transition Loading State */
+.visual-api-designer.transitioning {
+    opacity: 0.9;
+}
+
+.mode-transition-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    min-height: 400px;
+    color: var(--designer-text-secondary);
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--designer-bg);
+    z-index: 1000;
+}
+
+.mode-transition-loading .loading-spinner {
+    width: 32px;
+    height: 32px;
+    border: 3px solid var(--designer-border-light);
+    border-radius: 50%;
+    border-top: 3px solid var(--designer-primary);
+    animation: spin 1s linear infinite;
+    margin-bottom: 16px;
+}
+
+.mode-transition-loading p {
+    margin: 0;
+    font-size: 16px;
+    color: var(--designer-text-muted);
+    font-weight: 500;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
 /* Flexible Canvas Layout (Screenshot 2 Style) */
 .flexible-canvas {
     position: relative;
@@ -991,6 +1040,17 @@
     color: var(--designer-primary);
 }
 
+.toggle-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.toggle-btn:disabled:hover {
+    background: transparent;
+    color: var(--designer-text-secondary);
+}
+
 /* Main Content */
 .designer-content {
     flex: 1;
@@ -1355,8 +1415,27 @@
 
 .preview-container {
     flex: 1;
-    padding: 16px;
+    padding: 0px;
     overflow-y: auto;
+}
+
+/* Spec Preview content improvements */
+.spec-content-container {
+    max-height: 60vh;
+    overflow: auto;
+}
+
+.spec-content-container .spec-content {
+    margin: 0;
+}
+
+.preview-stats .stat-card {
+    cursor: pointer;
+    transition: transform 0.12s ease, background 0.12s ease;
+}
+
+.preview-stats .stat-card:hover {
+    transform: translateY(-1px);
 }
 
 /* Split View */
@@ -1377,6 +1456,66 @@
     border-left: 1px solid var(--designer-border);
     overflow-y: auto;
     background: var(--designer-card);
+}
+
+/* Resize Handle for Resizable Panels */
+.resize-handle {
+    width: 6px;
+    background: var(--designer-border);
+    cursor: col-resize;
+    transition: all 0.2s ease;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+}
+
+.resize-handle:hover {
+    background: var(--designer-accent);
+    width: 8px;
+}
+
+.resize-handle::before {
+    content: '';
+    position: absolute;
+    width: 2px;
+    height: 40px;
+    background: var(--designer-text-secondary);
+    border-radius: 1px;
+    opacity: 0.4;
+    transition: all 0.2s ease;
+}
+
+.resize-handle:hover::before {
+    opacity: 0.8;
+    background: white;
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.2);
+}
+
+.resize-handle:active {
+    background: var(--designer-accent);
+}
+
+.resize-handle:active::before {
+    opacity: 1;
+    background: white;
+}
+
+/* Make panels fill the container properly */
+.split-container>div[data-panel] {
+    display: flex;
+    flex-direction: column;
+}
+
+.split-container>div[data-panel].split-design {
+    overflow: hidden;
+}
+
+.split-container>div[data-panel].split-preview {
+    border-left: none;
+    /* Remove border since handle provides visual separation */
+    overflow: hidden;
 }
 
 /* Status Bar */
@@ -2259,12 +2398,45 @@
     }
 
     .split-container {
-        flex-direction: column;
+        flex-direction: column !important;
+    }
+
+    .split-container>div[data-panel].split-preview {
+        border-left: none !important;
+        border-top: 1px solid var(--designer-border) !important;
+        /* Adjust height for mobile preview */
+        min-height: 50vh !important;
+        max-height: 70vh !important;
+    }
+
+    .split-container>div[data-panel-group] {
+        flex-direction: column !important;
+    }
+
+    .resize-handle {
+        width: 100% !important;
+        height: 6px !important;
+        cursor: row-resize !important;
+    }
+
+    .resize-handle:hover {
+        height: 8px !important;
+        width: 100% !important;
+    }
+
+    .resize-handle::before {
+        width: 40px !important;
+        height: 2px !important;
     }
 
     .split-preview {
         width: 100%;
         height: 300px;
+        border-left: none;
+        border-top: 1px solid var(--designer-border);
+    }
+
+    .split-container>div[data-panel].split-preview {
         border-left: none;
         border-top: 1px solid var(--designer-border);
     }
@@ -2925,6 +3097,58 @@
     flex: 1;
     overflow-y: auto;
     min-height: 0;
+}
+
+/* Compact status chip for Validation header */
+.status-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 10px;
+    border-radius: 999px;
+    border: 1px solid var(--designer-border);
+    background: var(--designer-component-bg);
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--designer-text-primary);
+}
+
+.status-chip .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+    background: var(--designer-text-muted);
+}
+
+.status-chip.success {
+    border-color: rgba(40, 167, 69, 0.35);
+}
+
+.status-chip.success .dot {
+    background: var(--designer-success);
+}
+
+.status-chip.warning {
+    border-color: rgba(255, 193, 7, 0.35);
+}
+
+.status-chip.warning .dot {
+    background: var(--designer-warning);
+}
+
+.status-chip.error {
+    border-color: rgba(220, 53, 69, 0.35);
+}
+
+.status-chip.error .dot {
+    background: var(--designer-error);
+}
+
+.card-valid {
+    background: rgba(40, 167, 69, 0.08);
+    border: 1px solid rgba(40, 167, 69, 0.35);
+    border-radius: var(--designer-radius);
 }
 
 .no-issues {

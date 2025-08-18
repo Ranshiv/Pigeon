@@ -919,10 +919,9 @@
     flex-direction: column;
     background: #1a1d23;
     color: #e1e5e9;
-    border-radius: 12px;
     overflow: hidden;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-    border: 1px solid #3a3f47;
+    /* border: 1px solid #3a3f47; */
     position: relative;
 }
 

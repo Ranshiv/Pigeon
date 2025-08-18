@@ -1,11 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { VisualizationEngine } from '../services/VisualizationEngine';
 import TemplateLibraryManager from '../services/TemplateLibraryManager';
-import { NetworkFlowService } from '../services/NetworkFlowService';
-import { VisualizationDebugger } from '../services/VisualizationDebugger';
-import { PostRequestScriptService } from '../services/PostRequestScriptService';
-import { ExportService } from '../services/ExportService';
-import { AuthVisualizationService } from '../services/AuthVisualizationService';
 import ChartRenderer from './ChartRenderer';
 import NetworkFlowRenderer from './NetworkFlowRenderer';
 import './VisualizationTab.css';
@@ -26,14 +21,6 @@ const VisualizationTab = ({
     const [templateLibrary, setTemplateLibrary] = useState([]);
     const [suggestedCharts, setSuggestedCharts] = useState([]);
     const visualizationContainerRef = useRef(null);
-
-    // New state for advanced features
-    const [showNetworkFlow, setShowNetworkFlow] = useState(false);
-    const [showAuthFlow, setShowAuthFlow] = useState(false);
-    const [postRequestScript, setPostRequestScript] = useState('');
-    const [scriptOutput, setScriptOutput] = useState(null);
-    const [isDebugging, setIsDebugging] = useState(false);
-    const [activeTab, setActiveTab] = useState('visualizations'); // 'visualizations', 'network', 'auth', 'scripts'
 
     // Sample data for testing when no API response is available
     const sampleData = React.useMemo(() => ({
@@ -165,28 +152,40 @@ const VisualizationTab = ({
         }
     }, [onVisualizationUpdate]);
 
-    // Handle visualization context (when response data is provided from endpoint testing)
+    // Enhanced data handling with proper synchronization
     useEffect(() => {
+        let dataToUse;
+        let isFromContext = false;
+
+        // Priority 1: Use visualization context data if available
         if (visualizationContext && visualizationContext.responseData) {
             const contextData = visualizationContext.responseData.data || visualizationContext.responseData;
-            generateDefaultVisualizations(contextData);
-            generateChartSuggestions(contextData);
-            setPreviewData(contextData);
+            dataToUse = contextData;
+            isFromContext = true;
         }
-    }, [visualizationContext, generateDefaultVisualizations, generateChartSuggestions]);
+        // Priority 2: Use API response data
+        else if (apiResponse) {
+            dataToUse = apiResponse;
+        }
+        // Priority 3: Fall back to sample data
+        else {
+            dataToUse = sampleData;
+        }
 
-    useEffect(() => {
-        // Use API response data if available, otherwise use sample data
-        const dataToUse = apiResponse || sampleData;
-        setPreviewData(dataToUse);
+        // Only update if data has actually changed
+        if (JSON.stringify(dataToUse) !== JSON.stringify(previewData)) {
+            setPreviewData(dataToUse);
 
-        // Load template library
-        loadTemplateLibrary();
+            // Load template library only once
+            if (!isFromContext) {
+                loadTemplateLibrary();
+            }
 
-        // Auto-generate visualizations and suggestions
-        generateDefaultVisualizations(dataToUse);
-        generateChartSuggestions(dataToUse);
-    }, [apiResponse, sampleData, loadTemplateLibrary, generateDefaultVisualizations, generateChartSuggestions]);
+            // Auto-generate visualizations and suggestions
+            generateDefaultVisualizations(dataToUse);
+            generateChartSuggestions(dataToUse);
+        }
+    }, [visualizationContext, apiResponse, sampleData, previewData, loadTemplateLibrary, generateDefaultVisualizations, generateChartSuggestions]);
 
     const handleTemplateSelect = (templateId) => {
         setSelectedTemplate(templateId);

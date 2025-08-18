@@ -49,7 +49,7 @@ const CanvasSection = ({
 
     const handleAddNode = () => {
         if (onAddNode) {
-            onAddNode({ type: nodeType }, { x: 0, y: 0 });
+            onAddNode({ type: nodeType, position: { x: 0, y: 0 } });
         }
     };
 

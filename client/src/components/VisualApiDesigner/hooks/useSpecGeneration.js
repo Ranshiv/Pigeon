@@ -1,4 +1,5 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useMemo } from 'react';
+import { validateOpenAPISpec } from '../utils/validation';
 
 const useSpecGeneration = (nodes, edges) => {
     const [generatedSpec, setGeneratedSpec] = useState(null);
@@ -7,37 +8,47 @@ const useSpecGeneration = (nodes, edges) => {
     const [validationErrors, setValidationErrors] = useState([]);
 
     const validateComponents = useCallback(() => {
-        const errors = [];
+        const issues = [];
+
+        const pushError = (message, extras = {}) => issues.push({ type: 'error', message, ...extras });
+        const pushWarning = (message, extras = {}) => issues.push({ type: 'warning', message, ...extras });
 
         // Validate nodes
         nodes.forEach(node => {
+            const d = node.data || {};
             switch (node.type) {
-                case 'endpoint':
-                    if (!node.data?.path) {
-                        errors.push(`Endpoint "${node.id}" is missing a path`);
-                    } else if (!node.data.path.startsWith('/')) {
-                        errors.push(`Endpoint "${node.id}" path must start with /`);
+                case 'endpoint': {
+                    if (!d.path) {
+                        pushError(`Endpoint is missing a path`, { nodeId: node.id, path: 'paths' });
+                    } else if (!String(d.path).startsWith('/')) {
+                        pushError(`Endpoint path must start with /`, { nodeId: node.id, path: 'paths' });
                     }
 
-                    if (!node.data?.method) {
-                        errors.push(`Endpoint "${node.id}" is missing a method`);
+                    if (!d.method) {
+                        pushError(`Endpoint is missing an HTTP method`, { nodeId: node.id, path: 'paths' });
+                    }
+                    if (d.summary && d.summary.length > 120) {
+                        pushWarning(`Endpoint summary is quite long`, { nodeId: node.id, path: 'paths' });
                     }
                     break;
+                }
 
-                case 'schema':
-                    if (!node.data?.name) {
-                        errors.push(`Schema "${node.id}" is missing a name`);
+                case 'schema': {
+                    if (!d.name) {
+                        pushError(`Schema is missing a name`, { nodeId: node.id, path: 'components.schemas' });
                     }
                     break;
+                }
 
-                case 'parameter':
-                    if (!node.data?.name) {
-                        errors.push(`Parameter "${node.id}" is missing a name`);
+                case 'parameter': {
+                    if (!d.name) {
+                        pushError(`Parameter is missing a name`, { nodeId: node.id, path: 'components.parameters' });
                     }
-                    if (!node.data?.in) {
-                        errors.push(`Parameter "${node.id}" is missing location (query, path, header, cookie)`);
+                    if (!d.in) {
+                        pushError(`Parameter is missing location (query, path, header, cookie)`, { nodeId: node.id, path: 'components.parameters' });
                     }
                     break;
+                }
 
                 default:
                     break;
@@ -47,9 +58,9 @@ const useSpecGeneration = (nodes, edges) => {
         // Check for duplicate paths with same method
         const pathMethods = new Map();
         nodes.filter(n => n.type === 'endpoint').forEach(node => {
-            const key = `${node.data?.method?.toUpperCase()}-${node.data?.path}`;
+            const key = `${(node.data?.method || '').toUpperCase()}-${node.data?.path || ''}`;
             if (pathMethods.has(key)) {
-                errors.push(`Duplicate endpoint: ${node.data.method} ${node.data.path}`);
+                pushError(`Duplicate endpoint: ${node.data?.method} ${node.data?.path}`, { nodeId: node.id, path: 'paths' });
             }
             pathMethods.set(key, node.id);
         });
@@ -59,28 +70,32 @@ const useSpecGeneration = (nodes, edges) => {
         nodes.filter(n => n.type === 'schema').forEach(node => {
             if (node.data?.name) {
                 if (schemaNames.has(node.data.name)) {
-                    errors.push(`Duplicate schema name: "${node.data.name}"`);
+                    pushError(`Duplicate schema name: "${node.data.name}"`, { nodeId: node.id, path: 'components.schemas' });
                 }
                 schemaNames.add(node.data.name);
             }
         });
 
-        return errors;
+        return issues;
     }, [nodes]);
+
+    const sortObjectKeys = (obj) => {
+        return Object.keys(obj).sort().reduce((acc, key) => {
+            acc[key] = obj[key];
+            return acc;
+        }, {});
+    };
 
     const generateOpenAPISpec = useCallback(async () => {
         setIsGenerating(true);
         setError(null);
 
         try {
-            // Validate components first
-            const errors = validateComponents();
-            setValidationErrors(errors);
+            // Validate components first (do not block generation)
+            const issues = validateComponents();
+            setValidationErrors(issues);
 
-            if (errors.length > 0) {
-                throw new Error(`Validation failed: ${errors.join(', ')}`);
-            }
-
+            // Build spec with deterministic top-level order
             const spec = {
                 openapi: '3.0.0',
                 info: {
@@ -88,6 +103,9 @@ const useSpecGeneration = (nodes, edges) => {
                     version: '1.0.0',
                     description: 'API specification generated from visual designer'
                 },
+                servers: [
+                    { url: (typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000') }
+                ],
                 paths: {},
                 components: {
                     schemas: {},
@@ -166,6 +184,15 @@ const useSpecGeneration = (nodes, edges) => {
                 }
             });
 
+            // Build quick lookup maps for performance
+            const nodesById = new Map(nodes.map(n => [n.id, n]));
+            const edgesBySource = new Map();
+            edges.forEach(e => {
+                const arr = edgesBySource.get(e.source) || [];
+                arr.push(e);
+                edgesBySource.set(e.source, arr);
+            });
+
             // Process endpoints
             const endpointNodes = nodes.filter(n => n.type === 'endpoint');
             endpointNodes.forEach(node => {
@@ -210,13 +237,10 @@ const useSpecGeneration = (nodes, edges) => {
                     };
 
                     // Add parameters from connections
-                    const connectedParameters = edges
-                        .filter(edge => edge.source === node.id)
-                        .map(edge => nodes.find(n => n.id === edge.target))
+                    const connectedParameters = (edgesBySource.get(node.id) || [])
+                        .map(edge => nodesById.get(edge.target))
                         .filter(n => n && n.type === 'parameter')
-                        .map(paramNode => ({
-                            $ref: `#/components/parameters/${paramNode.data.name}`
-                        }));
+                        .map(paramNode => ({ $ref: `#/components/parameters/${paramNode.data.name}` }));
 
                     if (connectedParameters.length > 0) {
                         operation.parameters = connectedParameters;
@@ -224,9 +248,9 @@ const useSpecGeneration = (nodes, edges) => {
 
                     // Add request body if method supports it
                     if (['POST', 'PUT', 'PATCH'].includes(method.toUpperCase())) {
-                        const connectedSchemas = edges
-                            .filter(edge => edge.source === node.id && edge.type === 'request')
-                            .map(edge => nodes.find(n => n.id === edge.target))
+                        const connectedSchemas = (edgesBySource.get(node.id) || [])
+                            .filter(edge => edge.type === 'request')
+                            .map(edge => nodesById.get(edge.target))
                             .filter(n => n && n.type === 'schema');
 
                         if (connectedSchemas.length > 0) {
@@ -244,9 +268,9 @@ const useSpecGeneration = (nodes, edges) => {
                     }
 
                     // Add response schemas
-                    const responseSchemas = edges
-                        .filter(edge => edge.source === node.id && edge.type === 'response')
-                        .map(edge => nodes.find(n => n.id === edge.target))
+                    const responseSchemas = (edgesBySource.get(node.id) || [])
+                        .filter(edge => edge.type === 'response')
+                        .map(edge => nodesById.get(edge.target))
                         .filter(n => n && n.type === 'schema');
 
                     if (responseSchemas.length > 0) {
@@ -273,11 +297,47 @@ const useSpecGeneration = (nodes, edges) => {
                 }
             });
 
+            // Deterministic sorting of paths and components
+            const sortedPaths = Object.keys(spec.paths)
+                .sort()
+                .reduce((acc, p) => {
+                    const methods = spec.paths[p];
+                    acc[p] = Object.keys(methods)
+                        .sort()
+                        .reduce((ma, m) => { ma[m] = methods[m]; return ma; }, {});
+                    return acc;
+                }, {});
+            spec.paths = sortedPaths;
+
+            if (spec.components?.schemas) {
+                spec.components.schemas = sortObjectKeys(spec.components.schemas);
+            }
+            if (spec.components?.parameters) {
+                spec.components.parameters = sortObjectKeys(spec.components.parameters);
+            }
+
+            // Run additional spec-level validation
+            try {
+                const vr = validateOpenAPISpec(spec);
+                const vIssues = [
+                    ...vr.errors.map(m => ({ type: 'error', message: m })),
+                    ...vr.warnings.map(m => ({ type: 'warning', message: m }))
+                ];
+                // Merge unique issues by message
+                const existing = new Set((issues || []).map(i => i.message || String(i)));
+                const merged = [
+                    ...(issues || []),
+                    ...vIssues.filter(i => !existing.has(i.message))
+                ];
+                setValidationErrors(merged);
+            } catch { /* ignore validation utility errors */ }
+
             setGeneratedSpec(spec);
             return spec;
         } catch (err) {
-            setError(err.message);
-            throw err;
+            // Keep preview usable; only set error message
+            setError(err.message || 'Failed to generate specification');
+            return null;
         } finally {
             setIsGenerating(false);
         }
@@ -388,17 +448,43 @@ const useSpecGeneration = (nodes, edges) => {
         };
     }, [generatedSpec]);
 
-    // Auto-generate spec when nodes or edges change
+    // Create efficient dependency tracking for nodes and edges
+    const nodesDependency = useMemo(() => {
+        return nodes.map(n => ({
+            id: n.id,
+            type: n.type,
+            name: n.data?.name,
+            // Include other essential data that affects spec generation
+            path: n.data?.path,
+            method: n.data?.method,
+            dataHash: n.data ? Object.keys(n.data).length : 0
+        }));
+    }, [nodes]);
+
+    const edgesDependency = useMemo(() => {
+        return edges.map(e => ({
+            id: e.id,
+            source: e.source,
+            target: e.target,
+            type: e.type
+        }));
+    }, [edges]);
+
+    // Auto-generate spec when nodes or edges change with efficient dependency tracking
     useEffect(() => {
-        if (nodes.length > 0) {
-            generateOpenAPISpec().catch(() => {
-                // Error is already handled in the function
-            });
-        } else {
-            setGeneratedSpec(null);
-            setValidationErrors([]);
-        }
-    }, [nodes, edges, generateOpenAPISpec]);
+        const timeoutId = setTimeout(() => {
+            if (nodes.length > 0) {
+                generateOpenAPISpec().catch(() => {
+                    // Error is already handled in the function
+                });
+            } else {
+                setGeneratedSpec(null);
+                setValidationErrors([]);
+            }
+        }, 300); // 300ms debounce to prevent rapid successive updates
+
+        return () => clearTimeout(timeoutId);
+    }, [nodes.length, edges.length, nodesDependency, edgesDependency, generateOpenAPISpec]);
 
     return {
         generatedSpec,

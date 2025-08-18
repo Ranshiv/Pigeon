@@ -480,8 +480,11 @@
     color: #e1e5e9;
     font-size: 13px;
     line-height: 1.5;
-    /* Improved readability */
-    transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    /* Avoid animating background-related properties to keep select caret stable */
+    transition: border-color 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+        box-shadow 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+        background-color 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+        transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.03);
     -webkit-appearance: none;
     -moz-appearance: none;
@@ -492,7 +495,7 @@
 .form-select:hover,
 .form-textarea:hover {
     border-color: rgba(255, 255, 255, 0.15);
-    background: rgba(0, 0, 0, 0.3);
+    background-color: rgba(0, 0, 0, 0.3);
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
@@ -502,7 +505,7 @@
     border-color: #8b5cf6;
     outline: none;
     box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.25);
-    background: rgba(0, 0, 0, 0.35);
+    background-color: rgba(0, 0, 0, 0.35);
     transform: translateY(-1px);
 }
 
@@ -533,6 +536,10 @@
     background-position: right 12px center;
     background-size: 16px;
     padding-right: 40px;
+    /* Ensure the caret does not animate/slide on hover/focus */
+    transition: border-color 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+        box-shadow 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+        background-color 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 .error-message {
@@ -569,7 +576,7 @@
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
     z-index: 5;
-    border-radius:10px;
+    border-radius: 10px;
 }
 
 /* Collapsible section */
@@ -1329,4 +1336,91 @@
     .properties-panel.collapsed {
         transform: translateX(100%);
     }
+}
+
+/* Test Endpoint Styling */
+.test-endpoint-section {
+    margin-top: 12px;
+}
+
+.test-endpoint-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 12px 16px;
+    background: linear-gradient(135deg, #FF6C37, #FF8555);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 8px rgba(255, 108, 55, 0.3);
+}
+
+.test-endpoint-btn:hover:not(:disabled) {
+    background: linear-gradient(135deg, #E55A30, #FF6C37);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(255, 108, 55, 0.4);
+}
+
+.test-endpoint-btn:disabled {
+    background: #444;
+    color: #888;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+.test-endpoint-btn.testing {
+    background: #666;
+    cursor: wait;
+}
+
+.test-endpoint-btn .spinner {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.test-result {
+    margin-top: 12px;
+    padding: 12px;
+    border-radius: 6px;
+    font-size: 13px;
+}
+
+.test-result.success {
+    background: rgba(34, 197, 94, 0.1);
+    border: 1px solid rgba(34, 197, 94, 0.3);
+    color: #22c55e;
+}
+
+.test-result.error {
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    color: #ef4444;
+}
+
+.test-success,
+.test-error {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.test-success small {
+    color: rgba(34, 197, 94, 0.7);
+    margin-top: 4px;
 }

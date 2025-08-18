@@ -13,6 +13,7 @@ node_modules/
 # Build outputs
 dist/
 build/
+client/build/
 *.tgz
 *.tar.gz
 
@@ -23,6 +24,7 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 lerna-debug.log*
+pnpm-debug.log*
 
 # Runtime data
 pids
@@ -37,8 +39,14 @@ coverage/
 # nyc test coverage
 .nyc_output
 
+# Jest cache
+.jest/
+
 # ESLint cache
 .eslintcache
+
+# Prettier cache
+.prettier-cache
 
 # Optional npm cache directory
 .npm
@@ -80,6 +88,33 @@ coverage/
 # TernJS port file
 .tern-port
 
+# Test results and reports
+test-results/
+*.test-report.json
+junit.xml
+
+# API testing artifacts
+*.har
+*.postman_collection.json
+*.postman_environment.json
+
+# Database files
+*.sqlite
+*.sqlite3
+*.db
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.temp
+
+# Monaco Editor cache
+.monaco/
+
+# React build artifacts
+client/build/
+
 # OS generated files
 .DS_Store
 .DS_Store?
@@ -89,12 +124,34 @@ coverage/
 ehthumbs.db
 Thumbs.db
 
+# Windows thumbnail cache files
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+
+# Windows folder config file
+[Dd]esktop.ini
+
+# Windows Recycle Bin used on file shares
+$RECYCLE.BIN/
+
 # IDE files
 .vscode/
 .idea/
 *.swp
 *.swo
 *~
+
+# JetBrains IDEs
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# Visual Studio Code
+.vscode/
+*.code-workspace
 
 # Large files that shouldn't be in Git
 *.exe
@@ -103,8 +160,27 @@ Thumbs.db
 *.deb
 *.rpm
 
-#md files
-PENDING_FEATURES_COMPREHENSIVE_GUIDE.mdclient/build/ 
+# PDF and image outputs
+*.pdf
+screenshots/
+exports/
 
-#empty file remover
-scripts/remove-empty-files.js  
+# Certificate files
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+
+# Package manager lock files (uncomment if you want to ignore them)
+# package-lock.json
+# yarn.lock
+# pnpm-lock.yaml
+
+# Documentation artifacts that might be generated
+docs/generated/
+api-docs/
+
+# Configuration files with sensitive data
+config/local.js
+config/production.js  

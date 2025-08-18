@@ -822,7 +822,7 @@ const DesignCanvas = ({
                                         <button
                                             key={action.nodeType}
                                             className="quick-action-btn"
-                                            onClick={() => onNodeAdd && onNodeAdd({ type: action.nodeType }, action.position)}
+                                            onClick={() => onNodeAdd && onNodeAdd({ type: action.nodeType, position: action.position })}
                                             aria-label={action.label}
                                         >
                                             <FiPlus style={{ marginRight: 6 }} />

@@ -1,6 +1,5 @@
 ﻿import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import VisualizationTab from './VisualizationTab';
-import ErrorBoundary from './ErrorBoundary';
 import Editor from '@monaco-editor/react';
 import YAML from 'yaml';
 import './SpecPreviewModern.css';
@@ -56,13 +55,17 @@ const SpecPreview = ({
         try { window.localStorage.setItem('specTheme', theme); } catch { }
     }, [theme]);
 
-    // Tab accessibility refs
+    // Tab a11y refs
     const jsonTabRef = useRef(null);
     const yamlTabRef = useRef(null);
     const vizTabRef = useRef(null);
 
-    // Removed automatic tab switching to respect user choice
-    // Users can manually switch to visualization tab when needed
+    // Switch to visualization tab when visualization context is provided
+    useEffect(() => {
+        if (visualizationContext) {
+            setPreviewMode('visualization');
+        }
+    }, [visualizationContext]);
 
     const generateOpenAPISpec = useCallback(async (nodes, edges) => {
         const spec = {
@@ -146,53 +149,25 @@ const SpecPreview = ({
     // Keep generatedSpec in sync with provided spec; fall back to internal generation only if spec is not provided
     useEffect(() => {
         let cancelled = false;
-        let timeoutId;
-
         const run = async () => {
             setError(null);
-
-            // If spec is provided, use it directly (higher priority)
             if (spec) {
                 setIsGenerating(false);
                 setGeneratedSpec(spec);
                 return;
             }
-
-            // Only generate if we have nodes and no spec is provided
-            if (nodes && nodes.length > 0) {
-                setIsGenerating(true);
-
-                // Add slight delay to prevent rapid successive generations
-                timeoutId = setTimeout(async () => {
-                    try {
-                        const localSpec = await generateOpenAPISpec(nodes, edges);
-                        if (!cancelled) {
-                            setGeneratedSpec(localSpec);
-                        }
-                    } catch (err) {
-                        if (!cancelled) {
-                            setError(err.message);
-                        }
-                    } finally {
-                        if (!cancelled) {
-                            setIsGenerating(false);
-                        }
-                    }
-                }, 100);
-            } else {
-                setGeneratedSpec(null);
-                setIsGenerating(false);
+            setIsGenerating(true);
+            try {
+                const localSpec = await generateOpenAPISpec(nodes, edges);
+                if (!cancelled) setGeneratedSpec(localSpec);
+            } catch (err) {
+                if (!cancelled) setError(err.message);
+            } finally {
+                if (!cancelled) setIsGenerating(false);
             }
         };
-
         run();
-
-        return () => {
-            cancelled = true;
-            if (timeoutId) {
-                clearTimeout(timeoutId);
-            }
-        };
+        return () => { cancelled = true; };
     }, [spec, nodes, edges, generateOpenAPISpec]);
 
     const formatJson = (obj) => {
@@ -313,14 +288,6 @@ const SpecPreview = ({
         setLocalText(memoizedContent);
     }, [memoizedContent]);
 
-    // Reset editor state when switching to preview mode to prevent conflicts
-    useEffect(() => {
-        // Reset editor-specific states to prevent layout issues
-        setShowInlineIssues(false);
-        setShowExportMenu(false);
-        setCopied(false);
-    }, []); // Run once on component mount
-
     // Live validation: syntactic plus simple structural counts
     useEffect(() => {
         if (!localText) return;
@@ -440,20 +407,15 @@ const SpecPreview = ({
 
         if (previewMode === 'visualization') {
             return (
-                <ErrorBoundary
-                    fallbackMessage="Failed to load visualization. This might be due to invalid response data format."
-                    onRetry={() => setPreviewMode('json')}
-                >
-                    <VisualizationTab
-                        apiResponse={visualizationContext?.responseData || apiResponse}
-                        nodes={nodes}
-                        visualizationContext={visualizationContext}
-                        onVisualizationUpdate={(viz) => {
-                            console.log('Visualization created:', viz);
-                            // Could emit events here for parent components
-                        }}
-                    />
-                </ErrorBoundary>
+                <VisualizationTab
+                    apiResponse={visualizationContext?.responseData || apiResponse}
+                    nodes={nodes}
+                    visualizationContext={visualizationContext}
+                    onVisualizationUpdate={(viz) => {
+                        console.log('Visualization created:', viz);
+                        // Could emit events here for parent components
+                    }}
+                />
             );
         }
 
@@ -594,30 +556,19 @@ const SpecPreview = ({
     // Close export menu on outside click or Escape
     useEffect(() => {
         if (!showExportMenu) return;
-
-        let timeoutId;
-
         const onDocClick = (e) => {
-            // Use timeout to prevent conflicts with other click handlers
-            timeoutId = setTimeout(() => {
-                if (!exportBtnRef.current?.contains(e.target) &&
-                    !e.target.closest('.export-menu')) {
-                    setShowExportMenu(false);
-                }
-            }, 0);
+            if (!exportBtnRef.current) return;
+            if (!exportBtnRef.current.parentElement) return;
+            if (exportBtnRef.current.contains(e.target)) return;
+            if (exportBtnRef.current.parentElement.querySelector('.export-menu')?.contains(e.target)) return;
+            setShowExportMenu(false);
         };
-
         const onKey = (e) => {
-            if (e.key === 'Escape') {
-                setShowExportMenu(false);
-            }
+            if (e.key === 'Escape') setShowExportMenu(false);
         };
-
         document.addEventListener('mousedown', onDocClick);
         document.addEventListener('keydown', onKey);
-
         return () => {
-            clearTimeout(timeoutId);
             document.removeEventListener('mousedown', onDocClick);
             document.removeEventListener('keydown', onKey);
         };
@@ -647,9 +598,7 @@ const SpecPreview = ({
                             className={`format-btn ${previewMode === 'json' ? 'active' : ''}`}
                             id="tab-json"
                             ref={jsonTabRef}
-                            onClick={() => {
-                                setPreviewMode('json');
-                            }}
+                            onClick={() => setPreviewMode('json')}
                             role="tab"
                             aria-selected={previewMode === 'json'}
                             aria-controls="tabpanel-preview"
@@ -664,9 +613,7 @@ const SpecPreview = ({
                             className={`format-btn ${previewMode === 'yaml' ? 'active' : ''}`}
                             id="tab-yaml"
                             ref={yamlTabRef}
-                            onClick={() => {
-                                setPreviewMode('yaml');
-                            }}
+                            onClick={() => setPreviewMode('yaml')}
                             role="tab"
                             aria-selected={previewMode === 'yaml'}
                             aria-controls="tabpanel-preview"
@@ -681,9 +628,7 @@ const SpecPreview = ({
                             className={`format-btn ${previewMode === 'visualization' ? 'active' : ''}`}
                             id="tab-visualization"
                             ref={vizTabRef}
-                            onClick={() => {
-                                setPreviewMode('visualization');
-                            }}
+                            onClick={() => setPreviewMode('visualization')}
                             role="tab"
                             aria-selected={previewMode === 'visualization'}
                             aria-controls="tabpanel-preview"

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { FiSettings, FiTrash2, FiCheck, FiX, FiInfo } from 'react-icons/fi';
+import { FiSettings, FiTrash2, FiCheck, FiX, FiInfo, FiPlay, FiLoader } from 'react-icons/fi';
 import './PropertiesPanel.css';
 
 /**
@@ -10,26 +10,44 @@ import './PropertiesPanel.css';
  * - Clear separation of concerns between UI and logic
  */
 
-const PropertiesPanel = ({ selectedNode, onNodeUpdate, onDeleteNode }) => {
+const PropertiesPanel = ({ selectedNode, onNodeUpdate, onDeleteNode, onTestEndpoint }) => {
     const [properties, setProperties] = useState({});
     const [errors, setErrors] = useState({});
+    const [lastSelectedNodeId, setLastSelectedNodeId] = useState(null);
+    const [isTestingEndpoint, setIsTestingEndpoint] = useState(false);
+    const [testResult, setTestResult] = useState(null);
 
     useEffect(() => {
         if (selectedNode) {
-            setProperties(selectedNode.data || {});
-            setErrors({});
+            // Only update if this is a different node or if the node data has changed
+            const nodeId = selectedNode.id;
+            const nodeData = selectedNode.data || {};
+
+            if (nodeId !== lastSelectedNodeId || JSON.stringify(nodeData) !== JSON.stringify(properties)) {
+                setProperties(nodeData);
+                setErrors({});
+                setTestResult(null); // Clear test results when switching nodes
+                setLastSelectedNodeId(nodeId);
+            }
         } else {
             setProperties({});
             setErrors({});
+            setTestResult(null);
+            setLastSelectedNodeId(null);
         }
-    }, [selectedNode]);
+    }, [selectedNode, lastSelectedNodeId, properties]);
 
     const handlePropertyChange = useCallback((key, value) => {
         const newProperties = { ...properties, [key]: value };
         setProperties(newProperties);
 
         if (onNodeUpdate && selectedNode) {
-            onNodeUpdate(selectedNode.id, newProperties);
+            // Debounce updates to prevent cascading re-renders
+            clearTimeout(handlePropertyChange.timeoutId);
+            handlePropertyChange.timeoutId = setTimeout(() => {
+                // Ensure updates are applied to node.data, not top-level node fields
+                onNodeUpdate(selectedNode.id, { data: newProperties });
+            }, 150); // 150ms debounce
         }
     }, [properties, onNodeUpdate, selectedNode]);
 
@@ -70,6 +88,64 @@ const PropertiesPanel = ({ selectedNode, onNodeUpdate, onDeleteNode }) => {
         handlePropertyChange(key, value);
         validateProperty(key, value);
     }, [handlePropertyChange, validateProperty]);
+
+    // Endpoint testing functionality
+    const handleTestEndpoint = useCallback(async () => {
+        if (!selectedNode || selectedNode.type !== 'endpoint' || !onTestEndpoint) {
+            return;
+        }
+
+        const { method, path } = properties;
+        if (!method || !path) {
+            setTestResult({ error: 'Method and path are required for testing' });
+            return;
+        }
+
+        setIsTestingEndpoint(true);
+        setTestResult(null);
+
+        try {
+            // Construct test URL - use localhost for now, could be made configurable
+            const baseUrl = window.location.origin;
+            const testUrl = `${baseUrl}${path}`;
+
+            const response = await fetch(testUrl, {
+                method: method.toUpperCase(),
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                // Only add body for methods that support it
+                ...((['POST', 'PUT', 'PATCH'].includes(method.toUpperCase())) && {
+                    body: JSON.stringify({})
+                })
+            });
+
+            const responseData = await response.json().catch(() => ({}));
+
+            const result = {
+                status: response.status,
+                statusText: response.statusText,
+                data: responseData,
+                headers: Object.fromEntries(response.headers.entries()),
+                timestamp: new Date().toISOString()
+            };
+
+            setTestResult(result);
+
+            // Call the parent's visualization handler if the response is successful
+            if (response.ok && onTestEndpoint) {
+                onTestEndpoint(selectedNode.id, result);
+            }
+
+        } catch (error) {
+            setTestResult({
+                error: error.message || 'Failed to test endpoint',
+                timestamp: new Date().toISOString()
+            });
+        } finally {
+            setIsTestingEndpoint(false);
+        }
+    }, [selectedNode, properties, onTestEndpoint]);
 
     // Enhanced form field component following SRP
     const FormField = useCallback(({ label, children, error, required = false, helpText }) => (
@@ -226,6 +302,48 @@ const PropertiesPanel = ({ selectedNode, onNodeUpdate, onDeleteNode }) => {
                         error={errors.path}
                     />
                 </FormField>
+            </div>
+
+            <div className="form-section">
+                <h4 className="section-title">Testing</h4>
+
+                <div className="test-endpoint-section">
+                    <button
+                        className={`test-endpoint-btn ${isTestingEndpoint ? 'testing' : ''}`}
+                        onClick={handleTestEndpoint}
+                        disabled={isTestingEndpoint || !properties.method || !properties.path}
+                        title="Test this endpoint"
+                    >
+                        {isTestingEndpoint ? (
+                            <>
+                                <FiLoader className="spinner" />
+                                Testing...
+                            </>
+                        ) : (
+                            <>
+                                <FiPlay />
+                                Test Endpoint
+                            </>
+                        )}
+                    </button>
+
+                    {testResult && (
+                        <div className={`test-result ${testResult.error ? 'error' : 'success'}`}>
+                            {testResult.error ? (
+                                <div className="test-error">
+                                    <FiX />
+                                    <span>{testResult.error}</span>
+                                </div>
+                            ) : (
+                                <div className="test-success">
+                                    <FiCheck />
+                                    <span>Status: {testResult.status} {testResult.statusText}</span>
+                                    <small>Sent to visualization</small>
+                                </div>
+                            )}
+                        </div>
+                    )}
+                </div>
             </div>
 
             <div className="form-section">

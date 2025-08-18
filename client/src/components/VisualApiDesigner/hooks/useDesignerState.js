@@ -18,8 +18,10 @@ const useDesignerState = (initialState = {}) => {
     // Node operations with update batching for better performance
     const addNode = useCallback((nodeData) => {
         try {
-            // Generate a stable unique ID that won't change between renders
-            const nodeId = `node-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+            // Generate a stable unique ID based on type and timestamp for better predictability
+            const timestamp = Date.now();
+            const typePrefix = nodeData.type || 'node';
+            const nodeId = `${typePrefix}-${timestamp}-${Math.random().toString(36).substr(2, 6)}`;
 
             // Create the new node object
             const newNode = {
@@ -27,6 +29,7 @@ const useDesignerState = (initialState = {}) => {
                 type: nodeData.type || 'default',
                 position: nodeData.position || { x: 100, y: 100 },
                 data: nodeData.data || {},
+                dimensions: nodeData.dimensions || { width: 240, height: 128 },
                 ...nodeData
             };
 
@@ -34,6 +37,7 @@ const useDesignerState = (initialState = {}) => {
             setState(prevState => {
                 // Check if a node with this ID already exists to prevent duplicates
                 if (prevState.nodes.some(node => node.id === nodeId)) {
+                    console.warn('Duplicate node ID detected, skipping:', nodeId);
                     return prevState; // Skip update if node already exists
                 }
 
@@ -47,8 +51,15 @@ const useDesignerState = (initialState = {}) => {
 
             return newNode;
         } catch (error) {
-            // Silently handle errors to prevent UI crashes
-            return { id: `error-${Date.now()}`, type: 'error', position: { x: 0, y: 0 }, data: {} };
+            console.error('Error adding node:', error);
+            // Return a safe fallback node to prevent UI crashes
+            return {
+                id: `error-${Date.now()}`,
+                type: 'error',
+                position: { x: 0, y: 0 },
+                data: { error: error.message },
+                dimensions: { width: 240, height: 128 }
+            };
         }
     }, []);
 
