@@ -1,6 +1,19 @@
 // services/IntegrationService.js
 const fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args));
 const Integration = require('../models/Integration');
+const { Spectral, Document } = require('@stoplight/spectral-core');
+const { Json, Yaml } = require('@stoplight/spectral-parsers');
+const { oas } = require('@stoplight/spectral-rulesets');
+const fs = require('fs').promises;
+const path = require('path');
+const yaml = require('js-yaml');
+const {
+    resolveRuleset,
+    loadRuleset,
+    validateRuleset,
+    calculateLintScore,
+    normalizeFindings
+} = require('../utils/spectral');
 
 class IntegrationService {
     constructor() {
@@ -660,6 +673,166 @@ class IntegrationService {
             case 'recovery': return '🟢 Monitor has RECOVERED';
             default: return '⚪ Monitor status unknown';
         }
+    }
+
+    // OpenAPI Linting with Spectral
+    async lintOpenApi(specInput, options = {}) {
+        const {
+            rulesetPath = null,
+            timeoutMs = 10000,
+            maxSizeMB = 20,
+            workspaceId = null,
+            apiVersionId = null
+        } = options;
+
+        const isEnabled = process.env.PIGEON_LINT_ENABLED !== 'false';
+        if (!isEnabled) {
+            console.log('📋 OpenAPI linting is disabled via PIGEON_LINT_ENABLED=false');
+            return {
+                findings: [],
+                counts: { errors: 0, warnings: 0, infos: 0, hints: 0 },
+                score: 100,
+                rulesetInfo: { name: 'Disabled', sourcePath: 'N/A' },
+                lintedAt: new Date().toISOString()
+            };
+        }
+
+        try {
+            console.log('📋 Starting OpenAPI lint operation...');
+
+            // Parse and validate spec input
+            const { spec, specDoc } = await this.parseSpecInput(specInput, maxSizeMB);
+
+            // Resolve and load ruleset
+            const rulesetConfig = await resolveRuleset(rulesetPath, process.cwd());
+            const { ruleset, info: rulesetInfo } = await loadRuleset(rulesetConfig);
+
+            // Validate ruleset security
+            if (rulesetConfig.type === 'file') {
+                validateRuleset(ruleset, rulesetPath);
+            }
+
+            // Execute linting with timeout
+            const lintResults = await Promise.race([
+                this.executeLinting(specDoc, ruleset, rulesetConfig),
+                this.createTimeoutPromise(timeoutMs)
+            ]);
+
+            // Process and normalize results
+            const findings = normalizeFindings(lintResults);
+            const scoreData = calculateLintScore(findings);
+
+            const result = {
+                findings,
+                counts: {
+                    errors: scoreData.counts.error,
+                    warnings: scoreData.counts.warn,
+                    infos: scoreData.counts.info,
+                    hints: scoreData.counts.hint
+                },
+                score: scoreData.score,
+                rulesetInfo,
+                lintedAt: new Date().toISOString()
+            };
+
+            console.log(`📋 Lint completed: Score ${result.score}/100, ${result.findings.length} findings`);
+            return result;
+
+        } catch (error) {
+            console.error('❌ OpenAPI linting failed:', error.message);
+
+            // Return structured error for invalid specs or rulesets
+            if (error.name === 'YAMLException' || error.message.includes('parse')) {
+                return {
+                    findings: [{
+                        id: 'parse-error',
+                        message: `Parse error: ${error.message}`,
+                        severity: 'error',
+                        path: [],
+                        source: 'parser'
+                    }],
+                    counts: { errors: 1, warnings: 0, infos: 0, hints: 0 },
+                    score: 0,
+                    rulesetInfo: { name: 'N/A', sourcePath: 'N/A' },
+                    lintedAt: new Date().toISOString(),
+                    parseError: true
+                };
+            }
+
+            throw error;
+        }
+    }
+
+    async parseSpecInput(specInput, maxSizeMB) {
+        let spec;
+        let specContent;
+
+        // Handle different input types
+        if (typeof specInput === 'string') {
+            // File path
+            if (specInput.startsWith('http://') || specInput.startsWith('https://')) {
+                throw new Error('URL loading not supported for security reasons');
+            }
+
+            const filePath = path.resolve(specInput);
+            const stats = await fs.stat(filePath);
+            const sizeInMB = stats.size / (1024 * 1024);
+
+            if (sizeInMB > maxSizeMB) {
+                throw new Error(`Spec file too large: ${sizeInMB.toFixed(2)}MB (max: ${maxSizeMB}MB)`);
+            }
+
+            specContent = await fs.readFile(filePath, 'utf8');
+            const ext = path.extname(filePath).toLowerCase();
+
+            if (ext === '.json') {
+                spec = JSON.parse(specContent);
+            } else if (ext === '.yaml' || ext === '.yml') {
+                spec = yaml.load(specContent);
+            } else {
+                throw new Error(`Unsupported file format: ${ext}. Use .json, .yaml, or .yml`);
+            }
+        } else if (typeof specInput === 'object') {
+            // Already parsed object
+            spec = specInput;
+            specContent = JSON.stringify(spec, null, 2);
+        } else {
+            throw new Error('Invalid spec input: must be file path or parsed object');
+        }
+
+        // Validate basic OpenAPI structure
+        if (!spec.openapi && !spec.swagger) {
+            throw new Error('Not a valid OpenAPI/Swagger specification');
+        }
+
+        // Create Spectral document with appropriate parser
+        const ext = path.extname(typeof specInput === 'string' ? specInput : '.json').toLowerCase();
+        const parser = (ext === '.yaml' || ext === '.yml') ? Yaml : Json;
+        const specDoc = new Document(specContent, parser);
+
+        return { spec, specDoc };
+    }
+
+    async executeLinting(specDoc, ruleset, rulesetConfig) {
+        const spectral = new Spectral();
+
+        if (rulesetConfig.type === 'builtin') {
+            // Use built-in OpenAPI ruleset
+            spectral.setRuleset(oas);
+        } else {
+            // Use custom ruleset
+            await spectral.setRuleset(ruleset);
+        }
+
+        return await spectral.run(specDoc);
+    }
+
+    createTimeoutPromise(timeoutMs) {
+        return new Promise((_, reject) => {
+            setTimeout(() => {
+                reject(new Error(`Linting timeout exceeded: ${timeoutMs}ms`));
+            }, timeoutMs);
+        });
     }
 
     // Health monitoring and validation methods

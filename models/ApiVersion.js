@@ -80,6 +80,49 @@ const apiVersionSchema = new mongoose.Schema({
         description: String,
         mitigationStrategy: String
     }],
+    // OpenAPI Linting fields
+    lintFindings: [{
+        id: String,           // Rule ID/code
+        message: String,      // Error/warning message
+        severity: {
+            type: String,
+            enum: ['error', 'warn', 'info', 'hint'],
+            default: 'error'
+        },
+        path: [mongoose.Schema.Types.Mixed], // JSON path segments
+        range: {
+            start: {
+                line: Number,
+                character: Number
+            },
+            end: {
+                line: Number,
+                character: Number
+            }
+        },
+        docsUrl: String,      // Documentation URL for the rule
+        suggested: {
+            type: Boolean,
+            default: false
+        },
+        source: String,       // File/source reference
+        ruleTags: [String]    // Rule categories like 'oas3', 'validation'
+    }],
+    lintScore: {
+        type: Number,
+        min: 0,
+        max: 100,
+        default: null
+    },
+    lintedAt: {
+        type: Date,
+        default: null
+    },
+    rulesetInfo: {
+        name: String,
+        version: String,
+        sourcePath: String
+    },
     createdBy: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
@@ -97,6 +140,10 @@ const apiVersionSchema = new mongoose.Schema({
 
 // Compound index to ensure unique versions per collection
 apiVersionSchema.index({ collectionId: 1, version: 1 }, { unique: true });
+
+// Index for lint score queries
+apiVersionSchema.index({ lintScore: 1 });
+apiVersionSchema.index({ lintedAt: 1 });
 
 // Middleware to update updatedAt
 apiVersionSchema.pre('save', function (next) {

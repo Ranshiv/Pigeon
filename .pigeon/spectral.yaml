@@ -1,0 +1,32 @@
+# Pigeon OpenAPI Linting Ruleset
+# Extends the default OpenAPI 3 rules with custom overrides
+
+extends: ["@stoplight/spectral-rulesets/dist/oas/index.js"]
+
+rules:
+  # Override default rules
+  operation-description: warn
+  operation-summary: warn
+  
+  # Make info fields more strict
+  info-contact: error
+  info-license: warn
+  
+  # Custom rules for API standards
+  operation-operationId: error
+  
+  # Disable rules that don't fit your standards
+  # operation-tags: false
+
+# Custom functions can be added here
+# functions:
+#   - custom-function
+
+# Custom rules
+# rules:
+#   my-custom-rule:
+#     description: Example custom rule
+#     given: $.paths.*[?(@property === 'get' || @property === 'post')]
+#     severity: warn
+#     then:
+#       function: truthy

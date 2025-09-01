@@ -642,16 +642,6 @@ const VisualApiDesigner = ({
                 </div>
 
                 <div className="toolbar-group">
-                    <button
-                        className="toolbar-btn"
-                        onClick={() => saveDesign()}
-                        disabled={saveStatus === 'saving' || saveStatus === 'saved'}
-                        title="Save Design"
-                    >
-                        <FiSave />
-                        {saveStatus === 'saving' ? 'Saving...' : 'Save'}
-                    </button>
-
                     <label className="toolbar-btn" title="Import OpenAPI">
                         <FiUpload />
                         Import
@@ -664,16 +654,6 @@ const VisualApiDesigner = ({
                     </label>
 
                     {/* Export functionality moved to preview panel for consistency */}
-                </div>
-
-                <div className="toolbar-group">
-                    <button
-                        className={`toolbar-btn ${validationErrors.length === 0 ? 'success' : 'error'}`}
-                        title={`${validationErrors.length} validation errors`}
-                    >
-                        <FiCheck />
-                        {validationErrors.length === 0 ? 'Valid' : `${validationErrors.length} Errors`}
-                    </button>
                 </div>
             </div>
 

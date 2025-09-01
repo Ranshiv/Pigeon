@@ -109,6 +109,20 @@ passport.deserializeUser(async (id, done) => {
 // --- Use the central routes with /api prefix ---
 app.use('/api', routes);
 
+// --- HEALTH CHECK ENDPOINT ---
+app.get('/api/health', (req, res) => {
+    res.json({
+        status: 'ok',
+        service: 'pigeon-api',
+        timestamp: new Date(),
+        features: {
+            linting: 'enabled',
+            visualization: 'enabled',
+            collaboration: 'enabled'
+        }
+    });
+});
+
 // --- GOOGLE AUTH ROUTES ---
 app.get('/auth/google',
     (req, res, next) => {

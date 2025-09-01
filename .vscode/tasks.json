@@ -222,6 +222,27 @@
 			"command": "node test-server-status.js",
 			"isBackground": false,
 			"group": "build"
+		},
+		{
+			"label": "Test Spec Generation",
+			"type": "shell",
+			"command": "node test-spec-generation.js"
+		},
+		{
+			"label": "Generate Feature Guide PDF",
+			"type": "shell",
+			"command": "npm run generate:feature-guide"
+		},
+		{
+			"label": "Generate Feature Guide PDF",
+			"type": "shell",
+			"command": "npm run generate:feature-guide"
+		},
+		{
+			"label": "Generate Feature Guide PDF (One-off)",
+			"type": "shell",
+			"command": "npm run generate:feature-guide",
+			"isBackground": false
 		}
 	]
 }

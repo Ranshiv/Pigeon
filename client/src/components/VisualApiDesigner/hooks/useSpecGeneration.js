@@ -95,6 +95,33 @@ const useSpecGeneration = (nodes, edges) => {
             const issues = validateComponents();
             setValidationErrors(issues);
 
+            // Debug logging for spec generation
+            console.log('🔧 Generating OpenAPI spec from:', {
+                nodeCount: nodes.length,
+                edgeCount: edges.length,
+                nodeTypes: nodes.map(n => n.type),
+                endpointNodes: nodes.filter(n => n.type === 'endpoint').length,
+                schemaNodes: nodes.filter(n => n.type === 'schema').length
+            });
+
+            // Log detailed node data for debugging
+            nodes.forEach(node => {
+                if (node.type === 'endpoint' && (!node.data?.path || !node.data?.method)) {
+                    console.warn('⚠️ Endpoint node missing required data:', {
+                        id: node.id,
+                        data: node.data,
+                        hasPath: !!node.data?.path,
+                        hasMethod: !!node.data?.method
+                    });
+                }
+                if (node.type === 'schema' && !node.data?.name) {
+                    console.warn('⚠️ Schema node missing name:', {
+                        id: node.id,
+                        data: node.data
+                    });
+                }
+            });
+
             // Build spec with deterministic top-level order
             const spec = {
                 openapi: '3.0.0',
@@ -333,6 +360,19 @@ const useSpecGeneration = (nodes, edges) => {
             } catch { /* ignore validation utility errors */ }
 
             setGeneratedSpec(spec);
+
+            // Debug logging for generated spec
+            console.log('✅ Generated OpenAPI spec:', {
+                paths: Object.keys(spec.paths || {}).length,
+                operations: Object.values(spec.paths || {}).reduce((total, pathMethods) => {
+                    return total + Object.keys(pathMethods).length;
+                }, 0),
+                schemas: Object.keys(spec.components?.schemas || {}).length,
+                parameters: Object.keys(spec.components?.parameters || {}).length,
+                specSize: JSON.stringify(spec).length,
+                spec: spec // Full spec for debugging
+            });
+
             return spec;
         } catch (err) {
             // Keep preview usable; only set error message

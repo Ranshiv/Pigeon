@@ -3,6 +3,8 @@ const express = require('express');
 const router = express.Router();
 const ApiVersioningService = require('../services/ApiVersioningService');
 const MockServerService = require('../services/MockServerService');
+const IntegrationService = require('../services/IntegrationService');
+const ApiVersion = require('../models/ApiVersion');
 const { authenticateJWT } = require('../middleware/auth');
 
 // Create a new API version
@@ -13,6 +15,34 @@ router.post('/collections/:collectionId/versions', authenticateJWT, async (req, 
         const versionData = req.body;
 
         const apiVersion = await ApiVersioningService.createVersion(collectionId, versionData, userId);
+
+        // Auto-lint if enabled and OpenAPI spec is provided
+        if (apiVersion.openApiSpec && process.env.PIGEON_LINT_ENABLED !== 'false') {
+            try {
+                const integrationService = new IntegrationService();
+                const lintResult = await integrationService.lintOpenApi(apiVersion.openApiSpec, {
+                    apiVersionId: apiVersion._id
+                });
+
+                // Update the version with lint results
+                await ApiVersion.findByIdAndUpdate(apiVersion._id, {
+                    lintFindings: lintResult.findings,
+                    lintScore: lintResult.score,
+                    lintedAt: new Date(lintResult.lintedAt),
+                    rulesetInfo: lintResult.rulesetInfo
+                });
+
+                apiVersion.lintFindings = lintResult.findings;
+                apiVersion.lintScore = lintResult.score;
+                apiVersion.lintedAt = new Date(lintResult.lintedAt);
+                apiVersion.rulesetInfo = lintResult.rulesetInfo;
+
+                console.log(`📋 Auto-lint completed for API version ${apiVersion._id}: score ${lintResult.score}/100`);
+            } catch (lintError) {
+                console.warn(`⚠️ Auto-lint failed for API version ${apiVersion._id}:`, lintError.message);
+                // Don't fail the version creation if linting fails
+            }
+        }
 
         res.status(201).json({
             message: 'API version created successfully',
@@ -69,6 +99,34 @@ router.put('/versions/:versionId', authenticateJWT, async (req, res) => {
         const updateData = req.body;
 
         const version = await ApiVersioningService.updateVersion(versionId, updateData, userId);
+
+        // Auto-lint if enabled and OpenAPI spec was updated
+        if (updateData.openApiSpec && process.env.PIGEON_LINT_ENABLED !== 'false') {
+            try {
+                const integrationService = new IntegrationService();
+                const lintResult = await integrationService.lintOpenApi(updateData.openApiSpec, {
+                    apiVersionId: version._id
+                });
+
+                // Update the version with lint results
+                await ApiVersion.findByIdAndUpdate(version._id, {
+                    lintFindings: lintResult.findings,
+                    lintScore: lintResult.score,
+                    lintedAt: new Date(lintResult.lintedAt),
+                    rulesetInfo: lintResult.rulesetInfo
+                });
+
+                version.lintFindings = lintResult.findings;
+                version.lintScore = lintResult.score;
+                version.lintedAt = new Date(lintResult.lintedAt);
+                version.rulesetInfo = lintResult.rulesetInfo;
+
+                console.log(`📋 Auto-lint completed for updated API version ${version._id}: score ${lintResult.score}/100`);
+            } catch (lintError) {
+                console.warn(`⚠️ Auto-lint failed for updated API version ${version._id}:`, lintError.message);
+                // Don't fail the version update if linting fails
+            }
+        }
 
         res.json({
             message: 'API version updated successfully',
@@ -218,6 +276,120 @@ router.post('/versions/:versionId/generate-url', authenticateJWT, async (req, re
         console.error('Error generating versioned URL:', error);
         res.status(500).json({
             message: error.message || 'Failed to generate versioned URL'
+        });
+    }
+});
+
+// OpenAPI Linting endpoints
+
+// Re-run lint on an API version
+router.post('/versions/:versionId/lint', authenticateJWT, async (req, res) => {
+    try {
+        const { versionId } = req.params;
+        const { rulesetPath, timeoutMs = 10000, maxSizeMB = 20 } = req.body;
+
+        // Get the API version
+        const version = await ApiVersioningService.getVersion(versionId);
+        if (!version) {
+            return res.status(404).json({
+                message: 'API version not found'
+            });
+        }
+
+        if (!version.openApiSpec) {
+            return res.status(400).json({
+                message: 'No OpenAPI specification found for this version'
+            });
+        }
+
+        // Validate security: ensure rulesetPath is safe
+        if (rulesetPath && (rulesetPath.includes('..') || require('path').isAbsolute(rulesetPath))) {
+            return res.status(400).json({
+                message: 'Invalid ruleset path: must be relative and cannot contain ".."'
+            });
+        }
+
+        // Run linting
+        const integrationService = new IntegrationService();
+        const lintResult = await integrationService.lintOpenApi(version.openApiSpec, {
+            rulesetPath,
+            timeoutMs,
+            maxSizeMB,
+            apiVersionId: versionId
+        });
+
+        // Update the version with lint results
+        await ApiVersion.findByIdAndUpdate(versionId, {
+            lintFindings: lintResult.findings,
+            lintScore: lintResult.score,
+            lintedAt: new Date(lintResult.lintedAt),
+            rulesetInfo: lintResult.rulesetInfo
+        });
+
+        res.json({
+            message: 'Linting completed successfully',
+            summary: {
+                score: lintResult.score,
+                counts: lintResult.counts,
+                rulesetInfo: lintResult.rulesetInfo,
+                lintedAt: lintResult.lintedAt
+            },
+            findings: lintResult.findings
+        });
+
+    } catch (error) {
+        console.error('Error running lint:', error);
+        res.status(500).json({
+            message: error.message || 'Failed to run linting'
+        });
+    }
+});
+
+// Get lint results for an API version
+router.get('/versions/:versionId/lint', authenticateJWT, async (req, res) => {
+    try {
+        const { versionId } = req.params;
+
+        const version = await ApiVersioningService.getVersion(versionId);
+        if (!version) {
+            return res.status(404).json({
+                message: 'API version not found'
+            });
+        }
+
+        // Return persisted lint results
+        if (!version.lintedAt) {
+            return res.json({
+                message: 'No lint results available',
+                summary: {
+                    score: null,
+                    counts: { errors: 0, warnings: 0, infos: 0, hints: 0 },
+                    rulesetInfo: null,
+                    lintedAt: null
+                },
+                findings: []
+            });
+        }
+
+        res.json({
+            summary: {
+                score: version.lintScore,
+                counts: {
+                    errors: version.lintFindings.filter(f => f.severity === 'error').length,
+                    warnings: version.lintFindings.filter(f => f.severity === 'warn').length,
+                    infos: version.lintFindings.filter(f => f.severity === 'info').length,
+                    hints: version.lintFindings.filter(f => f.severity === 'hint').length
+                },
+                rulesetInfo: version.rulesetInfo,
+                lintedAt: version.lintedAt
+            },
+            findings: version.lintFindings || []
+        });
+
+    } catch (error) {
+        console.error('Error getting lint results:', error);
+        res.status(500).json({
+            message: error.message || 'Failed to get lint results'
         });
     }
 });

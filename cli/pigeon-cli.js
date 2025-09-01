@@ -13,6 +13,7 @@ const chalk = require('chalk');
 const { runCollection } = require('./runner');
 const { generateReport } = require('./reporter');
 const { loadEnvironment } = require('./environment');
+const { runLint } = require('./runner');
 
 // For Windows compatibility
 process.on('unhandledRejection', (reason, promise) => {
@@ -75,6 +76,60 @@ const argv = yargs(hideBin(process.argv))
         default: 30000
       });
   })
+  .command('lint', 'Lint an OpenAPI specification using Spectral', (yargs) => {
+    return yargs
+      .option('spec', {
+        alias: 's',
+        describe: 'Path to OpenAPI specification file (JSON or YAML)',
+        type: 'string',
+        demandOption: true
+      })
+      .option('ruleset', {
+        describe: 'Path to custom Spectral ruleset file',
+        type: 'string'
+      })
+      .option('format', {
+        alias: 'f',
+        describe: 'Output format',
+        type: 'string',
+        choices: ['json', 'table', 'stylish'],
+        default: 'stylish'
+      })
+      .option('output', {
+        alias: 'o',
+        describe: 'Output file to write results',
+        type: 'string'
+      })
+      .option('fail-on', {
+        describe: 'Exit with error code when threshold is breached',
+        type: 'string',
+        choices: ['off', 'warnings', 'errors'],
+        default: 'errors'
+      })
+      .option('save', {
+        describe: 'Save lint results to database (requires api-version-id)',
+        type: 'boolean',
+        default: false
+      })
+      .option('api-version-id', {
+        describe: 'API Version ID for saving results to database',
+        type: 'string'
+      })
+      .option('workspace-id', {
+        describe: 'Workspace ID for authorization checks',
+        type: 'string'
+      })
+      .option('timeout', {
+        describe: 'Timeout in milliseconds',
+        type: 'number',
+        default: 10000
+      })
+      .option('max-size', {
+        describe: 'Maximum spec file size in MB',
+        type: 'number',
+        default: 20
+      });
+  })
   .command('export', 'Export a collection for CI/CD usage', (yargs) => {
     return yargs
       .option('collection', {
@@ -92,6 +147,8 @@ const argv = yargs(hideBin(process.argv))
   })
   .example('$0 run --collection my-collection --environment prod --reporter junit', 'Run tests with production environment and generate JUnit report')
   .example('$0 run --collection api-tests.json --reporter csv --output ./test-results/api-test-results.csv', 'Run tests and generate CSV report for data analysis')
+  .example('$0 lint --spec openapi.yaml --format json --output lint-results.json', 'Lint OpenAPI spec and save results as JSON')
+  .example('$0 lint --spec api.json --ruleset .pigeon/spectral.yaml --fail-on warnings', 'Lint with custom ruleset and fail on warnings')
   .example('$0 export --collection my-collection --output ./ci/api-tests.json', 'Export collection for CI/CD usage')
   .epilogue('For more information, visit https://pigeon-api.com/docs/cli')
   .help()
@@ -161,6 +218,29 @@ async function main() {
 
       // Exit with appropriate code
       process.exit(failed > 0 ? 1 : 0);
+    }
+    else if (command === 'lint') {
+      console.log(chalk.cyan(`Linting OpenAPI spec: ${argv.spec}`));
+
+      const lintOptions = {
+        spec: argv.spec,
+        ruleset: argv.ruleset,
+        format: argv.format,
+        output: argv.output,
+        failOn: argv['fail-on'],
+        save: argv.save,
+        apiVersionId: argv['api-version-id'],
+        workspaceId: argv['workspace-id'],
+        timeout: argv.timeout,
+        maxSize: argv['max-size']
+      };
+
+      const startTime = Date.now();
+      const exitCode = await runLint(lintOptions);
+      const duration = Date.now() - startTime;
+
+      console.log(chalk.gray(`Lint completed in ${duration}ms`));
+      process.exit(exitCode);
     }
     else if (command === 'export') {
       console.log(chalk.cyan(`Exporting collection: ${argv.collection}`));

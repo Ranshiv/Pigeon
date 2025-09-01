@@ -9,6 +9,97 @@ import {
 } from '../utils/dragDropUtils';
 
 /**
+ * Returns default data structure for each node type
+ * This ensures nodes have the proper structure for spec generation
+ */
+const getDefaultNodeData = (nodeType) => {
+    switch (nodeType) {
+        case 'endpoint':
+            return {
+                path: '/api/resource',
+                method: 'GET',
+                summary: 'New API Endpoint',
+                description: 'Describe what this endpoint does',
+                tags: [],
+                deprecated: false,
+                operationId: '',
+                parameters: [],
+                responses: {
+                    '200': {
+                        description: 'Successful response',
+                        content: {
+                            'application/json': {
+                                schema: { type: 'object' }
+                            }
+                        }
+                    }
+                }
+            };
+
+        case 'schema':
+            return {
+                name: 'NewSchema',
+                type: 'object',
+                description: 'Define data structure',
+                required: [],
+                properties: {
+                    id: { type: 'string', description: 'Unique identifier' },
+                    name: { type: 'string', description: 'Name field' }
+                },
+                example: {
+                    id: 'example-id',
+                    name: 'Example Name'
+                }
+            };
+
+        case 'parameter':
+            return {
+                name: 'newParameter',
+                in: 'query',
+                type: 'string',
+                required: false,
+                description: 'Parameter description',
+                schema: { type: 'string' },
+                example: 'example-value'
+            };
+
+        case 'security':
+            return {
+                name: 'bearerAuth',
+                type: 'http',
+                scheme: 'bearer',
+                bearerFormat: 'JWT',
+                description: 'Bearer token authentication'
+            };
+
+        case 'info':
+            return {
+                title: 'API Title',
+                version: '1.0.0',
+                description: 'API description',
+                contact: {
+                    name: 'API Support',
+                    email: 'support@example.com'
+                },
+                license: {
+                    name: 'MIT',
+                    url: 'https://opensource.org/licenses/MIT'
+                }
+            };
+
+        case 'resource':
+            return {
+                name: 'Resource Group',
+                description: 'Group of related endpoints',
+                tags: []
+            };
+
+        default:
+            return {};
+    }
+};
+
+/**
  * Enhanced Custom hook for managing drag and drop functionality
  * Follows SRP by only handling drag and drop state and operations
  * Added: snap-to-grid, collision detection, performance optimization
@@ -53,11 +144,13 @@ const useDragAndDrop = (onNodeAdd, existingNodes = []) => {
                 // Find available position if collision detected
                 position = findAvailablePosition(position, existingNodes);
 
-                // Create node with enhanced position data
+                // Create node with enhanced position data and proper default data structure
+                const defaultData = getDefaultNodeData(componentData.type);
                 const newNode = {
                     type: componentData.type,
                     position: position,
                     data: {
+                        ...defaultData,
                         name: componentData.name || componentData.type,
                         description: componentData.description || ''
                     },

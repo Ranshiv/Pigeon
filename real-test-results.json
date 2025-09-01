@@ -1,0 +1,141 @@
+{
+  "score": 70,
+  "findings": [
+    {
+      "code": "info-contact",
+      "message": "Info object must have \"contact\" object.",
+      "path": [
+        "info"
+      ],
+      "severity": 1,
+      "range": {
+        "start": {
+          "line": 2,
+          "character": 10
+        },
+        "end": {
+          "line": 6,
+          "character": 3
+        }
+      },
+      "documentationUrl": "https://meta.stoplight.io/docs/spectral/docs/reference/openapi-rules.md#info-contact"
+    },
+    {
+      "code": "operation-tags",
+      "message": "Operation must have non-empty \"tags\" array.",
+      "path": [
+        "paths",
+        "/pets",
+        "get"
+      ],
+      "severity": 1,
+      "range": {
+        "start": {
+          "line": 14,
+          "character": 13
+        },
+        "end": {
+          "line": 33,
+          "character": 7
+        }
+      },
+      "documentationUrl": "https://meta.stoplight.io/docs/spectral/docs/reference/openapi-rules.md#operation-tags"
+    },
+    {
+      "code": "operation-description",
+      "message": "Operation \"description\" must be present and non-empty string.",
+      "path": [
+        "paths",
+        "/pets",
+        "post"
+      ],
+      "severity": 1,
+      "range": {
+        "start": {
+          "line": 34,
+          "character": 14
+        },
+        "end": {
+          "line": 59,
+          "character": 7
+        }
+      },
+      "documentationUrl": "https://meta.stoplight.io/docs/spectral/docs/reference/openapi-rules.md#operation-description"
+    },
+    {
+      "code": "operation-tags",
+      "message": "Operation must have non-empty \"tags\" array.",
+      "path": [
+        "paths",
+        "/pets",
+        "post"
+      ],
+      "severity": 1,
+      "range": {
+        "start": {
+          "line": 34,
+          "character": 14
+        },
+        "end": {
+          "line": 59,
+          "character": 7
+        }
+      },
+      "documentationUrl": "https://meta.stoplight.io/docs/spectral/docs/reference/openapi-rules.md#operation-tags"
+    },
+    {
+      "code": "operation-description",
+      "message": "Operation \"description\" must be present and non-empty string.",
+      "path": [
+        "paths",
+        "/pets/{petId}",
+        "get"
+      ],
+      "severity": 1,
+      "range": {
+        "start": {
+          "line": 62,
+          "character": 13
+        },
+        "end": {
+          "line": 91,
+          "character": 7
+        }
+      },
+      "documentationUrl": "https://meta.stoplight.io/docs/spectral/docs/reference/openapi-rules.md#operation-description"
+    },
+    {
+      "code": "operation-tags",
+      "message": "Operation must have non-empty \"tags\" array.",
+      "path": [
+        "paths",
+        "/pets/{petId}",
+        "get"
+      ],
+      "severity": 1,
+      "range": {
+        "start": {
+          "line": 62,
+          "character": 13
+        },
+        "end": {
+          "line": 91,
+          "character": 7
+        }
+      },
+      "documentationUrl": "https://meta.stoplight.io/docs/spectral/docs/reference/openapi-rules.md#operation-tags"
+    }
+  ],
+  "counts": {
+    "errors": 0,
+    "warnings": 6,
+    "infos": 0,
+    "hints": 0
+  },
+  "rulesetInfo": {
+    "name": "OpenAPI",
+    "sourcePath": "built-in"
+  },
+  "lintedAt": "2025-09-01T08:45:36.037Z",
+  "parseError": false
+}

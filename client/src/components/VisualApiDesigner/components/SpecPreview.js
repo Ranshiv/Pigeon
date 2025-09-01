@@ -46,7 +46,7 @@ const SpecPreview = ({
     const [sideBySide, setSideBySide] = useState(false);
     const [localText, setLocalText] = useState('');
     const [validationList, setValidationList] = useState([]);
-    const [editorHeight, setEditorHeight] = useState(500);
+    const [editorHeight, setEditorHeight] = useState(720);
 
     const editorRef = useRef(null);
     const monacoRef = useRef(null);
