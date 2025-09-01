@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
     FiSave,
     FiUpload,
@@ -63,11 +63,15 @@ const VisualApiDesigner = ({
         updateNode,
         deleteNode,
         selectNode,
+        markClean,
         undo,
         redo,
         canUndo,
         canRedo
     } = designerState;
+
+    // Get the loadDesign function from designer state
+    const { loadDesign: loadDesignerState } = designerState;
 
     const { generatedSpec, validationErrors } = useSpecGeneration(nodes, edges);
     const [viewMode, setViewMode] = useState('design'); // 'design', 'preview', 'split'
@@ -77,6 +81,16 @@ const VisualApiDesigner = ({
     const [isInitialized, setIsInitialized] = useState(false);
     const [leftSidebarExpanded, setLeftSidebarExpanded] = useState(true); // For Component Palette
     const [rightSidebarExpanded, setRightSidebarExpanded] = useState(true); // For Properties Panel
+
+    // Use ref to avoid recreating debug function
+    const collectionIdRef = useRef(collectionId);
+    const lastSaveRef = useRef(0); // Track last save time
+    const isDev = process.env.NODE_ENV === 'development';
+
+    // Update ref when collectionId changes
+    useEffect(() => {
+        collectionIdRef.current = collectionId;
+    }, [collectionId]);
 
     // Add keyboard shortcuts for toggling sidebars after state initialization
     useEffect(() => {
@@ -102,8 +116,9 @@ const VisualApiDesigner = ({
 
     // Initialize designer with collection requests
     useEffect(() => {
-        // Only run initialization once when requests are available
+        // Only run initialization once when requests are available and no design is loaded
         if (requests && requests.length > 0 && !isInitialized) {
+            console.log('🚀 Initializing designer with', requests.length, 'requests');
             try {
                 // We'll use a debounced approach to avoid excessive state updates
 
@@ -123,6 +138,7 @@ const VisualApiDesigner = ({
 
                 // Add nodes with delay to prevent React rendering issues
                 if (convertedNodes.length > 0) {
+                    console.log('📝 Adding', convertedNodes.length, 'nodes from requests');
                     // Use setTimeout to defer processing to next event loop
                     // This helps prevent cascading updates and max depth issues
                     setTimeout(() => {
@@ -144,6 +160,8 @@ const VisualApiDesigner = ({
 
                         processBatch(0);
                     }, 100);
+                } else {
+                    console.log('📝 No valid nodes to add from requests');
                 }
             } catch (error) {
                 // Catch any errors in the processing to prevent component crashes
@@ -175,31 +193,218 @@ const VisualApiDesigner = ({
 
     const saveDesign = useCallback(async () => {
         try {
-            // ENDPOINT DISABLED: The server endpoint doesn't exist yet
-            // Instead of making API calls that will fail, we'll just update the parent component
-
             // Skip if collection ID is invalid or contains '#' character
             if (!collectionId || typeof collectionId !== 'string' || collectionId.includes('#')) {
                 return { success: true, message: 'Save skipped - invalid collection ID' };
             }
 
-            // Skip actual network request since endpoint doesn't exist
-            // Just notify parent component of spec update
+            setSaveStatus('saving');
+
+            // Only log when there are significant changes
+            if (nodes?.length > 0 || edges?.length > 0) {
+                console.log('💾 Saving design with', nodes?.length || 0, 'nodes and', edges?.length || 0, 'edges');
+            }
+
+            // Prepare the designer state
+            const designerState = {
+                nodes: nodes || [],
+                edges: edges || [],
+                viewport: { x: 0, y: 0, zoom: 1 }
+            };
+
+            // Make API call to save design
+            const response = await fetch('/api/visual-designer/designs', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'include',
+                body: JSON.stringify({
+                    collectionId,
+                    designerState,
+                    openApiSpec: generatedSpec,
+                    name: collection?.name ? `${collection.name} Visual Design` : 'Untitled Design'
+                })
+            });
+
+            const result = await response.json();
+
+            // Only log errors or first successful save
+            if (!response.ok) {
+                console.error('💾 Save failed:', { status: response.status, result });
+                throw new Error(result.message || `HTTP ${response.status}: Failed to save design`);
+            }
+
+            // Notify parent component of spec update
             if (onSpecUpdate && generatedSpec) {
                 onSpecUpdate(generatedSpec);
             }
 
-            // Return mock success response
+            setSaveStatus('saved');
+
+            // Reset isDirty flag after successful save
+            markClean();
+            console.log('✅ Save successful, isDirty reset to false');
+
             return {
                 success: true,
-                message: 'Design saved locally (server endpoint disabled)',
+                message: result.message || 'Design saved successfully',
                 timestamp: new Date().toISOString()
             };
         } catch (error) {
-            // Silently handle error but return success to prevent cascading issues
-            return { success: true, message: 'Local save only - server endpoint disabled' };
+            // Only log errors in development mode
+            if (isDev) {
+                console.error('Error saving design:', error);
+            }
+            setSaveStatus('unsaved');
+
+            return {
+                success: false,
+                message: error.message || 'Failed to save design'
+            };
         }
-    }, [collectionId, generatedSpec, onSpecUpdate]);
+    }, [collectionId, nodes, edges, generatedSpec, onSpecUpdate, collection?.name, isDev, markClean]);
+
+    const loadDesign = useCallback(async () => {
+        try {
+            // Skip if collection ID is invalid
+            if (!collectionId || typeof collectionId !== 'string' || collectionId.includes('#')) {
+                return;
+            }
+
+            // Make API call to load design
+            const response = await fetch(`/api/visual-designer/designs/${collectionId}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'include'
+            });
+
+            const result = await response.json();
+
+            // Always log load operations to debug refresh issues
+            console.log('📖 Load design response:', {
+                status: response.status,
+                success: result.success,
+                hasData: !!result.data,
+                hasDesignerState: !!result.data?.designerState,
+                nodeCount: result.data?.designerState?.nodes?.length || 0,
+                edgeCount: result.data?.designerState?.edges?.length || 0
+            });
+
+            if (!response.ok) {
+                throw new Error(result.message || `HTTP ${response.status}: Failed to load design`);
+            }
+
+            // Load the design state if it exists
+            if (result.data?.designerState) {
+                const { designerState } = result.data;
+
+                console.log('📖 Loading designer state:', {
+                    nodeCount: designerState.nodes?.length || 0,
+                    edgeCount: designerState.edges?.length || 0,
+                    hasViewport: !!designerState.viewport
+                });
+
+                // Always load the designer state, even if empty
+                loadDesignerState(designerState);
+                setSaveStatus('saved');
+
+                if (designerState.nodes?.length > 0 || designerState.edges?.length > 0) {
+                    console.log('✅ Design loaded with', designerState.nodes?.length || 0, 'nodes and', designerState.edges?.length || 0, 'edges');
+                } else {
+                    console.log('📝 Empty design loaded');
+                }
+            } else {
+                console.log('📝 No designer state found in response');
+            }
+
+            return result.data;
+        } catch (error) {
+            console.error('❌ Error loading design:', error);
+            // Silently fail loading to not break the component
+        }
+    }, [collectionId, loadDesignerState]);
+
+    // Priority load effect - load saved design first, before initialization
+    useEffect(() => {
+        if (collectionId && !isInitialized) {
+            console.log('🎯 Priority load: Attempting to load saved design before initialization for:', collectionId);
+            loadDesign().then((loadedData) => {
+                if (loadedData?.designerState?.nodes?.length > 0) {
+                    console.log('✅ Found saved design with', loadedData.designerState.nodes.length, 'nodes - skipping request initialization');
+                    setIsInitialized(true); // Skip request initialization
+                } else {
+                    console.log('📝 No saved design found, allowing request initialization to proceed');
+                    // Let the initialization effect run by not setting isInitialized here
+                }
+            }).catch(error => {
+                console.log('⚠️ Priority load failed, allowing request initialization to proceed:', error.message);
+                // Let the initialization effect run
+            });
+        }
+    }, [collectionId, isInitialized, loadDesign, setIsInitialized]);
+
+    // Load design when component mounts or collection changes (after initialization)
+    useEffect(() => {
+        console.log('🔄 Standard load effect triggered:', {
+            hasCollectionId: !!collectionId,
+            collectionId: collectionId,
+            isInitialized,
+            loadDesignRef: typeof loadDesign
+        });
+
+        // Only load after initialization is complete (this handles cases where
+        // the priority load didn't find anything but initialization completed)
+        if (collectionId && isInitialized) {
+            console.log('📖 Standard load: Checking for design updates for collection:', collectionId);
+            // This is a secondary load to catch any updates
+            loadDesign();
+        } else {
+            console.log('⏭️ Skipping standard load - missing requirements:', {
+                hasCollectionId: !!collectionId,
+                isInitialized
+            });
+        }
+    }, [collectionId, isInitialized, loadDesign]);
+
+    // Debug function to check database state - memoized to prevent recreation
+    const debugDatabase = useCallback(async () => {
+        const currentCollectionId = collectionIdRef.current;
+        if (!currentCollectionId) {
+            console.log('🔍 No collectionId to debug');
+            return;
+        }
+
+        try {
+            const response = await fetch(`/api/visual-designer/debug/${currentCollectionId}`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': 'Bearer dev-token'
+                }
+            });
+
+            if (response.ok) {
+                const debugData = await response.json();
+                console.log('🔍 Database debug data:', debugData);
+            } else {
+                console.error('🔍 Debug endpoint failed:', response.status, response.statusText);
+            }
+        } catch (error) {
+            console.error('🔍 Debug check error:', error);
+        }
+    }, []);
+
+    // Add debug function to window for console access - only once and only in development
+    useEffect(() => {
+        if (isDev) {
+            window.debugVisualDesigner = debugDatabase;
+            return () => {
+                delete window.debugVisualDesigner;
+            };
+        }
+    }, [debugDatabase, isDev]);
 
     const handleAutoSave = useCallback(async () => {
         if (saveStatus === 'unsaved') {
@@ -214,35 +419,88 @@ const VisualApiDesigner = ({
         }
     }, [saveStatus, saveDesign]);
 
-    // Debounced save to prevent excessive saves during rapid changes
-    const debouncedSave = useMemo(() => {
-        let timeoutId;
-        return () => {
-            clearTimeout(timeoutId);
-            timeoutId = setTimeout(() => {
-                if (saveStatus === 'unsaved') {
-                    handleAutoSave();
-                }
-            }, 2000); // Increased debounce time from 10s to 2s for better UX
-        };
-    }, [saveStatus, handleAutoSave]);
+    // Debounced save to prevent excessive saves - use ref to avoid recreation
+    const debouncedSaveRef = useRef(null);
 
-    // Auto-save functionality with improved debouncing
+    const debouncedSave = useCallback(() => {
+        if (debouncedSaveRef.current) {
+            clearTimeout(debouncedSaveRef.current);
+        }
+        debouncedSaveRef.current = setTimeout(() => {
+            console.log('⚡ Debounced save executing...');
+            handleAutoSave();
+        }, 1000); // Reduced from 2000ms to 1000ms for faster saves
+    }, [handleAutoSave]);
+
+    // Auto-save functionality with improved debouncing and throttling
     useEffect(() => {
         // Auto-save only when:
         // 1. There are actual changes (isDirty)
         // 2. We're not already saving
         // 3. Collection ID is valid
+        // 4. Enough time has passed since last save (throttling)
+        const now = Date.now();
+        const timeSinceLastSave = now - lastSaveRef.current;
+        const minSaveInterval = isDev ? 1000 : 2000; // 1s in dev, 2s in prod (much faster)
+
+        console.log('🔍 Auto-save check:', {
+            isDirty,
+            saveStatus,
+            collectionId,
+            timeSinceLastSave,
+            minSaveInterval,
+            willTrigger: isDirty &&
+                saveStatus !== 'saving' &&
+                collectionId &&
+                typeof collectionId === 'string' &&
+                !collectionId.includes('#') &&
+                timeSinceLastSave >= minSaveInterval
+        });
+
         if (isDirty &&
             saveStatus !== 'saving' &&
             collectionId &&
             typeof collectionId === 'string' &&
-            !collectionId.includes('#')) {
+            !collectionId.includes('#') &&
+            timeSinceLastSave >= minSaveInterval) {
 
+            console.log('🔄 Auto-save triggered - isDirty:', isDirty, 'timeSinceLastSave:', timeSinceLastSave);
             setSaveStatus('unsaved');
+            lastSaveRef.current = now;
             debouncedSave();
         }
-    }, [isDirty, saveStatus, collectionId, debouncedSave]);
+    }, [isDirty, saveStatus, collectionId, debouncedSave, isDev]);
+
+    // Cleanup timeout on unmount
+    useEffect(() => {
+        return () => {
+            if (debouncedSaveRef.current) {
+                clearTimeout(debouncedSaveRef.current);
+            }
+        };
+    }, []);
+
+    // Save on page unload if there are unsaved changes
+    useEffect(() => {
+        const handleBeforeUnload = async (event) => {
+            if (isDirty && saveStatus !== 'saving') {
+                // Try to save changes before page unload
+                try {
+                    await saveDesign();
+                    console.log('💾 Emergency save completed before page unload');
+                } catch (error) {
+                    console.warn('💾 Emergency save failed:', error);
+                    // Show warning to user
+                    event.preventDefault();
+                    event.returnValue = 'You have unsaved changes. Are you sure you want to leave?';
+                    return 'You have unsaved changes. Are you sure you want to leave?';
+                }
+            }
+        };
+
+        window.addEventListener('beforeunload', handleBeforeUnload);
+        return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+    }, [isDirty, saveStatus, saveDesign]);
 
     // Sidebar state management - preserve user preferences across mode switches
     // Only provide gentle suggestions without forcing changes
@@ -280,6 +538,7 @@ const VisualApiDesigner = ({
     }, [viewMode, selectNode]);
 
     const handleElementUpdate = useCallback((elementId, updates) => {
+        console.log('🎯 handleElementUpdate called for', elementId, 'with updates:', updates);
         updateNode(elementId, updates);
     }, [updateNode]);
 

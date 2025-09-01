@@ -83,6 +83,8 @@ const useDesignerState = (initialState = {}) => {
                 nodes: updatedNodes,
                 isDirty: true
             };
+
+            console.log('🔧 updateNode called for', nodeId, 'with updates:', updates, 'isDirty set to:', true);
             return addToHistory(newState, prevState);
         });
     }, []);
