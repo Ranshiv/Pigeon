@@ -135,12 +135,17 @@
     background-color: rgba(244, 67, 54, 0.2);
 }
 
-/* Improved tabs */
+/* Improved tabs - Enhanced with 2025 Blue Palette */
 .workspace-tabs {
     display: flex;
-    border-bottom: 1px solid var(--border-color, #e0e0e0);
+    border-bottom: 1px solid rgba(59, 130, 246, 0.2);
     margin-bottom: 20px;
-    gap: 8px;
+    gap: 4px;
+    background: linear-gradient(to right, 
+                rgba(248, 250, 252, 0.8), 
+                rgba(241, 245, 249, 0.8));
+    border-radius: 12px 12px 0 0;
+    padding: 4px;
 }
 
 .workspace-tabs .tab {
@@ -148,35 +153,35 @@
     background: transparent;
     border: none;
     border-bottom: 3px solid transparent;
-    color: var(--text-secondary, #666);
+    color: var(--text-secondary);
     font-weight: 500;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     font-size: 15px;
-    border-radius: 8px 8px 0 0;
-    /* Rounded top corners */
+    border-radius: 8px;
+    position: relative;
+    overflow: hidden;
 }
 
 .workspace-tabs .tab:hover {
-    color: var(--text-color, #333);
-    background-color: #013B5B;
-    /* Darker blue hover background */
-    border-bottom-color: #014C75;
-    /* Deep blue accent */
+    color: var(--text-color);
+    background: rgba(59, 130, 246, 0.1);
+    border-bottom-color: var(--primary-color);
     transform: translateY(-2px);
-    /* Subtle lift effect */
+    box-shadow: 0 4px 20px rgba(59, 130, 246, 0.15),
+                0 0 0 1px rgba(59, 130, 246, 0.1);
 }
 
 .workspace-tabs .tab.active {
-    color: #ffffff;
-    /* White text for better contrast */
-    background-color: #014C75;
-    /* Deep blue active background */
-    border-bottom-color: #014C75;
-    /* Deep blue accent */
+    color: white;
+    background: linear-gradient(135deg, 
+                var(--primary-color) 0%, 
+                #2563eb 100%);
+    border-bottom-color: var(--primary-color);
     font-weight: 600;
-    box-shadow: 0 2px 8px rgba(1, 76, 117, 0.3);
-    /* Subtle blue glow */
+    box-shadow: 0 4px 20px rgba(59, 130, 246, 0.3),
+                0 8px 40px rgba(59, 130, 246, 0.15);
+    transform: translateY(-1px);
 }
 
 /* Tab content */

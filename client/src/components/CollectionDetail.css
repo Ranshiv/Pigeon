@@ -37,13 +37,16 @@
   align-items: center;
   justify-content: space-between;
   padding: 10px 20px;
-  background: linear-gradient(to bottom, #012A41, #002234);
-  /* Dark navy to very dark navy gradient */
-  border-bottom: 1px solid #00080D;
-  /* Almost black border */
+  background: linear-gradient(135deg, 
+              var(--primary-color) 0%, 
+              #2563eb 50%, 
+              #1e40af 100%);
+  /* Beautiful blue gradient */
+  border-bottom: 1px solid rgba(59, 130, 246, 0.3);
   height: 54px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-  /* Enhanced shadow for depth */
+  box-shadow: 0 4px 20px rgba(59, 130, 246, 0.2),
+              0 2px 8px rgba(0, 0, 0, 0.1);
+  /* Blue-tinted shadow with depth */
 }
 
 .collection-title {
@@ -515,14 +518,14 @@
 .tab-navigation {
   display: flex !important;
   padding: 0;
-  background: #002234;
-  /* Very dark navy background */
-  border-bottom: 1px solid #00080D;
-  /* Almost black border */
+  background: linear-gradient(to right, #1e293b, #334155);
+  /* Dark slate gradient */
+  border-bottom: 1px solid rgba(59, 130, 246, 0.2);
   position: relative;
   z-index: 10;
   min-height: 48px;
   flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .tab-btn {
@@ -532,39 +535,43 @@
   padding: 12px 24px;
   background: transparent;
   border: none;
-  color: rgba(224, 224, 224, 0.7);
-  /* Light gray text */
+  color: #94a3b8;
+  /* Slate-400 text */
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
   position: relative;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   white-space: nowrap;
   letter-spacing: 0.2px;
   min-height: 48px;
   flex-shrink: 0;
   border-bottom: 2px solid transparent;
+  border-radius: 8px 8px 0 0;
+  margin: 0 2px;
 }
 
+/* Blue glow hover effect */
 .tab-btn:hover {
-  color: rgba(255, 255, 255, 0.95);
-  background: #013B5B;
-  /* Darker blue hover background */
-  border-bottom-color: #014C75;
-  /* Deep blue accent on hover */
-  transform: translateY(-1px);
-  /* Subtle lift effect */
+  color: #f8fafc;
+  background: rgba(59, 130, 246, 0.1);
+  border-bottom-color: var(--primary-color);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px rgba(59, 130, 246, 0.2),
+              0 0 0 1px rgba(59, 130, 246, 0.1);
 }
 
+/* Enhanced active state with blue theme */
 .tab-btn.active {
   color: #ffffff !important;
-  background: #014C75 !important;
-  /* Deep blue active background */
+  background: linear-gradient(135deg, 
+              var(--primary-color) 0%, 
+              #2563eb 100%) !important;
   font-weight: 600;
-  border-bottom-color: #014C75;
-  /* Deep blue accent */
-  box-shadow: 0 2px 8px rgba(1, 76, 117, 0.3);
-  /* Subtle blue glow */
+  border-bottom-color: var(--primary-color);
+  box-shadow: 0 4px 20px rgba(59, 130, 246, 0.3),
+              0 8px 40px rgba(59, 130, 246, 0.15);
+  transform: translateY(-1px);
 }
 
 .tab-btn .fi,

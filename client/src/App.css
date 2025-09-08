@@ -1,51 +1,54 @@
 /* client/src/App.css */
-/* CSS Variables for theming - Minimalist Postman-inspired design */
+/* CSS Variables for theming - 2025 Blue Color Palette */
 :root {
-  /* Light theme variables */
-  --background-color: #f5f5f5;
-  --text-color: #333333;
-  --text-secondary: #6b7280;
-  --border-color: #e0e0e0;
+  /* Light theme variables - 2025 Blue Color Palette */
+  --background-color: #f8fafc;
+  --text-color: #1e293b;
+  --text-secondary: #64748b;
+  --border-color: #e2e8f0;
   --card-bg: #ffffff;
   --card-background: #ffffff;
-  --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-  --hover-bg: #f0f0f0;
-  --hover-background: #f3f4f6;
-  --primary-color: #ff6c37;
-  /* Postman-inspired orange */
-  --primary-hover: #e85c2a;
-  --secondary-color: #6c757d;
-  --secondary-hover: #5a6268;
-  --success-color: #28a745;
+  --card-shadow: 0 1px 3px rgba(1, 76, 117, 0.08);
+  --hover-bg: #f1f5f9;
+  --hover-background: #f1f5f9;
+  --primary-color: #014C75;
+  /* Deep blue primary */
+  --primary-hover: #013B5B;
+  --primary-light: #4A90E2;
+  /* Light blue for accents */
+  --secondary-color: #64748b;
+  --secondary-hover: #475569;
+  --success-color: #16a34a;
   --success-bg: #dcfce7;
-  --success-text: #16a34a;
-  --warning-color: #ffc107;
-  --danger-color: #dc3545;
+  --success-text: #15803d;
+  --warning-color: #eab308;
+  --danger-color: #dc2626;
   --danger-bg: #fef2f2;
   --danger-bg-hover: #fee2e2;
   --danger-border: #fecaca;
   --danger-border-hover: #fca5a5;
   --danger-text: #dc2626;
-  --info-color: #17a2b8;
-  --method-get: #7d69cb;
-  /* GET - purple */
-  --method-post: #ff6c37;
-  /* POST - orange */
-  --method-put: #4fade6;
-  /* PUT - blue */
-  --method-delete: #cf3030;
-  /* DELETE - red */
-  --method-patch: #ffb400;
-  /* PATCH - yellow */
-  --navbar-bg: #ffffff;
-  --navbar-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --info-color: #014C75;
+  /* Use our blue palette for info */
+  --method-get: #014C75;
+  /* Deep blue for GET */
+  --method-post: #16a34a;
+  /* Green for POST */
+  --method-put: #eab308;
+  /* Yellow for PUT */
+  --method-delete: #dc2626;
+  /* Red for DELETE */
+  --method-patch: #8b5cf6;
+  /* Purple for PATCH */
+  --navbar-bg: rgba(255, 255, 255, 0.95);
+  --navbar-shadow: 0 1px 2px rgba(1, 76, 117, 0.05);
   --panel-bg: #ffffff;
   --panel-border: 1px solid var(--border-color);
   --panel-radius: 4px;
-  --sidebar-bg: #f8f8f8;
+  --sidebar-bg: #f8fafc;
   --sidebar-border: 1px solid var(--border-color);
-  --disabled-bg: #f2f2f2;
-  --disabled-text: #a0a0a0;
+  --disabled-bg: #f1f5f9;
+  --disabled-text: #94a3b8;
   --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   --font-size-base: 14px;
   --font-size-sm: 12px;
@@ -71,56 +74,45 @@
   --content-max-width: 1400px;
 }
 
-/* Dark theme variables - 2025 Blue Palette */
+/* Dark theme variables - 2025 Blue Palette Enhanced */
 body.dark-theme {
-  --background-color: #00111A;
-  /* Main app background - nearly black navy */
-  --text-color: #e0e0e0;
-  --text-secondary: #9ca3af;
-  --border-color: #00080D;
-  /* Almost pure black for subtle borders */
-  --card-bg: #002234;
-  /* Very dark navy for cards */
-  --card-background: #002234;
-  /* Very dark navy for cards */
-  --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-  --hover-bg: #013B5B;
-  /* Darker blue for hover states */
-  --hover-background: #013B5B;
-  /* Darker blue for hover backgrounds */
-  --primary-color: #014C75;
-  /* Deep blue primary accent */
-  --primary-hover: #014368;
-  /* Darker blue on hover */
+  --background-color: #0f172a;
+  --text-color: #f8fafc;
+  --text-secondary: #94a3b8;
+  --border-color: #1e293b;
+  --card-bg: #1e293b;
+  --card-background: #1e293b;
+  --card-shadow: 0 4px 12px rgba(0, 8, 13, 0.4);
+  --hover-bg: #334155;
+  --hover-background: #334155;
+  --primary-color: #3b82f6;
+  /* Blue-500 primary */
+  --primary-hover: #2563eb;
+  --primary-light: #93c5fd;
   --success-bg: #064e3b;
-  --success-text: #10b981;
+  --success-text: #22c55e;
   --danger-bg: #4c1d1d;
   --danger-bg-hover: #5c2020;
   --danger-border: #7f1d1d;
   --danger-border-hover: #8f2020;
-  --danger-text: #f87171;
-  --info-color: #014C75;
-  /* Use our blue palette for info */
-  --method-get: #014C75;
-  /* Deep blue for GET */
-  --method-post: #ff7b00;
-  /* Keep orange for POST */
-  --method-put: #4fade6;
-  /* Keep blue for PUT */
-  --method-delete: #cf3030;
-  /* Keep red for DELETE */
-  --method-patch: #ffb400;
-  /* Keep yellow for PATCH */
-  --navbar-bg: #012A41;
-  /* Dark navy for navbar */
+  --danger-text: #ef4444;
+  --info-color: #3b82f6;
+  --method-get: #3b82f6;
+  /* Blue-500 for GET */
+  --method-post: #22c55e;
+  /* Green-500 for POST */
+  --method-put: #eab308;
+  /* Yellow-500 for PUT */
+  --method-delete: #ef4444;
+  /* Red-500 for DELETE */
+  --method-patch: #a855f7;
+  /* Purple-500 for PATCH */
+  --navbar-bg: rgba(30, 41, 59, 0.95);
   --navbar-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
-  --panel-bg: #002234;
-  /* Very dark navy for panels */
-  --sidebar-bg: #001927;
-  /* Almost black navy for sidebar */
-  --disabled-bg: #01324E;
-  /* Very dark blue for disabled elements */
-  --disabled-text: #7a7a7a;
+  --panel-bg: #1e293b;
+  --sidebar-bg: #0f172a;
+  --disabled-bg: #374151;
+  --disabled-text: #6b7280;
 }
 
 /* Base body styling */

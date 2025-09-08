@@ -15,30 +15,38 @@ html {
 /* Import the Inter font for a clean, modern look */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
-/* Apply the base theme variables - light theme by default */
+/* Apply the base theme variables - 2025 Blue Color Palette */
 body {
-  --background-color: #f8f9fa;
-  --text-color: #333333;
-  --text-secondary: #6c757d;
-  --border-color: #e1e4e8;
+  /* 2025 Blue Color Palette - Light Theme */
+  --background-color: #f8fafc;
+  --text-color: #1e293b;
+  --text-secondary: #64748b;
+  --border-color: #e2e8f0;
   --card-bg: #ffffff;
-  --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-  --hover-bg: #f5f5f5;
-  --primary-color: #FF6C37;
-  /* Postman-inspired orange */
-  --primary-hover: #e85d2a;
-  --secondary-color: #6c757d;
-  --secondary-hover: #5a6268;
-  --navbar-bg: #ffffff;
-  --navbar-border: rgba(0, 0, 0, 0.06);
+  --card-shadow: 0 1px 3px rgba(1, 76, 117, 0.08);
+  --hover-bg: #f1f5f9;
+  --primary-color: #014C75;
+  /* Deep blue primary */
+  --primary-hover: #013B5B;
+  --primary-light: #4A90E2;
+  /* Light blue for backgrounds */
+  --secondary-color: #64748b;
+  --secondary-hover: #475569;
+  --navbar-bg: rgba(255, 255, 255, 0.95);
+  --navbar-border: rgba(1, 76, 117, 0.06);
   --panel-bg: #ffffff;
 
-  /* Method colors for request types */
-  --method-get: #61affe;
-  --method-post: #49cc90;
-  --method-put: #fca130;
-  --method-delete: #f93e3e;
-  --method-patch: #50e3c2;
+  /* Method colors harmonized with blue palette */
+  --method-get: #014C75;
+  /* Deep blue for GET */
+  --method-post: #16a34a;
+  /* Green for POST */
+  --method-put: #eab308;
+  /* Yellow for PUT */
+  --method-delete: #dc2626;
+  /* Red for DELETE */
+  --method-patch: #8b5cf6;
+  /* Purple for PATCH */
 
   background-color: var(--background-color);
   color: var(--text-color);
@@ -66,48 +74,57 @@ body.light-theme {
   --card-background: #ffffff;
 }
 
-/* Dark theme variables - 2025 Blue Palette */
+/* Dark theme variables - 2025 Blue Palette Enhanced */
 body.dark-theme {
-  --background-color: #00111A;
-  /* Main app background - nearly black navy */
-  --text-color: #e0e0e0;
-  --text-secondary: #a0a0a0;
-  --border-color: #00080D;
-  /* Almost pure black for borders */
-  --card-bg: #002234;
-  /* Very dark navy for cards */
-  --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-  --hover-bg: #013B5B;
-  /* Darker blue for hover states */
-  --navbar-bg: #012A41;
-  /* Dark navy for navbar */
-  --navbar-border: rgba(1, 76, 117, 0.2);
+  --background-color: #0f172a;
+  /* Slate-900 dark background */
+  --text-color: #f8fafc;
+  /* Slate-50 light text */
+  --text-secondary: #94a3b8;
+  /* Slate-400 secondary text */
+  --border-color: #1e293b;
+  /* Slate-800 for borders */
+  --card-bg: #1e293b;
+  /* Slate-800 for cards */
+  --card-shadow: 0 4px 12px rgba(0, 8, 13, 0.4);
+  /* Deep blue shadow */
+  --hover-bg: #334155;
+  /* Slate-700 for hover states */
+  --primary-color: #3b82f6;
+  /* Blue-500 primary */
+  --primary-hover: #2563eb;
+  /* Blue-600 on hover */
+  --primary-light: #93c5fd;
+  /* Blue-300 light variant */
+  --navbar-bg: rgba(30, 41, 59, 0.95);
+  /* Semi-transparent slate-800 */
+  --navbar-border: rgba(59, 130, 246, 0.1);
   /* Primary blue with transparency */
-  --panel-bg: #002234;
-  /* Very dark navy for panels */
-  --navbar-background: #012A41;
-  /* Dark navy navbar */
-  --navbar-text: #ffffff;
-  /* Keep navbar text white for contrast */
-  --sidebar-background: #001927;
-  /* Almost black navy for sidebar */
-  --sidebar-text: #e0e0e0;
-  /* Light text for sidebar */
-  --button-background: #014C75;
-  /* Deep blue for buttons */
+  --panel-bg: #1e293b;
+  /* Slate-800 for panels */
+  
+  /* Enhanced variables for consistency */
+  --navbar-background: rgba(30, 41, 59, 0.95);
+  --navbar-text: #f8fafc;
+  --sidebar-background: #0f172a;
+  --sidebar-text: #f8fafc;
+  --button-background: #3b82f6;
   --button-text: #ffffff;
-  --border-color: #00080D;
-  /* Almost black borders */
-  --hover-background: #013B5B;
-  /* Darker blue hover */
-  --card-background: #002234;
-  /* Very dark navy for cards */
-  --primary-color: #014C75;
-  /* Deep blue primary */
-  --primary-hover: #014368;
-  /* Darker blue on hover */
-  --active-bg: #014368;
-  /* Darker blue for active states */
+  --hover-background: #334155;
+  --card-background: #1e293b;
+  --active-bg: #2563eb;
+  
+  /* Method colors harmonized with dark blue palette */
+  --method-get: #3b82f6;
+  /* Blue-500 for GET */
+  --method-post: #22c55e;
+  /* Green-500 for POST */
+  --method-put: #eab308;
+  /* Yellow-500 for PUT */
+  --method-delete: #ef4444;
+  /* Red-500 for DELETE */
+  --method-patch: #a855f7;
+  /* Purple-500 for PATCH */
 }
 
 /* Apply variables */
