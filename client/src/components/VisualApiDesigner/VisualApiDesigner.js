@@ -7,7 +7,9 @@ import {
     FiCode,
     FiEye,
     FiChevronLeft,
-    FiChevronRight
+    FiChevronRight,
+    FiGitBranch,
+    FiTag
 } from 'react-icons/fi';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 import DesignCanvas from './components/DesignCanvas';
@@ -15,6 +17,8 @@ import ComponentPalette from './components/ComponentPalette';
 import PropertiesPanel from './components/PropertiesPanel';
 import SpecPreview from './components/SpecPreview';
 import ValidationPanel from './components/ValidationPanel';
+import ContractDiffViewer from './components/ContractDiffViewer';
+import VersionCreationModal from './components/VersionCreationModal';
 import useDesignerState from './hooks/useDesignerState';
 import useSpecGeneration from './hooks/useSpecGeneration';
 import { suppressReactErrors } from '../../utils/errorSuppressor';
@@ -74,13 +78,15 @@ const VisualApiDesigner = ({
     const { loadDesign: loadDesignerState } = designerState;
 
     const { generatedSpec, validationErrors } = useSpecGeneration(nodes, edges);
-    const [viewMode, setViewMode] = useState('design'); // 'design', 'preview', 'split'
+    const [viewMode, setViewMode] = useState('design'); // 'design', 'preview', 'split', 'diff'
     const [isTransitioning, setIsTransitioning] = useState(false); // Smooth mode transitions
     const [saveStatus, setSaveStatus] = useState('saved'); // 'saved', 'saving', 'unsaved'
     const [visualizationContext, setVisualizationContext] = useState(null); // For handling visualization requests
     const [isInitialized, setIsInitialized] = useState(false);
     const [leftSidebarExpanded, setLeftSidebarExpanded] = useState(true); // For Component Palette
     const [rightSidebarExpanded, setRightSidebarExpanded] = useState(true); // For Properties Panel
+    const [isVersionModalOpen, setIsVersionModalOpen] = useState(false);
+    const [isSavingVersion, setIsSavingVersion] = useState(false);
 
     // Use ref to avoid recreating debug function
     const collectionIdRef = useRef(collectionId);
@@ -599,6 +605,39 @@ const VisualApiDesigner = ({
         event.target.value = '';
     };
 
+    const handleSaveAsVersion = useCallback(async (versionData) => {
+        setIsSavingVersion(true);
+
+        try {
+            const response = await fetch(`/api/api-versions/collections/${collectionId}/versions`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'include',
+                body: JSON.stringify(versionData)
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Failed to create API version');
+            }
+
+            const result = await response.json();
+            console.log('✅ API version created successfully:', result.apiVersion);
+
+            // Optionally switch to diff view to show the new version
+            // setViewMode('diff');
+
+            return result.apiVersion;
+        } catch (error) {
+            console.error('Error creating API version:', error);
+            throw error;
+        } finally {
+            setIsSavingVersion(false);
+        }
+    }, [collectionId]);
+
     // Handle smooth mode transitions
     const handleViewModeChange = useCallback((newMode) => {
         if (newMode === viewMode || isTransitioning) return;
@@ -653,6 +692,16 @@ const VisualApiDesigner = ({
                         />
                     </label>
 
+                    <button
+                        className="toolbar-btn toolbar-btn-primary"
+                        title="Save current design as API version"
+                        onClick={() => setIsVersionModalOpen(true)}
+                        disabled={!generatedSpec || Object.keys(generatedSpec?.paths || {}).length === 0}
+                    >
+                        <FiTag />
+                        Save as Version
+                    </button>
+
                     {/* Export functionality moved to preview panel for consistency */}
                 </div>
             </div>
@@ -682,6 +731,15 @@ const VisualApiDesigner = ({
                     >
                         <FiCode />
                         Split
+                    </button>
+                    <button
+                        className={`toggle-btn ${viewMode === 'diff' ? 'active' : ''}`}
+                        onClick={() => handleViewModeChange('diff')}
+                        disabled={isTransitioning}
+                        title="Contract Diff & Breaking Changes"
+                    >
+                        <FiGitBranch />
+                        Diff
                     </button>
                 </div>
             </div>
@@ -730,6 +788,19 @@ const VisualApiDesigner = ({
                             />
                         </Panel>
                     </PanelGroup>
+                );
+            case 'diff':
+                return (
+                    <div className="diff-container">
+                        <ContractDiffViewer
+                            currentSpec={generatedSpec}
+                            workspaceId={collection?.workspaceId}
+                            collectionId={collectionId}
+                            onVersionCompare={(comparison) => {
+                                console.log('Version comparison:', comparison);
+                            }}
+                        />
+                    </div>
                 );
             default:
                 return renderDesignView();
@@ -829,6 +900,16 @@ const VisualApiDesigner = ({
             <ValidationPanel
                 validationErrors={validationErrors}
                 onValidationIssueClick={handleVisualizationIssueClick}
+            />
+
+            {/* Version Creation Modal */}
+            <VersionCreationModal
+                isOpen={isVersionModalOpen}
+                onClose={() => setIsVersionModalOpen(false)}
+                onSave={handleSaveAsVersion}
+                collectionId={collectionId}
+                openApiSpec={generatedSpec}
+                isLoading={isSavingVersion}
             />
         </div>
     );

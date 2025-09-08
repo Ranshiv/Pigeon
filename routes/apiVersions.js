@@ -182,7 +182,99 @@ router.get('/versions/:version1Id/compare/:version2Id', authenticateJWT, async (
     try {
         const { version1Id, version2Id } = req.params;
 
-        const comparison = await ApiVersioningService.compareVersions(version1Id, version2Id);
+        // Get both versions first
+        const [version1, version2] = await Promise.all([
+            ApiVersioningService.getVersion(version1Id),
+            ApiVersioningService.getVersion(version2Id)
+        ]);
+
+        if (!version1 || !version2) {
+            return res.status(404).json({
+                message: 'One or both versions not found'
+            });
+        }
+
+        // Use the newer compareSpecs method for better diff detection
+        const specComparison = await ApiVersioningService.compareSpecs(
+            version1.openApiSpec,
+            version2.openApiSpec,
+            { includeNonBreaking: true }
+        );
+
+        // Transform the result to match frontend expectations
+        const changes = [];
+
+        if (specComparison.breakingChanges) {
+            specComparison.breakingChanges.forEach(change => {
+                changes.push({
+                    path: change.path || change.endpoint || '',
+                    description: change.description || change.message || change.change || 'Breaking change detected',
+                    breaking: true,
+                    type: change.type || 'breaking'
+                });
+            });
+        }
+
+        // Add non-breaking changes from summary
+        const summary = specComparison.summary || {};
+        const nonBreakingCount = summary.nonBreakingChanges || 0;
+        const addedEndpoints = summary.addedEndpoints || 0;
+        const modifiedEndpoints = summary.modifiedEndpoints || 0;
+
+        // Create placeholder non-breaking changes based on summary
+        if (addedEndpoints > 0) {
+            changes.push({
+                path: 'endpoints',
+                description: `${addedEndpoints} new endpoint(s) added`,
+                breaking: false,
+                type: 'addition'
+            });
+        }
+
+        if (modifiedEndpoints > 0 && !specComparison.hasBreakingChanges) {
+            changes.push({
+                path: 'endpoints',
+                description: `${modifiedEndpoints} endpoint(s) modified (non-breaking)`,
+                breaking: false,
+                type: 'modification'
+            });
+        }
+
+        // Calculate compatibility score
+        const totalChanges = summary.totalChanges || 0;
+        const breakingChanges = summary.breakingChanges || 0;
+        let compatibilityScore = 100;
+
+        if (totalChanges > 0) {
+            // Reduce score based on breaking changes (more weight) and total changes
+            const breakingPenalty = breakingChanges * 20; // 20 points per breaking change
+            const totalPenalty = Math.min(breakingPenalty, 80); // Cap at 80% reduction
+            compatibilityScore = Math.max(20, 100 - totalPenalty);
+        }
+
+        // Build response in format expected by frontend
+        const comparison = {
+            changes: changes,
+            compatibilityScore: compatibilityScore,
+            summary: {
+                totalChanges: totalChanges,
+                breakingChanges: breakingChanges,
+                nonBreakingChanges: nonBreakingCount,
+                addedEndpoints: addedEndpoints,
+                removedEndpoints: summary.removedEndpoints || 0,
+                modifiedEndpoints: modifiedEndpoints
+            },
+            versions: {
+                from: version1.version,
+                to: version2.version
+            },
+            hasBreakingChanges: specComparison.hasBreakingChanges || false,
+            changelog: specComparison.changelog || '',
+            // Include raw spec comparison for debugging
+            _debug: {
+                rawSpecComparison: specComparison
+            }
+        };
 
         res.json(comparison);
     } catch (error) {

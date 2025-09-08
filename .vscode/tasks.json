@@ -243,6 +243,13 @@
 			"type": "shell",
 			"command": "npm run generate:feature-guide",
 			"isBackground": false
+		},
+		{
+			"label": "Test Duplicate Key Fixes",
+			"type": "shell",
+			"command": "node test-duplicate-key-fixes.js",
+			"isBackground": false,
+			"group": "build"
 		}
 	]
 }

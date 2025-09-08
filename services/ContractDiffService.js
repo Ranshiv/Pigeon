@@ -1,345 +1,7 @@
-// services/ApiVersioningService.js
-const ApiVersion = require('../models/ApiVersion');
-const MockServer = require('../models/MockServer');
-const Collection = require('../models/Collection');
+// services/ContractDiffService.js
+// Database-free contract diff service for CLI usage
 
-class ApiVersioningService {
-    /**
-     * Create a new API version for a collection
-     */
-    static async createVersion(collectionId, versionData, userId) {
-        try {
-            // Validate version format
-            if (!this.isValidVersionFormat(versionData.version)) {
-                throw new Error('Invalid version format. Use v1, v1.0, v1.0.0, 1, 1.0, or 1.0.0');
-            }
-
-            // Check if version already exists
-            const existingVersion = await ApiVersion.findOne({
-                collectionId,
-                version: versionData.version
-            });
-
-            if (existingVersion) {
-                throw new Error(`Version ${versionData.version} already exists for this collection`);
-            }
-
-            // Normalize version format
-            const normalizedVersion = this.normalizeVersion(versionData.version);
-
-            const apiVersion = new ApiVersion({
-                collectionId,
-                version: normalizedVersion,
-                name: versionData.name,
-                description: versionData.description || '',
-                versioningStrategy: versionData.versioningStrategy || 'url',
-                versioningConfig: versionData.versioningConfig || {},
-                openApiSpec: versionData.openApiSpec || null,
-                changelog: versionData.changelog || '',
-                migrationGuide: versionData.migrationGuide || '',
-                backwardCompatible: versionData.backwardCompatible !== false,
-                breakingChanges: versionData.breakingChanges || [],
-                createdBy: userId
-            });
-
-            await apiVersion.save();
-            return apiVersion;
-        } catch (error) {
-            throw new Error(`Failed to create API version: ${error.message}`);
-        }
-    }
-
-    /**
-     * Get all versions for a collection
-     */
-    static async getVersions(collectionId) {
-        try {
-            const versions = await ApiVersion.find({ collectionId })
-                .populate('createdBy', 'displayName email')
-                .sort({ createdAt: -1 });
-
-            return versions;
-        } catch (error) {
-            throw new Error(`Failed to get API versions: ${error.message}`);
-        }
-    }
-
-    /**
-     * Get a specific version
-     */
-    static async getVersion(versionId) {
-        try {
-            const version = await ApiVersion.findById(versionId)
-                .populate('createdBy', 'displayName email')
-                .populate('collectionId', 'name description');
-
-            if (!version) {
-                throw new Error('API version not found');
-            }
-
-            return version;
-        } catch (error) {
-            throw new Error(`Failed to get API version: ${error.message}`);
-        }
-    }
-
-    /**
-     * Update an API version
-     */
-    static async updateVersion(versionId, updateData, userId) {
-        try {
-            const version = await ApiVersion.findById(versionId);
-
-            if (!version) {
-                throw new Error('API version not found');
-            }
-
-            // Update allowed fields
-            const allowedFields = [
-                'name', 'description', 'isActive', 'isDeprecated',
-                'deprecationDate', 'sunsetDate', 'versioningStrategy',
-                'versioningConfig', 'openApiSpec', 'changelog',
-                'migrationGuide', 'backwardCompatible', 'breakingChanges'
-            ];
-
-            allowedFields.forEach(field => {
-                if (updateData[field] !== undefined) {
-                    version[field] = updateData[field];
-                }
-            });
-
-            await version.save();
-            return version;
-        } catch (error) {
-            throw new Error(`Failed to update API version: ${error.message}`);
-        }
-    }
-
-    /**
-     * Deprecate an API version
-     */
-    static async deprecateVersion(versionId, deprecationInfo, userId) {
-        try {
-            const version = await ApiVersion.findById(versionId);
-
-            if (!version) {
-                throw new Error('API version not found');
-            }
-
-            version.isDeprecated = true;
-            version.deprecationDate = deprecationInfo.deprecationDate || new Date();
-            version.sunsetDate = deprecationInfo.sunsetDate || null;
-
-            if (deprecationInfo.migrationGuide) {
-                version.migrationGuide = deprecationInfo.migrationGuide;
-            }
-
-            await version.save();
-            return version;
-        } catch (error) {
-            throw new Error(`Failed to deprecate API version: ${error.message}`);
-        }
-    }
-
-    /**
-     * Delete an API version
-     */
-    static async deleteVersion(versionId, userId) {
-        try {
-            const apiVersion = await ApiVersion.findById(versionId);
-
-            if (!apiVersion) {
-                throw new Error('API version not found');
-            }
-
-            // Check if user has permission (optional: add permission check here)
-
-            // Delete associated mock servers first
-            await MockServer.deleteMany({ versionId: versionId });
-
-            // Delete the API version
-            await ApiVersion.findByIdAndDelete(versionId);
-
-            return { message: 'API version deleted successfully' };
-        } catch (error) {
-            throw new Error(`Failed to delete API version: ${error.message}`);
-        }
-    }
-
-    /**
-     * Generate version compatibility report
-     */
-    static async generateCompatibilityReport(collectionId) {
-        try {
-            const versions = await this.getVersions(collectionId);
-
-            const report = {
-                totalVersions: versions.length,
-                activeVersions: versions.filter(v => v.isActive && !v.isDeprecated).length,
-                deprecatedVersions: versions.filter(v => v.isDeprecated).length,
-                breakingChanges: 0,
-                backwardCompatible: 0,
-                versions: []
-            };
-
-            versions.forEach(version => {
-                if (version.backwardCompatible) {
-                    report.backwardCompatible++;
-                } else {
-                    report.breakingChanges++;
-                }
-
-                report.versions.push({
-                    version: version.version,
-                    name: version.name,
-                    isActive: version.isActive,
-                    isDeprecated: version.isDeprecated,
-                    backwardCompatible: version.backwardCompatible,
-                    breakingChanges: version.breakingChanges.length,
-                    createdAt: version.createdAt
-                });
-            });
-
-            return report;
-        } catch (error) {
-            throw new Error(`Failed to generate compatibility report: ${error.message}`);
-        }
-    }
-
-    /**
-     * Compare two API versions
-     */
-    static async compareVersions(version1Id, version2Id) {
-        try {
-            const [version1, version2] = await Promise.all([
-                ApiVersion.findById(version1Id),
-                ApiVersion.findById(version2Id)
-            ]);
-
-            if (!version1 || !version2) {
-                throw new Error('One or both versions not found');
-            }
-
-            const comparison = {
-                versions: {
-                    from: version1.version,
-                    to: version2.version
-                },
-                backwardCompatible: version2.backwardCompatible,
-                breakingChanges: version2.breakingChanges,
-                changelog: version2.changelog,
-                migrationGuide: version2.migrationGuide,
-                specChanges: this.compareOpenApiSpecs(version1.openApiSpec, version2.openApiSpec)
-            };
-
-            return comparison;
-        } catch (error) {
-            throw new Error(`Failed to compare versions: ${error.message}`);
-        }
-    }
-
-    /**
-     * Validate version format
-     */
-    static isValidVersionFormat(version) {
-        const versionPattern = /^v?\d+(\.\d+){0,2}$/;
-        return versionPattern.test(version);
-    }
-
-    /**
-     * Normalize version format
-     */
-    static normalizeVersion(version) {
-        // Remove 'v' prefix if present
-        let normalized = version.startsWith('v') ? version.substring(1) : version;
-
-        // Split version parts
-        const parts = normalized.split('.');
-
-        // Ensure we have major.minor.patch format
-        while (parts.length < 3) {
-            parts.push('0');
-        }
-
-        return `v${parts.join('.')}`;
-    }
-
-    /**
-     * Compare OpenAPI specifications
-     */
-    static compareOpenApiSpecs(spec1, spec2) {
-        if (!spec1 && !spec2) {
-            return { hasChanges: false, changes: [] };
-        }
-
-        if (!spec1 || !spec2) {
-            return {
-                hasChanges: true,
-                changes: ['OpenAPI specification added or removed']
-            };
-        }
-
-        const changes = [];
-
-        // Compare basic info
-        if (spec1.info?.version !== spec2.info?.version) {
-            changes.push(`Version changed from ${spec1.info?.version} to ${spec2.info?.version}`);
-        }
-
-        // Compare paths (simplified comparison)
-        const paths1 = Object.keys(spec1.paths || {});
-        const paths2 = Object.keys(spec2.paths || {});
-
-        const addedPaths = paths2.filter(path => !paths1.includes(path));
-        const removedPaths = paths1.filter(path => !paths2.includes(path));
-
-        addedPaths.forEach(path => changes.push(`Added endpoint: ${path}`));
-        removedPaths.forEach(path => changes.push(`Removed endpoint: ${path}`));
-
-        return {
-            hasChanges: changes.length > 0,
-            changes
-        };
-    }
-
-    /**
-     * Get versioning URL for a request
-     */
-    static getVersionedUrl(baseUrl, version, strategy = 'url', config = {}) {
-        switch (strategy) {
-            case 'url':
-                const pattern = config.urlPattern || '/api/v{version}';
-                const versionPart = pattern.replace('{version}', version.replace('v', ''));
-                return baseUrl.replace('/api', versionPart);
-
-            case 'query':
-                const queryParam = config.queryParam || 'version';
-                const separator = baseUrl.includes('?') ? '&' : '?';
-                return `${baseUrl}${separator}${queryParam}=${version}`;
-
-            default:
-                return baseUrl;
-        }
-    }
-
-    /**
-     * Get versioning headers for a request
-     */
-    static getVersionHeaders(version, strategy = 'header', config = {}) {
-        if (strategy === 'header') {
-            const headerName = config.headerName || 'API-Version';
-            return { [headerName]: version };
-        }
-
-        if (strategy === 'accept') {
-            const pattern = config.acceptPattern || 'application/vnd.api+json;version={version}';
-            const acceptValue = pattern.replace('{version}', version);
-            return { 'Accept': acceptValue };
-        }
-
-        return {};
-    }
-
+class ContractDiffService {
     /**
      * Compare two OpenAPI specifications with advanced contract diff capabilities
      * @param {Object} baseSpec - Base OpenAPI specification
@@ -389,16 +51,12 @@ class ApiVersioningService {
                 };
             }
 
-            let diffData = {};
-
-            // Use fallback diff implementation to avoid hanging issues with openapi-diff
-            // TODO: Investigate openapi-diff hanging issue in future
-            console.warn('Using fallback diff implementation');
-            diffData = this._fallbackDiff(baseSpec, newSpec);
+            // Generate diff using enhanced fallback implementation
+            const diffData = this._compareDiff(baseSpec, newSpec);
 
             // Apply rename detection heuristic if enabled
             if (detectRenames && diffData.paths) {
-                diffData = this._applyRenameDetection(diffData);
+                this._applyRenameDetection(diffData);
             }
 
             // Extract breaking changes
@@ -438,7 +96,7 @@ class ApiVersioningService {
 
     /**
      * Extract breaking changes from diff result
-     * @param {Object} diffResult - The diff result from openapi-diff or fallback
+     * @param {Object} diffResult - The diff result from comparison
      * @returns {Array} Array of normalized breaking changes
      */
     static extractBreakingChanges(diffResult) {
@@ -447,7 +105,7 @@ class ApiVersioningService {
         const breakingChanges = [];
 
         try {
-            // Handle direct breaking changes array (if library provides it)
+            // Handle direct breaking changes array
             if (diffResult.breakingChanges && Array.isArray(diffResult.breakingChanges)) {
                 diffResult.breakingChanges.forEach(change => {
                     breakingChanges.push({
@@ -479,74 +137,37 @@ class ApiVersioningService {
                 if (diffResult.paths.modified) {
                     Object.keys(diffResult.paths.modified).forEach(path => {
                         const pathChanges = diffResult.paths.modified[path];
-                        if (pathChanges.operations) {
-                            // Removed operations are breaking
-                            if (pathChanges.operations.removed) {
-                                pathChanges.operations.removed.forEach(method => {
-                                    breakingChanges.push({
-                                        type: 'breaking',
-                                        description: `${method.toUpperCase()} operation removed from ${path}`,
-                                        location: `paths.${path}.${method}`,
-                                        severity: 'error',
-                                        mitigationStrategy: `Update client code to use alternative endpoints or methods`
-                                    });
+                        if (pathChanges.breakingChanges) {
+                            pathChanges.breakingChanges.forEach(change => {
+                                breakingChanges.push({
+                                    type: 'breaking',
+                                    description: change.description,
+                                    location: change.location,
+                                    severity: this.determineSeverity(change),
+                                    mitigationStrategy: change.mitigationStrategy || 'Update client code accordingly'
                                 });
-                            }
-                        }
-                    });
-                }
-            }
-
-            // Check for parameter changes
-            if (diffResult.parameters) {
-                if (diffResult.parameters.added) {
-                    diffResult.parameters.added.forEach(param => {
-                        if (param.required) {
-                            breakingChanges.push({
-                                type: 'breaking',
-                                description: `Required parameter '${param.name}' was added`,
-                                location: param.location || 'parameters',
-                                severity: 'error',
-                                mitigationStrategy: 'Update client code to include the new required parameter'
                             });
                         }
-                    });
-                }
-            }
-
-            // Check response changes
-            if (diffResult.responses) {
-                if (diffResult.responses.removed) {
-                    diffResult.responses.removed.forEach(response => {
-                        breakingChanges.push({
-                            type: 'breaking',
-                            description: `Response status ${response.status} was removed`,
-                            location: response.location || 'responses',
-                            severity: 'error',
-                            mitigationStrategy: 'Update client code to handle new response status codes'
-                        });
                     });
                 }
             }
 
             // Check schema changes
-            if (diffResult.schemas) {
-                if (diffResult.schemas.modified) {
-                    Object.keys(diffResult.schemas.modified).forEach(schemaName => {
-                        const schemaChanges = diffResult.schemas.modified[schemaName];
-                        if (schemaChanges.properties && schemaChanges.properties.removed) {
-                            schemaChanges.properties.removed.forEach(prop => {
-                                breakingChanges.push({
-                                    type: 'breaking',
-                                    description: `Property '${prop}' was removed from schema '${schemaName}'`,
-                                    location: `schemas.${schemaName}.properties.${prop}`,
-                                    severity: 'error',
-                                    mitigationStrategy: 'Update client code to handle missing property'
-                                });
+            if (diffResult.schemas && diffResult.schemas.modified) {
+                Object.keys(diffResult.schemas.modified).forEach(schemaName => {
+                    const schemaChanges = diffResult.schemas.modified[schemaName];
+                    if (schemaChanges.breakingChanges) {
+                        schemaChanges.breakingChanges.forEach(change => {
+                            breakingChanges.push({
+                                type: 'breaking',
+                                description: change.description,
+                                location: change.location,
+                                severity: this.determineSeverity(change),
+                                mitigationStrategy: change.mitigationStrategy || 'Update client code to handle schema changes'
                             });
-                        }
-                    });
-                }
+                        });
+                    }
+                });
             }
 
         } catch (error) {
@@ -722,94 +343,10 @@ class ApiVersioningService {
     }
 
     /**
-     * Generate HTML report
+     * Enhanced diff implementation for contract comparison
      * @private
      */
-    static _generateHtmlReport(diffResult, breakingChanges, changelog, summary) {
-        const title = 'API Specification Diff Report';
-        const markdownContent = changelog.replace(/^# /, '').replace(/^## /gm, '<h2>').replace(/^### /gm, '<h3>').replace(/^\- /gm, '<li>').replace(/\n/g, '</li>\n');
-
-        return `<!DOCTYPE html>
-<html>
-<head>
-    <title>${title}</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        .summary { background: #f5f5f5; padding: 15px; border-radius: 5px; margin-bottom: 20px; }
-        .breaking { color: #d73a49; }
-        .non-breaking { color: #28a745; }
-        .warning { color: #ffc107; }
-        ul { list-style-type: none; padding-left: 0; }
-        li { margin: 5px 0; }
-    </style>
-</head>
-<body>
-    <h1>${title}</h1>
-    <div class="summary">
-        <h2>Summary</h2>
-        <p><span class="breaking">Breaking Changes: ${summary.breakingChanges}</span></p>
-        <p><span class="non-breaking">Non-Breaking Changes: ${summary.nonBreakingChanges}</span></p>
-        <p>Total Changes: ${summary.totalChanges}</p>
-    </div>
-    ${markdownContent}
-</body>
-</html>`;
-    }
-
-    /**
-     * Generate Markdown report
-     * @private
-     */
-    static _generateMarkdownReport(diffResult, breakingChanges, changelog, summary) {
-        return changelog;
-    }
-
-    /**
-     * Generate diff for null specs
-     * @private
-     */
-    static _generateNullSpecDiff(baseSpec, newSpec) {
-        if (!baseSpec && newSpec) {
-            // All of newSpec is added
-            const paths = newSpec.paths || {};
-            return {
-                paths: {
-                    added: paths,
-                    removed: {},
-                    modified: {}
-                },
-                nonBreakingChanges: Object.keys(paths).map(path => ({
-                    action: 'add',
-                    description: `Added endpoint ${path}`
-                }))
-            };
-        }
-
-        if (baseSpec && !newSpec) {
-            // All of baseSpec is removed
-            const paths = baseSpec.paths || {};
-            return {
-                paths: {
-                    added: {},
-                    removed: paths,
-                    modified: {}
-                },
-                breakingChanges: Object.keys(paths).map(path => ({
-                    type: 'removed',
-                    description: `Removed endpoint ${path}`,
-                    location: `paths.${path}`
-                }))
-            };
-        }
-
-        return {};
-    }
-
-    /**
-     * Fallback diff implementation
-     * @private
-     */
-    static _fallbackDiff(baseSpec, newSpec) {
+    static _compareDiff(baseSpec, newSpec) {
         const result = {
             paths: { added: {}, removed: {}, modified: {} },
             schemas: { added: {}, removed: {}, modified: {} },
@@ -1123,6 +660,47 @@ class ApiVersioningService {
     }
 
     /**
+     * Generate diff for null specs
+     * @private
+     */
+    static _generateNullSpecDiff(baseSpec, newSpec) {
+        if (!baseSpec && newSpec) {
+            // All of newSpec is added
+            const paths = newSpec.paths || {};
+            return {
+                paths: {
+                    added: paths,
+                    removed: {},
+                    modified: {}
+                },
+                nonBreakingChanges: Object.keys(paths).map(path => ({
+                    action: 'add',
+                    description: `Added endpoint ${path}`
+                }))
+            };
+        }
+
+        if (baseSpec && !newSpec) {
+            // All of baseSpec is removed
+            const paths = baseSpec.paths || {};
+            return {
+                paths: {
+                    added: {},
+                    removed: paths,
+                    modified: {}
+                },
+                breakingChanges: Object.keys(paths).map(path => ({
+                    type: 'removed',
+                    description: `Removed endpoint ${path}`,
+                    location: `paths.${path}`
+                }))
+            };
+        }
+
+        return {};
+    }
+
+    /**
      * Apply rename detection heuristic
      * @private
      */
@@ -1169,6 +747,49 @@ class ApiVersioningService {
 
         return matches / maxLength;
     }
+
+    /**
+     * Generate HTML report
+     * @private
+     */
+    static _generateHtmlReport(diffResult, breakingChanges, changelog, summary) {
+        const title = 'API Specification Diff Report';
+        const markdownContent = changelog.replace(/^# /, '').replace(/^## /gm, '<h2>').replace(/^### /gm, '<h3>').replace(/^\- /gm, '<li>').replace(/\n/g, '</li>\n');
+
+        return `<!DOCTYPE html>
+<html>
+<head>
+    <title>${title}</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .summary { background: #f5f5f5; padding: 15px; border-radius: 5px; margin-bottom: 20px; }
+        .breaking { color: #d73a49; }
+        .non-breaking { color: #28a745; }
+        .warning { color: #ffc107; }
+        ul { list-style-type: none; padding-left: 0; }
+        li { margin: 5px 0; }
+    </style>
+</head>
+<body>
+    <h1>${title}</h1>
+    <div class="summary">
+        <h2>Summary</h2>
+        <p><span class="breaking">Breaking Changes: ${summary.breakingChanges}</span></p>
+        <p><span class="non-breaking">Non-Breaking Changes: ${summary.nonBreakingChanges}</span></p>
+        <p>Total Changes: ${summary.totalChanges}</p>
+    </div>
+    ${markdownContent}
+</body>
+</html>`;
+    }
+
+    /**
+     * Generate Markdown report
+     * @private
+     */
+    static _generateMarkdownReport(diffResult, breakingChanges, changelog, summary) {
+        return changelog;
+    }
 }
 
-module.exports = ApiVersioningService;
+module.exports = ContractDiffService;

@@ -72,7 +72,7 @@ const ApiVersionManager = ({ collectionId, collection }) => {
 
             console.log('Sending version data:', versionData);
 
-            const response = await fetch('/api/api-versions', {
+            const response = await fetch(`/api/api-versions/collections/${collectionId}/versions`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -428,7 +428,7 @@ const ApiVersionManager = ({ collectionId, collection }) => {
                                     }
                                 }}
                             >
-                                
+
                                 <label htmlFor="isBackwardCompatible">
                                     Backward Compatible Version
                                     <input
@@ -442,7 +442,7 @@ const ApiVersionManager = ({ collectionId, collection }) => {
                                         This version maintains compatibility with previous versions and won't break existing integrations
                                     </div>
                                 </label>
-                               
+
                             </div>
 
                             <div className="form-group">

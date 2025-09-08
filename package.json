@@ -10,7 +10,10 @@
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
     "cli": "node ./cli/pigeon-cli.js",
-    "generate:guide-pdf": "node generate-pdf-guide.js"
+    "generate:guide-pdf": "node generate-pdf-guide.js",
+    "clean:empty:dry": "node ./scripts/remove-empty-files.js",
+    "clean:empty": "node ./scripts/remove-empty-files.js --apply",
+    "contract:diff": "node ./cli/pigeon-cli.js diff --base test-api-v1.json --head test-api-v2.json --format html --output diff-report.html"
   },
   "keywords": [
     "api",
@@ -23,6 +26,7 @@
   "license": "ISC",
   "description": "API Testing and Automation Tool with CI/CD Integration",
   "dependencies": {
+    "@ai-sdk/openai": "^2.0.25",
     "@apidevtools/swagger-parser": "^10.1.1",
     "@monaco-editor/react": "^4.7.0",
     "@shadcn/ui": "^0.0.4",
@@ -30,6 +34,7 @@
     "@stoplight/spectral-functions": "^1.10.1",
     "@stoplight/spectral-parsers": "^1.0.5",
     "@stoplight/spectral-rulesets": "^1.22.0",
+    "ai": "^5.0.34",
     "axios": "^1.10.0",
     "canvas": "^3.1.1",
     "chalk": "^4.1.2",
@@ -55,10 +60,13 @@
     "node-fetch": "^3.3.2",
     "nodemailer": "^6.9.8",
     "nodemailer-html-to-text": "^3.2.0",
+    "openapi-diff": "^0.24.1",
     "passport": "^0.7.0",
     "passport-google-oauth20": "^2.0.0",
     "pdfkit": "^0.17.1",
+    "prom-client": "^15.1.3",
     "puppeteer": "^24.14.0",
+    "redis": "^5.8.2",
     "socket.io": "^4.8.1",
     "ssl-checker": "^2.0.10",
     "whois": "^2.14.2",

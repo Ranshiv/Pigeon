@@ -123,6 +123,22 @@ const apiVersionSchema = new mongoose.Schema({
         version: String,
         sourcePath: String
     },
+    // Contract diff persistence fields
+    diffs: [{
+        fromVersion: String,
+        toVersion: String,
+        format: String,
+        result: mongoose.Schema.Types.Mixed,
+        breaking: Boolean,
+        createdAt: {
+            type: Date,
+            default: Date.now
+        }
+    }],
+    breaking: {
+        type: Boolean,
+        default: false
+    },
     createdBy: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
@@ -144,6 +160,10 @@ apiVersionSchema.index({ collectionId: 1, version: 1 }, { unique: true });
 // Index for lint score queries
 apiVersionSchema.index({ lintScore: 1 });
 apiVersionSchema.index({ lintedAt: 1 });
+
+// Index for diff queries
+apiVersionSchema.index({ 'diffs.createdAt': 1 });
+apiVersionSchema.index({ breaking: 1 });
 
 // Middleware to update updatedAt
 apiVersionSchema.pre('save', function (next) {

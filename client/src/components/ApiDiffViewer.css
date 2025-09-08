@@ -1,0 +1,818 @@
+/* ApiDiffViewer.css - Modern 2025 Design */
+
+/* Ensure ApiDiffViewer is always on top of other modals */
+.api-diff-viewer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(15, 23, 42, 0.4);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    padding: 24px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+}
+
+.api-diff-viewer .modal-container {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    box-shadow:
+        0 20px 25px -5px rgb(0 0 0 / 0.1),
+        0 8px 10px -6px rgb(0 0 0 / 0.1),
+        0 0 0 1px rgb(0 0 0 / 0.05);
+    width: 90%;
+    max-width: 1200px;
+    height: 90%;
+    max-height: 800px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    animation: slideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+    z-index: 10001;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95) translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.api-diff-viewer .diff-header {
+    background: #ffffff;
+    padding: 24px 24px 16px 24px;
+    border-bottom: 1px solid #f1f5f9;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.api-diff-viewer .header-content {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.api-diff-viewer .header-content h3 {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: #0f172a;
+    font-size: 1.25rem;
+    font-weight: 600;
+    line-height: 1.4;
+    letter-spacing: -0.025em;
+}
+
+.api-diff-viewer .version-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.api-diff-viewer .version-badge {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.api-diff-viewer .version-badge.base {
+    background: #e3f2fd;
+    color: #1976d2;
+    border: 1px solid #bbdefb;
+}
+
+.api-diff-viewer .version-badge.new {
+    background: #e8f5e8;
+    color: #2e7d32;
+    border: 1px solid #c8e6c9;
+}
+
+.api-diff-viewer .arrow {
+    color: #666;
+    font-weight: bold;
+}
+
+.api-diff-viewer .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.api-diff-viewer .download-group {
+    display: flex;
+    gap: 8px;
+}
+
+.api-diff-viewer .download-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    background: #ffffff;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    color: #64748b;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.api-diff-viewer .download-btn:hover {
+    background: #f8fafc;
+    border-color: #9ca3af;
+    color: #475569;
+    transform: translateY(-1px);
+}
+
+.api-diff-viewer .close-btn {
+    background: none;
+    border: none;
+    font-size: 1.125rem;
+    cursor: pointer;
+    color: #64748b;
+    padding: 8px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.api-diff-viewer .close-btn:hover {
+    background: #f1f5f9;
+    color: #0f172a;
+    transform: scale(1.05);
+}
+
+.api-diff-viewer .close-btn:focus {
+    outline: 2px solid #3b82f6;
+    outline-offset: 2px;
+}
+
+/* Main content container - removed duplicate definition */
+
+.api-diff-viewer .diff-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0;
+    background: #f6f8fb;
+    /* slightly darker to distinguish */
+    min-height: 0;
+}
+
+/* Empty State Design */
+.api-diff-viewer .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 20px;
+    text-align: center;
+    background: #ffffff;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    margin: 0 auto;
+    /* center horizontally by default */
+    width: clamp(280px, 60%, 540px);
+}
+
+.api-diff-viewer .empty-state-icon {
+    width: 64px;
+    height: 64px;
+    background: #f1f5f9;
+    border-radius: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 16px;
+    font-size: 1.5rem;
+    color: #64748b;
+}
+
+.api-diff-viewer .empty-state h3 {
+    margin: 0 0 8px 0;
+    color: #0f172a;
+    font-size: 1.125rem;
+    font-weight: 600;
+    line-height: 1.25;
+}
+
+.api-diff-viewer .empty-state p {
+    margin: 0 0 24px 0;
+    color: #64748b;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    max-width: 400px;
+}
+
+.api-diff-viewer .empty-state-actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.api-diff-viewer .empty-state-btn {
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    border: 1px solid #d1d5db;
+    background: #ffffff;
+    color: #374151;
+    text-decoration: none;
+}
+
+.api-diff-viewer .empty-state-btn:hover {
+    background: #f9fafb;
+    border-color: #9ca3af;
+    transform: translateY(-1px);
+}
+
+/* Loading and Error States */
+.api-diff-viewer .loading-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 20px;
+    color: #64748b;
+    text-align: center;
+    background: #ffffff;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    margin: 0 auto;
+}
+
+.api-diff-viewer .error-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 20px;
+    color: #dc2626;
+    text-align: center;
+    background: #ffffff;
+    border-radius: 12px;
+    border: 1px solid #fecaca;
+    margin: 0 auto;
+}
+
+.api-diff-viewer .error-state .FiAlertTriangle {
+    font-size: 48px;
+    margin-bottom: 16px;
+    color: #dc3545;
+}
+
+.api-diff-viewer .spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid #007bff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 15px;
+}
+
+.api-diff-viewer .retry-btn {
+    margin-top: 15px;
+    padding: 10px 20px;
+    background: #007bff;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.api-diff-viewer .retry-btn:hover {
+    background: #0056b3;
+}
+
+/* Diff Sections - Modern Card Design */
+.api-diff-viewer .diff-section {
+    background: #ffffff;
+    margin: 16px;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    overflow: hidden;
+    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+}
+
+.api-diff-viewer .diff-section:first-child {
+    margin-top: 16px;
+}
+
+.api-diff-viewer .diff-section:last-child {
+    margin-bottom: 16px;
+}
+
+.api-diff-viewer .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    /* keep headers aligned left */
+    gap: 12px;
+    padding: 16px 20px;
+    background: #ffffff;
+    border-bottom: 1px solid #f1f5f9;
+    border-radius: 12px 12px 0 0;
+}
+
+.api-diff-viewer .section-header h4 {
+    margin: 0;
+    color: #0f172a;
+    font-size: 1.125rem;
+    font-weight: 600;
+    line-height: 1.25;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.api-diff-viewer .summary-badges {
+    display: flex;
+    gap: 8px;
+    margin-left: 0;
+    /* keep with header title */
+    flex-wrap: wrap;
+}
+
+.api-diff-viewer .badge {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    line-height: 1;
+}
+
+.api-diff-viewer .badge.breaking {
+    background: #fef2f2;
+    color: #dc2626;
+    border: 1px solid #fecaca;
+}
+
+.api-diff-viewer .badge.total {
+    background: #eff6ff;
+    color: #2563eb;
+    border: 1px solid #bfdbfe;
+}
+
+.api-diff-viewer .section-content {
+    padding: 20px;
+}
+
+/* Center the empty state nicely inside sections without wasting space */
+.api-diff-viewer .section-content.empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 220px;
+}
+
+/* Summary Grid - Modern Card-Based Design */
+.api-diff-viewer .summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-top: 20px;
+}
+
+.api-diff-viewer .summary-card {
+    background: #ffffff;
+    border: 1px solid #f1f5f9;
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.api-diff-viewer .summary-card:hover {
+    border-color: #e2e8f0;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+}
+
+.api-diff-viewer .summary-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--card-accent-color);
+}
+
+.api-diff-viewer .summary-card.breaking {
+    --card-accent-color: #ef4444;
+}
+
+.api-diff-viewer .summary-card.breaking .summary-number {
+    color: #ef4444;
+}
+
+.api-diff-viewer .summary-card.non-breaking {
+    --card-accent-color: #10b981;
+}
+
+.api-diff-viewer .summary-card.non-breaking .summary-number {
+    color: #10b981;
+}
+
+.api-diff-viewer .summary-card.added {
+    --card-accent-color: #3b82f6;
+}
+
+.api-diff-viewer .summary-card.added .summary-number {
+    color: #3b82f6;
+}
+
+.api-diff-viewer .summary-card.removed {
+    --card-accent-color: #f59e0b;
+}
+
+.api-diff-viewer .summary-card.removed .summary-number {
+    color: #f59e0b;
+}
+
+.api-diff-viewer .summary-card.modified {
+    --card-accent-color: #8b5cf6;
+}
+
+.api-diff-viewer .summary-card.modified .summary-number {
+    color: #8b5cf6;
+}
+
+.api-diff-viewer .summary-card-icon {
+    width: 32px;
+    height: 32px;
+    margin: 0 auto 12px auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    background: var(--card-accent-color);
+    color: white;
+    font-size: 1rem;
+}
+
+.api-diff-viewer .summary-number {
+    font-size: 2.25rem;
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 8px;
+    font-variant-numeric: tabular-nums;
+}
+
+.api-diff-viewer .summary-label {
+    color: #64748b;
+    font-size: 0.875rem;
+    font-weight: 500;
+    line-height: 1.25;
+    margin: 0;
+}
+
+/* Changes List - Modern Design */
+.api-diff-viewer .changes-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 0;
+}
+
+.api-diff-viewer .change-item {
+    padding: 16px;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    background: #ffffff;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.api-diff-viewer .change-item::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: var(--change-accent-color);
+}
+
+.api-diff-viewer .change-item:hover {
+    border-color: #d1d5db;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px -1px rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+}
+
+.api-diff-viewer .change-item.error {
+    --change-accent-color: #ef4444;
+    background: #fefefe;
+    border-color: #fee2e2;
+}
+
+.api-diff-viewer .change-item.warning {
+    --change-accent-color: #f59e0b;
+    background: #fefefe;
+    border-color: #fed7aa;
+}
+
+.api-diff-viewer .change-item.info {
+    --change-accent-color: #3b82f6;
+    background: #fefefe;
+    border-color: #bfdbfe;
+}
+
+.api-diff-viewer .change-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+}
+
+.api-diff-viewer .change-type {
+    font-weight: 600;
+    color: #0f172a;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    background: #f1f5f9;
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+
+.api-diff-viewer .change-location {
+    font-family: ui-monospace, SFMono-Regular, 'SF Mono', Monaco, Menlo, 'Liberation Mono', 'Courier New', monospace;
+    font-size: 0.75rem;
+    background: #f8fafc;
+    padding: 4px 8px;
+    border-radius: 4px;
+    color: #475569;
+    border: 1px solid #e2e8f0;
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.api-diff-viewer .severity-badge {
+    font-size: 0.75rem;
+    font-weight: 500;
+    padding: 2px 8px;
+    border-radius: 12px;
+    text-transform: capitalize;
+}
+
+.api-diff-viewer .severity-badge.error {
+    background: #fef2f2;
+    color: #dc2626;
+    border: 1px solid #fecaca;
+}
+
+.api-diff-viewer .severity-badge.warning {
+    background: #fffbeb;
+    color: #d97706;
+    border: 1px solid #fed7aa;
+}
+
+.api-diff-viewer .severity-badge.info {
+    background: #eff6ff;
+    color: #2563eb;
+    border: 1px solid #bfdbfe;
+}
+
+.api-diff-viewer .change-description {
+    color: #374151;
+    line-height: 1.5;
+    margin: 0;
+    font-size: 0.875rem;
+}
+
+.api-diff-viewer .change-values {
+    display: flex;
+    gap: 15px;
+    margin-top: 8px;
+    font-size: 0.9rem;
+}
+
+.api-diff-viewer .old-value {
+    color: #dc3545;
+}
+
+.api-diff-viewer .new-value {
+    color: #28a745;
+}
+
+/* Changelog Content */
+.api-diff-viewer .changelog-content {
+    position: relative;
+}
+
+.api-diff-viewer .changelog-content pre {
+    background: #f8fafc;
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    white-space: pre-wrap;
+    line-height: 1.6;
+    color: #0f172a;
+    margin: 0;
+    overflow-x: auto;
+    font-size: 0.875rem;
+    font-family: ui-monospace, SFMono-Regular, 'SF Mono', Monaco, Menlo, 'Liberation Mono', 'Courier New', monospace;
+}
+
+/* Technical Details */
+.api-diff-viewer .technical-details {
+    position: relative;
+}
+
+.api-diff-viewer .technical-details pre {
+    background: #1e293b;
+    color: #e2e8f0;
+    padding: 20px;
+    border-radius: 8px;
+    margin: 0;
+    overflow-x: auto;
+    font-size: 0.875rem;
+    line-height: 1.6;
+    max-height: 400px;
+    overflow-y: auto;
+    font-family: ui-monospace, SFMono-Regular, 'SF Mono', Monaco, Menlo, 'Liberation Mono', 'Courier New', monospace;
+    border: 1px solid #334155;
+}
+
+.api-diff-viewer .technical-details pre::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+.api-diff-viewer .technical-details pre::-webkit-scrollbar-track {
+    background: #334155;
+    border-radius: 3px;
+}
+
+.api-diff-viewer .technical-details pre::-webkit-scrollbar-thumb {
+    background: #64748b;
+    border-radius: 3px;
+}
+
+.api-diff-viewer .technical-details pre::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .api-diff-viewer .modal-container {
+        width: 95%;
+        height: 90%;
+        margin: 0;
+    }
+
+    .api-diff-viewer .diff-header {
+        flex-direction: column;
+        gap: 16px;
+        align-items: flex-start;
+        padding: 20px 20px 16px 20px;
+    }
+
+    .api-diff-viewer .header-content {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+        width: 100%;
+    }
+
+    .api-diff-viewer .version-info {
+        flex-direction: column;
+        gap: 8px;
+        align-items: flex-start;
+    }
+
+    .api-diff-viewer .header-actions {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .api-diff-viewer .summary-grid {
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 12px;
+    }
+
+    .api-diff-viewer .summary-card {
+        padding: 16px 12px;
+    }
+
+    .api-diff-viewer .summary-number {
+        font-size: 1.75rem;
+    }
+
+    .api-diff-viewer .section-header {
+        padding: 16px 20px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .api-diff-viewer .section-content {
+        padding: 20px;
+    }
+
+    .api-diff-viewer .change-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .api-diff-viewer .change-location {
+        min-width: 100%;
+        white-space: normal;
+        word-break: break-all;
+    }
+
+    .api-diff-viewer .diff-section {
+        margin: 16px;
+    }
+
+    .api-diff-viewer .empty-state {
+        padding: 32px 20px;
+        margin: 16px;
+    }
+}
+
+@media (max-width: 480px) {
+    .api-diff-viewer .diff-header {
+        padding: 16px;
+    }
+
+    .api-diff-viewer .section-header {
+        padding: 16px;
+    }
+
+    .api-diff-viewer .section-content {
+        padding: 16px;
+    }
+
+    .api-diff-viewer .summary-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .api-diff-viewer .download-group {
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+
+    .api-diff-viewer .download-btn {
+        font-size: 0.75rem;
+        padding: 6px 12px;
+    }
+}

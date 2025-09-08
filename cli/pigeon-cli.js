@@ -10,15 +10,136 @@ const path = require('path');
 const yargs = require('yargs/yargs');
 const { hideBin } = require('yargs/helpers');
 const chalk = require('chalk');
-const { runCollection } = require('./runner');
-const { generateReport } = require('./reporter');
-const { loadEnvironment } = require('./environment');
-const { runLint } = require('./runner');
+// Don't import database-dependent modules at startup - load them lazily when needed
+const yaml = require('js-yaml');
 
 // For Windows compatibility
 process.on('unhandledRejection', (reason, promise) => {
   console.error('Unhandled Rejection at:', promise, 'reason:', reason);
 });
+
+/**
+ * Load OpenAPI specification from file (JSON or YAML)
+ * @param {string} filePath - Path to the spec file
+ * @returns {Object} Parsed OpenAPI specification
+ */
+function loadSpec(filePath) {
+  try {
+    if (!fs.existsSync(filePath)) {
+      throw new Error(`Specification file not found: ${filePath}`);
+    }
+
+    const content = fs.readFileSync(filePath, 'utf8');
+    const ext = path.extname(filePath).toLowerCase();
+
+    if (ext === '.json') {
+      return JSON.parse(content);
+    } else if (ext === '.yaml' || ext === '.yml') {
+      return yaml.load(content);
+    } else {
+      // Try to auto-detect based on content
+      try {
+        return JSON.parse(content);
+      } catch {
+        return yaml.load(content);
+      }
+    }
+  } catch (error) {
+    throw new Error(`Failed to load specification from ${filePath}: ${error.message}`);
+  }
+}
+
+/**
+ * Run diff command
+ * @param {Object} options - Diff command options
+ * @returns {number} Exit code
+ */
+async function runDiff(options) {
+  try {
+    // Use database-free ContractDiffService for diff operations
+    const ContractDiffService = require('../services/ContractDiffService');
+
+    console.log(chalk.cyan(`Comparing specifications:`));
+    console.log(`  Base: ${options.base}`);
+    console.log(`  Head: ${options.head}`);
+    console.log(`  Format: ${options.format}`);
+
+    // Load specifications
+    const baseSpec = loadSpec(options.base);
+    const headSpec = loadSpec(options.head);
+
+    console.log(chalk.gray(`Loaded base spec: ${baseSpec.info?.title || 'Unknown'} v${baseSpec.info?.version || 'Unknown'}`));
+    console.log(chalk.gray(`Loaded head spec: ${headSpec.info?.title || 'Unknown'} v${headSpec.info?.version || 'Unknown'}`));
+
+    // Run comparison
+    const startTime = Date.now();
+    const result = await ContractDiffService.compareSpecs(baseSpec, headSpec, {
+      format: options.format,
+      includeNonBreaking: true,
+      detectRenames: true
+    });
+    const duration = Date.now() - startTime;
+
+    // Print summary to console
+    console.log('\n' + chalk.cyan('Diff Results Summary:'));
+    console.log(`Breaking Changes: ${result.summary.breakingChanges > 0 ? chalk.red(result.summary.breakingChanges) : chalk.green(result.summary.breakingChanges)}`);
+    console.log(`Non-Breaking Changes: ${chalk.blue(result.summary.nonBreakingChanges)}`);
+    console.log(`Total Changes: ${result.summary.totalChanges}`);
+    console.log(`Added Endpoints: ${chalk.green(result.summary.addedEndpoints)}`);
+    console.log(`Removed Endpoints: ${result.summary.removedEndpoints > 0 ? chalk.red(result.summary.removedEndpoints) : chalk.green(result.summary.removedEndpoints)}`);
+    console.log(`Modified Endpoints: ${chalk.yellow(result.summary.modifiedEndpoints)}`);
+    console.log(chalk.gray(`Analysis completed in ${duration}ms`));
+
+    // Write output file if specified
+    if (options.output) {
+      const outputContent = typeof result.diffResult === 'string' ? result.diffResult : JSON.stringify(result.diffResult, null, 2);
+      fs.writeFileSync(options.output, outputContent);
+      console.log(chalk.gray(`Report saved to: ${options.output}`));
+    }
+
+    // Save to database if requested - only import database modules when needed
+    if (options.save && options.apiVersionId) {
+      try {
+        // Lazy load database modules only when needed
+        const ApiVersion = require('../models/ApiVersion');
+
+        await ApiVersion.findByIdAndUpdate(options.apiVersionId, {
+          $push: {
+            diffs: {
+              fromVersion: baseSpec.info?.version,
+              toVersion: headSpec.info?.version,
+              format: options.format,
+              result: result.diffResult,
+              breaking: result.hasBreakingChanges,
+              createdAt: new Date()
+            }
+          },
+          breaking: result.hasBreakingChanges,
+          breakingChanges: result.breakingChanges.map(change => ({
+            change: change.type,
+            description: change.description,
+            mitigationStrategy: change.mitigationStrategy
+          }))
+        });
+        console.log(chalk.gray(`Diff results saved to API version: ${options.apiVersionId}`));
+      } catch (saveError) {
+        console.warn(chalk.yellow(`Failed to save to database: ${saveError.message}`));
+        console.warn(chalk.yellow(`Note: Database connection may not be configured for CLI usage`));
+      }
+    }
+
+    // Determine exit code
+    if (result.hasBreakingChanges && options.failOnBreaking) {
+      console.log(chalk.red('\nBreaking changes detected! Exiting with error code 2.'));
+      return 2;
+    }
+
+    return 0;
+  } catch (error) {
+    console.error(chalk.red('Diff failed:'), error.message);
+    return 3;
+  }
+}
 
 // Print startup banner
 console.log(chalk.blue('🐦 Pigeon CLI - API Testing Tool'));
@@ -130,6 +251,46 @@ const argv = yargs(hideBin(process.argv))
         default: 20
       });
   })
+  .command('diff', 'Compare two OpenAPI specifications and detect breaking changes', (yargs) => {
+    return yargs
+      .option('base', {
+        alias: 'b',
+        describe: 'Path to base OpenAPI specification file (JSON or YAML)',
+        type: 'string',
+        demandOption: true
+      })
+      .option('head', {
+        describe: 'Path to new OpenAPI specification file (JSON or YAML)',
+        type: 'string',
+        demandOption: true
+      })
+      .option('format', {
+        alias: 'f',
+        describe: 'Output format',
+        type: 'string',
+        choices: ['json', 'html', 'markdown'],
+        default: 'json'
+      })
+      .option('output', {
+        alias: 'o',
+        describe: 'Output file path to write the diff report',
+        type: 'string'
+      })
+      .option('fail-on-breaking', {
+        describe: 'Exit with error code when breaking changes are found',
+        type: 'boolean',
+        default: true
+      })
+      .option('save', {
+        describe: 'Save diff results to database (requires api-version-id)',
+        type: 'boolean',
+        default: false
+      })
+      .option('api-version-id', {
+        describe: 'API Version ID for saving results to database',
+        type: 'string'
+      });
+  })
   .command('export', 'Export a collection for CI/CD usage', (yargs) => {
     return yargs
       .option('collection', {
@@ -149,6 +310,8 @@ const argv = yargs(hideBin(process.argv))
   .example('$0 run --collection api-tests.json --reporter csv --output ./test-results/api-test-results.csv', 'Run tests and generate CSV report for data analysis')
   .example('$0 lint --spec openapi.yaml --format json --output lint-results.json', 'Lint OpenAPI spec and save results as JSON')
   .example('$0 lint --spec api.json --ruleset .pigeon/spectral.yaml --fail-on warnings', 'Lint with custom ruleset and fail on warnings')
+  .example('$0 diff --base api-v1.yaml --head api-v2.yaml --format html --output diff-report.html', 'Compare API versions and generate HTML report')
+  .example('$0 diff --base api-v1.json --head api-v2.json --format markdown --fail-on-breaking', 'Compare specs and fail if breaking changes detected')
   .example('$0 export --collection my-collection --output ./ci/api-tests.json', 'Export collection for CI/CD usage')
   .epilogue('For more information, visit https://pigeon-api.com/docs/cli')
   .help()
@@ -164,6 +327,11 @@ async function main() {
 
     if (command === 'run') {
       console.log(chalk.cyan(`Running collection: ${argv.collection}`));
+
+      // Lazy load runner dependencies to avoid database connections for other commands
+      const { runCollection } = require('./runner');
+      const { generateReport } = require('./reporter');
+      const { loadEnvironment } = require('./environment');
 
       // Prepare environment options for the new scoping system
       const environmentOptions = {
@@ -222,6 +390,9 @@ async function main() {
     else if (command === 'lint') {
       console.log(chalk.cyan(`Linting OpenAPI spec: ${argv.spec}`));
 
+      // Lazy load lint dependencies
+      const { runLint } = require('./runner');
+
       const lintOptions = {
         spec: argv.spec,
         ruleset: argv.ruleset,
@@ -240,6 +411,22 @@ async function main() {
       const duration = Date.now() - startTime;
 
       console.log(chalk.gray(`Lint completed in ${duration}ms`));
+      process.exit(exitCode);
+    }
+    else if (command === 'diff') {
+      console.log(chalk.cyan('Running OpenAPI specification diff...'));
+
+      const diffOptions = {
+        base: argv.base,
+        head: argv.head,
+        format: argv.format,
+        output: argv.output,
+        failOnBreaking: argv['fail-on-breaking'],
+        save: argv.save,
+        apiVersionId: argv['api-version-id']
+      };
+
+      const exitCode = await runDiff(diffOptions);
       process.exit(exitCode);
     }
     else if (command === 'export') {
