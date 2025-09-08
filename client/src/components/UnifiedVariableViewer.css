@@ -99,7 +99,7 @@
 }
 
 .precedence-arrow {
-    color: var(--primary-color, #ff6c37);
+    color: var(--primary-color, #00A6FB);
     font-weight: bold;
     font-size: 1.1rem;
 }
@@ -438,7 +438,7 @@
     --text-color: #f0f6fc;
     --text-secondary: #7d8590;
     --border-color: #21262d;
-    --primary-color: #ff6c37;
+    --primary-color: #00A6FB;
 }
 
 /* Light theme overrides */
@@ -447,5 +447,5 @@
     --text-color: #24292f;
     --text-secondary: #656d76;
     --border-color: #d0d7de;
-    --primary-color: #ff6c37;
+    --primary-color: #00A6FB;
 }

@@ -32,7 +32,7 @@
 }
 
 .back-link:hover {
-    color: var(--primary-color, #ff6c37);
+    color: var(--primary-color, #00A6FB);
 }
 
 .documentation-title {
@@ -42,7 +42,7 @@
 }
 
 .doc-icon {
-    color: var(--primary-color, #ff6c37);
+    color: var(--primary-color, #00A6FB);
     font-size: 20px;
 }
 
@@ -90,7 +90,7 @@
 }
 
 .view-btn.active {
-    background-color: var(--primary-color, #ff6c37);
+    background-color: var(--primary-color, #00A6FB);
     color: white;
 }
 
@@ -118,8 +118,8 @@
 
 .action-btn.active {
     background-color: var(--primary-light, #fff0eb);
-    border-color: var(--primary-color, #ff6c37);
-    color: var(--primary-color, #ff6c37);
+    border-color: var(--primary-color, #00A6FB);
+    color: var(--primary-color, #00A6FB);
 }
 
 .publish-btn {
@@ -207,7 +207,7 @@ body.dark-theme .documentation-loading {
     width: 40px;
     height: 40px;
     border: 3px solid rgba(255, 108, 55, 0.3);
-    border-top-color: var(--primary-color, #ff6c37);
+    border-top-color: var(--primary-color, #00A6FB);
     border-radius: 50%;
     animation: spin 1s linear infinite;
     margin-bottom: 16px;
@@ -238,7 +238,7 @@ body.dark-theme .documentation-loading {
 .documentation-error button {
     margin-top: 16px;
     padding: 8px 16px;
-    background-color: var(--primary-color, #ff6c37);
+    background-color: var(--primary-color, #00A6FB);
     color: white;
     border: none;
     border-radius: 4px;
@@ -319,7 +319,7 @@ body.dark-theme .documentation-loading {
 .form-group input:focus,
 .form-group textarea:focus {
     outline: none;
-    border-color: var(--primary-color, #ff6c37);
+    border-color: var(--primary-color, #00A6FB);
     box-shadow: 0 0 0 2px rgba(255, 108, 55, 0.2);
 }
 
@@ -347,7 +347,7 @@ body.dark-theme .documentation-loading {
 
 .save-btn {
     padding: 8px 16px;
-    background-color: var(--primary-color, #ff6c37);
+    background-color: var(--primary-color, #00A6FB);
     color: white;
     border: none;
     border-radius: 4px;
@@ -403,8 +403,8 @@ body.dark-theme .documentation-loading {
 
 .tab-btn.active {
     background-color: var(--background-color, #ffffff);
-    color: var(--primary-color, #ff6c37);
-    border-bottom-color: var(--primary-color, #ff6c37);
+    color: var(--primary-color, #00A6FB);
+    border-bottom-color: var(--primary-color, #00A6FB);
 }
 
 .version-history-content {
@@ -519,7 +519,7 @@ body.dark-theme .documentation-loading {
 
     .tab-btn.active {
         background-color: var(--background-color, #1e1e1e);
-        color: var(--primary-color, #ff6c37);
+        color: var(--primary-color, #00A6FB);
     }
 
     .version-history-content {

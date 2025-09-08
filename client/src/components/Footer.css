@@ -27,7 +27,7 @@
 }
 
 .footer-brand-section h3 {
-    color: #FF6C37;
+    color: #00A6FB;
     font-size: 1.8rem;
     font-weight: 700;
     margin: 0 0 10px 0;
@@ -60,7 +60,7 @@
 }
 
 .social-icon:hover {
-    background-color: #FF6C37;
+    background-color: #00A6FB;
     color: white;
     transform: translateY(-3px);
 }
@@ -98,7 +98,7 @@
 
 .footer-links li a:hover,
 .contact-email:hover {
-    color: #FF6C37;
+    color: #00A6FB;
 }
 
 .contact-message {
@@ -129,7 +129,7 @@
 }
 
 .footer-legal-links a:hover {
-    color: #FF6C37;
+    color: #00A6FB;
 }
 
 /* Responsive styles */

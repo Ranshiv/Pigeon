@@ -73,9 +73,9 @@
 }
 
 .btn-primary {
-    background: #ff6c37;
+    background: #00A6FB;
     color: #ffffff;
-    border-color: #ff6c37;
+    border-color: #00A6FB;
     box-shadow: 0 2px 4px rgba(255, 108, 55, 0.2);
 }
 
@@ -236,7 +236,7 @@
 
 .viz-tab.active {
     background: #21252b;
-    border-top: 3px solid #ff6c37;
+    border-top: 3px solid #00A6FB;
     color: #ffffff;
 }
 
@@ -266,7 +266,7 @@
 
 .viz-tab.active .tab-type {
     background: rgba(255, 108, 55, 0.15);
-    color: #ff6c37;
+    color: #00A6FB;
     border-color: rgba(255, 108, 55, 0.3);
 }
 
@@ -469,7 +469,7 @@
     left: 0;
     right: 0;
     height: 3px;
-    background: linear-gradient(90deg, #ff6c37, #ff8a65);
+    background: linear-gradient(90deg, #00A6FB, #ff8a65);
     opacity: 0;
     transition: opacity 0.25s ease;
 }
@@ -489,7 +489,7 @@
 .metric-value {
     font-size: 32px;
     font-weight: 700;
-    color: #ff6c37;
+    color: #00A6FB;
     margin-bottom: 8px;
     line-height: 1;
     letter-spacing: -0.02em;
@@ -602,7 +602,7 @@
 .response-size {
     font-size: 24px;
     font-weight: 600;
-    color: #ff6c37;
+    color: #00A6FB;
     margin-bottom: 6px;
 }
 
@@ -734,7 +734,7 @@
 
 .template-select:focus {
     outline: none;
-    border-color: #ff6c37;
+    border-color: #00A6FB;
 }
 
 .template-textarea {
@@ -753,7 +753,7 @@
 }
 
 .template-textarea:focus {
-    border-color: #ff6c37;
+    border-color: #00A6FB;
     outline: none;
     box-shadow: 0 0 0 3px rgba(255, 108, 55, 0.1);
 }
@@ -854,7 +854,7 @@
 .stat-value {
     font-size: 24px;
     font-weight: 700;
-    color: #ff6c37;
+    color: #00A6FB;
     margin-bottom: 6px;
     line-height: 1;
 }
@@ -894,7 +894,7 @@
     width: 20px;
     height: 20px;
     border: 2px solid #3a3f47;
-    border-top: 2px solid #ff6c37;
+    border-top: 2px solid #00A6FB;
     border-radius: 50%;
     animation: spin 1s linear infinite;
     margin-right: 12px;
@@ -955,7 +955,7 @@
 }
 
 .spec-preview.modern .preview-header .header-icon {
-    color: #ff6c37;
+    color: #00A6FB;
 }
 
 .spec-preview.modern .preview-controls {
@@ -999,7 +999,7 @@
 }
 
 .spec-preview.modern .format-btn.active {
-    background: #ff6c37;
+    background: #00A6FB;
     color: #ffffff;
     font-weight: 500;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
@@ -1167,7 +1167,7 @@
 
 .spec-preview.modern .spinner {
     font-size: 32px;
-    color: #ff6c37;
+    color: #00A6FB;
     animation: spin 1s linear infinite;
 }
 
@@ -1335,7 +1335,7 @@
     height: 32px;
     border-radius: 8px;
     background: rgba(255, 108, 55, 0.1);
-    color: #ff6c37;
+    color: #00A6FB;
     font-size: 16px;
 }
 
@@ -1928,7 +1928,7 @@
 .btn:focus,
 .template-select:focus,
 .template-textarea:focus {
-    outline: 2px solid #ff6c37;
+    outline: 2px solid #00A6FB;
     outline-offset: 2px;
 }
 
@@ -1944,7 +1944,7 @@
 
 .metric-card:focus-within,
 .metric-item:focus-within {
-    outline: 2px solid #ff6c37;
+    outline: 2px solid #00A6FB;
     outline-offset: 2px;
 }
 
@@ -1959,7 +1959,7 @@
 .export-buttons button:focus:not(:disabled) {
     background: linear-gradient(135deg, #3a3f47 0%, #2a2f36 100%);
     color: #ffffff;
-    border-color: #ff6c37;
+    border-color: #00A6FB;
 }
 
 /* Button Press Animation */
@@ -1997,7 +1997,7 @@
     height: 16px;
     margin: -8px 0 0 -8px;
     border: 2px solid transparent;
-    border-top: 2px solid #ff6c37;
+    border-top: 2px solid #00A6FB;
     border-radius: 50%;
     animation: spin 1s linear infinite;
 }

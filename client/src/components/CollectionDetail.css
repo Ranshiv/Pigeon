@@ -3,14 +3,14 @@
 :root {
   --background-color: #1c1c1e;
   --sidebar-bg: #262626;
-  --primary-color: #FF6C37;
+  --primary-color: #00A6FB;
   --primary-hover: #e65a2e;
   --text-color: #e6e6e6;
   --text-secondary: #a0a0a0;
   --border-color: #3e3e3e;
   --hover-color: #333333;
   --method-get: #00aa13;
-  --method-post: #FF6C37;
+  --method-post: #00A6FB;
   --method-put: #0066cc;
   --method-delete: #cc3333;
   --method-patch: #9933cc;
@@ -793,7 +793,7 @@
 
 /* Modern simple button for Create Your First Request */
 .gradient-button {
-  background-color: #FF6C37;
+  background-color: #00A6FB;
   border: none !important;
   position: relative;
   overflow: hidden;
@@ -814,7 +814,7 @@
   align-items: center;
   justify-content: center;
   padding: 10px 16px;
-  background-color: #FF6C37;
+  background-color: #00A6FB;
   color: white;
   border: none;
   border-radius: var(--border-radius);

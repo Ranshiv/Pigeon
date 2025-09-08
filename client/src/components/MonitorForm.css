@@ -46,11 +46,11 @@
 }
 
 .monitor-form-modal::-webkit-scrollbar-thumb:hover {
-    background: var(--primary-color, #FF6C37);
+    background: var(--primary-color, #00A6FB);
 }
 
 .monitor-form-modal::-webkit-scrollbar-thumb:active {
-    background: var(--primary-hover, #e85c2a);
+    background: var(--primary-hover, #0582CA);
 }
 
     
@@ -133,7 +133,7 @@
 }
 
 .form-section:hover {
-    border-color: var(--primary-color, #FF6C37);
+    border-color: var(--primary-color, #00A6FB);
     box-shadow: 0 4px 20px rgba(255, 108, 55, 0.1);
 }
 
@@ -148,7 +148,7 @@
 }
 
 .form-section h3 svg {
-    color: var(--primary-color, #FF6C37);
+    color: var(--primary-color, #00A6FB);
 }
 
 .form-section .section-header {
@@ -198,7 +198,7 @@
 .form-group select:focus,
 .form-group textarea:focus {
     outline: none;
-    border-color: var(--primary-color, #FF6C37);
+    border-color: var(--primary-color, #00A6FB);
     box-shadow: 0 0 0 3px rgba(255, 108, 55, 0.1);
     background: var(--card-bg, #2c2c2e);
 }
@@ -277,9 +277,9 @@
 }
 
 .number-control-btn:hover {
-    background: var(--primary-color, #FF6C37);
+    background: var(--primary-color, #00A6FB);
     color: white;
-    border-color: var(--primary-color, #FF6C37);
+    border-color: var(--primary-color, #00A6FB);
 }
 
 .number-control-btn:active {
@@ -312,7 +312,7 @@
 /* Enhanced focus styles for number inputs */
 .form-group input[type="number"]:focus {
     outline: none;
-    border-color: var(--primary-color, #FF6C37);
+    border-color: var(--primary-color, #00A6FB);
     box-shadow: 0 0 0 3px rgba(255, 108, 55, 0.1);
     background: var(--card-bg, #2c2c2e);
 }
@@ -413,8 +413,8 @@
 }
 
 .checkbox-label input[type="checkbox"]:checked+.checkmark {
-    background: var(--primary-color, #FF6C37);
-    border-color: var(--primary-color, #FF6C37);
+    background: var(--primary-color, #00A6FB);
+    border-color: var(--primary-color, #00A6FB);
 }
 
 .checkbox-label input[type="checkbox"]:checked+.checkmark::after {
@@ -482,12 +482,12 @@
 }
 
 .btn-primary {
-    background: var(--primary-color, #FF6C37);
+    background: var(--primary-color, #00A6FB);
     color: white;
 }
 
 .btn-primary:hover:not(:disabled) {
-    background: var(--primary-hover, #e85c2a);
+    background: var(--primary-hover, #0582CA);
     transform: translateY(-1px);
     box-shadow: 0 2px 8px rgba(255, 108, 55, 0.3);
 }

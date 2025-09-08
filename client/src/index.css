@@ -24,11 +24,19 @@ body {
   --card-bg: #ffffff;
   --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
   --hover-bg: #f5f5f5;
-  --primary-color: #FF6C37;
-  /* Postman-inspired orange */
-  --primary-hover: #e85d2a;
-  --secondary-color: #6c757d;
-  --secondary-hover: #5a6268;
+  --primary-color: #00A6FB;
+  /* Blue primary color - bright azure */
+  --primary-hover: #0582CA;
+  --secondary-color: #0582CA;
+  --secondary-hover: #006494;
+  
+  /* Blue palette colors */
+  --accent-primary: #006494;
+  /* Deep cerulean - for success states, confirmations, active elements */
+  --accent-secondary: #003554;
+  /* Dark prussian blue - for dark theme primary, navigation bars */
+  --accent-tertiary: #051923;
+  /* Near-black blue - for dark theme backgrounds, overlays */
   --navbar-bg: #ffffff;
   --navbar-border: rgba(0, 0, 0, 0.06);
   --panel-bg: #ffffff;
@@ -59,7 +67,7 @@ body.light-theme {
   --sidebar-background: #f0f0f0;
   --sidebar-text: #ffffff;
   /* Changed sidebar text to white */
-  --button-background: #007bff;
+  --button-background: #00A6FB;
   --button-text: #ffffff;
   --border-color: #ddd;
   --hover-background: #e0e0e0;
@@ -78,16 +86,16 @@ body.dark-theme {
   --navbar-bg: #252525;
   --navbar-border: rgba(255, 255, 255, 0.06);
   --panel-bg: #252525;
-  --navbar-background: #1c2128;
-  /* Darker navbar */
+  --navbar-background: #003554;
+  /* Dark prussian blue for navbar */
   --navbar-text: #ffffff;
   /* Ensured navbar text is white */
   --sidebar-background: #2d333b;
   /* Darker sidebar */
   --sidebar-text: #ffffff;
   /* Changed sidebar text to white */
-  --button-background: #377df0;
-  /* Brighter blue */
+  --button-background: #00A6FB;
+  /* Blue primary color */
   --button-text: #ffffff;
   --border-color: #444c56;
   /* Darker border */

@@ -126,8 +126,8 @@
 }
 
 .visual-api-designer {
-    --designer-primary: #FF6C37;
-    --designer-primary-hover: #e85d2a;
+    --designer-primary: #00A6FB;
+    --designer-primary-hover: #0582CA;
     --designer-primary-light: #fff3ef;
     --designer-secondary: #6c757d;
     --designer-secondary-hover: #5a6268;
@@ -2167,7 +2167,7 @@
     height: 16px;
     border-radius: 50%;
     border: none;
-    background: #FF6C37;
+    background: #00A6FB;
     cursor: crosshair;
     z-index: 20;
     opacity: 0;
@@ -2193,7 +2193,7 @@
 }
 
 .conn-handle:hover {
-    background: #e85d2a;
+    background: #0582CA;
     box-shadow: 0 4px 12px rgba(255, 108, 55, 0.5);
 }
 
@@ -2215,31 +2215,31 @@
 
 /* Edge styling - Screenshot 2 style */
 .edges-layer .edge-path {
-    stroke: #FF6C37;
+    stroke: #00A6FB;
     stroke-width: 2;
     filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
     cursor: pointer;
 }
 
 .edges-layer .edge-path.default {
-    stroke: #FF6C37;
+    stroke: #00A6FB;
     opacity: 0.8;
 }
 
 .edges-layer .edge-path.smooth {
-    stroke: #FF6C37;
+    stroke: #00A6FB;
     opacity: 0.9;
 }
 
 .edges-layer .edge-path.preview {
-    stroke: #FF6C37;
+    stroke: #00A6FB;
     stroke-dasharray: 8 4;
     opacity: 0.7;
     animation: dashFlow 1s linear infinite;
 }
 
 .edges-layer .edge-path.selected {
-    stroke: #FF6C37;
+    stroke: #00A6FB;
     stroke-width: 3;
     filter: drop-shadow(0 0 8px rgba(255, 108, 55, 0.8));
     opacity: 1;

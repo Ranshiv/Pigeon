@@ -33,7 +33,7 @@
 }
 
 .create-mock-btn {
-    background: var(--primary-color, #ff6c37);
+    background: var(--primary-color, #00A6FB);
     color: white;
     border: none;
     padding: 8px 14px;

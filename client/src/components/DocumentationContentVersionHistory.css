@@ -119,7 +119,7 @@
 }
 
 .restore-btn {
-  background: linear-gradient(135deg, var(--primary-color, #ff6c37), rgba(255, 108, 55, 0.8));
+  background: linear-gradient(135deg, var(--primary-color, #00A6FB), rgba(255, 108, 55, 0.8));
   color: white;
   border: none;
   padding: 6px 12px;
@@ -152,7 +152,7 @@
 
 .expand-icon:hover {
   background-color: rgba(255, 108, 55, 0.08);
-  color: var(--primary-color, #ff6c37);
+  color: var(--primary-color, #00A6FB);
 }
 
 .expand-icon.expanded {
@@ -290,7 +290,7 @@
 
 [data-theme="dark"] .expand-icon:hover {
   background-color: rgba(255, 108, 55, 0.15);
-  color: var(--primary-color, #ff6c37);
+  color: var(--primary-color, #00A6FB);
 }
 
 [data-theme="dark"] .version-content {

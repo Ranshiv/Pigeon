@@ -21,7 +21,7 @@
 }
 
 .enhanced-node:hover {
-    border-color: #ff6c37;
+    border-color: #00A6FB;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
     transform: translateY(-2px);
 }
@@ -37,7 +37,7 @@
     left: -1px;
     right: -1px;
     bottom: -1px;
-    border: 1px dashed #ff6c37;
+    border: 1px dashed #00A6FB;
     border-radius: 8px;
     pointer-events: none;
     z-index: 10;
@@ -70,7 +70,7 @@
     height: 24px;
     background: #333;
     border-radius: 4px;
-    color: #ff6c37;
+    color: #00A6FB;
     margin-right: 8px;
 }
 
@@ -174,7 +174,7 @@
     left: 0;
     width: 3px;
     height: 100%;
-    background: #ff6c37;
+    background: #00A6FB;
     opacity: 1;
 }
 
@@ -375,7 +375,7 @@
     height: 24px;
     background: #333;
     border-radius: 4px;
-    color: #ff6c37;
+    color: #00A6FB;
 }
 
 .node-card-type-badge {
@@ -394,7 +394,7 @@
     border-radius: 4px;
     text-transform: uppercase;
     background: rgba(255, 108, 55, 0.2);
-    color: #ff6c37;
+    color: #00A6FB;
 }
 
 .node-card-content {
@@ -424,7 +424,7 @@
     left: -2px;
     right: -2px;
     bottom: -2px;
-    border: 1px dashed #ff6c37;
+    border: 1px dashed #00A6FB;
     border-radius: 9px;
     pointer-events: none;
     animation: selectionPulse 2s infinite;

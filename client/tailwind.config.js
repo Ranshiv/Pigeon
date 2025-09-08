@@ -8,8 +8,29 @@ module.exports = {
         extend: {
             colors: {
                 primary: {
-                    DEFAULT: '#FF6C37',
-                    hover: '#e85d2a',
+                    DEFAULT: '#00A6FB',
+                    hover: '#0582CA',
+                },
+                secondary: {
+                    DEFAULT: '#0582CA',
+                    hover: '#006494',
+                },
+                accent: {
+                    primary: '#006494',
+                    secondary: '#003554',
+                    tertiary: '#051923',
+                },
+                blue: {
+                    50: '#f0f9ff',
+                    100: '#e0f2fe',
+                    200: '#bae6fd',
+                    300: '#7dd3fc',
+                    400: '#38bdf8',
+                    500: '#00A6FB',
+                    600: '#0582CA',
+                    700: '#006494',
+                    800: '#003554',
+                    900: '#051923',
                 },
             },
             fontFamily: {

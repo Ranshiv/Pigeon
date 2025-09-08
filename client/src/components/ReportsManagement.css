@@ -982,7 +982,7 @@
 }
 
 .report-card:hover {
-    border-color: var(--primary-color, #FF6C37);
+    border-color: var(--primary-color, #00A6FB);
     box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
     transform: translateY(-2px);
 }
@@ -992,7 +992,7 @@
 }
 
 .report-card:hover .report-icon svg {
-    color: var(--primary-hover, #e85d2a);
+    color: var(--primary-hover, #0582CA);
     transform: scale(1.1);
     transition: all 0.2s ease;
 }
@@ -1025,7 +1025,7 @@
 .report-icon svg {
     width: 20px;
     height: 20px;
-    color: var(--primary-color, #FF6C37);
+    color: var(--primary-color, #00A6FB);
 }
 
 .report-info h4 {
@@ -1132,7 +1132,7 @@
 
 /* Modern Buttons */
 .btn-primary {
-    background: var(--primary-color, #FF6C37);
+    background: var(--primary-color, #00A6FB);
     color: white;
     border: none;
     padding: 12px 24px;
@@ -1148,7 +1148,7 @@
 }
 
 .btn-primary:hover:not(:disabled) {
-    background: var(--primary-hover, #e85d2a);
+    background: var(--primary-hover, #0582CA);
     box-shadow: 0 4px 12px rgba(255, 108, 55, 0.25);
     transform: translateY(-1px);
 }
@@ -1194,13 +1194,13 @@
 .btn-secondary:active {
     background: var(--pressed-bg, #f3f4f6);
     transform: translateY(0);
-    border-color: var(--primary-color, #FF6C37);
+    border-color: var(--primary-color, #00A6FB);
 }
 
 .btn-secondary:focus {
     outline: none;
     box-shadow: 0 0 0 3px rgba(255, 108, 55, 0.1);
-    border-color: var(--primary-color, #FF6C37);
+    border-color: var(--primary-color, #00A6FB);
 }
 
 /* Empty State */
@@ -1252,7 +1252,7 @@
 .loading-icon {
     width: 48px;
     height: 48px;
-    color: var(--primary-color, #FF6C37);
+    color: var(--primary-color, #00A6FB);
     margin-bottom: 16px;
     animation: pulse 2s infinite;
 }
@@ -1390,7 +1390,7 @@
 .form-group select:focus,
 .form-group textarea:focus {
     outline: none;
-    border-color: var(--primary-color, #FF6C37);
+    border-color: var(--primary-color, #00A6FB);
     box-shadow: 0 0 0 3px rgba(255, 108, 55, 0.1);
 }
 
@@ -1460,14 +1460,14 @@
 
 .add-recipient-btn:active {
     background: var(--pressed-bg, #e5e7eb);
-    border-color: var(--primary-color, #FF6C37);
+    border-color: var(--primary-color, #00A6FB);
     transform: scale(0.98);
 }
 
 .add-recipient-btn:focus {
     outline: none;
     box-shadow: 0 0 0 3px rgba(255, 108, 55, 0.1);
-    border-color: var(--primary-color, #FF6C37);
+    border-color: var(--primary-color, #00A6FB);
 }
 
 /* Checkbox Group */
@@ -1496,7 +1496,7 @@
 
 .checkbox-label:has(input[type="checkbox"]:checked) {
     background: rgba(255, 108, 55, 0.1);
-    border-color: var(--primary-color, #FF6C37);
+    border-color: var(--primary-color, #00A6FB);
     box-shadow: 0 0 0 3px rgba(255, 108, 55, 0.05);
 }
 
@@ -1507,14 +1507,14 @@
 .checkbox-label input[type="checkbox"] {
     width: 18px;
     height: 18px;
-    accent-color: var(--primary-color, #FF6C37);
+    accent-color: var(--primary-color, #00A6FB);
     margin: 0;
     border-radius: 4px;
     cursor: pointer;
 }
 
 .checkbox-label input[type="checkbox"]:checked+span {
-    color: var(--primary-color, #FF6C37);
+    color: var(--primary-color, #00A6FB);
     font-weight: 600;
 }
 
@@ -1572,13 +1572,13 @@
 }
 
 .nav-btn.active {
-    background: var(--primary-color, #FF6C37);
+    background: var(--primary-color, #00A6FB);
     color: white;
     box-shadow: 0 2px 4px rgba(255, 108, 55, 0.2);
 }
 
 .nav-btn.active:hover {
-    background: var(--primary-hover, #e85d2a);
+    background: var(--primary-hover, #0582CA);
 }
 
 .header-subtitle {

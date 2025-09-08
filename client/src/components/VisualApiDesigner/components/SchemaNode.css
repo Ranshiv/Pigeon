@@ -24,7 +24,7 @@
 }
 
 .schema-node-modern.selected {
-    border-color: #ff6c37;
+    border-color: #00A6FB;
     box-shadow: 0 0 0 2px rgba(255, 108, 55, 0.2);
 }
 
@@ -134,7 +134,7 @@
     color: #fff;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    background: #ff6c37;
+    background: #00A6FB;
 }
 
 .schema-node-modern .status-badge {
@@ -157,7 +157,7 @@
     left: -2px;
     right: -2px;
     bottom: -2px;
-    border: 1px dashed #ff6c37;
+    border: 1px dashed #00A6FB;
     border-radius: 9px;
     pointer-events: none;
     animation: selectionPulse 2s infinite;
@@ -259,7 +259,7 @@
     height: 24px;
     background: #333;
     border-radius: 4px;
-    color: #ff6c37;
+    color: #00A6FB;
 }
 
 .schema-node-modern .node-card-type-badge {
@@ -278,7 +278,7 @@
     border-radius: 4px;
     text-transform: uppercase;
     background: rgba(255, 108, 55, 0.2);
-    color: #ff6c37;
+    color: #00A6FB;
 }
 
 .schema-node-modern .node-card-content {

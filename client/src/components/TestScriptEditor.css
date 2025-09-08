@@ -44,9 +44,9 @@
 }
 
 .editor-actions .snippet-button {
-    background-color: var(--primary-color, #FF6C37);
+    background-color: var(--primary-color, #00A6FB);
     color: white;
-    border-color: var(--primary-color, #FF6C37);
+    border-color: var(--primary-color, #00A6FB);
 }
 
 .editor-actions .snippet-button:hover {
@@ -174,9 +174,9 @@
 }
 
 .dark-theme .editor-actions .snippet-button {
-    background-color: var(--primary-color, #FF6C37);
+    background-color: var(--primary-color, #00A6FB);
     color: white;
-    border-color: var(--primary-color, #FF6C37);
+    border-color: var(--primary-color, #00A6FB);
 }
 
 .dark-theme .editor-actions .snippet-button:hover {

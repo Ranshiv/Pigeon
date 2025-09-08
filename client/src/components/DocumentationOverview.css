@@ -15,7 +15,7 @@
     font-size: 2.5rem;
     font-weight: 700;
     margin-bottom: 1rem;
-    color: var(--primary-color, #ff6c37);
+    color: var(--primary-color, #00A6FB);
 }
 
 .documentation-intro {
@@ -52,7 +52,7 @@
     font-size: 1.25rem;
     font-weight: 600;
     margin-bottom: 1rem;
-    color: var(--primary-color, #ff6c37);
+    color: var(--primary-color, #00A6FB);
 }
 
 .documentation-section h2 svg {
@@ -86,7 +86,7 @@
 }
 
 .documentation-links a:hover {
-    color: var(--primary-color, #ff6c37);
+    color: var(--primary-color, #00A6FB);
 }
 
 .documentation-footer {
@@ -121,7 +121,7 @@
     font-size: 1.1rem;
     font-weight: 600;
     margin-bottom: 1rem;
-    color: var(--primary-color, #ff6c37);
+    color: var(--primary-color, #00A6FB);
 }
 
 .resource-card ul {
@@ -143,7 +143,7 @@
 }
 
 .resource-card ul li a:hover {
-    color: var(--primary-color, #ff6c37);
+    color: var(--primary-color, #00A6FB);
 }
 
 .join-community {
@@ -171,7 +171,7 @@
 
 .community-links a:hover {
     background-color: var(--primary-light, #fff0eb);
-    color: var(--primary-color, #ff6c37);
+    color: var(--primary-color, #00A6FB);
 }
 
 /* Responsive adjustments */

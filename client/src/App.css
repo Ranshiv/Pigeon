@@ -11,11 +11,19 @@
   --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
   --hover-bg: #f0f0f0;
   --hover-background: #f3f4f6;
-  --primary-color: #ff6c37;
-  /* Postman-inspired orange */
-  --primary-hover: #e85c2a;
-  --secondary-color: #6c757d;
-  --secondary-hover: #5a6268;
+  --primary-color: #00A6FB;
+  /* Blue primary color - bright azure */
+  --primary-hover: #0582CA;
+  --secondary-color: #0582CA;
+  --secondary-hover: #006494;
+  
+  /* Blue palette colors */
+  --accent-primary: #006494;
+  /* Deep cerulean - for success states, confirmations, active elements */
+  --accent-secondary: #003554;
+  /* Dark prussian blue - for dark theme primary, navigation bars */
+  --accent-tertiary: #051923;
+  /* Near-black blue - for dark theme backgrounds, overlays */
   --success-color: #28a745;
   --success-bg: #dcfce7;
   --success-text: #16a34a;
@@ -29,7 +37,7 @@
   --info-color: #17a2b8;
   --method-get: #7d69cb;
   /* GET - purple */
-  --method-post: #ff6c37;
+  --method-post: #00A6FB;
   /* POST - orange */
   --method-put: #4fade6;
   /* PUT - blue */
@@ -82,9 +90,16 @@ body.dark-theme {
   --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
   --hover-bg: #353535;
   --hover-background: #404040;
-  --primary-color: #ff6c37;
-  /* Keep the orange accent */
-  --primary-hover: #e85c2a;
+  --primary-color: #00A6FB;
+  /* Blue primary color for dark theme */
+  --primary-hover: #0582CA;
+  --secondary-color: #0582CA;
+  --secondary-hover: #006494;
+  
+  /* Blue palette colors for dark theme */
+  --accent-primary: #006494;
+  --accent-secondary: #003554;
+  --accent-tertiary: #051923;
   --success-bg: #064e3b;
   --success-text: #10b981;
   --danger-bg: #4c1d1d;

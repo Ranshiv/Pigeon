@@ -61,8 +61,8 @@
 /* Export Button Variants */
 .export-button.primary,
 .export-btn.primary {
-    background: #ff6c37;
-    border-color: #ff6c37;
+    background: #00A6FB;
+    border-color: #00A6FB;
     color: #ffffff;
 }
 
@@ -197,7 +197,7 @@
     width: 16px;
     height: 16px;
     border: 2px solid #404650;
-    border-top: 2px solid #ff6c37;
+    border-top: 2px solid #00A6FB;
     border-radius: 50%;
     animation: spin 1s linear infinite;
 }
@@ -262,12 +262,12 @@
 }
 
 .export-format-option:hover {
-    border-color: #ff6c37;
+    border-color: #00A6FB;
     background: #2d2d2d;
 }
 
 .export-format-option.selected {
-    border-color: #ff6c37;
+    border-color: #00A6FB;
     background: rgba(255, 108, 55, 0.1);
 }
 
