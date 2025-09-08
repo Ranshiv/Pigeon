@@ -31,16 +31,19 @@
   color: var(--text-color);
 }
 
-/* Top app bar styling - improved with gradient and better spacing */
+/* Top app bar styling - Enhanced with 2025 Blue Palette */
 .collection-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 10px 20px;
-  background: linear-gradient(to bottom, #2d2d30, #252528);
-  border-bottom: 1px solid var(--border-color);
+  background: linear-gradient(to bottom, #012A41, #002234);
+  /* Dark navy to very dark navy gradient */
+  border-bottom: 1px solid #00080D;
+  /* Almost black border */
   height: 54px;
-  box-shadow: var(--shadow-sm);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  /* Enhanced shadow for depth */
 }
 
 .collection-title {
@@ -508,12 +511,14 @@
   height: 100%;
 }
 
-/* Clean, modern tab navigation - Simplified and refined */
+/* Clean, modern tab navigation - Enhanced with 2025 Blue Palette */
 .tab-navigation {
   display: flex !important;
   padding: 0;
-  background: #2a2a2d;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  background: #002234;
+  /* Very dark navy background */
+  border-bottom: 1px solid #00080D;
+  /* Almost black border */
   position: relative;
   z-index: 10;
   min-height: 48px;
@@ -527,12 +532,13 @@
   padding: 12px 24px;
   background: transparent;
   border: none;
-  color: rgba(255, 255, 255, 0.7);
+  color: rgba(224, 224, 224, 0.7);
+  /* Light gray text */
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
   position: relative;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
   white-space: nowrap;
   letter-spacing: 0.2px;
   min-height: 48px;
@@ -541,16 +547,24 @@
 }
 
 .tab-btn:hover {
-  color: rgba(255, 255, 255, 0.9);
-  background: rgba(255, 255, 255, 0.05);
-  border-bottom-color: rgba(255, 108, 55, 0.5);
+  color: rgba(255, 255, 255, 0.95);
+  background: #013B5B;
+  /* Darker blue hover background */
+  border-bottom-color: #014C75;
+  /* Deep blue accent on hover */
+  transform: translateY(-1px);
+  /* Subtle lift effect */
 }
 
 .tab-btn.active {
   color: #ffffff !important;
-  background: rgba(255, 108, 55, 0.1) !important;
+  background: #014C75 !important;
+  /* Deep blue active background */
   font-weight: 600;
-  border-bottom-color: var(--primary-color);
+  border-bottom-color: #014C75;
+  /* Deep blue accent */
+  box-shadow: 0 2px 8px rgba(1, 76, 117, 0.3);
+  /* Subtle blue glow */
 }
 
 .tab-btn .fi,

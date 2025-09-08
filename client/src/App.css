@@ -71,20 +71,27 @@
   --content-max-width: 1400px;
 }
 
-/* Dark theme variables */
+/* Dark theme variables - 2025 Blue Palette */
 body.dark-theme {
-  --background-color: #1c1c1e;
+  --background-color: #00111A;
+  /* Main app background - nearly black navy */
   --text-color: #e0e0e0;
   --text-secondary: #9ca3af;
-  --border-color: #3e3e3e;
-  --card-bg: #2c2c2e;
-  --card-background: #2c2c2e;
-  --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
-  --hover-bg: #353535;
-  --hover-background: #404040;
-  --primary-color: #ff6c37;
-  /* Keep the orange accent */
-  --primary-hover: #e85c2a;
+  --border-color: #00080D;
+  /* Almost pure black for subtle borders */
+  --card-bg: #002234;
+  /* Very dark navy for cards */
+  --card-background: #002234;
+  /* Very dark navy for cards */
+  --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --hover-bg: #013B5B;
+  /* Darker blue for hover states */
+  --hover-background: #013B5B;
+  /* Darker blue for hover backgrounds */
+  --primary-color: #014C75;
+  /* Deep blue primary accent */
+  --primary-hover: #014368;
+  /* Darker blue on hover */
   --success-bg: #064e3b;
   --success-text: #10b981;
   --danger-bg: #4c1d1d;
@@ -92,22 +99,27 @@ body.dark-theme {
   --danger-border: #7f1d1d;
   --danger-border-hover: #8f2020;
   --danger-text: #f87171;
-  --info-color: #17a2b8;
-  --method-get: #eb5c1a;
-  /* GET - purple */
+  --info-color: #014C75;
+  /* Use our blue palette for info */
+  --method-get: #014C75;
+  /* Deep blue for GET */
   --method-post: #ff7b00;
-  /* POST - orange */
+  /* Keep orange for POST */
   --method-put: #4fade6;
-  /* PUT - blue */
+  /* Keep blue for PUT */
   --method-delete: #cf3030;
-  /* DELETE - red */
+  /* Keep red for DELETE */
   --method-patch: #ffb400;
-  /* PATCH - yellow */
-  --navbar-bg: #252525;
-  --navbar-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-  --panel-bg: #252525;
-  --sidebar-bg: #2c2c2e;
-  --disabled-bg: #333333;
+  /* Keep yellow for PATCH */
+  --navbar-bg: #012A41;
+  /* Dark navy for navbar */
+  --navbar-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --panel-bg: #002234;
+  /* Very dark navy for panels */
+  --sidebar-bg: #001927;
+  /* Almost black navy for sidebar */
+  --disabled-bg: #01324E;
+  /* Very dark blue for disabled elements */
   --disabled-text: #7a7a7a;
 }
 
@@ -319,16 +331,18 @@ select:focus {
   background: #ababab;
 }
 
-/* Dark theme scrollbar */
+/* Dark theme scrollbar - Enhanced with Blue Palette */
 .dark-theme ::-webkit-scrollbar-track {
   background: var(--background-color);
 }
 
 .dark-theme ::-webkit-scrollbar-thumb {
-  background: #454545;
+  background: #013B5B;
+  /* Darker blue for scrollbar thumb */
   border-radius: 4px;
 }
 
 .dark-theme ::-webkit-scrollbar-thumb:hover {
-  background: #555555;
+  background: #014368;
+  /* Even darker blue on hover */
 }

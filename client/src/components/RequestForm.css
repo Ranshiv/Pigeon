@@ -1584,18 +1584,25 @@ input:checked+.slider:before {
     user-select: none;
 }
 
-/* Primary button style (orange/primary color) */
+/* Primary button style - Enhanced with 2025 Blue Palette */
 .btn-primary,
 .send-btn {
-    background-color: var(--primary-color, #FF6C37);
+    background: linear-gradient(135deg, #014C75, #014368);
+    /* Blue gradient for depth */
     color: white;
     border: none;
+    box-shadow: 0 2px 8px rgba(1, 76, 117, 0.2);
+    /* Subtle blue glow */
 }
 
 .btn-primary:hover:not(:disabled),
 .send-btn:hover:not(:disabled) {
-    background-color: var(--primary-hover, #e65a2e);
-    transform: translateY(-1px);
+    background: linear-gradient(135deg, #014368, #013B5B);
+    /* Darker blue gradient on hover */
+    transform: translateY(-2px);
+    /* Enhanced lift effect */
+    box-shadow: 0 4px 16px rgba(1, 76, 117, 0.3);
+    /* Enhanced blue glow */
 }
 
 .btn-primary:disabled,
@@ -1603,20 +1610,33 @@ input:checked+.slider:before {
     opacity: 0.6;
     cursor: not-allowed;
     transform: none;
+    background: #01324E;
+    /* Very dark blue for disabled state */
+    box-shadow: none;
 }
 
-/* Secondary button style (outlined) */
+/* Secondary button style - Enhanced with Blue Accents */
 .btn-secondary,
 .save-btn {
     background-color: transparent;
     color: var(--text-color, #e6e6e6);
-    border: 1px solid var(--border-color, #3e3e3e);
+    border: 1px solid #013B5B;
+    /* Darker blue border */
+    transition: all 0.3s ease;
 }
 
 .btn-secondary:hover:not(:disabled),
 .save-btn:hover:not(:disabled) {
-    background-color: rgba(255, 255, 255, 0.05);
-    border-color: var(--primary-color, #FF6C37);
+    background-color: rgba(1, 76, 117, 0.1);
+    /* Subtle blue background */
+    border-color: #014C75;
+    /* Deep blue border */
+    color: #ffffff;
+    /* White text on hover */
+    transform: translateY(-1px);
+    /* Subtle lift */
+    box-shadow: 0 2px 8px rgba(1, 76, 117, 0.15);
+    /* Light blue glow */
 }
 
 .btn-secondary:disabled,

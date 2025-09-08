@@ -66,36 +66,48 @@ body.light-theme {
   --card-background: #ffffff;
 }
 
-/* Dark theme variables */
+/* Dark theme variables - 2025 Blue Palette */
 body.dark-theme {
-  --background-color: #1c1c1c;
+  --background-color: #00111A;
+  /* Main app background - nearly black navy */
   --text-color: #e0e0e0;
   --text-secondary: #a0a0a0;
-  --border-color: #383838;
-  --card-bg: #252525;
-  --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
-  --hover-bg: #2c2c2c;
-  --navbar-bg: #252525;
-  --navbar-border: rgba(255, 255, 255, 0.06);
-  --panel-bg: #252525;
-  --navbar-background: #1c2128;
-  /* Darker navbar */
+  --border-color: #00080D;
+  /* Almost pure black for borders */
+  --card-bg: #002234;
+  /* Very dark navy for cards */
+  --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --hover-bg: #013B5B;
+  /* Darker blue for hover states */
+  --navbar-bg: #012A41;
+  /* Dark navy for navbar */
+  --navbar-border: rgba(1, 76, 117, 0.2);
+  /* Primary blue with transparency */
+  --panel-bg: #002234;
+  /* Very dark navy for panels */
+  --navbar-background: #012A41;
+  /* Dark navy navbar */
   --navbar-text: #ffffff;
-  /* Ensured navbar text is white */
-  --sidebar-background: #2d333b;
-  /* Darker sidebar */
-  --sidebar-text: #ffffff;
-  /* Changed sidebar text to white */
-  --button-background: #377df0;
-  /* Brighter blue */
+  /* Keep navbar text white for contrast */
+  --sidebar-background: #001927;
+  /* Almost black navy for sidebar */
+  --sidebar-text: #e0e0e0;
+  /* Light text for sidebar */
+  --button-background: #014C75;
+  /* Deep blue for buttons */
   --button-text: #ffffff;
-  --border-color: #444c56;
-  /* Darker border */
-  --hover-background: #373e47;
-  /* Darker hover */
-  --card-background: #2d333b;
-  /* Darker card */
-
+  --border-color: #00080D;
+  /* Almost black borders */
+  --hover-background: #013B5B;
+  /* Darker blue hover */
+  --card-background: #002234;
+  /* Very dark navy for cards */
+  --primary-color: #014C75;
+  /* Deep blue primary */
+  --primary-hover: #014368;
+  /* Darker blue on hover */
+  --active-bg: #014368;
+  /* Darker blue for active states */
 }
 
 /* Apply variables */
@@ -326,27 +338,41 @@ code {
   background-color: var(--method-patch);
 }
 
-/* Helper classes for tabs */
+/* Helper classes for tabs - Enhanced with 2025 Blue Palette */
 .tabs {
   display: flex;
   border-bottom: 1px solid var(--border-color);
+  background-color: var(--card-bg);
+  border-radius: 8px 8px 0 0;
 }
 
 .tab {
-  padding: 10px 16px;
+  padding: 12px 20px;
   cursor: pointer;
-  border-bottom: 2px solid transparent;
+  border-bottom: 3px solid transparent;
   color: var(--text-secondary);
-  transition: color 0.2s, border-color 0.2s;
+  transition: all 0.3s ease;
+  font-weight: 500;
+  position: relative;
+  background: transparent;
+  border: none;
+  font-size: 14px;
 }
 
 .tab:hover {
   color: var(--text-color);
+  background-color: var(--hover-bg);
+  border-bottom-color: #013B5B;
+  /* Darker blue on hover */
 }
 
 .tab.active {
-  color: var(--primary-color);
+  color: #ffffff;
+  /* White text for active tab */
+  background-color: var(--primary-color);
+  /* Deep blue background */
   border-bottom-color: var(--primary-color);
+  font-weight: 600;
 }
 
 /* Scrollbar styling */
@@ -369,11 +395,13 @@ code {
 }
 
 .dark-theme ::-webkit-scrollbar-thumb {
-  background: #444;
+  background: #013B5B;
+  /* Darker blue for scrollbar thumb */
 }
 
 .dark-theme ::-webkit-scrollbar-thumb:hover {
-  background: #555;
+  background: #014368;
+  /* Even darker blue on hover */
 }
 
 /* client/src/index.css */

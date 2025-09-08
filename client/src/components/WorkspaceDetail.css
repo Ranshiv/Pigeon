@@ -147,22 +147,36 @@
     padding: 12px 20px;
     background: transparent;
     border: none;
-    border-bottom: 2px solid transparent;
+    border-bottom: 3px solid transparent;
     color: var(--text-secondary, #666);
     font-weight: 500;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.3s ease;
     font-size: 15px;
+    border-radius: 8px 8px 0 0;
+    /* Rounded top corners */
 }
 
 .workspace-tabs .tab:hover {
-    color: var(--accent, #2196f3);
-    background-color: rgba(33, 150, 243, 0.05);
+    color: var(--text-color, #333);
+    background-color: #013B5B;
+    /* Darker blue hover background */
+    border-bottom-color: #014C75;
+    /* Deep blue accent */
+    transform: translateY(-2px);
+    /* Subtle lift effect */
 }
 
 .workspace-tabs .tab.active {
-    color: var(--accent, #2196f3);
-    border-bottom-color: var(--accent, #2196f3);
+    color: #ffffff;
+    /* White text for better contrast */
+    background-color: #014C75;
+    /* Deep blue active background */
+    border-bottom-color: #014C75;
+    /* Deep blue accent */
+    font-weight: 600;
+    box-shadow: 0 2px 8px rgba(1, 76, 117, 0.3);
+    /* Subtle blue glow */
 }
 
 /* Tab content */

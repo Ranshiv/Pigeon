@@ -267,35 +267,46 @@
 }
 
 .quick-action-btn {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.75rem 1.25rem;
-    border-radius: 8px;
-    border: 1px solid var(--border-color, #e0e0e0);
-    background: transparent;
-    color: var(--text-color, #333);
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.25rem;
+  border-radius: 8px;
+  border: 1px solid var(--border-color, #e0e0e0);
+  background: transparent;
+  color: var(--text-color, #333);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
 }
 
 .quick-action-btn:hover {
-    background: var(--hover-background, #f5f5f5);
-    transform: translateY(-2px);
+  background: #013B5B;
+  /* Darker blue hover background */
+  color: #ffffff;
+  /* White text on hover */
+  border-color: #014C75;
+  /* Deep blue border */
+  transform: translateY(-2px);
+  /* Subtle lift effect */
+  box-shadow: 0 4px 12px rgba(1, 76, 117, 0.2);
+  /* Blue glow */
 }
 
 .quick-action-btn.primary {
-    background: var(--primary-color, #2196f3);
-    color: white;
-    border: none;
+  background: #014C75;
+  /* Deep blue primary background */
+  color: white;
+  border: none;
 }
 
 .quick-action-btn.primary:hover {
-    background: var(--primary-hover, #1976d2);
-}
-
-.action-icon {
+  background: #014368;
+  /* Darker blue on hover */
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(1, 76, 117, 0.3);
+  /* Enhanced blue glow */
+}.action-icon {
     font-size: 1.1rem;
 }
 
@@ -701,11 +712,15 @@
     transform: translateY(-2px);
 }
 
-/* Dark theme adjustments */
+/* Dark theme adjustments - Enhanced with 2025 Blue Palette */
 .dark-theme .dashboard-section,
 .dark-theme .welcome-section {
-    background: var(--dark-card-bg, #1a1a1a);
-    box-shadow: var(--dark-card-shadow, 0 8px 20px rgba(0, 0, 0, 0.25));
+  background: #002234;
+  /* Very dark navy for cards */
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  /* Enhanced shadow */
+  border: 1px solid #00080D;
+  /* Almost black border */
 }
 
 .dark-theme .stat-card,
@@ -713,11 +728,26 @@
 .dark-theme .collection-card,
 .dark-theme .quick-link,
 .dark-theme .empty-state {
-    background: var(--dark-secondary-bg, #222);
-    border-color: var(--dark-border, #333);
+  background: #002234;
+  /* Very dark navy background */
+  border-color: #00080D;
+  /* Almost black border */
+  transition: all 0.3s ease;
 }
 
-.dark-theme .welcome-content h1,
+.dark-theme .stat-card:hover,
+.dark-theme .workspace-card:hover,
+.dark-theme .collection-card:hover,
+.dark-theme .quick-link:hover {
+  background: #013B5B;
+  /* Darker blue on hover */
+  border-color: #014C75;
+  /* Deep blue border on hover */
+  transform: translateY(-3px);
+  /* Enhanced lift effect */
+  box-shadow: 0 8px 24px rgba(1, 76, 117, 0.2);
+  /* Blue glow on hover */
+}.dark-theme .welcome-content h1,
 .dark-theme .dashboard-section h2,
 .dark-theme .stat-value,
 .dark-theme .workspace-info h3,
