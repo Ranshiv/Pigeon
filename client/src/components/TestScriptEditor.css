@@ -44,9 +44,9 @@
 }
 
 .editor-actions .snippet-button {
-    background-color: var(--primary-color, #FF6C37);
+    background-color: var(--primary-color, #014C75);
     color: white;
-    border-color: var(--primary-color, #FF6C37);
+    border-color: var(--primary-color, #014C75);
 }
 
 .editor-actions .snippet-button:hover {
@@ -76,7 +76,7 @@
 
 .script-textarea:focus {
     outline: none;
-    box-shadow: inset 0 0 0 1px var(--focus-color, #007bff);
+    box-shadow: inset 0 0 0 1px var(--focus-color, #014C75);
 }
 
 .snippet-menu {
@@ -174,9 +174,9 @@
 }
 
 .dark-theme .editor-actions .snippet-button {
-    background-color: var(--primary-color, #FF6C37);
+    background-color: var(--primary-color, #014C75);
     color: white;
-    border-color: var(--primary-color, #FF6C37);
+    border-color: var(--primary-color, #014C75);
 }
 
 .dark-theme .editor-actions .snippet-button:hover {
@@ -232,5 +232,5 @@
 
 .script-editor:focus {
     outline: none;
-    box-shadow: inset 0 0 0 1px var(--focus-color, #007bff);
+    box-shadow: inset 0 0 0 1px var(--focus-color, #014C75);
 }

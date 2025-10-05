@@ -5,7 +5,7 @@ const SchemaNode = ({ data, isSelected, onSelect, onDelete }) => {
 
     const getTypeColor = (type) => {
         const colors = {
-            object: '#2196F3',
+            object: '#014C75',
             array: '#4CAF50',
             string: '#FF9800',
             number: '#9C27B0',

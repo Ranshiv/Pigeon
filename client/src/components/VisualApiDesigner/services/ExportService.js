@@ -904,7 +904,7 @@ export class ExportService {
 
         const copyButton = modal.querySelector('.copy-button');
         copyButton.style.cssText = `
-            background: #ff6c37;
+            background: #014C75;
             color: #ffffff;
             border: none;
             padding: 10px 20px;

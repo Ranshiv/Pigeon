@@ -1,6 +1,6 @@
 /* client/src/components/Footer.css */
 .footer {
-    background-color: #0b0b0a;
+    background-color: var(--footer-bg);
     color: #9e9e9e;
     position: relative;
     width: 100%;
@@ -9,6 +9,7 @@
     margin-top: auto;
     overflow: visible;
     padding-bottom: 0;
+    
     /* Remove extra padding that was for the curve */
 }
 
@@ -27,7 +28,7 @@
 }
 
 .footer-brand-section h3 {
-    color: #FF6C37;
+    color: #014C75;
     font-size: 1.8rem;
     font-weight: 700;
     margin: 0 0 10px 0;
@@ -60,7 +61,7 @@
 }
 
 .social-icon:hover {
-    background-color: #FF6C37;
+    background-color: #014C75;
     color: white;
     transform: translateY(-3px);
 }
@@ -98,7 +99,7 @@
 
 .footer-links li a:hover,
 .contact-email:hover {
-    color: #FF6C37;
+    color: #014C75;
 }
 
 .contact-message {
@@ -129,7 +130,7 @@
 }
 
 .footer-legal-links a:hover {
-    color: #FF6C37;
+    color: #014C75;
 }
 
 /* Responsive styles */

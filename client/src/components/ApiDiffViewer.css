@@ -165,7 +165,7 @@
 }
 
 .api-diff-viewer .close-btn:focus {
-    outline: 2px solid #3b82f6;
+    outline: 2px solid #014C75;
     outline-offset: 2px;
 }
 
@@ -303,26 +303,26 @@
     color: white;
     border: none;
     border-radius: 6px;
+    border-top: 3px solid #014C75;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 15px;
+}
+
+.api-diff-viewer .retry-btn {
+    margin-top: 15px;
+    padding: 10px 20px;
+    background: #014C75;
+    color: white;
+    border: none;
+    border-radius: 6px;
     cursor: pointer;
     transition: background 0.2s ease;
 }
 
 .api-diff-viewer .retry-btn:hover {
-    background: #0056b3;
-}
-
-/* Diff Sections - Modern Card Design */
-.api-diff-viewer .diff-section {
-    background: #ffffff;
-    margin: 16px;
-    border-radius: 12px;
-    border: 1px solid #e2e8f0;
-    overflow: hidden;
-    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-}
-
-.api-diff-viewer .diff-section:first-child {
-    margin-top: 16px;
+    background: #013B5B;
+    px;
 }
 
 .api-diff-viewer .diff-section:last-child {
@@ -444,27 +444,27 @@
 }
 
 .api-diff-viewer .summary-card.added {
-    --card-accent-color: #3b82f6;
+    --card-accent-color: #014C75;
 }
 
 .api-diff-viewer .summary-card.added .summary-number {
-    color: #3b82f6;
+    color: #014C75;
 }
 
 .api-diff-viewer .summary-card.removed {
-    --card-accent-color: #f59e0b;
+    --card-accent-color: #ef4444;
 }
 
 .api-diff-viewer .summary-card.removed .summary-number {
-    color: #f59e0b;
+    color: #ef4444;
 }
 
 .api-diff-viewer .summary-card.modified {
-    --card-accent-color: #8b5cf6;
+    --card-accent-color: #f59e0b;
 }
 
 .api-diff-viewer .summary-card.modified .summary-number {
-    color: #8b5cf6;
+    color: #f59e0b;
 }
 
 .api-diff-viewer .summary-card-icon {
@@ -481,338 +481,337 @@
 }
 
 .api-diff-viewer .summary-number {
-    font-size: 2.25rem;
-    font-weight: 700;
-    line-height: 1;
-    margin-bottom: 8px;
-    font-variant-numeric: tabular-nums;
+    font-siz --card-accent-color: #014C75;
 }
 
-.api-diff-viewer .summary-label {
-    color: #64748b;
-    font-size: 0.875rem;
-    font-weight: 500;
-    line-height: 1.25;
-    margin: 0;
-}
+.api-diff-viewer .summary-card.modified .summary-number {
+    color: #014C75;
 
-/* Changes List - Modern Design */
-.api-diff-viewer .changes-list {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    margin-top: 0;
-}
-
-.api-diff-viewer .change-item {
-    padding: 16px;
-    border-radius: 8px;
-    border: 1px solid #e2e8f0;
-    background: #ffffff;
-    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-    position: relative;
-    overflow: hidden;
-}
-
-.api-diff-viewer .change-item::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 3px;
-    background: var(--change-accent-color);
-}
-
-.api-diff-viewer .change-item:hover {
-    border-color: #d1d5db;
-    transform: translateY(-1px);
-    box-shadow: 0 2px 4px -1px rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
-}
-
-.api-diff-viewer .change-item.error {
-    --change-accent-color: #ef4444;
-    background: #fefefe;
-    border-color: #fee2e2;
-}
-
-.api-diff-viewer .change-item.warning {
-    --change-accent-color: #f59e0b;
-    background: #fefefe;
-    border-color: #fed7aa;
-}
-
-.api-diff-viewer .change-item.info {
-    --change-accent-color: #3b82f6;
-    background: #fefefe;
-    border-color: #bfdbfe;
-}
-
-.api-diff-viewer .change-header {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 8px;
-    flex-wrap: wrap;
-}
-
-.api-diff-viewer .change-type {
-    font-weight: 600;
-    color: #0f172a;
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    background: #f1f5f9;
-    padding: 4px 8px;
-    border-radius: 4px;
-}
-
-.api-diff-viewer .change-location {
-    font-family: ui-monospace, SFMono-Regular, 'SF Mono', Monaco, Menlo, 'Liberation Mono', 'Courier New', monospace;
-    font-size: 0.75rem;
-    background: #f8fafc;
-    padding: 4px 8px;
-    border-radius: 4px;
-    color: #475569;
-    border: 1px solid #e2e8f0;
-    flex: 1;
-    min-width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-.api-diff-viewer .severity-badge {
-    font-size: 0.75rem;
-    font-weight: 500;
-    padding: 2px 8px;
-    border-radius: 12px;
-    text-transform: capitalize;
-}
-
-.api-diff-viewer .severity-badge.error {
-    background: #fef2f2;
-    color: #dc2626;
-    border: 1px solid #fecaca;
-}
-
-.api-diff-viewer .severity-badge.warning {
-    background: #fffbeb;
-    color: #d97706;
-    border: 1px solid #fed7aa;
-}
-
-.api-diff-viewer .severity-badge.info {
-    background: #eff6ff;
-    color: #2563eb;
-    border: 1px solid #bfdbfe;
-}
-
-.api-diff-viewer .change-description {
-    color: #374151;
-    line-height: 1.5;
-    margin: 0;
-    font-size: 0.875rem;
-}
-
-.api-diff-viewer .change-values {
-    display: flex;
-    gap: 15px;
-    margin-top: 8px;
-    font-size: 0.9rem;
-}
-
-.api-diff-viewer .old-value {
-    color: #dc3545;
-}
-
-.api-diff-viewer .new-value {
-    color: #28a745;
-}
-
-/* Changelog Content */
-.api-diff-viewer .changelog-content {
-    position: relative;
-}
-
-.api-diff-viewer .changelog-content pre {
-    background: #f8fafc;
-    padding: 20px;
-    border-radius: 8px;
-    border: 1px solid #e2e8f0;
-    white-space: pre-wrap;
-    line-height: 1.6;
-    color: #0f172a;
-    margin: 0;
-    overflow-x: auto;
-    font-size: 0.875rem;
-    font-family: ui-monospace, SFMono-Regular, 'SF Mono', Monaco, Menlo, 'Liberation Mono', 'Courier New', monospace;
-}
-
-/* Technical Details */
-.api-diff-viewer .technical-details {
-    position: relative;
-}
-
-.api-diff-viewer .technical-details pre {
-    background: #1e293b;
-    color: #e2e8f0;
-    padding: 20px;
-    border-radius: 8px;
-    margin: 0;
-    overflow-x: auto;
-    font-size: 0.875rem;
-    line-height: 1.6;
-    max-height: 400px;
-    overflow-y: auto;
-    font-family: ui-monospace, SFMono-Regular, 'SF Mono', Monaco, Menlo, 'Liberation Mono', 'Courier New', monospace;
-    border: 1px solid #334155;
-}
-
-.api-diff-viewer .technical-details pre::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
-}
-
-.api-diff-viewer .technical-details pre::-webkit-scrollbar-track {
-    background: #334155;
-    border-radius: 3px;
-}
-
-.api-diff-viewer .technical-details pre::-webkit-scrollbar-thumb {
-    background: #64748b;
-    border-radius: 3px;
-}
-
-.api-diff-viewer .technical-details pre::-webkit-scrollbar-thumb:hover {
-    background: #94a3b8;
-}
-
-/* Animations */
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-    }
-
-    to {
-        opacity: 1;
-    }
-}
-
-@keyframes spin {
-    0% {
-        transform: rotate(0deg);
-    }
-
-    100% {
-        transform: rotate(360deg);
-    }
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-    .api-diff-viewer .modal-container {
-        width: 95%;
-        height: 90%;
+    .api-diff-viewer .summary-label {
+        color: #64748b;
+        font-size: 0.875rem;
+        font-weight: 500;
+        line-height: 1.25;
         margin: 0;
     }
 
-    .api-diff-viewer .diff-header {
+    /* Changes List - Modern Design */
+    .api-diff-viewer .changes-list {
+        display: flex;
         flex-direction: column;
-        gap: 16px;
-        align-items: flex-start;
-        padding: 20px 20px 16px 20px;
-    }
-
-    .api-diff-viewer .header-content {
-        flex-direction: column;
-        align-items: flex-start;
         gap: 12px;
-        width: 100%;
+        margin-top: 0;
     }
 
-    .api-diff-viewer .version-info {
-        flex-direction: column;
-        gap: 8px;
-        align-items: flex-start;
+    .api-diff-viewer .change-item {
+        padding: 16px;
+        border-radius: 8px;
+        border: 1px solid #e2e8f0;
+        background: #ffffff;
+        transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        position: relative;
+        overflow: hidden;
     }
 
-    .api-diff-viewer .header-actions {
-        width: 100%;
-        justify-content: space-between;
+    .api-diff-viewer .change-item::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 3px;
+        background: var(--change-accent-color);
     }
 
-    .api-diff-viewer .summary-grid {
-        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-        gap: 12px;
+    .api-diff-viewer .change-item:hover {
+        border-color: #d1d5db;
+        transform: translateY(-1px);
+        box-shadow: 0 2px 4px -1px rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
     }
 
-    .api-diff-viewer .summary-card {
-        padding: 16px 12px;
+    .api-diff-viewer .change-item.error {
+        --change-accent-color: #ef4444;
+        background: #fefefe;
+        border-color: #fee2e2;
     }
 
-    .api-diff-viewer .summary-number {
-        font-size: 1.75rem;
+    .api-diff-viewer .change-item.warning {
+        --change-accent-color: #f59e0b;
+        background: #fffbeb;
+        border-color: #fed7aa;
     }
 
-    .api-diff-viewer .section-header {
-        padding: 16px 20px;
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 12px;
-    }
-
-    .api-diff-viewer .section-content {
-        padding: 20px;
+    .api-diff-viewer .change-item.info {
+        --change-accent-color: #014C75;
+        background: #E5F3FF;
+        border-color: #b8e0ff;
     }
 
     .api-diff-viewer .change-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 8px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 8px;
+        flex-wrap: wrap;
+    }
+
+    .api-diff-viewer .change-type {
+        font-weight: 600;
+        color: #0f172a;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        background: #f1f5f9;
+        padding: 4px 8px;
+        border-radius: 4px;
     }
 
     .api-diff-viewer .change-location {
-        min-width: 100%;
-        white-space: normal;
-        word-break: break-all;
-    }
-
-    .api-diff-viewer .diff-section {
-        margin: 16px;
-    }
-
-    .api-diff-viewer .empty-state {
-        padding: 32px 20px;
-        margin: 16px;
-    }
-}
-
-@media (max-width: 480px) {
-    .api-diff-viewer .diff-header {
-        padding: 16px;
-    }
-
-    .api-diff-viewer .section-header {
-        padding: 16px;
-    }
-
-    .api-diff-viewer .section-content {
-        padding: 16px;
-    }
-
-    .api-diff-viewer .summary-grid {
-        grid-template-columns: 1fr;
-        gap: 12px;
-    }
-
-    .api-diff-viewer .download-group {
-        flex-wrap: wrap;
-        gap: 6px;
-    }
-
-    .api-diff-viewer .download-btn {
+        font-family: ui-monospace, SFMono-Regular, 'SF Mono', Monaco, Menlo, 'Liberation Mono', 'Courier New', monospace;
         font-size: 0.75rem;
-        padding: 6px 12px;
+        background: #f8fafc;
+        padding: 4px 8px;
+        border-radius: 4px;
+        color: #475569;
+        border: 1px solid #e2e8f0;
+        flex: 1;
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
     }
-}
+
+    .api-diff-viewer .severity-badge {
+        font-size: 0.75rem;
+        font-weight: 500;
+        padding: 2px 8px;
+        border-radius: 12px;
+        text-transform: capitalize;
+    }
+
+    .api-diff-viewer .severity-badge.error {
+        background: #fef2f2;
+        color: #dc2626;
+        border: 1px solid #fecaca;
+    }
+
+    .api-diff-viewer .severity-badge.warning {
+        background: #fffbeb;
+        color: #d97706;
+        border: 1px solid #fed7aa;
+    }
+
+    .api-diff-viewer .severity-badge.info {
+        background: #eff6ff;
+        color: #2563eb;
+        border: 1px solid #bfdbfe;
+    }
+
+    .api-diff-viewer .change-description {
+        color: #374151;
+        line-height: 1.5;
+        margin: 0;
+        font-size: 0.875rem;
+    }
+
+    .api-diff-viewer .change-values {
+        display: flex;
+        gap: 15px;
+        margin-top: 8px;
+        font-size: 0.9rem;
+    }
+
+    .api-diff-viewer .old-value {
+        color: #dc3545;
+    }
+
+    .api-diff-viewer .new-value {
+        color: #28a745;
+    }
+
+    /* Changelog Content */
+    .api-diff-viewer .changelog-content {
+        position: relative;
+    }
+
+    .api-diff-viewer .changelog-content pre {
+        background: #f8fafc;
+        padding: 20px;
+        border-radius: 8px;
+        border: 1px solid #e2e8f0;
+        white-space: pre-wrap;
+        line-height: 1.6;
+        color: #0f172a;
+        margin: 0;
+        overflow-x: auto;
+        font-size: 0.875rem;
+        font-family: ui-monospace, SFMono-Regular, 'SF Mono', Monaco, Menlo, 'Liberation Mono', 'Courier New', monospace;
+    }
+
+    /* Technical Details */
+    .api-diff-viewer .technical-details {
+        position: relative;
+    }
+
+    .api-diff-viewer .technical-details pre {
+        background: #1e293b;
+        color: #e2e8f0;
+        padding: 20px;
+        border-radius: 8px;
+        margin: 0;
+        overflow-x: auto;
+        font-size: 0.875rem;
+        line-height: 1.6;
+        max-height: 400px;
+        overflow-y: auto;
+        font-family: ui-monospace, SFMono-Regular, 'SF Mono', Monaco, Menlo, 'Liberation Mono', 'Courier New', monospace;
+        border: 1px solid #334155;
+    }
+
+    .api-diff-viewer .technical-details pre::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+    }
+
+    .api-diff-viewer .technical-details pre::-webkit-scrollbar-track {
+        background: #334155;
+        border-radius: 3px;
+    }
+
+    .api-diff-viewer .technical-details pre::-webkit-scrollbar-thumb {
+        background: #64748b;
+        border-radius: 3px;
+    }
+
+    .api-diff-viewer .technical-details pre::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8;
+    }
+
+    /* Animations */
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+
+        to {
+            opacity: 1;
+        }
+    }
+
+    @keyframes spin {
+        0% {
+            transform: rotate(0deg);
+        }
+
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .api-diff-viewer .modal-container {
+            width: 95%;
+            height: 90%;
+            margin: 0;
+        }
+
+        .api-diff-viewer .diff-header {
+            flex-direction: column;
+            gap: 16px;
+            align-items: flex-start;
+            padding: 20px 20px 16px 20px;
+        }
+
+        .api-diff-viewer .header-content {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 12px;
+            width: 100%;
+        }
+
+        .api-diff-viewer .version-info {
+            flex-direction: column;
+            gap: 8px;
+            align-items: flex-start;
+        }
+
+        .api-diff-viewer .header-actions {
+            width: 100%;
+            justify-content: space-between;
+        }
+
+        .api-diff-viewer .summary-grid {
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 12px;
+        }
+
+        .api-diff-viewer .summary-card {
+            padding: 16px 12px;
+        }
+
+        .api-diff-viewer .summary-number {
+            font-size: 1.75rem;
+        }
+
+        .api-diff-viewer .section-header {
+            padding: 16px 20px;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .api-diff-viewer .section-content {
+            padding: 20px;
+        }
+
+        .api-diff-viewer .change-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 8px;
+        }
+
+        .api-diff-viewer .change-location {
+            min-width: 100%;
+            white-space: normal;
+            word-break: break-all;
+        }
+
+        .api-diff-viewer .diff-section {
+            margin: 16px;
+        }
+
+        .api-diff-viewer .empty-state {
+            padding: 32px 20px;
+            margin: 16px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .api-diff-viewer .diff-header {
+            padding: 16px;
+        }
+
+        .api-diff-viewer .section-header {
+            padding: 16px;
+        }
+
+        .api-diff-viewer .section-content {
+            padding: 16px;
+        }
+
+        .api-diff-viewer .summary-grid {
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+
+        .api-diff-viewer .download-group {
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .api-diff-viewer .download-btn {
+            font-size: 0.75rem;
+            padding: 6px 12px;
+        }
+    }

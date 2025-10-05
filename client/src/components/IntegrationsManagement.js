@@ -832,7 +832,7 @@ const IntegrationsManagement = () => {
                                                     href="https://support.google.com/accounts/answer/185833"
                                                     target="_blank"
                                                     rel="noopener noreferrer"
-                                                    style={{ color: '#007bff' }}
+                                                    style={{ color: '#014C75' }}
                                                 >
                                                     How to generate Gmail App Password →
                                                 </a>
@@ -842,7 +842,7 @@ const IntegrationsManagement = () => {
                                                     href="https://help.yahoo.com/kb/generate-third-party-passwords-sln15241.html"
                                                     target="_blank"
                                                     rel="noopener noreferrer"
-                                                    style={{ color: '#007bff' }}
+                                                    style={{ color: '#014C75' }}
                                                 >
                                                     How to generate Yahoo App Password →
                                                 </a>
@@ -868,7 +868,7 @@ const IntegrationsManagement = () => {
                                                 href="https://docs.microsoft.com/en-us/microsoftteams/platform/webhooks-and-connectors/how-to/add-incoming-webhook"
                                                 target="_blank"
                                                 rel="noopener noreferrer"
-                                                style={{ color: '#007bff' }}
+                                                style={{ color: '#014C75' }}
                                             >
                                                 📋 Official Microsoft Teams webhook guide →
                                             </a>
@@ -894,7 +894,7 @@ const IntegrationsManagement = () => {
                                                 href="https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks"
                                                 target="_blank"
                                                 rel="noopener noreferrer"
-                                                style={{ color: '#007bff' }}
+                                                style={{ color: '#014C75' }}
                                             >
                                                 🔗 Discord webhooks documentation →
                                             </a>
@@ -919,7 +919,7 @@ const IntegrationsManagement = () => {
                                                 href="https://api.slack.com/messaging/webhooks"
                                                 target="_blank"
                                                 rel="noopener noreferrer"
-                                                style={{ color: '#007bff' }}
+                                                style={{ color: '#014C75' }}
                                             >
                                                 📚 Official Slack webhook guide →
                                             </a>
@@ -946,7 +946,7 @@ const IntegrationsManagement = () => {
                                                 href="https://support.atlassian.com/atlassian-account/docs/manage-api-tokens-for-your-atlassian-account/"
                                                 target="_blank"
                                                 rel="noopener noreferrer"
-                                                style={{ color: '#007bff' }}
+                                                style={{ color: '#014C75' }}
                                             >
                                                 📖 Official Atlassian API token guide →
                                             </a>
@@ -1092,7 +1092,7 @@ const IntegrationsManagement = () => {
                                                     href="https://support.google.com/accounts/answer/185833"
                                                     target="_blank"
                                                     rel="noopener noreferrer"
-                                                    style={{ color: '#007bff' }}
+                                                    style={{ color: '#014C75' }}
                                                 >
                                                     How to generate Gmail App Password →
                                                 </a>
@@ -1102,7 +1102,7 @@ const IntegrationsManagement = () => {
                                                     href="https://help.yahoo.com/kb/generate-third-party-passwords-sln15241.html"
                                                     target="_blank"
                                                     rel="noopener noreferrer"
-                                                    style={{ color: '#007bff' }}
+                                                    style={{ color: '#014C75' }}
                                                 >
                                                     How to generate Yahoo App Password →
                                                 </a>
@@ -1128,7 +1128,7 @@ const IntegrationsManagement = () => {
                                                 href="https://docs.microsoft.com/en-us/microsoftteams/platform/webhooks-and-connectors/how-to/add-incoming-webhook"
                                                 target="_blank"
                                                 rel="noopener noreferrer"
-                                                style={{ color: '#007bff' }}
+                                                style={{ color: '#014C75' }}
                                             >
                                                 📋 Official Microsoft Teams webhook guide →
                                             </a>
@@ -1154,7 +1154,7 @@ const IntegrationsManagement = () => {
                                                 href="https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks"
                                                 target="_blank"
                                                 rel="noopener noreferrer"
-                                                style={{ color: '#007bff' }}
+                                                style={{ color: '#014C75' }}
                                             >
                                                 🔗 Discord webhooks documentation →
                                             </a>
@@ -1179,7 +1179,7 @@ const IntegrationsManagement = () => {
                                                 href="https://api.slack.com/messaging/webhooks"
                                                 target="_blank"
                                                 rel="noopener noreferrer"
-                                                style={{ color: '#007bff' }}
+                                                style={{ color: '#014C75' }}
                                             >
                                                 📚 Official Slack webhook guide →
                                             </a>
@@ -1206,7 +1206,7 @@ const IntegrationsManagement = () => {
                                                 href="https://support.atlassian.com/atlassian-account/docs/manage-api-tokens-for-your-atlassian-account/"
                                                 target="_blank"
                                                 rel="noopener noreferrer"
-                                                style={{ color: '#007bff' }}
+                                                style={{ color: '#014C75' }}
                                             >
                                                 📖 Official Atlassian API token guide →
                                             </a>

@@ -323,12 +323,12 @@ class EmailService {
                 <html>
                 <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
                     <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
-                        <h2 style="color: #007bff;">Confirm Your Status Page Subscription</h2>
+                        <h2 style="color: #014C75;">Confirm Your Status Page Subscription</h2>
                         <p>You've subscribed to receive status updates for ${companyName}.</p>
                         <p>Please click the button below to confirm your subscription:</p>
                         <div style="text-align: center; margin: 30px 0;">
                             <a href="${verificationUrl}" 
-                               style="background-color: #007bff; color: white; padding: 12px 30px; 
+                               style="background-color: #014C75; color: white; padding: 12px 30px; 
                                       text-decoration: none; border-radius: 5px; display: inline-block;">
                                 Confirm Subscription
                             </a>
@@ -377,7 +377,7 @@ class EmailService {
                 <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
                     <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
                         <div style="text-align: center; margin-bottom: 30px;">
-                            <h2 style="color: #007bff;">Team Invitation</h2>
+                            <h2 style="color: #014C75;">Team Invitation</h2>
                         </div>
                         
                         <p>Hi there!</p>
@@ -393,7 +393,7 @@ class EmailService {
                         
                         <div style="text-align: center; margin: 30px 0;">
                             <a href="${inviteUrl}" 
-                               style="background-color: #007bff; color: white; padding: 12px 30px; 
+                               style="background-color: #014C75; color: white; padding: 12px 30px; 
                                       text-decoration: none; border-radius: 5px; display: inline-block;">
                                 Accept Invitation
                             </a>
@@ -503,7 +503,7 @@ If you have any questions, please contact our support team.
 
     generateMaintenanceHTML(maintenance, type) {
         const statusColor = {
-            scheduled: '#007bff',
+            scheduled: '#014C75',
             reminder: '#ffc107',
             started: '#fd7e14',
             completed: '#28a745'

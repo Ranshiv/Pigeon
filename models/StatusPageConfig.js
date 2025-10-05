@@ -22,7 +22,7 @@ const statusPageConfigSchema = new mongoose.Schema({
         faviconUrl: String,
         primaryColor: {
             type: String,
-            default: '#007bff'
+            default: '#014C75'
         },
         secondaryColor: {
             type: String,

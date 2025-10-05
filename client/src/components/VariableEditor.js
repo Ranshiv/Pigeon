@@ -80,7 +80,7 @@ const VariableEditor = ({
     const getScopeColor = (scope) => {
         switch (scope) {
             case 'global': return '#9c27b0';
-            case 'collection': return '#2196f3';
+            case 'collection': return '#014C75';
             case 'environment': return '#4caf50';
             case 'request': return '#ff9800';
             default: return '#666';

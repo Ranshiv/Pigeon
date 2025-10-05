@@ -1,12 +1,36 @@
-/* Unified Variable Viewer Styles */
+/* Unified Variable Viewer Styles - Enhanced with 2025 Blue Palette */
 .unified-variable-viewer {
+    /* 2025 Blue Palette CSS Variables */
+    --primary-blue: #014C75;
+    --primary-blue-hover: #013B5B;
+    --primary-blue-pressed: #012A41;
+    --primary-blue-light: #E5F3FF;
+    --light-blue: #4FC3E7;
+
+    /* Dark Theme Blues */
+    --dark-navy: #00111A;
+    --very-dark-navy: #002234;
+    --almost-black-navy: #001927;
+    --almost-black: #00111F;
+    --border-blue: #003956;
+
+    /* Light Theme Colors */
+    --light-bg: #ffffff;
+    --light-surface: #f8f9fa;
+    --light-hover: #f5f5f5;
+    --light-text: #333333;
+    --light-text-secondary: #6c757d;
+    --light-border: #e1e4e8;
+
+    /* Component Properties */
     display: flex;
     flex-direction: column;
     height: 100%;
-    background: var(--background-color, #1a1a1a);
+    background: var(--background-color, var(--dark-navy));
     color: var(--text-color, #e6e6e6);
     border-radius: 8px;
     overflow: hidden;
+    border: 1px solid var(--almost-black);
 }
 
 .viewer-header {
@@ -14,8 +38,8 @@
     justify-content: space-between;
     align-items: flex-start;
     padding: 20px;
-    background: rgba(255, 255, 255, 0.02);
-    border-bottom: 1px solid var(--border-color, #333);
+    background: var(--very-dark-navy);
+    border-bottom: 1px solid var(--almost-black);
 }
 
 .header-info h3 {
@@ -44,13 +68,20 @@
     text-align: center;
     min-width: 60px;
     padding: 8px 12px;
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--almost-black-navy)!important ;
     border-radius: 6px;
-    border: 1px solid var(--border-color, #333);
+    border: 1px solid var(--almost-black)!important;
+    transition: all 0.3s ease;
+}
+
+.stat-item:hover {
+    background: var(--primary-blue-hover);
+    border-color: var(--primary-blue);
 }
 
 .stat-item.active {
     background: rgba(34, 197, 94, 0.1);
+    /* Keep green for active states */
     border-color: rgba(34, 197, 94, 0.3);
 }
 
@@ -73,8 +104,8 @@
 /* Precedence Indicator */
 .precedence-indicator {
     padding: 16px 20px;
-    background: rgba(0,0,0, 0.05);
-    border-bottom: 1px solid var(--border-color, #333);
+    background: var(--almost-black-navy);
+    border-bottom: 1px solid var(--almost-black);
 }
 
 .precedence-flow {
@@ -90,16 +121,22 @@
     align-items: center;
     gap: 6px;
     padding: 6px 12px;
-    background: rgba(255, 255, 255, 0.08);
+    background: var(--very-dark-navy);
     border-radius: 20px;
     font-size: 0.8rem;
     font-weight: 500;
     color: var(--level-color, #e6e6e6);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--almost-black);
+    transition: all 0.3s ease;
+}
+
+.precedence-step:hover {
+    background: var(--primary-blue-hover);
+    border-color: var(--primary-blue);
 }
 
 .precedence-arrow {
-    color: var(--primary-color, #ff6c37);
+    color: var(--primary-blue);
     font-weight: bold;
     font-size: 1.1rem;
 }
@@ -123,9 +160,9 @@
 
 .variable-level {
     margin-bottom: 12px;
-    background: rgba(255, 255, 255, 0.02);
+    background: var(--very-dark-navy);
     border-radius: 8px;
-    border: 1px solid var(--border-color, #333);
+    border: 1px solid var(--almost-black);
     overflow: hidden;
 }
 
@@ -135,13 +172,13 @@
     align-items: center;
     padding: 16px;
     cursor: pointer;
-    background: rgba(255, 255, 255, 0.03);
-    border-bottom: 1px solid var(--border-color, #333);
-    transition: all 0.2s ease;
+    background: var(--almost-black-navy);
+    border-bottom: 1px solid var(--almost-black);
+    transition: all 0.3s ease;
 }
 
 .level-header:hover {
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--primary-blue-hover);
 }
 
 .level-info {
@@ -190,11 +227,11 @@
 
 .priority-indicator {
     padding: 2px 8px;
-    background: rgba(255, 255, 255, 0.1);
+    background: var(--primary-blue-hover);
     border-radius: 12px;
     font-size: 0.75rem;
     color: var(--level-color, #e6e6e6);
-    border: 1px solid var(--level-color, #e6e6e6);
+    border: 1px solid var(--primary-blue);
 }
 
 /* Level Content */
@@ -223,8 +260,8 @@
 
 /* Variable Items */
 .variable-item {
-    border-bottom: 1px solid var(--border-color, #333);
-    transition: all 0.2s ease;
+    border-bottom: 1px solid var(--almost-black);
+    transition: all 0.3s ease;
     position: relative;
 }
 
@@ -233,12 +270,13 @@
 }
 
 .variable-item:hover {
-    background: rgba(255, 255, 255, 0.03);
+    background: var(--primary-blue-hover);
 }
 
 .variable-item.overridden {
     opacity: 0.6;
-    background: rgba(255, 193, 7, 0.05);
+    background: rgba(1, 76, 117, 0.05);
+    border-left: 3px solid var(--light-blue);
 }
 
 .variable-item.active {
@@ -280,9 +318,9 @@
 }
 
 .override-indicator {
-    background: rgba(255, 193, 7, 0.2);
-    color: #ffc107;
-    border: 1px solid rgba(255, 193, 7, 0.3);
+    background: rgba(79, 195, 231, 0.2);
+    color: var(--light-blue);
+    border: 1px solid rgba(79, 195, 231, 0.3);
 }
 
 .active-indicator {
@@ -299,12 +337,12 @@
 .show-value-btn,
 .edit-btn {
     background: none;
-    border: 1px solid var(--border-color, #333);
+    border: 1px solid var(--almost-black);
     color: var(--text-secondary, #a0a0a0);
     padding: 4px 6px;
     border-radius: 4px;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.3s ease;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -312,8 +350,9 @@
 
 .show-value-btn:hover,
 .edit-btn:hover {
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--primary-blue-hover);
     color: var(--text-color, #e6e6e6);
+    border-color: var(--primary-blue);
 }
 
 /* Variable Details */
@@ -366,9 +405,9 @@
     font-style: italic;
     margin-top: 4px;
     padding: 8px;
-    background: rgba(255, 255, 255, 0.02);
+    background: var(--almost-black-navy);
     border-radius: 4px;
-    border-left: 3px solid var(--border-color, #333);
+    border-left: 3px solid var(--primary-blue);
 }
 
 /* Compact Mode */
@@ -432,20 +471,57 @@
     }
 }
 
-/* Dark theme overrides */
+/* Dark theme overrides - Enhanced with 2025 Blue Palette */
 [data-theme="dark"] .unified-variable-viewer {
-    --background-color: #0c0c0c;
+    --background-color: var(--dark-navy);
     --text-color: #f0f6fc;
-    --text-secondary: #7d8590;
-    --border-color: #21262d;
-    --primary-color: #ff6c37;
+    --text-secondary: #B8D4E3;
+    --border-color: var(--almost-black);
+    --primary-color: var(--primary-blue);
 }
 
-/* Light theme overrides */
+/* Light theme overrides - Enhanced with 2025 Blue Palette */
 [data-theme="light"] .unified-variable-viewer {
-    --background-color: #ffffff;
-    --text-color: #24292f;
-    --text-secondary: #656d76;
-    --border-color: #d0d7de;
-    --primary-color: #ff6c37;
+    --background-color: var(--light-bg);
+    --text-color: var(--light-text);
+    --text-secondary: var(--light-text-secondary);
+    --border-color: var(--light-border);
+    --primary-color: var(--primary-blue);
+}
+
+[data-theme="light"] .unified-variable-viewer .viewer-header,
+[data-theme="light"] .unified-variable-viewer .variable-level,
+[data-theme="light"] .unified-variable-viewer .level-header,
+[data-theme="light"] .unified-variable-viewer .stat-item,
+[data-theme="light"] .unified-variable-viewer .precedence-indicator {
+    background: var(--light-surface);
+    border-color: var(--light-border);
+}
+
+[data-theme="light"] .unified-variable-viewer .stat-item:hover,
+[data-theme="light"] .unified-variable-viewer .level-header:hover,
+[data-theme="light"] .unified-variable-viewer .variable-item:hover {
+    background: var(--light-hover);
+}
+
+[data-theme="light"] .unified-variable-viewer .precedence-step {
+    background: var(--light-bg);
+    border-color: var(--light-border);
+}
+
+[data-theme="light"] .unified-variable-viewer .precedence-step:hover {
+    background: var(--primary-blue-light);
+    border-color: var(--primary-blue);
+}
+
+[data-theme="light"] .unified-variable-viewer .variable-description {
+    background: var(--light-surface);
+    border-left-color: var(--primary-blue);
+}
+
+[data-theme="light"] .unified-variable-viewer .show-value-btn:hover,
+[data-theme="light"] .unified-variable-viewer .edit-btn:hover {
+    background: var(--primary-blue-light);
+    border-color: var(--primary-blue);
+    color: var(--primary-blue);
 }

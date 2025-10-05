@@ -52,8 +52,8 @@
 }
 
 .control-btn.active {
-    background: rgba(255, 108, 55, 0.15);
-    color: #ff6c37;
+    background: rgba(1, 76, 117, 0.15);
+    color: #014C75;
 }
 
 .control-btn.disabled,
@@ -65,7 +65,7 @@
 
 .control-btn:focus {
     outline: none;
-    box-shadow: 0 0 0 2px rgba(255, 108, 55, 0.4);
+    box-shadow: 0 0 0 2px rgba(1, 76, 117, 0.4);
 }
 
 .control-btn .icon {
@@ -97,7 +97,7 @@
 
 .zoom-value {
     font-variant-numeric: tabular-nums;
-    color: #ff6c37;
+    color: var(--button-text);
 }
 
 /* Tooltip enhancement */

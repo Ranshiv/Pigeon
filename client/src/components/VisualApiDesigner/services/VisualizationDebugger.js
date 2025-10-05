@@ -10,14 +10,14 @@ export class VisualizationDebugger {
             patterns: [/\.html?$/i, /\/$/],
             contentTypes: ['text/html'],
             icon: '📄',
-            color: '#3b82f6',
+            color: '#014C75',
             priority: 'High'
         },
         stylesheet: {
             patterns: [/\.css$/i],
             contentTypes: ['text/css'],
             icon: '🎨',
-            color: '#8b5cf6',
+            color: '#014C75',
             priority: 'High'
         },
         script: {
@@ -38,7 +38,7 @@ export class VisualizationDebugger {
             patterns: [/\.(woff|woff2|ttf|otf|eot)$/i],
             contentTypes: ['font/', 'application/font'],
             icon: '🔤',
-            color: '#6366f1',
+            color: '#014C75',
             priority: 'Low'
         },
         media: {
@@ -66,7 +66,7 @@ export class VisualizationDebugger {
             patterns: [/^wss?:/],
             contentTypes: [],
             icon: '⚡',
-            color: '#8b5cf6',
+            color: '#014C75',
             priority: 'High'
         },
         manifest: {
@@ -816,7 +816,7 @@ export class VisualizationDebugger {
 
         panel.innerHTML = `
             <div class="performance-metrics" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 16px;">
-                <div style="grid-column: 1 / -1; color: #ff6c37; font-weight: bold; margin-bottom: 8px;">Session Performance</div>
+                <div style="grid-column: 1 / -1; color: #014C75; font-weight: bold; margin-bottom: 8px;">Session Performance</div>
                 <div class="metric-item" style="background: rgba(255, 255, 255, 0.05); padding: 10px; border-radius: 6px;">
                     <div style="color: #64748b; font-size: 12px;">Session Duration</div>
                     <div style="color: #f1f5f9; font-size: 16px; font-weight: bold;">${sessionDuration}</div>
@@ -834,7 +834,7 @@ export class VisualizationDebugger {
                     <div style="color: #f1f5f9; font-size: 16px; font-weight: bold;">${logCount}</div>
                 </div>
                 
-                <div style="grid-column: 1 / -1; color: #ff6c37; font-weight: bold; margin: 16px 0 8px 0;">Browser Performance</div>
+                <div style="grid-column: 1 / -1; color: #014C75; font-weight: bold; margin: 16px 0 8px 0;">Browser Performance</div>
                 <div class="metric-item" style="background: rgba(255, 255, 255, 0.05); padding: 10px; border-radius: 6px;">
                     <div style="color: #64748b; font-size: 12px;">Page Render Time</div>
                     <div style="color: #f1f5f9; font-size: 16px; font-weight: bold;">${renderTime.toFixed(2)}ms</div>
@@ -867,7 +867,7 @@ export class VisualizationDebugger {
         if (!session || !session.networkRequests || session.networkRequests.length === 0) {
             panel.innerHTML = `
                 <div style="padding:24px;color:#8b92a5;text-align:center;">
-                    <h4 style="color:#ff6c37;">🏗️ Request Structure Inspector</h4>
+                    <h4 style="color:#014C75;">🏗️ Request Structure Inspector</h4>
                     <p>No API requests to inspect yet. Make a request to see its structure here.</p>
                 </div>
             `;
@@ -904,8 +904,8 @@ export class VisualizationDebugger {
 
         panel.innerHTML = `
             <div style="padding:12px;">
-                <div style="background:rgba(255,108,55,0.1);padding:12px;border-radius:6px;margin-bottom:16px;">
-                    <h4 style="color:#ff6c37;margin:0 0 8px 0;font-size:14px;">🔍 Latest Request: ${latestRequest.method} ${latestRequest.targetUrl || latestRequest.url}</h4>
+                <div style="background:rgba(1,76,117,0.1);padding:12px;border-radius:6px;margin-bottom:16px;">
+                    <h4 style="color:#014C75;margin:0 0 8px 0;font-size:14px;">🔍 Latest Request: ${latestRequest.method} ${latestRequest.targetUrl || latestRequest.url}</h4>
                     <div style="color:#8b92a5;font-size:12px;">Status: <span style="color:#10b981;">${latestRequest.statusCode} ${latestRequest.statusText}</span> | Duration: ${latestRequest.duration}ms</div>
                 </div>
                 
@@ -936,13 +936,13 @@ export class VisualizationDebugger {
 
         if (typeof obj !== 'object') {
             const typeColor = typeof obj === 'string' ? '#10b981' :
-                typeof obj === 'number' ? '#3b82f6' :
+                typeof obj === 'number' ? '#014C75' :
                     typeof obj === 'boolean' ? '#f59e0b' : '#8b92a5';
             return `<div style="margin-left:${level * 16}px;color:${typeColor};">${JSON.stringify(obj)}</div>`;
         }
 
         let html = `<div style="margin-left:${level * 16}px;">
-            <span style="color:#ff6c37;cursor:pointer;" onclick="this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'none' ? 'block' : 'none'">
+            <span style="color:#014C75;cursor:pointer;" onclick="this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'none' ? 'block' : 'none'">>
                 ${level === 0 ? '📁' : '📂'} ${rootName} ${Array.isArray(obj) ? `[${obj.length}]` : `{${Object.keys(obj).length}}`}
             </span>
             <div style="margin-left:16px;">`;
@@ -1135,7 +1135,7 @@ export class VisualizationDebugger {
                 font-size: 20px;
                 line-height: 1;
                 opacity: 0.9;
-                color: #58a6ff;
+                color: var(--primary-color, #014C75);
             }
 
             .welcome-content {
@@ -1227,7 +1227,7 @@ export class VisualizationDebugger {
 
             /* Log Type Styles - Modern Color Palette */
             .log-info .log-icon { 
-                color: #58a6ff; 
+                color: var(--primary-color, #014C75); 
             }
             .log-success .log-icon { 
                 color: #3fb950; 
@@ -1244,7 +1244,7 @@ export class VisualizationDebugger {
 
             /* Clean Border Indicators */
             .log-info { 
-                border-left-color: #1f6feb;
+                border-left-color: var(--primary-hover, #013B5B);
             }
             .log-success { 
                 border-left-color: #238636;
@@ -1261,7 +1261,7 @@ export class VisualizationDebugger {
 
             .log-info:hover { 
                 background: rgba(31, 111, 235, 0.05);
-                border-left-color: #58a6ff;
+                border-left-color: var(--primary-color, #014C75);
             }
             .log-success:hover { 
                 background: rgba(35, 134, 54, 0.05);
@@ -1298,7 +1298,7 @@ export class VisualizationDebugger {
 
             /* Enhanced Focus States for Accessibility */
             .debug-console-container:focus-within {
-                border-color: #1f6feb;
+                border-color: #013B5B;
                 box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15), 0 0 0 3px rgba(31, 111, 235, 0.1);
             }
 
@@ -1340,37 +1340,65 @@ export class VisualizationDebugger {
                 display: flex;
                 align-items: center;
                 gap: 12px;
+                transition: all 0.2s ease;
+            }
+            
+            .console-input-container:hover {
+                background: var(--hover-bg, #161b22);
+                border-top-color: var(--border-color, #30363d);
+            }
+            
+            .console-input-container:focus-within {
+                background: var(--hover-bg, #161b22);
+                border-top-color: var(--primary-color, #014C75);
+                box-shadow: 0 0 0 1px var(--primary-color, #014C75);
             }
 
             .console-input-container::before {
                 content: '❯';
-                color: #58a6ff;
+                color: var(--primary-color, #014C75);
                 font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
                 font-size: 14px;
                 font-weight: 600;
                 line-height: 1;
                 flex-shrink: 0;
+                opacity: 0.9;
+                transition: all 0.2s ease;
+            }
+            
+            .console-input-container:hover::before {
+                opacity: 1;
+            }
+            
+            .console-input-container:focus-within::before {
+                color: var(--primary-hover, #013B5B);
+                opacity: 1;
+                transform: scale(1.05);
             }
 
             .console-input-container input {
                 flex: 1;
                 background: transparent;
                 border: none;
-                color: #f0f6fc;
+                color: var(--text-color, #f0f6fc);
                 font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
                 font-size: 13px;
                 padding: 0;
                 outline: none;
                 line-height: 1.4;
+                transition: all 0.2s ease;
             }
 
             .console-input-container input::placeholder {
-                color: #6e7681;
+                color: var(--text-muted, #6e7681);
                 font-style: italic;
+                opacity: 0.8;
+                transition: all 0.2s ease;
             }
 
             .console-input-container input:focus::placeholder {
-                color: #484f58;
+                color: var(--text-secondary, #484f58);
+                opacity: 0.6;
             }
 
             /* Print Styles */
@@ -1672,8 +1700,8 @@ export class VisualizationDebugger {
             case 'error': return '#ef4444';
             case 'warn': return '#f59e0b';
             case 'success': return '#22c55e';
-            case 'info': return '#3b82f6';
-            case 'debug': return '#8b5cf6';
+            case 'info': return 'var(--primary-color, #014C75)';
+            case 'debug': return 'var(--primary-color, #014C75)';
             default: return '#ffffff';
         }
     }
@@ -1762,7 +1790,7 @@ export class VisualizationDebugger {
                     method: 'GET',
                     type: 'document',
                     typeIcon: '📄',
-                    typeColor: '#3b82f6',
+                    typeColor: '#014C75',
                     priority: 'High',
                     initiator: 'navigation',
                     size: navigation.decodedBodySize || 0,
@@ -1813,7 +1841,7 @@ export class VisualizationDebugger {
                 method: 'GET',
                 type: 'document',
                 typeIcon: '📄',
-                typeColor: '#3b82f6',
+                typeColor: '#014C75',
                 priority: 'High',
                 initiator: 'navigation',
                 size: 15420,
@@ -1833,7 +1861,7 @@ export class VisualizationDebugger {
                 method: 'GET',
                 type: 'stylesheet',
                 typeIcon: '🎨',
-                typeColor: '#8b5cf6',
+                typeColor: '#014C75',
                 priority: 'High',
                 initiator: 'link',
                 size: 8945,
@@ -1913,7 +1941,7 @@ export class VisualizationDebugger {
                 method: 'GET',
                 type: 'font',
                 typeIcon: '🔤',
-                typeColor: '#6366f1',
+                typeColor: '#014C75',
                 priority: 'Low',
                 initiator: 'css',
                 size: 45600,
@@ -2158,7 +2186,7 @@ export class VisualizationDebugger {
         if (!session.networkRequests || session.networkRequests.length === 0) {
             panel.innerHTML = `
                 <div style="padding:24px;color:#8b92a5;text-align:center;">
-                    <h4 style="color:#ff6c37;">📡 Network Activity Monitor</h4>
+                    <h4 style="color:#014C75;">📡 Network Activity Monitor</h4>
                     <p>No network requests captured yet. Make API calls or visit websites to see comprehensive network activity.</p>
                 </div>
             `;
@@ -2277,14 +2305,14 @@ export class VisualizationDebugger {
                     
                     <div style="display: flex; gap: 8px; align-items: center;">
                         <button id="clear-network" style="background: #db2c3a; color: white; border: none; border-radius: 4px; padding: 4px 12px; font-size: 12px; cursor: pointer; transition: background 0.2s;">Clear All</button>
-                        <button id="reset-filters" style="background: #6366f1; color: white; border: none; border-radius: 4px; padding: 4px 12px; font-size: 12px; cursor: pointer; transition: background 0.2s;">Reset Filters</button>
+                        <button id="reset-filters" style="background: #014C75; color: white; border: none; border-radius: 4px; padding: 4px 12px; font-size: 12px; cursor: pointer; transition: background 0.2s;">Reset Filters</button>
                         <button id="export-network" style="background: #238636; color: white; border: none; border-radius: 4px; padding: 4px 12px; font-size: 12px; cursor: pointer; transition: background 0.2s;">Export HAR</button>
                     </div>
                 </div>
                 
                 <!-- Enhanced Load Statistics -->
                 <div style="display: flex; flex-wrap: wrap; gap: 16px; padding: 10px; background: rgba(255, 255, 255, 0.02); border-radius: 6px; border: 1px solid rgba(255, 255, 255, 0.05);">
-                    <div style="font-size: 12px;"><span style="color: #8b949e;">Requests:</span> <span style="color: #58a6ff; font-weight: 600;">${loadStats.totalRequests}</span></div>
+                    <div style="font-size: 12px;"><span style="color: #8b949e;">Requests:</span> <span style="color: #014C75; font-weight: 600;">${loadStats.totalRequests}</span></div>
                     <div style="font-size: 12px;"><span style="color: #8b949e;">Transferred:</span> <span style="color: #39d353; font-weight: 600;">${this.formatBytes(loadStats.totalTransferredSize)}</span></div>
                     <div style="font-size: 12px;"><span style="color: #8b949e;">Resources:</span> <span style="color: #ffab70; font-weight: 600;">${this.formatBytes(loadStats.totalSize)}</span></div>
                     <div style="font-size: 12px;"><span style="color: #8b949e;">Finish:</span> <span style="color: #f85149; font-weight: 600;">${loadStats.finishTime}ms</span></div>
@@ -2333,7 +2361,7 @@ export class VisualizationDebugger {
                     <td style="padding: 6px; color: ${req.typeColor}; text-align: center;">
                         <span title="${req.type}">${req.typeIcon}</span>
                     </td>
-                    <td style="padding: 6px; color: #58a6ff; font-weight: 600; font-family: monospace;">
+                    <td style="padding: 6px; color: #014C75; font-weight: 600; font-family: monospace;">
                         ${req.method || 'GET'}
                     </td>
                     <td style="padding: 6px; color: #f0f6fc; max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${req.name || req.url}">
@@ -2503,7 +2531,7 @@ export class VisualizationDebugger {
         if (status === 'failed') return '#f85149';
         if (status === 'pending') return '#ffab70';
         if (statusCode >= 200 && statusCode < 300) return '#39d353';
-        if (statusCode >= 300 && statusCode < 400) return '#58a6ff';
+        if (statusCode >= 300 && statusCode < 400) return '#014C75';
         if (statusCode >= 400) return '#f85149';
         return '#8b949e';
     }
@@ -2560,7 +2588,7 @@ export class VisualizationDebugger {
                 return `
                     <div style="display: flex; align-items: center; gap: 4px;">
                         <div style="display: flex; height: 12px; border-radius: 2px; overflow: hidden; min-width: 30px;">
-                            ${timing.domainLookup > 0 ? `<div style="background: #58a6ff; width: ${timing.domainLookup * scale}px;" title="DNS Lookup: ${timing.domainLookup}ms"></div>` : ''}
+                            ${timing.domainLookup > 0 ? `<div style="background: #014C75; width: ${timing.domainLookup * scale}px;" title="DNS Lookup: ${timing.domainLookup}ms"></div>` : ''}
                             ${timing.connect > 0 ? `<div style="background: #ffab70; width: ${timing.connect * scale}px;" title="Connect: ${timing.connect}ms"></div>` : ''}
                             ${timing.request > 0 ? `<div style="background: #39d353; width: ${timing.request * scale}px;" title="Request: ${timing.request}ms"></div>` : ''}
                             ${timing.response > 0 ? `<div style="background: #a5a5a5; width: ${timing.response * scale}px;" title="Response: ${timing.response}ms"></div>` : ''}
@@ -2867,7 +2895,7 @@ export class VisualizationDebugger {
                 box-shadow: 0 16px 32px rgba(0, 0, 0, 0.5);
             ">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                    <h3 style="margin: 0; color: #58a6ff; font-size: 18px;">
+                    <h3 style="margin: 0; color: #014C75; font-size: 18px;">
                         ${req.typeIcon} ${req.type.toUpperCase()} Request Details
                     </h3>
                     <button id="close-modal" style="
@@ -3667,7 +3695,7 @@ export class VisualizationDebugger {
                 newFilterInput.addEventListener('focus', () => {
                     const wrapper = newFilterInput.closest('.filter-input-wrapper');
                     if (wrapper) {
-                        wrapper.style.borderColor = '#58a6ff';
+                        wrapper.style.borderColor = '#014C75';
                         wrapper.style.boxShadow = '0 0 0 2px rgba(88, 166, 255, 0.1)';
                     }
                 });

@@ -79,7 +79,7 @@
 
 .history-search input:focus {
     outline: none;
-    border-color: var(--primary-color, #007bff);
+    border-color: var(--primary-color, #014C75);
     box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.1);
 }
 
@@ -133,8 +133,8 @@
 
 .filter-btn.active {
     background-color: var(--primary-light, #e6f7ff);
-    border-color: var(--primary-color, #007bff);
-    color: var(--primary-color, #007bff);
+    border-color: var(--primary-color, #014C75);
+    color: var(--primary-color, #014C75);
 }
 
 .filter-btn.method-get {
@@ -350,8 +350,8 @@
     margin-top: 16px;
     padding: 8px 16px;
     background-color: var(--primary-light, #e6f7ff);
-    color: var(--primary-color, #007bff);
-    border: 1px solid var(--primary-color, #007bff);
+    color: var(--primary-color, #014C75);
+    border: 1px solid var(--primary-color, #014C75);
     border-radius: 4px;
     cursor: pointer;
     font-weight: 500;

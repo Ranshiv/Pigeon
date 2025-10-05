@@ -3,6 +3,8 @@ import VisualizationTab from './VisualizationTab';
 import ErrorBoundary from './ErrorBoundary';
 import Editor from '@monaco-editor/react';
 import YAML from 'yaml';
+import { useTheme } from '../../../context/ThemeContext';
+import { registerPigeonThemes, getPigeonMonacoTheme, pigeonEditorOptions } from '../../../themes/monacoThemes';
 import './SpecPreviewModern.css';
 import {
     FiFileText,
@@ -38,23 +40,48 @@ const SpecPreview = ({
     const [showInlineIssues, setShowInlineIssues] = useState(false);
     const [copied, setCopied] = useState(false);
     const [showExportMenu, setShowExportMenu] = useState(false);
-    const [theme] = useState(() => {
-        const saved = typeof window !== 'undefined' ? window.localStorage.getItem('specTheme') : null;
-        if (saved === 'vs-dark' || saved === 'light') return saved;
-        return (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'vs-dark' : 'light';
-    });
+    const { theme } = useTheme(); // Use theme from context instead of local state
     const [sideBySide, setSideBySide] = useState(false);
     const [localText, setLocalText] = useState('');
     const [validationList, setValidationList] = useState([]);
-    const [editorHeight, setEditorHeight] = useState(720);
+    const editorHeight = 720; // Fixed height instead of dynamic resizing
 
     const editorRef = useRef(null);
     const monacoRef = useRef(null);
     const exportBtnRef = useRef(null);
 
+    // Register custom Monaco themes when component mounts
     useEffect(() => {
-        try { window.localStorage.setItem('specTheme', theme); } catch { }
-    }, [theme]);
+        if (monacoRef.current) {
+            registerPigeonThemes(monacoRef.current);
+        }
+    }, []);
+
+    // Get the appropriate Monaco theme name based on app theme
+    const monacoTheme = useMemo(() => getPigeonMonacoTheme(theme), [theme]);
+
+    // Apply theme changes when app theme changes
+    useEffect(() => {
+        if (monacoRef.current && editorRef.current) {
+            try {
+                registerPigeonThemes(monacoRef.current);
+                monacoRef.current.editor.setTheme(monacoTheme);
+                console.log(`Applied Monaco theme: ${monacoTheme}`);
+            } catch (error) {
+                console.error('Error applying Monaco theme:', error);
+            }
+        }
+    }, [monacoTheme]);
+
+    // Enhanced editor options with Pigeon styling
+    const editorOptions = useMemo(() => ({
+        ...pigeonEditorOptions,
+        wordWrap: 'on',
+        minimap: { enabled: false },
+        lineNumbers: 'on',
+        folding: true,
+        scrollBeyondLastLine: false,
+    }), []);
 
     // Tab accessibility refs
     const jsonTabRef = useRef(null);
@@ -468,27 +495,27 @@ const SpecPreview = ({
                                 height={editorHeight}
                                 defaultLanguage="json"
                                 language={previewMode === 'yaml' ? 'yaml' : 'json'}
-                                theme={theme}
+                                theme={monacoTheme}
                                 value={content}
                                 onChange={(val) => setLocalText(val ?? '')}
                                 onMount={(editor, monaco) => {
                                     editorRef.current = editor;
                                     monacoRef.current = monaco;
+                                    // Register themes when Monaco is available
+                                    registerPigeonThemes(monaco);
+                                    // Apply the theme after registration
+                                    setTimeout(() => {
+                                        monaco.editor.setTheme(monacoTheme);
+                                    }, 100);
                                 }}
-                                options={{
-                                    wordWrap: 'on',
-                                    minimap: { enabled: false },
-                                    lineNumbers: 'on',
-                                    folding: true,
-                                    scrollBeyondLastLine: false,
-                                }}
+                                options={editorOptions}
                             />
                         </div>
                         <div className="editor-pane" style={{ height: editorHeight }}>
                             <Editor
                                 height={editorHeight}
                                 language={previewMode === 'yaml' ? 'json' : 'yaml'}
-                                theme={theme}
+                                theme={monacoTheme}
                                 value={(() => {
                                     try {
                                         const parsed = previewMode === 'json' ? JSON.parse(content) : YAML.parse(content);
@@ -497,7 +524,10 @@ const SpecPreview = ({
                                         return '';
                                     }
                                 })()}
-                                options={{ readOnly: true, wordWrap: 'on', minimap: { enabled: false } }}
+                                options={{
+                                    ...editorOptions,
+                                    readOnly: true
+                                }}
                             />
                         </div>
                     </>
@@ -505,20 +535,20 @@ const SpecPreview = ({
                     <Editor
                         height={editorHeight}
                         language={previewMode === 'yaml' ? 'yaml' : 'json'}
-                        theme={theme}
+                        theme={monacoTheme}
                         value={content}
                         onChange={(val) => setLocalText(val ?? '')}
                         onMount={(editor, monaco) => {
                             editorRef.current = editor;
                             monacoRef.current = monaco;
+                            // Register themes when Monaco is available
+                            registerPigeonThemes(monaco);
+                            // Apply the theme after registration
+                            setTimeout(() => {
+                                monaco.editor.setTheme(monacoTheme);
+                            }, 100);
                         }}
-                        options={{
-                            wordWrap: 'on',
-                            minimap: { enabled: false },
-                            lineNumbers: 'on',
-                            folding: true,
-                            scrollBeyondLastLine: false,
-                        }}
+                        options={editorOptions}
                     />
                 )}
 
@@ -555,28 +585,6 @@ const SpecPreview = ({
                         {copied ? <FiCheckCircle className="btn-icon" aria-hidden="true" /> : <FiCopy className="btn-icon" aria-hidden="true" />}
                     </button>
                 </div>
-
-                <div
-                    className="editor-resizer"
-                    role="separator"
-                    aria-orientation="horizontal"
-                    onMouseDown={(e) => {
-                        const startY = e.clientY;
-                        const startH = editorHeight;
-                        const onMove = (ev) => {
-                            const delta = ev.clientY - startY;
-                            const next = Math.min(900, Math.max(280, startH + delta));
-                            setEditorHeight(next);
-                        };
-                        const onUp = () => {
-                            window.removeEventListener('mousemove', onMove);
-                            window.removeEventListener('mouseup', onUp);
-                        };
-                        window.addEventListener('mousemove', onMove);
-                        window.addEventListener('mouseup', onUp);
-                    }}
-                    title="Drag to resize editor"
-                />
             </div>
         );
     };

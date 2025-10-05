@@ -20,7 +20,7 @@
     width: 40px;
     height: 40px;
     border: 4px solid #f3f3f3;
-    border-top: 4px solid #007bff;
+    border-top: 4px solid #014C75;
     border-radius: 50%;
     animation: spin 1s linear infinite;
     margin-bottom: 20px;
@@ -49,7 +49,7 @@
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    color: #007bff;
+    color: #014C75;
     text-decoration: none;
     padding: 8px 12px;
     border-radius: 6px;
@@ -84,7 +84,7 @@
 }
 
 .monitor-icon {
-    color: #007bff;
+    color: #014C75;
 }
 
 .monitor-details {
@@ -101,7 +101,7 @@
     border-radius: 6px;
     border: 1px solid var(--border-color, #e9ecef);
     font-size: 0.875rem;
-    color: var(--primary-color, #007bff);
+    color: var(--primary-color, #014C75);
     transition: all 0.15s ease;
     cursor: pointer;
     word-break: break-all;
@@ -111,7 +111,7 @@
 }
 
 .monitor-url:hover {
-    border-color: var(--primary-color, #007bff);
+    border-color: var(--primary-color, #014C75);
     background: var(--hover-bg, #e9ecef);
 }
 

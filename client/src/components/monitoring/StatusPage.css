@@ -138,7 +138,7 @@
 }
 
 .service-url {
-    color: var(--primary-color, #007bff);
+    color: var(--primary-color, #014C75);
     font-size: 0.875rem;
     font-family: 'SF Mono', 'Monaco', 'Menlo', 'Consolas', monospace;
     background: #f8f9fa;
@@ -154,7 +154,7 @@
 }
 
 .service-url:hover {
-    border-color: var(--primary-color, #007bff);
+    border-color: var(--primary-color, #014C75);
     background: #e9ecef;
 }
 
@@ -284,12 +284,12 @@
 }
 
 .btn-primary {
-    background: #007bff;
+    background: #014C75;
     color: white;
 }
 
 .btn-primary:hover {
-    background: #0056b3;
+    background: #013B5B;
     transform: translateY(-1px);
 }
 

@@ -2,6 +2,8 @@
 import VisualizationTab from './VisualizationTab';
 import Editor from '@monaco-editor/react';
 import YAML from 'yaml';
+import { useTheme } from '../../../context/ThemeContext';
+import { registerPigeonThemes, getPigeonMonacoTheme, pigeonEditorOptions } from '../../../themes/monacoThemes';
 import './SpecPreviewModern.css';
 import {
     FiFileText,
@@ -45,7 +47,7 @@ const SpecPreview = ({
     const [sideBySide, setSideBySide] = useState(false);
     const [localText, setLocalText] = useState('');
     const [validationList, setValidationList] = useState([]);
-    const [editorHeight, setEditorHeight] = useState(500);
+    const editorHeight = 220; // Fixed height instead of dynamic resizing
 
     const editorRef = useRef(null);
     const monacoRef = useRef(null);
@@ -517,28 +519,6 @@ const SpecPreview = ({
                         {copied ? <FiCheckCircle className="btn-icon" aria-hidden="true" /> : <FiCopy className="btn-icon" aria-hidden="true" />}
                     </button>
                 </div>
-
-                <div
-                    className="editor-resizer"
-                    role="separator"
-                    aria-orientation="horizontal"
-                    onMouseDown={(e) => {
-                        const startY = e.clientY;
-                        const startH = editorHeight;
-                        const onMove = (ev) => {
-                            const delta = ev.clientY - startY;
-                            const next = Math.min(900, Math.max(280, startH + delta));
-                            setEditorHeight(next);
-                        };
-                        const onUp = () => {
-                            window.removeEventListener('mousemove', onMove);
-                            window.removeEventListener('mouseup', onUp);
-                        };
-                        window.addEventListener('mousemove', onMove);
-                        window.addEventListener('mouseup', onUp);
-                    }}
-                    title="Drag to resize editor"
-                />
             </div>
         );
     };

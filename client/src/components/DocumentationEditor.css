@@ -3,7 +3,7 @@
     display: flex;
     flex-direction: column;
     height: 100%;
-    background-color: var(--background-color, #ffffff);
+    background-color: var(--background-color);
     border-radius: 8px;
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
     overflow: hidden;
@@ -14,8 +14,8 @@
     justify-content: space-between;
     align-items: center;
     padding: 18px 20px;
-    border-bottom: 1px solid var(--border-color, #eaeaea);
-    background-color: var(--header-bg, #f8f9fa);
+    border-bottom: 1px solid var(--border-color);
+    background-color: var(--card-bg);
 }
 
 .editor-title-section {
@@ -27,16 +27,16 @@
     padding: 10px 14px;
     font-size: 16px;
     font-weight: 500;
-    border: 1px solid var(--border-color, #eaeaea);
+    border: 1px solid var(--border-color);
     border-radius: 6px;
     transition: all 0.2s ease;
-    background-color: var(--input-bg, #ffffff);
-    color: var(--text-primary, #333333);
+    background-color: var(--card-bg);
+    color: var(--text-color);
 }
 
 .title-input:focus {
-    border-color: var(--primary-color, #FF6C37);
-    box-shadow: 0 0 0 2px rgba(255, 108, 55, 0.2);
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px var(--primary-light);
     outline: none;
 }
 
@@ -49,10 +49,10 @@
 /* Modern Toggle Button Group */
 .view-toggle-group {
     display: flex;
-    background-color: var(--toggle-group-bg, #f1f3f4);
+    background-color: var(--card-bg);
     border-radius: 8px;
     padding: 4px;
-    border: 1px solid var(--border-color, #e1e5e9);
+    border: 1px solid var(--border-color);
     position: relative;
 }
 
@@ -67,7 +67,7 @@
     font-size: 14px;
     font-weight: 500;
     transition: all 0.2s ease;
-    color: var(--text-secondary, #6b7280);
+    color: var(--text-secondary);
     position: relative;
     min-width: 80px;
     justify-content: center;
@@ -76,19 +76,19 @@
 }
 
 .view-toggle-btn:hover:not(.active) {
-    background-color: var(--button-hover, rgba(0, 0, 0, 0.04));
-    color: var(--text-primary, #374151);
+    background-color: var(--hover-bg);
+    color: var(--text-color);
 }
 
 .view-toggle-btn.active {
-    background-color: var(--primary-color, #FF6C37);
+    background-color: var(--primary-color);
     color: white;
     font-weight: 600;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .view-toggle-btn.active:hover {
-    background-color: var(--primary-hover, #e55a2a);
+    background-color: var(--primary-hover);
     color: white;
 }
 
@@ -110,9 +110,9 @@
 }
 
 .view-toggle.active {
-    background-color: var(--primary-color, #FF6C37);
+    background-color: var(--primary-color);
     color: white;
-    border-color: var(--primary-color, #FF6C37);
+    border-color: var(--primary-color);
 }
 
 .save-button {
@@ -120,7 +120,7 @@
     align-items: center;
     gap: 8px;
     padding: 10px 18px;
-    background-color: var(--primary-color, #FF6C37);
+    background-color: var(--primary-color);
     color: white;
     border: none;
     border-radius: 6px;
@@ -131,7 +131,7 @@
 }
 
 .save-button:hover {
-    background-color: var(--primary-hover, #e55a2a);
+    background-color: var(--primary-hover);
     transform: translateY(-1px);
 }
 
@@ -154,9 +154,9 @@
 .editor-sidebar {
     width: 280px;
     padding: 20px;
-    border-right: 1px solid var(--border-color, #eaeaea);
+    border-right: 1px solid var(--border-color);
     overflow-y: auto;
-    background-color: var(--sidebar-background, #f8f9fa);
+    background-color: var(--card-bg);
 }
 
 .insert-template-btn {
@@ -167,7 +167,7 @@
     width: 100%;
     padding: 14px 16px;
     margin-bottom: 20px;
-    background-color: var(--primary-color, #FF6C37);
+    background-color: var(--primary-color);
     color: white;
     border: none;
     border-radius: 8px;
@@ -175,32 +175,32 @@
     font-size: 14px;
     font-weight: 600;
     transition: all 0.2s ease;
-    box-shadow: 0 2px 8px rgba(255, 108, 55, 0.2);
+    box-shadow: 0 2px 8px var(--primary-shadow);
     position: relative;
     overflow: hidden;
 }
 
 .insert-template-btn:hover {
-    background-color: var(--primary-hover, #e55a2a);
+    background-color: var(--primary-hover);
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(255, 108, 55, 0.3);
+    box-shadow: 0 4px 12px var(--primary-shadow);
 }
 
 .insert-template-btn:active {
     transform: translateY(0);
-    box-shadow: 0 2px 6px rgba(255, 108, 55, 0.2);
+    box-shadow: 0 2px 6px var(--primary-shadow);
 }
 
 .insert-template-btn:focus {
     outline: none;
-    box-shadow: 0 0 0 3px rgba(255, 108, 55, 0.2), 0 2px 8px rgba(255, 108, 55, 0.2);
+    box-shadow: 0 0 0 3px var(--primary-light), 0 2px 8px var(--primary-shadow);
 }
 
 .editor-content {
     flex: 1;
     display: flex;
     overflow: hidden;
-    background-color: var(--content-bg, #ffffff);
+    background-color: var(--card-bg);
 }
 
 .documentation-textarea {
@@ -212,8 +212,8 @@
     font-size: 15px;
     line-height: 1.6;
     outline: none;
-    color: var(--text-primary, #333333);
-    background-color: var(--textarea-bg, #ffffff);
+    color: var(--text-color);
+    background-color: var(--card-bg);
 }
 
 .documentation-preview {
@@ -221,16 +221,16 @@
     padding: 24px 32px;
     overflow-y: auto;
     line-height: 1.7;
-    color: var(--text-primary, #333333);
-    background-color: var(--preview-bg, #ffffff);
+    color: var(--text-color);
+    background-color: var(--card-bg);
 }
 
 .documentation-preview h1 {
     font-size: 28px;
     margin-top: 0;
     margin-bottom: 24px;
-    color: var(--text-primary, #333333);
-    border-bottom: 1px solid var(--border-color, #eaeaea);
+    color: var(--text-color);
+    border-bottom: 1px solid var(--border-color);
     padding-bottom: 12px;
 }
 
@@ -300,7 +300,7 @@
 
 .editor-tools {
     margin-bottom: 28px;
-    background-color: var(--tools-bg, #ffffff);
+    background-color: var(--card-bg);
     border-radius: 8px;
     padding: 16px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
@@ -310,9 +310,9 @@
     margin-top: 0;
     margin-bottom: 14px;
     font-size: 16px;
-    color: var(--text-primary, #333333);
+    color: var(--text-color);
     font-weight: 600;
-    border-bottom: 1px solid var(--border-light, #f0f0f0);
+    border-bottom: 1px solid var(--border-color);
     padding-bottom: 8px;
 }
 
@@ -323,27 +323,29 @@
     padding: 10px 12px;
     margin-bottom: 6px;
     background-color: transparent;
-    border: 1px solid var(--border-color, #eaeaea);
+    border: 1px solid var(--border-color);
     border-radius: 6px;
     cursor: pointer;
     font-size: 14px;
     text-align: left;
-    color: var(--text-secondary, #666666);
+    color: var(--text-secondary);
     transition: all 0.2s ease;
 }
 
 .editor-tools button:hover {
-    background-color: var(--hover-background, #f5f5f5);
-    border-color: var(--border-hover, #d0d0d0);
+    background-color: var(--hover-bg);
+    border-color: var(--primary-color);
+    color: var(--primary-color);
 }
 
 .editor-tools button:active {
-    background-color: var(--active-background, #e9e9e9);
+    background-color: var(--primary-light);
+    border-color: var(--primary-color);
 }
 
 .editor-tools button svg {
     margin-right: 10px;
-    color: var(--icon-color, #888888);
+    color: var(--text-muted);
 }
 
 .endpoints-list {
@@ -407,7 +409,7 @@
 
 .method-get {
     background-color: rgba(97, 175, 254, 0.15);
-    color: var(--get-color, #2196f3);
+    color: var(--get-color, #014C75);
 }
 
 .method-post {
@@ -547,8 +549,8 @@
 .form-group input:focus,
 .form-group select:focus {
     outline: none;
-    border-color: var(--primary-color, #FF6C37);
-    box-shadow: 0 0 0 2px rgba(255, 108, 55, 0.2);
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px var(--primary-light);
 }
 
 .form-row {
@@ -611,7 +613,7 @@
 
 .insert-btn {
     padding: 10px 18px;
-    background-color: var(--primary-color, #FF6C37);
+    background-color: var(--primary-color);
     color: white;
     border: none;
     border-radius: 6px;
@@ -622,45 +624,12 @@
 }
 
 .insert-btn:hover {
-    background-color: var(--primary-hover, #e55a2a);
+    background-color: var(--primary-hover);
 }
 
 .insert-btn:disabled {
     background-color: #cccccc;
     cursor: not-allowed;
-}
-
-/* Dark mode support */
-@media (prefers-color-scheme: dark) {
-    .documentation-editor {
-        --background-color: #1e1e1e;
-        --header-bg: #252525;
-        --sidebar-background: #252525;
-        --content-bg: #1e1e1e;
-        --textarea-bg: #1e1e1e;
-        --preview-bg: #1e1e1e;
-        --tools-bg: #252525;
-        --endpoint-bg: #2d2d2d;
-        --border-color: #3e3e3e;
-        --border-light: #333333;
-        --border-hover: #505050;
-        --text-primary: #e6e6e6;
-        --text-secondary: #b0b0b0;
-        --text-tertiary: #808080;
-        --code-background: #2d2d2d;
-        --code-border: #3e3e3e;
-        --code-text: #e6e6e6;
-        --table-header-background: #252525;
-        --table-row-alt: #252525;
-        --input-bg: #2d2d2d;
-        --button-bg: #2d2d2d;
-        --button-hover: #3d3d3d;
-        --hover-background: #333333;
-        --active-background: #3d3d3d;
-        --icon-color: #b0b0b0;
-        --background-light: #252525;
-        --toggle-group-bg: #2d2d2d;
-    }
 }
 
 /* Responsive adjustments */
@@ -672,7 +641,7 @@
     .editor-sidebar {
         width: 100%;
         border-right: none;
-        border-bottom: 1px solid var(--border-color, #eaeaea);
+        border-bottom: 1px solid var(--border-color);
         max-height: 300px;
     }
 

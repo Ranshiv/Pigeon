@@ -61,15 +61,15 @@
 /* Export Button Variants */
 .export-button.primary,
 .export-btn.primary {
-    background: #ff6c37;
-    border-color: #ff6c37;
+    background: #014C75;
+    border-color: #014C75;
     color: #ffffff;
 }
 
 .export-button.primary:hover,
 .export-btn.primary:hover {
-    background: #e55a2b;
-    border-color: #e55a2b;
+    background: #013B5B;
+    border-color: #013B5B;
 }
 
 .export-button.secondary,
@@ -197,7 +197,7 @@
     width: 16px;
     height: 16px;
     border: 2px solid #404650;
-    border-top: 2px solid #ff6c37;
+    border-top: 2px solid #014C75;
     border-radius: 50%;
     animation: spin 1s linear infinite;
 }
@@ -238,7 +238,7 @@
 .export-message.info {
     background: rgba(59, 130, 246, 0.1);
     border: 1px solid rgba(59, 130, 246, 0.2);
-    color: #3b82f6;
+    color: #014C75;
 }
 
 /* Export Format Options */
@@ -262,13 +262,13 @@
 }
 
 .export-format-option:hover {
-    border-color: #ff6c37;
+    border-color: #014C75;
     background: #2d2d2d;
 }
 
 .export-format-option.selected {
-    border-color: #ff6c37;
-    background: rgba(255, 108, 55, 0.1);
+    border-color: #014C75;
+    background: rgba(1, 76, 117, 0.1);
 }
 
 .export-format-icon {

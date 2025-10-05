@@ -15,7 +15,7 @@
 
 .spotlight-item button {
     padding: 6px 12px;
-    background-color: #007bff;
+    background-color: #014C75;
     color: white;
     border: none;
     border-radius: 4px;
@@ -23,7 +23,7 @@
 }
 
 .spotlight-item button:hover {
-    background-color: #0056b3;
+    background-color: #013B5B;
 }
 
 .spotlight-header {
@@ -39,7 +39,7 @@
 }
 
 .header-icon {
-    color: #f59e0b;
+    color: #014C75;
     margin-right: 0.5rem;
 }
 
@@ -126,12 +126,12 @@
 }
 
 .star-icon {
-    color: #f59e0b;
+    color: #014C75;
     margin-right: 0.25rem;
 }
 
 .usage-icon {
-    color: #4f46e5;
+    color: #014C75;
     margin-right: 0.25rem;
 }
 
@@ -175,7 +175,7 @@
 }
 
 .explore-community-btn {
-    background-color: #4f46e5;
+    background-color: #014C75;
     color: white;
     border: none;
     border-radius: 4px;

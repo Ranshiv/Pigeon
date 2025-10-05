@@ -40,12 +40,12 @@
 }
 
 .btn-primary {
-    background: #007bff;
+    background: #014C75;
     color: white;
 }
 
 .btn-primary:hover {
-    background: #0056b3;
+    background: #013B5B;
     transform: translateY(-1px);
 }
 
@@ -105,14 +105,14 @@
 }
 
 .filter-btn:hover {
-    border-color: #007bff;
-    color: #007bff;
+    border-color: #014C75;
+    color: #014C75;
 }
 
 .filter-btn.active {
-    background: #007bff;
+    background: #014C75;
     color: white;
-    border-color: #007bff;
+    border-color: #014C75;
 }
 
 .loading,

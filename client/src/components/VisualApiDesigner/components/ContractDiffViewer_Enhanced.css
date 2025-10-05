@@ -2,14 +2,14 @@
 
 /* Toolbar button styles */
 .toolbar-btn-primary {
-    background: #3b82f6 !important;
+    background: #014C75 !important;
     color: white !important;
-    border: 1px solid #3b82f6 !important;
+    border: 1px solid #014C75 !important;
 }
 
 .toolbar-btn-primary:hover:not(:disabled) {
-    background: #2563eb !important;
-    border-color: #2563eb !important;
+    background: #013B5B !important;
+    border-color: #013B5B !important;
 }
 
 .toolbar-btn-primary:disabled {
@@ -84,7 +84,7 @@
 }
 
 .contract-diff-viewer .refresh-btn {
-    background: #3b82f6;
+    background: #014C75;
     color: white;
     border: none;
     padding: 12px 24px;
@@ -96,7 +96,7 @@
 }
 
 .contract-diff-viewer .refresh-btn:hover {
-    background: #2563eb;
+    background: #013B5B;
 }
 
 /* Loading and error states */
@@ -114,7 +114,7 @@
     width: 32px;
     height: 32px;
     border: 3px solid #e5e7eb;
-    border-top: 3px solid #3b82f6;
+    border-top: 3px solid #014C75;
     border-radius: 50%;
     animation: spin 1s linear infinite;
     margin-bottom: 16px;

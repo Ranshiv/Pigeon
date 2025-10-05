@@ -1,13 +1,24 @@
-/* Diff Comparison Panel - 2025 Modern Design */
+/* Diff Comparison Panel - 2025 Modern Design - Theme Responsive */
 .diff-comparison-panel {
-    background: var(--bg-primary, #ffffff);
-    border: 1px solid var(--border-light, #e5e7eb);
+    background: var(--bg-surface
+    , #ffffff);
+    border: 1px solid var(--border-light, #003956);
     border-radius: 0.75rem;
     overflow: hidden;
     flex: 1;
     display: flex;
     flex-direction: column;
     min-height: 0;
+    margin: 2%;
+
+    /* Light theme defaults - matching application theme */
+    --bg-primary: #f8f9fa;
+    --bg-surface: #ffffff;
+    --bg-hover: #f5f5f5;
+    --text-primary: #333333;
+    --text-secondary: #6c757d;
+    --border-light: #e1e4e8;
+    --color-primary: #014C75;
 }
 
 .comparison-header {
@@ -15,15 +26,15 @@
     justify-content: space-between;
     align-items: center;
     padding: 1.25rem 1.5rem;
-    background: var(--bg-surface, #f8fafc);
-    border-bottom: 1px solid var(--border-light, #e5e7eb);
+    background: var(--bg-surface, #ffffff);
+    border-bottom: 1px solid var(--border-light, #e1e4e8);
     flex-shrink: 0;
 }
 
 .view-mode-selector {
     display: flex;
     gap: 0.25rem;
-    background: var(--bg-toggle, #f3f4f6);
+    background: var(--bg-surface, #ffffff);
     padding: 0.25rem;
     border-radius: 0.5rem;
 }
@@ -36,7 +47,7 @@
     border: none;
     border-radius: 0.375rem;
     background: transparent;
-    color: var(--text-secondary, #6b7280);
+    color: var(--text-secondary, #6c757d);
     font-size: 0.875rem;
     font-weight: 500;
     cursor: pointer;
@@ -45,12 +56,12 @@
 }
 
 .view-mode-btn:hover {
-    background: var(--bg-hover, #e5e7eb);
+    background: var(--bg-hover, #f5f5f5);
 }
 
 .view-mode-btn.active {
     background: var(--bg-primary, #ffffff);
-    color: var(--text-primary, #1a1a1a);
+    color: var(--text-primary, #333333);
     box-shadow: 0 1px 3px var(--shadow-light, rgba(0, 0, 0, 0.1));
 }
 
@@ -65,10 +76,10 @@
     align-items: center;
     gap: 0.5rem;
     padding: 0.5rem 0.75rem;
-    border: 1px solid var(--border-light, #e5e7eb);
+    border: 1px solid var(--border-light, #e1e4e8);
     border-radius: 0.375rem;
     background: var(--bg-primary, #ffffff);
-    color: var(--text-secondary, #6b7280);
+    color: var(--text-secondary, #6c757d);
     font-size: 0.875rem;
     font-weight: 500;
     cursor: pointer;
@@ -76,9 +87,9 @@
 }
 
 .action-btn:hover {
-    background: var(--bg-hover, #f8fafc);
-    border-color: var(--border-hover, #d1d5db);
-    color: var(--text-primary, #1a1a1a);
+    background: var(--bg-hover, #f5f5f5);
+    border-color: var(--border-light, #e1e4e8);
+    color: var(--text-primary, #333333);
 }
 
 .comparison-content {
@@ -99,7 +110,7 @@
 .spec-panel {
     display: flex;
     flex-direction: column;
-    border-right: 1px solid var(--border-light, #e5e7eb);
+    border-right: 1px solid var(--border-light, #e1e4e8);
     min-height: 0;
 }
 
@@ -109,8 +120,8 @@
 
 .panel-header {
     padding: 1rem 1.5rem;
-    background: var(--bg-ultra-light, #fafbfc);
-    border-bottom: 1px solid var(--border-ultra-light, #f3f4f6);
+    background: var(--bg-surface, #ffffff);
+    border-bottom: 1px solid var(--border-light, #e1e4e8);
     flex-shrink: 0;
 }
 
@@ -118,7 +129,7 @@
     margin: 0;
     font-size: 0.875rem;
     font-weight: 600;
-    color: var(--text-primary, #1a1a1a);
+    color: var(--text-primary, #333333);
     text-transform: uppercase;
     letter-spacing: 0.025em;
 }
@@ -132,12 +143,12 @@
 .spec-content pre {
     margin: 0;
     padding: 1.5rem;
-    background: var(--bg-code, #f8fafc);
+    background: var(--bg-surface, #ffffff);
     border: none;
     font-family: 'JetBrains Mono', 'Fira Code', 'Monaco', 'Consolas', monospace;
     font-size: 0.8125rem;
     line-height: 1.5;
-    color: var(--text-primary, #1a1a1a);
+    color: var(--text-primary, #333333);
     white-space: pre-wrap;
     word-break: break-word;
 }
@@ -166,7 +177,7 @@
 .diff-content {
     flex: 1;
     overflow: auto;
-    background: var(--bg-code, #f8fafc);
+    background: var(--bg-surface, #ffffff);
 }
 
 .diff-lines {
@@ -193,7 +204,7 @@
 
 .diff-line.added {
     background: var(--color-success-bg, #f0fdf4);
-    border-left-color: var(--color-success, #22c55e);
+    border-left-color: var(--color-success, #10b981);
 }
 
 .diff-line.unchanged {
@@ -300,7 +311,7 @@
 
 .change-badge.addition {
     background: var(--color-success-bg, #f0fdf4);
-    color: var(--color-success, #22c55e);
+    color: var(--color-success, #10b981);
 }
 
 .change-badge.removal {
@@ -429,34 +440,56 @@
     }
 }
 
-/* Dark Mode Support */
+/* Dark theme support - matching application theme */
+.diff-comparison-panel[data-theme="dark"],
+.dark .diff-comparison-panel {
+    --bg-primary: #00111A;
+    --bg-surface: #002234;
+    --bg-hover: #013B5B;
+    --text-primary: #ffffff;
+    --text-secondary: #B8D4E3;
+    --text-tertiary: #7A9BAD;
+    --border-light: #003956;
+    --color-primary: #014C75;
+    --shadow-light: rgba(0, 0, 0, 0.3);
+
+    /* Adjusted diff colors for dark mode with 2025 Blue Palette */
+    --color-error: #ef4444;
+    --color-error-bg: #2D1117;
+
+    --color-success: #10b981;
+    --color-success-bg: #0F2419;
+
+    --color-warning: #f59e0b;
+    --color-warning-bg: #1F1A14;
+
+    --color-neutral: #B8D4E3;
+    --color-neutral-bg: #002234;
+}
+
 @media (prefers-color-scheme: dark) {
     .diff-comparison-panel {
-        --bg-primary: #171717;
-        --bg-surface: #262626;
-        --bg-hover: #2a2a2a;
-        --bg-ultra-light: #1f1f1f;
-        --bg-toggle: #262626;
-        --bg-code: #1a1a1a;
+        --bg-primary: #00111A;
+        --bg-surface: #002234;
+        --bg-hover: #013B5B;
         --text-primary: #ffffff;
-        --text-secondary: #a3a3a3;
-        --text-tertiary: #737373;
-        --border-light: #262626;
-        --border-ultra-light: #1f1f1f;
-        --border-hover: #404040;
+        --text-secondary: #B8D4E3;
+        --text-tertiary: #7A9BAD;
+        --border-light: #003956;
+        --color-primary: #014C75;
         --shadow-light: rgba(0, 0, 0, 0.3);
 
-        /* Adjusted diff colors for dark mode */
-        --color-error: #f87171;
-        --color-error-bg: #1f1414;
+        /* Adjusted diff colors for dark mode with 2025 Blue Palette */
+        --color-error: #ef4444;
+        --color-error-bg: #2D1117;
 
-        --color-success: #4ade80;
-        --color-success-bg: #14251a;
+        --color-success: #10b981;
+        --color-success-bg: #0F2419;
 
-        --color-warning: #fbbf24;
-        --color-warning-bg: #1f1a14;
+        --color-warning: #f59e0b;
+        --color-warning-bg: #1F1A14;
 
-        --color-neutral: #a3a3a3;
-        --color-neutral-bg: #262626;
+        --color-neutral: #B8D4E3;
+        --color-neutral-bg: #002234;
     }
 }

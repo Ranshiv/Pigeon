@@ -99,7 +99,7 @@
     height: 40px;
     border: 3px solid rgba(0, 123, 255, 0.1);
     border-radius: 50%;
-    border-top: 3px solid var(--primary-color, #007bff);
+    border-top: 3px solid var(--primary-color, #014C75);
     animation: spin 1s linear infinite;
     margin-bottom: 16px;
 }
@@ -139,7 +139,7 @@
     display: inline-flex;
     align-items: center;
     text-decoration: none;
-    color: var(--primary-color, #007bff);
+    color: var(--primary-color, #014C75);
     font-size: 14px;
     font-weight: 500;
     gap: 4px;
@@ -205,13 +205,13 @@
 }
 
 .replay-button {
-    border-color: var(--primary-color, #007bff);
-    color: var(--primary-color, #007bff);
+    border-color: var(--primary-color, #014C75);
+    color: var(--primary-color, #014C75);
     background-color: var(--primary-light, rgba(0, 123, 255, 0.1));
 }
 
 .replay-button:hover {
-    background-color: var(--primary-color, #007bff);
+    background-color: var(--primary-color, #014C75);
     color: white;
 }
 

@@ -43,6 +43,16 @@ const DraggableNode = ({ id, children, style, className, isDragging, onResize, o
     const [resizeStart, setResizeStart] = useState(null);
     const resizeRef = useRef(null);
 
+    // Cleanup effect to prevent DOM manipulation conflicts
+    useEffect(() => {
+        return () => {
+            // Clean up any pending animations or timeouts when component unmounts
+            if (resizeRef.current) {
+                resizeRef.current.style.transition = 'none';
+            }
+        };
+    }, []);
+
     // Enhanced transform calculation for precise cursor tracking
     const optimizedStyle = {
         ...style,
@@ -57,7 +67,9 @@ const DraggableNode = ({ id, children, style, className, isDragging, onResize, o
         // Add subtle visual enhancement during drag
         filter: isDragging
             ? 'drop-shadow(0 8px 25px rgba(0, 0, 0, 0.5)) brightness(1.1)'
-            : style.filter || 'none'
+            : style.filter || 'none',
+        // Add pointer events safety
+        pointerEvents: style.pointerEvents || 'auto'
     };
 
     // Handle resize start
@@ -261,6 +273,47 @@ const DesignCanvas = ({
     onEdgeDelete,
     onEdgeSelect
 }) => {
+    // Stabilize nodes array to prevent unnecessary re-renders
+    const stableNodes = useMemo(() => {
+        return nodes.filter(node => node && node.id && typeof node.id === 'string');
+    }, [nodes]);
+
+    const stableEdges = useMemo(() => {
+        return edges.filter(edge => edge && edge.id);
+    }, [edges]);
+
+    // Track nodes being deleted to prevent race conditions
+    const [nodesBeingDeleted, setNodesBeingDeleted] = useState(new Set());
+
+    // Safe node deletion wrapper
+    const handleSafeNodeDelete = useCallback((nodeId) => {
+        if (!nodeId || nodesBeingDeleted.has(nodeId)) {
+            return; // Prevent double deletion
+        }
+
+        // Mark node as being deleted
+        setNodesBeingDeleted(prev => new Set([...prev, nodeId]));
+
+        // Add a small delay to ensure any ongoing DOM operations complete
+        setTimeout(() => {
+            if (onNodeDelete) {
+                onNodeDelete(nodeId);
+            }
+            // Remove from deletion tracking after a safe delay
+            setTimeout(() => {
+                setNodesBeingDeleted(prev => {
+                    const newSet = new Set(prev);
+                    newSet.delete(nodeId);
+                    return newSet;
+                });
+            }, 100);
+        }, 16); // One animation frame
+    }, [onNodeDelete, nodesBeingDeleted]);
+
+    // Filter out nodes being deleted from rendering
+    const renderableNodes = useMemo(() => {
+        return stableNodes.filter(node => !nodesBeingDeleted.has(node.id));
+    }, [stableNodes, nodesBeingDeleted]);
     const [activeId, setActiveId] = useState(null);
     const [dragDelta, setDragDelta] = useState({ x: 0, y: 0 });
     const canvasRef = useRef(null);
@@ -393,7 +446,7 @@ const DesignCanvas = ({
                 id={node.id}
                 isDragging={isDragging}
                 onResize={handleNodeResize}
-                className={`positioned-node enhanced-node ${node.type}-node${isSelected ? ' selected' : ''}${hoverTargetId === node.id ? ' can-connect' : ''}`}
+                className={`positioned-node enhanced-node ${node.type}-node${isSelected ? ' selected' : ''}${hoverTargetId === node.id ? ' can-connect' : ''}${nodesBeingDeleted.has(node.id) ? ' deleting' : ''}`}
                 style={{
                     position: 'absolute',
                     left: position.x,
@@ -487,7 +540,23 @@ const DesignCanvas = ({
                 </div>
             </DraggableNode>
         );
-    }, [selectedNode, renderNode, activeId, handleNodeResize, onNodeSelect, onEdgeAdd, connectingFrom, hoverTargetId, nodes]);
+    }, [selectedNode, renderNode, activeId, handleNodeResize, onNodeSelect, onEdgeAdd, connectingFrom, hoverTargetId, nodes, nodesBeingDeleted]);
+
+    // Safe node renderer with error boundary
+    const renderSafeNode = useCallback((node) => {
+        // Safety checks to prevent rendering invalid nodes
+        if (!node || !node.id || typeof node.id !== 'string') {
+            console.warn('Skipping invalid node:', node);
+            return null;
+        }
+
+        try {
+            return renderPositionedNode(node);
+        } catch (error) {
+            console.error('Error rendering node:', node.id, error);
+            return null;
+        }
+    }, [renderPositionedNode]);
 
     // Keyboard delete support for selected node
     useEffect(() => {
@@ -497,14 +566,12 @@ const DesignCanvas = ({
             const tag = document.activeElement?.tagName;
             if (tag === 'INPUT' || tag === 'TEXTAREA' || document.activeElement?.isContentEditable) return;
             if (e.key === 'Delete' || e.key === 'Backspace') {
-                if (onNodeDelete) {
-                    onNodeDelete(selectedNode.id);
-                }
+                handleSafeNodeDelete(selectedNode.id);
             }
         };
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [selectedNode, onNodeDelete]);
+    }, [selectedNode, handleSafeNodeDelete]);
 
     // Keyboard delete support for selected edge
     useEffect(() => {
@@ -720,11 +787,11 @@ const DesignCanvas = ({
                                 markerWidth="6"
                                 markerHeight="6"
                                 orient="auto-start-reverse">
-                                <path d="M 0 0 L 10 5 L 0 10 z" fill="#FF6C37" />
+                                <path d="M 0 0 L 10 5 L 0 10 z" fill="#014C75" />
                             </marker>
                         </defs>
                         {/* Existing edges */}
-                        {edges && edges.map(edge => {
+                        {stableEdges.map(edge => {
                             const s = nodes.find(n => n.id === edge.source);
                             const t = nodes.find(n => n.id === edge.target);
                             if (!s || !t) return null;
@@ -804,10 +871,14 @@ const DesignCanvas = ({
                     </svg>
 
                     {/* Positioned nodes (Screenshot 2 style) */}
-                    {nodes.map((node) => renderPositionedNode(node))}
+                    {renderableNodes.map((node) => (
+                        <React.Fragment key={`node-wrapper-${node.id}`}>
+                            {renderSafeNode(node)}
+                        </React.Fragment>
+                    ))}
 
                     {/* Empty state with grid pattern */}
-                    {nodes.length === 0 && (
+                    {renderableNodes.length === 0 && (
                         <div className="canvas-empty-state">
                             <div className="empty-state-content">
                                 <div className="empty-state-icon">

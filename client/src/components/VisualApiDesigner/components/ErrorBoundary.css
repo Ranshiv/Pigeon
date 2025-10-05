@@ -32,10 +32,30 @@
 }
 
 .error-retry-button:hover {
-    background: #0056b3 !important;
+    background: #013B5B !important;
     transform: translateY(-1px);
 }
 
 .error-retry-button:active {
     transform: translateY(0);
+}
+
+.error-recovery-message {
+    color: #666 !important;
+    font-style: italic;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.5;
+    }
+
+    100% {
+        opacity: 1;
+    }
 }

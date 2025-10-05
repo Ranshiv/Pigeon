@@ -4,6 +4,8 @@
  * into reusable, single-responsibility functions
  */
 
+import { safeAppendChild, safeCreateElement } from './safeDOMUtils';
+
 import { DND_CONFIG } from '../constants/designCanvasConstants';
 
 /**
@@ -38,8 +40,13 @@ export const createDragImage = (component) => {
         pointerEvents: 'none'
     });
 
-    document.body.appendChild(dragImage);
-    return dragImage;
+    // Safely append to DOM with error handling
+    if (safeAppendChild(document.body, dragImage)) {
+        return dragImage;
+    } else {
+        console.warn('Failed to create drag image safely');
+        return null;
+    }
 };
 
 /**

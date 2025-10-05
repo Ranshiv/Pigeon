@@ -1,37 +1,85 @@
 /* Base CSS reset and global styles */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
-/* Apply a consistent box model */
-* {
+/* CSS Reset */
+*,
+*::before,
+*::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
-/* Set default font styles and smooth scrolling */
 html {
   scroll-behavior: smooth;
 }
 
-/* Import the Inter font for a clean, modern look */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-
-/* Apply the base theme variables - light theme by default */
+/* Centralized CSS Variables - 2025 Blue Palette */
 body {
+  /* === Light Theme (Default) === */
+  /* Primary Blue Palette */
+  --primary-color: #014C75;
+  --primary-hover: #013B5B;
+  --primary-light: #E5F3FF;
+
+  /* Background & Surface Colors */
   --background-color: #f8f9fa;
+  --card-bg: #ffffff;
+  --card-background: #ffffff;
+  --hover-bg: #f5f5f5;
+  --hover-background: #f3f4f6;
+
+  /* Text Colors */
   --text-color: #333333;
   --text-secondary: #6c757d;
+  --text-muted: #9ca3af;
+
+  /* Border & Shadow */
   --border-color: #e1e4e8;
-  --card-bg: #ffffff;
   --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-  --hover-bg: #f5f5f5;
-  --primary-color: #FF6C37;
-  /* Postman-inspired orange */
-  --primary-hover: #e85d2a;
+
+  /* Secondary Colors */
   --secondary-color: #6c757d;
   --secondary-hover: #5a6268;
+
+  /* Status Colors */
+  --success-color: #28a745;
+  --success-bg: #dcfce7;
+  --success-text: #16a34a;
+  --success-light: #d4edda;
+  --warning-color: #ffc107;
+  --warning-light: #fff3cd;
+  --danger-color: #dc3545;
+  --danger-bg: #fef2f2;
+  --danger-bg-hover: #fee2e2;
+  --danger-border: #fecaca;
+  --danger-border-hover: #fca5a5;
+  --danger-text: #dc2626;
+  --danger-light: #f8d7da;
+  --error-color: #dc3545;
+  --error-light: #f8d7da;
+  --info-color: #014C75;
+  --info-light: #E5F3FF;
+
+  /* Navigation */
   --navbar-bg: #ffffff;
+  --navbar-background: #ffffff;
+  --navbar-text: #333333;
   --navbar-border: rgba(0, 0, 0, 0.06);
+  --navbar-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --sidebar-bg: #f8f8f8;
+  --sidebar-background: #f8f8f8;
+  --sidebar-text: #333333;
+  --sidebar-border: 1px solid var(--border-color);
   --panel-bg: #ffffff;
+  --panel-border: 1px solid var(--border-color);
+  --panel-radius: 4px;
+
+  /* Buttons and Interactive Elements */
+  --button-background: #014C75;
+  --button-text: #ffffff;
+  --disabled-bg: #f2f2f2;
+  --disabled-text: #a0a0a0;
 
   /* Method colors for request types */
   --method-get: #61affe;
@@ -40,105 +88,148 @@ body {
   --method-delete: #f93e3e;
   --method-patch: #50e3c2;
 
+  /* Designer-specific aliases (for backward compatibility) */
+  --designer-primary: var(--primary-color);
+  --designer-primary-hover: var(--primary-hover);
+  --designer-primary-light: var(--primary-light);
+  --designer-secondary: var(--secondary-color);
+  --designer-secondary-hover: var(--secondary-hover);
+  --designer-success: var(--success-color);
+  --designer-success-light: var(--success-light);
+  --designer-warning: var(--warning-color);
+  --designer-warning-light: var(--warning-light);
+  --designer-error: var(--error-color);
+  --designer-error-light: var(--error-light);
+  --designer-info: var(--info-color);
+  --designer-info-light: var(--info-light);
+  --designer-bg: var(--background-color);
+  --designer-card: var(--card-bg);
+  --designer-border: var(--border-color);
+  --designer-border-light: var(--border-color);
+  --designer-text-primary: var(--text-color);
+  --designer-text-secondary: var(--text-secondary);
+  --designer-text-muted: var(--text-muted);
+  --designer-canvas-bg: #001A26;
+  --designer-component-bg: #002D45;
+  --designer-card-rgb: 0, 34, 52;
+  --designer-shadow: var(--shadow);
+  --designer-shadow-md: var(--shadow-md);
+  --designer-shadow-lg: var(--shadow-lg);
+  --designer-shadow-hover: var(--shadow-hover);
+  --designer-radius: var(--border-radius);
+  --designer-radius-sm: var(--border-radius-sm);
+  --designer-radius-lg: var(--border-radius-lg);
+
+  /* Spacing and Layout */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+
+  /* Typography */
+  --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  --font-size-base: 14px;
+  --font-size-sm: 12px;
+  --font-size-lg: 16px;
+  --font-size-xl: 18px;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-bold: 600;
+  --line-height: 1.5;
+
+  /* Transitions and Effects */
+  --transition-speed: 0.2s;
+  --border-radius: 8px;
+  --border-radius-sm: 6px;
+  --border-radius-lg: 12px;
+  --shadow: 0 1px 3px rgba(1, 76, 117, 0.15);
+  --shadow-md: 0 4px 6px rgba(1, 76, 117, 0.12);
+  --shadow-lg: 0 8px 25px rgba(1, 76, 117, 0.18);
+  --shadow-hover: 0 2px 8px rgba(1, 76, 117, 0.2);
+
+  /* Apply base styles */
   background-color: var(--background-color);
   color: var(--text-color);
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  font-family: var(--font-family);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  font-size: 14px;
-}
-
-/* Light theme variables (default) */
-body.light-theme {
-  --background-color: #ffffff;
-  --text-color: #ffffff;
-  /* Changed text color to white */
-  --navbar-background: #333;
-  --navbar-text: #ffffff;
-  --sidebar-background: #f0f0f0;
-  --sidebar-text: #ffffff;
-  /* Changed sidebar text to white */
-  --button-background: #007bff;
-  --button-text: #ffffff;
-  --border-color: #ddd;
-  --hover-background: #e0e0e0;
-  --card-background: #ffffff;
+  font-size: var(--font-size-base);
+  scroll-behavior: smooth;
+  text-rendering: optimizeSpeed;
+  margin: 0;
+  overflow-x: hidden;
+  min-height: 100vh;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 /* Dark theme variables - 2025 Blue Palette */
 body.dark-theme {
   --background-color: #00111A;
-  /* Main app background - nearly black navy */
   --text-color: #e0e0e0;
-  --text-secondary: #a0a0a0;
-  --border-color: #00080D;
-  /* Almost pure black for borders */
+  --text-secondary: #d0d0d0;
+  --border-color: #003956;
   --card-bg: #002234;
-  /* Very dark navy for cards */
+  --card-background: #002234;
   --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
   --hover-bg: #013B5B;
-  /* Darker blue for hover states */
-  --navbar-bg: #012A41;
-  /* Dark navy for navbar */
-  --navbar-border: rgba(1, 76, 117, 0.2);
-  /* Primary blue with transparency */
-  --panel-bg: #002234;
-  /* Very dark navy for panels */
-  --navbar-background: #012A41;
-  /* Dark navy navbar */
-  --navbar-text: #ffffff;
-  /* Keep navbar text white for contrast */
-  --sidebar-background: #001927;
-  /* Almost black navy for sidebar */
-  --sidebar-text: #e0e0e0;
-  /* Light text for sidebar */
-  --button-background: #014C75;
-  /* Deep blue for buttons */
-  --button-text: #ffffff;
-  --border-color: #00080D;
-  /* Almost black borders */
   --hover-background: #013B5B;
-  /* Darker blue hover */
-  --card-background: #002234;
-  /* Very dark navy for cards */
+  --node-bg: #003d59;
+  --node-header: #002938;
+  --footer-bg: #001721;
+  --navbar-bg: #012A41;
+  --navbar-background: #012A41;
+  --navbar-text: #ffffff;
+  --navbar-border: rgba(1, 76, 117, 0.2);
+  --panel-bg: #002234;
+  --sidebar-bg: #001927;
+  --sidebar-background: #001927;
+  --sidebar-text: #e0e0e0;
+  --button-background: #014C75;
+  --button-text: #ffffff;
   --primary-color: #014C75;
-  /* Deep blue primary */
   --primary-hover: #014368;
-  /* Darker blue on hover */
-  --active-bg: #014368;
-  /* Darker blue for active states */
+  --secondary-color: #01324E;
+  --icon-color:white;
+  /* Dark theme secondary color */
+  --secondary-hover: #013B5B;
+  --active-color: #002b42;
+
+  /* Designer-specific overrides for dark theme */
+  --designer-bg: #00111A;
+  --designer-card: #002234;
+  --designer-border: #003956;
+  --designer-border-light: #002938;
+  --designer-text-primary: #ffffff;
+  --designer-text-secondary: #B8D4E3;
+  --designer-text-muted: #7A9BAD;
+  --designer-canvas-bg: #001A26;
+  --designer-component-bg: #002D45;
+  --designer-card-rgb: 0, 34, 52;
+  
+
+  --debug-bg:  #013B5B;
+  --debug-bg2: #012A41;
+
+  --border02-color: #1c4d66;
 }
 
-/* Apply variables */
-body {
-  background-color: var(--background-color);
-  color: var(--text-color);
-  margin: 0;
-  font-family: sans-serif;
-  transition: background-color 0.3s ease, color 0.3s ease;
-  /* Smooth transition */
-  min-height: 100vh;
+/* Light theme override (explicit) */
+body.light-theme {
+  --background-color: #f8f9fa;
+  --text-color: #333333;
+  --navbar-background: #ffffff;
+  --navbar-text: #333333;
+  --sidebar-background: #f8f8f8;
+  --sidebar-text: #333333;
+  --button-background: #014C75;
+  --button-text: #ffffff;
+  --border-color: #e1e4e8;
+  --hover-background: #f5f5f5;
+  --card-background: #ffffff;
 }
 
-/* Add page transition animation */
-@keyframes pageTransition {
-  0% {
-    opacity: 1;
-  }
 
-  50% {
-    opacity: 0.8;
-  }
-
-  100% {
-    opacity: 1;
-  }
-}
-
-body.page-transition {
-  animation: pageTransition 0.3s ease;
-}
 
 .App {
   /* ... other App styles ... */
@@ -300,7 +391,7 @@ code {
 }
 
 .badge-primary {
-  background-color: rgba(255, 108, 55, 0.15);
+  background-color: rgba(1, 76, 117, 0.15);
   color: var(--primary-color);
 }
 
@@ -404,21 +495,7 @@ code {
   /* Even darker blue on hover */
 }
 
-/* client/src/index.css */
-/* 
-  Base styles that complement App.css
-  These styles help ensure consistent rendering across browsers
-*/
-
-/* Reset box-sizing */
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-}
-
-/* Remove default margin and padding */
-body,
+/* Remove default margin and padding for headings and paragraphs */
 h1,
 h2,
 h3,
@@ -438,104 +515,10 @@ img {
   height: auto;
 }
 
-/* Set core body defaults */
-body {
-  scroll-behavior: smooth;
-  text-rendering: optimizeSpeed;
-  margin: 0;
-  overflow-x: hidden;
-}
-
 /* Make form elements consistent */
 button,
 input,
 select,
 textarea {
   font: inherit;
-}
-
-/* Remove all animations and transitions for users that prefer reduced motion */
-@media (prefers-reduced-motion: reduce) {
-  * {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
-  }
-}
-
-/* Global utility classes */
-.text-center {
-  text-align: center;
-}
-
-.text-right {
-  text-align: right;
-}
-
-.text-left {
-  text-align: left;
-}
-
-.d-flex {
-  display: flex;
-}
-
-.flex-column {
-  flex-direction: column;
-}
-
-.align-center {
-  align-items: center;
-}
-
-.justify-center {
-  justify-content: center;
-}
-
-.justify-between {
-  justify-content: space-between;
-}
-
-.justify-end {
-  justify-content: flex-end;
-}
-
-.w-100 {
-  width: 100%;
-}
-
-.h-100 {
-  height: 100%;
-}
-
-.m-0 {
-  margin: 0;
-}
-
-.p-0 {
-  padding: 0;
-}
-
-/* Accessibility focus styles */
-:focus-visible {
-  outline: 2px solid var(--primary-color);
-  outline-offset: 2px;
-}
-
-/* Page transition effect */
-@keyframes pageTransition {
-  0% {
-    opacity: 0;
-    transform: translateY(5px);
-  }
-
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.page-entering {
-  animation: pageTransition 0.3s ease forwards;
 }

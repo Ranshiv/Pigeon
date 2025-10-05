@@ -15,7 +15,7 @@
     font-size: 2.5rem;
     font-weight: 700;
     margin-bottom: 1rem;
-    color: var(--primary-color, #ff6c37);
+    color: var(--primary-color, #014C75);
 }
 
 .documentation-intro {
@@ -52,7 +52,7 @@
     font-size: 1.25rem;
     font-weight: 600;
     margin-bottom: 1rem;
-    color: var(--primary-color, #ff6c37);
+    color: var(--primary-color, #014C75);
 }
 
 .documentation-section h2 svg {
@@ -74,7 +74,7 @@
 
 .documentation-links a {
     font-size: 0.9rem;
-    color: var(--link-color, #0066cc);
+    color: var(--link-color, #014C75);
     text-decoration: none;
     transition: color 0.2s ease;
     padding: 0.4rem 0;
@@ -86,7 +86,7 @@
 }
 
 .documentation-links a:hover {
-    color: var(--primary-color, #ff6c37);
+    color: var(--primary-color, #014C75);
 }
 
 .documentation-footer {
@@ -121,7 +121,7 @@
     font-size: 1.1rem;
     font-weight: 600;
     margin-bottom: 1rem;
-    color: var(--primary-color, #ff6c37);
+    color: var(--primary-color, #014C75);
 }
 
 .resource-card ul {
@@ -136,14 +136,14 @@
 
 .resource-card ul li a {
     font-size: 0.9rem;
-    color: var(--link-color, #0066cc);
+    color: var(--link-color, #014C75);
     text-decoration: none;
     transition: color 0.2s ease;
     display: inline-block;
 }
 
 .resource-card ul li a:hover {
-    color: var(--primary-color, #ff6c37);
+    color: var(--primary-color, #014C75);
 }
 
 .join-community {
@@ -171,7 +171,7 @@
 
 .community-links a:hover {
     background-color: var(--primary-light, #fff0eb);
-    color: var(--primary-color, #ff6c37);
+    color: var(--primary-color, #014C75);
 }
 
 /* Responsive adjustments */
@@ -240,6 +240,6 @@
     }
 
     .community-links a:hover {
-        background-color: rgba(255, 108, 55, 0.2);
+        background-color: rgba(1, 76, 117, 0.2);
     }
 }

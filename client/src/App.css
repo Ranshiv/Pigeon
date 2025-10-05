@@ -1,127 +1,5 @@
 /* client/src/App.css */
-/* CSS Variables for theming - Minimalist Postman-inspired design */
-:root {
-  /* Light theme variables */
-  --background-color: #f5f5f5;
-  --text-color: #333333;
-  --text-secondary: #6b7280;
-  --border-color: #e0e0e0;
-  --card-bg: #ffffff;
-  --card-background: #ffffff;
-  --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-  --hover-bg: #f0f0f0;
-  --hover-background: #f3f4f6;
-  --primary-color: #ff6c37;
-  /* Postman-inspired orange */
-  --primary-hover: #e85c2a;
-  --secondary-color: #6c757d;
-  --secondary-hover: #5a6268;
-  --success-color: #28a745;
-  --success-bg: #dcfce7;
-  --success-text: #16a34a;
-  --warning-color: #ffc107;
-  --danger-color: #dc3545;
-  --danger-bg: #fef2f2;
-  --danger-bg-hover: #fee2e2;
-  --danger-border: #fecaca;
-  --danger-border-hover: #fca5a5;
-  --danger-text: #dc2626;
-  --info-color: #17a2b8;
-  --method-get: #7d69cb;
-  /* GET - purple */
-  --method-post: #ff6c37;
-  /* POST - orange */
-  --method-put: #4fade6;
-  /* PUT - blue */
-  --method-delete: #cf3030;
-  /* DELETE - red */
-  --method-patch: #ffb400;
-  /* PATCH - yellow */
-  --navbar-bg: #ffffff;
-  --navbar-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-  --panel-bg: #ffffff;
-  --panel-border: 1px solid var(--border-color);
-  --panel-radius: 4px;
-  --sidebar-bg: #f8f8f8;
-  --sidebar-border: 1px solid var(--border-color);
-  --disabled-bg: #f2f2f2;
-  --disabled-text: #a0a0a0;
-  --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-  --font-size-base: 14px;
-  --font-size-sm: 12px;
-  --font-size-lg: 16px;
-  --font-size-xl: 18px;
-  --font-weight-normal: 400;
-  --font-weight-medium: 500;
-  --font-weight-bold: 600;
-  --line-height: 1.5;
-  --transition-speed: 0.2s;
-  --spacing-xs: 4px;
-  --spacing-sm: 8px;
-  --spacing-md: 16px;
-  --spacing-lg: 24px;
-  --spacing-xl: 32px;
-  --border-radius-sm: 3px;
-  --border-radius-md: 4px;
-  --border-radius-lg: 6px;
-  --code-font: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', monospace;
-
-  /* New open layout variables */
-  --content-padding: 20px;
-  --content-max-width: 1400px;
-}
-
-/* Dark theme variables - 2025 Blue Palette */
-body.dark-theme {
-  --background-color: #00111A;
-  /* Main app background - nearly black navy */
-  --text-color: #e0e0e0;
-  --text-secondary: #9ca3af;
-  --border-color: #00080D;
-  /* Almost pure black for subtle borders */
-  --card-bg: #002234;
-  /* Very dark navy for cards */
-  --card-background: #002234;
-  /* Very dark navy for cards */
-  --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-  --hover-bg: #013B5B;
-  /* Darker blue for hover states */
-  --hover-background: #013B5B;
-  /* Darker blue for hover backgrounds */
-  --primary-color: #014C75;
-  /* Deep blue primary accent */
-  --primary-hover: #014368;
-  /* Darker blue on hover */
-  --success-bg: #064e3b;
-  --success-text: #10b981;
-  --danger-bg: #4c1d1d;
-  --danger-bg-hover: #5c2020;
-  --danger-border: #7f1d1d;
-  --danger-border-hover: #8f2020;
-  --danger-text: #f87171;
-  --info-color: #014C75;
-  /* Use our blue palette for info */
-  --method-get: #014C75;
-  /* Deep blue for GET */
-  --method-post: #ff7b00;
-  /* Keep orange for POST */
-  --method-put: #4fade6;
-  /* Keep blue for PUT */
-  --method-delete: #cf3030;
-  /* Keep red for DELETE */
-  --method-patch: #ffb400;
-  /* Keep yellow for PATCH */
-  --navbar-bg: #012A41;
-  /* Dark navy for navbar */
-  --navbar-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
-  --panel-bg: #002234;
-  /* Very dark navy for panels */
-  --sidebar-bg: #001927;
-  /* Almost black navy for sidebar */
-  --disabled-bg: #01324E;
-  /* Very dark blue for disabled elements */
-  --disabled-text: #7a7a7a;
-}
+/* Global styles using centralized CSS variables from index.css */
 
 /* Base body styling */
 body {
@@ -147,6 +25,7 @@ body {
   transition: background-color var(--transition-speed) ease;
   width: 100%;
   max-width: none;
+  background-color: var(--background-color);
   /* Ensure no max width constraint */
 }
 

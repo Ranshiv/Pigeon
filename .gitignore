@@ -184,3 +184,6 @@ api-docs/
 # Configuration files with sensitive data
 config/local.js
 config/production.js  
+
+#Ignore vscode AI rules
+.github\instructions\codacy.instructions.md

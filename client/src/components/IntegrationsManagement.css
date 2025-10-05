@@ -224,8 +224,8 @@
 
 .action-btn.edit:hover {
     background: rgba(245, 158, 11, 0.1);
-    border-color: #f59e0b;
-    color: #f59e0b;
+    border-color: #014C75;
+    color: #014C75;
 }
 
 .action-btn.delete:hover {
@@ -572,7 +572,7 @@
 }
 
 .note-content a {
-    color: #007bff;
+    color: #014C75;
     text-decoration: none;
     font-weight: 500;
 }

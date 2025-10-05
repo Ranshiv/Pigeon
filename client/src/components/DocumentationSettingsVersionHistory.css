@@ -12,7 +12,7 @@
     width: 20px;
     height: 20px;
     border: 2px solid var(--border-color, #e1e4e8);
-    border-top: 2px solid var(--primary-color, #ff6c37);
+    border-top: 2px solid var(--primary-color, #014C75);
     border-radius: 50%;
     animation: spin 1s linear infinite;
     margin: 0 auto 12px;
@@ -78,7 +78,7 @@
 
 .version-item.selected {
     background-color: #1e1e1e;
-    border-left: 3px solid var(--primary-color, #ff6c37);
+    border-left: 3px solid var(--primary-color, #014C75);
 }
 
 .version-header {
@@ -97,7 +97,7 @@
     height: 32px;
     background-color: var(--icon-bg, #f1f3f4);
     border-radius: 6px;
-    color: var(--primary-color, #ff6c37);
+    color: var(--primary-color, #014C75);
 }
 
 .version-info {
@@ -248,15 +248,15 @@
 }
 
 .restore-btn:hover {
-    background-color: var(--primary-color, #ff6c37);
+    background-color: var(--primary-color, #014C75);
     color: white;
-    border-color: var(--primary-color, #ff6c37);
+    border-color: var(--primary-color, #014C75);
 }
 
 .compare-btn:hover {
-    background-color: var(--info-color, #007bff);
+    background-color: var(--info-color, #014C75);
     color: white;
-    border-color: var(--info-color, #007bff);
+    border-color: var(--info-color, #014C75);
 }
 
 /* Success message styling */
@@ -293,9 +293,9 @@
 }
 
 .pagination button:hover:not(:disabled) {
-    background-color: var(--primary-color, #ff6c37);
+    background-color: var(--primary-color, #014C75);
     color: white;
-    border-color: var(--primary-color, #ff6c37);
+    border-color: var(--primary-color, #014C75);
 }
 
 .pagination button:disabled {
@@ -444,7 +444,7 @@
     }
 
     .pagination button:hover:not(:disabled) {
-        --primary-color: #ff6c37;
+        --primary-color: #014C75;
     }
 }
 

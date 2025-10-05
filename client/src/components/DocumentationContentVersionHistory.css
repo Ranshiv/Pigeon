@@ -89,7 +89,7 @@
 }
 
 .version-header:hover {
-  background: rgba(255, 108, 55, 0.02);
+  background: rgba(1, 76, 117, 0.02);
 }
 
 .version-info {
@@ -119,7 +119,7 @@
 }
 
 .restore-btn {
-  background: linear-gradient(135deg, var(--primary-color, #ff6c37), rgba(255, 108, 55, 0.8));
+  background: linear-gradient(135deg, var(--primary-color, #014C75), rgba(1, 76, 117, 0.8));
   color: white;
   border: none;
   padding: 6px 12px;
@@ -131,7 +131,7 @@
 }
 
 .restore-btn:hover:not(:disabled) {
-  background: linear-gradient(135deg, rgba(255, 108, 55, 0.9), rgba(255, 108, 55, 0.7));
+  background: linear-gradient(135deg, rgba(1, 76, 117, 0.9), rgba(1, 76, 117, 0.7));
   transform: translateY(-1px);
 }
 
@@ -151,8 +151,8 @@
 }
 
 .expand-icon:hover {
-  background-color: rgba(255, 108, 55, 0.08);
-  color: var(--primary-color, #ff6c37);
+  background-color: rgba(1, 76, 117, 0.08);
+  color: var(--primary-color, #014C75);
 }
 
 .expand-icon.expanded {
@@ -196,7 +196,7 @@
 }
 
 .content-text:hover {
-  border-color: rgba(255, 108, 55, 0.3);
+  border-color: rgba(1, 76, 117, 0.3);
 }
 
 .content-comparison h4 {
@@ -226,8 +226,8 @@
 }
 
 .comparison-stats span:hover {
-  border-color: rgba(255, 108, 55, 0.3);
-  background: rgba(255, 108, 55, 0.02);
+  border-color: rgba(1, 76, 117, 0.3);
+  background: rgba(1, 76, 117, 0.02);
 }
 
 .version-history-footer {
@@ -277,7 +277,7 @@
 }
 
 [data-theme="dark"] .version-header:hover {
-  background: rgba(255, 108, 55, 0.08);
+  background: rgba(1, 76, 117, 0.08);
 }
 
 [data-theme="dark"] .version-changes {
@@ -289,8 +289,8 @@
 }
 
 [data-theme="dark"] .expand-icon:hover {
-  background-color: rgba(255, 108, 55, 0.15);
-  color: var(--primary-color, #ff6c37);
+  background-color: rgba(1, 76, 117, 0.15);
+  color: var(--primary-color, #014C75);
 }
 
 [data-theme="dark"] .version-content {
@@ -305,7 +305,7 @@
 }
 
 [data-theme="dark"] .content-text:hover {
-  border-color: rgba(255, 108, 55, 0.4);
+  border-color: rgba(1, 76, 117, 0.4);
 }
 
 [data-theme="dark"] .content-preview h4,
@@ -320,8 +320,8 @@
 }
 
 [data-theme="dark"] .comparison-stats span:hover {
-  background: rgba(255, 108, 55, 0.08);
-  border-color: rgba(255, 108, 55, 0.4);
+  background: rgba(1, 76, 117, 0.08);
+  border-color: rgba(1, 76, 117, 0.4);
 }
 
 [data-theme="dark"] .version-history-footer {

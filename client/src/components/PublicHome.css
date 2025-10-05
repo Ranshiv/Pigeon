@@ -4,8 +4,8 @@
 :root {
     --transition-standard: 0.3s ease-in-out;
     --transition-slow: 0.5s ease-out;
-    --primary-color: #007bff;
-    --primary-darker: #0056b3;
+    --primary-color: #014C75;
+    --primary-darker: #013B5B;
     --secondary-color: #6c757d;
     --accent-color: #28a745;
     --hover-lift: translateY(-5px);
@@ -376,7 +376,7 @@
     left: 20px;
     width: 100%;
     height: 100%;
-    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+    background: linear-gradient(135deg, #014C75 0%, #013B5B 100%);
     border-radius: 16px;
     opacity: 0.1;
     z-index: -1;
@@ -1061,6 +1061,12 @@
 .section-header {
     max-width: 800px;
     margin: 0 auto 60px;
+    color: var(--text-color, #333);
+    background-color: var(--card-background);
+}
+
+.dark-theme .section-header {
+    color: var(--dark-text);
 }
 
 .section-subtitle {
@@ -2154,7 +2160,7 @@
 }
 
 .intro-button-primary {
-    background: linear-gradient(90deg, var(--primary-color), #2196f3);
+    background: linear-gradient(90deg, var(--primary-color), #014C75);
     color: white;
     box-shadow:
         0 10px 25px rgba(0, 123, 255, 0.4),
@@ -2167,7 +2173,7 @@
     box-shadow:
         0 15px 30px rgba(0, 123, 255, 0.5),
         0 0 0 2px rgba(0, 123, 255, 0.4);
-    background: linear-gradient(90deg, #2196f3, var(--primary-color));
+    background: linear-gradient(90deg, #014C75, var(--primary-color));
 }
 
 .intro-button-primary:active {
@@ -2255,7 +2261,7 @@
     top: 15%;
     left: 10%;
     animation-delay: 0s;
-    background: linear-gradient(90deg, #007bff, #6610f2);
+    background: linear-gradient(90deg, #014C75, #013B5B);
 }
 
 .intro-badge:nth-child(2) {

@@ -337,8 +337,8 @@ export class AuthVisualizationService {
                 selector: 'node[type="client"]',
                 style: {
                     'background-color': '#e3f2fd',
-                    'border-color': '#2196f3',
-                    'color': '#1976d2'
+                    'border-color': '#014C75',
+                    'color': '#014C75'
                 }
             },
             {
@@ -370,7 +370,7 @@ export class AuthVisualizationService {
                 selector: 'node[type="database"]',
                 style: {
                     'background-color': '#fce4ec',
-                    'border-color': '#e91e63',
+                    'border-color': '#014C75',
                     'color': '#c2185b',
                     'shape': 'barrel'
                 }
@@ -395,8 +395,8 @@ export class AuthVisualizationService {
             {
                 selector: 'edge[type="redirect"]',
                 style: {
-                    'line-color': '#2196f3',
-                    'target-arrow-color': '#2196f3',
+                    'line-color': '#014C75',
+                    'target-arrow-color': '#014C75',
                     'line-style': 'dashed'
                 }
             },

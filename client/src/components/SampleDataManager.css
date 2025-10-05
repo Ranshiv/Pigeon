@@ -2,8 +2,8 @@
 :root {
     --background-color: #1c1c1e;
     --sidebar-bg: #262626;
-    --primary-color: #FF6C37;
-    --primary-hover: #e65a2e;
+    --primary-color: #014C75;
+    --primary-hover: #013B5B;
     --text-color: #e6e6e6;
     --text-secondary: #a0a0a0;
     --border-color: #3e3e3e;
@@ -103,11 +103,11 @@
 
 .toolbar-button.save {
     border-color: var(--primary-color);
-    background: rgba(255, 108, 55, 0.1);
+    background: rgba(1, 76, 117, 0.1);
 }
 
 .toolbar-button.save:hover {
-    background: rgba(255, 108, 55, 0.2);
+    background: rgba(1, 76, 117, 0.2);
 }
 
 .header-left {
@@ -168,13 +168,13 @@
 }
 
 .action-btn.template-btn {
-    background: rgba(255, 108, 55, 0.15);
+    background: rgba(1, 76, 117, 0.15);
     color: var(--text-color);
-    border-color: rgba(255, 108, 55, 0.3);
+    border-color: rgba(1, 76, 117, 0.3);
 }
 
 .action-btn.template-btn:hover {
-    background: rgba(255, 108, 55, 0.25);
+    background: rgba(1, 76, 117, 0.25);
     border-color: var(--primary-color);
 }
 
@@ -262,7 +262,7 @@
     outline: none;
     border-color: var(--primary-color);
     background-color: rgba(255, 255, 255, 0.08);
-    box-shadow: 0 0 0 3px rgba(255, 108, 55, 0.15);
+    box-shadow: 0 0 0 3px rgba(1, 76, 117, 0.15);
 }
 
 .search-input-container input::placeholder {
@@ -312,7 +312,7 @@
 }
 
 .category-btn.active {
-    background: rgba(255, 108, 55, 0.15);
+    background: rgba(1, 76, 117, 0.15);
     border-color: var(--primary-color);
     color: var(--text-color);
 }
@@ -371,7 +371,7 @@
 }
 
 .datasets-list li.active {
-    background: rgba(255, 108, 55, 0.1);
+    background: rgba(1, 76, 117, 0.1);
     color: var(--text-color);
     border-left: 2px solid var(--primary-color);
 }
@@ -461,7 +461,7 @@
 }
 
 .view-mode-btn.active {
-    background: rgba(255, 108, 55, 0.2);
+    background: rgba(1, 76, 117, 0.2);
     color: var(--text-color);
 }
 
@@ -756,7 +756,7 @@
 .form-group textarea:focus {
     outline: none;
     border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(255, 108, 55, 0.15);
+    box-shadow: 0 0 0 3px rgba(1, 76, 117, 0.15);
 }
 
 .modal-actions {

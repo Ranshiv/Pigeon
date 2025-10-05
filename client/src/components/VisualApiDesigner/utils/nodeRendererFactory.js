@@ -31,16 +31,16 @@ const COMPONENT_TYPES = {
     },
     resource: {
         icon: FiFolderPlus,
-        color: '#3B82F6', // blue-500
+        color: '#014C75', // blue-500
         bgColor: '#EFF6FF', // blue-50
-        borderColor: '#93C5FD', // blue-300
+        borderColor: '#E5F3FF', // blue-300
         name: 'Resource'
     },
     schema: {
         icon: FiDatabase,
-        color: '#8B5CF6', // violet-500
+        color: '#014C75', // blue palette
         bgColor: '#F5F3FF', // violet-50
-        borderColor: '#C4B5FD', // violet-300
+        borderColor: '#E5F3FF', // violet-300
         name: 'Schema'
     },
     parameter: {

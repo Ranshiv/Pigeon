@@ -35,7 +35,7 @@ const UnifiedVariableViewer = ({
             id: 'environment',
             name: 'Environment Variables',
             icon: FiLayers,
-            color: '#3b82f6',
+            color: '#014C75',
             description: 'Variables for the current environment',
             variables: environmentVariables,
             priority: 2
@@ -53,7 +53,7 @@ const UnifiedVariableViewer = ({
             id: 'global',
             name: 'Global Variables',
             icon: FiGlobe,
-            color: '#8b5cf6',
+            color: '#014C75',
             description: 'Variables available across all workspaces (lowest priority)',
             variables: globalVariables,
             priority: 4

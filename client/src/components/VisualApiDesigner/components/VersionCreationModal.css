@@ -42,7 +42,7 @@
     align-items: center;
     justify-content: space-between;
     padding: 24px 24px 0 24px;
-    border-bottom: 1px solid #e5e7eb;
+    border-bottom: 1px solid var(--border-color);
     margin-bottom: 24px;
 }
 
@@ -53,7 +53,7 @@
 }
 
 .title-icon {
-    color: #3b82f6;
+    color: #014C75;
     font-size: 20px;
 }
 
@@ -151,7 +151,7 @@
 .form-group input:focus,
 .form-group textarea:focus {
     outline: none;
-    border-color: #3b82f6;
+    border-color: #014C75;
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
@@ -203,7 +203,7 @@
 
 .spec-preview-section {
     background: #f8fafc;
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--border-color);
     border-radius: 8px;
     padding: 16px;
     margin-bottom: 32px;
@@ -235,7 +235,7 @@
     gap: 12px;
     justify-content: flex-end;
     padding-top: 24px;
-    border-top: 1px solid #e5e7eb;
+    border-top: 1px solid var(--border-color);
 }
 
 .btn-secondary,
@@ -264,12 +264,12 @@
 }
 
 .btn-primary {
-    background: #3b82f6;
+    background: #014C75;
     color: white;
 }
 
 .btn-primary:hover:not(:disabled) {
-    background: #2563eb;
+    background: #013B5B;
 }
 
 .btn-primary:disabled,

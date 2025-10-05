@@ -48,7 +48,7 @@ const VisualizationShowcase = () => {
 
                         const viz = VisualizationEngine.generateChart('bar', chartData, {
                             title: 'User Scores',
-                            backgroundColor: '#FF6C37'
+                            backgroundColor: '#014C75'
                         });
                         setVisualization(viz);
                     }
@@ -286,7 +286,7 @@ const VisualizationShowcase = () => {
                                         margin: '0 0 8px 0',
                                         border: '1px solid #ddd',
                                         borderRadius: '6px',
-                                        background: activeDemo === key ? '#FF6C37' : 'white',
+                                        background: activeDemo === key ? '#014C75' : 'white',
                                         color: activeDemo === key ? 'white' : '#333',
                                         cursor: 'pointer',
                                         textAlign: 'left',
@@ -319,22 +319,22 @@ const VisualizationShowcase = () => {
                                         onClick={demo.action}
                                         style={{
                                             padding: '10px 16px',
-                                            border: '1px solid #FF6C37',
+                                            border: '1px solid #014C75',
                                             borderRadius: '6px',
                                             background: 'white',
-                                            color: '#FF6C37',
+                                            color: '#014C75',
                                             cursor: 'pointer',
                                             fontSize: '14px',
                                             fontWeight: '500',
                                             transition: 'all 0.2s'
                                         }}
                                         onMouseOver={(e) => {
-                                            e.target.style.background = '#FF6C37';
+                                            e.target.style.background = '#014C75';
                                             e.target.style.color = 'white';
                                         }}
                                         onMouseOut={(e) => {
                                             e.target.style.background = 'white';
-                                            e.target.style.color = '#FF6C37';
+                                            e.target.style.color = '#014C75';
                                         }}
                                     >
                                         {demo.name}

@@ -51,7 +51,7 @@
 
 .workspace-badge.team {
     background-color: rgba(245, 158, 11, 0.3);
-    color: #2196f3;
+    color: #014C75;
 }
 
 .workspace-description {
@@ -118,8 +118,8 @@
 }
 
 .workspace-edit-btn {
-    background-color: var(--accent-light, #e3f2fd);
-    color: var(--accent, #2196f3);
+    background-color: var(--accent-light, #E5F3FF);
+    color: var(--accent, #014C75);
 }
 
 .workspace-delete-btn {
@@ -128,7 +128,7 @@
 }
 
 .workspace-edit-btn:hover {
-    background-color: var(--accent-hover, #bbdefb);
+    background-color: var(--accent-hover, #013B5B);
 }
 
 .workspace-delete-btn:hover {
@@ -245,8 +245,8 @@
 .view-collection-btn {
     padding: 8px 16px;
     background-color: transparent;
-    border: 1px solid var(--accent, #2196f3);
-    color: var(--accent, #2196f3);
+    border: 1px solid var(--accent, #014C75);
+    color: var(--accent, #014C75);
     border-radius: 4px;
     cursor: pointer;
     font-weight: 500;
@@ -255,7 +255,7 @@
 }
 
 .view-collection-btn:hover {
-    background-color: var(--accent, #2196f3);
+    background-color: var(--accent, #014C75);
     color: white;
 }
 
@@ -264,7 +264,7 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    background-color: var(--accent, #2196f3);
+    background-color: var(--accent, #014C75);
     color: white;
     border: none;
     padding: 8px 16px;
@@ -276,7 +276,7 @@
 
 .add-collection-btn:hover,
 .invite-member-btn:hover {
-    background-color: var(--accent-dark, #1976d2);
+    background-color: var(--accent-dark, #014C75);
 }
 
 /* Empty states */
@@ -293,7 +293,7 @@
 }
 
 .empty-state .primary-btn {
-    background-color: var(--accent, #2196f3);
+    background-color: var(--accent, #014C75);
     color: white;
     padding: 10px 20px;
     border: none;
@@ -304,7 +304,7 @@
 }
 
 .empty-state .primary-btn:hover {
-    background-color: var(--accent-dark, #1976d2);
+    background-color: var(--accent-dark, #014C75);
 }
 
 /* Members table */
@@ -338,7 +338,7 @@
     width: 32px;
     height: 32px;
     border-radius: 50%;
-    background-color: var(--accent, #2196f3);
+    background-color: var(--accent, #014C75);
     color: white;
     display: flex;
     align-items: center;
@@ -371,7 +371,7 @@
 
 .role-badge.admin {
     background-color: rgba(33, 150, 243, 0.1);
-    color: #2196f3;
+    color: #014C75;
 }
 
 .role-badge.editor {
@@ -598,8 +598,8 @@
 }
 
 .activity-icon {
-    background-color: var(--accent-light, #e3f2fd);
-    color: var(--accent, #2196f3);
+    background-color: var(--accent-light, #E5F3FF);
+    color: var(--accent, #014C75);
     width: 32px;
     height: 32px;
     border-radius: 50%;
@@ -711,8 +711,8 @@
 }
 
 .role-option.selected {
-    border-color: var(--accent, #2196f3);
-    background-color: var(--accent-light, #e3f2fd);
+    border-color: var(--accent, #014C75);
+    background-color: var(--accent-light, #E5F3FF);
 }
 
 .role-option p {
@@ -745,7 +745,7 @@
 
 .invite-btn {
     padding: 10px 16px;
-    background-color: var(--accent, #2196f3);
+    background-color: var(--accent, #014C75);
     color: white;
     border: none;
     border-radius: 4px;
@@ -755,7 +755,7 @@
 }
 
 .invite-btn:hover {
-    background-color: var(--accent-dark, #1976d2);
+    background-color: var(--accent-dark, #014C75);
 }
 
 .invite-btn:disabled {
@@ -800,7 +800,7 @@
 .back-button {
     margin-top: 20px;
     padding: 10px 16px;
-    background-color: var(--accent, #2196f3);
+    background-color: var(--accent, #014C75);
     color: white;
     border: none;
     border-radius: 4px;
@@ -851,7 +851,7 @@
 
 .stat-icon.collections {
     background-color: rgba(33, 150, 243, 0.1);
-    color: #2196f3;
+    color: #014C75;
 }
 
 .stat-icon.members {
@@ -918,8 +918,8 @@
 }
 
 .recent-collection-item:hover {
-    background-color: var(--accent-light, #e3f2fd);
-    border-color: var(--accent, #2196f3);
+    background-color: var(--accent-light, #E5F3FF);
+    border-color: var(--accent, #014C75);
 }
 
 .collection-name {
@@ -952,7 +952,7 @@
 .loading-spinner {
     border: 3px solid rgba(0, 0, 0, 0.1);
     border-radius: 50%;
-    border-top: 3px solid var(--accent, #2196f3);
+    border-top: 3px solid var(--accent, #014C75);
     width: 24px;
     height: 24px;
     animation: spin 1s linear infinite;

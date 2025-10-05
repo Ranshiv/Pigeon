@@ -1,10 +1,9 @@
-/* DocumentationManager.css */
 .documentation-manager {
     display: flex;
     flex-direction: column;
     height: 100%;
     overflow: hidden;
-    background-color: var(--background-color, #fff);
+    background-color: var(--background-color);
 }
 
 .documentation-header {
@@ -12,8 +11,8 @@
     flex-wrap: wrap;
     align-items: center;
     padding: 16px 20px;
-    background-color: var(--header-bg, #ffffff);
-    border-bottom: 1px solid var(--border-color, #e0e0e0);
+    background-color: var(--card-bg);
+    border-bottom: 1px solid var(--border-color);
     gap: 16px;
 }
 
@@ -25,14 +24,14 @@
     display: flex;
     align-items: center;
     gap: 4px;
-    color: var(--text-secondary, #666666);
+    color: var(--text-secondary);
     text-decoration: none;
     font-size: 14px;
     transition: color 0.2s;
 }
 
 .back-link:hover {
-    color: var(--primary-color, #ff6c37);
+    color: var(--primary-color);
 }
 
 .documentation-title {
@@ -42,7 +41,7 @@
 }
 
 .doc-icon {
-    color: var(--primary-color, #ff6c37);
+    color: var(--primary-color);
     font-size: 20px;
 }
 
@@ -50,6 +49,7 @@
     margin: 0;
     font-size: 20px;
     font-weight: 600;
+    color: var(--text-color);
 }
 
 .last-updated {
@@ -57,7 +57,7 @@
     align-items: center;
     gap: 4px;
     font-size: 12px;
-    color: var(--text-tertiary, #999999);
+    color: var(--text-muted);
     margin-left: 16px;
 }
 
@@ -71,7 +71,7 @@
 /* View mode toggle styles */
 .view-mode-toggle {
     display: flex;
-    border: 1px solid var(--border-color, #e0e0e0);
+    border: 1px solid var(--border-color);
     border-radius: 4px;
     overflow: hidden;
     margin-right: 8px;
@@ -82,20 +82,21 @@
     align-items: center;
     gap: 4px;
     padding: 6px 12px;
-    background: var(--background-color, #fff);
+    background: var(--card-bg);
     border: none;
     font-size: 13px;
     cursor: pointer;
     transition: background-color 0.2s;
+    color: var(--text-color);
 }
 
 .view-btn.active {
-    background-color: var(--primary-color, #ff6c37);
+    background-color: var(--primary-color);
     color: white;
 }
 
 .view-btn:not(.active):hover {
-    background-color: var(--hover-bg, #f5f5f5);
+    background-color: var(--hover-bg);
 }
 
 .action-btn {
@@ -103,33 +104,33 @@
     align-items: center;
     gap: 6px;
     padding: 8px 12px;
-    background-color: var(--background-light, #f5f5f5);
-    border: 1px solid var(--border-color, #e0e0e0);
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
     border-radius: 4px;
     font-size: 13px;
     cursor: pointer;
     transition: all 0.2s;
-    color: var(--text-primary, #333);
+    color: var(--text-color);
 }
 
 .action-btn:hover {
-    background-color: var(--hover-bg, #e8e8e8);
+    background-color: var(--hover-bg);
 }
 
 .action-btn.active {
-    background-color: var(--primary-light, #fff0eb);
-    border-color: var(--primary-color, #ff6c37);
-    color: var(--primary-color, #ff6c37);
+    background-color: var(--primary-light);
+    border-color: var(--primary-color);
+    color: var(--primary-color);
 }
 
 .publish-btn {
-    background-color: var(--success-light, #edf7ed);
-    color: var(--success-color, #4caf50);
-    border-color: var(--success-color, #4caf50);
+    background-color: var(--success-light);
+    color: var(--success-color);
+    border-color: var(--success-color);
 }
 
 .publish-btn:hover {
-    background-color: var(--success-light-hover, #dbefdb);
+    background-color: var(--success-bg);
 }
 
 .action-dropdown {
@@ -142,11 +143,11 @@
     top: 100%;
     right: 0;
     z-index: 10;
-    background-color: var(--card-bg, #ffffff);
+    background-color: var(--card-bg);
     min-width: 160px;
-    border: 1px solid var(--border-color, #e0e0e0);
+    border: 1px solid var(--border-color);
     border-radius: 4px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow-md);
     margin-top: 4px;
 }
 
@@ -163,10 +164,11 @@
     border: none;
     font-size: 13px;
     cursor: pointer;
+    color: var(--text-color);
 }
 
 .dropdown-content button:hover {
-    background-color: var(--hover-bg, #f5f5f5);
+    background-color: var(--hover-bg);
 }
 
 /* Main documentation content container */
@@ -186,28 +188,17 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    background-color: rgba(255, 255, 255, 0.9);
+    background-color: rgba(248, 249, 250, 0.9);
     -webkit-backdrop-filter: blur(2px);
     backdrop-filter: blur(2px);
     z-index: 1000;
 }
 
-/* Theme-aware loading background */
-body.dark-theme .documentation-loading {
-    background-color: rgba(28, 28, 30, 0.9);
-}
-
-@media (prefers-color-scheme: dark) {
-    .documentation-loading {
-        background-color: rgba(28, 28, 30, 0.9);
-    }
-}
-
 .spinner {
     width: 40px;
     height: 40px;
-    border: 3px solid rgba(255, 108, 55, 0.3);
-    border-top-color: var(--primary-color, #ff6c37);
+    border: 3px solid var(--primary-light);
+    border-top-color: var(--primary-color);
     border-radius: 50%;
     animation: spin 1s linear infinite;
     margin-bottom: 16px;
@@ -231,14 +222,14 @@ body.dark-theme .documentation-loading {
 }
 
 .documentation-error h3 {
-    color: var(--error-color, #f44336);
+    color: var(--error-color);
     margin-bottom: 8px;
 }
 
 .documentation-error button {
     margin-top: 16px;
     padding: 8px 16px;
-    background-color: var(--primary-color, #ff6c37);
+    background-color: var(--primary-color);
     color: white;
     border: none;
     border-radius: 4px;
@@ -247,7 +238,7 @@ body.dark-theme .documentation-loading {
 }
 
 .documentation-error button:hover {
-    background-color: var(--primary-hover, #e55a2a);
+    background-color: var(--primary-hover);
 }
 
 /* Settings panel */
@@ -263,7 +254,8 @@ body.dark-theme .documentation-loading {
     font-size: 20px;
     font-weight: 600;
     padding-bottom: 12px;
-    border-bottom: 1px solid var(--border-color, #e0e0e0);
+    border-bottom: 1px solid var(--border-color);
+    color: var(--text-color);
 }
 
 .settings-section {
@@ -275,6 +267,7 @@ body.dark-theme .documentation-loading {
     margin-bottom: 16px;
     font-size: 16px;
     font-weight: 500;
+    color: var(--text-color);
 }
 
 .setting-option {
@@ -287,13 +280,14 @@ body.dark-theme .documentation-loading {
     gap: 8px;
     font-weight: 500;
     margin-bottom: 6px;
+    color: var(--text-color);
 }
 
 .setting-description {
     margin-top: 4px;
     margin-bottom: 0;
     font-size: 13px;
-    color: var(--text-tertiary, #999999);
+    color: var(--text-muted);
     padding-left: 24px;
 }
 
@@ -305,22 +299,25 @@ body.dark-theme .documentation-loading {
     display: block;
     margin-bottom: 6px;
     font-weight: 500;
+    color: var(--text-color);
 }
 
 .form-group input,
 .form-group textarea {
     width: 100%;
     padding: 8px 12px;
-    border: 1px solid var(--border-color, #e0e0e0);
+    border: 1px solid var(--border-color);
     border-radius: 4px;
     font-size: 14px;
+    background-color: var(--card-bg);
+    color: var(--text-color);
 }
 
 .form-group input:focus,
 .form-group textarea:focus {
     outline: none;
-    border-color: var(--primary-color, #ff6c37);
-    box-shadow: 0 0 0 2px rgba(255, 108, 55, 0.2);
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px var(--primary-light);
 }
 
 .settings-actions {
@@ -332,9 +329,9 @@ body.dark-theme .documentation-loading {
 
 .cancel-btn {
     padding: 8px 16px;
-    background-color: var(--background-light, #f5f5f5);
-    color: var(--text-secondary, #666666);
-    border: 1px solid var(--border-color, #e0e0e0);
+    background-color: var(--card-bg);
+    color: var(--text-secondary);
+    border: 1px solid var(--border-color);
     border-radius: 4px;
     font-size: 14px;
     cursor: pointer;
@@ -342,12 +339,12 @@ body.dark-theme .documentation-loading {
 }
 
 .cancel-btn:hover {
-    background-color: var(--hover-bg, #e8e8e8);
+    background-color: var(--hover-bg);
 }
 
 .save-btn {
     padding: 8px 16px;
-    background-color: var(--primary-color, #ff6c37);
+    background-color: var(--primary-color);
     color: white;
     border: none;
     border-radius: 4px;
@@ -357,12 +354,12 @@ body.dark-theme .documentation-loading {
 }
 
 .save-btn:hover {
-    background-color: var(--primary-hover, #e55a2a);
+    background-color: var(--primary-hover);
 }
 
 /* Version History Tabs */
 .version-history-section {
-    border: 1px solid var(--border-color, #e0e0e0);
+    border: 1px solid var(--border-color);
     border-radius: 8px;
     overflow: hidden;
 }
@@ -371,13 +368,13 @@ body.dark-theme .documentation-loading {
     margin: 0 0 20px 0;
     padding: 16px 16px 0 16px;
     font-size: 18px;
-    color: var(--text-primary, #333333);
+    color: var(--text-color);
 }
 
 .version-history-tabs {
     display: flex;
-    background-color: var(--background-light, #f5f5f5);
-    border-bottom: 1px solid var(--border-color, #e0e0e0);
+    background-color: var(--card-bg);
+    border-bottom: 1px solid var(--border-color);
 }
 
 .tab-btn {
@@ -391,138 +388,23 @@ body.dark-theme .documentation-loading {
     border: none;
     cursor: pointer;
     font-size: 14px;
-    color: var(--text-secondary, #666666);
+    color: var(--text-secondary);
     transition: all 0.2s;
     border-bottom: 3px solid transparent;
 }
 
 .tab-btn:hover {
-    background-color: var(--hover-bg, #e8e8e8);
-    color: var(--text-primary, #333333);
+    background-color: var(--hover-bg);
+    color: var(--text-color);
 }
 
 .tab-btn.active {
-    background-color: var(--background-color, #ffffff);
-    color: var(--primary-color, #ff6c37);
-    border-bottom-color: var(--primary-color, #ff6c37);
+    background-color: var(--card-bg);
+    color: var(--primary-color);
+    border-bottom-color: var(--primary-color);
 }
 
 .version-history-content {
     padding: 20px;
-    background-color: var(--background-color, #ffffff);
-}
-
-/* Dark mode support */
-@media (prefers-color-scheme: dark) {
-    .documentation-manager {
-        background-color: var(--background-color, #1e1e1e);
-    }
-
-    .documentation-header {
-        background-color: var(--header-bg, #252525);
-        border-bottom-color: var(--border-color, #333333);
-    }
-
-    .back-link,
-    .action-btn,
-    .documentation-title h2 {
-        color: var(--text-primary, #e0e0e0);
-    }
-
-    .action-btn {
-        background-color: var(--background-light, #2c2c2c);
-        border-color: var(--border-color, #333333);
-    }
-
-    .action-btn:hover {
-        background-color: var(--hover-bg, #3c3c3c);
-    }
-
-    .action-btn.active {
-        background-color: rgba(255, 108, 55, 0.2);
-    }
-
-    .view-btn {
-        background: var(--background-color, #1e1e1e);
-        color: var(--text-primary, #e0e0e0);
-    }
-
-    .view-btn:not(.active):hover {
-        background-color: var(--hover-bg, #2c2c2c);
-    }
-
-    .dropdown-content {
-        background-color: var(--card-bg, #252525);
-        border-color: var(--border-color, #333333);
-    }
-
-    .dropdown-content button {
-        color: var(--text-primary, #e0e0e0);
-    }
-
-    .dropdown-content button:hover {
-        background-color: var(--hover-bg, #333333);
-    }
-
-    .documentation-settings h3,
-    .settings-section h4 {
-        color: var(--text-primary, #e0e0e0);
-    }
-
-    .documentation-settings h3 {
-        border-bottom-color: var(--border-color, #333333);
-    }
-
-    .setting-option label,
-    .form-group label {
-        color: var(--text-primary, #e0e0e0);
-    }
-
-    .form-group input,
-    .form-group textarea {
-        background-color: var(--input-bg, #2c2c2c);
-        border-color: var(--border-color, #333333);
-        color: var(--text-primary, #e0e0e0);
-    }
-
-    .cancel-btn {
-        background-color: var(--background-light, #2c2c2c);
-        border-color: var(--border-color, #333333);
-        color: var(--text-primary, #e0e0e0);
-    }
-
-    .cancel-btn:hover {
-        background-color: var(--hover-bg, #3c3c3c);
-    }
-
-    .version-history-section {
-        border-color: var(--border-color, #333333);
-    }
-
-    .version-history-section h3 {
-        color: var(--text-primary, #e0e0e0);
-    }
-
-    .version-history-tabs {
-        background-color: var(--background-light, #2c2c2c);
-        border-bottom-color: var(--border-color, #333333);
-    }
-
-    .tab-btn {
-        color: var(--text-secondary, #b0b0b0);
-    }
-
-    .tab-btn:hover {
-        background-color: var(--hover-bg, #3c3c3c);
-        color: var(--text-primary, #e0e0e0);
-    }
-
-    .tab-btn.active {
-        background-color: var(--background-color, #1e1e1e);
-        color: var(--primary-color, #ff6c37);
-    }
-
-    .version-history-content {
-        background-color: var(--background-color, #1e1e1e);
-    }
+    background-color: var(--card-bg);
 }

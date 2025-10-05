@@ -91,7 +91,8 @@
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    margin-bottom: var(--spacing-sm);
+    
+    /* margin-bottom: var(--spacing-sm); */
 }
 
 .collection-title-area {
@@ -312,7 +313,7 @@
 .form-group textarea:focus {
     outline: none;
     border-color: var(--primary-color);
-    box-shadow: 0 0 0 2px rgba(255, 108, 55, 0.2);
+    box-shadow: 0 0 0 2px rgba(1, 76, 117, 0.2);
 }
 
 .role-selector {
@@ -333,7 +334,7 @@
 
 .role-option.selected {
     border-color: var(--primary-color);
-    background-color: rgba(255, 108, 55, 0.05);
+    background-color: rgba(1, 76, 117, 0.05);
 }
 
 .role-option svg {
@@ -576,7 +577,7 @@
     font-size: var(--font-size-sm);
     color: var(--primary-color);
     padding: 6px var(--spacing-sm);
-    background-color: rgba(255, 108, 55, 0.1);
+    background-color: rgba(1, 76, 117, 0.1);
     border-radius: var(--border-radius-md);
 }
 
@@ -671,7 +672,7 @@
 .create-collection-form .form-textarea:focus {
     outline: none;
     border-color: var(--primary-color);
-    box-shadow: 0 0 0 2px rgba(255, 108, 55, 0.2);
+    box-shadow: 0 0 0 2px rgba(1, 76, 117, 0.2);
 }
 
 .create-collection-form .form-actions {

@@ -22,7 +22,7 @@ router.get('/config/:workspaceId', ensureAuthenticated, async (req, res) => {
             return res.json({
                 branding: {
                     companyName: 'Your Company',
-                    primaryColor: '#007bff',
+                    primaryColor: '#014C75',
                     secondaryColor: '#6c757d',
                     backgroundColor: '#ffffff',
                     textColor: '#333333'

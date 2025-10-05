@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef, startTransition, Suspense } from 'react';
 import {
     FiSave,
     FiUpload,
@@ -19,9 +19,12 @@ import SpecPreview from './components/SpecPreview';
 import ValidationPanel from './components/ValidationPanel';
 import ContractDiffViewer from './components/ContractDiffViewer';
 import VersionCreationModal from './components/VersionCreationModal';
+import ErrorBoundary from './components/ErrorBoundary';
 import useDesignerState from './hooks/useDesignerState';
 import useSpecGeneration from './hooks/useSpecGeneration';
+import { debounce } from '../../utils/debounce';
 import { suppressReactErrors } from '../../utils/errorSuppressor';
+import { installDOMErrorHandlers, uninstallDOMErrorHandlers } from './utils/domErrorHandler';
 import './VisualApiDesigner.css';
 import './icon-styles.css';
 import './node-borders.css';
@@ -43,14 +46,26 @@ const VisualApiDesigner = ({
             setIsSmallScreen(window.innerWidth <= 1024);
         };
 
+        // Debounce the screen size check to prevent excessive calls during zoom/resize
+        const debouncedCheckScreenSize = debounce(checkScreenSize, 100);
+
         checkScreenSize();
-        window.addEventListener('resize', checkScreenSize);
-        return () => window.removeEventListener('resize', checkScreenSize);
+        window.addEventListener('resize', debouncedCheckScreenSize);
+        return () => window.removeEventListener('resize', debouncedCheckScreenSize);
     }, []);
 
     // Suppress specific React errors to reduce console noise
     useEffect(() => {
-        suppressReactErrors();
+        const cleanup = suppressReactErrors();
+        return cleanup; // Clean up error handlers when component unmounts
+    }, []);
+
+    // Install DOM error handlers to prevent React reconciliation conflicts
+    useEffect(() => {
+        installDOMErrorHandlers();
+        return () => {
+            uninstallDOMErrorHandlers();
+        };
     }, []);
 
     const designerState = useDesignerState(initialSpec);
@@ -549,8 +564,26 @@ const VisualApiDesigner = ({
     }, [updateNode]);
 
     const handleElementDelete = useCallback((elementId) => {
-        deleteNode(elementId);
-    }, [deleteNode]);
+        console.log('🗑️ handleElementDelete called for', elementId);
+        // Debounce deletion to prevent rapid successive calls and add safety delay
+        const debouncedDelete = debounce(() => {
+            // Double-check the element still exists before deleting
+            const elementExists = nodes.find(node => node.id === elementId);
+            if (!elementExists) {
+                console.warn('Element already deleted:', elementId);
+                return;
+            }
+
+            // Use React transition to batch the update and prevent conflicts
+            startTransition(() => {
+                // Add small delay to ensure DOM is stable
+                requestAnimationFrame(() => {
+                    deleteNode(elementId);
+                });
+            });
+        }, 100);
+        debouncedDelete();
+    }, [deleteNode, nodes]);
 
     const handleVisualize = useCallback((nodeId, responseData) => {
         try {
@@ -837,23 +870,25 @@ const VisualApiDesigner = ({
             </div>
 
             <div className="workspace-center">
-                <DesignCanvas
-                    nodes={nodes}
-                    edges={edges}
-                    selectedEdge={selectedEdge}
-                    selectedNode={selectedNode}
-                    onNodeSelect={handleElementSelect}
-                    onNodeUpdate={handleElementUpdate}
-                    onNodeDelete={handleElementDelete}
-                    onVisualize={handleVisualize}
-                    onNodeAdd={addNode}
-                    onEdgeAdd={addEdge}
-                    onEdgeDelete={deleteEdge}
-                    onEdgeSelect={selectEdge}
-                />
-            </div>
-
-            <div className={`workspace-right ${!rightSidebarExpanded ? 'collapsed' : ''}`}>
+                <ErrorBoundary fallbackMessage="The design canvas encountered an issue. Please try refreshing or contact support if the problem persists.">
+                    <Suspense fallback={<div className="loading-canvas">Loading canvas...</div>}>
+                        <DesignCanvas
+                            nodes={nodes}
+                            edges={edges}
+                            selectedEdge={selectedEdge}
+                            selectedNode={selectedNode}
+                            onNodeSelect={handleElementSelect}
+                            onNodeUpdate={handleElementUpdate}
+                            onNodeDelete={handleElementDelete}
+                            onVisualize={handleVisualize}
+                            onNodeAdd={addNode}
+                            onEdgeAdd={addEdge}
+                            onEdgeDelete={deleteEdge}
+                            onEdgeSelect={selectEdge}
+                        />
+                    </Suspense>
+                </ErrorBoundary>
+            </div>            <div className={`workspace-right ${!rightSidebarExpanded ? 'collapsed' : ''}`}>
                 {/* Move the toggle button outside of conditional rendering to ensure it's always visible */}
                 <div
                     className="sidebar-toggle right-toggle"

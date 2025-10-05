@@ -6,7 +6,7 @@ const EndpointNode = ({ data, isSelected, onSelect, onDelete }) => {
     const getMethodColor = (method) => {
         const colors = {
             GET: '#4CAF50',
-            POST: '#2196F3',
+            POST: '#014C75',
             PUT: '#FF9800',
             DELETE: '#F44336',
             PATCH: '#9C27B0',
@@ -152,7 +152,7 @@ const EndpointNode = ({ data, isSelected, onSelect, onDelete }) => {
                             key={index}
                             style={{
                                 background: '#E3F2FD',
-                                color: '#1976D2',
+                                color: '#014C75',
                                 padding: '2px 6px',
                                 borderRadius: '12px',
                                 fontSize: '10px',

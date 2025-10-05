@@ -106,7 +106,7 @@
 }
 
 .variable-key {
-    color: var(--primary-color, #3b82f6);
+    color: var(--primary-color, #014C75);
     font-weight: 500;
     flex-shrink: 0;
 }

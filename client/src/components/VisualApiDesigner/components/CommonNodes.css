@@ -21,13 +21,13 @@
 }
 
 .enhanced-node:hover {
-    border-color: #ff6c37;
+    border-color: #014C75;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
     transform: translateY(-2px);
 }
 
 .enhanced-node.selected {
-    box-shadow: 0 0 0 2px rgba(255, 108, 55, 0.2);
+    box-shadow: 0 0 0 2px rgba(1, 76, 117, 0.2);
 }
 
 /* Selection outline styling */
@@ -37,7 +37,7 @@
     left: -1px;
     right: -1px;
     bottom: -1px;
-    border: 1px dashed #ff6c37;
+    border: 1px dashed #014C75;
     border-radius: 8px;
     pointer-events: none;
     z-index: 10;
@@ -70,7 +70,7 @@
     height: 24px;
     background: #333;
     border-radius: 4px;
-    color: #ff6c37;
+    color: #014C75;
     margin-right: 8px;
 }
 
@@ -122,10 +122,14 @@
 
 /* Ensure node-card-content has proper styling */
 .node-card-content {
-    background-color: #1a1a1a !important;
+    background-color: var(--node-bg);
     position: relative;
     isolation: isolate;
     z-index: 1;
+    padding: 12px;
+    flex-grow: 1;
+
+
 }
 
 /* Ensure no bleed-through on dragging state */
@@ -138,12 +142,6 @@
 }
 
 /* Ensure node-card-header has proper styling */
-.node-card-header {
-    background-color: #252525 !important;
-    position: relative;
-    isolation: isolate;
-    z-index: 1;
-}
 
 /* Ensure node-card-outer has proper styling */
 .node-card-outer {
@@ -174,7 +172,7 @@
     left: 0;
     width: 3px;
     height: 100%;
-    background: #ff6c37;
+    background: #014C75;
     opacity: 1;
 }
 
@@ -189,9 +187,9 @@
     border-color: #06B6D4;
 }
 
-.endpoint-node-modern.info-node .node-card-content {
-    background: rgba(6, 182, 212, 0.05);
-}
+
+
+
 
 .endpoint-node-modern.info-node .icon-bg {
     color: #06B6D4;
@@ -230,7 +228,7 @@
 }
 
 .endpoint-node-modern.parameter-node:hover {
-    border-color: #F59E0B;
+    border-color: #014C75;
 }
 
 .endpoint-node-modern.parameter-node .node-card-content {
@@ -238,12 +236,12 @@
 }
 
 .endpoint-node-modern.parameter-node .icon-bg {
-    color: #F59E0B;
+    color: #014C75;
 }
 
 .endpoint-node-modern.parameter-node .node-card-status {
     background: rgba(245, 158, 11, 0.2);
-    color: #F59E0B;
+    color: #014C75;
 }
 
 /* Tag Node - Lime/Green theme */
@@ -305,7 +303,7 @@
 
 .method-badge.patch {
     background: rgba(139, 92, 246, 0.2);
-    color: #C4B5FD;
+    color: #E5F3FF;
 }
 
 /* Endpoint Path */
@@ -336,7 +334,7 @@
     display: inline-block;
     padding: 2px 6px;
     background: rgba(139, 92, 246, 0.1);
-    color: #C4B5FD;
+    color: #E5F3FF;
     font-size: 11px;
     font-weight: 500;
     border-radius: 4px;
@@ -354,10 +352,12 @@
     display: flex;
     align-items: center;
     padding: 12px;
-    background: #252525;
-    background-color: #252525;
+    background-color: var(--node-header);
     border-bottom: 1px solid #333;
     isolation: isolate;
+    position: relative;
+    z-index: 1;
+
 }
 
 .node-card-icon {
@@ -375,7 +375,7 @@
     height: 24px;
     background: #333;
     border-radius: 4px;
-    color: #ff6c37;
+    color: #014C75;
 }
 
 .node-card-type-badge {
@@ -393,16 +393,10 @@
     font-weight: 500;
     border-radius: 4px;
     text-transform: uppercase;
-    background: rgba(255, 108, 55, 0.2);
-    color: #ff6c37;
+    background: rgba(1, 76, 117, 0.2);
+    color: #014C75;
 }
 
-.node-card-content {
-    padding: 12px;
-    flex-grow: 1;
-    background-color: #1a1a1a;
-    isolation: isolate;
-}
 
 .node-card-title {
     font-size: 14px;
@@ -424,7 +418,7 @@
     left: -2px;
     right: -2px;
     bottom: -2px;
-    border: 1px dashed #ff6c37;
+    border: 1px dashed #014C75;
     border-radius: 9px;
     pointer-events: none;
     animation: selectionPulse 2s infinite;

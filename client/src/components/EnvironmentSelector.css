@@ -1,49 +1,50 @@
-/* Modern Minimalistic Environment Selector with Theme Support */
+/* Modern Minimalistic Environment Selector - 2025 Blue Palette Theme */
 
-/* Light Theme Variables (Default) */
+/* Light Theme Variables (Default) - 2025 Blue Palette */
 :root {
-    --env-bg-primary: #ffffff;
-    --env-bg-secondary: #fafbfc;
-    --env-bg-tertiary: #f9fafb;
-    --env-bg-hover: #f9fafb;
-    --env-bg-selected: #f0f9ff;
-    --env-border-primary: #e5e7eb;
-    --env-border-secondary: #f3f4f6;
-    --env-border-hover: #d1d5db;
-    --env-border-accent: #fa6a17;
-    --env-text-primary: #374151;
-    --env-text-secondary: #6b7280;
-    --env-text-tertiary: #9ca3af;
-    --env-text-accent: #ce7d2d;
-    --env-text-success: #10b981;
-    --env-shadow-light: rgba(0, 0, 0, 0.05);
-    --env-shadow-medium: rgba(0, 0, 0, 0.08);
-    --env-shadow-heavy: rgba(0, 0, 0, 0.15);
+    --env-bg-primary: var(--card-bg, #ffffff);
+    --env-bg-secondary: var(--background-color, #f8f9fa);
+    --env-bg-tertiary: var(--hover-bg, #f5f5f5);
+    --env-bg-hover: var(--hover-bg, #f5f5f5);
+    --env-bg-selected: var(--primary-light, #E5F3FF);
+    --env-border-primary: var(--border-color, #e1e4e8);
+    --env-border-secondary: var(--border-color, #e1e4e8);
+    --env-border-hover: var(--primary-color, #014C75);
+    --env-border-accent: var(--primary-color, #014C75);
+    --env-text-primary: var(--text-color, #333333);
+    --env-text-secondary: var(--text-secondary, #6c757d);
+    --env-text-tertiary: var(--text-muted, #9ca3af);
+    --env-text-accent: var(--primary-color, #014C75);
+    --env-text-success: var(--success-color, #28a745);
+    --env-shadow-light: var(--card-shadow, 0 1px 3px rgba(0, 0, 0, 0.08));
+    --env-shadow-medium: 0 2px 8px rgba(1, 76, 117, 0.12);
+    --env-shadow-heavy: 0 4px 16px rgba(1, 76, 117, 0.15);
     --env-overlay: rgba(0, 0, 0, 0.4);
-    --env-focus-ring: rgba(99, 102, 241, 0.1);
+    --env-focus-ring: rgba(1, 76, 117, 0.2);
 }
 
-/* Dark Theme Variables - Updated to match project's existing color scheme */
-[data-theme="dark"] {
-    --env-bg-primary: #1a1a1a;
-    --env-bg-secondary: #202020;
-    --env-bg-tertiary: #161616;
-    --env-bg-hover: #252525;
-    --env-bg-selected: #2a2a2a;
-    --env-border-primary: #333333;
-    --env-border-secondary: #2a2a2a;
-    --env-border-hover: #444444;
-    --env-border-accent: #e9860e;
-    --env-text-primary: #ffffff;
-    --env-text-secondary: #b3b3b3;
-    --env-text-tertiary: #808080;
-    --env-text-accent: #e9780e;
-    --env-text-success: #22c55e;
+/* Dark Theme Variables - 2025 Blue Palette Alignment */
+[data-theme="dark"],
+body.dark-theme .environment-selector {
+    --env-bg-primary: var(--card-bg, #002234);
+    --env-bg-secondary: var(--background-color, #00111A);
+    --env-bg-tertiary: var(--sidebar-bg, #001927);
+    --env-bg-hover: var(--hover-bg, #013B5B);
+    --env-bg-selected: rgba(1, 76, 117, 0.2);
+    --env-border-primary: var(--border-color, #003956);
+    --env-border-secondary: var(--border-color, #003956);
+    --env-border-hover: var(--primary-color, #014C75);
+    --env-border-accent: var(--primary-color, #014C75);
+    --env-text-primary: var(--text-color, #e0e0e0);
+    --env-text-secondary: var(--text-secondary, #B8D4E3);
+    --env-text-tertiary: #7A9BAD;
+    --env-text-accent: var(--primary-color, #014C75);
+    --env-text-success: var(--success-color, #22c55e);
     --env-shadow-light: rgba(0, 0, 0, 0.3);
     --env-shadow-medium: rgba(0, 0, 0, 0.4);
     --env-shadow-heavy: rgba(0, 0, 0, 0.6);
     --env-overlay: rgba(0, 0, 0, 0.8);
-    --env-focus-ring: rgba(14, 165, 233, 0.2);
+    --env-focus-ring: rgba(1, 76, 117, 0.3);
 }
 
 .environment-selector {
@@ -346,6 +347,7 @@
     border-color: var(--env-border-accent);
     border-style: solid;
     color: var(--env-text-accent);
+    box-shadow: var(--env-shadow-medium);
 }
 
 /* Modern Modal Styling */

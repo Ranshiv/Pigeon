@@ -90,21 +90,38 @@ const useDesignerState = (initialState = {}) => {
     }, []);
 
     const deleteNode = useCallback((nodeId) => {
-        setState(prevState => {
-            // Remove node and associated edges
-            const filteredNodes = prevState.nodes.filter(node => node.id !== nodeId);
-            const filteredEdges = prevState.edges.filter(
-                edge => edge.source !== nodeId && edge.target !== nodeId
-            );
+        if (!nodeId) {
+            console.warn('Attempted to delete node with invalid ID:', nodeId);
+            return;
+        }
 
-            const newState = {
-                ...prevState,
-                nodes: filteredNodes,
-                edges: filteredEdges,
-                selectedNode: prevState.selectedNode?.id === nodeId ? null : prevState.selectedNode,
-                isDirty: true
-            };
-            return addToHistory(newState, prevState);
+        setState(prevState => {
+            try {
+                // Safety check - ensure the node exists before deletion
+                const nodeExists = prevState.nodes.some(node => node.id === nodeId);
+                if (!nodeExists) {
+                    console.warn('Attempted to delete non-existent node:', nodeId);
+                    return prevState; // No change if node doesn't exist
+                }
+
+                // Remove node and associated edges
+                const filteredNodes = prevState.nodes.filter(node => node && node.id && node.id !== nodeId);
+                const filteredEdges = prevState.edges.filter(
+                    edge => edge && edge.source !== nodeId && edge.target !== nodeId
+                );
+
+                const newState = {
+                    ...prevState,
+                    nodes: filteredNodes,
+                    edges: filteredEdges,
+                    selectedNode: prevState.selectedNode?.id === nodeId ? null : prevState.selectedNode,
+                    isDirty: true
+                };
+                return addToHistory(newState, prevState);
+            } catch (error) {
+                console.error('Error deleting node:', nodeId, error);
+                return prevState; // Return unchanged state on error
+            }
         });
     }, []);
 

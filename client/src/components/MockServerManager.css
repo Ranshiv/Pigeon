@@ -33,7 +33,7 @@
 }
 
 .create-mock-btn {
-    background: var(--primary-color, #ff6c37);
+    background: var(--primary-color, #014C75);
     color: white;
     border: none;
     padding: 8px 14px;
@@ -48,7 +48,7 @@
 }
 
 .create-mock-btn:hover {
-    background: var(--primary-hover, #e55a2b);
+    background: var(--primary-hover, #013B5B);
     transform: translateY(-1px);
 }
 
@@ -333,7 +333,7 @@
 }
 
 .method.post {
-    background: #3b82f6;
+    background: #014C75;
 }
 
 .method.put {
@@ -345,7 +345,7 @@
 }
 
 .method.patch {
-    background: #8b5cf6;
+    background: #014C75;
 }
 
 .path {

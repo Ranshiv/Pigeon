@@ -1,8 +1,25 @@
-/* client/src/components/ReportsManagement.css */
+/* client/src/components/ReportsManagement.css - 2025 Blue Palette Theme */
 .reports-management {
     padding: 24px;
     background: var(--background-color);
     min-height: 100vh;
+
+    /* Light theme defaults - matching application theme */
+    --bg-primary: #f8f9fa;
+    --bg-surface: #ffffff;
+    --bg-hover: #f5f5f5;
+    --text-primary: #333333;
+    --text-secondary: #6c757d;
+    --text-tertiary: #9ca3af;
+    --border-light: #e1e4e8;
+    --border-hover: #d1d5db;
+    --color-primary: #014C75;
+    --color-primary-hover: #013B5B;
+    --color-primary-pressed: #012A41;
+    --color-success: #10b981;
+    --color-warning: #f59e0b;
+    --color-error: #ef4444;
+    --shadow-light: rgba(1, 76, 117, 0.08);
 }
 
 /* Header */
@@ -194,7 +211,7 @@
 }
 
 .item.active {
-    background: rgba(59, 130, 246, 0.1);
+    background: rgba(1, 76, 117, 0.1);
     border-color: var(--primary-color);
 }
 
@@ -223,12 +240,12 @@
 
 .status-badge.active {
     background: rgba(16, 185, 129, 0.1);
-    color: #10b981;
+    color: var(--color-success, #10b981);
 }
 
 .status-badge.inactive {
     background: rgba(107, 114, 128, 0.1);
-    color: #6b7280;
+    color: var(--text-secondary, #6c757d);
 }
 
 /* Item Meta */
@@ -391,12 +408,12 @@
 
 .content-item.enabled {
     background: rgba(16, 185, 129, 0.1);
-    color: #10b981;
+    color: var(--color-success, #10b981);
 }
 
 .content-item.disabled {
     background: rgba(107, 114, 128, 0.1);
-    color: #6b7280;
+    color: var(--text-secondary, #6c757d);
 }
 
 /* No Selection State */
@@ -497,8 +514,8 @@
 
 .btn-secondary.delete:hover {
     background: rgba(239, 68, 68, 0.1);
-    border-color: #ef4444;
-    color: #ef4444;
+    border-color: var(--color-error, #ef4444);
+    color: var(--color-error, #ef4444);
 }
 
 /* Modal Styles */
@@ -611,7 +628,7 @@
 .form-group select:focus {
     outline: none;
     border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    box-shadow: 0 0 0 3px rgba(1, 76, 117, 0.1);
 }
 
 .form-row {
@@ -656,7 +673,7 @@
 }
 
 .remove-btn {
-    background: #ef4444;
+    background: var(--color-error, #ef4444);
     border: none;
     color: white;
     padding: 8px;
@@ -692,6 +709,31 @@
     padding: 20px 24px;
     border-top: 1px solid var(--border-color);
     flex-shrink: 0;
+}
+
+/* Dark Theme Support */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --color-primary: #4FC3E7;
+        --color-primary-hover: #3BA8C7;
+        --color-primary-pressed: #2B8AA7;
+        --color-primary-light: rgba(79, 195, 231, 0.1);
+
+        --color-success: #22c55e;
+        --color-warning: #f59e0b;
+        --color-error: #ef4444;
+
+        --text-primary: #e5e7eb;
+        --text-secondary: #9ca3af;
+        --text-tertiary: #6b7280;
+
+        --bg-primary: #1f2937;
+        --bg-surface: #374151;
+        --bg-hover: #4b5563;
+
+        --border-light: #4b5563;
+        --border-hover: #6b7280;
+    }
 }
 
 /* Responsive Design */
@@ -938,7 +980,7 @@
 
 .template-content p {
     margin: 0 0 16px 0;
-    color: var(--text-secondary, #6b7280);
+    color: var(--text-secondary, #6c757d);
     font-size: 14px;
     line-height: 1.5;
     flex: 1;
@@ -951,8 +993,8 @@
 }
 
 .template-meta span {
-    background: var(--hover-bg, #f3f4f6);
-    color: var(--text-color, #374151);
+    background: var(--bg-hover, #f5f5f5);
+    color: var(--text-primary, #333333);
     padding: 6px 12px;
     border-radius: 8px;
     font-size: 12px;
@@ -982,7 +1024,7 @@
 }
 
 .report-card:hover {
-    border-color: var(--primary-color, #FF6C37);
+    border-color: var(--primary-color, #014C75);
     box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
     transform: translateY(-2px);
 }
@@ -992,7 +1034,7 @@
 }
 
 .report-card:hover .report-icon svg {
-    color: var(--primary-hover, #e85d2a);
+    color: var(--color-primary-hover, #013B5B);
     transform: scale(1.1);
     transition: all 0.2s ease;
 }
@@ -1025,19 +1067,19 @@
 .report-icon svg {
     width: 20px;
     height: 20px;
-    color: var(--primary-color, #FF6C37);
+    color: var(--primary-color, #014C75);
 }
 
 .report-info h4 {
     margin: 0 0 4px 0;
     font-size: 18px;
     font-weight: 600;
-    color: var(--text-color, #111827);
+    color: var(--text-primary, #333333);
 }
 
 .report-info p {
     margin: 0;
-    color: var(--text-secondary, #6b7280);
+    color: var(--text-secondary, #6c757d);
     font-size: 14px;
     text-transform: capitalize;
 }
@@ -1074,7 +1116,7 @@
 .action-btn svg {
     width: 16px;
     height: 16px;
-    color: var(--text-secondary, #6b7280);
+    color: var(--text-secondary, #6c757d);
 }
 
 .report-details {
@@ -1088,7 +1130,7 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    color: var(--text-secondary, #6b7280);
+    color: var(--text-secondary, #6c757d);
     font-size: 14px;
 }
 
@@ -1122,17 +1164,17 @@
 
 .status-badge.inactive {
     background: var(--hover-bg, #f3f4f6);
-    color: var(--text-secondary, #6b7280);
+    color: var(--text-secondary, #6c757d);
 }
 
 .next-run {
     font-size: 12px;
-    color: var(--text-secondary, #6b7280);
+    color: var(--text-secondary, #6c757d);
 }
 
 /* Modern Buttons */
 .btn-primary {
-    background: var(--primary-color, #FF6C37);
+    background: var(--primary-color, #014C75);
     color: white;
     border: none;
     padding: 12px 24px;
@@ -1148,20 +1190,20 @@
 }
 
 .btn-primary:hover:not(:disabled) {
-    background: var(--primary-hover, #e85d2a);
-    box-shadow: 0 4px 12px rgba(255, 108, 55, 0.25);
+    background: var(--color-primary-hover, #013B5B);
+    box-shadow: 0 4px 12px rgba(1, 76, 117, 0.25);
     transform: translateY(-1px);
 }
 
 .btn-primary:active:not(:disabled) {
-    background: var(--primary-pressed, #d44a1f);
+    background: var(--color-primary-pressed, #012A41);
     transform: translateY(0);
-    box-shadow: 0 2px 4px rgba(255, 108, 55, 0.15);
+    box-shadow: 0 2px 4px rgba(1, 76, 117, 0.15);
 }
 
 .btn-primary:focus:not(:disabled) {
     outline: none;
-    box-shadow: 0 0 0 3px rgba(255, 108, 55, 0.3);
+    box-shadow: 0 0 0 3px rgba(1, 76, 117, 0.3);
 }
 
 .btn-primary:disabled {
@@ -1171,9 +1213,9 @@
 }
 
 .btn-secondary {
-    background: var(--card-background, #ffffff);
-    color: var(--text-color, #374151);
-    border: 1px solid var(--border-color, #e5e7eb);
+    background: var(--bg-surface, #ffffff);
+    color: var(--text-primary, #333333);
+    border: 1px solid var(--border-light, #e1e4e8);
     padding: 12px 24px;
     border-radius: 12px;
     font-size: 14px;
@@ -1186,21 +1228,21 @@
 }
 
 .btn-secondary:hover {
-    background: var(--hover-bg, #f9fafb);
-    border-color: var(--border-color, #d1d5db);
+    background: var(--bg-hover, #f5f5f5);
+    border-color: var(--border-hover, #d1d5db);
     transform: translateY(-1px);
 }
 
 .btn-secondary:active {
-    background: var(--pressed-bg, #f3f4f6);
+    background: var(--bg-hover, #f5f5f5);
     transform: translateY(0);
-    border-color: var(--primary-color, #FF6C37);
+    border-color: var(--color-primary, #014C75);
 }
 
 .btn-secondary:focus {
     outline: none;
-    box-shadow: 0 0 0 3px rgba(255, 108, 55, 0.1);
-    border-color: var(--primary-color, #FF6C37);
+    box-shadow: 0 0 0 3px rgba(1, 76, 117, 0.1);
+    border-color: var(--primary-color, #014C75);
 }
 
 /* Empty State */
@@ -1224,12 +1266,12 @@
     margin: 0 0 12px 0;
     font-size: 20px;
     font-weight: 600;
-    color: var(--text-color, #111827);
+    color: var(--text-primary, #333333);
 }
 
 .empty-state p {
     margin: 0 0 32px 0;
-    color: var(--text-secondary, #6b7280);
+    color: var(--text-secondary, #6c757d);
     font-size: 16px;
     max-width: 400px;
     margin-left: auto;
@@ -1252,7 +1294,7 @@
 .loading-icon {
     width: 48px;
     height: 48px;
-    color: var(--primary-color, #FF6C37);
+    color: var(--primary-color, #014C75);
     margin-bottom: 16px;
     animation: pulse 2s infinite;
 }
@@ -1271,7 +1313,7 @@
 
 .loading-content p {
     margin: 0;
-    color: var(--text-secondary, #6b7280);
+    color: var(--text-secondary, #6c757d);
     font-size: 16px;
 }
 
@@ -1317,7 +1359,7 @@
     margin: 0;
     font-size: 24px;
     font-weight: 700;
-    color: var(--text-color, #111827);
+    color: var(--text-primary, #333333);
 }
 
 .close-btn {
@@ -1328,7 +1370,7 @@
     border-radius: 10px;
     font-size: 20px;
     cursor: pointer;
-    color: var(--text-secondary, #6b7280);
+    color: var(--text-secondary, #6c757d);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1337,7 +1379,7 @@
 
 .close-btn:hover {
     background: var(--border-color, #e5e7eb);
-    color: var(--text-color, #374151);
+    color: var(--text-primary, #333333);
 }
 
 /* Form Styles */
@@ -1355,7 +1397,7 @@
     margin: 0 0 20px 0;
     font-size: 18px;
     font-weight: 600;
-    color: var(--text-color, #111827);
+    color: var(--text-primary, #333333);
     padding-bottom: 8px;
     border-bottom: 1px solid var(--border-color, #f3f4f6);
 }
@@ -1368,7 +1410,7 @@
     display: block;
     margin-bottom: 8px;
     font-weight: 500;
-    color: var(--text-color, #374151);
+    color: var(--text-primary, #333333);
     font-size: 14px;
 }
 
@@ -1381,7 +1423,7 @@
     border-radius: 12px;
     font-size: 14px;
     background: var(--card-background, #ffffff);
-    color: var(--text-color, #374151);
+    color: var(--text-primary, #333333);
     transition: all 0.2s ease;
     box-sizing: border-box;
 }
@@ -1390,8 +1432,8 @@
 .form-group select:focus,
 .form-group textarea:focus {
     outline: none;
-    border-color: var(--primary-color, #FF6C37);
-    box-shadow: 0 0 0 3px rgba(255, 108, 55, 0.1);
+    border-color: var(--primary-color, #014C75);
+    box-shadow: 0 0 0 3px rgba(1, 76, 117, 0.1);
 }
 
 .form-row {
@@ -1437,7 +1479,7 @@
 
 .add-recipient-btn {
     background: var(--hover-bg, #f3f4f6);
-    color: var(--text-color, #374151);
+    color: var(--text-primary, #333333);
     border: 1px solid var(--border-color, #e5e7eb);
     border-style: dashed;
     padding: 12px 20px;
@@ -1460,14 +1502,14 @@
 
 .add-recipient-btn:active {
     background: var(--pressed-bg, #e5e7eb);
-    border-color: var(--primary-color, #FF6C37);
+    border-color: var(--primary-color, #014C75);
     transform: scale(0.98);
 }
 
 .add-recipient-btn:focus {
     outline: none;
-    box-shadow: 0 0 0 3px rgba(255, 108, 55, 0.1);
-    border-color: var(--primary-color, #FF6C37);
+    box-shadow: 0 0 0 3px rgba(1, 76, 117, 0.1);
+    border-color: var(--primary-color, #014C75);
 }
 
 /* Checkbox Group */
@@ -1495,9 +1537,9 @@
 }
 
 .checkbox-label:has(input[type="checkbox"]:checked) {
-    background: rgba(255, 108, 55, 0.1);
-    border-color: var(--primary-color, #FF6C37);
-    box-shadow: 0 0 0 3px rgba(255, 108, 55, 0.05);
+    background: rgba(1, 76, 117, 0.1);
+    border-color: var(--primary-color, #014C75);
+    box-shadow: 0 0 0 3px rgba(1, 76, 117, 0.05);
 }
 
 .checkbox-label:active {
@@ -1507,14 +1549,14 @@
 .checkbox-label input[type="checkbox"] {
     width: 18px;
     height: 18px;
-    accent-color: var(--primary-color, #FF6C37);
+    accent-color: var(--primary-color, #014C75);
     margin: 0;
     border-radius: 4px;
     cursor: pointer;
 }
 
 .checkbox-label input[type="checkbox"]:checked+span {
-    color: var(--primary-color, #FF6C37);
+    color: var(--primary-color, #014C75);
     font-weight: 600;
 }
 
@@ -1548,7 +1590,7 @@
     background: transparent;
     border: none;
     border-radius: 8px;
-    color: var(--text-secondary, #6b7280);
+    color: var(--text-secondary, #6c757d);
     font-size: 0.875rem;
     font-weight: 500;
     cursor: pointer;
@@ -1558,7 +1600,7 @@
 
 .nav-btn:hover {
     background: var(--hover-background, #f3f4f6);
-    color: var(--text-color, #111827);
+    color: var(--text-primary, #333333);
 }
 
 .nav-btn:active {
@@ -1568,22 +1610,22 @@
 
 .nav-btn:focus {
     outline: none;
-    box-shadow: 0 0 0 3px rgba(255, 108, 55, 0.1);
+    box-shadow: 0 0 0 3px rgba(1, 76, 117, 0.1);
 }
 
 .nav-btn.active {
-    background: var(--primary-color, #FF6C37);
+    background: var(--primary-color, #014C75);
     color: white;
-    box-shadow: 0 2px 4px rgba(255, 108, 55, 0.2);
+    box-shadow: 0 2px 4px rgba(1, 76, 117, 0.2);
 }
 
 .nav-btn.active:hover {
-    background: var(--primary-hover, #e85d2a);
+    background: var(--color-primary-hover, #013B5B);
 }
 
 .header-subtitle {
     margin: 0;
-    color: var(--text-secondary, #6b7280);
+    color: var(--text-secondary, #6c757d);
     font-size: 16px;
     font-weight: 400;
 }

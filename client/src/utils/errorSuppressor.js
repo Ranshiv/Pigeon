@@ -25,8 +25,32 @@ export const suppressReactErrors = () => {
             return;
         }
 
+        // Skip ResizeObserver loop completed errors (common during zoom operations)
+        if (typeof message === 'string' &&
+            (message.includes('ResizeObserver loop completed with undelivered notifications') ||
+                message.includes('ResizeObserver loop limit exceeded'))) {
+            return;
+        }
+
         // Pass through all other errors
         return originalConsoleError.apply(console, [message, ...args]);
+    };
+
+    // Also handle window error events for ResizeObserver errors
+    const handleWindowError = (event) => {
+        if (event.error && event.error.message &&
+            event.error.message.includes('ResizeObserver loop completed')) {
+            // Prevent the error from being logged
+            event.preventDefault();
+            return false;
+        }
+    };
+
+    window.addEventListener('error', handleWindowError);
+
+    // Return cleanup function
+    return () => {
+        window.removeEventListener('error', handleWindowError);
     };
 };
 

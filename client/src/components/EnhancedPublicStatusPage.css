@@ -14,7 +14,7 @@
 
 /* Header */
 .status-header {
-    background: linear-gradient(135deg, var(--primary-color, #007bff), var(--secondary-color, #6c757d));
+    background: linear-gradient(135deg, var(--primary-color, #014C75), var(--secondary-color, #6c757d));
     color: white;
     padding: 60px 0;
     text-align: center;
@@ -52,7 +52,7 @@
 
 .loading-icon {
     font-size: 3rem;
-    color: #007bff;
+    color: #014C75;
     margin-bottom: 16px;
     animation: pulse 2s infinite;
 }
@@ -151,7 +151,7 @@
 
 .refresh-btn:hover {
     background: #f8f9fa;
-    color: var(--primary-color, #007bff);
+    color: var(--primary-color, #014C75);
 }
 
 /* Maintenance Section */
@@ -196,7 +196,7 @@
 
 .status-badge.scheduled {
     background: #e3f2fd;
-    color: #1976d2;
+    color: #014C75;
 }
 
 .status-badge.in_progress {
@@ -266,7 +266,7 @@
 
 .service-card:hover {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    border-color: var(--primary-color, #007bff);
+    border-color: var(--primary-color, #014C75);
 }
 
 .service-header {
@@ -320,7 +320,7 @@
 }
 
 .tag {
-    background: var(--primary-color, #007bff);
+    background: var(--primary-color, #014C75);
     color: white;
     padding: 2px 8px;
     border-radius: 12px;
@@ -366,7 +366,7 @@
 
 .severity-badge.minor {
     background: #e3f2fd;
-    color: #1976d2;
+    color: #014C75;
 }
 
 .severity-badge.major {
@@ -422,13 +422,13 @@
 
 .form-group input:focus {
     outline: none;
-    border-color: var(--primary-color, #007bff);
+    border-color: var(--primary-color, #014C75);
     box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
 }
 
 .form-group button {
     padding: 12px 24px;
-    background: var(--primary-color, #007bff);
+    background: var(--primary-color, #014C75);
     color: white;
     border: none;
     border-radius: 6px;
@@ -439,7 +439,7 @@
 }
 
 .form-group button:hover:not(:disabled) {
-    background: #0056b3;
+    background: #013B5B;
 }
 
 .form-group button:disabled {

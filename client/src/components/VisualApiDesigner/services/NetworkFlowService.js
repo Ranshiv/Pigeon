@@ -1,5 +1,6 @@
 import cytoscape from 'cytoscape';
 import dagre from 'cytoscape-dagre';
+import { debounce } from '../../../utils/debounce';
 
 // Register dagre layout
 cytoscape.use(dagre);
@@ -166,7 +167,7 @@ export class NetworkFlowService {
                     selector: 'node',
                     style: {
                         'background-color': function (ele) {
-                            return ele.data('metadata')?.color || '#3b82f6';
+                            return ele.data('metadata')?.color || '#014C75';
                         },
                         'label': 'data(label)',
                         'text-valign': 'center',
@@ -207,7 +208,7 @@ export class NetworkFlowService {
                     selector: 'node[type="database"]',
                     style: {
                         'background-color': function (ele) {
-                            return ele.data('metadata')?.color || '#2563eb';
+                            return ele.data('metadata')?.color || '#013B5B';
                         },
                         'shape': 'round-rectangle',
                         'width': 110,
@@ -221,7 +222,7 @@ export class NetworkFlowService {
                     selector: 'node[type="service"]',
                     style: {
                         'background-color': function (ele) {
-                            return ele.data('metadata')?.color || '#7c3aed';
+                            return ele.data('metadata')?.color || '#014C75';
                         },
                         'shape': 'round-rectangle',
                         'width': 110,
@@ -254,20 +255,20 @@ export class NetworkFlowService {
                         'line-color': function (ele) {
                             switch (ele.data('type')) {
                                 case 'http': return '#16a34a';
-                                case 'database': return '#2563eb';
+                                case 'database': return '#013B5B';
                                 case 'cache': return '#d97706';
                                 case 'auth': return '#dc2626';
-                                case 'websocket': return '#7c3aed';
+                                case 'websocket': return '#014C75';
                                 default: return '#64748b';
                             }
                         },
                         'target-arrow-color': function (ele) {
                             switch (ele.data('type')) {
                                 case 'http': return '#16a34a';
-                                case 'database': return '#2563eb';
+                                case 'database': return '#013B5B';
                                 case 'cache': return '#d97706';
                                 case 'auth': return '#dc2626';
-                                case 'websocket': return '#7c3aed';
+                                case 'websocket': return '#014C75';
                                 default: return '#64748b';
                             }
                         },
@@ -333,11 +334,11 @@ export class NetworkFlowService {
                 {
                     selector: 'node[metadata.websiteType="Content Site"]',
                     style: {
-                        'border-color': '#7c3aed',
+                        'border-color': '#014C75',
                         'border-width': 2,
                         'border-style': 'solid',
                         'background-color': function (ele) {
-                            return ele.data('metadata')?.color || '#7c3aed';
+                            return ele.data('metadata')?.color || '#014C75';
                         }
                     }
                 },
@@ -377,8 +378,8 @@ export class NetworkFlowService {
                 {
                     selector: 'edge[type="database"]',
                     style: {
-                        'line-color': '#7c3aed',
-                        'target-arrow-color': '#7c3aed',
+                        'line-color': '#014C75',
+                        'target-arrow-color': '#014C75',
                         'line-style': 'dotted',
                         'curve-style': 'straight',
                         'width': 2
@@ -529,13 +530,19 @@ export class NetworkFlowService {
                             // Add event listeners
                             this.addFlowInteractions(cy);
 
-                            // Add resize handler
-                            window.addEventListener('resize', () => {
-                                if (cy) {
-                                    cy.resize();
-                                    cy.fit(cy.elements(), 30);
+                            // Add resize handler with debouncing to prevent ResizeObserver errors
+                            const handleResize = debounce(() => {
+                                if (cy && !cy.destroyed()) {
+                                    try {
+                                        cy.resize();
+                                        cy.fit(cy.elements(), 30);
+                                    } catch (error) {
+                                        console.warn('Cytoscape resize error:', error);
+                                    }
                                 }
-                            });
+                            }, 100);
+
+                            window.addEventListener('resize', handleResize);
 
                             // Store instance
                             this.instances.set(containerId, cy);
@@ -726,7 +733,7 @@ export class NetworkFlowService {
                     metadata: {
                         type: 'Client Application',
                         details: 'User Agent',
-                        color: '#3b82f6'
+                        color: '#014C75'
                     }
                 }
             ],
@@ -782,7 +789,7 @@ export class NetworkFlowService {
                     type: 'gateway',
                     metadata: {
                         details: 'Traffic Distribution',
-                        color: '#8b5cf6'
+                        color: '#014C75'
                     }
                 });
                 flowData.edges.push({
@@ -866,7 +873,7 @@ export class NetworkFlowService {
                 path: path,
                 contentType,
                 websiteType: websiteType.type,
-                color: websiteType.color || '#3b82f6'
+                color: websiteType.color || '#014C75'
             }
         });
         flowData.edges.push({
@@ -1265,7 +1272,7 @@ export class NetworkFlowService {
                 metadata: {
                     dbType: dbInfo.type,
                     operation: requestMethod === 'GET' ? 'Query' : 'Update',
-                    color: dbInfo.color || '#3b82f6',
+                    color: dbInfo.color || '#014C75',
                     icon: dbInfo.icon || 'database'
                 }
             });
@@ -1318,7 +1325,7 @@ export class NetworkFlowService {
                 metadata: {
                     dataType: isJson ? 'JSON' : isForm ? 'Form Data' : 'Raw Data',
                     bodySize: requestBody?.length || 0,
-                    color: isJson ? '#0ea5e9' : isForm ? '#8b5cf6' : '#6b7280'
+                    color: isJson ? '#0ea5e9' : isForm ? '#014C75' : '#6b7280'
                 }
             });
             flowData.edges.push({
@@ -1478,7 +1485,7 @@ export class NetworkFlowService {
         let websiteType = {
             type: 'General Website',
             architecture: 'Standard Web',
-            color: '#2563eb', // Default blue
+            color: '#013B5B', // Default blue
             icon: 'globe',
             layout: 'simple',
             components: ['web-server']
@@ -1536,7 +1543,7 @@ export class NetworkFlowService {
             websiteType = {
                 type: 'Content Site',
                 architecture: 'CMS Architecture',
-                color: '#7c3aed', // Purple
+                color: '#014C75', // Purple
                 icon: 'file-text',
                 layout: 'content-focused',
                 components: [
@@ -1659,7 +1666,7 @@ export class NetworkFlowService {
             websiteType = {
                 type: 'Single Page App',
                 architecture: 'Frontend Framework',
-                color: '#8b5cf6', // Violet
+                color: '#014C75', // Blue
                 icon: 'layout',
                 layout: 'frontend-heavy',
                 components: [
@@ -1717,7 +1724,7 @@ export class NetworkFlowService {
                 name: 'Graph DB',
                 type: 'Graph',
                 icon: 'share-2',
-                color: '#8b5cf6'
+                color: '#014C75'
             };
         } else if (path.includes('key') || path.includes('cache') || path.includes('redis')) {
             dbInfo = {
@@ -1738,7 +1745,7 @@ export class NetworkFlowService {
                 name: 'PostgreSQL',
                 type: 'SQL',
                 icon: 'database',
-                color: '#3b82f6'
+                color: '#014C75'
             };
         } else if (path.match(/mysql|maria/i)) {
             dbInfo = {
@@ -1762,7 +1769,7 @@ export class NetworkFlowService {
                     name: 'SQL Database',
                     type: 'SQL',
                     icon: 'database',
-                    color: '#3b82f6'
+                    color: '#014C75'
                 };
             } else if (bodyStr.includes('query') && (bodyStr.includes('filter') || bodyStr.includes('sort'))) {
                 dbInfo = {
@@ -1818,21 +1825,21 @@ export class NetworkFlowService {
             cacheInfo = {
                 name: 'CDN Cache',
                 type: 'Edge',
-                color: '#8b5cf6',
+                color: '#014C75',
                 icon: 'cloud'
             };
         } else if (headers['X-Varnish'] || headers['x-varnish']) {
             cacheInfo = {
                 name: 'Varnish Cache',
                 type: 'HTTP Accelerator',
-                color: '#3b82f6',
+                color: '#014C75',
                 icon: 'zap'
             };
         } else if (headers['X-Cache-Lookup'] || headers['x-cache-lookup']) {
             cacheInfo = {
                 name: 'Proxy Cache',
                 type: 'Lookup',
-                color: '#6366f1',
+                color: '#014C75',
                 icon: 'box'
             };
         }
@@ -1873,7 +1880,7 @@ export class NetworkFlowService {
             backend = {
                 name: 'PHP',
                 type: 'Application Server',
-                color: '#6366f1',
+                color: '#014C75',
                 icon: 'code'
             };
         } else if (poweredBy.includes('Express') || poweredBy.includes('Node')) {
@@ -1933,7 +1940,7 @@ export class NetworkFlowService {
             backend = {
                 name: 'PHP',
                 type: 'Application Server',
-                color: '#6366f1',
+                color: '#014C75',
                 icon: 'code'
             };
         } else if (path.match(/\.aspx?$/i)) {
@@ -2322,7 +2329,7 @@ export class NetworkFlowService {
                 {
                     sourceType: 'gateway',
                     targetType: 'endpoint',
-                    color: '#3b82f6',
+                    color: '#014C75',
                     speed: 700,
                     dataSize: 10,
                     frequency: 'high',
@@ -2331,7 +2338,7 @@ export class NetworkFlowService {
                 {
                     sourceType: 'endpoint',
                     targetType: 'database',
-                    color: '#8b5cf6',
+                    color: '#014C75',
                     speed: 1000,
                     dataSize: 12,
                     frequency: 'medium',
@@ -2560,7 +2567,7 @@ export class NetworkFlowService {
         cy.on('mouseover', 'node', function (event) {
             const node = event.target;
             node.style('border-width', 4);
-            node.style('border-color', '#ff6c37');
+            node.style('border-color', '#014C75');
         });
 
         cy.on('mouseout', 'node', function (event) {

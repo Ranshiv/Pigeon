@@ -74,7 +74,7 @@
 
 .form-actions button:focus {
     outline: none;
-    box-shadow: 0 0 0 2px rgba(255, 108, 55, 0.2);
+    box-shadow: 0 0 0 2px rgba(1, 76, 117, 0.2);
 }
 
 /* Loading state */
@@ -367,7 +367,7 @@
 .form-group select:focus {
     outline: none;
     border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(255, 108, 55, 0.1);
+    box-shadow: 0 0 0 3px rgba(1, 76, 117, 0.1);
     transform: translateY(-1px);
 }
 
@@ -413,7 +413,7 @@
 
 .checkbox-group.checked {
     border-color: var(--primary-color);
-    background: rgba(255, 108, 55, 0.05);
+    background: rgba(1, 76, 117, 0.05);
 }
 
 /* Remove the check icon */
@@ -442,7 +442,7 @@
 }
 
 .api-version-manager .checkbox-group input[type="checkbox"]:checked {
-    background-color: #ff6c37 !important;
+    background-color: #014C75 !important;
 }
 
 .api-version-manager .checkbox-group input[type="checkbox"]::after {
@@ -464,7 +464,7 @@
 
 .api-version-manager .checkbox-group input[type="checkbox"]:focus {
     outline: none !important;
-    box-shadow: 0 0 0 3px rgba(255, 108, 55, 0.2) !important;
+    box-shadow: 0 0 0 3px rgba(1, 76, 117, 0.2) !important;
 }
 
 .api-version-manager .checkbox-group input[type="checkbox"]:hover {
@@ -543,7 +543,7 @@
     background-color: var(--primary-hover);
     border-color: var(--primary-hover);
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(255, 108, 55, 0.3);
+    box-shadow: 0 4px 12px rgba(1, 76, 117, 0.3);
 }
 
 .form-actions button[type="submit"]:disabled {

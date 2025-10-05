@@ -65,7 +65,7 @@
     width: 40px;
     height: 40px;
     border-radius: var(--border-radius-md);
-    background-color: rgba(255, 108, 55, 0.1);
+    background-color: rgba(1, 76, 117, 0.1);
     color: var(--primary-color);
     display: flex;
     align-items: center;
@@ -200,7 +200,7 @@
 .image-placeholder {
     width: 180px;
     height: 180px;
-    background-color: rgba(255, 108, 55, 0.1);
+    background-color: rgba(1, 76, 117, 0.1);
     border-radius: 50%;
     display: flex;
     justify-content: center;

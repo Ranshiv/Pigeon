@@ -3,7 +3,7 @@
     max-width: 1400px;
     margin: 0 auto;
     padding: 2rem;
-    background: linear-gradient(135deg, rgba(255, 108, 55, 0.02) 0%, rgba(33, 150, 243, 0.01) 100%);
+    background: linear-gradient(135deg, var(--primary-light) 0%, var(--primary-ultra-light) 100%);
     min-height: 100vh;
     position: relative;
     overflow: hidden;
@@ -16,7 +16,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: linear-gradient(45deg, rgba(255, 108, 55, 0.03) 0%, transparent 50%, rgba(33, 150, 243, 0.02) 100%);
+    background: linear-gradient(45deg, var(--primary-ultra-light) 0%, transparent 50%, var(--primary-muted) 100%);
     pointer-events: none;
     z-index: 0;
 }
@@ -39,7 +39,7 @@
     padding: 0.5rem 1rem;
     border-radius: 8px;
     background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 108, 55, 0.1);
+    border: 1px solid var(--border-color);
     -webkit-backdrop-filter: blur(10px);
     backdrop-filter: blur(10px);
     transition: all 0.3s ease;
@@ -47,10 +47,10 @@
 }
 
 .documentation-breadcrumbs .breadcrumb-link:hover {
-    background: rgba(255, 108, 55, 0.1);
+    background: var(--primary-light);
     color: var(--primary-color);
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(255, 108, 55, 0.2);
+    box-shadow: 0 4px 12px var(--primary-shadow);
 }
 
 .documentation-breadcrumbs .breadcrumb-current {
@@ -61,8 +61,8 @@
     font-weight: 600;
     padding: 0.5rem 1rem;
     border-radius: 8px;
-    background: rgba(255, 108, 55, 0.1);
-    border: 1px solid rgba(255, 108, 55, 0.2);
+    background: var(--primary-light);
+    border: 1px solid var(--border-color);
 }
 
 .documentation-breadcrumbs .breadcrumb-separator {
@@ -73,7 +73,7 @@
 .documentation-breadcrumbs .breadcrumb-icon {
     font-size: 1.2rem;
     color: var(--primary-color);
-    filter: drop-shadow(0 2px 4px rgba(255, 108, 55, 0.3));
+    filter: drop-shadow(0 2px 4px rgba(1, 76, 117, 0.3));
 }
 
 .documentation-page-header {
@@ -96,11 +96,11 @@
 
 @keyframes titleGlow {
     0% {
-        filter: drop-shadow(0 0 5px rgba(255, 108, 55, 0.3));
+        filter: drop-shadow(0 0 5px rgba(1, 76, 117, 0.3));
     }
 
     100% {
-        filter: drop-shadow(0 0 15px rgba(255, 108, 55, 0.5));
+        filter: drop-shadow(0 0 15px rgba(1, 76, 117, 0.5));
     }
 }
 
@@ -113,7 +113,7 @@
     padding: 20px 24px;
     background: rgba(255, 255, 255, 0.05);
     border-radius: 12px;
-    border: 1px solid rgba(255, 108, 55, 0.1);
+    border: 1px solid rgba(1, 76, 117, 0.1);
     -webkit-backdrop-filter: blur(10px);
     backdrop-filter: blur(10px);
     position: relative;
@@ -127,7 +127,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: linear-gradient(45deg, rgba(255, 108, 55, 0.02) 0%, transparent 50%, rgba(33, 150, 243, 0.02) 100%);
+    background: linear-gradient(45deg, rgba(1, 76, 117, 0.02) 0%, transparent 50%, rgba(33, 150, 243, 0.02) 100%);
     pointer-events: none;
 }
 
@@ -142,7 +142,7 @@
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.7) 100%);
     border-radius: 16px;
     padding: 2rem;
-    border: 1px solid rgba(255, 108, 55, 0.1);
+    border: 1px solid rgba(1, 76, 117, 0.1);
     -webkit-backdrop-filter: blur(10px);
     backdrop-filter: blur(10px);
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
@@ -157,7 +157,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: linear-gradient(45deg, rgba(255, 108, 55, 0.02) 0%, transparent 50%, rgba(33, 150, 243, 0.02) 100%);
+    background: linear-gradient(45deg, rgba(1, 76, 117, 0.02) 0%, transparent 50%, rgba(33, 150, 243, 0.02) 100%);
     pointer-events: none;
 }
 
@@ -188,25 +188,25 @@
     }
 
     .documentation-page::before {
-        background: linear-gradient(45deg, rgba(255, 108, 55, 0.05) 0%, transparent 50%, rgba(33, 150, 243, 0.03) 100%);
+        background: linear-gradient(45deg, rgba(1, 76, 117, 0.05) 0%, transparent 50%, rgba(33, 150, 243, 0.03) 100%);
     }
 
     .documentation-page-subtitle {
         background: rgba(0, 0, 0, 0.3);
-        border-color: rgba(255, 108, 55, 0.2);
+        border-color: rgba(1, 76, 117, 0.2);
     }
 
     .documentation-page-container {
         background: linear-gradient(135deg, rgba(40, 40, 40, 0.9) 0%, rgba(30, 30, 30, 0.8) 100%);
-        border-color: rgba(255, 108, 55, 0.2);
+        border-color: rgba(1, 76, 117, 0.2);
     }
 
     .breadcrumb-link {
         background: rgba(0, 0, 0, 0.3) !important;
-        border-color: rgba(255, 108, 55, 0.2) !important;
+        border-color: rgba(1, 76, 117, 0.2) !important;
     }
 
     .breadcrumb-link:hover {
-        background: rgba(255, 108, 55, 0.2) !important;
+        background: rgba(1, 76, 117, 0.2) !important;
     }
 }
