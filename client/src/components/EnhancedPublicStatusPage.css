@@ -131,12 +131,7 @@
 }
 
 .last-updated {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin: 0;
-    color: #6c757d;
-    font-size: 0.875rem;
+    color: var(--text-color) !important;
 }
 
 .refresh-btn {

@@ -3,19 +3,7 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import './HistorySection.css';
 import { FiClock, FiSearch, FiFilter, FiX } from 'react-icons/fi';
-// Simplified date-fns imports to avoid compatibility issues
-import format from 'date-fns/format';
 
-// Helper to format date/time nicely
-const formatTimestamp = (isoString) => {
-    if (!isoString) return 'N/A';
-    try {
-        const date = new Date(isoString);
-        return format(date, 'MMM d, yyyy h:mm a'); // More readable format
-    } catch (e) {
-        return 'Invalid Date';
-    }
-};
 
 // Group history entries by date categories without using date-fns comparison functions
 const groupHistoryByDate = (history) => {
@@ -73,13 +61,29 @@ const groupHistoryByDate = (history) => {
     return grouped;
 };
 
-const HistorySection = ({ history = [], onSelectHistory }) => {
+const HistorySection = ({ history = [], onSelectHistory, selectedId, loading = false }) => {
     const [searchTerm, setSearchTerm] = useState('');
     const [activeFilter, setActiveFilter] = useState('all');
 
     if (!Array.isArray(history)) {
         console.error("History prop is not an array:", history);
         return <div className="history-section error">Error loading history data.</div>;
+    }
+
+    // Loading state with skeleton
+    if (loading) {
+        return (
+            <div className="history-section loading">
+                <div className="history-header">
+                    <h2><FiClock /> Request History</h2>
+                </div>
+                <div className="loading-state">
+                    <div className="loading-spinner-history"></div>
+                    <h3>Loading History</h3>
+                    <p>Fetching your request history...</p>
+                </div>
+            </div>
+        );
     }
 
     // Filter history based on search and method filter
@@ -165,7 +169,7 @@ const HistorySection = ({ history = [], onSelectHistory }) => {
                         {['get', 'post', 'put', 'delete', 'patch'].map(method => (
                             <button
                                 key={method}
-                                className={`filter-btn ${activeFilter === method ? 'active' : ''}`}
+                                className={`filter-btn method-${method} ${activeFilter === method ? 'active' : ''}`}
                                 onClick={() => handleFilterClick(method)}
                                 title={`Filter ${method.toUpperCase()} requests`}
                             >
@@ -225,69 +229,91 @@ const HistorySection = ({ history = [], onSelectHistory }) => {
                 </div>
             </div>
 
-            {/* Today's requests */}
-            {groupedHistory.today.length > 0 && (
-                <div className="history-group">
-                    <h3 className="group-header">Today</h3>
-                    <ul className="history-list">
-                        {groupedHistory.today.map(entry => renderHistoryItem(entry))}
-                    </ul>
-                </div>
-            )}
+            <div className="history-content">
+                {/* Today's requests */}
+                {groupedHistory.today.length > 0 && (
+                    <div className="history-group">
+                        <h3 className="group-header">Today</h3>
+                        <ul className="history-list">
+                            {groupedHistory.today.map(entry => renderHistoryItem(entry))}
+                        </ul>
+                    </div>
+                )}
 
-            {/* Yesterday's requests */}
-            {groupedHistory.yesterday.length > 0 && (
-                <div className="history-group">
-                    <h3 className="group-header">Yesterday</h3>
-                    <ul className="history-list">
-                        {groupedHistory.yesterday.map(entry => renderHistoryItem(entry))}
-                    </ul>
-                </div>
-            )}
+                {/* Yesterday's requests */}
+                {groupedHistory.yesterday.length > 0 && (
+                    <div className="history-group">
+                        <h3 className="group-header">Yesterday</h3>
+                        <ul className="history-list">
+                            {groupedHistory.yesterday.map(entry => renderHistoryItem(entry))}
+                        </ul>
+                    </div>
+                )}
 
-            {/* This week's requests */}
-            {groupedHistory.thisWeek.length > 0 && (
-                <div className="history-group">
-                    <h3 className="group-header">Earlier this week</h3>
-                    <ul className="history-list">
-                        {groupedHistory.thisWeek.map(entry => renderHistoryItem(entry))}
-                    </ul>
-                </div>
-            )}
+                {/* This week's requests */}
+                {groupedHistory.thisWeek.length > 0 && (
+                    <div className="history-group">
+                        <h3 className="group-header">Earlier this week</h3>
+                        <ul className="history-list">
+                            {groupedHistory.thisWeek.map(entry => renderHistoryItem(entry))}
+                        </ul>
+                    </div>
+                )}
 
-            {/* This month's requests */}
-            {groupedHistory.thisMonth.length > 0 && (
-                <div className="history-group">
-                    <h3 className="group-header">Earlier this month</h3>
-                    <ul className="history-list">
-                        {groupedHistory.thisMonth.map(entry => renderHistoryItem(entry))}
-                    </ul>
-                </div>
-            )}
+                {/* This month's requests */}
+                {groupedHistory.thisMonth.length > 0 && (
+                    <div className="history-group">
+                        <h3 className="group-header">Earlier this month</h3>
+                        <ul className="history-list">
+                            {groupedHistory.thisMonth.map(entry => renderHistoryItem(entry))}
+                        </ul>
+                    </div>
+                )}
 
-            {/* Older requests */}
-            {groupedHistory.older.length > 0 && (
-                <div className="history-group">
-                    <h3 className="group-header">Older</h3>
-                    <ul className="history-list">
-                        {groupedHistory.older.map(entry => renderHistoryItem(entry))}
-                    </ul>
-                </div>
-            )}
+                {/* Older requests */}
+                {groupedHistory.older.length > 0 && (
+                    <div className="history-group">
+                        <h3 className="group-header">Older</h3>
+                        <ul className="history-list">
+                            {groupedHistory.older.map(entry => renderHistoryItem(entry))}
+                        </ul>
+                    </div>
+                )}
+            </div>
         </div>
     );
 
     // Helper function to render each history item
     function renderHistoryItem(entry) {
         const testResults = getTestResultsSummary(entry);
-        const urlPath = entry.url ? new URL(entry.url, 'http://example.com').pathname : '';
-        const shortUrl = urlPath.length > 30 ? urlPath.substring(0, 30) + '...' : urlPath;
-        const urlTip = entry.url || 'No URL';
+        // Derive a human-friendly URL for the sidebar
+        let displayUrl = '';
+        let urlTip = entry?.url || 'No URL';
+        try {
+            if (entry?.url) {
+                const parsed = new URL(entry.url, 'http://example.com');
+                const isAbsolute = /^(https?:)\/\//i.test(entry.url) && parsed.hostname;
+
+                if (isAbsolute) {
+                    // Show hostname + path (+ query if present) for absolute URLs
+                    displayUrl = `${parsed.hostname}${parsed.pathname}${parsed.search || ''}`;
+                } else {
+                    // Relative path – try to include host header if available
+                    const host = entry.headers?.host || entry.host || '';
+                    displayUrl = `${host}${parsed.pathname}${parsed.search || ''}` || parsed.pathname;
+                }
+            }
+        } catch (e) {
+            // Fall back to raw string if URL parsing fails
+            displayUrl = entry?.url || '';
+        }
+
+        const shortUrl = displayUrl.length > 50 ? displayUrl.substring(0, 50) + '...' : displayUrl;
 
         return (
             <li
                 key={entry._id}
-                className="history-item"
+                className={`history-item ${selectedId === entry._id ? 'active' : ''}`}
                 onClick={() => onSelectHistory(entry)}
                 title={`View details for ${entry.method} ${urlTip}`}
             >
@@ -295,7 +321,7 @@ const HistorySection = ({ history = [], onSelectHistory }) => {
                     <span className={`method-badge method-${entry.method?.toLowerCase()}`}>
                         {entry.method}
                     </span>
-                    <span className="history-url" title={urlTip}>{shortUrl}</span>
+                    <span className="history-url" title={urlTip}>{shortUrl || '/'}</span>
                 </div>
                 <div className="history-item-details">
                     <span className={`status-badge status-${String(entry.responseStatus || 0).charAt(0)}xx`}>
@@ -328,6 +354,8 @@ HistorySection.propTypes = {
         testResults: PropTypes.array
     })),
     onSelectHistory: PropTypes.func.isRequired,
+    selectedId: PropTypes.string,
+    loading: PropTypes.bool,
 };
 
 export default HistorySection;

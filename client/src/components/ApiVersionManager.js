@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import {
-    FiGitBranch, FiPlus, FiTrash2, FiClock, FiAlertTriangle,
-    FiServer, FiInfo, FiFileText, FiSettings
+    FiGitBranch, FiTrash2, FiClock, FiAlertTriangle,
+    FiServer, FiInfo, FiFileText, FiSettings, FiTag, FiX
 } from 'react-icons/fi';
 import MockServerManager from './MockServerManager';
 import './ApiVersionManager.css';
@@ -32,6 +32,7 @@ const ApiVersionManager = ({ collectionId, collection }) => {
 
             if (response.ok) {
                 const data = await response.json();
+                console.log('Fetched versions data:', data);
                 setVersions(data);
             } else {
                 throw new Error('Failed to fetch versions');
@@ -59,9 +60,20 @@ const ApiVersionManager = ({ collectionId, collection }) => {
                 return;
             }
 
+            // Validate required fields
+            if (!formData.version.trim()) {
+                setError('Version number is required');
+                return;
+            }
+
+            if (!formData.name.trim()) {
+                setError('Version name is required');
+                return;
+            }
+
             const versionData = {
                 version: formData.version,
-                name: formData.name || `${formData.version} API`,
+                name: formData.name,
                 description: formData.description,
                 changelog: formData.changelog,
                 migrationGuide: formData.migrationGuide,
@@ -81,8 +93,12 @@ const ApiVersionManager = ({ collectionId, collection }) => {
                 body: JSON.stringify(versionData)
             });
 
+            const responseData = await response.json();
+            console.log('Create version response:', responseData);
+
             if (response.ok) {
-                const newVersion = await response.json();
+                const newVersion = responseData.apiVersion || responseData;
+                console.log('New version created:', newVersion);
                 setVersions([...versions, newVersion]);
                 setShowCreateForm(false);
                 setFormData({
@@ -95,14 +111,22 @@ const ApiVersionManager = ({ collectionId, collection }) => {
                     specification: ''
                 });
             } else {
-                throw new Error('Failed to create version');
+                throw new Error(responseData.message || 'Failed to create version');
             }
         } catch (err) {
+            console.error('Error creating version:', err);
             setError(err.message);
         }
     };
 
     const handleDeprecateVersion = async (versionId) => {
+        console.log('Attempting to deprecate version with ID:', versionId);
+
+        if (!versionId) {
+            setError('Version ID is required to deprecate a version');
+            return;
+        }
+
         if (!window.confirm('Are you sure you want to deprecate this version?')) {
             return;
         }
@@ -113,17 +137,28 @@ const ApiVersionManager = ({ collectionId, collection }) => {
                 credentials: 'include'
             });
 
+            const responseData = await response.json();
+            console.log('Deprecate response:', responseData);
+
             if (response.ok) {
                 fetchVersions(); // Refresh the list
             } else {
-                throw new Error('Failed to deprecate version');
+                throw new Error(responseData.message || 'Failed to deprecate version');
             }
         } catch (err) {
+            console.error('Error deprecating version:', err);
             setError(err.message);
         }
     };
 
     const handleDeleteVersion = async (versionId) => {
+        console.log('Attempting to delete version with ID:', versionId);
+
+        if (!versionId) {
+            setError('Version ID is required to delete a version');
+            return;
+        }
+
         if (!window.confirm('Are you sure you want to delete this version? This action cannot be undone.')) {
             return;
         }
@@ -134,12 +169,16 @@ const ApiVersionManager = ({ collectionId, collection }) => {
                 credentials: 'include'
             });
 
+            const responseData = await response.json();
+            console.log('Delete response:', responseData);
+
             if (response.ok) {
                 setVersions(versions.filter(v => v._id !== versionId));
             } else {
-                throw new Error('Failed to delete version');
+                throw new Error(responseData.message || 'Failed to delete version');
             }
         } catch (err) {
+            console.error('Error deleting version:', err);
             setError(err.message);
         }
     };
@@ -192,7 +231,7 @@ const ApiVersionManager = ({ collectionId, collection }) => {
                         className="create-version-btn"
                         onClick={() => setShowCreateForm(true)}
                     >
-                        <FiPlus /> Create Version
+                        <FiTag /> Create Version
                     </button>
                 </div>
             </div>
@@ -222,73 +261,76 @@ const ApiVersionManager = ({ collectionId, collection }) => {
                                 className="create-version-btn"
                                 onClick={() => setShowCreateForm(true)}
                             >
-                                <FiPlus /> Create First Version
+                                <FiTag /> Create First Version
                             </button>
                         </div>
                     ) : (
                         <div className="versions-grid">
-                            {versions.map(version => (
-                                <div key={version._id} className="version-card">
-                                    <div className="version-header">
-                                        <div className="version-info">
-                                            <h4>v{version.version}</h4>
-                                            <p>{version.description}</p>
-                                        </div>
-                                        <div className={`version-status ${version.isDeprecated ? 'deprecated' : 'active'}`}>
-                                            {version.isDeprecated ? 'Deprecated' : 'Active'}
-                                        </div>
-                                    </div>
-
-                                    <div className="version-details">
-                                        <p>{version.changelog}</p>
-
-                                        <div className="version-meta">
-                                            <span>
-                                                <FiClock size={12} />
-                                                {new Date(version.createdAt).toLocaleDateString()}
-                                            </span>
+                            {versions.map(version => {
+                                console.log('Rendering version:', version);
+                                return (
+                                    <div key={version._id} className="version-card">
+                                        <div className="version-header">
+                                            <div className="version-info">
+                                                <h4>{version.name || `v${version.version}`}</h4>
+                                                <p>{version.description}</p>
+                                            </div>
+                                            <div className={`version-status ${version.isDeprecated ? 'deprecated' : 'active'}`}>
+                                                {version.isDeprecated ? 'Deprecated' : 'Active'}
+                                            </div>
                                         </div>
 
-                                        <div className={`compatibility-badge ${version.isBackwardCompatible ? 'compatible' : 'breaking'}`}>
-                                            {version.isBackwardCompatible ? (
-                                                <span>✓ Backward Compatible</span>
-                                            ) : (
-                                                <span>⚠ Breaking Changes</span>
-                                            )}
+                                        <div className="version-details">
+                                            <p>{version.changelog}</p>
+
+                                            <div className="version-meta">
+                                                <span>
+                                                    <FiClock size={12} />
+                                                    {new Date(version.createdAt).toLocaleDateString()}
+                                                </span>
+                                            </div>
+
+                                            <div className={`compatibility-badge ${version.backwardCompatible ? 'compatible' : 'breaking'}`}>
+                                                {version.backwardCompatible ? (
+                                                    <span>✓ Backward Compatible</span>
+                                                ) : (
+                                                    <span>⚠ Breaking Changes</span>
+                                                )}
+                                            </div>
                                         </div>
-                                    </div>
 
-                                    <div className="version-actions">
-                                        <button
-                                            className="action-btn mock-server"
-                                            onClick={() => handleManageMockServers(version._id)}
-                                        >
-                                            <FiServer size={14} />
-                                            Mock Servers
-                                        </button>
-
-                                        <div className="action-btn-group">
-                                            {!version.isDeprecated && (
-                                                <button
-                                                    className="action-btn deprecate"
-                                                    onClick={() => handleDeprecateVersion(version._id)}
-                                                >
-                                                    <FiAlertTriangle size={14} />
-                                                    Deprecate
-                                                </button>
-                                            )}
-
+                                        <div className="version-actions">
                                             <button
-                                                className="action-btn delete"
-                                                onClick={() => handleDeleteVersion(version._id)}
+                                                className="action-btn mock-server"
+                                                onClick={() => handleManageMockServers(version._id)}
                                             >
-                                                <FiTrash2 size={14} />
-                                                Delete
+                                                <FiServer size={14} />
+                                                Mock Servers
                                             </button>
+
+                                            <div className="action-btn-group">
+                                                {!version.isDeprecated && (
+                                                    <button
+                                                        className="action-btn deprecate"
+                                                        onClick={() => handleDeprecateVersion(version._id)}
+                                                    >
+                                                        <FiAlertTriangle size={14} />
+                                                        Deprecate
+                                                    </button>
+                                                )}
+
+                                                <button
+                                                    className="action-btn delete"
+                                                    onClick={() => handleDeleteVersion(version._id)}
+                                                >
+                                                    <FiTrash2 size={14} />
+                                                    Delete
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            ))}
+                                );
+                            })}
                         </div>
                     )}
                 </div>
@@ -298,14 +340,17 @@ const ApiVersionManager = ({ collectionId, collection }) => {
                 <div className="create-version-form">
                     <form onSubmit={handleCreateVersion}>
                         <div className="form-header">
-                            <h3>Create New API Version</h3>
+                            <h3>
+                                <FiTag className="icon" />
+                                Create New API Version
+                            </h3>
                             <button
                                 type="button"
                                 className="close-btn"
                                 onClick={() => setShowCreateForm(false)}
                                 aria-label="Close form"
                             >
-                                ✕
+                                <FiX />
                             </button>
                         </div>
 
@@ -336,7 +381,7 @@ const ApiVersionManager = ({ collectionId, collection }) => {
                                     </div>
                                 </div>
 
-                                <div className="form-group">
+                                <div className="form-group required">
                                     <label htmlFor="name">Version Name</label>
                                     <input
                                         type="text"
@@ -345,9 +390,10 @@ const ApiVersionManager = ({ collectionId, collection }) => {
                                         value={formData.name}
                                         onChange={handleInputChange}
                                         placeholder="e.g., Stable Release, Beta"
+                                        required
                                     />
                                     <div className="field-hint">
-                                        Optional friendly name for this version
+                                        Required friendly name for this version
                                     </div>
                                 </div>
                             </div>
@@ -466,7 +512,7 @@ const ApiVersionManager = ({ collectionId, collection }) => {
                                 Cancel
                             </button>
                             <button type="submit">
-                                <FiPlus />
+                                <FiTag />
                                 Create Version
                             </button>
                         </div>
@@ -497,7 +543,7 @@ const ApiVersionManager = ({ collectionId, collection }) => {
                         </div>
                         <div className="stat">
                             <div className="stat-number">
-                                {versions.filter(v => v.isBackwardCompatible).length}
+                                {versions.filter(v => v.backwardCompatible).length}
                             </div>
                             <div className="stat-label">Compatible</div>
                         </div>

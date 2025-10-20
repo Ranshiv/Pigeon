@@ -661,7 +661,7 @@
 
 /* Collection overview card */
 .collection-overview-card {
-  background-color: rgba(255, 255, 255, 0.03);
+  background-color: var(--card-bg, #002234);
   border: 1px solid var(--border-color);
   border-radius: 8px;
   padding: 24px;
@@ -679,7 +679,7 @@
 
 /* Structured metadata layout */
 .collection-metadata-section {
-  background-color: rgba(255, 255, 255, 0.02);
+  background-color: var(--card-bg, #002234);
   border: 1px solid var(--border-color);
   border-radius: 8px;
   padding: 20px;
@@ -774,7 +774,7 @@
 
 /* Collaboration info card */
 .real-time-info {
-  background-color: rgba(255, 255, 255, 0.02);
+  background-color: var(--card-bg, #002234);
   border: 1px solid var(--border-color);
   border-radius: 8px;
   padding: 24px;

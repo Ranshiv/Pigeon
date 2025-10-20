@@ -1,7 +1,7 @@
 // client/src/components/DocumentationManager.js
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { FiBook, FiDownload, FiUpload, FiSettings, FiGlobe, FiClock, FiChevronLeft, FiEdit, FiFileText, FiGitBranch, FiGrid } from 'react-icons/fi';
+import { FiBook, FiDownload, FiUpload, FiSettings, FiGlobe, FiClock, FiChevronLeft, FiEdit, FiFileText, FiGitBranch } from 'react-icons/fi';
 import DocumentationEditor from './DocumentationEditor';
 import DocumentationViewer from './DocumentationViewer';
 import DocumentationSettingsVersionHistory from './DocumentationSettingsVersionHistory';
@@ -42,7 +42,7 @@ const DocumentationManager = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
     const [isSaving, setIsSaving] = useState(false);
-    const [view, setView] = useState('edit'); // 'edit', 'view', 'swagger', 'settings', 'history', 'api-versions', 'visual-designer'
+    const [view, setView] = useState('edit'); // 'edit', 'view', 'swagger', 'settings', 'history', 'api-versions'
     const [currentSettings, setCurrentSettings] = useState(null);
     const [originalSettings, setOriginalSettings] = useState(null);
     const [settingsChanged, setSettingsChanged] = useState(false);
@@ -1016,12 +1016,6 @@ const DocumentationManager = () => {
                     >
                         <FiGitBranch /> API Versions
                     </button>
-                    <button
-                        className={`action-btn ${view === 'visual-designer' ? 'active' : ''}`}
-                        onClick={() => setView(view === 'visual-designer' ? 'edit' : 'visual-designer')}
-                    >
-                        <FiGrid /> Visual Designer
-                    </button>
                 </div>
             </div>
 
@@ -1169,7 +1163,10 @@ const DocumentationManager = () => {
                         </div>                        {/* Version History Section - placed before actions */}
                         <div style={{ margin: '32px 0' }}>
                             <div className="version-history-section">
-                                <h3>Version History</h3>
+                                <div className="version-history-header">
+                                    <h3>Version History</h3>
+                                    <p className="version-history-description">Track and manage all changes to your application settings and content</p>
+                                </div>
                                 <div className="version-history-tabs">
                                     <button
                                         className={`tab-btn ${versionHistoryTab === 'settings' ? 'active' : ''}`}
@@ -1258,18 +1255,6 @@ const DocumentationManager = () => {
                     </div>
                 )}
 
-                {view === 'visual-designer' && (
-                    <div className="visual-designer-removed">
-                        <div className="migration-notice">
-                            <h3>🎨 Visual API Designer Moved</h3>
-                            <p>The Visual API Designer has been moved to the "Add Request" page for better integration with the request workflow.</p>
-                            <p>You can now find it as a tab in the request form after creating a new request.</p>
-                            <Link to="/workspaces/requests/new" className="migration-link">
-                                Go to Request Form →
-                            </Link>
-                        </div>
-                    </div>
-                )}
             </div>
         </div>
     );

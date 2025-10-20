@@ -1,3 +1,40 @@
+/* WorkspaceDetail.css - 2025 Blue Palette Theme */
+
+/* Theme Variables - Matching Project Theme */
+:root {
+    /* Light Theme */
+    --ws-bg-primary: var(--background-color, #f8f9fa);
+    --ws-bg-surface: var(--card-bg, #ffffff);
+    --ws-bg-hover: var(--hover-bg, #f5f5f5);
+    --ws-text-primary: var(--text-color, #333333);
+    --ws-text-secondary: var(--text-secondary, #6c757d);
+    --ws-text-tertiary: var(--text-muted, #9ca3af);
+    --ws-border-light: var(--border-color, #e1e4e8);
+    --ws-primary-color: var(--primary-color, #014C75);
+    --ws-primary-hover: var(--primary-hover, #013B5B);
+    --ws-primary-light: var(--primary-light, #E5F3FF);
+    --ws-shadow: var(--card-shadow, 0 1px 3px rgba(0, 0, 0, 0.08));
+    --ws-success-color: var(--success-color, #28a745);
+    --ws-warning-color: var(--warning-color, #ffc107);
+    --ws-danger-color: var(--danger-color, #dc3545);
+}
+
+/* Dark Theme Variables */
+[data-theme="dark"],
+body.dark-theme {
+    --ws-bg-primary: var(--background-color, #00111A);
+    --ws-bg-surface: var(--card-bg, #002234);
+    --ws-bg-hover: var(--hover-bg, #013B5B);
+    --ws-text-primary: var(--text-color, #e0e0e0);
+    --ws-text-secondary: var(--text-secondary, #B8D4E3);
+    --ws-text-tertiary: var(--text-muted, #7A9BAD);
+    --ws-border-light: var(--border-color, #003956);
+    --ws-primary-color: var(--primary-color, #014C75);
+    --ws-primary-hover: var(--primary-hover, #013B5B);
+    --ws-primary-light: rgba(1, 76, 117, 0.2);
+    --ws-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
 .workspace-detail-container {
     display: flex;
     flex-direction: column;
@@ -5,7 +42,7 @@
     max-width: 1200px;
     margin: 0 auto;
     padding: 2rem 3rem 4rem;
-    background-color: #121212;
+    background-color: var(--ws-bg-primary);
 }
 
 .workspace-header {
@@ -13,7 +50,7 @@
     justify-content: space-between;
     align-items: center;
     padding-bottom: 20px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid var(--ws-border-light);
 }
 
 .workspace-title-section {
@@ -26,7 +63,7 @@
     font-size: 2rem;
     font-weight: 500;
     margin: 0;
-    color: #ffffff;
+    color: var(--ws-text-primary);
     letter-spacing: -0.5px;
 }
 
@@ -40,23 +77,24 @@
 }
 
 .workspace-badge.personal {
-    background-color: rgba(59, 130, 246, 0.3);
-    color: #ffffff;
+    background-color: rgba(1, 76, 117, 0.2);
+    color: var(--ws-primary-color);
+    margin: 3px;
 }
 
 .workspace-badge.public {
-    background-color: rgba(16, 185, 129, 0.3);
-    color: #ffffff;
+    background-color: rgba(40, 167, 69, 0.2);
+    color: var(--ws-success-color);
 }
 
 .workspace-badge.team {
-    background-color: rgba(245, 158, 11, 0.3);
-    color: #014C75;
+    background-color: rgba(255, 193, 7, 0.2);
+    color: var(--ws-warning-color);
 }
 
 .workspace-description {
     font-size: 16px;
-    color: var(--text-secondary, #666);
+    color: var(--ws-text-secondary);
     margin-top: 8px;
     line-height: 1.5;
     max-width: 800px;
@@ -74,8 +112,8 @@
     gap: 8px;
     padding: 8px 12px;
     border-radius: 6px;
-    background-color: rgba(76, 175, 80, 0.1);
-    color: #4caf50;
+    background-color: rgba(40, 167, 69, 0.1);
+    color: var(--ws-success-color);
     font-size: 14px;
     font-weight: 500;
 }
@@ -94,14 +132,14 @@
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    color: #4caf50;
+    color: var(--ws-success-color);
     transition: all 0.2s ease;
     margin-left: 4px;
     padding: 0;
 }
 
 .invite-member-btn-small:hover {
-    background-color: rgba(76, 175, 80, 0.2);
+    background-color: rgba(40, 167, 69, 0.2);
 }
 
 .workspace-edit-btn,
@@ -118,27 +156,28 @@
 }
 
 .workspace-edit-btn {
-    background-color: var(--accent-light, #E5F3FF);
-    color: var(--accent, #014C75);
+    background-color: var(--ws-primary-light);
+    color: var(--ws-primary-color);
 }
 
 .workspace-delete-btn {
-    background-color: rgba(244, 67, 54, 0.1);
-    color: #f44336;
+    background-color: rgba(220, 53, 69, 0.1);
+    color: var(--ws-danger-color);
 }
 
 .workspace-edit-btn:hover {
-    background-color: var(--accent-hover, #013B5B);
+    background-color: var(--ws-primary-hover);
+    color: #ffffff;
 }
 
 .workspace-delete-btn:hover {
-    background-color: rgba(244, 67, 54, 0.2);
+    background-color: rgba(220, 53, 69, 0.2);
 }
 
 /* Improved tabs */
 .workspace-tabs {
     display: flex;
-    border-bottom: 1px solid var(--border-color, #e0e0e0);
+    border-bottom: 1px solid var(--ws-border-light);
     margin-bottom: 20px;
     gap: 8px;
 }
@@ -148,35 +187,28 @@
     background: transparent;
     border: none;
     border-bottom: 3px solid transparent;
-    color: var(--text-secondary, #666);
+    color: var(--ws-text-secondary);
     font-weight: 500;
     cursor: pointer;
     transition: all 0.3s ease;
     font-size: 15px;
     border-radius: 8px 8px 0 0;
-    /* Rounded top corners */
 }
 
 .workspace-tabs .tab:hover {
-    color: var(--text-color, #333);
-    background-color: #013B5B;
-    /* Darker blue hover background */
-    border-bottom-color: #014C75;
-    /* Deep blue accent */
+    color: var(--ws-text-primary);
+    background-color: var(--ws-primary-hover);
+    color: #ffffff;
+    border-bottom-color: var(--ws-primary-color);
     transform: translateY(-2px);
-    /* Subtle lift effect */
 }
 
 .workspace-tabs .tab.active {
     color: #ffffff;
-    /* White text for better contrast */
-    background-color: #014C75;
-    /* Deep blue active background */
-    border-bottom-color: #014C75;
-    /* Deep blue accent */
+    background-color: var(--ws-primary-color);
+    border-bottom-color: var(--ws-primary-color);
     font-weight: 600;
     box-shadow: 0 2px 8px rgba(1, 76, 117, 0.3);
-    /* Subtle blue glow */
 }
 
 /* Tab content */
@@ -206,29 +238,30 @@
 }
 
 .collection-card {
-    background-color: var(--card-bg, white);
-    border: 1px solid var(--border-color, #e0e0e0);
+    background-color: var(--ws-bg-surface);
+    border: 1px solid var(--ws-border-light);
     border-radius: 8px;
     padding: 20px;
     display: flex;
     flex-direction: column;
     transition: all 0.3s ease;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    box-shadow: var(--ws-shadow);
 }
 
 .collection-card:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 12px rgba(1, 76, 117, 0.15);
 }
 
 .collection-card h3 {
     margin: 0 0 8px 0;
     font-size: 17px;
     font-weight: 600;
+    color: var(--ws-text-primary);
 }
 
 .collection-card p {
-    color: var(--text-secondary, #666);
+    color: var(--ws-text-secondary);
     margin: 0 0 16px 0;
     font-size: 14px;
     flex-grow: 1;
@@ -237,7 +270,7 @@
 .collection-meta {
     display: flex;
     justify-content: space-between;
-    color: var(--text-tertiary, #888);
+    color: var(--ws-text-tertiary);
     font-size: 13px;
     margin-bottom: 16px;
 }
@@ -245,8 +278,8 @@
 .view-collection-btn {
     padding: 8px 16px;
     background-color: transparent;
-    border: 1px solid var(--accent, #014C75);
-    color: var(--accent, #014C75);
+    border: 1px solid var(--ws-primary-color);
+    color: var(--ws-primary-color);
     border-radius: 4px;
     cursor: pointer;
     font-weight: 500;
@@ -255,7 +288,7 @@
 }
 
 .view-collection-btn:hover {
-    background-color: var(--accent, #014C75);
+    background-color: var(--ws-primary-color);
     color: white;
 }
 
@@ -264,7 +297,7 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    background-color: var(--accent, #014C75);
+    background-color: var(--ws-primary-color);
     color: white;
     border: none;
     padding: 8px 16px;
@@ -276,7 +309,7 @@
 
 .add-collection-btn:hover,
 .invite-member-btn:hover {
-    background-color: var(--accent-dark, #014C75);
+    background-color: var(--ws-primary-hover);
 }
 
 /* Empty states */
@@ -284,8 +317,8 @@
     text-align: center;
     padding: 40px 20px;
     border-radius: 8px;
-    background-color: var(--background-light, #f5f5f5);
-    color: var(--text-secondary, #666);
+    background-color: var(--ws-bg-hover);
+    color: var(--ws-text-secondary);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -293,7 +326,7 @@
 }
 
 .empty-state .primary-btn {
-    background-color: var(--accent, #014C75);
+    background-color: var(--ws-primary-color);
     color: white;
     padding: 10px 20px;
     border: none;
@@ -304,7 +337,7 @@
 }
 
 .empty-state .primary-btn:hover {
-    background-color: var(--accent-dark, #014C75);
+    background-color: var(--ws-primary-hover);
 }
 
 /* Members table */
@@ -316,15 +349,15 @@
 .members-table th {
     text-align: left;
     padding: 12px 16px;
-    border-bottom: 1px solid var(--border-color, #e0e0e0);
-    color: var(--text-secondary, #666);
+    border-bottom: 1px solid var(--ws-border-light);
+    color: var(--ws-text-secondary);
     font-weight: 500;
     font-size: 14px;
 }
 
 .members-table td {
     padding: 12px 16px;
-    border-bottom: 1px solid var(--border-color, #e0e0e0);
+    border-bottom: 1px solid var(--ws-border-light);
     font-size: 14px;
 }
 
@@ -338,7 +371,7 @@
     width: 32px;
     height: 32px;
     border-radius: 50%;
-    background-color: var(--accent, #014C75);
+    background-color: var(--ws-primary-color);
     color: white;
     display: flex;
     align-items: center;
@@ -354,12 +387,12 @@
 
 .user-name {
     font-weight: 500;
-    color: var(--text-primary, #333);
+    color: var(--ws-text-primary);
 }
 
 .user-email {
     font-size: 12px;
-    color: var(--text-tertiary, #888);
+    color: var(--ws-text-tertiary);
 }
 
 .role-badge {
@@ -370,30 +403,30 @@
 }
 
 .role-badge.admin {
-    background-color: rgba(33, 150, 243, 0.1);
-    color: #014C75;
+    background-color: rgba(1, 76, 117, 0.1);
+    color: var(--ws-primary-color);
 }
 
 .role-badge.editor {
-    background-color: rgba(76, 175, 80, 0.1);
-    color: #4caf50;
+    background-color: rgba(40, 167, 69, 0.1);
+    color: var(--ws-success-color);
 }
 
 .role-badge.viewer {
-    background-color: rgba(158, 158, 158, 0.1);
-    color: #9e9e9e;
+    background-color: rgba(108, 117, 125, 0.1);
+    color: var(--ws-text-secondary);
 }
 
 .role-badge.visitor {
     background-color: rgba(255, 193, 7, 0.1);
-    color: #FFC107;
+    color: var(--ws-warning-color);
 }
 
 /* Style for active visitors in the members table */
 .user-cell .active-indicator {
     width: 8px;
     height: 8px;
-    background-color: #10b981;
+    background-color: var(--ws-success-color);
     border-radius: 50%;
     display: inline-block;
     margin-left: 6px;
@@ -404,26 +437,28 @@
 .role-select {
     padding: 4px 8px;
     border-radius: 4px;
-    border: 1px solid var(--border-color, #e0e0e0);
+    border: 1px solid var(--ws-border-light);
+    background-color: var(--ws-bg-surface);
+    color: var(--ws-text-primary);
 }
 
 .remove-member-btn {
     padding: 4px 10px;
     background-color: transparent;
-    color: #f44336;
-    border: 1px solid #f44336;
+    color: var(--ws-danger-color);
+    border: 1px solid var(--ws-danger-color);
     border-radius: 4px;
     cursor: pointer;
     transition: all 0.2s ease;
 }
 
 .remove-member-btn:hover {
-    background-color: rgba(244, 67, 54, 0.1);
+    background-color: rgba(220, 53, 69, 0.1);
 }
 
 .owner-label {
     font-size: 12px;
-    color: var(--text-tertiary, #888);
+    color: var(--ws-text-tertiary);
 }
 
 /* Merge requests */
@@ -434,22 +469,22 @@
 }
 
 .merge-request-card {
-    border: 1px solid var(--border-color, #e0e0e0);
+    border: 1px solid var(--ws-border-light);
     border-radius: 8px;
     padding: 20px;
-    background-color: var(--card-bg, white);
+    background-color: var(--ws-bg-surface);
 }
 
 .merge-request-card.approved {
-    border-left: 4px solid #4caf50;
+    border-left: 4px solid var(--ws-success-color);
 }
 
 .merge-request-card.rejected {
-    border-left: 4px solid #f44336;
+    border-left: 4px solid var(--ws-danger-color);
 }
 
 .merge-request-card.pending {
-    border-left: 4px solid #ff9800;
+    border-left: 4px solid var(--ws-warning-color);
 }
 
 .merge-request-header {
@@ -472,7 +507,7 @@
 }
 
 .merge-icon {
-    color: #ff9800;
+    color: var(--ws-warning-color);
 }
 
 .status-badge {
@@ -483,18 +518,18 @@
 }
 
 .status-badge.approved {
-    background-color: rgba(76, 175, 80, 0.1);
-    color: #4caf50;
+    background-color: rgba(40, 167, 69, 0.1);
+    color: var(--ws-success-color);
 }
 
 .status-badge.rejected {
-    background-color: rgba(244, 67, 54, 0.1);
-    color: #f44336;
+    background-color: rgba(220, 53, 69, 0.1);
+    color: var(--ws-danger-color);
 }
 
 .status-badge.pending {
-    background-color: rgba(255, 152, 0, 0.1);
-    color: #ff9800;
+    background-color: rgba(255, 193, 7, 0.1);
+    color: var(--ws-warning-color);
 }
 
 .merge-details {
@@ -507,7 +542,7 @@
     display: flex;
     align-items: center;
     gap: 16px;
-    background-color: var(--background-light, #f5f5f5);
+    background-color: var(--ws-bg-hover);
     padding: 12px 16px;
     border-radius: 6px;
 }
@@ -521,21 +556,22 @@
 
 .label {
     font-size: 12px;
-    color: var(--text-tertiary, #888);
+    color: var(--ws-text-tertiary);
 }
 
 .value {
     font-weight: 500;
+    color: var(--ws-text-primary);
 }
 
 .merge-arrow {
-    color: var(--text-secondary, #666);
+    color: var(--ws-text-secondary);
 }
 
 .merge-meta {
     display: flex;
     justify-content: space-between;
-    color: var(--text-tertiary, #888);
+    color: var(--ws-text-tertiary);
     font-size: 13px;
 }
 
@@ -556,31 +592,31 @@
 }
 
 .approve-btn {
-    background-color: #4caf50;
+    background-color: var(--ws-success-color);
     color: white;
 }
 
 .approve-btn:hover {
-    background-color: #43a047;
+    background-color: #218838;
 }
 
 .reject-btn {
     background-color: transparent;
-    border: 1px solid #f44336;
-    color: #f44336;
+    border: 1px solid var(--ws-danger-color);
+    color: var(--ws-danger-color);
 }
 
 .reject-btn:hover {
-    background-color: rgba(244, 67, 54, 0.1);
+    background-color: rgba(220, 53, 69, 0.1);
 }
 
 .merge-result {
     display: flex;
     justify-content: space-between;
     font-size: 13px;
-    color: var(--text-tertiary, #888);
+    color: var(--ws-text-tertiary);
     padding-top: 8px;
-    border-top: 1px dashed var(--border-color, #e0e0e0);
+    border-top: 1px dashed var(--ws-border-light);
 }
 
 /* Activity timeline */
@@ -594,12 +630,12 @@
     display: flex;
     gap: 16px;
     padding-bottom: 16px;
-    border-bottom: 1px solid var(--border-color, #e0e0e0);
+    border-bottom: 1px solid var(--ws-border-light);
 }
 
 .activity-icon {
-    background-color: var(--accent-light, #E5F3FF);
-    color: var(--accent, #014C75);
+    background-color: var(--ws-primary-light);
+    color: var(--ws-primary-color);
     width: 32px;
     height: 32px;
     border-radius: 50%;
@@ -621,22 +657,23 @@
 
 .activity-header .user {
     font-weight: 500;
-    color: var(--text-primary, #333);
+    color: var(--ws-text-primary);
 }
 
 .activity-header .time {
     font-size: 12px;
-    color: var(--text-tertiary, #888);
+    color: var(--ws-text-tertiary);
 }
 
 .activity-message {
     margin: 0;
     line-height: 1.5;
+    color: var(--ws-text-primary);
 }
 
 .activity-details {
     font-size: 13px;
-    color: var(--text-tertiary, #888);
+    color: var(--ws-text-tertiary);
     margin-top: 4px;
 }
 
@@ -657,14 +694,14 @@
 }
 
 .modal-content {
-    background-color: var(--card-bg, white);
+    background-color: var(--ws-bg-surface);
     border-radius: 8px;
     padding: 24px;
     max-width: 500px;
     width: 90%;
     max-height: 80vh;
     overflow-y: auto;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 10px 25px rgba(1, 76, 117, 0.2);
 }
 
 .modal-content h2 {
@@ -672,6 +709,7 @@
     margin-bottom: 20px;
     font-size: 20px;
     font-weight: 500;
+    color: var(--ws-text-primary);
 }
 
 .form-group {
@@ -682,15 +720,17 @@
     display: block;
     margin-bottom: 6px;
     font-weight: 500;
-    color: var(--text-secondary, #666);
+    color: var(--ws-text-secondary);
 }
 
 .form-group input {
     width: 100%;
     padding: 10px 12px;
-    border: 1px solid var(--border-color, #e0e0e0);
+    border: 1px solid var(--ws-border-light);
     border-radius: 4px;
     font-size: 14px;
+    background-color: var(--ws-bg-surface);
+    color: var(--ws-text-primary);
 }
 
 .role-options {
@@ -704,21 +744,21 @@
     align-items: flex-start;
     gap: 12px;
     padding: 12px;
-    border: 1px solid var(--border-color, #e0e0e0);
+    border: 1px solid var(--ws-border-light);
     border-radius: 4px;
     cursor: pointer;
     transition: all 0.2s ease;
 }
 
 .role-option.selected {
-    border-color: var(--accent, #014C75);
-    background-color: var(--accent-light, #E5F3FF);
+    border-color: var(--ws-primary-color);
+    background-color: var(--ws-primary-light);
 }
 
 .role-option p {
     margin: 4px 0 0 0;
     font-size: 13px;
-    color: var(--text-secondary, #666);
+    color: var(--ws-text-secondary);
 }
 
 .modal-actions {
@@ -731,8 +771,8 @@
 .cancel-btn {
     padding: 10px 16px;
     background-color: transparent;
-    border: 1px solid var(--border-color, #e0e0e0);
-    color: var(--text-secondary, #666);
+    border: 1px solid var(--ws-border-light);
+    color: var(--ws-text-secondary);
     border-radius: 4px;
     font-weight: 500;
     cursor: pointer;
@@ -740,12 +780,12 @@
 }
 
 .cancel-btn:hover {
-    background-color: var(--background-light, #f5f5f5);
+    background-color: var(--ws-bg-hover);
 }
 
 .invite-btn {
     padding: 10px 16px;
-    background-color: var(--accent, #014C75);
+    background-color: var(--ws-primary-color);
     color: white;
     border: none;
     border-radius: 4px;
@@ -755,7 +795,7 @@
 }
 
 .invite-btn:hover {
-    background-color: var(--accent-dark, #014C75);
+    background-color: var(--ws-primary-hover);
 }
 
 .invite-btn:disabled {
@@ -770,7 +810,7 @@
     justify-content: center;
     min-height: 300px;
     font-size: 16px;
-    color: var(--text-secondary, #666);
+    color: var(--ws-text-secondary);
 }
 
 .error-container {
@@ -779,19 +819,19 @@
     text-align: center;
     padding: 24px;
     border-radius: 8px;
-    background-color: rgba(244, 67, 54, 0.05);
-    border: 1px solid rgba(244, 67, 54, 0.2);
+    background-color: rgba(220, 53, 69, 0.05);
+    border: 1px solid rgba(220, 53, 69, 0.2);
 }
 
 .error-container h2 {
-    color: #f44336;
+    color: var(--ws-danger-color);
     margin-top: 0;
 }
 
 .debug-info {
     margin-top: 24px;
     text-align: left;
-    background-color: rgba(0, 0, 0, 0.03);
+    background-color: var(--ws-bg-hover);
     padding: 16px;
     border-radius: 4px;
     font-size: 14px;
@@ -800,7 +840,7 @@
 .back-button {
     margin-top: 20px;
     padding: 10px 16px;
-    background-color: var(--accent, #014C75);
+    background-color: var(--ws-primary-color);
     color: white;
     border: none;
     border-radius: 4px;
@@ -828,15 +868,15 @@
     align-items: center;
     gap: 16px;
     padding: 20px;
-    background-color: var(--card-bg, white);
+    background-color: var(--ws-bg-surface);
     border-radius: 8px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+    box-shadow: var(--ws-shadow);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .stat-card:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 12px rgba(1, 76, 117, 0.15);
 }
 
 .stat-icon {
@@ -850,18 +890,18 @@
 }
 
 .stat-icon.collections {
-    background-color: rgba(33, 150, 243, 0.1);
-    color: #014C75;
+    background-color: rgba(1, 76, 117, 0.1);
+    color: var(--ws-primary-color);
 }
 
 .stat-icon.members {
-    background-color: rgba(76, 175, 80, 0.1);
-    color: #4caf50;
+    background-color: rgba(40, 167, 69, 0.1);
+    color: var(--ws-success-color);
 }
 
 .stat-icon.pending {
-    background-color: rgba(255, 152, 0, 0.1);
-    color: #ff9800;
+    background-color: rgba(255, 193, 7, 0.1);
+    color: var(--ws-warning-color);
 }
 
 .stat-icon.activity {
@@ -877,19 +917,20 @@
 .stat-value {
     font-size: 24px;
     font-weight: 600;
-    color: var(--text-primary, #333);
+    color: var(--ws-text-primary);
 }
 
 .stat-label {
     font-size: 14px;
-    color: var(--text-secondary, #666);
+    color: var(--ws-text-secondary);
 }
 
 .recent-collections {
-    background-color: var(--card-bg, white);
+    background-color: var(--ws-bg-surface);
     border-radius: 8px;
     padding: 20px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+    box-shadow: var(--ws-shadow);
+    border: 1px solid var(--ws-border-light);
 }
 
 .recent-collections h3 {
@@ -897,39 +938,64 @@
     align-items: center;
     gap: 8px;
     margin-top: 0;
-    margin-bottom: 16px;
+    margin-bottom: 12px;
     font-size: 16px;
-    color: var(--text-secondary, #666);
+    color: var(--ws-text-secondary);
     font-weight: 500;
 }
 
+.recent-collections h3 svg {
+    color: var(--ws-primary-color);
+}
+
 .recent-collections-list {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    /* Vertical list to mirror the screenshot layout */
+    display: flex;
+    flex-direction: column;
     gap: 12px;
 }
 
 .recent-collection-item {
-    padding: 12px;
-    border-radius: 6px;
-    border: 1px solid var(--border-color, #e0e0e0);
+    /* Pill-like row item */
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 16px;
+    border-radius: 999px;
+    border: 1px solid var(--ws-border-light);
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+    background-color: var(--ws-bg-hover);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.03);
 }
 
 .recent-collection-item:hover {
-    background-color: var(--accent-light, #E5F3FF);
-    border-color: var(--accent, #014C75);
+    background-color: var(--ws-primary-light);
+    border-color: var(--ws-primary-color);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 6px rgba(1, 76, 117, 0.25), inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+}
+
+.recent-collection-item:focus,
+.recent-collection-item:focus-visible {
+    outline: none;
+    border-color: var(--ws-primary-color);
+    box-shadow: 0 0 0 3px rgba(1, 76, 117, 0.25);
 }
 
 .collection-name {
     font-weight: 500;
-    margin-bottom: 4px;
+    color: var(--ws-text-primary);
+    margin: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .collection-updated {
     font-size: 12px;
-    color: var(--text-tertiary, #888);
+    color: var(--ws-text-tertiary);
 }
 
 /* Add notification badge for pending merge requests */
@@ -941,7 +1007,7 @@
     height: 18px;
     font-size: 11px;
     font-weight: 600;
-    background-color: #f44336;
+    background-color: var(--ws-danger-color);
     color: white;
     border-radius: 9px;
     padding: 0 6px;
@@ -950,9 +1016,9 @@
 
 /* Loading spinner */
 .loading-spinner {
-    border: 3px solid rgba(0, 0, 0, 0.1);
+    border: 3px solid var(--ws-border-light);
     border-radius: 50%;
-    border-top: 3px solid var(--accent, #014C75);
+    border-top: 3px solid var(--ws-primary-color);
     width: 24px;
     height: 24px;
     animation: spin 1s linear infinite;
@@ -1016,7 +1082,7 @@
 .active-members-section {
     margin-bottom: 24px;
     padding-bottom: 16px;
-    border-bottom: 1px solid var(--border-color, #e0e0e0);
+    border-bottom: 1px solid var(--ws-border-light);
 }
 
 .section-title {
@@ -1026,7 +1092,7 @@
 .section-title h3 {
     font-size: 17px;
     font-weight: 500;
-    color: var(--text-secondary, #666);
+    color: var(--ws-text-secondary);
     margin: 0;
 }
 
@@ -1035,7 +1101,7 @@
     display: block;
     width: 100%;
     max-width: unset;
-    background-color: var(--background-light, #f5f5f5);
+    background-color: var(--ws-bg-hover);
     border-radius: 8px;
     padding: 16px;
 }
@@ -1043,4 +1109,5 @@
 .active-members-section .collaborators-header {
     font-size: 16px;
     margin-bottom: 16px;
+    color: var(--ws-text-primary);
 }

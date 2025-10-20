@@ -177,7 +177,7 @@
 .diff-content {
     flex: 1;
     overflow: auto;
-    background: var(--bg-surface, #ffffff);
+    background: var(--background-color, #ffffff);
 }
 
 .diff-lines {

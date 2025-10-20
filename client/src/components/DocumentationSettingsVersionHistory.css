@@ -410,37 +410,41 @@
     margin: 0;
 }
 
-/* Dark mode support */
+/* Dark mode support - 2025 Blue Theme */
 @media (prefers-color-scheme: dark) {
     .settings-version-history {
-        /* --background-color: #0d1117; */
-        --header-bg: #161b22;
-        --details-bg: #171818;
-        --border-color: #30363d;
-        --text-primary: #c9d1d9;
-        --text-muted: #8b949e;
-        --hover-bg: #21262d;
-        --selected-bg: #1c2128;
-        --icon-bg: #21262d;
-        --code-bg: #161b22;
+        /* --background-color: #00111A; */
+        --header-bg: #012A41;
+        --details-bg: #001927;
+        --border-color: #003956;
+        --text-primary: #e0e0e0;
+        --text-muted: #7A9BAD;
+        --hover-bg: #013B5B;
+        --selected-bg: #002b42;
+        --icon-bg: #013B5B;
+        --code-bg: #002234;
         --success-bg: #0f2419;
-        --success-color: #56d364;
+        --success-color: #28a745;
         --danger-bg: #2d1117;
-        --danger-color: #f85149;
-        --warning-color: #d29922;
-        --info-color: #58a6ff;
+        --danger-color: #dc3545;
+        --warning-color: #ffc107;
+        --info-color: #014C75;
+    }
+
+    .version-icon {
+        color: #ffffff;
     }
 
     .success-message {
-        --success-bg: #1e3a28;
-        --success-text: #5cb85c;
-        --success-border: #2d4a36;
+        --success-bg: #0f2419;
+        --success-text: #28a745;
+        --success-border: #1e3a28;
     }
 
     .pagination button {
-        --background-color: #2d3748;
-        --border-color: #4a5568;
-        --text-primary: #e2e8f0;
+        --background-color: #002234;
+        --border-color: #003956;
+        --text-primary: #e0e0e0;
     }
 
     .pagination button:hover:not(:disabled) {

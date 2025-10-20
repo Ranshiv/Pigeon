@@ -112,6 +112,7 @@ body.dark-theme .variable-editor {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 16px;
+    margin-bottom: 1%;
 }
 
 .variable-card {
@@ -295,10 +296,67 @@ body.dark-theme .variable-editor {
 }
 
 .add-variable-form {
-    background: var(--var-bg-tertiary);
-    border: 1px solid var(--var-border-primary);
     border-radius: 12px;
     padding: 20px;
+}
+
+.form-actions {
+    margin: 0 !important;
+    background-color: var(--var-bg-primary) !important;
+}
+
+/* Add Variable Button - Primary Action */
+.add-variable-btn {
+    background: var(--var-primary-color) !important;
+    color: white !important;
+    border: none !important;
+    padding: 10px 20px !important;
+    border-radius: 8px !important;
+    font-size: 0.875rem !important;
+    font-weight: 500 !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    box-shadow: 0 2px 8px rgba(1, 76, 117, 0.2) !important;
+}
+
+.add-variable-btn:hover:not(:disabled) {
+    background: var(--var-primary-hover) !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 12px rgba(1, 76, 117, 0.3) !important;
+}
+
+.add-variable-btn:disabled {
+    opacity: 0.5 !important;
+    cursor: not-allowed !important;
+    transform: none !important;
+}
+
+/* Cancel Button - Secondary Action */
+.cancel-add-btn,
+.cancel-edit-btn {
+    background: var(--var-primary-color) !important;
+    border: 1px solid var(--var-border-primary) !important;
+    color: var(--var-text-primary) !important;
+    padding: 10px 20px !important;
+    border-radius: 8px !important;
+    font-size: 0.875rem !important;
+    font-weight: 500 !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+}
+
+.btn-secondary .cancel-add-btn:hover,
+.cancel-edit-btn:hover {
+    background: var(--var-bg-tertiary) !important;
+    border-color: var(--var-primary-color) !important;
+    color: var(--var-primary-color) !important;
+    transform: translateY(-1px) !important;
 }
 
 .add-variable-icon {
@@ -569,6 +627,7 @@ body.dark-theme .variable-editor {
     display: flex;
     align-items: center;
     justify-content: center;
+    min-width: 20px !important;
 }
 
 .action-btn:hover {

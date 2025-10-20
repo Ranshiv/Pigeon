@@ -502,8 +502,9 @@ function SampleDataManager({ collectionId }) {
                         className="action-btn template-btn"
                         onClick={() => setShowTemplateModal(true)}
                         title="Use a template to create sample data"
+                        aria-label="Browse sample data templates"
                     >
-                        <FiCode className="icon" /> Templates
+                        <FiGrid className="icon" /> Templates
                     </button>
                     <button
                         className="action-btn"

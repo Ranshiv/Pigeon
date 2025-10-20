@@ -180,7 +180,8 @@ body.dark-theme .environment-modal-overlay {
     border: 1px solid var(--modal-border-primary);
     border-radius: 8px;
     overflow-y: auto;
-    max-height: 300px;
+    /* max-height: 300px; */
+    padding: 20px;
 }
 
 .environment-modal-actions {

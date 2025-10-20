@@ -335,7 +335,7 @@ body.dark-theme .environment-selector {
     background: var(--env-bg-primary);
     border: 1px dashed var(--env-border-hover);
     border-radius: 10px;
-    color: var(--env-border-accent);
+    color: var(--text-color, #014C75);
     cursor: pointer;
     font-size: 14px;
     font-weight: 500;

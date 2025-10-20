@@ -30,7 +30,7 @@
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
     gap: 2rem;
-    margin-bottom: 3rem;
+    margin-top: 3rem;
 }
 
 .documentation-section {
@@ -52,7 +52,7 @@
     font-size: 1.25rem;
     font-weight: 600;
     margin-bottom: 1rem;
-    color: var(--primary-color, #014C75);
+    color: var(--text-color);
 }
 
 .documentation-section h2 svg {

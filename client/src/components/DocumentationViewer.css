@@ -64,7 +64,7 @@
     flex: 1;
     padding: 25px 30px;
     overflow: auto;
-    background-color: var(--card-bg);
+    background-color: var(--background-color, #ffffff);
 }
 
 .markdown-content {
@@ -301,13 +301,13 @@
     }
 
     .edit-documentation-link {
-        background-color: var(--background-light, #2c2c2c);
-        color: var(--text-primary, #e0e0e0);
-        border-color: var(--border-color, #333333);
+        background-color: var(--card-bg, #002234);
+        color: var(--text-color, #e0e0e0);
+        border-color: var(--border-color, #003956);
     }
 
     .edit-documentation-link:hover {
-        background-color: var(--hover-bg, #3c3c3c);
+        background-color: var(--hover-bg, #013B5B);
     }
 
     .markdown-content h1,

@@ -142,7 +142,7 @@ body.dark-theme,
     margin-bottom: 20px;
 }
 
-.close-button {
+.oauth-callback .close-button {
     background: var(--oauth-primary-color, #014C75);
     color: white;
     border: none;
@@ -160,7 +160,7 @@ body.dark-theme,
     position: relative;
 }
 
-.close-button::before {
+.oauth-callback .close-button::before {
     content: "✕";
     font-size: 16px;
     font-weight: 400;
@@ -168,13 +168,13 @@ body.dark-theme,
     margin-left: 8px;
 }
 
-.close-button:hover {
+.oauth-callback .close-button:hover {
     background: var(--oauth-primary-hover, #013B5B);
     transform: translateY(-1px);
     box-shadow: 0 4px 16px rgba(1, 76, 117, 0.2);
 }
 
-.close-button:active {
+.oauth-callback .close-button:active {
     transform: translateY(0);
 }
 

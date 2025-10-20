@@ -267,7 +267,7 @@ body.dark-theme .header-title h3 {
 
 [data-theme="dark"] .header-icon,
 body.dark-theme .header-icon {
-    color: var(--primary-color, #014C75);
+    color: var(--text-color, #014C75);
 }
 
 [data-theme="dark"] .collection-name,

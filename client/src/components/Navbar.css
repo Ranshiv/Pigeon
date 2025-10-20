@@ -425,22 +425,23 @@
 /* Workspace selector dropdown styling */
 .workspace-selector-dropdown {
     position: absolute;
-    top: calc(100% + 5px);
+    top: calc(100% + 6px);
     left: 50%;
     transform: translateX(-50%);
-    background-color: #222;
-    border-radius: 6px;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
-    width: 280px;
-    max-height: 500px;
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+    width: 260px;
+    max-height: 460px;
     overflow-y: auto;
     z-index: 101;
     /* Higher z-index than regular dropdowns */
     opacity: 1;
     visibility: visible;
     pointer-events: auto;
-    color: #e0e0e0;
-    padding: 0;
+    color: var(--text-color);
+    padding: 6px 0;
 }
 
 .workspace-selector-header {
@@ -453,50 +454,73 @@
 .workspace-search-container {
     position: relative;
     width: 100%;
-    padding: 16px;
-    padding-bottom: 12px;
+    padding: 10px 12px 8px 12px;
 }
 
 .search-icon {
     position: absolute;
-    left: 26px;
+    left: 22px;
     top: 50%;
     transform: translateY(-50%);
-    color: #777;
+    color: var(--text-secondary);
     font-size: 14px;
 }
 
 .workspace-search-input {
     width: 100%;
-    padding: 8px 12px 8px 32px;
-    border-radius: 4px;
-    border: none;
-    background-color: #323232;
-    color: #e0e0e0;
+    padding: 8px 12px 8px 30px;
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
+    background-color: var(--hover-bg);
+    color: var(--text-color);
     font-size: 13px;
+}
+
+/* Make placeholder text white for better contrast */
+.workspace-search-input::placeholder {
+    color: var(--text-secondary);
+}
+
+.workspace-search-input::-webkit-input-placeholder {
+    color: var(--text-secondary);
+}
+
+.workspace-search-input::-moz-placeholder {
+    color: var(--text-secondary);
+}
+
+.workspace-search-input:-ms-input-placeholder {
+    color: var(--text-secondary);
+}
+
+.workspace-search-input::-ms-input-placeholder {
+    color: var(--text-secondary);
 }
 
 .workspace-search-input:focus {
     outline: none;
-    background-color: #3a3a3a;
+    background-color: var(--card-bg);
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(1, 76, 117, 0.25);
 }
 
 .create-workspace-btn {
     background-color: transparent;
-    color: #e0e0e0;
+    color: var(--text-color);
     border: none;
     padding: 10px 16px;
     cursor: pointer;
-    font-weight: 500;
+    font-weight: 600;
     font-size: 13px;
-    transition: background-color 0.2s;
+    transition: background-color 0.15s ease, color 0.15s ease;
     width: 100%;
     text-align: left;
-    border-bottom: 1px solid #333;
+    border-bottom: 1px solid var(--border-color);
 }
 
 .create-workspace-btn:hover {
-    background-color: #333;
+    background-color: var(--hover-bg);
+    color: var(--primary-color);
 }
 
 .workspace-section {
@@ -505,8 +529,8 @@
 
 .workspace-section-title {
     font-size: 11px;
-    font-weight: 400;
-    color: #888;
+    font-weight: 500;
+    color: var(--text-secondary);
     margin: 8px 16px 4px;
     text-transform: lowercase;
 }
@@ -520,13 +544,16 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    padding: 6px 16px;
+    padding: 8px 16px;
     cursor: pointer;
-    transition: background-color 0.2s;
+    transition: background-color 0.15s ease, color 0.15s ease, border-left-color 0.15s ease;
+    border-left: 3px solid transparent;
 }
 
 .workspace-item:hover {
-    background-color: #333;
+    background-color: var(--hover-bg);
+    border-left-color: var(--primary-color);
+    color: var(--text-color);
 }
 
 .workspace-icon-small {
@@ -535,7 +562,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #e0e0e0;
+    color: var(--text-color);
     font-size: 12px;
 }
 
@@ -545,11 +572,11 @@
     justify-content: space-between;
     width: 100%;
     font-size: 13px;
-    font-weight: 400;
+    font-weight: 500;
 }
 
 .current-workspace-indicator {
-    color: #014C75;
+    color: var(--primary-color);
 }
 
 .view-all-workspaces {
@@ -557,13 +584,14 @@
     align-items: center;
     justify-content: space-between;
     padding: 10px 16px;
-    color: #e0e0e0;
+    color: var(--text-color);
     font-size: 13px;
     cursor: pointer;
-    transition: background-color 0.2s;
-    border-top: 1px solid #333;
+    transition: background-color 0.15s ease, color 0.15s ease;
+    border-top: 1px solid var(--border-color);
 }
 
 .view-all-workspaces:hover {
-    background-color: #333;
+    background-color: var(--hover-bg);
+    color: var(--text-color);
 }
