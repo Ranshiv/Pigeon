@@ -174,12 +174,17 @@ body.dark-theme {
     background-color: rgba(220, 53, 69, 0.2);
 }
 
-/* Improved tabs */
+/* Improved tabs - Enhanced with 2025 Blue Palette */
 .workspace-tabs {
     display: flex;
     border-bottom: 1px solid var(--ws-border-light);
     margin-bottom: 20px;
-    gap: 8px;
+    gap: 4px;
+    background: linear-gradient(to right, 
+                rgba(248, 250, 252, 0.8), 
+                rgba(241, 245, 249, 0.8));
+    border-radius: 12px 12px 0 0;
+    padding: 4px;
 }
 
 .workspace-tabs .tab {
@@ -190,25 +195,11 @@ body.dark-theme {
     color: var(--ws-text-secondary);
     font-weight: 500;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     font-size: 15px;
     border-radius: 8px 8px 0 0;
-}
-
-.workspace-tabs .tab:hover {
-    color: var(--ws-text-primary);
-    background-color: var(--ws-primary-hover);
-    color: #ffffff;
-    border-bottom-color: var(--ws-primary-color);
-    transform: translateY(-2px);
-}
-
-.workspace-tabs .tab.active {
-    color: #ffffff;
-    background-color: var(--ws-primary-color);
-    border-bottom-color: var(--ws-primary-color);
-    font-weight: 600;
-    box-shadow: 0 2px 8px rgba(1, 76, 117, 0.3);
+    position: relative;
+    overflow: hidden;
 }
 
 /* Tab content */

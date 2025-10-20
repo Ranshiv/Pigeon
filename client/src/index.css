@@ -81,12 +81,17 @@ body {
   --disabled-bg: #f2f2f2;
   --disabled-text: #a0a0a0;
 
-  /* Method colors for request types */
-  --method-get: #61affe;
-  --method-post: #49cc90;
-  --method-put: #fca130;
-  --method-delete: #f93e3e;
-  --method-patch: #50e3c2;
+  /* Method colors harmonized with blue palette */
+  --method-get: #014C75;
+  /* Deep blue for GET */
+  --method-post: #16a34a;
+  /* Green for POST */
+  --method-put: #eab308;
+  /* Yellow for PUT */
+  --method-delete: #dc2626;
+  /* Red for DELETE */
+  --method-patch: #8b5cf6;
+  /* Purple for PATCH */
 
   /* Designer-specific aliases (for backward compatibility) */
   --designer-primary: var(--primary-color);
@@ -163,7 +168,7 @@ body {
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* Dark theme variables - 2025 Blue Palette */
+/* Dark theme variables - 2025 Blue Palette Enhanced */
 body.dark-theme {
   --background-color: #00111A;
   --text-color: #e0e0e0;

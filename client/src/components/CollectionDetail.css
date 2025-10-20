@@ -38,7 +38,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 35px 20px;
+  padding: 10px 20px;
   background: var(--navbar-bg, #012A41);
   /* Use project's navbar background */
   border-bottom: 1px solid var(--border-color, #003956);
@@ -525,6 +525,7 @@
   z-index: 10;
   min-height: 48px;
   flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .tab-btn {
@@ -534,20 +535,23 @@
   padding: 12px 24px;
   background: transparent;
   border: none;
-  color: rgba(224, 224, 224, 0.7);
-  /* Light gray text */
+  color: #94a3b8;
+  /* Slate-400 text */
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
   position: relative;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   white-space: nowrap;
   letter-spacing: 0.2px;
   min-height: 48px;
   flex-shrink: 0;
   border-bottom: 2px solid transparent;
+  border-radius: 8px 8px 0 0;
+  margin: 0 2px;
 }
 
+/* Blue glow hover effect */
 .tab-btn:hover {
   color: rgba(255, 255, 255, 0.95);
   background: var(--hover-bg, #013B5B);
@@ -558,6 +562,7 @@
   /* Subtle lift effect */
 }
 
+/* Enhanced active state with blue theme */
 .tab-btn.active {
   color: #ffffff !important;
   background: var(--primary-color, #014C75) !important;

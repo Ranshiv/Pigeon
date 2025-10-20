@@ -1,5 +1,6 @@
 /* client/src/App.css */
 /* Global styles using centralized CSS variables from index.css */
+/* Note: CSS variables are defined in index.css for centralized theming */
 
 /* Base body styling */
 body {
