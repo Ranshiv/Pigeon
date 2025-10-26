@@ -8,7 +8,6 @@ import AIAgentToolsSection from './AIAgentToolsSection';
 import RequestForm from './RequestForm';
 import ResponseDisplay from './ResponseDisplay';
 import WorkspaceDetail from './WorkspaceDetail';
-import WorkspaceEdit from './WorkspaceEdit';
 import CollectionsManagement from './CollectionsManagement';
 import { FiGrid, FiPlus, FiUsers, FiGlobe, FiLock, FiStar } from 'react-icons/fi';
 import './WorkspacesSection.css';
@@ -460,8 +459,8 @@ const WorkspacesSection = ({ requests, response, onSend, onCreate, onUpdate, onD
                 {/* Workspace Detail Route */}
                 <Route path=":id" element={<WorkspaceDetail />} />
 
-                {/* Workspace Edit Route */}
-                <Route path=":id/edit" element={<WorkspaceEdit />} />
+                {/* Workspace Edit Route - Redirect to detail page (edit modal will open there) */}
+                <Route path=":id/edit" element={<Navigate to=".." replace />} />
 
                 {/* Collections Management Route */}
                 <Route path="collections/*" element={<CollectionsManagement />} />

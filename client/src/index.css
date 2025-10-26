@@ -190,7 +190,7 @@ body.dark-theme {
   --primary-color: #014C75;
   --primary-hover: #014368;
   --secondary-color: #01324E;
-  --icon-color:white;
+  --icon-color: white;
   /* Dark theme secondary color */
   --secondary-hover: #013B5B;
   --active-color: #002b42;
@@ -206,9 +206,9 @@ body.dark-theme {
   --designer-canvas-bg: #001A26;
   --designer-component-bg: #002D45;
   --designer-card-rgb: 0, 34, 52;
-  
 
-  --debug-bg:  #013B5B;
+
+  --debug-bg: #013B5B;
   --debug-bg2: #012A41;
 
   --border02-color: #1c4d66;

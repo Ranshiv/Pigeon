@@ -59,6 +59,32 @@
     color: var(--text-color);
 }
 
+.new-workspace-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: linear-gradient(135deg, var(--primary-color) 0%, #013B5B 100%);
+    color: #ffffff;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 12px rgba(1, 76, 117, 0.3);
+}
+
+.new-workspace-btn svg {
+    font-size: 18px;
+}
+
+.new-workspace-btn:hover {
+    background: linear-gradient(135deg, var(--primary-hover) 0%, #012A41 100%);
+    box-shadow: 0 6px 16px rgba(1, 76, 117, 0.4);
+    transform: translateY(-2px);
+}
+
 /* Workspace Type Tabs Styling - Enhanced with 2025 Blue Palette */
 .workspace-types-tabs {
     display: flex;
@@ -82,11 +108,19 @@
     box-shadow: var(--card-shadow);
 }
 
+.workspace-tab svg {
+    color: var(--text-secondary);
+}
+
 .workspace-tab.active {
-    background: linear-gradient(135deg, var(--primary-color) 0%, #2563eb 100%);
-    color: white;
+    background: linear-gradient(135deg, var(--primary-color) 0%, #013B5B 100%);
+    color: #ffffff !important;
     border-color: var(--primary-color);
     box-shadow: 0 4px 12px rgba(1, 76, 117, 0.3);
+}
+
+.workspace-tab.active svg {
+    color: #ffffff !important;
 }
 
 .workspace-tab:hover:not(.active) {
@@ -157,21 +191,22 @@
     justify-content: center;
     flex-shrink: 0;
     box-shadow: 0 2px 8px rgba(1, 76, 117, 0.1);
+    font-size: 20px;
 }
 
 .workspace-icon.personal {
-    color: var(--primary-color);
-    background-color: rgba(1, 76, 117, 0.15);
+    color: #ffffff;
+    background-color: var(--primary-color);
 }
 
 .workspace-icon.team {
-    background-color: rgba(234, 179, 8, 0.15);
-    color: var(--primary-color);
+    background-color: #eab308;
+    color: #ffffff;
 }
 
 .workspace-icon.public {
-    background-color: rgba(22, 163, 74, 0.15);
-    color: #16a34a;
+    background-color: #16a34a;
+    color: #ffffff;
 }
 
 .workspace-title {
@@ -188,7 +223,7 @@
 
 .workspace-type {
     font-size: 0.7rem;
-    padding: 0.25rem 0.6rem;
+    padding: 0.35rem 0.8rem;
     border-radius: 6px;
     font-weight: 600;
     text-transform: uppercase;
@@ -199,17 +234,17 @@
 
 .workspace-type.personal {
     color: #ffffff;
-    background-color: rgba(1, 76, 117, 0.3);
+    background-color: var(--primary-color);
 }
 
 .workspace-type.team {
     color: #ffffff;
-    background-color: rgba(234, 179, 8, 0.3);
+    background-color: #eab308;
 }
 
 .workspace-type.public {
     color: #ffffff;
-    background-color: rgba(22, 163, 74, 0.3);
+    background-color: #16a34a;
 }
 
 .workspace-description {
@@ -230,31 +265,60 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    font-size: 0.85rem;
+    font-size: 0.9rem;
     color: var(--text-secondary);
-    padding-top: 1rem;
+    padding-top: 1.25rem;
     margin-top: auto;
     border-top: 1px solid var(--border-color);
+    gap: 1rem;
 }
 
 .collaborators-count {
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
+    color: var(--text-secondary);
 }
 
 .collaborators-count svg {
     color: var(--primary-color);
+    font-size: 18px;
+    flex-shrink: 0;
+}
+
+.collaborators-count span {
+    font-weight: 500;
+}
+
+.collections-count {
+    color: var(--text-secondary);
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.collections-count strong {
+    color: var(--text-color);
+    font-weight: 600;
+    font-size: 1rem;
 }
 
 .workspace-role {
-    font-size: 0.8rem;
+    font-size: 0.85rem;
     color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    gap: 6px;
 }
 
 .workspace-role .role {
-    font-weight: 500;
+    font-weight: 600;
     color: var(--primary-color);
+    background-color: rgba(1, 76, 117, 0.1);
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.8rem;
 }
 
 .empty-workspaces {
@@ -271,8 +335,9 @@
 }
 
 .empty-workspaces svg {
-    color: var(--text-secondary);
+    color: var(--primary-color);
     margin-bottom: 1.5rem;
+    opacity: 0.6;
 }
 
 .empty-workspaces p {
@@ -285,8 +350,8 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    background: var(--primary-color);
-    color: white;
+    background: linear-gradient(135deg, var(--primary-color) 0%, #013B5B 100%);
+    color: #ffffff;
     border: none;
     padding: 0.75rem 1.5rem;
     border-radius: 8px;
@@ -296,12 +361,11 @@
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     box-shadow: 0 4px 12px rgba(1, 76, 117, 0.3);
     margin: 10px;
-    width: 90% !important;
+    width: 90%;
 }
 
 .create-workspace-btn:hover {
-    background: var(--primary-hover);
-    color: var(--text-color);
+    background: linear-gradient(135deg, var(--primary-hover) 0%, #012A41 100%);
     box-shadow: 0 6px 16px rgba(1, 76, 117, 0.4);
     transform: translateY(-2px);
 }
@@ -409,18 +473,18 @@
 }
 
 .workspace-type-option:nth-child(1) .type-icon {
-    background-color: rgba(1, 76, 117, 0.15);
-    color: var(--primary-color);
+    background-color: var(--primary-color);
+    color: #ffffff;
 }
 
 .workspace-type-option:nth-child(2) .type-icon {
-    background-color: rgba(234, 179, 8, 0.15);
-    color: #ca8a04;
+    background-color: #eab308;
+    color: #ffffff;
 }
 
 .workspace-type-option:nth-child(3) .type-icon {
-    background-color: rgba(22, 163, 74, 0.15);
-    color: #16a34a;
+    background-color: #16a34a;
+    color: #ffffff;
 }
 
 .type-info strong {
@@ -465,14 +529,14 @@
 }
 
 .create-btn {
-    background: linear-gradient(135deg, var(--primary-color) 0%, #2563eb 100%);
-    color: white;
+    background: linear-gradient(135deg, var(--primary-color) 0%, #013B5B 100%);
+    color: #ffffff;
     border: none;
     box-shadow: 0 4px 12px rgba(1, 76, 117, 0.3);
 }
 
 .create-btn:hover {
-    background: linear-gradient(135deg, var(--primary-hover) 0%, #1d4ed8 100%);
+    background: linear-gradient(135deg, var(--primary-hover) 0%, #012A41 100%);
     box-shadow: 0 6px 16px rgba(1, 76, 117, 0.4);
     transform: translateY(-2px);
 }
@@ -517,7 +581,18 @@
     text-align: center;
     padding: 1.5rem;
     font-size: 0.8rem;
-    color: rgba(255, 255, 255, 0.5);
+    color: var(--text-secondary);
     border-top: 1px solid var(--border-color);
     margin-top: 2rem;
+}
+
+.footer a {
+    color: var(--primary-color);
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.footer a:hover {
+    color: var(--primary-hover);
+    text-decoration: underline;
 }

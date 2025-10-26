@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import './WorkspaceDetail.css';
+import './WorkspaceEdit.css';
 import {
     FiUsers, FiPlus, FiEdit, FiTrash2, FiActivity,
     FiGitMerge, FiGitBranch, FiGitPullRequest, FiLock,
@@ -29,6 +30,14 @@ const WorkspaceDetail = () => {
     const [inviteRole, setInviteRole] = useState('viewer');
     const [activeUsers, setActiveUsers] = useState([]);
     const [showGlobalVariablesModal, setShowGlobalVariablesModal] = useState(false);
+
+    // Edit modal state
+    const [showEditModal, setShowEditModal] = useState(false);
+    const [editName, setEditName] = useState('');
+    const [editDescription, setEditDescription] = useState('');
+    const [editIsPublic, setEditIsPublic] = useState(false);
+    const [saving, setSaving] = useState(false);
+    const [editError, setEditError] = useState(null);
 
     // Access the collaboration context
     const { joinWorkspace, sendActivity, connected, getActiveUsers } = useCollaboration();
@@ -372,6 +381,59 @@ const WorkspaceDetail = () => {
     };
 
     // Handle workspace deletion
+    // Handle edit workspace form submission
+    const handleEditWorkspace = async (e) => {
+        e.preventDefault();
+        try {
+            setSaving(true);
+            setEditError(null);
+
+            // Basic validation
+            if (!editName.trim()) {
+                setEditError('Workspace name is required');
+                return;
+            }
+
+            const response = await fetch(`http://localhost:5001/api/workspaces/${id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'include',
+                body: JSON.stringify({
+                    name: editName,
+                    description: editDescription,
+                    isPublic: editIsPublic
+                })
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(errorData.message || 'Failed to update workspace');
+            }
+
+            const updatedWorkspace = await response.json();
+            console.log('Workspace updated successfully:', updatedWorkspace);
+
+            // Update local state
+            setWorkspace(updatedWorkspace);
+            setShowEditModal(false);
+
+            // Send activity about workspace update
+            if (connected) {
+                sendActivity('workspace_updated', {
+                    workspaceId: id,
+                    workspaceName: editName
+                });
+            }
+        } catch (err) {
+            setEditError('Failed to update workspace. Please try again.');
+            console.error('Error updating workspace:', err);
+        } finally {
+            setSaving(false);
+        }
+    };
+
     const handleDeleteWorkspace = async () => {
         if (window.confirm('Are you sure you want to delete this workspace? This action cannot be undone.')) {
             try {
@@ -562,7 +624,12 @@ const WorkspaceDetail = () => {
 
                     {workspace.userRole === 'admin' && (
                         <>
-                            <button className="workspace-edit-btn" onClick={() => navigate(`/workspace/workspaces/${id}/edit`)}>
+                            <button className="workspace-edit-btn" onClick={() => {
+                                setEditName(workspace.name);
+                                setEditDescription(workspace.description || '');
+                                setEditIsPublic(workspace.isPublic || false);
+                                setShowEditModal(true);
+                            }}>
                                 <FiEdit /> Edit
                             </button>
                             {!workspace.isPersonal && (
@@ -975,6 +1042,106 @@ const WorkspaceDetail = () => {
                                 </button>
                                 <button type="submit" className="invite-btn" disabled={loading}>
                                     {loading ? 'Inviting...' : 'Send Invitation'}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+
+            {/* Edit Workspace Modal */}
+            {showEditModal && (
+                <div className="workspace-edit-container" onClick={(e) => {
+                    if (e.target === e.currentTarget) {
+                        setShowEditModal(false);
+                    }
+                }}>
+                    <div className="workspace-edit-modal-wrapper">
+                        <h1>Edit Workspace</h1>
+
+                        {editError && <div className="error-message">{editError}</div>}
+
+                        <form onSubmit={handleEditWorkspace} className="workspace-edit-form">
+                            <div className="form-group">
+                                <label htmlFor="workspaceName">Name</label>
+                                <input
+                                    type="text"
+                                    id="workspaceName"
+                                    value={editName}
+                                    onChange={(e) => setEditName(e.target.value)}
+                                    required
+                                    placeholder="Enter workspace name"
+                                />
+                            </div>
+
+                            <div className="form-group">
+                                <label htmlFor="workspaceDesc">Description</label>
+                                <textarea
+                                    id="workspaceDesc"
+                                    value={editDescription}
+                                    onChange={(e) => setEditDescription(e.target.value)}
+                                    placeholder="Describe your workspace"
+                                    rows={3}
+                                ></textarea>
+                            </div>
+
+                            {/* Don't allow changing personal workspace status */}
+                            {!workspace.isPersonal && (
+                                <div className="form-group">
+                                    <label>Visibility</label>
+                                    <div className="workspace-types">
+                                        <div
+                                            className={`workspace-type-option ${!editIsPublic ? 'selected' : ''}`}
+                                            onClick={() => setEditIsPublic(false)}
+                                        >
+                                            <div className="type-icon">
+                                                <FiUsers size={20} />
+                                            </div>
+                                            <div className="type-info">
+                                                <strong>Team</strong>
+                                                <p>Collaborate with specific people</p>
+                                            </div>
+                                        </div>
+
+                                        <div
+                                            className={`workspace-type-option ${editIsPublic ? 'selected' : ''}`}
+                                            onClick={() => setEditIsPublic(true)}
+                                        >
+                                            <div className="type-icon">
+                                                <FiGlobe size={20} />
+                                            </div>
+                                            <div className="type-info">
+                                                <strong>Public</strong>
+                                                <p>Visible to everyone in the community</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {workspace.isPersonal && (
+                                <div className="form-group">
+                                    <div className="info-box">
+                                        <FiLock size={16} />
+                                        <p>This is a personal workspace. Visibility settings cannot be changed.</p>
+                                    </div>
+                                </div>
+                            )}
+
+                            <div className="form-actions">
+                                <button
+                                    type="button"
+                                    className="cancel-btn"
+                                    onClick={() => setShowEditModal(false)}
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="submit"
+                                    className="save-btn"
+                                    disabled={saving}
+                                >
+                                    {saving ? 'Saving...' : 'Save Changes'}
                                 </button>
                             </div>
                         </form>

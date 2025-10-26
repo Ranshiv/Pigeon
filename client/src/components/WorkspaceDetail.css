@@ -251,6 +251,7 @@ body.dark-theme {
 .collection-card:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(1, 76, 117, 0.15);
+    border-color: var(--ws-primary-color);
 }
 
 .collection-card h3 {
@@ -260,11 +261,20 @@ body.dark-theme {
     color: var(--ws-text-primary);
 }
 
+body.dark-theme .collection-card h3 {
+    color: #e0e0e0;
+}
+
 .collection-card p {
     color: var(--ws-text-secondary);
     margin: 0 0 16px 0;
     font-size: 14px;
     flex-grow: 1;
+    line-height: 1.5;
+}
+
+body.dark-theme .collection-card p {
+    color: #B8D4E3;
 }
 
 .collection-meta {
@@ -273,6 +283,11 @@ body.dark-theme {
     color: var(--ws-text-tertiary);
     font-size: 13px;
     margin-bottom: 16px;
+    font-weight: 500;
+}
+
+body.dark-theme .collection-meta {
+    color: #7A9BAD;
 }
 
 .view-collection-btn {
@@ -289,7 +304,17 @@ body.dark-theme {
 
 .view-collection-btn:hover {
     background-color: var(--ws-primary-color);
-    color: white;
+    color: #ffffff;
+}
+
+body.dark-theme .view-collection-btn {
+    border-color: #0EA5E9;
+    color: #0EA5E9;
+}
+
+body.dark-theme .view-collection-btn:hover {
+    background-color: #0EA5E9;
+    color: #ffffff;
 }
 
 .add-collection-btn,
