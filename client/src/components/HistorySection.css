@@ -540,7 +540,7 @@ body.dark-theme .filter-btn:hover {
 }
 
 body.dark-theme .filter-btn.active {
-    background-color: var(--primary-color, #014C75);
+    background-color: var(--primary-color, #014C75)!important;
     border-color: var(--primary-color, #014C75);
     color: #ffffff;
 }
@@ -555,6 +555,7 @@ body.dark-theme .history-item {
 }
 
 body.dark-theme .history-item:hover {
+  
     border-color: var(--primary-color, #014C75);
     box-shadow: 0 2px 8px rgba(1, 76, 117, 0.3);
 }

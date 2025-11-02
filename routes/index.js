@@ -30,6 +30,9 @@ const mockServersRoutes = require('./mockServers');
 // Import Visual API Designer routes
 const visualDesignerRoutes = require('./visualDesigner');
 
+// Import Analytics routes
+const analyticsRoutes = require('./analytics');
+
 // Register routes with their base paths
 router.use('/auth', authRoutes);
 router.use('/collections', collectionsRoutes);
@@ -57,5 +60,8 @@ router.use('/mock-servers', mockServersRoutes);
 
 // Register Visual API Designer routes
 router.use('/visual-designer', visualDesignerRoutes);
+
+// Register Analytics routes
+router.use('/analytics', analyticsRoutes);
 
 module.exports = router;

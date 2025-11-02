@@ -212,8 +212,10 @@
 
 .filter-btn.active {
     background: var(--primary-color);
+    
     color: white;
 }
+
 
 /* Error Banner */
 .error-banner {
@@ -379,6 +381,13 @@
     color: #ef4444;
 }
 
+/* Analytics button special styling */
+.action-btn:hover:has(svg):first-child {
+    background: rgba(1, 76, 117, 0.1);
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+}
+
 /* Monitor Metrics */
 .monitor-metrics {
     display: grid;
@@ -410,6 +419,8 @@
 .metric-value.status {
     font-weight: 700;
     font-size: 0.8rem;
+    margin: 0px !important;
+    padding: 0px !important;
 }
 
 /* Monitor Tags */

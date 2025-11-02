@@ -348,6 +348,13 @@ const MonitoringDashboard = () => {
                                 <div className="monitor-actions">
                                     <button
                                         className="action-btn"
+                                        onClick={() => navigate(`/workspace/monitoring/${monitor._id}/analytics`)}
+                                        title="View Analytics"
+                                    >
+                                        <FiTrendingUp />
+                                    </button>
+                                    <button
+                                        className="action-btn"
                                         onClick={() => navigate(`/workspace/monitoring/${monitor._id}/history`)}
                                         title="View History"
                                     >

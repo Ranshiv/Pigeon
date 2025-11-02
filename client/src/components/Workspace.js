@@ -13,6 +13,7 @@ import ReportsManagement from './ReportsManagement';
 import TeamsManagement from './TeamsManagement';
 import IntegrationsManagement from './IntegrationsManagement';
 import MaintenanceManagement from './MaintenanceManagement';
+import AnalyticsDashboard from './Analytics/AnalyticsDashboard';
 import './Workspace.css';
 import SettingsPage from './SettingsPage';
 import HistoryDetailsSection from './HistoryDetailsSection';
@@ -27,7 +28,8 @@ const Workspace = () => {
             {/* The order of these routes matters - more specific routes should come first */}
             <Route path="collections/new" element={<CollectionCreate />} />
             <Route path="collections/:collectionId/documentation" element={<DocumentationManager />} />
-            <Route path="collections/:collectionId" element={<CollectionDetail />} />            <Route path="collections" element={<CollectionsManagement />} />            <Route path="api-network/*" element={<APINetworkSection />} />            <Route path="monitoring/:id/history" element={<MonitoringHistory />} />
+            <Route path="collections/:collectionId" element={<CollectionDetail />} />            <Route path="collections" element={<CollectionsManagement />} />            <Route path="api-network/*" element={<APINetworkSection />} />            <Route path="monitoring/:id/analytics" element={<AnalyticsDashboard />} />
+            <Route path="monitoring/:id/history" element={<MonitoringHistory />} />
             <Route path="monitoring/reports" element={<ReportsManagement />} />
             <Route path="monitoring/teams" element={<TeamsManagement />} />
             <Route path="monitoring/integrations" element={<IntegrationsManagement />} />

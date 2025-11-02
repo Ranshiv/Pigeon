@@ -17,6 +17,9 @@ const { initializeSocketServer } = require('./utils/socket/socket-server');
 // Import monitoring service
 const MonitoringService = require('./services/monitoring/MonitoringService');
 
+// Import analytics scheduler
+const AnalyticsScheduler = require('./services/AnalyticsScheduler');
+
 // Import all routes from the central routes module
 const routes = require('./routes');
 
@@ -672,6 +675,9 @@ server.listen(port, () => {
     setTimeout(() => {
         console.log('Starting monitoring service...');
         MonitoringService.start();
+
+        console.log('Starting analytics scheduler...');
+        AnalyticsScheduler.start();
     }, 2000); // Give server 2 seconds to fully initialize
 });
 
@@ -803,6 +809,7 @@ app.get('/api/console-capture/sessions', (req, res) => {
 process.on('SIGTERM', () => {
     console.log('SIGTERM received, shutting down gracefully');
     MonitoringService.stop();
+    AnalyticsScheduler.stop();
     BrowserConsoleService.cleanup();
     server.close(() => {
         console.log('Process terminated');
@@ -813,6 +820,7 @@ process.on('SIGTERM', () => {
 process.on('SIGINT', () => {
     console.log('SIGINT received, shutting down gracefully');
     MonitoringService.stop();
+    AnalyticsScheduler.stop();
     BrowserConsoleService.cleanup();
     server.close(() => {
         console.log('Process terminated');
