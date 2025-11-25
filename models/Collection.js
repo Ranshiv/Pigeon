@@ -11,11 +11,22 @@ const variableSchema = new mongoose.Schema({
 const requestSchema = new mongoose.Schema({
     name: { type: String, required: true },
     url: { type: String, required: true },
-    method: { type: String, required: true, enum: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS', 'HEAD'] },
+    method: { type: String, required: true, enum: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS', 'HEAD', 'GRAPHQL'] },
     headers: [{ name: String, value: String }],
     params: [{ name: String, value: String }],
     body: { type: String, default: '' },
-    bodyType: { type: String, enum: ['none', 'json', 'form-data', 'x-www-form-urlencoded', 'raw'], default: 'none' },
+    bodyType: { type: String, enum: ['none', 'json', 'form-data', 'x-www-form-urlencoded', 'raw', 'graphql'], default: 'none' },
+
+    // GraphQL-specific fields
+    graphql: {
+        query: { type: String, default: '' },
+        variables: { type: mongoose.Schema.Types.Mixed, default: {} },
+        operationType: { type: String, enum: ['query', 'mutation', 'subscription', ''], default: '' },
+        operationName: { type: String, default: '' },
+        schema: { type: String, default: '' },
+        schemaUrl: { type: String, default: '' },
+    },
+
     preRequestScript: { type: String, default: '' },
     testScript: { type: String, default: '' },
     order: { type: Number, default: 0 }, // For ordering requests within collection

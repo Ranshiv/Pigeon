@@ -172,6 +172,10 @@ const Home = () => {
                         <FiSend className="action-icon" />
                         <span>New Request</span>
                     </button>
+                    <button className="quick-action-btn" onClick={() => navigate('../graphql')}>
+                        <FiCode className="action-icon" />
+                        <span>GraphQL</span>
+                    </button>
                     <button className="quick-action-btn" onClick={() => navigate('../collections/new')}>
                         <FiPackage className="action-icon" />
                         <span>New Collection</span>

@@ -33,6 +33,9 @@ const visualDesignerRoutes = require('./visualDesigner');
 // Import Analytics routes
 const analyticsRoutes = require('./analytics');
 
+// Import GraphQL routes
+const graphqlRoutes = require('./graphql');
+
 // Register routes with their base paths
 router.use('/auth', authRoutes);
 router.use('/collections', collectionsRoutes);
@@ -63,5 +66,8 @@ router.use('/visual-designer', visualDesignerRoutes);
 
 // Register Analytics routes
 router.use('/analytics', analyticsRoutes);
+
+// Register GraphQL routes
+router.use('/graphql', graphqlRoutes);
 
 module.exports = router;
