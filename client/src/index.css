@@ -88,6 +88,22 @@ body {
   --method-delete: #f93e3e;
   --method-patch: #50e3c2;
 
+  /* Protocol Testing colors */
+  --protocol-ws: #8B5CF6;
+  /* WebSocket - Purple */
+  --protocol-grpc: #06B6D4;
+  /* gRPC - Cyan */
+  --protocol-graphql: #E535AB;
+  /* GraphQL - Pink */
+  --protocol-soap: #F97316;
+  /* SOAP - Orange */
+  --protocol-mqtt: #22C55E;
+  /* MQTT - Green */
+  --protocol-sse: #EC4899;
+  /* SSE - Pink */
+  --protocol-http: #014C75;
+  /* HTTP - Primary Blue */
+
   /* Designer-specific aliases (for backward compatibility) */
   --designer-primary: var(--primary-color);
   --designer-primary-hover: var(--primary-hover);

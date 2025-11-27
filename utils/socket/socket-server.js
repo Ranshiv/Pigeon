@@ -5,6 +5,14 @@ const socketIo = require('socket.io');
 const userSockets = new Map(); // Map socketId -> userData
 let ioInstance = null; // Store the io instance globally
 
+// Protocol session stores
+const protocolSessions = {
+    websocket: new Map(), // WebSocket sessions
+    grpc: new Map(),      // gRPC streaming sessions
+    mqtt: new Map(),      // MQTT connection sessions
+    sse: new Map()        // SSE connection sessions
+};
+
 /**
  * Initialize Socket.io server
  * @param {Object} server - HTTP server instance
@@ -412,19 +420,287 @@ function initializeSocketServer(server) {
                 });
             }
 
+            // Clean up protocol sessions for this socket
+            cleanupProtocolSessions(socket.id);
+
             // Remove from global socket store
             userSockets.delete(socket.id);
 
             // Clear user rooms
             userRooms.clear();
         });
+
+        // ==========================================
+        // PROTOCOL TESTING REAL-TIME HANDLERS
+        // ==========================================
+
+        // WebSocket Protocol Testing
+        socket.on('protocol:websocket:connect', async ({ url, protocols, headers }, callback) => {
+            try {
+                const WebSocket = require('ws');
+                const ws = new WebSocket(url, protocols, { headers });
+                const sessionId = `ws_${socket.id}_${Date.now()}`;
+
+                ws.on('open', () => {
+                    protocolSessions.websocket.set(sessionId, { ws, url, connectedAt: new Date() });
+                    socket.emit('protocol:websocket:connected', { sessionId, url });
+                });
+
+                ws.on('message', (data) => {
+                    socket.emit('protocol:websocket:message', {
+                        sessionId,
+                        data: data.toString(),
+                        timestamp: new Date()
+                    });
+                });
+
+                ws.on('close', (code, reason) => {
+                    socket.emit('protocol:websocket:disconnected', { sessionId, code, reason: reason.toString() });
+                    protocolSessions.websocket.delete(sessionId);
+                });
+
+                ws.on('error', (error) => {
+                    socket.emit('protocol:websocket:error', { sessionId, error: error.message });
+                });
+
+                if (callback) callback({ success: true, sessionId });
+            } catch (error) {
+                if (callback) callback({ success: false, error: error.message });
+            }
+        });
+
+        socket.on('protocol:websocket:send', ({ sessionId, message }, callback) => {
+            try {
+                const session = protocolSessions.websocket.get(sessionId);
+                if (!session) {
+                    if (callback) callback({ success: false, error: 'Session not found' });
+                    return;
+                }
+                session.ws.send(message);
+                if (callback) callback({ success: true });
+            } catch (error) {
+                if (callback) callback({ success: false, error: error.message });
+            }
+        });
+
+        socket.on('protocol:websocket:disconnect', ({ sessionId }, callback) => {
+            try {
+                const session = protocolSessions.websocket.get(sessionId);
+                if (session) {
+                    session.ws.close();
+                    protocolSessions.websocket.delete(sessionId);
+                }
+                if (callback) callback({ success: true });
+            } catch (error) {
+                if (callback) callback({ success: false, error: error.message });
+            }
+        });
+
+        // MQTT Protocol Testing
+        socket.on('protocol:mqtt:connect', async ({ brokerUrl, options }, callback) => {
+            try {
+                const mqtt = require('mqtt');
+                const sessionId = `mqtt_${socket.id}_${Date.now()}`;
+                const client = mqtt.connect(brokerUrl, options);
+
+                client.on('connect', () => {
+                    protocolSessions.mqtt.set(sessionId, {
+                        client,
+                        brokerUrl,
+                        subscriptions: new Set(),
+                        connectedAt: new Date()
+                    });
+                    socket.emit('protocol:mqtt:connected', { sessionId, brokerUrl });
+                });
+
+                client.on('message', (topic, message) => {
+                    socket.emit('protocol:mqtt:message', {
+                        sessionId,
+                        topic,
+                        message: message.toString(),
+                        timestamp: new Date()
+                    });
+                });
+
+                client.on('close', () => {
+                    socket.emit('protocol:mqtt:disconnected', { sessionId });
+                    protocolSessions.mqtt.delete(sessionId);
+                });
+
+                client.on('error', (error) => {
+                    socket.emit('protocol:mqtt:error', { sessionId, error: error.message });
+                });
+
+                if (callback) callback({ success: true, sessionId });
+            } catch (error) {
+                if (callback) callback({ success: false, error: error.message });
+            }
+        });
+
+        socket.on('protocol:mqtt:subscribe', ({ sessionId, topic, qos = 0 }, callback) => {
+            try {
+                const session = protocolSessions.mqtt.get(sessionId);
+                if (!session) {
+                    if (callback) callback({ success: false, error: 'Session not found' });
+                    return;
+                }
+                session.client.subscribe(topic, { qos }, (err) => {
+                    if (err) {
+                        if (callback) callback({ success: false, error: err.message });
+                    } else {
+                        session.subscriptions.add(topic);
+                        if (callback) callback({ success: true });
+                    }
+                });
+            } catch (error) {
+                if (callback) callback({ success: false, error: error.message });
+            }
+        });
+
+        socket.on('protocol:mqtt:publish', ({ sessionId, topic, message, options = {} }, callback) => {
+            try {
+                const session = protocolSessions.mqtt.get(sessionId);
+                if (!session) {
+                    if (callback) callback({ success: false, error: 'Session not found' });
+                    return;
+                }
+                session.client.publish(topic, message, options, (err) => {
+                    if (callback) callback({ success: !err, error: err?.message });
+                });
+            } catch (error) {
+                if (callback) callback({ success: false, error: error.message });
+            }
+        });
+
+        socket.on('protocol:mqtt:unsubscribe', ({ sessionId, topic }, callback) => {
+            try {
+                const session = protocolSessions.mqtt.get(sessionId);
+                if (!session) {
+                    if (callback) callback({ success: false, error: 'Session not found' });
+                    return;
+                }
+                session.client.unsubscribe(topic, (err) => {
+                    if (!err) session.subscriptions.delete(topic);
+                    if (callback) callback({ success: !err, error: err?.message });
+                });
+            } catch (error) {
+                if (callback) callback({ success: false, error: error.message });
+            }
+        });
+
+        socket.on('protocol:mqtt:disconnect', ({ sessionId }, callback) => {
+            try {
+                const session = protocolSessions.mqtt.get(sessionId);
+                if (session) {
+                    session.client.end();
+                    protocolSessions.mqtt.delete(sessionId);
+                }
+                if (callback) callback({ success: true });
+            } catch (error) {
+                if (callback) callback({ success: false, error: error.message });
+            }
+        });
+
+        // SSE Protocol Testing
+        socket.on('protocol:sse:connect', async ({ url, options = {} }, callback) => {
+            try {
+                const EventSource = require('eventsource');
+                const sessionId = `sse_${socket.id}_${Date.now()}`;
+                const es = new EventSource(url, options);
+
+                es.onopen = () => {
+                    protocolSessions.sse.set(sessionId, { es, url, connectedAt: new Date() });
+                    socket.emit('protocol:sse:connected', { sessionId, url });
+                };
+
+                es.onmessage = (event) => {
+                    socket.emit('protocol:sse:event', {
+                        sessionId,
+                        type: 'message',
+                        data: event.data,
+                        lastEventId: event.lastEventId,
+                        timestamp: new Date()
+                    });
+                };
+
+                es.onerror = (error) => {
+                    socket.emit('protocol:sse:error', { sessionId, error: 'Connection error' });
+                };
+
+                if (callback) callback({ success: true, sessionId });
+            } catch (error) {
+                if (callback) callback({ success: false, error: error.message });
+            }
+        });
+
+        socket.on('protocol:sse:disconnect', ({ sessionId }, callback) => {
+            try {
+                const session = protocolSessions.sse.get(sessionId);
+                if (session) {
+                    session.es.close();
+                    protocolSessions.sse.delete(sessionId);
+                }
+                if (callback) callback({ success: true });
+            } catch (error) {
+                if (callback) callback({ success: false, error: error.message });
+            }
+        });
+
+        // gRPC Streaming Support
+        socket.on('protocol:grpc:stream', async ({ sessionId, serviceName, methodName, messages }, callback) => {
+            try {
+                // gRPC streaming would be handled by the gRPC service
+                // This event allows real-time updates during streaming calls
+                socket.emit('protocol:grpc:streamUpdate', {
+                    sessionId,
+                    serviceName,
+                    methodName,
+                    status: 'streaming',
+                    timestamp: new Date()
+                });
+                if (callback) callback({ success: true });
+            } catch (error) {
+                if (callback) callback({ success: false, error: error.message });
+            }
+        });
     });
 
     return io;
 }
 
+/**
+ * Clean up protocol sessions for a disconnected socket
+ */
+function cleanupProtocolSessions(socketId) {
+    // Clean up WebSocket sessions
+    for (const [sessionId, session] of protocolSessions.websocket) {
+        if (sessionId.includes(socketId)) {
+            try { session.ws.close(); } catch (e) { }
+            protocolSessions.websocket.delete(sessionId);
+        }
+    }
+
+    // Clean up MQTT sessions
+    for (const [sessionId, session] of protocolSessions.mqtt) {
+        if (sessionId.includes(socketId)) {
+            try { session.client.end(); } catch (e) { }
+            protocolSessions.mqtt.delete(sessionId);
+        }
+    }
+
+    // Clean up SSE sessions
+    for (const [sessionId, session] of protocolSessions.sse) {
+        if (sessionId.includes(socketId)) {
+            try { session.es.close(); } catch (e) { }
+            protocolSessions.sse.delete(sessionId);
+        }
+    }
+}
+
 module.exports = {
     initializeSocketServer,
     getUserSockets: () => userSockets,
-    getIO: () => ioInstance
+    getIO: () => ioInstance,
+    getProtocolSessions: () => protocolSessions,
+    cleanupProtocolSessions
 };

@@ -1,0 +1,484 @@
+/* client/src/components/Protocols/GrpcTester.css */
+
+.grpc-tester {
+    --grpc-bg: var(--card-bg, #ffffff);
+    --grpc-border: var(--border-color, #e0e0e0);
+    --grpc-text: var(--text-color, #333333);
+    --grpc-text-muted: var(--text-secondary, #666666);
+    --grpc-primary: var(--protocol-grpc, #06B6D4);
+    --grpc-success: #22C55E;
+    --grpc-error: #EF4444;
+
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 16px;
+    background: var(--grpc-bg);
+    border-radius: 12px;
+    border: 1px solid var(--grpc-border);
+}
+
+.grpc-section {
+    padding: 16px;
+    background: var(--grpc-bg);
+    border: 1px solid var(--grpc-border);
+    border-radius: 10px;
+}
+
+.grpc-section-title {
+    margin: 0 0 12px 0;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--grpc-text);
+}
+
+/* Proto Section */
+.grpc-proto-upload {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.grpc-proto-filename {
+    font-size: 0.85rem;
+    color: var(--grpc-text-muted);
+    padding: 4px 10px;
+    background: #f5f5f5;
+    border-radius: 4px;
+}
+
+.grpc-proto-editor {
+    width: 100%;
+    min-height: 120px;
+    padding: 12px;
+    font-family: 'Monaco', 'Menlo', monospace;
+    font-size: 0.85rem;
+    border: 1px solid var(--grpc-border);
+    border-radius: 8px;
+    resize: vertical;
+}
+
+.grpc-proto-editor:focus {
+    outline: none;
+    border-color: var(--grpc-primary);
+}
+
+/* Connection Section */
+.grpc-url-group {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.grpc-protocol-badge {
+    padding: 10px 16px;
+    background: linear-gradient(135deg, var(--grpc-primary), color-mix(in srgb, var(--grpc-primary) 70%, #000));
+    color: white;
+    font-weight: 600;
+    font-size: 0.85rem;
+    border-radius: 8px 0 0 8px;
+}
+
+.grpc-url-input {
+    flex: 1;
+    padding: 10px 14px;
+    border: 2px solid var(--grpc-border);
+    border-radius: 0;
+    font-size: 0.95rem;
+    font-family: 'Monaco', 'Menlo', monospace;
+}
+
+.grpc-url-input:focus {
+    outline: none;
+    border-color: var(--grpc-primary);
+}
+
+.grpc-service-method-selector {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 12px;
+}
+
+.grpc-select-group {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.grpc-select-group label {
+    font-size: 0.8rem;
+    color: var(--grpc-text-muted);
+}
+
+.grpc-select-group select {
+    padding: 10px;
+    border: 1px solid var(--grpc-border);
+    border-radius: 8px;
+    font-size: 0.9rem;
+    background: var(--grpc-bg);
+}
+
+.grpc-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+}
+
+.grpc-status-connected {
+    background: color-mix(in srgb, var(--grpc-success) 15%, transparent);
+    color: var(--grpc-success);
+}
+
+.grpc-status-disconnected {
+    background: #f5f5f5;
+    color: var(--grpc-text-muted);
+}
+
+.grpc-status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: currentColor;
+}
+
+.grpc-stats {
+    color: var(--grpc-text-muted);
+    font-size: 0.8rem;
+}
+
+/* Request Section */
+.grpc-metadata {
+    margin-bottom: 12px;
+}
+
+.grpc-metadata-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    font-size: 0.85rem;
+    color: var(--grpc-text-muted);
+}
+
+.grpc-metadata-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 6px;
+}
+
+.grpc-metadata-row input {
+    flex: 1;
+    padding: 8px 10px;
+    border: 1px solid var(--grpc-border);
+    border-radius: 6px;
+    font-size: 0.85rem;
+}
+
+.grpc-btn-remove {
+    padding: 8px 12px;
+    background: transparent;
+    border: 1px solid var(--grpc-error);
+    color: var(--grpc-error);
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.grpc-message-editor {
+    width: 100%;
+    min-height: 100px;
+    padding: 12px;
+    font-family: 'Monaco', 'Menlo', monospace;
+    font-size: 0.85rem;
+    border: 1px solid var(--grpc-border);
+    border-radius: 8px;
+    margin-bottom: 12px;
+    resize: vertical;
+}
+
+.grpc-message-editor:focus {
+    outline: none;
+    border-color: var(--grpc-primary);
+}
+
+/* Buttons */
+.grpc-btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.grpc-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.grpc-btn-upload,
+.grpc-btn-parse,
+.grpc-btn-sample {
+    background: #f5f5f5;
+    border: 1px solid var(--grpc-border);
+    color: var(--grpc-text);
+}
+
+.grpc-btn-upload:hover,
+.grpc-btn-parse:hover,
+.grpc-btn-sample:hover {
+    background: #e5e5e5;
+}
+
+.grpc-btn-sample {
+    background: color-mix(in srgb, var(--grpc-primary) 15%, #f5f5f5);
+    border-color: var(--grpc-primary);
+    color: var(--grpc-primary);
+}
+
+.grpc-btn-sample:hover {
+    background: color-mix(in srgb, var(--grpc-primary) 25%, #f5f5f5);
+}
+
+.grpc-btn-connect,
+.grpc-btn-invoke {
+    background: var(--grpc-primary);
+    color: white;
+    border-radius: 0 8px 8px 0;
+}
+
+.grpc-btn-connect:hover:not(:disabled),
+.grpc-btn-invoke:hover:not(:disabled) {
+    background: color-mix(in srgb, var(--grpc-primary) 85%, #000);
+}
+
+.grpc-btn-invoke {
+    width: 100%;
+    border-radius: 8px;
+}
+
+.grpc-btn-disconnect {
+    background: var(--grpc-error);
+    color: white;
+    border-radius: 0 8px 8px 0;
+}
+
+.grpc-btn-small {
+    padding: 6px 12px;
+    font-size: 0.8rem;
+    background: transparent;
+    border: 1px solid var(--grpc-border);
+}
+
+/* Response Section */
+.grpc-response-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.grpc-responses-list {
+    max-height: 400px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.grpc-empty {
+    text-align: center;
+    padding: 40px;
+    color: var(--grpc-text-muted);
+    font-size: 0.9rem;
+}
+
+.grpc-response {
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid var(--grpc-border);
+}
+
+.grpc-response-request {
+    background: #EFF6FF;
+    border-color: #BFDBFE;
+}
+
+.grpc-response-response {
+    background: #F0FDF4;
+    border-color: #BBF7D0;
+}
+
+.grpc-response-error {
+    background: #FEF2F2;
+    border-color: #FECACA;
+}
+
+.grpc-response-system {
+    background: #f5f5f5;
+    font-style: italic;
+}
+
+.grpc-response-header-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+    font-size: 0.8rem;
+}
+
+.grpc-response-type {
+    font-weight: 600;
+}
+
+.grpc-response-method {
+    color: var(--grpc-primary);
+    font-family: monospace;
+}
+
+.grpc-response-latency {
+    color: var(--grpc-text-muted);
+}
+
+.grpc-response-time {
+    margin-left: auto;
+    color: var(--grpc-text-muted);
+}
+
+.grpc-response-content {
+    margin: 0;
+    padding: 10px;
+    background: rgba(0, 0, 0, 0.03);
+    border-radius: 6px;
+    font-family: 'Monaco', 'Menlo', monospace;
+    font-size: 0.8rem;
+    overflow-x: auto;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.grpc-response-code {
+    margin-top: 8px;
+    font-size: 0.75rem;
+    color: var(--grpc-error);
+}
+
+/* Error Display */
+.grpc-error {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    background: #FEF2F2;
+    border: 1px solid #FECACA;
+    border-radius: 8px;
+    color: var(--grpc-error);
+    font-size: 0.9rem;
+}
+
+.grpc-error button {
+    background: transparent;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    color: var(--grpc-error);
+}
+
+/* Dark Mode */
+body.dark-theme .grpc-tester {
+    --grpc-bg: var(--card-bg, #002234);
+    --grpc-border: var(--border-color, #003956);
+    --grpc-text: var(--text-color, #e0e0e0);
+    --grpc-text-muted: var(--text-secondary, #d0d0d0);
+}
+
+body.dark-theme .grpc-response-request {
+    background: #013B5B;
+}
+
+body.dark-theme .grpc-response-response {
+    background: #0D3D2B;
+}
+
+body.dark-theme .grpc-response-error {
+    background: #3D1F1F;
+}
+
+body.dark-theme .grpc-response-system {
+    background: var(--sidebar-bg, #001927);
+}
+
+body.dark-theme .grpc-proto-editor,
+body.dark-theme .grpc-url-input,
+body.dark-theme .grpc-message-editor {
+    background: var(--card-bg, #002234);
+    color: var(--text-color, #e0e0e0);
+    border-color: var(--border-color, #003956);
+}
+
+body.dark-theme .grpc-select-group select {
+    background: var(--card-bg, #002234);
+    color: var(--text-color, #e0e0e0);
+    border-color: var(--border-color, #003956);
+}
+
+body.dark-theme .grpc-metadata-row input {
+    background: var(--card-bg, #002234);
+    color: var(--text-color, #e0e0e0);
+    border-color: var(--border-color, #003956);
+}
+
+body.dark-theme .grpc-proto-filename,
+body.dark-theme .grpc-status-disconnected {
+    background: var(--sidebar-bg, #001927);
+}
+
+body.dark-theme .grpc-btn-upload,
+body.dark-theme .grpc-btn-parse,
+body.dark-theme .grpc-btn-small {
+    background: var(--sidebar-bg, #001927);
+    color: var(--text-color, #e0e0e0);
+    border-color: var(--border-color, #003956);
+}
+
+body.dark-theme .grpc-btn-upload:hover,
+body.dark-theme .grpc-btn-parse:hover,
+body.dark-theme .grpc-btn-small:hover {
+    background: var(--hover-bg, #013B5B);
+}
+
+body.dark-theme .grpc-response-content {
+    background: rgba(0, 0, 0, 0.2);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .grpc-url-group {
+        flex-wrap: wrap;
+    }
+
+    .grpc-protocol-badge {
+        border-radius: 8px;
+    }
+
+    .grpc-url-input {
+        order: 1;
+        width: 100%;
+        border-radius: 8px;
+        margin-top: 8px;
+    }
+
+    .grpc-btn-connect,
+    .grpc-btn-disconnect {
+        border-radius: 8px;
+    }
+
+    .grpc-service-method-selector {
+        flex-direction: column;
+    }
+}

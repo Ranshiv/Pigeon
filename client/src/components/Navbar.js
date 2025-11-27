@@ -19,8 +19,10 @@ import {
     FiSearch,
     FiCheck,
     FiChevronRight,
-    FiBook  // Add FiBook icon for documentation
+    FiBook,  // Add FiBook icon for documentation
+    FiLink   // Add FiLink icon for protocols
 } from 'react-icons/fi';
+import { TbVectorTriangle } from 'react-icons/tb'; // Mesh network icon for GraphQL
 import Notifications from './Notifications'; // Import the Notifications component
 import { useCollaboration } from '../context/CollaborationContext';
 
@@ -413,6 +415,12 @@ const Navbar = ({ isAuthenticated }) => {
                                             </div>
                                             <div className="dropdown-item" onClick={() => handleNavigation('/workspace/api-network/ai-agent-tools')}>
                                                 <FiZap size={16} style={{ marginRight: '10px' }} /> AI Agent Tools
+                                            </div>
+                                            <div className="dropdown-item" onClick={() => handleNavigation('/workspace/graphql')}>
+                                                <TbVectorTriangle size={16} style={{ marginRight: '10px' }} /> GraphQL
+                                            </div>
+                                            <div className="dropdown-item" onClick={() => handleNavigation('/workspace/protocols')}>
+                                                <FiLink size={16} style={{ marginRight: '10px' }} /> Protocols
                                             </div>
                                             <div className="dropdown-item" onClick={() => handleNavigation('/workspace/api-network/requests/new')}>
                                                 <FiPlus size={16} style={{ marginRight: '10px' }} /> Add Request
