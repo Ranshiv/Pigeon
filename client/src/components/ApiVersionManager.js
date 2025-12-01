@@ -3,7 +3,7 @@ import {
     FiGitBranch, FiTrash2, FiClock, FiAlertTriangle,
     FiServer, FiInfo, FiFileText, FiSettings, FiTag, FiX
 } from 'react-icons/fi';
-import MockServerManager from './MockServerManager';
+import MockServerWorkspace from './MockServerWorkspace';
 import './ApiVersionManager.css';
 
 const ApiVersionManager = ({ collectionId, collection }) => {
@@ -205,7 +205,7 @@ const ApiVersionManager = ({ collectionId, collection }) => {
 
     if (showMockServerManager && selectedVersionId) {
         return (
-            <MockServerManager
+            <MockServerWorkspace
                 collectionId={collectionId}
                 versionId={selectedVersionId}
                 onClose={() => {

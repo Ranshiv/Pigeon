@@ -30,8 +30,14 @@ const MockServerManager = ({ collectionId, versionId, onClose }) => {
     });
 
     useEffect(() => {
+        console.log('MockServerManager mounted with:', { collectionId, versionId });
+
         const loadMockServers = async () => {
-            if (!versionId) return;
+            if (!versionId) {
+                console.warn('No versionId provided to MockServerManager');
+                setIsLoading(false);
+                return;
+            }
 
             try {
                 setIsLoading(true);
@@ -40,11 +46,16 @@ const MockServerManager = ({ collectionId, versionId, onClose }) => {
                     credentials: 'include'
                 });
 
+                console.log('Fetch mock servers response:', response.status);
+
                 if (response.ok) {
                     const data = await response.json();
-                    setMockServers(data.mockServers || []);
+                    console.log('Mock servers data:', data);
+                    setMockServers(data.mockServers || data || []);
                 } else {
-                    setError('Failed to fetch mock servers');
+                    const errorData = await response.json();
+                    console.error('Error fetching mock servers:', errorData);
+                    setError(errorData.message || 'Failed to fetch mock servers');
                 }
             } catch (err) {
                 console.error('Error fetching mock servers:', err);
@@ -59,6 +70,28 @@ const MockServerManager = ({ collectionId, versionId, onClose }) => {
 
     const handleCreateMockServer = async (e) => {
         e.preventDefault();
+
+        // Validate required fields
+        if (!formData.name.trim()) {
+            alert('Please enter a mock server name');
+            return;
+        }
+
+        if (!collectionId) {
+            alert('Collection ID is missing. Please try again.');
+            return;
+        }
+
+        if (!versionId) {
+            alert('Version ID is missing. Please try again.');
+            return;
+        }
+
+        console.log('Creating mock server with data:', {
+            ...formData,
+            collectionId,
+            versionId
+        });
 
         try {
             const response = await fetch('/api/mock-servers', {
@@ -75,8 +108,10 @@ const MockServerManager = ({ collectionId, versionId, onClose }) => {
                 })
             });
 
+            const result = await response.json();
+            console.log('Server response:', response.status, result);
+
             if (response.ok) {
-                const result = await response.json();
                 setMockServers([result.mockServer, ...mockServers]);
                 setShowCreateForm(false);
                 setFormData({
@@ -85,9 +120,10 @@ const MockServerManager = ({ collectionId, versionId, onClose }) => {
                     baseUrl: '',
                     mockEndpoints: []
                 });
+                alert('Mock server created successfully!');
             } else {
-                const errorData = await response.json();
-                alert(`Error creating mock server: ${errorData.message}`);
+                console.error('Error response:', result);
+                alert(`Error creating mock server: ${result.message || 'Unknown error'}`);
             }
         } catch (err) {
             console.error('Error creating mock server:', err);
@@ -164,7 +200,9 @@ const MockServerManager = ({ collectionId, versionId, onClose }) => {
     };
 
     const copyMockUrl = (server, endpoint) => {
-        const mockUrl = `${window.location.origin}/api/mock-servers/${server._id}/simulate${endpoint.path}`;
+        // Use the backend URL directly (port 5001) instead of the React dev server port
+        const backendUrl = process.env.REACT_APP_API_URL || 'http://localhost:5001';
+        const mockUrl = `${backendUrl}/api/mock-servers/${server._id}/simulate${endpoint.path}`;
         navigator.clipboard.writeText(mockUrl);
 
         // Show feedback

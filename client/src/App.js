@@ -62,7 +62,12 @@ function App() {
           <Route path="/status/:workspaceId" element={<EnhancedPublicStatusPage />} />
           <Route path="/documentation" element={<DocumentationOverview />} /> {/* Add the documentation route */}
           <Route path="/oauth/callback" element={<OAuthCallback />} /> {/* OAuth callback route */}
-          <Route path="*" element={<div>404 Not Found</div>} />
+          <Route path="*" element={<div className="not-found-container" style={{ padding: '40px', textAlign: 'center', color: '#fff' }}>
+            <h2>404 - Page Not Found</h2>
+            <p>The page you're looking for doesn't exist.</p>
+            <p>If you're trying to access a mock API endpoint, please use an API client like Postman or make the request programmatically.</p>
+            <a href="/" style={{ color: '#4a9eff', textDecoration: 'underline' }}>Go to Home</a>
+          </div>} />
         </Routes>
         <Footer />
       </div>

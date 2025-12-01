@@ -185,6 +185,11 @@
     overflow: hidden;
 }
 
+/* Remove padding for API Versions view */
+.documentation-content.api-versions-view {
+    padding: 0;
+}
+
 /* Loading state */
 .documentation-loading {
     position: fixed;

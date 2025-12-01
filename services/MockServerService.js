@@ -1,17 +1,409 @@
 // services/MockServerService.js
 const MockServer = require('../models/MockServer');
 const ApiVersion = require('../models/ApiVersion');
+const MockAnalytics = require('../models/MockAnalytics');
+const MockRecording = require('../models/MockRecording');
+const variableResolver = require('./VariableResolver');
+const { getIO } = require('../utils/socket/socket-server');
 
 class MockServerService {
+    /**
+     * Match a request path against an endpoint pattern with dynamic parameters
+     * @param {string} pattern - Endpoint pattern like /api/products/:id
+     * @param {string} requestPath - Actual request path like /api/products/123
+     * @returns {Object|null} - Matched params or null if no match
+     */
+    static matchPath(pattern, requestPath) {
+        const patternParts = pattern.split('/').filter(Boolean);
+        const pathParts = requestPath.split('/').filter(Boolean);
+
+        if (patternParts.length !== pathParts.length) {
+            return null;
+        }
+
+        const params = {};
+
+        for (let i = 0; i < patternParts.length; i++) {
+            const patternPart = patternParts[i];
+            const pathPart = pathParts[i];
+
+            if (patternPart.startsWith(':')) {
+                // Dynamic parameter - extract the value
+                const paramName = patternPart.substring(1);
+                params[paramName] = pathPart;
+            } else if (patternPart !== pathPart) {
+                // Static part doesn't match
+                return null;
+            }
+        }
+
+        return params;
+    }
+
+    /**
+     * Find matching endpoint with support for dynamic path parameters
+     * @param {Array} endpoints - Array of endpoint definitions
+     * @param {string} path - Request path
+     * @param {string} method - HTTP method
+     * @returns {Object|null} - Matched endpoint with extracted params, or null
+     */
+    static findMatchingEndpoint(endpoints, path, method) {
+        // First try exact match
+        const exactMatch = endpoints.find(
+            ep => ep.path === path && ep.method.toUpperCase() === method.toUpperCase()
+        );
+        if (exactMatch) {
+            return { endpoint: exactMatch, params: {} };
+        }
+
+        // Then try pattern matching for dynamic routes
+        for (const ep of endpoints) {
+            if (ep.method.toUpperCase() !== method.toUpperCase()) {
+                continue;
+            }
+
+            // Check if endpoint has dynamic parameters
+            if (ep.path.includes(':')) {
+                const params = this.matchPath(ep.path, path);
+                if (params) {
+                    return { endpoint: ep, params };
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Evaluate scenario trigger conditions against a request
+     * @param {Object} scenario - The scenario to evaluate
+     * @param {Object} request - The incoming request
+     * @param {Object} mockServer - The mock server for state access
+     * @returns {boolean} - Whether the scenario should trigger
+     */
+    static evaluateScenarioConditions(scenario, request, mockServer) {
+        if (!scenario.triggerConditions || scenario.triggerConditions.length === 0) {
+            return true; // No conditions means always trigger
+        }
+
+        let result = null;
+
+        for (let i = 0; i < scenario.triggerConditions.length; i++) {
+            const condition = scenario.triggerConditions[i];
+            const conditionResult = this.evaluateSingleCondition(condition, request, mockServer);
+
+            if (i === 0) {
+                result = conditionResult;
+            } else {
+                if (condition.logic === 'AND') {
+                    result = result && conditionResult;
+                } else {
+                    result = result || conditionResult;
+                }
+            }
+        }
+
+        return result === true;
+    }
+
+    /**
+     * Evaluate a single trigger condition
+     */
+    static evaluateSingleCondition(condition, request, mockServer) {
+        const { type, key, operator, value } = condition;
+        let actualValue;
+
+        switch (type) {
+            case 'header':
+                actualValue = request.headers?.[key?.toLowerCase()] || request.headers?.[key];
+                break;
+            case 'query':
+                actualValue = request.query?.[key];
+                break;
+            case 'body':
+                actualValue = this.getNestedValue(request.body, key);
+                break;
+            case 'method':
+                actualValue = request.method?.toUpperCase();
+                break;
+            case 'path':
+                actualValue = request.path;
+                break;
+            case 'probability':
+                // Random probability check
+                const probability = parseFloat(value) / 100;
+                return Math.random() < probability;
+            case 'counter':
+                // Check counter value from state
+                const counterValue = mockServer.state?.counters?.get(key) || 0;
+                actualValue = counterValue;
+                break;
+            case 'sequential':
+                // Always true for sequential - handled by response selection
+                return true;
+            default:
+                return false;
+        }
+
+        return this.compareValues(actualValue, operator, value);
+    }
+
+    /**
+     * Compare values based on operator
+     */
+    static compareValues(actualValue, operator, expectedValue) {
+        const actual = String(actualValue ?? '');
+        const expected = String(expectedValue ?? '');
+
+        switch (operator) {
+            case 'equals':
+                return actual === expected;
+            case 'not_equals':
+                return actual !== expected;
+            case 'contains':
+                return actual.includes(expected);
+            case 'not_contains':
+                return !actual.includes(expected);
+            case 'starts_with':
+                return actual.startsWith(expected);
+            case 'ends_with':
+                return actual.endsWith(expected);
+            case 'matches':
+                try {
+                    const regex = new RegExp(expected);
+                    return regex.test(actual);
+                } catch {
+                    return false;
+                }
+            case 'exists':
+                return actualValue !== undefined && actualValue !== null;
+            case 'not_exists':
+                return actualValue === undefined || actualValue === null;
+            case 'greater_than':
+                return parseFloat(actual) > parseFloat(expected);
+            case 'less_than':
+                return parseFloat(actual) < parseFloat(expected);
+            default:
+                return false;
+        }
+    }
+
+    /**
+     * Get nested value from object using dot notation
+     */
+    static getNestedValue(obj, path) {
+        if (!obj || !path) return undefined;
+        return path.split('.').reduce((current, key) => current?.[key], obj);
+    }
+
+    /**
+     * Select response from scenario based on weights or sequence
+     */
+    static selectScenarioResponse(scenario, mockServer) {
+        if (!scenario.responses || scenario.responses.length === 0) {
+            return null;
+        }
+
+        if (scenario.responses.length === 1) {
+            return scenario.responses[0];
+        }
+
+        // Sequential response selection
+        if (!scenario.useWeightedResponses) {
+            const index = (scenario.sequentialIndex || 0) % scenario.responses.length;
+            // Note: sequentialIndex should be incremented after selection
+            return scenario.responses[index];
+        }
+
+        // Weighted random selection
+        const totalWeight = scenario.responses.reduce((sum, r) => sum + (r.weight || 100), 0);
+        let random = Math.random() * totalWeight;
+
+        for (const response of scenario.responses) {
+            random -= (response.weight || 100);
+            if (random <= 0) {
+                return response;
+            }
+        }
+
+        return scenario.responses[0];
+    }
+
+    /**
+     * Resolve variables in response body
+     */
+    static async resolveResponseVariables(responseBody, request, mockServer, contextId = null) {
+        // Convert Map/Mongoose objects to plain objects first
+        let body = responseBody;
+        if (responseBody instanceof Map) {
+            body = Object.fromEntries(responseBody);
+        } else if (responseBody && typeof responseBody === 'object' && responseBody.toJSON) {
+            body = responseBody.toJSON();
+        } else if (responseBody && typeof responseBody === 'object') {
+            // Deep clone to ensure it's a plain object
+            try {
+                body = JSON.parse(JSON.stringify(responseBody));
+            } catch (e) {
+                body = responseBody;
+            }
+        }
+
+        if (!mockServer.globalConfig?.enableVariableResolution) {
+            return body;
+        }
+
+        if (typeof body === 'string') {
+            // Simple variable replacement for string responses
+            return responseBody.replace(/\{\{([^}]+)\}\}/g, (match, varName) => {
+                const trimmedName = varName.trim();
+
+                // Check mock server state variables (with state. prefix)
+                if (trimmedName.startsWith('state.')) {
+                    const stateVarName = trimmedName.substring(6); // Remove 'state.' prefix
+                    if (mockServer.state?.variables?.has(stateVarName)) {
+                        return mockServer.state.variables.get(stateVarName);
+                    }
+                }
+
+                // Check mock server state first (without prefix for backward compatibility)
+                if (mockServer.state?.variables?.has(trimmedName)) {
+                    return mockServer.state.variables.get(trimmedName);
+                }
+
+                // Check request data
+                if (trimmedName.startsWith('request.')) {
+                    const path = trimmedName.substring(8);
+                    if (path === 'method') return request.method;
+                    if (path === 'path') return request.path;
+                    if (path.startsWith('headers.')) {
+                        return request.headers?.[path.substring(8)] || match;
+                    }
+                    if (path.startsWith('query.')) {
+                        return request.query?.[path.substring(6)] || match;
+                    }
+                    if (path.startsWith('body.')) {
+                        return this.getNestedValue(request.body, path.substring(5)) || match;
+                    }
+                }
+
+                // Check path parameters (e.g., {{params.id}})
+                if (trimmedName.startsWith('params.')) {
+                    const paramName = trimmedName.substring(7);
+                    return request.params?.[paramName] || match;
+                }
+
+                // Check counters
+                if (trimmedName.startsWith('counter.')) {
+                    const counterName = trimmedName.substring(8);
+                    return mockServer.state?.counters?.get(counterName) || 0;
+                }
+
+                // Built-in variables
+                if (trimmedName === 'timestamp') return new Date().toISOString();
+                if (trimmedName === 'randomUUID') return require('crypto').randomUUID();
+                if (trimmedName === 'randomInt') return Math.floor(Math.random() * 1000000);
+
+                return match;
+            });
+        }
+
+        if (typeof responseBody === 'object' && responseBody !== null) {
+            // Deep clone and resolve variables in object
+            const resolved = JSON.parse(JSON.stringify(responseBody));
+            return await this.resolveObjectVariables(resolved, request, mockServer);
+        }
+
+        return responseBody;
+    }
+
+    /**
+     * Recursively resolve variables in an object
+     */
+    static async resolveObjectVariables(obj, request, mockServer) {
+        if (typeof obj === 'string') {
+            return await this.resolveResponseVariables(obj, request, mockServer);
+        }
+
+        if (Array.isArray(obj)) {
+            return await Promise.all(obj.map(item => this.resolveObjectVariables(item, request, mockServer)));
+        }
+
+        if (typeof obj === 'object' && obj !== null) {
+            const resolved = {};
+            for (const [key, value] of Object.entries(obj)) {
+                resolved[key] = await this.resolveObjectVariables(value, request, mockServer);
+            }
+            return resolved;
+        }
+
+        return obj;
+    }
+
+    /**
+     * Apply chaos engineering effects
+     */
+    static applyChaosEffects(mockServer) {
+        const chaos = mockServer.globalConfig?.chaos;
+        if (!chaos?.enabled) {
+            return { shouldFail: false, extraDelay: 0 };
+        }
+
+        // Random failure
+        const shouldFail = Math.random() * 100 < (chaos.randomFailureRate || 0);
+
+        // Random delay
+        let extraDelay = 0;
+        if (chaos.randomDelayRange?.max > 0) {
+            const min = chaos.randomDelayRange.min || 0;
+            const max = chaos.randomDelayRange.max;
+            extraDelay = Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        return { shouldFail, extraDelay };
+    }
+
+    /**
+     * Emit real-time updates via Socket.IO
+     */
+    static emitMockEvent(eventName, data) {
+        try {
+            const io = getIO();
+            if (io) {
+                io.emit(eventName, {
+                    ...data,
+                    timestamp: new Date()
+                });
+            }
+        } catch (error) {
+            console.error('Error emitting mock event:', error);
+        }
+    }
     /**
      * Create a new mock server for an API version
      */
     static async createMockServer(mockServerData, userId) {
         try {
-            // Validate that the API version exists
+            // Log the incoming data for debugging
+            console.log('Creating mock server with data:', mockServerData);
+            console.log('User ID:', userId);
+
+            // Validate required fields
+            if (!mockServerData.name) {
+                throw new Error('Mock server name is required');
+            }
+
+            if (!mockServerData.collectionId) {
+                throw new Error('Collection ID is required');
+            }
+
+            if (!mockServerData.versionId) {
+                throw new Error('Version ID is required');
+            }
+
+            // Optionally validate that the API version exists (make this non-blocking)
             const apiVersion = await ApiVersion.findById(mockServerData.versionId);
             if (!apiVersion) {
-                throw new Error('API version not found');
+                console.warn(`API version ${mockServerData.versionId} not found, but proceeding with mock server creation`);
             }
 
             const mockServer = new MockServer({
@@ -27,8 +419,10 @@ class MockServerService {
             });
 
             await mockServer.save();
+            console.log('Mock server created successfully:', mockServer._id);
             return mockServer;
         } catch (error) {
+            console.error('Error in createMockServer:', error);
             throw new Error(`Failed to create mock server: ${error.message}`);
         }
     }
@@ -246,8 +640,11 @@ class MockServerService {
 
     /**
      * Handle mock request (this would be used by the proxy endpoint)
+     * Enhanced with scenario evaluation, state management, and analytics
      */
     static async handleMockRequest(mockServerId, path, method, query, body, headers) {
+        const startTime = Date.now();
+
         try {
             const mockServer = await MockServer.findById(mockServerId);
 
@@ -255,39 +652,305 @@ class MockServerService {
                 throw new Error('Mock server not found or inactive');
             }
 
-            // Find matching endpoint
-            const endpoint = mockServer.mockEndpoints.find(
-                ep => ep.path === path && ep.method.toUpperCase() === method.toUpperCase()
-            );
+            // Increment request counter in state
+            const requestCounterKey = 'total_requests';
+            const currentCount = mockServer.state?.counters?.get(requestCounterKey) || 0;
+            if (!mockServer.state) mockServer.state = { counters: new Map(), variables: new Map() };
+            if (!mockServer.state.counters) mockServer.state.counters = new Map();
+            mockServer.state.counters.set(requestCounterKey, currentCount + 1);
 
-            if (!endpoint) {
+            // Build request object for evaluation
+            const request = {
+                path,
+                method: method.toUpperCase(),
+                query,
+                body,
+                headers
+            };
+
+            // Apply chaos engineering effects
+            const chaosEffects = this.applyChaosEffects(mockServer);
+            if (chaosEffects.shouldFail) {
+                const responseTime = Date.now() - startTime + chaosEffects.extraDelay;
+                await this.logRequestToAnalytics(mockServerId, request, 500, responseTime);
+
+                if (chaosEffects.extraDelay > 0) {
+                    await new Promise(resolve => setTimeout(resolve, chaosEffects.extraDelay));
+                }
+
+                // Emit event for chaos failure
+                this.emitMockEvent('mock:chaos:triggered', {
+                    mockServerId,
+                    path,
+                    method,
+                    type: 'random_failure'
+                });
+
                 return {
-                    status: 404,
-                    headers: { 'Content-Type': 'application/json' },
-                    body: { error: 'Endpoint not found', path, method }
+                    status: 500,
+                    headers: { 'Content-Type': 'application/json', 'X-Mock-Chaos': 'true' },
+                    body: { error: 'Chaos engineering: Random failure triggered' }
                 };
             }
 
-            // Apply response delay if configured
-            if (endpoint.responseDelay > 0) {
-                await new Promise(resolve => setTimeout(resolve, endpoint.responseDelay));
+            // Find matching scenarios (sorted by priority)
+            const matchingScenarios = (mockServer.scenarios || [])
+                .filter(s => s.isActive &&
+                    (s.endpointPath === path || s.endpointPath === '*') &&
+                    (s.endpointMethod === method.toUpperCase() || s.endpointMethod === '*'))
+                .sort((a, b) => (b.priority || 0) - (a.priority || 0));
+
+            // Evaluate scenarios to find a match
+            let matchedScenario = null;
+            let selectedResponse = null;
+
+            for (const scenario of matchingScenarios) {
+                if (this.evaluateScenarioConditions(scenario, request, mockServer)) {
+                    matchedScenario = scenario;
+                    selectedResponse = this.selectScenarioResponse(scenario, mockServer);
+
+                    // Update sequential index if needed
+                    if (!scenario.useWeightedResponses && scenario.responses?.length > 1) {
+                        const scenarioIndex = mockServer.scenarios.findIndex(s => s._id.equals(scenario._id));
+                        if (scenarioIndex >= 0) {
+                            mockServer.scenarios[scenarioIndex].sequentialIndex =
+                                ((scenario.sequentialIndex || 0) + 1) % scenario.responses.length;
+                        }
+                    }
+
+                    break;
+                }
             }
 
-            // Convert response headers Map to object
-            const responseHeaders = {};
-            if (endpoint.responseHeaders) {
-                endpoint.responseHeaders.forEach((value, key) => {
-                    responseHeaders[key] = value;
+            let response;
+
+            if (selectedResponse) {
+                // Convert selectedResponse.body to plain JavaScript object
+                // Mongoose Mixed type can cause serialization issues
+                let responseBodyData = selectedResponse.body;
+                if (responseBodyData && typeof responseBodyData === 'object') {
+                    if (responseBodyData.toJSON) {
+                        responseBodyData = responseBodyData.toJSON();
+                    } else if (responseBodyData._doc) {
+                        responseBodyData = responseBodyData._doc;
+                    } else {
+                        // Deep clone to ensure plain object
+                        try {
+                            responseBodyData = JSON.parse(JSON.stringify(responseBodyData));
+                        } catch (e) {
+                            console.error('Failed to serialize response body:', e);
+                        }
+                    }
+                }
+
+                console.log('[Mock Debug] selectedResponse.body raw:', selectedResponse.body);
+                console.log('[Mock Debug] selectedResponse.body type:', typeof selectedResponse.body);
+                console.log('[Mock Debug] responseBodyData after conversion:', responseBodyData);
+
+                // Build response from scenario
+                const resolvedBody = await this.resolveResponseVariables(
+                    responseBodyData,
+                    request,
+                    mockServer
+                );
+
+                const totalDelay = (selectedResponse.delay || 0) +
+                    (mockServer.globalConfig?.defaultDelay || 0) +
+                    chaosEffects.extraDelay;
+
+                if (totalDelay > 0) {
+                    await new Promise(resolve => setTimeout(resolve, totalDelay));
+                }
+
+                // Convert headers to object
+                const responseHeaders = {};
+                if (selectedResponse.headers) {
+                    selectedResponse.headers.forEach((value, key) => {
+                        responseHeaders[key] = value;
+                    });
+                }
+
+                response = {
+                    status: selectedResponse.statusCode || 200,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...responseHeaders,
+                        'X-Mock-Scenario': matchedScenario.name,
+                        'X-Mock-Response': selectedResponse.name || 'default'
+                    },
+                    body: resolvedBody
+                };
+
+                // Emit scenario triggered event
+                this.emitMockEvent('mock:scenario:triggered', {
+                    mockServerId,
+                    scenarioId: matchedScenario._id,
+                    scenarioName: matchedScenario.name,
+                    responseName: selectedResponse.name,
+                    path,
+                    method
                 });
+            } else {
+                // Fall back to basic endpoint matching with dynamic path support
+                const match = this.findMatchingEndpoint(mockServer.mockEndpoints, path, method);
+
+                if (!match) {
+                    const responseTime = Date.now() - startTime;
+                    await this.logRequestToAnalytics(mockServerId, request, 404, responseTime);
+
+                    return {
+                        status: 404,
+                        headers: { 'Content-Type': 'application/json' },
+                        body: { error: 'Endpoint not found', path, method }
+                    };
+                }
+
+                const { endpoint, params } = match;
+
+                // Add params to request for variable resolution
+                request.params = params;
+
+                // Apply response delay if configured
+                const totalDelay = (endpoint.responseDelay || 0) +
+                    (mockServer.globalConfig?.defaultDelay || 0) +
+                    chaosEffects.extraDelay;
+
+                if (totalDelay > 0) {
+                    await new Promise(resolve => setTimeout(resolve, totalDelay));
+                }
+
+                // Resolve variables in response body
+                const resolvedBody = await this.resolveResponseVariables(
+                    endpoint.responseBody,
+                    request,
+                    mockServer
+                );
+
+                // Convert response headers Map to object
+                const responseHeaders = {};
+                if (endpoint.responseHeaders) {
+                    endpoint.responseHeaders.forEach((value, key) => {
+                        responseHeaders[key] = value;
+                    });
+                }
+
+                response = {
+                    status: endpoint.statusCode,
+                    headers: responseHeaders,
+                    body: resolvedBody
+                };
             }
 
-            return {
-                status: endpoint.statusCode,
-                headers: responseHeaders,
-                body: endpoint.responseBody
-            };
+            // Calculate response time
+            const responseTime = Date.now() - startTime;
+
+            // Log to analytics
+            await this.logRequestToAnalytics(
+                mockServerId,
+                request,
+                response.status,
+                responseTime,
+                matchedScenario
+            );
+
+            // Record traffic if recording is active
+            if (mockServer.recording?.isRecording && mockServer.recording?.currentSessionId) {
+                await this.recordTraffic(mockServer, request, response, responseTime);
+            }
+
+            // Update mock server analytics
+            mockServer.analytics = mockServer.analytics || {};
+            mockServer.analytics.totalRequests = (mockServer.analytics.totalRequests || 0) + 1;
+            mockServer.analytics.lastRequestAt = new Date();
+
+            // Update endpoint request count
+            const endpointKey = `${method.toUpperCase()}:${path}`;
+            if (!mockServer.analytics.requestsByEndpoint) {
+                mockServer.analytics.requestsByEndpoint = new Map();
+            }
+            const endpointCount = mockServer.analytics.requestsByEndpoint.get(endpointKey) || 0;
+            mockServer.analytics.requestsByEndpoint.set(endpointKey, endpointCount + 1);
+
+            await mockServer.save();
+
+            // Emit request received event
+            this.emitMockEvent('mock:request:received', {
+                mockServerId,
+                path,
+                method,
+                statusCode: response.status,
+                responseTime,
+                scenarioName: matchedScenario?.name
+            });
+
+            return response;
         } catch (error) {
             throw new Error(`Failed to handle mock request: ${error.message}`);
+        }
+    }
+
+    /**
+     * Log request to analytics collection
+     */
+    static async logRequestToAnalytics(mockServerId, request, statusCode, responseTime, scenario = null) {
+        try {
+            const analytics = await MockAnalytics.getOrCreateForServer(mockServerId);
+            await analytics.logRequest({
+                method: request.method,
+                path: request.path,
+                statusCode,
+                responseTime,
+                requestSize: JSON.stringify(request.body || '').length,
+                responseSize: 0, // Would need actual response to calculate
+                scenarioId: scenario?._id,
+                scenarioName: scenario?.name,
+                clientInfo: {
+                    userAgent: request.headers?.['user-agent'],
+                    ip: request.headers?.['x-forwarded-for'] || request.headers?.['x-real-ip']
+                }
+            });
+            await analytics.save();
+        } catch (error) {
+            console.error('Error logging to analytics:', error);
+        }
+    }
+
+    /**
+     * Record traffic for replay
+     */
+    static async recordTraffic(mockServer, request, response, responseTime) {
+        try {
+            const recording = await MockRecording.findOne({
+                sessionId: mockServer.recording.currentSessionId,
+                status: 'recording'
+            });
+
+            if (recording) {
+                await recording.addRequest({
+                    timestamp: new Date(),
+                    method: request.method,
+                    path: request.path,
+                    headers: request.headers,
+                    queryParams: request.query,
+                    body: request.body,
+                    response: {
+                        status: response.status,
+                        headers: response.headers,
+                        body: response.body,
+                        duration: responseTime
+                    }
+                });
+                await recording.save();
+
+                // Emit recording update event
+                this.emitMockEvent('mock:recording:updated', {
+                    mockServerId: mockServer._id,
+                    sessionId: mockServer.recording.currentSessionId,
+                    requestCount: recording.requests.length
+                });
+            }
+        } catch (error) {
+            console.error('Error recording traffic:', error);
         }
     }
 
@@ -302,10 +965,233 @@ class MockServerService {
                 throw new Error('Mock server not found');
             }
 
+            // Also delete associated analytics and recordings
+            await MockAnalytics.findOneAndDelete({ mockServerId });
+            await MockRecording.deleteMany({ mockServerId });
+
             await MockServer.findByIdAndDelete(mockServerId);
             return { message: 'Mock server deleted successfully' };
         } catch (error) {
             throw new Error(`Failed to delete mock server: ${error.message}`);
+        }
+    }
+
+    // =====================
+    // SCENARIO MANAGEMENT
+    // =====================
+
+    /**
+     * Add a new scenario to a mock server
+     */
+    static async addScenario(mockServerId, scenarioData) {
+        try {
+            const mockServer = await MockServer.findById(mockServerId);
+
+            if (!mockServer) {
+                throw new Error('Mock server not found');
+            }
+
+            // Initialize scenarios array if it doesn't exist
+            if (!mockServer.scenarios) {
+                mockServer.scenarios = [];
+            }
+
+            // Set priority based on existing scenarios
+            const maxPriority = mockServer.scenarios.reduce(
+                (max, s) => Math.max(max, s.priority || 0), 0
+            );
+            scenarioData.priority = scenarioData.priority ?? maxPriority + 1;
+            scenarioData.sequentialIndex = 0;
+
+            mockServer.scenarios.push(scenarioData);
+            await mockServer.save();
+
+            // Emit scenario added event
+            this.emitMockEvent('mock:scenario:added', {
+                mockServerId,
+                scenarioName: scenarioData.name
+            });
+
+            return mockServer;
+        } catch (error) {
+            throw new Error(`Failed to add scenario: ${error.message}`);
+        }
+    }
+
+    /**
+     * Update an existing scenario
+     */
+    static async updateScenario(mockServerId, scenarioId, scenarioData) {
+        try {
+            const mockServer = await MockServer.findById(mockServerId);
+
+            if (!mockServer) {
+                throw new Error('Mock server not found');
+            }
+
+            const scenarioIndex = mockServer.scenarios?.findIndex(
+                s => s._id.toString() === scenarioId
+            );
+
+            if (scenarioIndex === -1 || scenarioIndex === undefined) {
+                throw new Error('Scenario not found');
+            }
+
+            // Preserve certain fields
+            const preservedFields = ['_id', 'sequentialIndex', 'createdAt'];
+            const existingScenario = mockServer.scenarios[scenarioIndex];
+
+            // Update scenario while preserving certain fields
+            mockServer.scenarios[scenarioIndex] = {
+                ...existingScenario.toObject(),
+                ...scenarioData,
+                _id: existingScenario._id,
+                sequentialIndex: existingScenario.sequentialIndex,
+                updatedAt: new Date()
+            };
+
+            await mockServer.save();
+
+            // Emit scenario updated event
+            this.emitMockEvent('mock:scenario:updated', {
+                mockServerId,
+                scenarioId,
+                scenarioName: scenarioData.name || existingScenario.name
+            });
+
+            return mockServer;
+        } catch (error) {
+            throw new Error(`Failed to update scenario: ${error.message}`);
+        }
+    }
+
+    /**
+     * Delete a scenario
+     */
+    static async deleteScenario(mockServerId, scenarioId) {
+        try {
+            const mockServer = await MockServer.findById(mockServerId);
+
+            if (!mockServer) {
+                throw new Error('Mock server not found');
+            }
+
+            const scenarioIndex = mockServer.scenarios?.findIndex(
+                s => s._id.toString() === scenarioId
+            );
+
+            if (scenarioIndex === -1 || scenarioIndex === undefined) {
+                throw new Error('Scenario not found');
+            }
+
+            const deletedScenario = mockServer.scenarios[scenarioIndex];
+            mockServer.scenarios.splice(scenarioIndex, 1);
+            await mockServer.save();
+
+            // Emit scenario deleted event
+            this.emitMockEvent('mock:scenario:deleted', {
+                mockServerId,
+                scenarioId,
+                scenarioName: deletedScenario.name
+            });
+
+            return mockServer;
+        } catch (error) {
+            throw new Error(`Failed to delete scenario: ${error.message}`);
+        }
+    }
+
+    /**
+     * Toggle scenario enabled status
+     */
+    static async toggleScenario(mockServerId, scenarioId) {
+        try {
+            const mockServer = await MockServer.findById(mockServerId);
+
+            if (!mockServer) {
+                throw new Error('Mock server not found');
+            }
+
+            const scenario = mockServer.scenarios?.find(
+                s => s._id.toString() === scenarioId
+            );
+
+            if (!scenario) {
+                throw new Error('Scenario not found');
+            }
+
+            scenario.isActive = !scenario.isActive;
+            await mockServer.save();
+
+            // Emit scenario toggled event
+            this.emitMockEvent('mock:scenario:toggled', {
+                mockServerId,
+                scenarioId,
+                scenarioName: scenario.name,
+                isActive: scenario.isActive
+            });
+
+            return mockServer;
+        } catch (error) {
+            throw new Error(`Failed to toggle scenario: ${error.message}`);
+        }
+    }
+
+    /**
+     * Reorder scenarios (affects priority)
+     */
+    static async reorderScenarios(mockServerId, scenarioIds) {
+        try {
+            const mockServer = await MockServer.findById(mockServerId);
+
+            if (!mockServer) {
+                throw new Error('Mock server not found');
+            }
+
+            if (!mockServer.scenarios || mockServer.scenarios.length === 0) {
+                throw new Error('No scenarios to reorder');
+            }
+
+            // Validate that all scenario IDs are present
+            const existingIds = mockServer.scenarios.map(s => s._id.toString());
+            const allIdsValid = scenarioIds.every(id => existingIds.includes(id));
+
+            if (!allIdsValid) {
+                throw new Error('Invalid scenario IDs provided');
+            }
+
+            // Reorder scenarios based on the provided order
+            const reorderedScenarios = [];
+            let priority = scenarioIds.length;
+
+            for (const id of scenarioIds) {
+                const scenario = mockServer.scenarios.find(s => s._id.toString() === id);
+                if (scenario) {
+                    scenario.priority = priority--;
+                    reorderedScenarios.push(scenario);
+                }
+            }
+
+            // Add any scenarios not in the list (shouldn't happen, but just in case)
+            for (const scenario of mockServer.scenarios) {
+                if (!scenarioIds.includes(scenario._id.toString())) {
+                    scenario.priority = priority--;
+                    reorderedScenarios.push(scenario);
+                }
+            }
+
+            mockServer.scenarios = reorderedScenarios;
+            await mockServer.save();
+
+            // Emit scenarios reordered event
+            this.emitMockEvent('mock:scenarios:reordered', {
+                mockServerId,
+                scenarioCount: reorderedScenarios.length
+            });
+
+            return mockServer;
+        } catch (error) {
+            throw new Error(`Failed to reorder scenarios: ${error.message}`);
         }
     }
 

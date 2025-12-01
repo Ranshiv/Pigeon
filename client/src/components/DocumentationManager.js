@@ -1014,12 +1014,12 @@ const DocumentationManager = () => {
                         className={`action-btn ${view === 'api-versions' ? 'active' : ''}`}
                         onClick={() => setView(view === 'api-versions' ? 'edit' : 'api-versions')}
                     >
-                        <FiGitBranch /> API Versions
+                        <FiGitBranch /> API Virtualizations
                     </button>
                 </div>
             </div>
 
-            <div className="documentation-content">
+            <div className={`documentation-content ${view === 'api-versions' ? 'api-versions-view' : ''}`}>
                 {view === 'edit' && documentation && !isLoading && (
                     <>
                         {console.log('Rendering editor with documentation:', documentation)}
