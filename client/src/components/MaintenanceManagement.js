@@ -411,6 +411,12 @@ const MaintenanceManagement = () => {
                 </button>
                 <button
                     className="nav-btn"
+                    onClick={() => navigate('/alerts/policies')}
+                >
+                    <FiBell /> Alerts & Policies
+                </button>
+                <button
+                    className="nav-btn"
                     onClick={() => navigate('/workspace/monitoring/reports')}
                 >
                     <FiBarChart /> Reports
@@ -497,7 +503,7 @@ const MaintenanceManagement = () => {
                         ))}
                     </div>
 
-                    
+
                 </div>
 
                 <div className="maintenance-details">

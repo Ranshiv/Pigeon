@@ -6,7 +6,7 @@ import {
     FiUsers, FiPlus, FiEdit, FiTrash2, FiMail, FiShield,
     FiCheckCircle, FiX, FiAlertCircle, FiSettings,
     FiEye, FiActivity, FiBarChart, FiTool, FiUser,
-    FiUserPlus, FiUserX, FiSave
+    FiUserPlus, FiUserX, FiSave, FiBell
 } from 'react-icons/fi';
 
 const TeamsManagement = () => {
@@ -201,6 +201,12 @@ const TeamsManagement = () => {
                     onClick={() => navigate('/workspace/monitoring')}
                 >
                     <FiActivity /> Dashboard
+                </button>
+                <button
+                    className="nav-btn"
+                    onClick={() => navigate('/alerts/policies')}
+                >
+                    <FiBell /> Alerts & Policies
                 </button>
                 <button
                     className="nav-btn"

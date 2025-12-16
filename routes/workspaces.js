@@ -12,17 +12,25 @@ const workspacesStore = {};
 router.get('/', ensureAuthenticated, async (req, res) => {
     try {
         const userId = req.user.id;
+        const userObjectId = ObjectId.isValid(userId) ? new ObjectId(userId) : null;
         const db = getDb();
 
-        // Fetch workspaces from MongoDB
-        const workspaces = await db.collection('workspaces')
+        // Fetch workspaces from MongoDB (support both string and ObjectId owners/collaborators)
+        let workspaces = await db.collection('workspaces')
             .find({
                 $or: [
                     { owner: userId },
-                    { "collaborators.userId": userId }
+                    ...(userObjectId ? [{ owner: userObjectId }] : []),
+                    { "collaborators.userId": userId },
+                    ...(userObjectId ? [{ "collaborators.userId": userObjectId }] : [])
                 ]
             })
             .toArray();
+
+        // Fallback for dev mode: if nothing matched the current user, show all existing workspaces
+        if (workspaces.length === 0 && process.env.NODE_ENV !== 'production') {
+            workspaces = await db.collection('workspaces').find({}).limit(50).toArray();
+        }
 
         // Separate into personal and team workspaces
         const personalWorkspaces = [];
@@ -32,12 +40,18 @@ router.get('/', ensureAuthenticated, async (req, res) => {
             // Convert MongoDB ObjectId to string for client use
             const wsWithStringId = {
                 ...workspace,
-                _id: workspace._id.toString()
+                _id: workspace._id.toString(),
+                owner: workspace.owner?.toString?.() || workspace.owner
             };
 
             // Add collection count information
             const collectionsCount = await db.collection('collections')
-                .countDocuments({ workspaceId: workspace._id.toString() });
+                .countDocuments({
+                    $or: [
+                        { workspaceId: workspace._id.toString() },
+                        ...(workspace._id ? [{ workspaceId: workspace._id }] : [])
+                    ]
+                });
 
             wsWithStringId.collectionsCount = collectionsCount;
             wsWithStringId.collaboratorsCount = workspace.collaborators ? workspace.collaborators.length : 1;
@@ -66,11 +80,11 @@ router.get('/', ensureAuthenticated, async (req, res) => {
                 description: "Workspace for API testing and documentation",
                 isPersonal: true,
                 isPublic: false,
-                owner: userId,
+                owner: userObjectId || userId,
                 userRole: "admin",
                 collaborators: [
                     {
-                        userId: userId,
+                        userId: userObjectId || userId,
                         displayName: req.user.name || "User",
                         email: req.user.email,
                         role: "admin",
@@ -88,6 +102,7 @@ router.get('/', ensureAuthenticated, async (req, res) => {
             personalWorkspaces.push({
                 ...defaultWorkspace,
                 _id: newWorkspaceId,
+                owner: (defaultWorkspace.owner && defaultWorkspace.owner.toString) ? defaultWorkspace.owner.toString() : defaultWorkspace.owner,
                 collectionsCount: 0,
                 collaboratorsCount: 1
             });
@@ -170,6 +185,7 @@ router.get('/:id', ensureAuthenticated, async (req, res) => {
     try {
         const workspaceId = req.params.id;
         const userId = req.user.id;
+        const userObjectId = ObjectId.isValid(userId) ? new ObjectId(userId) : null;
         const db = getDb();
 
         // Special handling for "my-workspace" - create the first personal workspace if none exists
@@ -237,8 +253,9 @@ router.get('/:id', ensureAuthenticated, async (req, res) => {
         let workspace;
 
         // Try to find the workspace in MongoDB first
-        const mongoWorkspace = await db.collection('workspaces')
-            .findOne({ _id: new ObjectId(workspaceId) });
+        const mongoWorkspace = ObjectId.isValid(workspaceId)
+            ? await db.collection('workspaces').findOne({ _id: new ObjectId(workspaceId) })
+            : null;
 
         if (mongoWorkspace) {
             workspace = {
@@ -247,10 +264,15 @@ router.get('/:id', ensureAuthenticated, async (req, res) => {
                 description: mongoWorkspace.description || "",
                 isPersonal: mongoWorkspace.isPersonal || false,
                 isPublic: mongoWorkspace.isPublic || false,
-                owner: mongoWorkspace.owner,
+                owner: mongoWorkspace.owner?.toString?.() || mongoWorkspace.owner,
                 userRole: "admin", // This should be determined based on the user's actual role
                 memberCount: mongoWorkspace.collaborators ? mongoWorkspace.collaborators.length : 1,
-                collectionCount: await db.collection('collections').countDocuments({ workspaceId: mongoWorkspace._id.toString() }),
+                collectionCount: await db.collection('collections').countDocuments({
+                    $or: [
+                        { workspaceId: mongoWorkspace._id.toString() },
+                        ...(mongoWorkspace._id ? [{ workspaceId: mongoWorkspace._id }] : [])
+                    ]
+                }),
                 collaborators: mongoWorkspace.collaborators || [],
                 createdAt: mongoWorkspace.createdAt,
                 updatedAt: mongoWorkspace.updatedAt
@@ -297,19 +319,26 @@ router.get('/:id', ensureAuthenticated, async (req, res) => {
 router.get('/:id/collections', ensureAuthenticated, async (req, res) => {
     try {
         const workspaceId = req.params.id;
+        const workspaceObjectId = ObjectId.isValid(workspaceId) ? new ObjectId(workspaceId) : null;
         const userId = req.user.id;
         const db = getDb();
 
         // Fetch collections from MongoDB
         const collections = await db.collection('collections')
-            .find({ workspaceId: workspaceId })
+            .find({
+                $or: [
+                    { workspaceId: workspaceId },
+                    ...(workspaceObjectId ? [{ workspaceId: workspaceObjectId }] : [])
+                ]
+            })
             .toArray();
 
         // If collections exist in MongoDB, return them
         if (collections && collections.length > 0) {
             const collectionsWithStringIds = collections.map(collection => ({
                 ...collection,
-                _id: collection._id.toString()
+                _id: collection._id.toString(),
+                workspaceId: collection.workspaceId?.toString?.() || collection.workspaceId
             }));
 
             return res.json(collectionsWithStringIds);
@@ -606,6 +635,7 @@ router.post('/', ensureAuthenticated, async (req, res) => {
     try {
         const { name, description, isPersonal, isPublic } = req.body;
         const userId = req.user.id;
+        const userObjectId = ObjectId.isValid(userId) ? new ObjectId(userId) : null;
         const db = getDb();
 
         // Validate input
@@ -619,11 +649,11 @@ router.post('/', ensureAuthenticated, async (req, res) => {
             description: description || "",
             isPersonal: isPersonal || false,
             isPublic: isPublic || false,
-            owner: userId,
+            owner: userObjectId || userId,
             userRole: "admin",
             collaborators: [
                 {
-                    userId: userId,
+                    userId: userObjectId || userId,
                     displayName: req.user.name || "User",
                     email: req.user.email,
                     role: "admin",
@@ -649,7 +679,8 @@ router.post('/', ensureAuthenticated, async (req, res) => {
         // Return the created workspace with its ID
         res.status(201).json({
             ...newWorkspace,
-            _id: workspaceId
+            _id: workspaceId,
+            owner: (newWorkspace.owner && newWorkspace.owner.toString) ? newWorkspace.owner.toString() : newWorkspace.owner
         });
     } catch (err) {
         console.error("Error creating workspace:", err);
@@ -685,6 +716,10 @@ router.put('/:id', ensureAuthenticated, async (req, res) => {
         // Validate input
         if (!name) {
             return res.status(400).json({ message: 'Workspace name is required' });
+        }
+
+        if (!ObjectId.isValid(actualWorkspaceId)) {
+            return res.status(400).json({ message: 'Invalid workspace id' });
         }
 
         // Check if the workspace exists

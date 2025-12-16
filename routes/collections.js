@@ -14,17 +14,32 @@ const collectionsStore = {};
 router.get('/', ensureAuthenticated, async (req, res) => {
     try {
         const userId = req.user.id;
+        const userObjectId = ObjectId.isValid(userId) ? new ObjectId(userId) : null;
         const db = getDb();        // Fetch collections from MongoDB
-        const collections = await db.collection('collections')
-            .find({ owner: userId })
+        let collections = await db.collection('collections')
+            .find({
+                $or: [
+                    { owner: userId },
+                    ...(userObjectId ? [{ owner: userObjectId }] : [])
+                ]
+            })
             .toArray();
+
+        // Fallback for dev mode: if no collections match the current user, show all
+        if (collections.length === 0 && process.env.NODE_ENV !== 'production') {
+            collections = await db.collection('collections').find({}).limit(100).toArray();
+        }
 
         // If collections exist in MongoDB, populate owner information and return them
         if (collections && collections.length > 0) {
             const User = require('../models/User');
             const populatedCollections = await Promise.all(
                 collections.map(async (collection) => {
-                    let populatedCollection = { ...collection, _id: collection._id.toString() };
+                    let populatedCollection = {
+                        ...collection,
+                        _id: collection._id.toString(),
+                        workspaceId: collection.workspaceId?.toString?.() || collection.workspaceId
+                    };
 
                     // Try to populate owner information
                     if (collection.owner && ObjectId.isValid(collection.owner)) {
@@ -194,10 +209,11 @@ router.get('/:id', ensureAuthenticated, async (req, res) => {
                     }
                 }
 
-                // Add string ID and return
+                // Add string IDs and return
                 return res.json({
                     ...populatedCollection,
-                    _id: populatedCollection._id.toString()
+                    _id: populatedCollection._id.toString(),
+                    workspaceId: populatedCollection.workspaceId?.toString?.() || populatedCollection.workspaceId
                 });
             }
         } catch (err) {
@@ -367,9 +383,15 @@ router.get('/:id', ensureAuthenticated, async (req, res) => {
 // Create a new collection
 router.post('/', ensureAuthenticated, async (req, res) => {
     try {
-        const { name, description, isPublic, workspaceId } = req.body;
+        const { name, description, isPublic, workspaceId, requests } = req.body;
         const userId = req.user.id;
+        const userObjectId = ObjectId.isValid(userId) ? new ObjectId(userId) : null;
+        const workspaceObjectId = workspaceId && ObjectId.isValid(workspaceId) ? new ObjectId(workspaceId) : null;
         const db = getDb();
+
+        if (!db) {
+            return res.status(500).json({ message: 'Database not initialized' });
+        }
 
         // Validate input
         if (!name) {
@@ -378,8 +400,9 @@ router.post('/', ensureAuthenticated, async (req, res) => {
         const newCollection = {
             name,
             description: description || "",
-            workspaceId: workspaceId || null,
-            owner: userId,  // Store as ObjectId for MongoDB
+            workspaceId: workspaceObjectId || workspaceId || null,
+            requests: Array.isArray(requests) ? requests : [],
+            owner: userObjectId || userId,  // Store as ObjectId for MongoDB
             isPublic: isPublic || false,
             collaborators: [],
             createdAt: new Date(),
@@ -389,11 +412,13 @@ router.post('/', ensureAuthenticated, async (req, res) => {
         // Store in MongoDB
         const result = await db.collection('collections').insertOne(newCollection);
         const collectionId = result.insertedId.toString();        // Also update in-memory store for backward compatibility
-        if (workspaceId) {
-            if (!collectionsStore[workspaceId]) {
-                collectionsStore[workspaceId] = [];
+        const workspaceKey = workspaceObjectId ? workspaceObjectId.toString() : workspaceId;
+
+        if (workspaceKey) {
+            if (!collectionsStore[workspaceKey]) {
+                collectionsStore[workspaceKey] = [];
             }
-            collectionsStore[workspaceId].push({
+            collectionsStore[workspaceKey].push({
                 ...newCollection,
                 _id: collectionId,
                 // For in-memory store, use populated owner structure
@@ -409,6 +434,7 @@ router.post('/', ensureAuthenticated, async (req, res) => {
         res.status(201).json({
             ...newCollection,
             _id: collectionId,
+            workspaceId: workspaceKey || null,
             owner: {
                 _id: userId,
                 displayName: req.user.displayName || req.user.name || "User",
@@ -425,12 +451,11 @@ router.post('/', ensureAuthenticated, async (req, res) => {
 router.put('/:id', ensureAuthenticated, async (req, res) => {
     try {
         const collectionId = req.params.id;
-        const { name, description, isPublic } = req.body;
+        const { name, description, isPublic, requests } = req.body;
         const db = getDb();
 
-        // Validate input
-        if (!name) {
-            return res.status(400).json({ message: 'Collection name is required' });
+        if (!db) {
+            return res.status(500).json({ message: 'Database not initialized' });
         }
 
         // Update in MongoDB
@@ -440,14 +465,24 @@ router.put('/:id', ensureAuthenticated, async (req, res) => {
             });
 
             if (collection) {
+                const updateDoc = {
+                    updatedAt: new Date()
+                };
+
+                // Allow partial updates; preserve existing values when not provided.
+                if (name !== undefined) updateDoc.name = name;
+                if (description !== undefined) updateDoc.description = description;
+                if (isPublic !== undefined) updateDoc.isPublic = isPublic;
+                if (requests !== undefined) updateDoc.requests = Array.isArray(requests) ? requests : [];
+
+                // If name was not provided and doesn't exist for some reason, enforce it.
+                if (updateDoc.name === undefined) updateDoc.name = collection.name;
+
                 await db.collection('collections').updateOne(
                     { _id: new ObjectId(collectionId) },
                     {
                         $set: {
-                            name,
-                            description: description || collection.description,
-                            isPublic: isPublic !== undefined ? isPublic : collection.isPublic,
-                            updatedAt: new Date()
+                            ...updateDoc
                         }
                     }
                 );
@@ -459,7 +494,8 @@ router.put('/:id', ensureAuthenticated, async (req, res) => {
 
                 return res.json({
                     ...updatedCollection,
-                    _id: updatedCollection._id.toString()
+                    _id: updatedCollection._id.toString(),
+                    workspaceId: updatedCollection.workspaceId?.toString?.() || updatedCollection.workspaceId
                 });
             }
         } catch (err) {
@@ -586,21 +622,37 @@ router.post('/:id/fork', ensureAuthenticated, async (req, res) => {
         const sourceCollectionId = req.params.id;
         const userId = req.user.id;
 
-        // Mock creating a forked collection
+        const db = getDb();
+        if (!db) {
+            return res.status(500).json({ message: 'Database not initialized' });
+        }
+
+        const source = await db.collection('collections').findOne({ _id: new ObjectId(sourceCollectionId) });
+        if (!source) {
+            return res.status(404).json({ message: 'Source collection not found' });
+        }
+
+        const forkData = req.body || {};
         const forkedCollection = {
-            _id: "fork" + Date.now().toString(),
-            name: "Fork of Collection",
-            description: "Forked collection from another user",
-            isPublic: false,
+            name: forkData.name || `Fork of ${source.name || 'Collection'}`,
+            description: forkData.description !== undefined ? forkData.description : (source.description || ''),
+            workspaceId: forkData.workspaceId || source.workspaceId || null,
+            requests: Array.isArray(source.requests) ? source.requests : [],
             owner: userId,
-            forkedFrom: sourceCollectionId,
-            requestCount: 3,
+            isPublic: false,
             collaborators: [],
+            forkedFrom: sourceCollectionId,
             createdAt: new Date(),
             updatedAt: new Date()
         };
 
-        res.status(201).json(forkedCollection);
+        const result = await db.collection('collections').insertOne(forkedCollection);
+        const forkedId = result.insertedId.toString();
+
+        return res.status(201).json({
+            ...forkedCollection,
+            _id: forkedId
+        });
     } catch (err) {
         console.error("Error forking collection:", err);
         res.status(500).json({ message: 'Error forking collection' });
@@ -611,29 +663,34 @@ router.post('/:id/fork', ensureAuthenticated, async (req, res) => {
 router.post('/:id/merge-request', ensureAuthenticated, async (req, res) => {
     try {
         const sourceCollectionId = req.params.id;
-        const { targetCollectionId } = req.body;
+        const { targetCollectionId, title, description } = req.body;
+
+        const db = getDb();
+        if (!db) {
+            return res.status(500).json({ message: 'Database not initialized' });
+        }
 
         if (!targetCollectionId) {
             return res.status(400).json({ message: 'Target collection ID is required' });
         }
 
-        // Mock creating a merge request
         const mergeRequest = {
-            _id: "merge" + Date.now().toString(),
             sourceCollectionId,
             targetCollectionId,
-            status: "pending",
-            changes: {
-                added: 2,
-                modified: 1,
-                deleted: 0
-            },
+            title: title || 'Merge Request',
+            description: description || '',
+            status: 'pending',
             createdBy: req.user.id,
             createdAt: new Date(),
             updatedAt: new Date()
         };
 
-        res.status(201).json(mergeRequest);
+        const result = await db.collection('mergeRequests').insertOne(mergeRequest);
+
+        res.status(201).json({
+            ...mergeRequest,
+            _id: result.insertedId.toString()
+        });
     } catch (err) {
         console.error("Error creating merge request:", err);
         res.status(500).json({ message: 'Error creating merge request' });

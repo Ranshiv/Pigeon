@@ -9,7 +9,8 @@ const MonitoringService = require('../services/monitoring/MonitoringService');
 const EmailService = require('../services/EmailService');
 
 // Get all monitors for the authenticated user
-router.get('/', ensureAuthenticated, async (req, res) => {
+// Support both /api/monitoring and /api/monitoring/monitors
+router.get(['/', '/monitors'], ensureAuthenticated, async (req, res) => {
     try {
         const { workspaceId, status, tags } = req.query;
         const query = { userId: req.user.id };
@@ -45,7 +46,8 @@ router.get('/', ensureAuthenticated, async (req, res) => {
 });
 
 // Get a specific monitor
-router.get('/:id', ensureAuthenticated, async (req, res) => {
+// Constrain :id so it doesn't catch routes like /alert-policies
+router.get('/:id([0-9a-fA-F]{24})', ensureAuthenticated, async (req, res) => {
     try {
         const monitor = await Monitor.findOne({
             _id: req.params.id,
@@ -71,7 +73,8 @@ router.get('/:id', ensureAuthenticated, async (req, res) => {
 });
 
 // Create a new monitor
-router.post('/', ensureAuthenticated, async (req, res) => {
+// Support both /api/monitoring and /api/monitoring/monitors
+router.post(['/', '/monitors'], ensureAuthenticated, async (req, res) => {
     try {
         const monitorData = {
             ...req.body,
@@ -89,7 +92,7 @@ router.post('/', ensureAuthenticated, async (req, res) => {
 });
 
 // Update a monitor
-router.put('/:id', ensureAuthenticated, async (req, res) => {
+router.put('/:id([0-9a-fA-F]{24})', ensureAuthenticated, async (req, res) => {
     try {
         const monitor = await Monitor.findOneAndUpdate(
             { _id: req.params.id, userId: req.user.id },
@@ -109,7 +112,7 @@ router.put('/:id', ensureAuthenticated, async (req, res) => {
 });
 
 // Delete a monitor
-router.delete('/:id', ensureAuthenticated, async (req, res) => {
+router.delete('/:id([0-9a-fA-F]{24})', ensureAuthenticated, async (req, res) => {
     try {
         const monitor = await Monitor.findOneAndDelete({
             _id: req.params.id,
@@ -131,10 +134,12 @@ router.delete('/:id', ensureAuthenticated, async (req, res) => {
 });
 
 // Get health check history for a monitor
-router.get('/:id/history', ensureAuthenticated, async (req, res) => {
+router.get('/:id([0-9a-fA-F]{24})/history', ensureAuthenticated, async (req, res) => {
     try {
         const { limit = 100, page = 1, timeRange } = req.query;
-        const skip = (page - 1) * limit;
+        const limitNum = Math.max(1, Math.min(1000, Math.trunc(Number(limit) || 100)));
+        const pageNum = Math.max(1, Math.trunc(Number(page) || 1));
+        const skip = (pageNum - 1) * limitNum;
 
         // Verify monitor ownership
         const monitor = await Monitor.findOne({
@@ -177,7 +182,7 @@ router.get('/:id/history', ensureAuthenticated, async (req, res) => {
             ...timeFilter
         })
             .sort({ checkedAt: -1 })
-            .limit(parseInt(limit))
+            .limit(limitNum)
             .skip(skip)
             .lean();
 
@@ -189,8 +194,8 @@ router.get('/:id/history', ensureAuthenticated, async (req, res) => {
         res.json({
             healthChecks,
             pagination: {
-                current: parseInt(page),
-                total: Math.ceil(total / limit),
+                current: pageNum,
+                total: Math.ceil(total / limitNum),
                 count: healthChecks.length,
                 totalRecords: total
             }
@@ -202,7 +207,7 @@ router.get('/:id/history', ensureAuthenticated, async (req, res) => {
 });
 
 // Get monitor statistics
-router.get('/:id/stats', ensureAuthenticated, async (req, res) => {
+router.get('/:id([0-9a-fA-F]{24})/stats', ensureAuthenticated, async (req, res) => {
     try {
         const { timeRange = '24h' } = req.query;
 
@@ -287,7 +292,7 @@ router.get('/:id/stats', ensureAuthenticated, async (req, res) => {
 });
 
 // Run manual health check
-router.post('/:id/check', ensureAuthenticated, async (req, res) => {
+router.post('/:id([0-9a-fA-F]{24})/check', ensureAuthenticated, async (req, res) => {
     try {
         // Verify monitor ownership
         const monitor = await Monitor.findOne({
@@ -341,6 +346,7 @@ router.get('/public', async (req, res) => {
 router.get('/incidents/recent', async (req, res) => {
     try {
         const { limit = 10 } = req.query;
+        const limitNum = Math.max(1, Math.min(100, Math.trunc(Number(limit) || 10)));
 
         // Get recent public incidents (last 30 days)
         const thirtyDaysAgo = new Date(Date.now() - (30 * 24 * 60 * 60 * 1000));
@@ -350,7 +356,7 @@ router.get('/incidents/recent', async (req, res) => {
             createdAt: { $gte: thirtyDaysAgo }
         })
             .sort({ createdAt: -1 })
-            .limit(parseInt(limit))
+            .limit(limitNum)
             .populate('affectedServices.monitorId', 'name url')
             .lean();
 
@@ -421,6 +427,529 @@ router.get('/service/status', ensureAuthenticated, async (req, res) => {
     } catch (error) {
         console.error('Error getting service status:', error);
         res.status(500).json({ message: 'Error getting service status', error: error.message });
+    }
+});
+
+// =====================
+// ALERT POLICY ROUTES
+// =====================
+
+const AlertPolicy = require('../models/AlertPolicy');
+const OnCallSchedule = require('../models/OnCallSchedule');
+const EscalationPolicy = require('../models/EscalationPolicy');
+const Alert = require('../models/Alert');
+const AlertingService = require('../services/AlertingService');
+const Workspace = require('../models/Workspace');
+
+const normalizeAlertPolicyPayload = (body) => {
+    const payload = { ...body };
+
+    // Older clients used `monitors`; schema uses `monitorIds`
+    if (!payload.monitorIds && Array.isArray(payload.monitors)) {
+        payload.monitorIds = payload.monitors;
+    }
+
+    // When clients send populated monitor objects, normalize to ids
+    if (Array.isArray(payload.monitorIds)) {
+        payload.monitorIds = payload.monitorIds
+            .map((m) => {
+                if (!m) return null;
+                if (typeof m === 'string') return m;
+                if (typeof m === 'object') return m._id || m.id || null;
+                return String(m);
+            })
+            .filter(Boolean);
+    }
+
+    // Normalize conditions
+    if (Array.isArray(payload.conditions)) {
+        payload.conditions = payload.conditions.map((c) => {
+            const next = { ...c };
+
+            // Older clients used `value`; schema uses `threshold`
+            if (next.threshold === undefined && next.value !== undefined) {
+                next.threshold = next.value;
+            }
+
+            // Map human-readable operator strings to schema enum
+            const operatorMap = {
+                greater: 'gt',
+                greaterThan: 'gt',
+                greater_or_equal: 'gte',
+                greaterOrEqual: 'gte',
+                less: 'lt',
+                lessThan: 'lt',
+                less_or_equal: 'lte',
+                lessOrEqual: 'lte',
+                equals: 'eq',
+                equal: 'eq',
+                notEquals: 'neq',
+                notEqual: 'neq'
+            };
+            if (typeof next.operator === 'string' && operatorMap[next.operator]) {
+                next.operator = operatorMap[next.operator];
+            }
+
+            return next;
+        });
+    }
+
+    return payload;
+};
+
+const getOrCreateDefaultWorkspaceId = async (userObjectId) => {
+    const existing = await Workspace.findOne({
+        $or: [{ owner: userObjectId }, { userId: userObjectId }]
+    }).select('_id');
+
+    if (existing) return existing._id;
+
+    const created = await Workspace.create({
+        name: 'Default Workspace',
+        description: 'Auto-created workspace for monitoring & alerting',
+        userId: userObjectId,
+        owner: userObjectId
+    });
+
+    return created._id;
+};
+
+// Get all alert policies
+router.get('/alert-policies', ensureAuthenticated, async (req, res) => {
+    try {
+        const { workspaceId, enabled, tags } = req.query;
+        const query = { createdBy: req.user.id };
+
+        if (workspaceId) query.workspaceId = workspaceId;
+        if (enabled !== undefined) query.enabled = enabled === 'true';
+        if (tags) query.tags = { $in: tags.split(',') };
+
+        const policies = await AlertPolicy.find(query)
+            .populate('escalationPolicyId')
+            .populate('monitorIds')
+            .sort({ createdAt: -1 });
+
+        res.json(policies);
+    } catch (error) {
+        console.error('Error fetching alert policies:', error);
+        res.status(500).json({ message: 'Error fetching alert policies', error: error.message });
+    }
+});
+
+// Get single alert policy
+router.get('/alert-policies/:id', ensureAuthenticated, async (req, res) => {
+    try {
+        const policy = await AlertPolicy.findById(req.params.id)
+            .populate('escalationPolicyId')
+            .populate('monitorIds')
+            .populate('createdBy', 'username email');
+
+        if (!policy) {
+            return res.status(404).json({ message: 'Alert policy not found' });
+        }
+
+        res.json(policy);
+    } catch (error) {
+        console.error('Error fetching alert policy:', error);
+        res.status(500).json({ message: 'Error fetching alert policy', error: error.message });
+    }
+});
+
+// Create alert policy
+router.post('/alert-policies', ensureAuthenticated, async (req, res) => {
+    try {
+        const normalized = normalizeAlertPolicyPayload(req.body);
+
+        // If workspaceId isn't provided (common when using /alerts/policies),
+        // default to the user's first workspace.
+        if (!normalized.workspaceId) {
+            normalized.workspaceId = await getOrCreateDefaultWorkspaceId(req.user._id);
+        }
+
+        const policyData = {
+            ...normalized,
+            createdBy: req.user.id
+        };
+
+        const policy = new AlertPolicy(policyData);
+        await policy.save();
+
+        res.status(201).json(policy);
+    } catch (error) {
+        console.error('Error creating alert policy:', error);
+        res.status(500).json({ message: 'Error creating alert policy', error: error.message });
+    }
+});
+
+// Update alert policy
+router.put('/alert-policies/:id', ensureAuthenticated, async (req, res) => {
+    try {
+        const policy = await AlertPolicy.findById(req.params.id);
+
+        if (!policy) {
+            return res.status(404).json({ message: 'Alert policy not found' });
+        }
+
+        const normalized = normalizeAlertPolicyPayload(req.body);
+        Object.assign(policy, normalized);
+        policy.updatedBy = req.user.id;
+        await policy.save();
+
+        res.json(policy);
+    } catch (error) {
+        console.error('Error updating alert policy:', error);
+        res.status(500).json({ message: 'Error updating alert policy', error: error.message });
+    }
+});
+
+// Delete alert policy
+router.delete('/alert-policies/:id', ensureAuthenticated, async (req, res) => {
+    try {
+        const policy = await AlertPolicy.findByIdAndDelete(req.params.id);
+
+        if (!policy) {
+            return res.status(404).json({ message: 'Alert policy not found' });
+        }
+
+        res.json({ message: 'Alert policy deleted successfully' });
+    } catch (error) {
+        console.error('Error deleting alert policy:', error);
+        res.status(500).json({ message: 'Error deleting alert policy', error: error.message });
+    }
+});
+
+// =====================
+// ON-CALL SCHEDULE ROUTES
+// =====================
+
+// Get all on-call schedules
+router.get('/on-call-schedules', ensureAuthenticated, async (req, res) => {
+    try {
+        const { workspaceId, teamId, enabled } = req.query;
+        const query = {};
+
+        if (workspaceId) query.workspaceId = workspaceId;
+        if (teamId) query.teamId = teamId;
+        if (enabled !== undefined) query.enabled = enabled === 'true';
+
+        const schedules = await OnCallSchedule.find(query)
+            .populate('teamId')
+            .populate('rotation.participants.userId', 'username email')
+            .populate('overrides.userId', 'username email')
+            .sort({ createdAt: -1 });
+
+        res.json(schedules);
+    } catch (error) {
+        console.error('Error fetching on-call schedules:', error);
+        res.status(500).json({ message: 'Error fetching on-call schedules', error: error.message });
+    }
+});
+
+// Get single on-call schedule
+router.get('/on-call-schedules/:id', ensureAuthenticated, async (req, res) => {
+    try {
+        const schedule = await OnCallSchedule.findById(req.params.id)
+            .populate('teamId')
+            .populate('rotation.participants.userId', 'username email')
+            .populate('overrides.userId', 'username email');
+
+        if (!schedule) {
+            return res.status(404).json({ message: 'On-call schedule not found' });
+        }
+
+        res.json(schedule);
+    } catch (error) {
+        console.error('Error fetching on-call schedule:', error);
+        res.status(500).json({ message: 'Error fetching on-call schedule', error: error.message });
+    }
+});
+
+// Create on-call schedule
+router.post('/on-call-schedules', ensureAuthenticated, async (req, res) => {
+    try {
+        const scheduleData = {
+            ...req.body,
+            createdBy: req.user.id
+        };
+
+        const schedule = new OnCallSchedule(scheduleData);
+        await schedule.save();
+
+        res.status(201).json(schedule);
+    } catch (error) {
+        console.error('Error creating on-call schedule:', error);
+        res.status(500).json({ message: 'Error creating on-call schedule', error: error.message });
+    }
+});
+
+// Update on-call schedule
+router.put('/on-call-schedules/:id', ensureAuthenticated, async (req, res) => {
+    try {
+        const schedule = await OnCallSchedule.findById(req.params.id);
+
+        if (!schedule) {
+            return res.status(404).json({ message: 'On-call schedule not found' });
+        }
+
+        Object.assign(schedule, req.body);
+        schedule.updatedBy = req.user.id;
+        await schedule.save();
+
+        res.json(schedule);
+    } catch (error) {
+        console.error('Error updating on-call schedule:', error);
+        res.status(500).json({ message: 'Error updating on-call schedule', error: error.message });
+    }
+});
+
+// Delete on-call schedule
+router.delete('/on-call-schedules/:id', ensureAuthenticated, async (req, res) => {
+    try {
+        const schedule = await OnCallSchedule.findByIdAndDelete(req.params.id);
+
+        if (!schedule) {
+            return res.status(404).json({ message: 'On-call schedule not found' });
+        }
+
+        res.json({ message: 'On-call schedule deleted successfully' });
+    } catch (error) {
+        console.error('Error deleting on-call schedule:', error);
+        res.status(500).json({ message: 'Error deleting on-call schedule', error: error.message });
+    }
+});
+
+// Get current on-call user
+router.get('/on-call-schedules/:id/current', ensureAuthenticated, async (req, res) => {
+    try {
+        const schedule = await OnCallSchedule.findById(req.params.id);
+
+        if (!schedule) {
+            return res.status(404).json({ message: 'On-call schedule not found' });
+        }
+
+        const userId = schedule.getCurrentOnCallUser();
+
+        if (!userId) {
+            return res.json({ onCall: null, message: 'No one currently on-call' });
+        }
+
+        const User = require('../models/User');
+        const user = await User.findById(userId).select('username email');
+
+        res.json({ onCall: user, schedule: schedule.name });
+    } catch (error) {
+        console.error('Error getting current on-call user:', error);
+        res.status(500).json({ message: 'Error getting current on-call user', error: error.message });
+    }
+});
+
+// Add override to schedule
+router.post('/on-call-schedules/:id/overrides', ensureAuthenticated, async (req, res) => {
+    try {
+        const schedule = await OnCallSchedule.findById(req.params.id);
+
+        if (!schedule) {
+            return res.status(404).json({ message: 'On-call schedule not found' });
+        }
+
+        const overrideData = {
+            ...req.body,
+            createdBy: req.user.id
+        };
+
+        await schedule.addOverride(overrideData);
+
+        res.status(201).json(schedule);
+    } catch (error) {
+        console.error('Error adding override:', error);
+        res.status(400).json({ message: error.message });
+    }
+});
+
+// =====================
+// ESCALATION POLICY ROUTES
+// =====================
+
+// Get all escalation policies
+router.get('/escalation-policies', ensureAuthenticated, async (req, res) => {
+    try {
+        const { workspaceId, teamId, enabled } = req.query;
+        const query = {};
+
+        if (workspaceId) query.workspaceId = workspaceId;
+        if (teamId) query.teamId = teamId;
+        if (enabled !== undefined) query.enabled = enabled === 'true';
+
+        const policies = await EscalationPolicy.find(query)
+            .populate('teamId')
+            .populate('fallbackPolicy.policyId')
+            .sort({ createdAt: -1 });
+
+        res.json(policies);
+    } catch (error) {
+        console.error('Error fetching escalation policies:', error);
+        res.status(500).json({ message: 'Error fetching escalation policies', error: error.message });
+    }
+});
+
+// Get single escalation policy
+router.get('/escalation-policies/:id', ensureAuthenticated, async (req, res) => {
+    try {
+        const policy = await EscalationPolicy.findById(req.params.id)
+            .populate('teamId')
+            .populate('fallbackPolicy.policyId');
+
+        if (!policy) {
+            return res.status(404).json({ message: 'Escalation policy not found' });
+        }
+
+        res.json(policy);
+    } catch (error) {
+        console.error('Error fetching escalation policy:', error);
+        res.status(500).json({ message: 'Error fetching escalation policy', error: error.message });
+    }
+});
+
+// Create escalation policy
+router.post('/escalation-policies', ensureAuthenticated, async (req, res) => {
+    try {
+        const policyData = {
+            ...req.body,
+            createdBy: req.user.id
+        };
+
+        const policy = new EscalationPolicy(policyData);
+        await policy.save();
+
+        res.status(201).json(policy);
+    } catch (error) {
+        console.error('Error creating escalation policy:', error);
+        res.status(500).json({ message: 'Error creating escalation policy', error: error.message });
+    }
+});
+
+// Update escalation policy
+router.put('/escalation-policies/:id', ensureAuthenticated, async (req, res) => {
+    try {
+        const policy = await EscalationPolicy.findById(req.params.id);
+
+        if (!policy) {
+            return res.status(404).json({ message: 'Escalation policy not found' });
+        }
+
+        Object.assign(policy, req.body);
+        policy.updatedBy = req.user.id;
+        await policy.save();
+
+        res.json(policy);
+    } catch (error) {
+        console.error('Error updating escalation policy:', error);
+        res.status(500).json({ message: 'Error updating escalation policy', error: error.message });
+    }
+});
+
+// Delete escalation policy
+router.delete('/escalation-policies/:id', ensureAuthenticated, async (req, res) => {
+    try {
+        const policy = await EscalationPolicy.findByIdAndDelete(req.params.id);
+
+        if (!policy) {
+            return res.status(404).json({ message: 'Escalation policy not found' });
+        }
+
+        res.json({ message: 'Escalation policy deleted successfully' });
+    } catch (error) {
+        console.error('Error deleting escalation policy:', error);
+        res.status(500).json({ message: 'Error deleting escalation policy', error: error.message });
+    }
+});
+
+// Get escalation timeline for policy
+router.get('/escalation-policies/:id/timeline', ensureAuthenticated, async (req, res) => {
+    try {
+        const policy = await EscalationPolicy.findById(req.params.id);
+
+        if (!policy) {
+            return res.status(404).json({ message: 'Escalation policy not found' });
+        }
+
+        const timeline = policy.getEscalationTimeline();
+        res.json(timeline);
+    } catch (error) {
+        console.error('Error getting escalation timeline:', error);
+        res.status(500).json({ message: 'Error getting escalation timeline', error: error.message });
+    }
+});
+
+// =====================
+// ALERT ANALYTICS ROUTES
+// =====================
+
+// Get alert statistics
+router.get('/alerts/statistics', ensureAuthenticated, async (req, res) => {
+    try {
+        const { workspaceId, startDate, endDate } = req.query;
+        const filters = {};
+
+        if (workspaceId) {
+            const monitors = await Monitor.find({ workspaceId }).select('_id');
+            filters.monitorId = { $in: monitors.map(m => m._id) };
+        }
+
+        if (startDate) {
+            filters.triggeredAt = { $gte: new Date(startDate) };
+        }
+
+        if (endDate) {
+            filters.triggeredAt = { ...filters.triggeredAt, $lte: new Date(endDate) };
+        }
+
+        const statistics = await AlertingService.getAlertStatistics(filters);
+        res.json(statistics);
+    } catch (error) {
+        console.error('Error fetching alert statistics:', error);
+        res.status(500).json({ message: 'Error fetching alert statistics', error: error.message });
+    }
+});
+
+// Get alert frequency (for heatmap)
+router.get('/alerts/frequency', ensureAuthenticated, async (req, res) => {
+    try {
+        const { startDate, endDate, groupBy = 'hour' } = req.query;
+
+        if (!startDate || !endDate) {
+            return res.status(400).json({ message: 'startDate and endDate are required' });
+        }
+
+        const frequency = await AlertingService.getAlertFrequency(
+            new Date(startDate),
+            new Date(endDate),
+            groupBy
+        );
+
+        res.json(frequency);
+    } catch (error) {
+        console.error('Error fetching alert frequency:', error);
+        res.status(500).json({ message: 'Error fetching alert frequency', error: error.message });
+    }
+});
+
+// Get grouped alerts
+router.get('/alerts/grouped', ensureAuthenticated, async (req, res) => {
+    try {
+        const { workspaceId } = req.query;
+        const filters = { status: { $in: ['triggered', 'acknowledged'] } };
+
+        if (workspaceId) {
+            const monitors = await Monitor.find({ workspaceId }).select('_id');
+            filters.monitorId = { $in: monitors.map(m => m._id) };
+        }
+
+        const groupedAlerts = await Alert.getGroupedAlerts(filters);
+        res.json(groupedAlerts);
+    } catch (error) {
+        console.error('Error fetching grouped alerts:', error);
+        res.status(500).json({ message: 'Error fetching grouped alerts', error: error.message });
     }
 });
 

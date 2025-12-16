@@ -3,7 +3,9 @@ const mongoose = require('mongoose');
 const { MongoClient } = require('mongodb');
 
 // MongoDB connection URI and DB name
-const mongoURI = process.env.MONGODB_URI || 'mongodb://localhost:27017';
+// Prefer explicit MONGODB_URI, but fall back to DATABASE_URL (used by this repo)
+// so the native driver doesn't try (and fail) to connect to localhost.
+const mongoURI = process.env.MONGODB_URI || process.env.DATABASE_URL || 'mongodb://localhost:27017';
 const dbName = process.env.DB_NAME || 'pigeon_db';
 
 // Create MongoDB client for native driver operations
@@ -47,14 +49,29 @@ async function connectMongoose() {
 
 // Initialize both connections
 async function initializeConnections() {
-    await connectToDatabase();
+    // Mongoose is required for the majority of route handlers (models/)
+    // so connect it first.
     await connectMongoose();
+
+    // Native driver is used for some operations; treat it as best-effort in dev.
+    try {
+        await connectToDatabase();
+    } catch (err) {
+        console.warn('Native MongoDB client connection failed; continuing with Mongoose only:', err?.message || err);
+    }
 }
 
 module.exports = {
     connectToDatabase,
     connectMongoose,
     initializeConnections,
-    getDb: () => db,
+    getDb: () => {
+        if (db) return db;
+        // In tests, routes may rely on a Mongoose-only connection (e.g. mongodb-memory-server).
+        if (mongoose.connection && mongoose.connection.readyState === 1 && mongoose.connection.db) {
+            return mongoose.connection.db;
+        }
+        return null;
+    },
     client
 };

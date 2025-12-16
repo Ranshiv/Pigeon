@@ -635,6 +635,12 @@ const IntegrationsManagement = () => {
                 </button>
                 <button
                     className="nav-btn"
+                    onClick={() => navigate('/alerts/policies')}
+                >
+                    <FiBell /> Alerts & Policies
+                </button>
+                <button
+                    className="nav-btn"
                     onClick={() => navigate('/workspace/monitoring/reports')}
                 >
                     <FiBarChart /> Reports

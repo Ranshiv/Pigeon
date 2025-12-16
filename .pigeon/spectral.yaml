@@ -1,12 +1,12 @@
 # Pigeon OpenAPI Linting Ruleset
 # Extends the default OpenAPI 3 rules with custom overrides
 
-extends: ["@stoplight/spectral-rulesets/dist/oas/index.js"]
+extends: ["spectral:oas"]
 
 rules:
   # Override default rules
   operation-description: warn
-  operation-summary: warn
+  # operation-summary: warn  # (not present in spectral:oas)
   
   # Make info fields more strict
   info-contact: error

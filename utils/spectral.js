@@ -2,6 +2,7 @@
 const fs = require('fs').promises;
 const path = require('path');
 const yaml = require('js-yaml');
+const { oas } = require('@stoplight/spectral-rulesets');
 
 /**
  * Utility functions for Spectral ruleset resolution and management
@@ -20,6 +21,7 @@ async function resolveRuleset(explicitRulesetPath, workspaceRoot = process.cwd()
         return {
             type: 'builtin',
             name: 'OpenAPI',
+            ruleset: 'oas',
             source: 'built-in',
             sourcePath: '@stoplight/spectral-rulesets/oas'
         };
@@ -29,10 +31,30 @@ async function resolveRuleset(explicitRulesetPath, workspaceRoot = process.cwd()
     if (explicitRulesetPath) {
         const resolvedPath = path.resolve(explicitRulesetPath);
         if (await fileExists(resolvedPath)) {
+            // If the user explicitly points at the standard workspace/root override files,
+            // keep the same source classification expected by the rest of the system.
+            const workspaceAbs = path.resolve(workspaceRoot);
+            const pigeonAbs = path.join(workspaceAbs, '.pigeon');
+            const base = path.basename(resolvedPath).toLowerCase();
+
+            const isWithin = (parent, child) => {
+                const rel = path.relative(parent, child);
+                return rel === '' || (!rel.startsWith('..') && !path.isAbsolute(rel));
+            };
+
+            let source = 'explicit';
+            if (base === 'spectral.yaml' || base === 'spectral.yml' || base === 'spectral.json') {
+                if (isWithin(pigeonAbs, resolvedPath)) {
+                    source = 'workspace';
+                } else if (isWithin(workspaceAbs, resolvedPath)) {
+                    source = 'root';
+                }
+            }
+
             return {
                 type: 'file',
                 path: resolvedPath,
-                source: 'explicit',
+                source,
                 sourcePath: resolvedPath
             };
         }
@@ -79,6 +101,7 @@ async function resolveRuleset(explicitRulesetPath, workspaceRoot = process.cwd()
     return {
         type: 'builtin',
         name: 'OpenAPI',
+        ruleset: 'oas',
         source: 'default',
         sourcePath: '@stoplight/spectral-rulesets/oas'
     };
@@ -91,11 +114,12 @@ async function loadRuleset(rulesetConfig) {
     if (rulesetConfig.type === 'builtin') {
         // Return builtin ruleset identifier
         return {
-            ruleset: rulesetConfig.ruleset,
+            ruleset: rulesetConfig.ruleset || 'oas',
             info: {
                 name: 'OpenAPI Recommended',
                 version: 'builtin',
-                sourcePath: rulesetConfig.ruleset
+                source: rulesetConfig.source,
+                sourcePath: rulesetConfig.sourcePath
             }
         };
     }
@@ -113,11 +137,33 @@ async function loadRuleset(rulesetConfig) {
         throw new Error(`Unsupported ruleset format: ${ext}. Use .json, .yaml, or .yml`);
     }
 
+    // Spectral core expects `extends` entries to already be ruleset objects.
+    // Support common string aliases used in YAML rulesets.
+    if (parsed && typeof parsed === 'object' && parsed.extends) {
+        const rawExtends = Array.isArray(parsed.extends) ? parsed.extends : [parsed.extends];
+        const resolvedExtends = rawExtends.map((ref) => {
+            if (typeof ref !== 'string') return ref;
+
+            const normalized = ref.trim().toLowerCase();
+            if (normalized === 'spectral:oas' || normalized === 'oas' || normalized === 'openapi' || normalized === 'spectral:openapi') {
+                return oas;
+            }
+
+            throw new Error(`Unsupported ruleset extends reference: ${ref}`);
+        });
+
+        parsed = {
+            ...parsed,
+            extends: resolvedExtends
+        };
+    }
+
     return {
         ruleset: parsed,
         info: {
             name: parsed.name || path.basename(rulesetConfig.path),
             version: parsed.version || 'unknown',
+            source: rulesetConfig.source,
             sourcePath: rulesetConfig.path
         }
     };
@@ -132,24 +178,30 @@ function validateRuleset(ruleset, rulesetPath) {
         throw new Error('Ruleset must be an object');
     }
 
-    // Security: ensure no dangerous functions or code execution
-    const rulesetStr = JSON.stringify(ruleset);
-    const dangerousPatterns = [
-        /require\s*\(/,
-        /import\s+/,
-        /eval\s*\(/,
-        /Function\s*\(/,
-        /process\./,
-        /global\./,
-        /__dirname/,
-        /__filename/
-    ];
+    // Security: validate rule function references are simple identifiers.
+    // (Spectral core executes functions by name; disallow inline code like eval("...")).
+    const isSafeFunctionName = (value) => {
+        if (typeof value !== 'string') return true;
+        // Allow common Spectral function naming patterns: letters/numbers/_/./-
+        return /^[A-Za-z_][A-Za-z0-9_.-]*$/.test(value);
+    };
 
-    for (const pattern of dangerousPatterns) {
-        if (pattern.test(rulesetStr)) {
-            throw new Error(`Ruleset contains potentially dangerous code: ${pattern.source}`);
+    const walk = (node) => {
+        if (!node || typeof node !== 'object') return;
+        if (Array.isArray(node)) {
+            node.forEach(walk);
+            return;
         }
-    }
+
+        for (const [key, value] of Object.entries(node)) {
+            if (key === 'function' && typeof value === 'string' && !isSafeFunctionName(value)) {
+                throw new Error('Ruleset contains potentially dangerous code: invalid function reference');
+            }
+            walk(value);
+        }
+    };
+
+    walk(ruleset);
 
     // Validate path traversal
     if (rulesetPath && (rulesetPath.includes('..') || path.isAbsolute(rulesetPath))) {

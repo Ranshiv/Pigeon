@@ -9,12 +9,15 @@ import DocumentationOverview from './components/DocumentationOverview';
 import PublicStatusPage from './components/PublicStatusPage';
 import EnhancedPublicStatusPage from './components/EnhancedPublicStatusPage';
 import OAuthCallback from './components/OAuthCallback';
+import AlertsDashboard from './components/alerting/AlertsDashboard';
+import AlertPolicyEditor from './components/alerting/AlertPolicyEditor';
 import { CollaborationProvider } from './context/CollaborationContext';
 import 'react-toastify/dist/ReactToastify.css';
 import './App.css';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     // Check authentication status on app load
@@ -44,12 +47,40 @@ function App() {
       } catch (err) {
         console.error("Error checking auth:", err);
         setIsAuthenticated(false); // Assume not authenticated on error
+      } finally {
+        setIsLoading(false); // Always stop loading after auth check
       }
     };
 
     checkAuth();
   }, []);
 
+
+  // Show loading spinner while checking authentication
+  if (isLoading) {
+    return (
+      <div className="App" style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '100vh',
+        background: '#1a1a2e'
+      }}>
+        <div style={{ textAlign: 'center', color: '#fff' }}>
+          <div style={{
+            border: '4px solid #f3f3f3',
+            borderTop: '4px solid #4a9eff',
+            borderRadius: '50%',
+            width: '50px',
+            height: '50px',
+            animation: 'spin 1s linear infinite',
+            margin: '0 auto 20px'
+          }}></div>
+          <p>Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <CollaborationProvider>
@@ -58,6 +89,8 @@ function App() {
         <Routes>
           <Route path="/" element={isAuthenticated ? <Navigate to="/workspace" /> : <PublicHome />} />
           <Route path="/workspace/*" element={isAuthenticated ? <Workspace /> : <Navigate to="/" />} />
+          <Route path="/alerts" element={isAuthenticated ? <AlertsDashboard /> : <Navigate to="/" />} />
+          <Route path="/alerts/policies" element={isAuthenticated ? <AlertPolicyEditor /> : <Navigate to="/" />} />
           <Route path="/status" element={<PublicStatusPage />} />
           <Route path="/status/:workspaceId" element={<EnhancedPublicStatusPage />} />
           <Route path="/documentation" element={<DocumentationOverview />} /> {/* Add the documentation route */}

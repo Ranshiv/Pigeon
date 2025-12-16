@@ -3,6 +3,7 @@ const cron = require('node-cron');
 const fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args));
 const Monitor = require('../../models/Monitor');
 const HealthCheck = require('../../models/HealthCheck');
+const AlertPolicy = require('../../models/AlertPolicy');
 const EmailService = require('../EmailService');
 const IntegrationService = require('../IntegrationService');
 const { getIO } = require('../../utils/socket/socket-server');
@@ -264,38 +265,147 @@ class MonitoringService {
         try {
             const shouldAlert = this.shouldSendAlert(monitor, healthCheck);
 
-            if (shouldAlert && monitor.alertSettings) {
+            // Allow alert policies to enable email channel even if monitor-level email is off.
+            // This makes the "Email" option in the Alert Policy editor functional.
+            const policyEmailEnabled = shouldAlert ? await this.isPolicyEmailEnabled(monitor) : false;
+
+            if (shouldAlert) {
+                const alertSettings = monitor.alertSettings || {};
                 const alertData = {
                     monitor,
                     healthCheck,
                     alertType: this.getAlertType(monitor, healthCheck)
                 };
 
-                // Send email alert
-                if (monitor.alertSettings.emailEnabled) {
-                    await this.emailService.sendMonitorAlert(alertData);
+                let alertResults = {
+                    email: { attempted: false, success: false },
+                    webhook: { attempted: false, success: false },
+                    slack: { attempted: false, success: false },
+                    integrations: { attempted: false, success: false }
+                };
+
+                // Send email alert with error handling
+                if (alertSettings.emailEnabled !== false || policyEmailEnabled) {
+                    alertResults.email.attempted = true;
+                    try {
+                        const emailResult = await this.emailService.sendMonitorAlert(alertData);
+                        alertResults.email.success = emailResult?.success || emailResult?.skipped || false;
+
+                        if (emailResult?.skipped) {
+                            console.warn(`📧 Email alert skipped for ${monitor.name}: ${emailResult.reason || 'unknown reason'}`);
+                        }
+
+                        if (emailResult?.requiresAction) {
+                            console.warn('⚠️  Email alerts require configuration. Continuing with other alert methods...');
+                            if (emailResult?.error) {
+                                console.warn(`   ↳ ${emailResult.error}`);
+                            }
+                        }
+                    } catch (error) {
+                        console.error('❌ Email alert failed (non-fatal):', error.message);
+                        alertResults.email.error = error.message;
+                    }
                 }
 
-                // Send webhook alert
-                if (monitor.alertSettings.webhookUrl) {
-                    await this.sendWebhookAlert(monitor.alertSettings.webhookUrl, alertData);
+                // Send webhook alert with error handling
+                if (alertSettings.webhookUrl) {
+                    alertResults.webhook.attempted = true;
+                    try {
+                        await this.sendWebhookAlert(alertSettings.webhookUrl, alertData);
+                        alertResults.webhook.success = true;
+                    } catch (error) {
+                        console.error('❌ Webhook alert failed (non-fatal):', error.message);
+                        alertResults.webhook.error = error.message;
+                    }
                 }
 
-                // Send Slack alert
-                if (monitor.alertSettings.slackWebhook) {
-                    await this.sendSlackAlert(monitor.alertSettings.slackWebhook, alertData);
+                // Send Slack alert with error handling
+                if (alertSettings.slackWebhook) {
+                    alertResults.slack.attempted = true;
+                    try {
+                        await this.sendSlackAlert(alertSettings.slackWebhook, alertData);
+                        alertResults.slack.success = true;
+                    } catch (error) {
+                        console.error('❌ Slack alert failed (non-fatal):', error.message);
+                        alertResults.slack.error = error.message;
+                    }
                 }
 
-                // Send integration alerts with rate limiting
-                await this.sendIntegrationAlerts(monitor, alertData);
+                // Send integration alerts with rate limiting and error handling
+                alertResults.integrations.attempted = true;
+                try {
+                    await this.sendIntegrationAlerts(monitor, alertData);
+                    alertResults.integrations.success = true;
+                } catch (error) {
+                    console.error('❌ Integration alerts failed (non-fatal):', error.message);
+                    alertResults.integrations.error = error.message;
+                }
 
-                // Mark alert as sent
-                await HealthCheck.findByIdAndUpdate(healthCheck._id || healthCheck.monitorId, {
-                    alertSent: true
-                });
+                // Log alert summary
+                const successfulAlerts = Object.values(alertResults).filter(r => r.success).length;
+                const attemptedAlerts = Object.values(alertResults).filter(r => r.attempted).length;
+
+                if (successfulAlerts > 0) {
+                    console.log(`✅ Sent ${successfulAlerts}/${attemptedAlerts} alerts for ${monitor.name}`);
+                } else if (attemptedAlerts > 0) {
+                    console.warn(`⚠️  All ${attemptedAlerts} alert methods failed for ${monitor.name}`);
+                } else {
+                    console.log(`ℹ️  No alert methods configured for ${monitor.name}`);
+                }
+
+                // Mark alert as sent even if some methods failed (at least attempted)
+                if (attemptedAlerts > 0) {
+                    await HealthCheck.findByIdAndUpdate(healthCheck._id || healthCheck.monitorId, {
+                        alertSent: true,
+                        alertResults: alertResults
+                    });
+                }
             }
         } catch (error) {
-            console.error('Error sending alerts:', error);
+            console.error('❌ Critical error in alert system:', error);
+            // Don't throw - we want monitoring to continue even if alerts fail
+        }
+    }
+
+    async isPolicyEmailEnabled(monitor) {
+        try {
+            if (!monitor?._id || !monitor?.userId) return false;
+
+            // Some deployments may not have Alert model registered yet; register it defensively.
+            // (Used by policy utilities elsewhere; safe to require here.)
+            try {
+                require('../../models/Alert');
+            } catch {
+                // Ignore registration errors; we don't rely on it here.
+            }
+
+            const query = {
+                createdBy: monitor.userId,
+                enabled: true,
+                $or: [
+                    { monitorIds: monitor._id },
+                    { monitorIds: { $size: 0 } }
+                ]
+            };
+
+            const policies = await AlertPolicy.find(query)
+                .select('enabled schedule notificationChannels')
+                .sort({ createdAt: -1 });
+
+            for (const policy of policies) {
+                if (typeof policy.isActiveNow === 'function' && !policy.isActiveNow()) continue;
+
+                const channels = Array.isArray(policy.notificationChannels) ? policy.notificationChannels : [];
+                const emailChannel = channels.find((c) => c && c.type === 'email');
+                if (emailChannel && emailChannel.enabled !== false) {
+                    return true;
+                }
+            }
+
+            return false;
+        } catch (error) {
+            console.error('Error checking policy email enablement:', error.message);
+            return false;
         }
     }
 
@@ -386,21 +496,25 @@ class MonitoringService {
 
     // Determine if alert should be sent
     shouldSendAlert(monitor, healthCheck) {
-        const { alertSettings } = monitor;
-        if (!alertSettings) return false;
+        // Backwards compatibility: older monitor docs may not have alertSettings.
+        // Apply safe defaults so alerts still work.
+        const alertSettings = monitor.alertSettings || {};
+        const alertOnFailure = alertSettings.alertOnFailure !== false;
+        const alertOnSlowResponse = alertSettings.alertOnSlowResponse !== false;
+        const alertOnRecovery = alertSettings.alertOnRecovery !== false;
 
         // Alert on failure
-        if (alertSettings.alertOnFailure && healthCheck.status === 'failure') {
+        if (alertOnFailure && healthCheck.status === 'failure') {
             return true;
         }
 
         // Alert on slow response
-        if (alertSettings.alertOnSlowResponse && healthCheck.status === 'timeout') {
+        if (alertOnSlowResponse && healthCheck.status === 'timeout') {
             return true;
         }
 
         // Alert on recovery (first success after failures)
-        if (alertSettings.alertOnRecovery &&
+        if (alertOnRecovery &&
             healthCheck.status === 'success' &&
             monitor.consecutiveFailures > 0) {
             return true;

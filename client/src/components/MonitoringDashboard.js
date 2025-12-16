@@ -5,7 +5,7 @@ import {
     FiActivity, FiAlertCircle, FiCheckCircle, FiClock,
     FiPlus, FiGlobe, FiRefreshCw, FiEye, FiEdit,
     FiTrash2, FiPause, FiPlay, FiTrendingUp, FiBarChart,
-    FiUsers, FiSettings, FiTool
+    FiUsers, FiSettings, FiTool, FiBell
 } from 'react-icons/fi';
 import MonitorForm from './MonitorForm';
 import './MonitoringDashboard.css';
@@ -219,6 +219,12 @@ const MonitoringDashboard = () => {
                     onClick={() => navigate('/workspace/monitoring')}
                 >
                     <FiActivity /> Dashboard
+                </button>
+                <button
+                    className="nav-btn"
+                    onClick={() => navigate('/alerts/policies')}
+                >
+                    <FiBell /> Alerts & Policies
                 </button>
                 <button
                     className="nav-btn"

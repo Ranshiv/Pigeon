@@ -9,6 +9,10 @@ const userSchema = new mongoose.Schema({
     fontSize: { type: String, default: '16px' },
     // Add profileIcon field
     profileIcon: { type: String, default: null }, // Store the filename, default to null
+    // OAuth2 tokens for email sending (from Google OAuth)
+    accessToken: { type: String, select: false }, // Don't include by default for security
+    refreshToken: { type: String, select: false }, // Don't include by default for security
+    tokenExpiry: { type: Date, select: false }, // When access token expires
     createdAt: { type: Date, default: Date.now }
 });
 

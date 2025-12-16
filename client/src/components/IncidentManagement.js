@@ -3,7 +3,8 @@ import React, { useState, useEffect } from 'react';
 import {
     FiAlertTriangle, FiPlus, FiEdit, FiTrash2,
     FiEye, FiClock, FiCheckCircle, FiAlertCircle,
-    FiSearch, FiRefreshCw
+    FiSearch, FiRefreshCw, FiBell, FiActivity, FiFileText,
+    FiUsers, FiArrowUp, FiCheck, FiLink, FiCalendar, FiMessageCircle
 } from 'react-icons/fi';
 import './IncidentManagement.css';
 
@@ -15,6 +16,12 @@ const IncidentManagement = () => {
     const [showCreateForm, setShowCreateForm] = useState(false);
     const [editingIncident, setEditingIncident] = useState(null);
     const [selectedIncident, setSelectedIncident] = useState(null);
+    const [incidentTimeline, setIncidentTimeline] = useState([]);
+    const [linkedAlerts, setLinkedAlerts] = useState([]);
+    const [postMortem, setPostMortem] = useState(null);
+    const [showPostMortem, setShowPostMortem] = useState(false);
+    const [activeTab, setActiveTab] = useState('details'); // details | timeline | alerts | postmortem
+    const [actionLoading, setActionLoading] = useState(false);
 
     useEffect(() => {
         const fetchIncidents = async () => {
@@ -143,6 +150,125 @@ const IncidentManagement = () => {
             case 'monitoring': return <FiClock className="status-icon monitoring" />;
             case 'resolved': return <FiCheckCircle className="status-icon resolved" />;
             default: return <FiAlertCircle className="status-icon unknown" />;
+        }
+    };
+
+    // Fetch incident timeline, linked alerts, and post-mortem when incident is selected
+    useEffect(() => {
+        if (selectedIncident) {
+            fetchIncidentTimeline(selectedIncident._id);
+            fetchLinkedAlerts(selectedIncident._id);
+            if (selectedIncident.status === 'resolved') {
+                fetchPostMortem(selectedIncident._id);
+            }
+        }
+    }, [selectedIncident]);
+
+    const fetchIncidentTimeline = async (incidentId) => {
+        try {
+            const response = await fetch(`/api/incidents/${incidentId}/timeline`, {
+                credentials: 'include'
+            });
+            if (response.ok) {
+                const data = await response.json();
+                setIncidentTimeline(data);
+            }
+        } catch (error) {
+            console.error('Error fetching incident timeline:', error);
+        }
+    };
+
+    const fetchLinkedAlerts = async (incidentId) => {
+        try {
+            const response = await fetch(`/api/incidents/${incidentId}/alerts`, {
+                credentials: 'include'
+            });
+            if (response.ok) {
+                const data = await response.json();
+                setLinkedAlerts(data);
+            }
+        } catch (error) {
+            console.error('Error fetching linked alerts:', error);
+        }
+    };
+
+    const fetchPostMortem = async (incidentId) => {
+        try {
+            const response = await fetch(`/api/incidents/${incidentId}/post-mortem`, {
+                credentials: 'include'
+            });
+            if (response.ok) {
+                const data = await response.json();
+                setPostMortem(data);
+            }
+        } catch (error) {
+            console.error('Error fetching post-mortem:', error);
+        }
+    };
+
+    const handleAcknowledge = async (incidentId) => {
+        setActionLoading(true);
+        try {
+            const response = await fetch(`/api/incidents/${incidentId}/acknowledge`, {
+                method: 'POST',
+                credentials: 'include',
+                headers: { 'Content-Type': 'application/json' }
+            });
+            if (response.ok) {
+                const updated = await response.json();
+                setIncidents(incidents.map(inc => inc._id === incidentId ? updated : inc));
+                setSelectedIncident(updated);
+                fetchIncidentTimeline(incidentId); // Refresh timeline
+            }
+        } catch (error) {
+            console.error('Error acknowledging incident:', error);
+        } finally {
+            setActionLoading(false);
+        }
+    };
+
+    const handleEscalate = async (incidentId, targetLevel) => {
+        setActionLoading(true);
+        try {
+            const response = await fetch(`/api/incidents/${incidentId}/escalate`, {
+                method: 'POST',
+                credentials: 'include',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ targetLevel })
+            });
+            if (response.ok) {
+                const updated = await response.json();
+                setIncidents(incidents.map(inc => inc._id === incidentId ? updated : inc));
+                setSelectedIncident(updated);
+                fetchIncidentTimeline(incidentId); // Refresh timeline
+            }
+        } catch (error) {
+            console.error('Error escalating incident:', error);
+        } finally {
+            setActionLoading(false);
+        }
+    };
+
+    const handleResolve = async (incidentId, resolution) => {
+        setActionLoading(true);
+        try {
+            const response = await fetch(`/api/incidents/${incidentId}/resolve`, {
+                method: 'POST',
+                credentials: 'include',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ resolution })
+            });
+            if (response.ok) {
+                const updated = await response.json();
+                setIncidents(incidents.map(inc => inc._id === incidentId ? updated : inc));
+                setSelectedIncident(updated);
+                fetchIncidentTimeline(incidentId); // Refresh timeline
+                fetchPostMortem(incidentId); // Load post-mortem if generated
+            }
+        } catch (error) {
+            console.error('Error resolving incident:', error);
+        } finally {
+            setActionLoading(false);
         }
     };
 
@@ -289,10 +415,25 @@ const IncidentManagement = () => {
                 </div>
 
                 {selectedIncident && (
-                    <IncidentDetails
+                    <EnhancedIncidentDetails
                         incident={selectedIncident}
+                        timeline={incidentTimeline}
+                        linkedAlerts={linkedAlerts}
+                        postMortem={postMortem}
+                        activeTab={activeTab}
+                        onTabChange={setActiveTab}
                         onUpdate={updateIncident}
-                        onClose={() => setSelectedIncident(null)}
+                        onClose={() => {
+                            setSelectedIncident(null);
+                            setActiveTab('details');
+                            setIncidentTimeline([]);
+                            setLinkedAlerts([]);
+                            setPostMortem(null);
+                        }}
+                        onAcknowledge={handleAcknowledge}
+                        onEscalate={handleEscalate}
+                        onResolve={handleResolve}
+                        actionLoading={actionLoading}
                     />
                 )}
             </div>
@@ -314,9 +455,26 @@ const IncidentManagement = () => {
     );
 };
 
-const IncidentDetails = ({ incident, onUpdate, onClose }) => {
+const EnhancedIncidentDetails = ({
+    incident,
+    timeline,
+    linkedAlerts,
+    postMortem,
+    activeTab,
+    onTabChange,
+    onUpdate,
+    onClose,
+    onAcknowledge,
+    onEscalate,
+    onResolve,
+    actionLoading
+}) => {
     const [newUpdate, setNewUpdate] = useState('');
     const [newStatus, setNewStatus] = useState(incident.status);
+    const [showResolveModal, setShowResolveModal] = useState(false);
+    const [showEscalateModal, setShowEscalateModal] = useState(false);
+    const [resolution, setResolution] = useState('');
+    const [escalationLevel, setEscalationLevel] = useState(1);
 
     const addUpdate = async () => {
         if (!newUpdate.trim()) return;
@@ -337,13 +495,198 @@ const IncidentDetails = ({ incident, onUpdate, onClose }) => {
         setNewUpdate('');
     };
 
+    const handleResolveConfirm = () => {
+        onResolve(incident._id, resolution);
+        setShowResolveModal(false);
+        setResolution('');
+    };
+
+    const handleEscalateConfirm = () => {
+        onEscalate(incident._id, escalationLevel);
+        setShowEscalateModal(false);
+    };
+
     return (
-        <div className="incident-details">
+        <div className="incident-details enhanced">
             <div className="details-header">
-                <h2>{incident.title}</h2>
+                <div className="header-left">
+                    <h2>{incident.title}</h2>
+                    <div className="incident-badges">
+                        <span className={`severity-badge ${incident.severity}`}>{incident.severity}</span>
+                        <span className={`status-badge ${incident.status}`}>{incident.status}</span>
+                    </div>
+                </div>
                 <button className="close-btn" onClick={onClose}>×</button>
             </div>
 
+            {/* Workflow Action Buttons */}
+            <div className="workflow-actions">
+                {incident.status !== 'acknowledged' && incident.status !== 'resolved' && (
+                    <button
+                        className="action-btn acknowledge"
+                        onClick={() => onAcknowledge(incident._id)}
+                        disabled={actionLoading}
+                    >
+                        <FiCheck /> Acknowledge
+                    </button>
+                )}
+                {incident.status !== 'resolved' && (
+                    <button
+                        className="action-btn escalate"
+                        onClick={() => setShowEscalateModal(true)}
+                        disabled={actionLoading}
+                    >
+                        <FiArrowUp /> Escalate
+                    </button>
+                )}
+                {incident.status !== 'resolved' && (
+                    <button
+                        className="action-btn resolve"
+                        onClick={() => setShowResolveModal(true)}
+                        disabled={actionLoading}
+                    >
+                        <FiCheckCircle /> Resolve
+                    </button>
+                )}
+            </div>
+
+            {/* Tab Navigation */}
+            <div className="details-tabs">
+                <button
+                    className={`tab-btn ${activeTab === 'details' ? 'active' : ''}`}
+                    onClick={() => onTabChange('details')}
+                >
+                    <FiFileText /> Details
+                </button>
+                <button
+                    className={`tab-btn ${activeTab === 'timeline' ? 'active' : ''}`}
+                    onClick={() => onTabChange('timeline')}
+                >
+                    <FiActivity /> Timeline
+                </button>
+                <button
+                    className={`tab-btn ${activeTab === 'alerts' ? 'active' : ''}`}
+                    onClick={() => onTabChange('alerts')}
+                >
+                    <FiBell /> Linked Alerts ({linkedAlerts.length})
+                </button>
+                {postMortem && (
+                    <button
+                        className={`tab-btn ${activeTab === 'postmortem' ? 'active' : ''}`}
+                        onClick={() => onTabChange('postmortem')}
+                    >
+                        <FiMessageCircle /> Post-Mortem
+                    </button>
+                )}
+            </div>
+
+            {/* Tab Content */}
+            <div className="tab-content">
+                {activeTab === 'details' && (
+                    <DetailsTab
+                        incident={incident}
+                        newUpdate={newUpdate}
+                        newStatus={newStatus}
+                        onUpdateChange={setNewUpdate}
+                        onStatusChange={setNewStatus}
+                        onAddUpdate={addUpdate}
+                    />
+                )}
+
+                {activeTab === 'timeline' && (
+                    <TimelineTab timeline={timeline} />
+                )}
+
+                {activeTab === 'alerts' && (
+                    <AlertsTab alerts={linkedAlerts} />
+                )}
+
+                {activeTab === 'postmortem' && postMortem && (
+                    <PostMortemTab postMortem={postMortem} />
+                )}
+            </div>
+
+            {/* Resolve Modal */}
+            {showResolveModal && (
+                <div className="action-modal-overlay" onClick={() => setShowResolveModal(false)}>
+                    <div className="action-modal" onClick={(e) => e.stopPropagation()}>
+                        <div className="modal-header">
+                            <h3>Resolve Incident</h3>
+                            <button className="close-btn" onClick={() => setShowResolveModal(false)}>×</button>
+                        </div>
+                        <div className="modal-body">
+                            <label>Resolution Summary</label>
+                            <textarea
+                                value={resolution}
+                                onChange={(e) => setResolution(e.target.value)}
+                                placeholder="Describe how this incident was resolved..."
+                                rows={4}
+                                className="resolution-textarea"
+                            />
+                        </div>
+                        <div className="modal-actions">
+                            <button className="btn-secondary" onClick={() => setShowResolveModal(false)}>
+                                Cancel
+                            </button>
+                            <button
+                                className="btn-primary"
+                                onClick={handleResolveConfirm}
+                                disabled={!resolution.trim() || actionLoading}
+                            >
+                                Confirm Resolution
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Escalate Modal */}
+            {showEscalateModal && (
+                <div className="action-modal-overlay" onClick={() => setShowEscalateModal(false)}>
+                    <div className="action-modal" onClick={(e) => e.stopPropagation()}>
+                        <div className="modal-header">
+                            <h3>Escalate Incident</h3>
+                            <button className="close-btn" onClick={() => setShowEscalateModal(false)}>×</button>
+                        </div>
+                        <div className="modal-body">
+                            <label>Escalation Level</label>
+                            <select
+                                value={escalationLevel}
+                                onChange={(e) => setEscalationLevel(parseInt(e.target.value))}
+                                className="escalation-select"
+                            >
+                                <option value={1}>Level 1 - Team Lead</option>
+                                <option value={2}>Level 2 - Manager</option>
+                                <option value={3}>Level 3 - Senior Management</option>
+                                <option value={4}>Level 4 - Executive</option>
+                            </select>
+                            <p className="escalation-note">
+                                <FiUsers /> This will notify the next level in the escalation policy.
+                            </p>
+                        </div>
+                        <div className="modal-actions">
+                            <button className="btn-secondary" onClick={() => setShowEscalateModal(false)}>
+                                Cancel
+                            </button>
+                            <button
+                                className="btn-warning"
+                                onClick={handleEscalateConfirm}
+                                disabled={actionLoading}
+                            >
+                                Escalate Now
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+};
+
+// Details Tab Component
+const DetailsTab = ({ incident, newUpdate, newStatus, onUpdateChange, onStatusChange, onAddUpdate }) => {
+    return (
+        <div className="details-tab-content">
             <div className="incident-info">
                 <div className="info-row">
                     <strong>Status:</strong>
@@ -363,7 +706,29 @@ const IncidentDetails = ({ incident, onUpdate, onClose }) => {
                         <span>{new Date(incident.resolvedAt).toLocaleString()}</span>
                     </div>
                 )}
+                {incident.acknowledgedAt && (
+                    <div className="info-row">
+                        <strong>Acknowledged:</strong>
+                        <span>{new Date(incident.acknowledgedAt).toLocaleString()}</span>
+                    </div>
+                )}
             </div>
+
+            <div className="incident-description">
+                <h4>Description</h4>
+                <p>{incident.description}</p>
+            </div>
+
+            {incident.affectedServices && incident.affectedServices.length > 0 && (
+                <div className="affected-services-section">
+                    <h4>Affected Services</h4>
+                    <div className="services-list">
+                        {incident.affectedServices.map((service, idx) => (
+                            <span key={idx} className="service-tag">{service.serviceName}</span>
+                        ))}
+                    </div>
+                </div>
+            )}
 
             <div className="incident-updates">
                 <h3>Updates</h3>
@@ -392,7 +757,7 @@ const IncidentDetails = ({ incident, onUpdate, onClose }) => {
                     <div className="update-form">
                         <select
                             value={newStatus}
-                            onChange={(e) => setNewStatus(e.target.value)}
+                            onChange={(e) => onStatusChange(e.target.value)}
                             className="status-select"
                         >
                             <option value="investigating">Investigating</option>
@@ -402,14 +767,14 @@ const IncidentDetails = ({ incident, onUpdate, onClose }) => {
                         </select>
                         <textarea
                             value={newUpdate}
-                            onChange={(e) => setNewUpdate(e.target.value)}
+                            onChange={(e) => onUpdateChange(e.target.value)}
                             placeholder="Describe the current status..."
                             className="update-textarea"
                             rows={3}
                         />
                         <button
                             className="btn-primary"
-                            onClick={addUpdate}
+                            onClick={onAddUpdate}
                             disabled={!newUpdate.trim()}
                         >
                             Add Update
@@ -417,6 +782,192 @@ const IncidentDetails = ({ incident, onUpdate, onClose }) => {
                     </div>
                 </div>
             </div>
+        </div>
+    );
+};
+
+// Timeline Tab Component
+const TimelineTab = ({ timeline }) => {
+    const getEventIcon = (eventType) => {
+        switch (eventType) {
+            case 'created':
+                return <FiAlertTriangle className="event-icon created" />;
+            case 'acknowledged':
+                return <FiCheck className="event-icon acknowledged" />;
+            case 'escalated':
+                return <FiArrowUp className="event-icon escalated" />;
+            case 'alert_linked':
+                return <FiLink className="event-icon linked" />;
+            case 'status_change':
+                return <FiActivity className="event-icon status-change" />;
+            case 'resolved':
+                return <FiCheckCircle className="event-icon resolved" />;
+            default:
+                return <FiCalendar className="event-icon default" />;
+        }
+    };
+
+    return (
+        <div className="timeline-tab-content">
+            {timeline.length === 0 ? (
+                <div className="empty-timeline">
+                    <FiActivity className="empty-icon" />
+                    <p>No timeline events yet</p>
+                </div>
+            ) : (
+                <div className="timeline-events">
+                    {timeline.map((event, index) => (
+                        <div key={index} className="timeline-event">
+                            <div className="event-icon-container">
+                                {getEventIcon(event.type)}
+                                {index < timeline.length - 1 && <div className="event-connector" />}
+                            </div>
+                            <div className="event-content">
+                                <div className="event-header">
+                                    <h4 className="event-title">{event.title}</h4>
+                                    <span className="event-time">
+                                        {new Date(event.timestamp).toLocaleString()}
+                                    </span>
+                                </div>
+                                <p className="event-description">{event.description}</p>
+                                {event.actor && (
+                                    <span className="event-actor">
+                                        <FiUsers /> {event.actor}
+                                    </span>
+                                )}
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            )}
+        </div>
+    );
+};
+
+// Alerts Tab Component
+const AlertsTab = ({ alerts }) => {
+    const getSeverityColor = (severity) => {
+        switch (severity) {
+            case 'critical':
+                return '#dc3545';
+            case 'warning':
+                return '#ffc107';
+            case 'info':
+                return '#17a2b8';
+            default:
+                return '#6c757d';
+        }
+    };
+
+    return (
+        <div className="alerts-tab-content">
+            {alerts.length === 0 ? (
+                <div className="empty-alerts">
+                    <FiBell className="empty-icon" />
+                    <p>No linked alerts</p>
+                </div>
+            ) : (
+                <div className="linked-alerts-list">
+                    {alerts.map((alert) => (
+                        <div key={alert._id} className="linked-alert-card">
+                            <div className="alert-header">
+                                <div
+                                    className="alert-severity-indicator"
+                                    style={{ backgroundColor: getSeverityColor(alert.severity) }}
+                                />
+                                <div className="alert-info">
+                                    <h4 className="alert-name">{alert.name}</h4>
+                                    <span className="alert-severity">{alert.severity}</span>
+                                </div>
+                                <span className="alert-status">{alert.status}</span>
+                            </div>
+                            <p className="alert-condition">{alert.condition}</p>
+                            <div className="alert-meta">
+                                <span className="alert-time">
+                                    <FiClock /> {new Date(alert.triggeredAt).toLocaleString()}
+                                </span>
+                                {alert.groupId && (
+                                    <span className="alert-group">
+                                        <FiLink /> Group: {alert.groupId}
+                                    </span>
+                                )}
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            )}
+        </div>
+    );
+};
+
+// Post-Mortem Tab Component
+const PostMortemTab = ({ postMortem }) => {
+    return (
+        <div className="postmortem-tab-content">
+            <div className="postmortem-header">
+                <h3>Post-Mortem Analysis</h3>
+                <span className="postmortem-date">
+                    Generated: {new Date(postMortem.generatedAt).toLocaleString()}
+                </span>
+            </div>
+
+            <div className="postmortem-section">
+                <h4><FiAlertTriangle /> Summary</h4>
+                <p>{postMortem.summary}</p>
+            </div>
+
+            <div className="postmortem-section">
+                <h4><FiActivity /> Timeline</h4>
+                <div className="postmortem-timeline">
+                    <div className="timeline-item">
+                        <strong>Detection Time:</strong>
+                        <span>{postMortem.detectionTime} minutes</span>
+                    </div>
+                    <div className="timeline-item">
+                        <strong>Time to Acknowledge:</strong>
+                        <span>{postMortem.timeToAcknowledge} minutes</span>
+                    </div>
+                    <div className="timeline-item">
+                        <strong>Time to Resolve:</strong>
+                        <span>{postMortem.timeToResolve} minutes</span>
+                    </div>
+                </div>
+            </div>
+
+            <div className="postmortem-section">
+                <h4><FiFileText /> Root Cause</h4>
+                <p>{postMortem.rootCause}</p>
+            </div>
+
+            <div className="postmortem-section">
+                <h4><FiCheckCircle /> Resolution</h4>
+                <p>{postMortem.resolution}</p>
+            </div>
+
+            {postMortem.actionItems && postMortem.actionItems.length > 0 && (
+                <div className="postmortem-section">
+                    <h4><FiCheck /> Action Items</h4>
+                    <ul className="action-items-list">
+                        {postMortem.actionItems.map((item, index) => (
+                            <li key={index} className="action-item">
+                                <input type="checkbox" className="action-checkbox" />
+                                <span>{item}</span>
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+            )}
+
+            {postMortem.lessonsLearned && postMortem.lessonsLearned.length > 0 && (
+                <div className="postmortem-section">
+                    <h4><FiMessageCircle /> Lessons Learned</h4>
+                    <ul className="lessons-list">
+                        {postMortem.lessonsLearned.map((lesson, index) => (
+                            <li key={index}>{lesson}</li>
+                        ))}
+                    </ul>
+                </div>
+            )}
         </div>
     );
 };

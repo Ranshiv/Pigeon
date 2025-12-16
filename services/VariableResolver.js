@@ -475,8 +475,17 @@ class VariableResolver {
 const variableResolver = new VariableResolver();
 
 // Periodic cleanup of old contexts
-setInterval(() => {
-    variableResolver.cleanupOldContexts();
-}, 10 * 60 * 1000); // Every 10 minutes
+// Note: Avoid keeping the Node event loop alive for one-off CLI runs and Jest tests.
+// - In tests: don't schedule background cleanup at all.
+// - Otherwise: schedule cleanup, but `unref()` the interval so it won't prevent process exit.
+if (process.env.NODE_ENV !== 'test') {
+    const cleanupInterval = setInterval(() => {
+        variableResolver.cleanupOldContexts();
+    }, 10 * 60 * 1000); // Every 10 minutes
+
+    if (typeof cleanupInterval.unref === 'function') {
+        cleanupInterval.unref();
+    }
+}
 
 module.exports = variableResolver;

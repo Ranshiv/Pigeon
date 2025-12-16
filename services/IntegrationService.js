@@ -712,11 +712,18 @@ class IntegrationService {
                 validateRuleset(ruleset, rulesetPath);
             }
 
-            // Execute linting with timeout
-            const lintResults = await Promise.race([
-                this.executeLinting(specDoc, ruleset, rulesetConfig),
-                this.createTimeoutPromise(timeoutMs)
-            ]);
+            // Execute linting with timeout.
+            // Important: always clear the timeout so it doesn't keep the event loop alive.
+            const timeout = this.createTimeout(timeoutMs);
+            let lintResults;
+            try {
+                lintResults = await Promise.race([
+                    this.executeLinting(specDoc, ruleset, rulesetConfig),
+                    timeout.promise
+                ]);
+            } finally {
+                timeout.cancel();
+            }
 
             // Process and normalize results
             const findings = normalizeFindings(lintResults);
@@ -766,6 +773,7 @@ class IntegrationService {
     async parseSpecInput(specInput, maxSizeMB) {
         let spec;
         let specContent;
+        let format = 'json';
 
         // Handle different input types
         if (typeof specInput === 'string') {
@@ -775,27 +783,50 @@ class IntegrationService {
             }
 
             const filePath = path.resolve(specInput);
-            const stats = await fs.stat(filePath);
-            const sizeInMB = stats.size / (1024 * 1024);
 
-            if (sizeInMB > maxSizeMB) {
-                throw new Error(`Spec file too large: ${sizeInMB.toFixed(2)}MB (max: ${maxSizeMB}MB)`);
-            }
+            // Prefer treating input as a file path if it exists; otherwise treat it as inline content.
+            try {
+                const stats = await fs.stat(filePath);
+                const sizeInMB = stats.size / (1024 * 1024);
 
-            specContent = await fs.readFile(filePath, 'utf8');
-            const ext = path.extname(filePath).toLowerCase();
+                if (sizeInMB > maxSizeMB) {
+                    throw new Error(`Spec file too large: ${sizeInMB.toFixed(2)}MB (max: ${maxSizeMB}MB)`);
+                }
 
-            if (ext === '.json') {
-                spec = JSON.parse(specContent);
-            } else if (ext === '.yaml' || ext === '.yml') {
-                spec = yaml.load(specContent);
-            } else {
-                throw new Error(`Unsupported file format: ${ext}. Use .json, .yaml, or .yml`);
+                specContent = await fs.readFile(filePath, 'utf8');
+                const ext = path.extname(filePath).toLowerCase();
+
+                if (ext === '.json') {
+                    format = 'json';
+                    spec = JSON.parse(specContent);
+                } else if (ext === '.yaml' || ext === '.yml') {
+                    format = 'yaml';
+                    spec = yaml.load(specContent);
+                } else {
+                    throw new Error(`Unsupported file format: ${ext}. Use .json, .yaml, or .yml`);
+                }
+            } catch (err) {
+                // If it doesn't exist as a file path, interpret the string as spec content.
+                if (err && (err.code === 'ENOENT' || err.code === 'ENOTDIR')) {
+                    specContent = specInput;
+                    const trimmed = specInput.trim();
+
+                    if (trimmed.startsWith('{') || trimmed.startsWith('[')) {
+                        format = 'json';
+                        spec = JSON.parse(trimmed);
+                    } else {
+                        format = 'yaml';
+                        spec = yaml.load(specInput);
+                    }
+                } else {
+                    throw err;
+                }
             }
         } else if (typeof specInput === 'object') {
             // Already parsed object
             spec = specInput;
             specContent = JSON.stringify(spec, null, 2);
+            format = 'json';
         } else {
             throw new Error('Invalid spec input: must be file path or parsed object');
         }
@@ -806,8 +837,7 @@ class IntegrationService {
         }
 
         // Create Spectral document with appropriate parser
-        const ext = path.extname(typeof specInput === 'string' ? specInput : '.json').toLowerCase();
-        const parser = (ext === '.yaml' || ext === '.yml') ? Yaml : Json;
+        const parser = format === 'yaml' ? Yaml : Json;
         const specDoc = new Document(specContent, parser);
 
         return { spec, specDoc };
@@ -827,12 +857,20 @@ class IntegrationService {
         return await spectral.run(specDoc);
     }
 
-    createTimeoutPromise(timeoutMs) {
-        return new Promise((_, reject) => {
-            setTimeout(() => {
+    createTimeout(timeoutMs) {
+        let timer;
+        const promise = new Promise((_, reject) => {
+            timer = setTimeout(() => {
                 reject(new Error(`Linting timeout exceeded: ${timeoutMs}ms`));
             }, timeoutMs);
         });
+
+        return {
+            promise,
+            cancel: () => {
+                if (timer) clearTimeout(timer);
+            }
+        };
     }
 
     // Health monitoring and validation methods

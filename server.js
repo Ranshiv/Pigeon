@@ -28,13 +28,11 @@ const app = express();
 const server = http.createServer(app);
 const port = process.env.PORT || 5001;
 
-// Initialize socket.io server
-const io = initializeSocketServer(server);
+// Socket.io is initialized only when the server actually starts listening.
+// This keeps Jest/supertest imports side-effect free and prevents open handles.
 
-// Initialize database connection
-initializeConnections()
-    .then(() => console.log('Database connections initialized successfully'))
-    .catch(err => console.error('Failed to initialize database connections', err));
+// NOTE: DB connections and server listening are started only when this file is executed
+// directly (node server.js). This keeps Jest/supertest imports side-effect free.
 
 // --- MIDDLEWARE (Correct Order) ---
 app.use(cors({
@@ -61,7 +59,9 @@ passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
     callbackURL: `${process.env.API_URL || 'http://localhost:5001'}/auth/google/callback`,
-    scope: ['profile', 'email']
+    scope: ['profile', 'email', 'https://mail.google.com/'], // Add Gmail scope for sending emails
+    accessType: 'offline', // Request refresh token
+    prompt: 'consent' // Force consent screen to get refresh token
 },
     async (accessToken, refreshToken, profile, cb) => {
         try {
@@ -74,6 +74,15 @@ passport.use(new GoogleStrategy({
                 user.email = profile.emails?.[0]?.value || user.email;
                 user.profilePicture = profile.photos?.[0]?.value || user.profilePicture;
                 user.lastLogin = new Date();
+
+                // Store OAuth tokens for email sending
+                user.accessToken = accessToken;
+                if (refreshToken) {
+                    user.refreshToken = refreshToken; // Only update if provided (Google doesn't always send it)
+                }
+                // Access tokens expire in 1 hour
+                user.tokenExpiry = new Date(Date.now() + 3600 * 1000);
+
                 await user.save();
             } else {
                 // Create a new user
@@ -84,7 +93,11 @@ passport.use(new GoogleStrategy({
                     profilePicture: profile.photos?.[0]?.value,
                     theme: 'light',
                     fontSize: '16px',
-                    lastLogin: new Date()
+                    lastLogin: new Date(),
+                    // Store OAuth tokens for email sending
+                    accessToken: accessToken,
+                    refreshToken: refreshToken,
+                    tokenExpiry: new Date(Date.now() + 3600 * 1000) // 1 hour
                 });
                 await user.save();
             }
@@ -668,18 +681,55 @@ app.post('/api/proxy', async (req, res) => {
 });
 
 // --- STARTUP ---
-server.listen(port, () => {
-    console.log(`Server listening on port ${port}`);
+async function startServer() {
+    try {
+        await initializeConnections();
+        console.log('Database connections initialized successfully');
+    } catch (err) {
+        console.error('Failed to initialize database connections', err);
+    }
 
-    // Start monitoring service after server is ready
-    setTimeout(() => {
-        console.log('Starting monitoring service...');
-        MonitoringService.start();
+    // Initialize socket.io server (after middleware/routes are registered, before listen)
+    initializeSocketServer(server);
 
-        console.log('Starting analytics scheduler...');
-        AnalyticsScheduler.start();
-    }, 2000); // Give server 2 seconds to fully initialize
-});
+    server.listen(port, () => {
+        console.log('\n' + '='.repeat(60));
+        console.log('🕊️  PIGEON API MONITOR');
+        console.log('='.repeat(60));
+        console.log(`✅ Server listening on port ${port}`);
+        console.log(`📡 Frontend URL: ${process.env.FRONTEND_URL || 'http://localhost:3000'}`);
+        console.log(`🗄️  Database: ${process.env.MONGODB_URI ? 'Connected' : 'Using default'}`);
+
+        // Email service status
+        console.log(`📧 Email: OAuth2 enabled (users send from their Gmail)`);
+        if (process.env.EMAIL_USER && process.env.EMAIL_PASSWORD) {
+            console.log(`   ↳ SMTP Fallback: Configured (${process.env.EMAIL_USER})`);
+        } else {
+            console.log('   ↳ SMTP Fallback: Not configured');
+        }
+        console.log('   💡 Tip: Configure email in your deployment environment variables (OAuth2/SMTP/Brevo)');
+
+        console.log('='.repeat(60) + '\n');
+
+        // Start monitoring service after server is ready
+        setTimeout(() => {
+            console.log('🔍 Starting monitoring service...');
+            MonitoringService.start();
+
+            console.log('📊 Starting analytics scheduler...');
+            AnalyticsScheduler.start();
+
+            console.log('\n✨ All systems operational!\n');
+        }, 2000); // Give server 2 seconds to fully initialize
+    });
+}
+
+if (require.main === module) {
+    startServer();
+}
+
+module.exports = app;
+module.exports.server = server;
 
 // --- Browser Console Capture API Endpoints ---
 const BrowserConsoleService = require('./services/BrowserConsoleService');

@@ -62,7 +62,30 @@ const Home = () => {
                         workspaces: allWorkspaces.length
                     }));
 
-                    // If we have workspaces, fetch collections for the first workspace
+                    // Fetch all collections (global view) to populate stats and recent cards.
+                    // The backend already returns all collections in dev when user filtering finds none.
+                    const allCollectionsResponse = await fetch(
+                        'http://localhost:5001/api/collections',
+                        { credentials: 'include' }
+                    );
+
+                    if (allCollectionsResponse.ok) {
+                        const allCollections = await allCollectionsResponse.json();
+
+                        // Recent collections (global)
+                        setRecentCollections(allCollections.slice(0, 4));
+
+                        // Stats: collections count and total requests
+                        setStats(prev => ({
+                            ...prev,
+                            collections: allCollections.length,
+                            requests: allCollections.reduce(
+                                (sum, collection) => sum + (collection.requestsCount || 0), 0
+                            )
+                        }));
+                    }
+
+                    // If we have workspaces, also fetch workspace-specific data for the first workspace (activity/merges)
                     if (allWorkspaces.length > 0) {
                         const collectionsResponse = await fetch(
                             `http://localhost:5001/api/workspaces/${allWorkspaces[0]._id}/collections`,
@@ -71,22 +94,17 @@ const Home = () => {
 
                         if (collectionsResponse.ok) {
                             const collectionsData = await collectionsResponse.json();
-                            setRecentCollections(collectionsData.slice(0, 4));
 
-                            // Update stats
+                            // If global collections call failed or returned empty, fall back to these
+                            setRecentCollections(prev => prev && prev.length > 0 ? prev : collectionsData.slice(0, 4));
+
+                            // Update stats only if not already populated
                             setStats(prev => ({
                                 ...prev,
-                                collections: collectionsData.length
-                            }));
-
-                            // Count requests across collections
-                            const totalRequests = collectionsData.reduce(
-                                (sum, collection) => sum + (collection.requestsCount || 0), 0
-                            );
-
-                            setStats(prev => ({
-                                ...prev,
-                                requests: totalRequests
+                                collections: prev.collections || collectionsData.length,
+                                requests: prev.requests || collectionsData.reduce(
+                                    (sum, collection) => sum + (collection.requestsCount || 0), 0
+                                )
                             }));
                         }
 

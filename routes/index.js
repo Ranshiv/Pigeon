@@ -11,6 +11,7 @@ const requestsRoutes = require('./requests');
 const historyRoutes = require('./history');
 const documentationRoutes = require('./documentation');
 const monitoringRoutes = require('./monitoring');
+const mergeRequestsRoutes = require('./mergeRequests');
 
 // Import new advanced monitoring routes
 const statusPagesRoutes = require('./statusPages');
@@ -48,6 +49,7 @@ router.use('/requests', requestsRoutes);
 router.use('/history', historyRoutes);
 router.use('/documentation', documentationRoutes);
 router.use('/monitoring', monitoringRoutes);
+router.use('/merge-requests', mergeRequestsRoutes);
 
 // Register new advanced monitoring routes
 router.use('/status-pages', statusPagesRoutes);

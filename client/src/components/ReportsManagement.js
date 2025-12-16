@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import {
     FiFileText, FiPlus, FiEdit, FiTrash2, FiDownload,
     FiClock, FiMail, FiCalendar, FiBarChart, FiTrendingUp,
-    FiSettings, FiActivity, FiUsers, FiTool, FiCheckCircle, FiEye
+    FiSettings, FiActivity, FiUsers, FiTool, FiCheckCircle, FiEye, FiBell
 } from 'react-icons/fi';
 import './ReportsManagement.css';
 
@@ -321,6 +321,12 @@ const ReportsManagement = () => {
                     <FiActivity /> Dashboard
                 </button>
                 <button
+                    className="nav-btn"
+                    onClick={() => navigate('/alerts/policies')}
+                >
+                    <FiBell /> Alerts & Policies
+                </button>
+                <button
                     className="nav-btn active"
                     onClick={() => navigate('/workspace/monitoring/reports')}
                 >
@@ -395,8 +401,8 @@ const ReportsManagement = () => {
                             </div>
                         ) : (
                             reports.map(report => (
-                                <div 
-                                    key={report._id} 
+                                <div
+                                    key={report._id}
                                     className={`item ${selectedReport?._id === report._id ? 'active' : ''}`}
                                     onClick={() => setSelectedReport(report)}
                                 >
