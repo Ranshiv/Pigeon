@@ -40,6 +40,7 @@
     "@stoplight/spectral-rulesets": "^1.22.0",
     "ai": "^5.0.34",
     "axios": "^1.10.0",
+    "autocannon": "^8.0.0",
     "canvas": "^3.1.1",
     "chalk": "^4.1.2",
     "chart.js": "^4.5.0",

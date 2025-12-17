@@ -16,6 +16,7 @@ import MaintenanceManagement from './MaintenanceManagement';
 import AnalyticsDashboard from './Analytics/AnalyticsDashboard';
 import GraphQLTestPage from './GraphQLTestPage';
 import ProtocolTestPage from './ProtocolTestPage';
+import PerformanceTestsPage from './performanceTesting/PerformanceTestsPage';
 import './Workspace.css';
 import SettingsPage from './SettingsPage';
 import HistoryDetailsSection from './HistoryDetailsSection';
@@ -39,6 +40,7 @@ const Workspace = () => {
             <Route path="monitoring" element={<MonitoringDashboard />} />
             <Route path="graphql" element={<GraphQLTestPage />} />
             <Route path="protocols" element={<ProtocolTestPage />} />
+            <Route path="performance-tests" element={<PerformanceTestsPage />} />
             <Route path="settings" element={<SettingsPage />} />
             <Route path="history/*" element={<HistoryDetailsSection />} />
 

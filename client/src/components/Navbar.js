@@ -19,6 +19,7 @@ import {
     FiSearch,
     FiCheck,
     FiChevronRight,
+    FiBarChart2,
     FiBook,  // Add FiBook icon for documentation
     FiLink   // Add FiLink icon for protocols
 } from 'react-icons/fi';
@@ -421,6 +422,9 @@ const Navbar = ({ isAuthenticated }) => {
                                             </div>
                                             <div className="dropdown-item" onClick={() => handleNavigation('/workspace/protocols')}>
                                                 <FiLink size={16} style={{ marginRight: '10px' }} /> Protocols
+                                            </div>
+                                            <div className="dropdown-item" onClick={() => handleNavigation('/workspace/performance-tests')}>
+                                                <FiBarChart2 size={16} style={{ marginRight: '10px' }} /> Performance Tests
                                             </div>
                                             <div className="dropdown-item" onClick={() => handleNavigation('/workspace/api-network/requests/new')}>
                                                 <FiPlus size={16} style={{ marginRight: '10px' }} /> Add Request

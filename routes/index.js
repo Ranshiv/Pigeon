@@ -13,6 +13,9 @@ const documentationRoutes = require('./documentation');
 const monitoringRoutes = require('./monitoring');
 const mergeRequestsRoutes = require('./mergeRequests');
 
+// Import Performance Testing routes
+const performanceTestingRoutes = require('./performanceTesting');
+
 // Import new advanced monitoring routes
 const statusPagesRoutes = require('./statusPages');
 const reportsRoutes = require('./reports');
@@ -50,6 +53,9 @@ router.use('/history', historyRoutes);
 router.use('/documentation', documentationRoutes);
 router.use('/monitoring', monitoringRoutes);
 router.use('/merge-requests', mergeRequestsRoutes);
+
+// Performance testing & load generation
+router.use('/performance-tests', performanceTestingRoutes);
 
 // Register new advanced monitoring routes
 router.use('/status-pages', statusPagesRoutes);
