@@ -28,6 +28,48 @@ export const CollaborationProvider = ({ children }) => {
   const roomsRef = useRef(new Set());
   // Add ref for tracking currently edited documents
   const editingDocumentsRef = useRef(new Map());
+  // Track the current room without forcing callbacks to depend on state
+  const currentRoomRef = useRef(null);
+  // Rate-limit activity events to avoid notification floods
+  const lastActivityRef = useRef(new Map());
+
+  useEffect(() => {
+    currentRoomRef.current = currentRoom;
+  }, [currentRoom]);
+
+  const normalizeUsers = useCallback((users) => {
+    const list = Array.isArray(users) ? users : [];
+    const byId = new Map();
+
+    for (const u of list) {
+      if (!u) continue;
+      const id = (typeof u === 'string') ? u : (u.id || u.userId);
+      if (!id) continue;
+
+      // Prefer the first full object we see for an id
+      if (!byId.has(id)) {
+        byId.set(id, {
+          id,
+          name: (typeof u === 'object' ? u.name : undefined),
+          email: (typeof u === 'object' ? u.email : undefined),
+          avatar: (typeof u === 'object' ? u.avatar : undefined),
+          joinedAt: new Date()
+        });
+      } else {
+        const existing = byId.get(id);
+        if (typeof u === 'object') {
+          byId.set(id, {
+            ...existing,
+            name: existing.name || u.name,
+            email: existing.email || u.email,
+            avatar: existing.avatar || u.avatar
+          });
+        }
+      }
+    }
+
+    return Array.from(byId.values());
+  }, []);
 
   // Get user information from local storage or state
   const getUserInfo = useCallback(() => {
@@ -174,16 +216,9 @@ export const CollaborationProvider = ({ children }) => {
 
     // Listen for active users events (matches server's "activeUsers" event)
     socketInstance.on('activeUsers', ({ room, users }) => {
-      // Remove excessive logging that fills up the console
       setActiveRooms(prev => ({
         ...prev,
-        [room]: users.map(user => ({
-          id: user.id || user,
-          name: user.name,
-          email: user.email,
-          avatar: user.avatar,
-          joinedAt: new Date()
-        }))
+        [room]: normalizeUsers(users)
       }));
     });
 
@@ -246,8 +281,9 @@ export const CollaborationProvider = ({ children }) => {
 
     // Implement heartbeat to keep connection alive and verify active status
     const heartbeatInterval = setInterval(() => {
-      if (socketInstance.connected && currentRoom) {
-        socketInstance.emit('heartbeat', { room: currentRoom });
+      const room = currentRoomRef.current;
+      if (socketInstance.connected && room) {
+        socketInstance.emit('heartbeat', { room });
       }
     }, 30000); // Send heartbeat every 30 seconds
 
@@ -326,18 +362,34 @@ export const CollaborationProvider = ({ children }) => {
   }, [socket, connected]);
 
   // Send activity to server
-  const sendActivity = useCallback((activityType, details) => {
-    if (socket && connected && currentRoom) {
-      // Log removed to reduce console noise
-      socket.emit('userActivity', {
-        room: currentRoom,
-        activity: {
-          type: activityType,
-          details
-        }
-      });
+  // Optional third arg (roomOverride) avoids needing brittle timeouts while joining rooms.
+  const sendActivity = useCallback((activityType, details, roomOverride = null) => {
+    if (!socket || !connected) return;
+
+    const room = roomOverride || currentRoomRef.current;
+    if (!room) return;
+
+    // Basic client-side rate limiting: drop identical events that happen too frequently.
+    let detailsKey = '';
+    try {
+      detailsKey = details ? JSON.stringify(details) : '';
+    } catch {
+      detailsKey = String(details);
     }
-  }, [socket, connected, currentRoom]);
+    const signature = `${room}|${activityType}|${detailsKey}`;
+    const now = Date.now();
+    const last = lastActivityRef.current.get(signature) || 0;
+    if (now - last < 1500) return;
+    lastActivityRef.current.set(signature, now);
+
+    socket.emit('userActivity', {
+      room,
+      activity: {
+        type: activityType,
+        details
+      }
+    });
+  }, [socket, connected]);
 
   // Load version history for an entity
   const loadVersionHistory = useCallback(async (entityType, entityId) => {

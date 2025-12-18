@@ -92,8 +92,22 @@ function initializeSocketServer(server) {
             socket.join(roomName);
             userRooms.add(roomName);
 
+            const dedupeUsersById = (users) => {
+                const byId = new Map();
+                for (const u of users || []) {
+                    if (!u) continue;
+                    const id = u.id || u.userId;
+                    if (!id) continue;
+                    if (!byId.has(id)) {
+                        byId.set(id, u);
+                    }
+                }
+                return Array.from(byId.values());
+            };
+
             // Notify others in the room that someone joined with consistent data structure
             socket.to(roomName).emit('userJoined', {
+                room: roomName,
                 userId: socket.id,
                 user: authenticatedUser,
                 timestamp: new Date()
@@ -102,7 +116,7 @@ function initializeSocketServer(server) {
             // Get and send current active users in this room with consistent data structure
             const roomSockets = io.sockets.adapter.rooms.get(roomName);
             if (roomSockets) {
-                const users = Array.from(roomSockets).map(socketId => {
+                const users = dedupeUsersById(Array.from(roomSockets).map(socketId => {
                     const socketInstance = io.sockets.sockets.get(socketId);
                     // Use the authenticatedUser object, or create a fallback with socket ID
                     return socketInstance.authenticatedUser || {
@@ -111,7 +125,7 @@ function initializeSocketServer(server) {
                         displayName: "Anonymous",
                         userStatus: "online"
                     };
-                });
+                }));
 
                 // Send to the joining user the list of active users
                 socket.emit('activeUsers', {
@@ -143,6 +157,7 @@ function initializeSocketServer(server) {
 
             // Notify others in the room with consistent data structure
             socket.to(roomName).emit('userLeft', {
+                room: roomName,
                 userId: socket.id,
                 user: authenticatedUser,
                 timestamp: new Date()
@@ -161,9 +176,16 @@ function initializeSocketServer(server) {
                     };
                 });
 
+                const byId = new Map();
+                for (const u of users) {
+                    if (!u || !u.id) continue;
+                    if (!byId.has(u.id)) byId.set(u.id, u);
+                }
+                const dedupedUsers = Array.from(byId.values());
+
                 socket.to(roomName).emit('activeUsers', {
                     room: roomName,
-                    users: users,
+                    users: dedupedUsers,
                     timestamp: new Date()
                 });
             }
@@ -176,7 +198,7 @@ function initializeSocketServer(server) {
             const roomSockets = io.sockets.adapter.rooms.get(roomName);
             if (!roomSockets) return [];
 
-            return Array.from(roomSockets).map(socketId => {
+            const users = Array.from(roomSockets).map(socketId => {
                 const socketInstance = io.sockets.sockets.get(socketId);
                 return socketInstance.authenticatedUser || {
                     id: socketId,
@@ -185,6 +207,13 @@ function initializeSocketServer(server) {
                     userStatus: "online"
                 };
             });
+
+            const byId = new Map();
+            for (const u of users) {
+                if (!u || !u.id) continue;
+                if (!byId.has(u.id)) byId.set(u.id, u);
+            }
+            return Array.from(byId.values());
         };
 
         // Join a workspace room
@@ -251,7 +280,7 @@ function initializeSocketServer(server) {
 
             // Broadcast to others in the room
             socket.to(room).emit('userActivity', {
-                userId: socket.id,
+                userId: authenticatedUser.id || socket.id,
                 user: authenticatedUser,
                 activity,
                 timestamp: new Date()
@@ -274,11 +303,8 @@ function initializeSocketServer(server) {
         socket.on('heartbeat', ({ room }) => {
             // Refresh the user's presence in the room
             if (userRooms.has(room)) {
-                // Optionally broadcast to room that user is still active
-                socket.to(room).emit('heartbeat', {
-                    userId: socket.id,
-                    timestamp: new Date()
-                });
+                // No broadcast needed; clients use heartbeat only to keep the connection warm.
+                socket.lastHeartbeatAt = Date.now();
             }
         });
 
@@ -292,8 +318,15 @@ function initializeSocketServer(server) {
                     return socketInstance.authenticatedUser || { id: socketId };
                 });
 
+                const byId = new Map();
+                for (const u of users) {
+                    if (!u || !u.id) continue;
+                    if (!byId.has(u.id)) byId.set(u.id, u);
+                }
+                const dedupedUsers = Array.from(byId.values());
+
                 if (callback) {
-                    callback(users);
+                    callback(dedupedUsers);
                 }
             } else if (callback) {
                 callback([]);

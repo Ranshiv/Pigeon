@@ -787,7 +787,7 @@ const DesignCanvas = ({
                                 markerWidth="6"
                                 markerHeight="6"
                                 orient="auto-start-reverse">
-                                <path d="M 0 0 L 10 5 L 0 10 z" fill="#014C75" />
+                                <path d="M 0 0 L 10 5 L 0 10 z" fill="var(--designer-connector, #38bdf8)" />
                             </marker>
                         </defs>
                         {/* Existing edges */}

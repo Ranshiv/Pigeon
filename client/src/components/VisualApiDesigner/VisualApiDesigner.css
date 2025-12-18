@@ -135,6 +135,9 @@
     font-family: var(--font-family);
     font-size: var(--font-size-base);
     line-height: var(--line-height);
+
+    /* Higher-contrast connector color for the dark canvas */
+    --designer-connector: #38bdf8;
 }
 
 /* Transition Loading State */
@@ -2256,15 +2259,16 @@
     height: 16px;
     border-radius: 50%;
     border: none;
-    background: #014C75;
+    background: var(--designer-connector);
     cursor: crosshair;
     z-index: 20;
-    opacity: 0;
+    /* Slightly visible by default so connectors aren't "missing" */
+    opacity: 0.28;
     transition: all 0.2s ease;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 2px 8px rgba(1, 76, 117, 0.3);
+    box-shadow: 0 2px 10px rgba(56, 189, 248, 0.25);
 }
 
 .conn-handle::before {
@@ -2281,9 +2285,13 @@
     opacity: 1;
 }
 
+.positioned-node.selected .conn-handle {
+    opacity: 0.9;
+}
+
 .conn-handle:hover {
-    background: #013B5B;
-    box-shadow: 0 4px 12px rgba(1, 76, 117, 0.5);
+    background: #7dd3fc;
+    box-shadow: 0 6px 16px rgba(56, 189, 248, 0.45);
 }
 
 .conn-handle:hover::before {
@@ -2304,33 +2312,33 @@
 
 /* Edge styling - Screenshot 2 style */
 .edges-layer .edge-path {
-    stroke: #014C75;
+    stroke: var(--designer-connector);
     stroke-width: 2;
     filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
     cursor: pointer;
 }
 
 .edges-layer .edge-path.default {
-    stroke: #014C75;
+    stroke: var(--designer-connector);
     opacity: 0.8;
 }
 
 .edges-layer .edge-path.smooth {
-    stroke: #014C75;
+    stroke: var(--designer-connector);
     opacity: 0.9;
 }
 
 .edges-layer .edge-path.preview {
-    stroke: #014C75;
+    stroke: var(--designer-connector);
     stroke-dasharray: 8 4;
     opacity: 0.7;
     animation: dashFlow 1s linear infinite;
 }
 
 .edges-layer .edge-path.selected {
-    stroke: #014C75;
+    stroke: var(--designer-connector);
     stroke-width: 3;
-    filter: drop-shadow(0 0 8px rgba(1, 76, 117, 0.8));
+    filter: drop-shadow(0 0 10px rgba(56, 189, 248, 0.65));
     opacity: 1;
 }
 

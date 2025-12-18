@@ -6,11 +6,12 @@ import {
     FiUsers, FiPlus, FiEdit, FiTrash2, FiActivity,
     FiGitMerge, FiGitBranch, FiGitPullRequest, FiLock,
     FiCalendar, FiBarChart2, FiPackage, FiClock, FiStar,
-    FiGlobe
+    FiGlobe, FiX
 } from 'react-icons/fi';
 import { useCollaboration } from '../context/CollaborationContext';
 import ActiveCollaborators from './ActiveCollaborators';
 import GlobalVariablesModal from './GlobalVariablesModal';
+import CollectionCreate from './CollectionCreate';
 
 const WorkspaceDetail = () => {
     const { id } = useParams();
@@ -30,6 +31,7 @@ const WorkspaceDetail = () => {
     const [inviteRole, setInviteRole] = useState('viewer');
     const [activeUsers, setActiveUsers] = useState([]);
     const [showGlobalVariablesModal, setShowGlobalVariablesModal] = useState(false);
+    const [showCreateCollectionModal, setShowCreateCollectionModal] = useState(false);
 
     // Edit modal state
     const [showEditModal, setShowEditModal] = useState(false);
@@ -86,6 +88,10 @@ const WorkspaceDetail = () => {
                 setWorkspace(data);
                 setCollaborators(data.collaborators || []);
 
+                // IMPORTANT: the route param can be an alias like "my-workspace".
+                // For collection queries we must use the real workspace _id returned by the API when available.
+                const resolvedWorkspaceId = data?._id || id;
+
                 // Join the workspace room for real-time collaboration
                 if (connected) {
                     joinWorkspace(id);
@@ -95,9 +101,9 @@ const WorkspaceDetail = () => {
 
                 // Load collections, merge requests, and activities in parallel for better performance
                 await Promise.allSettled([
-                    fetchCollections(id),
-                    fetchMergeRequests(id),
-                    fetchActivities(id)
+                    fetchCollections(resolvedWorkspaceId),
+                    fetchMergeRequests(resolvedWorkspaceId),
+                    fetchActivities(resolvedWorkspaceId)
                 ]);
 
             } catch (err) {
@@ -120,7 +126,7 @@ const WorkspaceDetail = () => {
     useEffect(() => {
         // Only fetch collections if we're on the collections tab and workspace is loaded
         if (activeTab === 'collections' && workspace && id) {
-            fetchCollections(id);
+            fetchCollections(workspace._id || id);
         }
     }, [location.pathname, activeTab]);
 
@@ -252,6 +258,14 @@ const WorkspaceDetail = () => {
                 workspaceName: workspace.name
             });
         }
+    };
+
+    const openCreateCollectionModal = () => {
+        setShowCreateCollectionModal(true);
+    };
+
+    const closeCreateCollectionModal = () => {
+        setShowCreateCollectionModal(false);
     };
 
     // Handle inviting users to workspace
@@ -600,10 +614,16 @@ const WorkspaceDetail = () => {
         <div className="workspace-detail-container">
             <header className="workspace-header">
                 <div className="workspace-title-section">
-                    <h1>{workspace.name}</h1>
-                    {workspace.isPersonal && <span className="workspace-badge personal">Personal</span>}
-                    {workspace.isPublic && <span className="workspace-badge public">Public</span>}
-                    {!workspace.isPersonal && !workspace.isPublic && <span className="workspace-badge team">Team</span>}
+                    <div className="workspace-title-row">
+                        <h1>{workspace.name}</h1>
+                        {workspace.isPersonal && <span className="workspace-badge personal">Personal</span>}
+                        {workspace.isPublic && <span className="workspace-badge public">Public</span>}
+                        {!workspace.isPersonal && !workspace.isPublic && <span className="workspace-badge team">Team</span>}
+                    </div>
+
+                    {workspace.description && (
+                        <p className="workspace-description">{workspace.description}</p>
+                    )}
                 </div>
 
                 <div className="workspace-actions">
@@ -641,10 +661,6 @@ const WorkspaceDetail = () => {
                     )}
                 </div>
             </header>
-
-            {workspace.description && (
-                <p className="workspace-description">{workspace.description}</p>
-            )}
 
             {/* Dashboard Overview Section - New addition */}
             <div className="workspace-dashboard">
@@ -736,18 +752,19 @@ const WorkspaceDetail = () => {
                     <div className="collections-tab">
                         <div className="tab-header">
                             <h2>Collections</h2>
-                            <button className="add-collection-btn" onClick={() => navigate(`/workspace/collections/new?workspaceId=${id}`)}>
+                            <button className="add-collection-btn" onClick={openCreateCollectionModal}>
                                 <FiPlus /> New Collection
                             </button>
                         </div>
 
-                        <div className="collections-list">
+                        <div className="workspace-panel">
                             {collections.length === 0 ? (
                                 <div className="empty-state">
                                     <FiPackage size={32} />
-                                    <p>No collections in this workspace yet.</p>
-                                    <button className="primary-btn" onClick={() => navigate(`/workspace/collections/new?workspaceId=${id}`)}>
-                                        Create your first collection
+                                    <p>No collections yet</p>
+                                    <p className="empty-state-subtext">Create your first collection to organize and test your API endpoints. Collections help you group related requests together.</p>
+                                    <button className="primary-btn" onClick={openCreateCollectionModal}>
+                                        + Create Collection
                                     </button>
                                 </div>
                             ) : (
@@ -783,77 +800,79 @@ const WorkspaceDetail = () => {
                             )}
                         </div>
 
-                        <div className="active-members-section">
-                            <div className="section-title">
-                                <h3>Currently Active</h3>
+                        <div className="workspace-panel">
+                            <div className="active-members-section">
+                                <div className="section-title">
+                                    <h3>Currently Active</h3>
+                                </div>
+                                <ActiveCollaborators workspaceId={id} />
                             </div>
-                            <ActiveCollaborators workspaceId={id} />
-                        </div>
 
-                        <div className="members-list">
-                            <div className="section-title">
-                                <h3>All Members</h3>
-                            </div>
-                            <table className="members-table">
-                                <thead>
-                                    <tr>
-                                        <th>User</th>
-                                        <th>Role</th>
-                                        <th>Joined</th>
-                                        {workspace.userRole === 'admin' && <th>Actions</th>}
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {getAllMembers.map(collab => (
-                                        <tr key={collab.userId}>
-                                            <td className="user-cell">
-                                                <div className="avatar">
-                                                    {collab.displayName ? collab.displayName[0].toUpperCase() : 'U'}
-                                                </div>
-                                                <div className="user-info">
-                                                    <span className="user-name">
-                                                        {collab.displayName}
-                                                        {collab.isActiveVisitor && <span className="active-indicator" title="Currently active in workspace"></span>}
-                                                    </span>
-                                                    <span className="user-email">{collab.email}</span>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                {workspace.userRole === 'admin' && collab.userId !== workspace.owner && !collab.isActiveVisitor ? (
-                                                    <select
-                                                        value={collab.role}
-                                                        onChange={(e) => handleUpdateCollaboratorRole(collab.userId, e.target.value)}
-                                                        className="role-select"
-                                                    >
-                                                        <option value="admin">Admin</option>
-                                                        <option value="editor">Editor</option>
-                                                        <option value="viewer">Viewer</option>
-                                                    </select>
-                                                ) : (
-                                                    <span className={`role-badge ${collab.role}`}>
-                                                        {collab.role === 'admin' ? 'Admin' : collab.role === 'editor' ? 'Editor' : 'Viewer'}
-                                                    </span>
-                                                )}
-                                            </td>
-                                            <td>{formatDate(collab.joinedAt)}</td>
-                                            {workspace.userRole === 'admin' && (
+                            <div className="members-list">
+                                <div className="section-title">
+                                    <h3>All Members</h3>
+                                </div>
+                                <table className="members-table">
+                                    <thead>
+                                        <tr>
+                                            <th>User</th>
+                                            <th>Role</th>
+                                            <th>Joined</th>
+                                            {workspace.userRole === 'admin' && <th>Actions</th>}
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {getAllMembers.map(collab => (
+                                            <tr key={collab.userId}>
+                                                <td className="user-cell">
+                                                    <div className="avatar">
+                                                        {collab.displayName ? collab.displayName[0].toUpperCase() : 'U'}
+                                                    </div>
+                                                    <div className="user-info">
+                                                        <span className="user-name">
+                                                            {collab.displayName}
+                                                            {collab.isActiveVisitor && <span className="active-indicator" title="Currently active in workspace"></span>}
+                                                        </span>
+                                                        <span className="user-email">{collab.email}</span>
+                                                    </div>
+                                                </td>
                                                 <td>
-                                                    {collab.userId !== workspace.owner ? (
-                                                        <button
-                                                            className="remove-member-btn"
-                                                            onClick={() => handleRemoveCollaborator(collab.userId)}
+                                                    {workspace.userRole === 'admin' && collab.userId !== workspace.owner && !collab.isActiveVisitor ? (
+                                                        <select
+                                                            value={collab.role}
+                                                            onChange={(e) => handleUpdateCollaboratorRole(collab.userId, e.target.value)}
+                                                            className="role-select"
                                                         >
-                                                            Remove
-                                                        </button>
+                                                            <option value="admin">Admin</option>
+                                                            <option value="editor">Editor</option>
+                                                            <option value="viewer">Viewer</option>
+                                                        </select>
                                                     ) : (
-                                                        <span className="owner-label">Owner</span>
+                                                        <span className={`role-badge ${collab.role}`}>
+                                                            {collab.role === 'admin' ? 'Admin' : collab.role === 'editor' ? 'Editor' : 'Viewer'}
+                                                        </span>
                                                     )}
                                                 </td>
-                                            )}
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
+                                                <td>{formatDate(collab.joinedAt)}</td>
+                                                {workspace.userRole === 'admin' && (
+                                                    <td>
+                                                        {collab.userId !== workspace.owner ? (
+                                                            <button
+                                                                className="remove-member-btn"
+                                                                onClick={() => handleRemoveCollaborator(collab.userId)}
+                                                            >
+                                                                Remove
+                                                            </button>
+                                                        ) : (
+                                                            <span className="owner-label">Owner</span>
+                                                        )}
+                                                    </td>
+                                                )}
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 )}
@@ -865,78 +884,80 @@ const WorkspaceDetail = () => {
                             <h2>Merge Requests</h2>
                         </div>
 
-                        {mergeRequests.length === 0 ? (
-                            <div className="empty-state">
-                                <FiGitPullRequest size={32} />
-                                <p>No merge requests yet.</p>
-                            </div>
-                        ) : (
-                            <div className="merge-requests-list">
-                                {mergeRequests.map(request => (
-                                    <div key={request._id} className={`merge-request-card ${request.status}`}>
-                                        <div className="merge-request-header">
-                                            <div className="merge-request-title">
-                                                <FiGitPullRequest className="merge-icon" />
-                                                <h3>
-                                                    {request.title || `Merge from ${request.sourceCollection.name} to ${request.targetCollection.name}`}
-                                                </h3>
+                        <div className="workspace-panel">
+                            {mergeRequests.length === 0 ? (
+                                <div className="empty-state">
+                                    <FiGitPullRequest size={32} />
+                                    <p>No merge requests yet.</p>
+                                </div>
+                            ) : (
+                                <div className="merge-requests-list">
+                                    {mergeRequests.map(request => (
+                                        <div key={request._id} className={`merge-request-card ${request.status}`}>
+                                            <div className="merge-request-header">
+                                                <div className="merge-request-title">
+                                                    <FiGitPullRequest className="merge-icon" />
+                                                    <h3>
+                                                        {request.title || `Merge from ${request.sourceCollection.name} to ${request.targetCollection.name}`}
+                                                    </h3>
+                                                </div>
+                                                <span className={`status-badge ${request.status}`}>
+                                                    {request.status === 'pending' ? 'Pending' :
+                                                        request.status === 'approved' ? 'Approved' : 'Rejected'}
+                                                </span>
                                             </div>
-                                            <span className={`status-badge ${request.status}`}>
-                                                {request.status === 'pending' ? 'Pending' :
-                                                    request.status === 'approved' ? 'Approved' : 'Rejected'}
-                                            </span>
+
+                                            <div className="merge-details">
+                                                <div className="merge-collections">
+                                                    <div className="source">
+                                                        <span className="label">Source</span>
+                                                        <span className="value">{request.sourceCollection.name}</span>
+                                                    </div>
+                                                    <FiGitBranch className="merge-arrow" />
+                                                    <div className="target">
+                                                        <span className="label">Target</span>
+                                                        <span className="value">{request.targetCollection.name}</span>
+                                                    </div>
+                                                </div>
+
+                                                <div className="merge-meta">
+                                                    <span>Created by: {request.createdBy.displayName}</span>
+                                                    <span>Created: {formatDate(request.createdAt)}</span>
+                                                </div>
+
+                                                {request.status === 'pending' && workspace.userRole !== 'viewer' && (
+                                                    <div className="merge-actions">
+                                                        <button
+                                                            className="approve-btn"
+                                                            onClick={() => handleApproveMergeRequest(request._id)}
+                                                        >
+                                                            Approve
+                                                        </button>
+                                                        <button
+                                                            className="reject-btn"
+                                                            onClick={() => handleRejectMergeRequest(request._id)}
+                                                        >
+                                                            Reject
+                                                        </button>
+                                                    </div>
+                                                )}
+
+                                                {request.status !== 'pending' && request.actionBy && (
+                                                    <div className="merge-result">
+                                                        <span>
+                                                            {request.status === 'approved' ? 'Approved' : 'Rejected'} by: {request.actionBy.displayName}
+                                                        </span>
+                                                        <span>
+                                                            {request.status === 'approved' ? 'Approved' : 'Rejected'} on: {formatDate(request.updatedAt)}
+                                                        </span>
+                                                    </div>
+                                                )}
+                                            </div>
                                         </div>
-
-                                        <div className="merge-details">
-                                            <div className="merge-collections">
-                                                <div className="source">
-                                                    <span className="label">Source</span>
-                                                    <span className="value">{request.sourceCollection.name}</span>
-                                                </div>
-                                                <FiGitBranch className="merge-arrow" />
-                                                <div className="target">
-                                                    <span className="label">Target</span>
-                                                    <span className="value">{request.targetCollection.name}</span>
-                                                </div>
-                                            </div>
-
-                                            <div className="merge-meta">
-                                                <span>Created by: {request.createdBy.displayName}</span>
-                                                <span>Created: {formatDate(request.createdAt)}</span>
-                                            </div>
-
-                                            {request.status === 'pending' && workspace.userRole !== 'viewer' && (
-                                                <div className="merge-actions">
-                                                    <button
-                                                        className="approve-btn"
-                                                        onClick={() => handleApproveMergeRequest(request._id)}
-                                                    >
-                                                        Approve
-                                                    </button>
-                                                    <button
-                                                        className="reject-btn"
-                                                        onClick={() => handleRejectMergeRequest(request._id)}
-                                                    >
-                                                        Reject
-                                                    </button>
-                                                </div>
-                                            )}
-
-                                            {request.status !== 'pending' && request.actionBy && (
-                                                <div className="merge-result">
-                                                    <span>
-                                                        {request.status === 'approved' ? 'Approved' : 'Rejected'} by: {request.actionBy.displayName}
-                                                    </span>
-                                                    <span>
-                                                        {request.status === 'approved' ? 'Approved' : 'Rejected'} on: {formatDate(request.updatedAt)}
-                                                    </span>
-                                                </div>
-                                            )}
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        )}
+                                    ))}
+                                </div>
+                            )}
+                        </div>
                     </div>
                 )}
 
@@ -947,37 +968,39 @@ const WorkspaceDetail = () => {
                             <h2>Recent Activity</h2>
                         </div>
 
-                        {activities.length === 0 ? (
-                            <div className="empty-state">
-                                <FiActivity size={32} />
-                                <p>No activity recorded yet.</p>
-                            </div>
-                        ) : (
-                            <div className="activity-timeline">
-                                {activities.map(activity => (
-                                    <div key={activity._id} className="activity-item">
-                                        <div className="activity-icon">
-                                            {getActivityIcon(activity.type)}
-                                        </div>
-                                        <div className="activity-content">
-                                            <div className="activity-header">
-                                                <span className="user">{activity.user.displayName}</span>
-                                                <span className="time">{formatDate(activity.timestamp)}</span>
+                        <div className="workspace-panel">
+                            {activities.length === 0 ? (
+                                <div className="empty-state">
+                                    <FiActivity size={32} />
+                                    <p>No activity recorded yet.</p>
+                                </div>
+                            ) : (
+                                <div className="activity-timeline">
+                                    {activities.map(activity => (
+                                        <div key={activity._id} className="activity-item">
+                                            <div className="activity-icon">
+                                                {getActivityIcon(activity.type)}
                                             </div>
-                                            <p className="activity-message">{activity.message}</p>
-                                            {activity.details && (
-                                                <div className="activity-details">
-                                                    {typeof activity.details === 'string'
-                                                        ? activity.details
-                                                        : JSON.stringify(activity.details)
-                                                    }
+                                            <div className="activity-content">
+                                                <div className="activity-header">
+                                                    <span className="user">{activity.user.displayName}</span>
+                                                    <span className="time">{formatDate(activity.timestamp)}</span>
                                                 </div>
-                                            )}
+                                                <p className="activity-message">{activity.message}</p>
+                                                {activity.details && (
+                                                    <div className="activity-details">
+                                                        {typeof activity.details === 'string'
+                                                            ? activity.details
+                                                            : JSON.stringify(activity.details)
+                                                        }
+                                                    </div>
+                                                )}
+                                            </div>
                                         </div>
-                                    </div>
-                                ))}
-                            </div>
-                        )}
+                                    ))}
+                                </div>
+                            )}
+                        </div>
                     </div>
                 )}
             </div>
@@ -1155,6 +1178,33 @@ const WorkspaceDetail = () => {
                 onClose={() => setShowGlobalVariablesModal(false)}
                 workspaceId={workspace._id}
             />
+
+            {/* Create Collection Modal */}
+            {showCreateCollectionModal && (
+                <div className="modal-overlay" onClick={(e) => {
+                    if (e.target === e.currentTarget) closeCreateCollectionModal();
+                }}>
+                    <div className="modal-content ws-collection-create-modal">
+                        <button
+                            type="button"
+                            className="ws-modal-close"
+                            onClick={closeCreateCollectionModal}
+                            aria-label="Close"
+                        >
+                            <FiX />
+                        </button>
+                        <CollectionCreate
+                            embedded
+                            workspaceId={workspace._id}
+                            onCancel={closeCreateCollectionModal}
+                            onCreated={async () => {
+                                closeCreateCollectionModal();
+                                await fetchCollections(workspace._id || id);
+                            }}
+                        />
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

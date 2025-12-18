@@ -1,8 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import './CollectionsManagement.css'; // Reuse the existing CSS
 
-const CollectionCreate = () => {
+const CollectionCreate = ({
+    workspaceId: workspaceIdProp,
+    embedded = false,
+    onCancel,
+    onCreated
+} = {}) => {
     const navigate = useNavigate();
     const location = useLocation();
     const [loading, setLoading] = useState(false);
@@ -12,7 +17,7 @@ const CollectionCreate = () => {
 
     // Get workspace ID from query params if available
     const queryParams = new URLSearchParams(location.search);
-    const workspaceId = queryParams.get('workspaceId');
+    const workspaceId = workspaceIdProp || queryParams.get('workspaceId');
 
     const handleCreateCollection = async (e) => {
         e.preventDefault();
@@ -52,6 +57,12 @@ const CollectionCreate = () => {
                 const newCollection = await response.json();
                 console.log('Collection created successfully:', newCollection);
 
+                // If embedded (modal/overlay use-case), delegate behavior to caller.
+                if (typeof onCreated === 'function') {
+                    onCreated(newCollection);
+                    return;
+                }
+
                 // Navigate to either the workspace detail or collections list
                 if (workspaceId) {
                     navigate(`/workspace/workspaces/${workspaceId}`);
@@ -79,6 +90,10 @@ const CollectionCreate = () => {
     };
 
     const handleCancel = () => {
+        if (typeof onCancel === 'function') {
+            onCancel();
+            return;
+        }
         // Navigate back to either the workspace detail or collections list
         if (workspaceId) {
             navigate(`/workspace/workspaces/${workspaceId}`);
@@ -88,7 +103,7 @@ const CollectionCreate = () => {
     };
 
     return (
-        <div className="collection-create-page">
+        <div className={`collection-create-page${embedded ? ' embedded' : ''}`}>
             <div className="page-header">
                 <h1>Create New Collection</h1>
                 <p className="subtitle">

@@ -136,10 +136,39 @@ const DocumentationManager = () => {
                                 isNew: true
                             });
                         }
+                    } else if (documentationResponse.status === 404) {
+                        // Documentation doesn't exist yet — this is normal for "Create Documentation".
+                        // Ensure we set an empty structure so the editor renders instead of showing an infinite loader.
+                        console.log('No documentation exists yet (404). Initializing empty documentation.');
+                        setDocumentation({
+                            title: '',
+                            content: '',
+                            collectionId: collectionId,
+                            isNew: true
+                        });
+                    } else {
+                        // For other non-OK statuses, surface an error so we don't get stuck.
+                        const status = documentationResponse.status;
+                        let details = '';
+                        try {
+                            details = await documentationResponse.text();
+                        } catch (e) {
+                            // ignore
+                        }
+                        throw new Error(`Failed to fetch documentation: ${status}${details ? ` - ${details}` : ''}`);
                     }
                 } catch (docError) {
                     console.error('Error fetching documentation, may not exist yet:', docError);
-                    // No need to set error state, documentation might not exist yet
+                    // If we ended up here due to a network error or unexpected failure, ensure the UI can still render.
+                    // Prefer showing the editor with empty content over an infinite loader.
+                    if (!documentation) {
+                        setDocumentation({
+                            title: '',
+                            content: '',
+                            collectionId: collectionId,
+                            isNew: true
+                        });
+                    }
                 }
 
             } catch (err) {

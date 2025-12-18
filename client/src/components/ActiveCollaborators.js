@@ -149,15 +149,20 @@ function ActiveCollaborators({ collectionId, workspaceId }) {
     );
   }
 
-  const maxAvatarsToShow = expanded ? activeUsers.length : 3;
-  const hasMoreUsers = activeUsers.length > maxAvatarsToShow && !expanded;
+  // Dedupe users by stable id to avoid duplicate key warnings
+  const dedupedActiveUsers = Array.from(
+    new Map((activeUsers || []).filter(u => u && u.id).map(u => [u.id, u])).values()
+  );
+
+  const maxAvatarsToShow = expanded ? dedupedActiveUsers.length : 3;
+  const hasMoreUsers = dedupedActiveUsers.length > maxAvatarsToShow && !expanded;
 
   return (
     <div className={`active-collaborators-minimal ${expanded ? 'expanded' : ''}`}>
       {/* Minimal collaborator summary that always shows */}
       <div className="collaborators-summary" onClick={toggleExpanded}>
         <div className="avatar-stack">
-          {activeUsers.slice(0, maxAvatarsToShow).map((user, index) => (
+          {dedupedActiveUsers.slice(0, maxAvatarsToShow).map((user, index) => (
             <div
               key={user.id}
               className="mini-avatar"
@@ -172,7 +177,7 @@ function ActiveCollaborators({ collectionId, workspaceId }) {
           ))}
           {hasMoreUsers && (
             <div className="mini-avatar more">
-              +{activeUsers.length - maxAvatarsToShow}
+              +{dedupedActiveUsers.length - maxAvatarsToShow}
             </div>
           )}
         </div>
@@ -183,11 +188,11 @@ function ActiveCollaborators({ collectionId, workspaceId }) {
         <div className="collaborator-details">
           <div className="collaborator-details-header">
             <FiUsers />
-            <span>{activeUsers.length} Active {activeUsers.length === 1 ? 'User' : 'Users'}</span>
+            <span>{dedupedActiveUsers.length} Active {dedupedActiveUsers.length === 1 ? 'User' : 'Users'}</span>
             <button className="close-button" onClick={toggleExpanded}>×</button>
           </div>
           <div className="collaborator-list">
-            {activeUsers.map((user) => (
+            {dedupedActiveUsers.map((user) => (
               <div key={user.id} className="collaborator-item-minimal">
                 <div
                   className="collaborator-avatar-minimal"

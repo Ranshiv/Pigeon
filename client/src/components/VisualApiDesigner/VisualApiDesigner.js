@@ -194,23 +194,30 @@ const VisualApiDesigner = ({
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [requests, isInitialized]); // Remove addNode from dependencies to prevent re-runs
 
+    const joinCollectionFn = collaborationContext?.joinCollection;
+    const leaveCollectionFn = collaborationContext?.leaveCollection;
+    const sendActivityFn = collaborationContext?.sendActivity;
+
     // Handle collaboration events
     useEffect(() => {
-        if (collaborationContext && collectionId) {
-            // Join collection for real-time collaboration
-            collaborationContext.joinCollection(collectionId);
+        if (!collectionId) return;
+        if (typeof joinCollectionFn !== 'function' || typeof leaveCollectionFn !== 'function') return;
 
-            // Send activity when designer is opened
-            collaborationContext.sendActivity('designer_opened', {
+        // Join collection for real-time collaboration
+        joinCollectionFn(collectionId);
+
+        // Send activity when designer is opened (explicit room avoids timing issues)
+        if (typeof sendActivityFn === 'function') {
+            sendActivityFn('designer_opened', {
                 collectionId,
                 collectionName: collection?.name
-            });
-
-            return () => {
-                collaborationContext.leaveCollection(collectionId);
-            };
+            }, `collection:${collectionId}`);
         }
-    }, [collaborationContext, collectionId, collection?.name]);
+
+        return () => {
+            leaveCollectionFn(collectionId);
+        };
+    }, [collectionId, joinCollectionFn, leaveCollectionFn, sendActivityFn]);
 
     const saveDesign = useCallback(async () => {
         try {

@@ -9,7 +9,21 @@ const Notifications = () => {
   const [userActivities, setUserActivities] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const notificationRef = useRef(null);
+  const recentActivityRef = useRef(new Map());
+  const currentUserIdRef = useRef(null);
   const { socket } = useCollaboration();
+
+  useEffect(() => {
+    try {
+      const userStr = localStorage.getItem('user');
+      if (userStr) {
+        const user = JSON.parse(userStr);
+        currentUserIdRef.current = user?.id || user?._id || null;
+      }
+    } catch {
+      currentUserIdRef.current = null;
+    }
+  }, []);
 
   // Handle clicking outside to close notifications dropdown
   useEffect(() => {
@@ -30,10 +44,25 @@ const Notifications = () => {
     if (!socket) return;
 
     const handleUserActivity = (data) => {
-      console.log('Received user activity:', data);
       if (!data || !data.activity) return;
 
       const { activity, userId, timestamp = new Date().toISOString() } = data;
+
+      // Ignore self-activity (common when a user has multiple tabs/sockets open)
+      if (currentUserIdRef.current && userId === currentUserIdRef.current) return;
+
+      // Basic de-duplication / flood protection
+      let detailsKey = '';
+      try {
+        detailsKey = activity?.details ? JSON.stringify(activity.details) : '';
+      } catch {
+        detailsKey = String(activity?.details);
+      }
+      const signature = `${userId}|${activity?.type}|${detailsKey}`;
+      const now = Date.now();
+      const last = recentActivityRef.current.get(signature) || 0;
+      if (now - last < 1000) return;
+      recentActivityRef.current.set(signature, now);
 
       // Add the new activity to our state
       setUserActivities(prev => {

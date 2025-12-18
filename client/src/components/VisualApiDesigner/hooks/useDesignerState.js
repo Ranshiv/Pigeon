@@ -1,5 +1,30 @@
 import { useState, useCallback } from 'react';
 
+// Lightweight stable hash for generating deterministic IDs from strings
+const hashString = (str = '') => {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+        hash = ((hash << 5) - hash) + str.charCodeAt(i);
+        hash |= 0; // Convert to 32bit integer
+    }
+    // Ensure non-negative and compact
+    return Math.abs(hash).toString(36);
+};
+
+const ensureEdgeId = (edge, fallbackIndex = 0) => {
+    if (!edge) return edge;
+    if (edge.id && typeof edge.id === 'string') return edge;
+
+    // Prefer Mongo subdocument identifiers if present
+    const mongoId = edge._id?.toString?.() || (typeof edge._id === 'string' ? edge._id : null);
+    if (mongoId) {
+        return { ...edge, id: mongoId };
+    }
+
+    const base = `${edge.source || 'unknown'}|${edge.target || 'unknown'}|${edge.type || 'default'}|${edge?.data?.label || ''}|${fallbackIndex}`;
+    return { ...edge, id: `edge-${hashString(base)}` };
+};
+
 const useDesignerState = (initialState = {}) => {
     const [state, setState] = useState({
         nodes: [],
@@ -408,15 +433,41 @@ const useDesignerState = (initialState = {}) => {
         return node;
     }, []);
 
+    // Edge migration function (supports legacy designs that didn't store `id`)
+    const migrateEdgeData = useCallback((edge, index = 0) => {
+        if (!edge) return null;
+
+        // Normalize shape
+        const normalized = {
+            ...edge,
+            source: edge.source,
+            target: edge.target,
+            type: edge.type || 'default',
+            data: edge.data || {}
+        };
+
+        // Drop obviously invalid edges to avoid runtime errors/render glitches
+        if (!normalized.source || !normalized.target) {
+            return null;
+        }
+
+        return ensureEdgeId(normalized, index);
+    }, []);
+
     const loadDesign = useCallback((designData) => {
         setState(prevState => {
             // Migrate nodes to ensure they have proper data structure
             const migratedNodes = (designData.nodes || []).map(migrateNodeData);
 
+            // Migrate edges (important for older saved designs)
+            const migratedEdges = (designData.edges || [])
+                .map((edge, idx) => migrateEdgeData(edge, idx))
+                .filter(Boolean);
+
             const newState = {
                 ...prevState,
                 nodes: migratedNodes,
-                edges: designData.edges || [],
+                edges: migratedEdges,
                 selectedNode: null,
                 selectedEdge: null,
                 isDirty: false
@@ -430,7 +481,7 @@ const useDesignerState = (initialState = {}) => {
 
             return addToHistory(newState, prevState);
         });
-    }, [migrateNodeData]);
+    }, [migrateNodeData, migrateEdgeData]);
 
     const setLoading = useCallback((loading) => {
         setState(prevState => ({

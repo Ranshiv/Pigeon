@@ -318,18 +318,63 @@ router.get('/:id', ensureAuthenticated, async (req, res) => {
 // Get workspace collections
 router.get('/:id/collections', ensureAuthenticated, async (req, res) => {
     try {
-        const workspaceId = req.params.id;
-        const workspaceObjectId = ObjectId.isValid(workspaceId) ? new ObjectId(workspaceId) : null;
+        let workspaceId = req.params.id;
         const userId = req.user.id;
+        const userObjectId = ObjectId.isValid(userId) ? new ObjectId(userId) : null;
         const db = getDb();
+
+        // Support the "my-workspace" alias by resolving it to the user's personal workspace _id.
+        if (workspaceId === 'my-workspace') {
+            const personalWorkspace = await db.collection('workspaces').findOne({
+                isPersonal: true,
+                $or: [
+                    { owner: userId },
+                    ...(userObjectId ? [{ owner: userObjectId }] : [])
+                ]
+            });
+
+            if (personalWorkspace?._id) {
+                workspaceId = personalWorkspace._id.toString();
+            }
+        }
+
+        const workspaceObjectId = ObjectId.isValid(workspaceId) ? new ObjectId(workspaceId) : null;
+
+        // Determine if this is the user's personal workspace. If so, include unassigned collections (workspaceId:null)
+        // owned by the user, since older flows could create collections without a workspaceId.
+        let isPersonalWorkspace = false;
+        if (workspaceObjectId) {
+            try {
+                const wsDoc = await db.collection('workspaces').findOne({ _id: workspaceObjectId });
+                isPersonalWorkspace = !!wsDoc?.isPersonal;
+            } catch (err) {
+                console.log(`Non-fatal: failed to read workspace ${workspaceId} for collections: ${err.message}`);
+            }
+        }
+
+        const ownerOr = [
+            { owner: userId },
+            ...(userObjectId ? [{ owner: userObjectId }] : [])
+        ];
+
+        const collectionOr = [
+            { workspaceId: workspaceId },
+            ...(workspaceObjectId ? [{ workspaceId: workspaceObjectId }] : [])
+        ];
+
+        if (isPersonalWorkspace) {
+            collectionOr.push({
+                $and: [
+                    { workspaceId: null },
+                    { $or: ownerOr }
+                ]
+            });
+        }
 
         // Fetch collections from MongoDB
         const collections = await db.collection('collections')
             .find({
-                $or: [
-                    { workspaceId: workspaceId },
-                    ...(workspaceObjectId ? [{ workspaceId: workspaceObjectId }] : [])
-                ]
+                $or: collectionOr
             })
             .toArray();
 
@@ -451,7 +496,106 @@ router.get('/:id/collections', ensureAuthenticated, async (req, res) => {
 // Get workspace activity
 router.get('/:id/activity', ensureAuthenticated, async (req, res) => {
     try {
-        const workspaceId = req.params.id;
+        let workspaceId = req.params.id;
+        const db = getDb();
+        const userId = req.user.id;
+        const userObjectId = ObjectId.isValid(userId) ? new ObjectId(userId) : null;
+
+        // Support the "my-workspace" alias.
+        if (workspaceId === 'my-workspace') {
+            const personalWorkspace = await db.collection('workspaces').findOne({
+                isPersonal: true,
+                $or: [
+                    { owner: userId },
+                    ...(userObjectId ? [{ owner: userObjectId }] : [])
+                ]
+            });
+
+            if (personalWorkspace?._id) {
+                workspaceId = personalWorkspace._id.toString();
+            }
+        }
+
+        const workspaceObjectId = ObjectId.isValid(workspaceId) ? new ObjectId(workspaceId) : null;
+
+        // 1) Prefer persisted activity logs if present.
+        try {
+            const persisted = await db.collection('workspaceActivity')
+                .find({
+                    $or: [
+                        { workspaceId: workspaceId },
+                        ...(workspaceObjectId ? [{ workspaceId: workspaceObjectId }] : [])
+                    ]
+                })
+                .sort({ timestamp: -1 })
+                .limit(25)
+                .toArray();
+
+            if (persisted && persisted.length > 0) {
+                return res.json(
+                    persisted.map(a => ({
+                        ...a,
+                        _id: a._id?.toString?.() || a._id,
+                        workspaceId: a.workspaceId?.toString?.() || a.workspaceId
+                    }))
+                );
+            }
+        } catch (err) {
+            // Non-fatal: if the collection doesn't exist or query fails, fall back below.
+            console.log(`workspaceActivity lookup failed for workspace ${workspaceId}: ${err.message}`);
+        }
+
+        // 2) Fallback: synthesize activity from recent collections in this workspace.
+        try {
+            const ownerOr = [
+                { owner: userId },
+                ...(userObjectId ? [{ owner: userObjectId }] : [])
+            ];
+
+            const collectionOr = [
+                { workspaceId: workspaceId },
+                ...(workspaceObjectId ? [{ workspaceId: workspaceObjectId }] : [])
+            ];
+
+            if (isPersonalWorkspace) {
+                collectionOr.push({
+                    $and: [
+                        { workspaceId: null },
+                        { $or: ownerOr }
+                    ]
+                });
+            }
+
+            const recentCollections = await db.collection('collections')
+                .find({
+                    $or: collectionOr
+                })
+                .sort({ createdAt: -1 })
+                .limit(10)
+                .toArray();
+
+            if (recentCollections && recentCollections.length > 0) {
+                const synthesized = recentCollections.map((c) => ({
+                    _id: `synth-${c._id.toString()}-created`,
+                    type: 'collection_created',
+                    message: `Created collection '${c.name || 'Untitled'}'`,
+                    user: {
+                        userId: req.user.id,
+                        displayName: req.user.displayName || req.user.name || 'User',
+                        email: req.user.email
+                    },
+                    timestamp: c.createdAt || c.updatedAt || new Date(),
+                    details: {
+                        collectionId: c._id.toString(),
+                        workspaceId: workspaceId
+                    }
+                }));
+
+                return res.json(synthesized);
+            }
+        } catch (err) {
+            console.log(`collections fallback for activity failed for workspace ${workspaceId}: ${err.message}`);
+        }
 
         // Mock activity data based on workspace ID
         let activities = [];

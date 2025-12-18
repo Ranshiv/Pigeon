@@ -17,6 +17,8 @@
     --ws-success-color: var(--success-color, #28a745);
     --ws-warning-color: var(--warning-color, #ffc107);
     --ws-danger-color: var(--danger-color, #dc3545);
+    --ws-disabled-bg: var(--disabled-bg, #f2f2f2);
+    --ws-disabled-text: var(--disabled-text, #a0a0a0);
 }
 
 /* Dark Theme Variables */
@@ -38,10 +40,10 @@ body.dark-theme {
 .workspace-detail-container {
     display: flex;
     flex-direction: column;
-    gap: 28px;
-    max-width: 1200px;
+    gap: 24px;
+    max-width: 1140px;
     margin: 0 auto;
-    padding: 2rem 3rem 4rem;
+    padding: 2rem 2.5rem 4rem;
     background-color: var(--ws-bg-primary);
 }
 
@@ -49,22 +51,31 @@ body.dark-theme {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding-bottom: 20px;
-    border-bottom: 1px solid var(--ws-border-light);
+    padding-bottom: 8px;
 }
 
 .workspace-title-section {
     display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    min-width: 0;
+}
+
+.workspace-title-row {
+    display: flex;
     align-items: center;
-    gap: 16px;
+    gap: 12px;
+    min-width: 0;
 }
 
 .workspace-title-section h1 {
     font-size: 2rem;
-    font-weight: 500;
+    font-weight: 600;
     margin: 0;
     color: var(--ws-text-primary);
     letter-spacing: -0.5px;
+    line-height: 1.2;
 }
 
 .workspace-badge {
@@ -95,7 +106,7 @@ body.dark-theme {
 .workspace-description {
     font-size: 16px;
     color: var(--ws-text-secondary);
-    margin-top: 8px;
+    margin: 0;
     line-height: 1.5;
     max-width: 800px;
 }
@@ -104,6 +115,7 @@ body.dark-theme {
     display: flex;
     align-items: center;
     gap: 12px;
+    flex-wrap: wrap;
 }
 
 .members-indicator {
@@ -111,9 +123,10 @@ body.dark-theme {
     align-items: center;
     gap: 8px;
     padding: 8px 12px;
-    border-radius: 6px;
-    background-color: rgba(40, 167, 69, 0.1);
-    color: var(--ws-success-color);
+    border-radius: 999px;
+    background-color: var(--ws-bg-hover);
+    border: 1px solid var(--ws-border-light);
+    color: var(--ws-text-secondary);
     font-size: 14px;
     font-weight: 500;
 }
@@ -132,14 +145,33 @@ body.dark-theme {
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    color: var(--ws-success-color);
+    color: var(--ws-text-secondary);
     transition: all 0.2s ease;
     margin-left: 4px;
     padding: 0;
 }
 
 .invite-member-btn-small:hover {
-    background-color: rgba(40, 167, 69, 0.2);
+    background-color: var(--ws-bg-surface);
+}
+
+/* Primary pill action (Global Variables) */
+.workspace-global-vars-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    border-radius: 999px;
+    background-color: var(--ws-primary-color);
+    color: var(--button-text, #ffffff);
+    border: 1px solid var(--ws-primary-color);
+    cursor: pointer;
+    font-weight: 600;
+    transition: filter 0.2s ease, transform 0.2s ease;
+}
+
+.workspace-global-vars-btn:hover {
+    filter: brightness(0.95);
 }
 
 .workspace-edit-btn,
@@ -147,74 +179,80 @@ body.dark-theme {
     display: flex;
     align-items: center;
     gap: 6px;
-    padding: 8px 16px;
-    border-radius: 6px;
+    padding: 8px 14px;
+    border-radius: 999px;
     font-weight: 500;
     cursor: pointer;
     transition: all 0.2s ease;
-    border: none;
+    border: 1px solid var(--ws-border-light);
 }
 
 .workspace-edit-btn {
-    background-color: var(--ws-primary-light);
-    color: var(--ws-primary-color);
+    background-color: var(--ws-bg-surface);
+    color: var(--ws-text-primary);
 }
 
 .workspace-delete-btn {
-    background-color: rgba(220, 53, 69, 0.1);
+    background-color: var(--ws-bg-surface);
     color: var(--ws-danger-color);
+    border-color: rgba(220, 53, 69, 0.35);
 }
 
 .workspace-edit-btn:hover {
-    background-color: var(--ws-primary-hover);
-    color: #ffffff;
+    background-color: var(--ws-bg-hover);
+    transform: translateY(-1px);
 }
 
 .workspace-delete-btn:hover {
-    background-color: rgba(220, 53, 69, 0.2);
+    background-color: rgba(220, 53, 69, 0.08);
+    transform: translateY(-1px);
 }
 
 /* Improved tabs */
 .workspace-tabs {
     display: flex;
     border-bottom: 1px solid var(--ws-border-light);
-    margin-bottom: 20px;
-    gap: 8px;
+    margin-bottom: 4px;
+    gap: 24px;
+    padding: 0 2px;
 }
 
 .workspace-tabs .tab {
-    padding: 12px 20px;
+    padding: 10px 2px;
     background: transparent;
     border: none;
-    border-bottom: 3px solid transparent;
+    border-bottom: 2px solid transparent;
     color: var(--ws-text-secondary);
     font-weight: 500;
     cursor: pointer;
     transition: all 0.3s ease;
     font-size: 15px;
-    border-radius: 8px 8px 0 0;
+    border-radius: 0;
 }
 
 .workspace-tabs .tab:hover {
     color: var(--ws-text-primary);
-    background-color: var(--ws-primary-hover);
-    color: #ffffff;
-    border-bottom-color: var(--ws-primary-color);
-    transform: translateY(-2px);
 }
 
 .workspace-tabs .tab.active {
-    color: #ffffff;
-    background-color: var(--ws-primary-color);
+    color: var(--ws-primary-color);
     border-bottom-color: var(--ws-primary-color);
     font-weight: 600;
-    box-shadow: 0 2px 8px rgba(1, 76, 117, 0.3);
 }
 
 /* Tab content */
 .workspace-content {
     flex: 1;
     position: relative;
+}
+
+/* Unified surface panel (used inside each tab) */
+.workspace-panel {
+    background-color: var(--ws-bg-surface);
+    border: 1px solid var(--ws-border-light);
+    border-radius: var(--border-radius, 8px);
+    box-shadow: var(--ws-shadow);
+    padding: 18px;
 }
 
 .tab-header {
@@ -308,12 +346,12 @@ body.dark-theme .collection-meta {
 }
 
 body.dark-theme .view-collection-btn {
-    border-color: #0EA5E9;
-    color: #0EA5E9;
+    border-color: var(--ws-primary-color);
+    color: var(--ws-primary-color);
 }
 
 body.dark-theme .view-collection-btn:hover {
-    background-color: #0EA5E9;
+    background-color: var(--ws-primary-color);
     color: #ffffff;
 }
 
@@ -325,8 +363,8 @@ body.dark-theme .view-collection-btn:hover {
     background-color: var(--ws-primary-color);
     color: white;
     border: none;
-    padding: 8px 16px;
-    border-radius: 4px;
+    padding: 8px 14px;
+    border-radius: 999px;
     cursor: pointer;
     font-weight: 500;
     transition: all 0.2s ease;
@@ -340,9 +378,10 @@ body.dark-theme .view-collection-btn:hover {
 /* Empty states */
 .empty-state {
     text-align: center;
-    padding: 40px 20px;
-    border-radius: 8px;
-    background-color: var(--ws-bg-hover);
+    padding: 64px 20px;
+    border-radius: var(--border-radius, 8px);
+    background-color: var(--ws-bg-primary);
+    border: 1px dashed var(--ws-border-light);
     color: var(--ws-text-secondary);
     display: flex;
     flex-direction: column;
@@ -350,12 +389,19 @@ body.dark-theme .view-collection-btn:hover {
     gap: 16px;
 }
 
+.empty-state-subtext {
+    max-width: 680px;
+    color: var(--ws-text-tertiary);
+    line-height: 1.6;
+    margin: 0;
+}
+
 .empty-state .primary-btn {
     background-color: var(--ws-primary-color);
-    color: white;
-    padding: 10px 20px;
+    color: var(--button-text, #ffffff);
+    padding: 10px 18px;
     border: none;
-    border-radius: 4px;
+    border-radius: 999px;
     font-weight: 500;
     cursor: pointer;
     transition: all 0.2s ease;
@@ -622,7 +668,7 @@ body.dark-theme .view-collection-btn:hover {
 }
 
 .approve-btn:hover {
-    background-color: #218838;
+    filter: brightness(0.95);
 }
 
 .reject-btn {
@@ -729,6 +775,46 @@ body.dark-theme .view-collection-btn:hover {
     box-shadow: 0 10px 25px rgba(1, 76, 117, 0.2);
 }
 
+/* Create Collection modal overrides */
+.ws-collection-create-modal {
+    position: relative;
+    max-width: 560px;
+    width: min(560px, 92vw);
+    padding: 18px;
+}
+
+.ws-collection-create-modal .collection-create-page.embedded {
+    padding: 0;
+    max-width: 100%;
+    margin: 0;
+}
+
+.ws-collection-create-modal .create-collection-form-container {
+    padding: 16px;
+}
+
+.ws-modal-close {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 36px;
+    height: 36px;
+    border-radius: 999px;
+    border: 1px solid var(--ws-border-light);
+    background-color: var(--ws-bg-surface);
+    color: var(--ws-text-secondary);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.ws-modal-close:hover {
+    background-color: var(--ws-bg-hover);
+    transform: translateY(-1px);
+}
+
 .modal-content h2 {
     margin-top: 0;
     margin-bottom: 20px;
@@ -824,7 +910,8 @@ body.dark-theme .view-collection-btn:hover {
 }
 
 .invite-btn:disabled {
-    background-color: #cccccc;
+    background-color: var(--ws-disabled-bg);
+    color: var(--ws-disabled-text);
     cursor: not-allowed;
 }
 
@@ -878,8 +965,8 @@ body.dark-theme .view-collection-btn:hover {
 .workspace-dashboard {
     display: flex;
     flex-direction: column;
-    gap: 24px;
-    margin-bottom: 32px;
+    gap: 16px;
+    margin-bottom: 12px;
 }
 
 .dashboard-stats {
@@ -890,13 +977,15 @@ body.dark-theme .view-collection-btn:hover {
 
 .stat-card {
     display: flex;
-    align-items: center;
-    gap: 16px;
-    padding: 20px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 18px;
     background-color: var(--ws-bg-surface);
-    border-radius: 8px;
+    border-radius: var(--border-radius, 8px);
     box-shadow: var(--ws-shadow);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
+    border: 1px solid var(--ws-border-light);
 }
 
 .stat-card:hover {
@@ -905,13 +994,13 @@ body.dark-theme .view-collection-btn:hover {
 }
 
 .stat-icon {
-    width: 48px;
-    height: 48px;
-    border-radius: 12px;
+    width: 40px;
+    height: 40px;
+    border-radius: var(--border-radius, 8px);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 20px;
+    font-size: 18px;
 }
 
 .stat-icon.collections {
@@ -930,8 +1019,8 @@ body.dark-theme .view-collection-btn:hover {
 }
 
 .stat-icon.activity {
-    background-color: rgba(156, 39, 176, 0.1);
-    color: #9c27b0;
+    background-color: rgba(108, 117, 125, 0.12);
+    color: var(--ws-text-secondary);
 }
 
 .stat-info {
@@ -940,8 +1029,8 @@ body.dark-theme .view-collection-btn:hover {
 }
 
 .stat-value {
-    font-size: 24px;
-    font-weight: 600;
+    font-size: 28px;
+    font-weight: 700;
     color: var(--ws-text-primary);
 }
 
@@ -1085,14 +1174,13 @@ body.dark-theme .view-collection-btn:hover {
     .workspace-tabs {
         overflow-x: auto;
         padding-bottom: 6px;
-        gap: 0;
+        gap: 16px;
         white-space: nowrap;
-        /* scrollbar-width: thin; */
         justify-content: flex-start;
     }
 
     .workspace-tabs .tab {
-        padding: 12px 16px;
+        padding: 10px 2px;
     }
 
     .merge-collections,

@@ -396,11 +396,33 @@ router.post('/', ensureAuthenticated, async (req, res) => {
         // Validate input
         if (!name) {
             return res.status(400).json({ message: 'Collection name is required' });
-        }        // Create a new collection document for MongoDB
+        }
+
+        // If workspaceId is not provided, default to the user's personal workspace.
+        // This keeps the UX consistent: collections are part of a workspace by default.
+        let resolvedWorkspaceId = workspaceObjectId || workspaceId || null;
+        if (!resolvedWorkspaceId) {
+            try {
+                const personalWorkspace = await db.collection('workspaces').findOne({
+                    isPersonal: true,
+                    $or: [
+                        { owner: userId },
+                        ...(userObjectId ? [{ owner: userObjectId }] : [])
+                    ]
+                });
+                if (personalWorkspace?._id) {
+                    resolvedWorkspaceId = personalWorkspace._id;
+                }
+            } catch (err) {
+                console.log('Non-fatal: failed to resolve personal workspace for collection:', err.message);
+            }
+        }
+
+        // Create a new collection document for MongoDB
         const newCollection = {
             name,
             description: description || "",
-            workspaceId: workspaceObjectId || workspaceId || null,
+            workspaceId: resolvedWorkspaceId,
             requests: Array.isArray(requests) ? requests : [],
             owner: userObjectId || userId,  // Store as ObjectId for MongoDB
             isPublic: isPublic || false,
@@ -411,8 +433,37 @@ router.post('/', ensureAuthenticated, async (req, res) => {
 
         // Store in MongoDB
         const result = await db.collection('collections').insertOne(newCollection);
-        const collectionId = result.insertedId.toString();        // Also update in-memory store for backward compatibility
-        const workspaceKey = workspaceObjectId ? workspaceObjectId.toString() : workspaceId;
+        const collectionId = result.insertedId.toString();
+
+        // Workspace key (string) used by the client and the in-memory store
+        const workspaceKey = resolvedWorkspaceId?.toString?.() || resolvedWorkspaceId || null;
+
+        // Persist workspace activity when the collection is associated with a workspace.
+        try {
+            if (resolvedWorkspaceId) {
+                await db.collection('workspaceActivity').insertOne({
+                    workspaceId: resolvedWorkspaceId,
+                    type: 'collection_created',
+                    message: `Created collection '${name}'`,
+                    user: {
+                        userId: req.user.id,
+                        displayName: req.user.displayName || req.user.name || 'User',
+                        email: req.user.email || 'user@example.com'
+                    },
+                    timestamp: new Date(),
+                    details: {
+                        collectionId,
+                        name,
+                        workspaceId: workspaceKey
+                    }
+                });
+            }
+        } catch (activityErr) {
+            // Activity logging should never block collection creation.
+            console.log('Non-fatal: failed to write workspaceActivity:', activityErr.message);
+        }
+
+        // Also update in-memory store for backward compatibility
 
         if (workspaceKey) {
             if (!collectionsStore[workspaceKey]) {
