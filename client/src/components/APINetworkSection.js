@@ -7,7 +7,7 @@ import AIAgentToolsSection from './AIAgentToolsSection';
 import RequestWorkspace from './RequestWorkspace';
 import RequestForm from './RequestForm';
 import ResponseDisplay from './ResponseDisplay';
-import APINetworkExplore from './APINetworkExplore';
+import ExplorePage from './marketplace/ExplorePage';
 import './APINetworkSection.css';
 
 const APINetworkSection = () => {
@@ -166,7 +166,7 @@ const APINetworkSection = () => {
             <div className="api-network-main-content">
                 <Routes>
                     <Route index element={<Navigate to="explore" />} />
-                    <Route path="explore" element={<APINetworkExplore />} />
+                    <Route path="explore" element={<ExplorePage />} />
                     <Route path="spotlight" element={<SpotlightSection />} />
                     <Route path="trending" element={<TrendingSection />} />
                     <Route path="ai-agent-tools" element={<AIAgentToolsSection />} />

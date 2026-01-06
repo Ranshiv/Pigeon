@@ -5,6 +5,9 @@ const { ObjectId } = require('mongodb');
 const { ensureAuthenticated, authenticateJWT } = require('../middleware/auth');
 const { getDb } = require('../config/db');
 
+// Compliance audit logging (who changed what)
+const AuditLogger = require('../features/compliance/AuditLogger');
+
 // In-memory store for backward compatibility
 const workspacesStore = {};
 
@@ -762,6 +765,21 @@ router.delete('/:id/collaborators/:userId', ensureAuthenticated, async (req, res
         const workspaceId = req.params.id;
         const collaboratorId = req.params.userId;
 
+        // Best-effort audit log (this route is currently a stub)
+        try {
+            await AuditLogger.log({
+                req,
+                actorId: req.user.id,
+                workspaceId,
+                action: 'workspace.collaborator.remove',
+                targetType: 'workspace',
+                targetId: workspaceId,
+                metadata: { collaboratorId }
+            });
+        } catch (e) {
+            console.warn('Audit log failed (workspace collaborator remove):', e.message);
+        }
+
         // Return success response
         res.json({
             message: 'Collaborator removed successfully',
@@ -811,6 +829,25 @@ router.post('/', ensureAuthenticated, async (req, res) => {
         // Store the workspace in MongoDB
         const result = await db.collection('workspaces').insertOne(newWorkspace);
         const workspaceId = result.insertedId.toString();
+
+        // Audit log: workspace created
+        try {
+            await AuditLogger.log({
+                req,
+                actorId: req.user.id,
+                workspaceId,
+                action: 'workspace.create',
+                targetType: 'workspace',
+                targetId: workspaceId,
+                metadata: {
+                    name: newWorkspace.name,
+                    isPersonal: newWorkspace.isPersonal,
+                    isPublic: newWorkspace.isPublic
+                }
+            });
+        } catch (e) {
+            console.warn('Audit log failed (workspace create):', e.message);
+        }
 
         // Also update our in-memory store
         workspacesStore[workspaceId] = {
@@ -914,6 +951,27 @@ router.put('/:id', ensureAuthenticated, async (req, res) => {
             updatedAt: new Date()
         };
 
+        // Audit log: workspace updated
+        try {
+            await AuditLogger.log({
+                req,
+                actorId: req.user.id,
+                workspaceId: actualWorkspaceId,
+                action: 'workspace.update',
+                targetType: 'workspace',
+                targetId: actualWorkspaceId,
+                metadata: {
+                    fields: {
+                        name,
+                        description,
+                        isPublic
+                    }
+                }
+            });
+        } catch (e) {
+            console.warn('Audit log failed (workspace update):', e.message);
+        }
+
         res.json(updatedWorkspace);
     } catch (err) {
         console.error("Error updating workspace:", err);
@@ -942,6 +1000,21 @@ router.delete('/:id', ensureAuthenticated, async (req, res) => {
 
         if (workspace) {
             await db.collection('workspaces').deleteOne({ _id: new ObjectId(workspaceId) });
+        }
+
+        // Audit log: workspace deleted
+        try {
+            await AuditLogger.log({
+                req,
+                actorId: req.user.id,
+                workspaceId,
+                action: 'workspace.delete',
+                targetType: 'workspace',
+                targetId: workspaceId,
+                metadata: { isPersonal: workspace?.isPersonal || false }
+            });
+        } catch (e) {
+            console.warn('Audit log failed (workspace delete):', e.message);
         }
 
         // Also remove from in-memory store if it exists

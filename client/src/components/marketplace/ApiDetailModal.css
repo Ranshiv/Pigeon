@@ -1,0 +1,831 @@
+/* ApiDetailModal.css */
+/* ... Previous Styles ... */
+/* Retaining all previously written styles with !important, and appending new specific styles for the endpoint redesign */
+
+/* ... (Keep existing styles from previous steps) ... */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.4) !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 20px;
+    backdrop-filter: blur(8px);
+    animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.api-detail-modal {
+    background-color: var(--card-bg) !important;
+    border-radius: 16px;
+    width: 100%;
+    max-width: 1100px;
+    height: 85vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
+    border: 1px solid var(--border-color) !important;
+    overflow: hidden;
+    animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Modal Header Styles (Preserved) */
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 32px;
+    background-color: var(--card-bg) !important;
+    border-bottom: 1px solid var(--border-color) !important;
+    z-index: 10;
+    gap: 24px;
+}
+
+/* ... (Rest of header styles are assumed to be safe, I'm appending endpoints below) ... */
+
+/* === NEW ENDPOINTS TAB STYLES === */
+.endpoints-tab {
+    max-width: 900px;
+    margin: 0 auto;
+    padding-bottom: 40px;
+}
+
+.endpoints-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.endpoints-header-row h3 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-color) !important;
+    margin: 0;
+}
+
+.endpoint-count {
+    font-size: 0.9rem;
+    color: var(--text-secondary) !important;
+    font-weight: 500;
+    background-color: var(--background-color) !important;
+    padding: 4px 12px;
+    border-radius: 100px;
+    border: 1px solid var(--border-color) !important;
+}
+
+.endpoints-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* Modern Endpoint Card */
+.endpoint-card-modern {
+    background-color: var(--card-bg) !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: 12px;
+    overflow: hidden;
+    transition: all 0.2s ease;
+    box-shadow: var(--shadow-sm) !important;
+}
+
+.endpoint-card-modern:hover {
+    box-shadow: var(--shadow-md) !important;
+    border-color: var(--primary-color) !important;
+    /* Slight highlight on hover */
+}
+
+/* Card Header Row */
+.endpoint-primary-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px;
+    background-color: var(--card-bg) !important;
+    gap: 16px;
+}
+
+.endpoint-info-group {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex: 1;
+    min-width: 0;
+    /* Text truncation handling */
+}
+
+/* Method Badge */
+.method-badge-large {
+    padding: 6px 14px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    min-width: 80px;
+    text-align: center;
+}
+
+.method-get {
+    background: rgba(97, 175, 254, 0.1) !important;
+    color: var(--method-get) !important;
+    border: 1px solid rgba(97, 175, 254, 0.2) !important;
+}
+
+.method-post {
+    background: rgba(73, 204, 144, 0.1) !important;
+    color: var(--method-post) !important;
+    border: 1px solid rgba(73, 204, 144, 0.2) !important;
+}
+
+.method-put {
+    background: rgba(252, 161, 48, 0.1) !important;
+    color: var(--method-put) !important;
+    border: 1px solid rgba(252, 161, 48, 0.2) !important;
+}
+
+.method-delete {
+    background: rgba(249, 62, 62, 0.1) !important;
+    color: var(--method-delete) !important;
+    border: 1px solid rgba(249, 62, 62, 0.2) !important;
+}
+
+.method-patch {
+    background: rgba(80, 227, 194, 0.1) !important;
+    color: var(--method-patch) !important;
+    border: 1px solid rgba(80, 227, 194, 0.2) !important;
+}
+
+/* Path Container */
+.path-container {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+}
+
+.endpoint-path-large {
+    font-family: 'Roboto Mono', monospace;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-color) !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.endpoint-summary {
+    font-size: 0.9rem;
+    color: var(--text-secondary) !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Try Button */
+.btn-try-modern {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    background-color: var(--primary-color) !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 4px 6px -1px rgba(1, 76, 117, 0.2) !important;
+}
+
+.btn-try-modern:hover {
+    background-color: var(--primary-hover) !important;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 8px -1px rgba(1, 76, 117, 0.3) !important;
+}
+
+/* Details Section (Parameters & Body) */
+.endpoint-details-modern {
+    padding: 0 24px 24px 24px;
+    border-top: 1px solid var(--border-color) !important;
+    background-color: var(--background-color) !important;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    animation: fadeIn 0.3s ease;
+}
+
+.params-section-modern,
+.body-section-modern {
+    margin-top: 20px;
+}
+
+.params-section-modern h4,
+.body-section-modern h4 {
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    color: var(--text-secondary) !important;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    margin-bottom: 12px;
+}
+
+/* Parameters Table */
+.params-table {
+    border: 1px solid var(--border-color) !important;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.params-header {
+    display: grid;
+    grid-template-columns: 2fr 1fr 3fr;
+    padding: 10px 16px;
+    background-color: var(--card-bg) !important;
+    border-bottom: 1px solid var(--border-color) !important;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-muted) !important;
+}
+
+.params-row-modern {
+    display: grid;
+    grid-template-columns: 2fr 1fr 3fr;
+    padding: 12px 16px;
+    background-color: var(--background-color) !important;
+    border-bottom: 1px solid var(--border-color) !important;
+    align-items: center;
+    font-size: 0.9rem;
+}
+
+.params-row-modern:last-child {
+    border-bottom: none !important;
+}
+
+.param-cell-name {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.param-name-code {
+    font-family: 'Roboto Mono', monospace;
+    font-weight: 600;
+    color: var(--text-color) !important;
+}
+
+.req-dot {
+    color: var(--danger-color) !important;
+    font-size: 1.2rem;
+    line-height: 0;
+}
+
+.type-badge {
+    background-color: var(--card-bg) !important;
+    border: 1px solid var(--border-color) !important;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    color: var(--text-secondary) !important;
+    font-family: 'Roboto Mono', monospace;
+}
+
+.param-cell-desc {
+    color: var(--text-secondary) !important;
+    line-height: 1.4;
+}
+
+/* Body Snippet */
+.body-snippet pre {
+    margin: 0;
+    padding: 16px;
+    background-color: #0d1117 !important;
+    border-radius: 8px;
+    color: #e6edf3 !important;
+    font-family: 'Roboto Mono', monospace;
+    font-size: 0.85rem;
+    overflow-x: auto;
+    border: 1px solid var(--border-color) !important;
+}
+
+/* Legacy Header parts not already overridden in previous files */
+.header-main-content {
+    display: flex;
+    gap: 24px;
+    flex: 1;
+    align-items: center;
+}
+
+.header-details {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+/* Re-declaring critical header styles to ensure file completeness if replace overwrote too much, 
+   though previous tool call was a full file write, this one is overwrite. 
+   I will include the full content to be safe and ensure consistency.
+*/
+.api-icon-large {
+    width: 80px;
+    height: 80px;
+    min-width: 80px;
+    border-radius: 20px;
+    overflow: hidden;
+    background-color: var(--background-color) !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--border-color) !important;
+    box-shadow: var(--shadow-sm) !important;
+}
+
+.api-icon-large img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.api-icon-placeholder-large {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--primary-color) !important;
+}
+
+.title-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.title-row h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text-color) !important;
+    margin: 0;
+    letter-spacing: -0.03em;
+    line-height: 1;
+}
+
+.badges-wrapper {
+    display: flex;
+    gap: 8px;
+}
+
+.badge {
+    padding: 4px 10px;
+    border-radius: 100px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    line-height: 1;
+}
+
+.badge-featured {
+    background-color: rgba(255, 193, 7, 0.15) !important;
+    color: #d97706 !important;
+    border: 1px solid rgba(255, 193, 7, 0.3) !important;
+}
+
+.badge-trending {
+    background-color: rgba(1, 76, 117, 0.1) !important;
+    color: var(--primary-color) !important;
+    border: 1px solid rgba(1, 76, 117, 0.2) !important;
+}
+
+.meta-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    font-size: 0.95rem;
+    color: var(--text-secondary) !important;
+}
+
+.provider-info strong {
+    color: var(--text-color) !important;
+    font-weight: 600;
+}
+
+.dot-divider {
+    color: var(--border-color) !important;
+}
+
+.meta-stats {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.stat-pill {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    background-color: var(--background-color) !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--text-color) !important;
+}
+
+.category-pill {
+    background-color: var(--primary-light) !important;
+    color: var(--primary-color) !important;
+    border-color: transparent !important;
+}
+
+.close-btn {
+    background-color: var(--background-color) !important;
+    border: 1px solid var(--border-color) !important;
+    color: var(--text-muted) !important;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.close-btn:hover {
+    background-color: var(--hover-bg) !important;
+    color: var(--text-color) !important;
+    transform: rotate(90deg);
+}
+
+.modal-tabs {
+    display: flex;
+    justify-content: center;
+    /* Center the tabs for better balance */
+    padding: 16px 32px;
+    background-color: var(--card-bg) !important;
+    border-bottom: 1px solid var(--border-color) !important;
+}
+
+.tabs-wrapper {
+    display: flex;
+    gap: 4px;
+    background-color: var(--background-color) !important;
+    padding: 6px;
+    border-radius: 14px;
+    border: 1px solid var(--border-color) !important;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.03) !important;
+}
+
+.tab-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 24px;
+    border: none !important;
+    background: transparent !important;
+    color: var(--text-secondary) !important;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    border-radius: 10px;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    white-space: nowrap;
+}
+
+.tab-btn:hover:not(.active) {
+    color: var(--text-color) !important;
+    background-color: var(--hover-bg) !important;
+}
+
+.tab-btn.active {
+    background-color: var(--primary-color) !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 12px rgba(1, 76, 117, 0.25) !important;
+    transform: scale(1.02);
+}
+
+.tab-btn svg {
+    transition: transform 0.2s ease;
+}
+
+.tab-btn.active svg {
+    transform: scale(1.1);
+}
+
+.modal-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 32px;
+    background-color: var(--background-color) !important;
+}
+
+.overview-tab {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 24px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.overview-main {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.overview-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.overview-card {
+    background-color: var(--card-bg) !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: var(--shadow) !important;
+}
+
+.overview-card h3 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-color) !important;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.description-card p {
+    color: var(--text-color) !important;
+    /* Brighter for readability */
+    line-height: 1.6;
+    font-size: 0.95rem;
+    opacity: 0.9;
+}
+
+.doc-section {
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border-color) !important;
+}
+
+.doc-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--primary-color) !important;
+    font-weight: 500;
+    font-size: 0.95rem;
+}
+
+.doc-link:hover {
+    gap: 12px;
+    text-decoration: underline;
+}
+
+.info-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.info-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.9rem;
+}
+
+.info-label {
+    color: var(--text-secondary) !important;
+    /* Increased contrast from text-muted */
+    font-weight: 600;
+    /* Slightly bolder for better definition */
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.info-text {
+    color: var(--text-color) !important;
+    font-weight: 500;
+}
+
+.separator {
+    height: 1px;
+    background-color: var(--border-color) !important;
+    margin: 4px 0;
+}
+
+.url-copy-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    max-width: 60%;
+}
+
+.url-copy-row code {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    background-color: var(--background-color) !important;
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    color: var(--text-color) !important;
+    /* Brighter */
+    border: 1px solid var(--border-color) !important;
+    font-family: 'Roboto Mono', monospace;
+}
+
+.icon-btn-small {
+    background: none !important;
+    border: none !important;
+    color: var(--text-muted) !important;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    display: flex;
+}
+
+.icon-btn-small:hover {
+    background-color: var(--hover-bg) !important;
+    color: var(--primary-color) !important;
+}
+
+.info-badge-outline {
+    padding: 4px 10px;
+    border-radius: 6px;
+    border: 1px solid currentColor !important;
+    font-size: 0.75rem;
+    font-weight: 600;
+    background-color: transparent !important;
+}
+
+.rating-row {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    color: var(--text-color) !important;
+    font-weight: 600;
+}
+
+.rating-count {
+    color: var(--text-secondary) !important;
+    font-weight: 400;
+    font-size: 0.8rem;
+}
+
+.tags-cloud {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.tag-pill-modern {
+    padding: 6px 12px;
+    background-color: var(--background-color) !important;
+    color: var(--text-secondary) !important;
+    border-radius: 100px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    border: 1px solid var(--border-color) !important;
+    transition: all 0.2s;
+}
+
+.tag-pill-modern:hover {
+    border-color: var(--primary-color) !important;
+    color: var(--primary-color) !important;
+    background-color: var(--primary-light) !important;
+}
+
+.endpoints-preview-card .card-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.endpoints-preview-card h3 {
+    margin-bottom: 0;
+}
+
+.view-all-btn {
+    background: none !important;
+    border: none !important;
+    color: var(--primary-color) !important;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.view-all-btn:hover {
+    text-decoration: underline;
+}
+
+.mini-endpoints-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.mini-endpoint-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 12px;
+    background-color: var(--background-color) !important;
+    border-radius: 8px;
+    border: 1px solid transparent !important;
+}
+
+.mini-endpoint-item:hover {
+    border-color: var(--border-color) !important;
+}
+
+.mini-path {
+    font-family: 'Roboto Mono', monospace;
+    font-size: 0.85rem;
+    color: var(--text-color) !important;
+    font-weight: 500;
+    /* Ensure it's not too thin */
+}
+
+.method-badge-mini {
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 4px;
+    min-width: 45px;
+    text-align: center;
+    text-transform: uppercase;
+}
+
+.tryit-tab {
+    max-width: 1200px;
+    height: 100%;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+}
+
+@media (max-width: 900px) {
+    .overview-tab {
+        grid-template-columns: 1fr;
+    }
+
+    .api-detail-modal {
+        height: 100%;
+        max-height: 100vh;
+        border-radius: 0;
+    }
+
+    .header-main-content {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+    }
+
+    .modal-header {
+        flex-direction: column;
+    }
+
+    .close-btn {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+    }
+}

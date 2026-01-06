@@ -40,8 +40,14 @@ const analyticsRoutes = require('./analytics');
 // Import GraphQL routes
 const graphqlRoutes = require('./graphql');
 
+// Import Compliance routes
+const complianceRoutes = require('./compliance');
+
 // Import Multi-Protocol routes
 const protocolsRoutes = require('./protocols');
+
+// Import API Marketplace routes
+const apiMarketplaceRoutes = require('./apiMarketplace');
 
 // Register routes with their base paths
 router.use('/auth', authRoutes);
@@ -81,7 +87,13 @@ router.use('/analytics', analyticsRoutes);
 // Register GraphQL routes
 router.use('/graphql', graphqlRoutes);
 
+// Register Compliance routes
+router.use('/compliance', complianceRoutes);
+
 // Register Multi-Protocol routes (WebSocket, gRPC, SOAP, MQTT, SSE)
 router.use('/protocols', protocolsRoutes);
+
+// Register API Marketplace routes
+router.use('/marketplace', apiMarketplaceRoutes);
 
 module.exports = router;

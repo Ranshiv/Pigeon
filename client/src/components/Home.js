@@ -400,11 +400,11 @@ const Home = () => {
                             <p>Learn how to use all features of Pigeon</p>
                         </div>
                     </a>
-                    <a href="../api-network/explore" className="quick-link">
+                    <a href="/workspace/api-network/explore" className="quick-link">
                         <FiSearch className="quick-link-icon" />
                         <div className="quick-link-content">
-                            <h3>Explore APIs</h3>
-                            <p>Discover trending and popular APIs</p>
+                            <h3>Explore Public APIs</h3>
+                            <p>Discover and test popular public APIs</p>
                         </div>
                     </a>
                     <a href="https://github.com/your-org/pigeon" target="_blank" rel="noopener noreferrer" className="quick-link">

@@ -1,7 +1,6 @@
 //client/src/components/WorkspacesSection.js
 import React, { useState, useEffect } from 'react';
 import { Routes, Route, useNavigate, useParams, Navigate, useLocation } from 'react-router-dom';
-import APINetworkExplore from './APINetworkExplore';
 import SpotlightSection from './SpotlightSection';
 import TrendingSection from './TrendingSection';
 import AIAgentToolsSection from './AIAgentToolsSection';
@@ -465,8 +464,8 @@ const WorkspacesSection = ({ requests, response, onSend, onCreate, onUpdate, onD
                 {/* Collections Management Route */}
                 <Route path="collections/*" element={<CollectionsManagement />} />
 
-                {/* Updated Routes - Using APINetworkExplore instead of ExploreSection */}
-                <Route path="explore" element={<APINetworkExplore requests={requests} onSend={onSend} onDelete={onDelete} onSelect={(request) => navigate(`requests/${request._id}`)} onEdit={(request) => navigate(`requests/edit/${request._id}`)} />} />
+                {/* Explore redirects to the new marketplace explore page */}
+                <Route path="explore" element={<Navigate to="/workspace/api-network/explore" replace />} />
                 <Route path="spotlight" element={<SpotlightSection />} />
                 <Route path="trending" element={<TrendingSection />} />
                 <Route path="ai-agent-tools" element={<AIAgentToolsSection />} />

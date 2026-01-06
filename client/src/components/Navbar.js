@@ -20,6 +20,7 @@ import {
     FiCheck,
     FiChevronRight,
     FiBarChart2,
+    FiShield,
     FiBook,  // Add FiBook icon for documentation
     FiLink   // Add FiLink icon for protocols
 } from 'react-icons/fi';
@@ -406,7 +407,7 @@ const Navbar = ({ isAuthenticated }) => {
                                     {showApiDropdown && (
                                         <div className="navbar-dropdown">
                                             <div className="dropdown-item" onClick={() => handleNavigation('/workspace/api-network/explore')}>
-                                                <FiGlobe size={16} style={{ marginRight: '10px' }} /> Explore
+                                                <FiGlobe size={16} style={{ marginRight: '10px' }} /> Explore Public APIs
                                             </div>
                                             <div className="dropdown-item" onClick={() => handleNavigation('/workspace/api-network/spotlight')}>
                                                 <FiBell size={16} style={{ marginRight: '10px' }} /> Spotlight
@@ -439,6 +440,12 @@ const Navbar = ({ isAuthenticated }) => {
                                 <div className="navbar-item" onClick={() => handleNavigation('/workspace/monitoring')}>
                                     <span className={isActive('/workspace/monitoring') ? 'active' : ''}>
                                         <FiTrendingUp size={18} /> Monitoring
+                                    </span>
+                                </div>
+
+                                <div className="navbar-item" onClick={() => handleNavigation('/workspace/compliance')}>
+                                    <span className={isActive('/workspace/compliance') ? 'active' : ''}>
+                                        <FiShield size={18} /> Compliance
                                     </span>
                                 </div>
 

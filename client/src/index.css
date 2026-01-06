@@ -1,5 +1,5 @@
 /* Base CSS reset and global styles */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto+Mono:wght@400;500;600&display=swap');
 
 /* CSS Reset */
 *,
@@ -182,12 +182,16 @@ body {
 /* Dark theme variables - 2025 Blue Palette */
 body.dark-theme {
   --background-color: #00111A;
-  --text-color: #e0e0e0;
-  --text-secondary: #d0d0d0;
+  --text-color: #f8fafc;
+  /* Brightened for better visibility */
+  --text-secondary: #cbd5e1;
+  /* Clearer secondary text */
+  --text-muted: #94a3b8;
+  /* Explicitly defined for dark theme */
   --border-color: #003956;
   --card-bg: #002234;
   --card-background: #002234;
-  --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
   --hover-bg: #013B5B;
   --hover-background: #013B5B;
   --node-bg: #003d59;
@@ -196,20 +200,21 @@ body.dark-theme {
   --navbar-bg: #012A41;
   --navbar-background: #012A41;
   --navbar-text: #ffffff;
-  --navbar-border: rgba(1, 76, 117, 0.2);
+  --navbar-border: rgba(255, 255, 255, 0.1);
   --panel-bg: #002234;
   --sidebar-bg: #001927;
   --sidebar-background: #001927;
-  --sidebar-text: #e0e0e0;
+  --sidebar-text: #f1f5f9;
   --button-background: #014C75;
   --button-text: #ffffff;
-  --primary-color: #014C75;
-  --primary-hover: #014368;
-  --secondary-color: #01324E;
-  --icon-color: white;
-  /* Dark theme secondary color */
-  --secondary-hover: #013B5B;
-  --active-color: #002b42;
+  --primary-color: #38bdf8;
+  /* Brighter blue for interactive elements in dark mode */
+  --primary-hover: #7dd3fc;
+  --primary-light: rgba(56, 189, 248, 0.15);
+  --secondary-color: #64748b;
+  --icon-color: #f8fafc;
+  --secondary-hover: #94a3b8;
+  --active-color: #0c4a6e;
 
   /* Designer-specific overrides for dark theme */
   --designer-bg: #00111A;
@@ -223,10 +228,8 @@ body.dark-theme {
   --designer-component-bg: #002D45;
   --designer-card-rgb: 0, 34, 52;
 
-
   --debug-bg: #013B5B;
   --debug-bg2: #012A41;
-
   --border02-color: #1c4d66;
 }
 

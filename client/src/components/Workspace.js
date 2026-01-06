@@ -17,6 +17,7 @@ import AnalyticsDashboard from './Analytics/AnalyticsDashboard';
 import GraphQLTestPage from './GraphQLTestPage';
 import ProtocolTestPage from './ProtocolTestPage';
 import PerformanceTestsPage from './performanceTesting/PerformanceTestsPage';
+import ComplianceSection from './compliance/ComplianceSection';
 import './Workspace.css';
 import SettingsPage from './SettingsPage';
 import HistoryDetailsSection from './HistoryDetailsSection';
@@ -31,7 +32,8 @@ const Workspace = () => {
             {/* The order of these routes matters - more specific routes should come first */}
             <Route path="collections/new" element={<CollectionCreate />} />
             <Route path="collections/:collectionId/documentation" element={<DocumentationManager />} />
-            <Route path="collections/:collectionId" element={<CollectionDetail />} />            <Route path="collections" element={<CollectionsManagement />} />            <Route path="api-network/*" element={<APINetworkSection />} />            <Route path="monitoring/:id/analytics" element={<AnalyticsDashboard />} />
+            <Route path="collections/:collectionId" element={<CollectionDetail />} />            <Route path="collections" element={<CollectionsManagement />} />            <Route path="api-network/*" element={<APINetworkSection />} />
+            <Route path="monitoring/:id/analytics" element={<AnalyticsDashboard />} />
             <Route path="monitoring/:id/history" element={<MonitoringHistory />} />
             <Route path="monitoring/reports" element={<ReportsManagement />} />
             <Route path="monitoring/teams" element={<TeamsManagement />} />
@@ -41,6 +43,7 @@ const Workspace = () => {
             <Route path="graphql" element={<GraphQLTestPage />} />
             <Route path="protocols" element={<ProtocolTestPage />} />
             <Route path="performance-tests" element={<PerformanceTestsPage />} />
+            <Route path="compliance/*" element={<ComplianceSection />} />
             <Route path="settings" element={<SettingsPage />} />
             <Route path="history/*" element={<HistoryDetailsSection />} />
 

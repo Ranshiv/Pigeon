@@ -6,6 +6,9 @@ const Team = require('../models/Team');
 const User = require('../models/User');
 const EmailService = require('../services/EmailService');
 
+// Compliance audit logging (who changed what)
+const AuditLogger = require('../features/compliance/AuditLogger');
+
 // Get all teams for the authenticated user
 router.get('/', ensureAuthenticated, async (req, res) => {
     try {
@@ -127,6 +130,21 @@ router.post('/', ensureAuthenticated, async (req, res) => {
 
         await team.save();
 
+        // Audit log: team created
+        try {
+            await AuditLogger.log({
+                req,
+                actorId: req.user.id,
+                workspaceId: team.workspaceId,
+                action: 'team.create',
+                targetType: 'team',
+                targetId: team._id,
+                metadata: { name: team.name }
+            });
+        } catch (e) {
+            console.warn('Audit log failed (team create):', e.message);
+        }
+
         // Populate the response
         await team.populate([
             { path: 'ownerId', select: 'displayName email' },
@@ -169,6 +187,23 @@ router.put('/:id', ensureAuthenticated, async (req, res) => {
         team.updatedAt = new Date();
         await team.save();
 
+        // Audit log: team updated
+        try {
+            await AuditLogger.log({
+                req,
+                actorId: req.user.id,
+                workspaceId: team.workspaceId,
+                action: 'team.update',
+                targetType: 'team',
+                targetId: team._id,
+                metadata: {
+                    fields: { name, description, settings }
+                }
+            });
+        } catch (e) {
+            console.warn('Audit log failed (team update):', e.message);
+        }
+
         await team.populate('members.userId', 'displayName email');
         await team.populate('ownerId', 'displayName email');
 
@@ -194,6 +229,21 @@ router.delete('/:id', ensureAuthenticated, async (req, res) => {
         }
 
         await Team.findByIdAndDelete(req.params.id);
+
+        // Audit log: team deleted
+        try {
+            await AuditLogger.log({
+                req,
+                actorId: req.user.id,
+                workspaceId: team.workspaceId,
+                action: 'team.delete',
+                targetType: 'team',
+                targetId: team._id,
+                metadata: { name: team.name }
+            });
+        } catch (e) {
+            console.warn('Audit log failed (team delete):', e.message);
+        }
 
         res.json({ message: 'Team deleted successfully' });
     } catch (error) {
@@ -252,6 +302,21 @@ router.post('/:id/invite', ensureAuthenticated, async (req, res) => {
         });
 
         await team.save();
+
+        // Audit log: team member invited
+        try {
+            await AuditLogger.log({
+                req,
+                actorId: req.user.id,
+                workspaceId: team.workspaceId,
+                action: 'team.member.invite',
+                targetType: 'team',
+                targetId: team._id,
+                metadata: { invitedEmail: email, role }
+            });
+        } catch (e) {
+            console.warn('Audit log failed (team invite):', e.message);
+        }
 
         // Send invitation email
         try {
@@ -315,6 +380,21 @@ router.put('/:id/members/:memberId/role', ensureAuthenticated, async (req, res) 
 
         await team.save();
 
+        // Audit log: member role changed
+        try {
+            await AuditLogger.log({
+                req,
+                actorId: req.user.id,
+                workspaceId: team.workspaceId,
+                action: 'team.member.role.update',
+                targetType: 'team',
+                targetId: team._id,
+                metadata: { memberId: req.params.memberId, role }
+            });
+        } catch (e) {
+            console.warn('Audit log failed (team member role update):', e.message);
+        }
+
         await team.populate('members.userId', 'displayName email');
         await team.populate('ownerId', 'displayName email');
 
@@ -357,6 +437,21 @@ router.delete('/:id/members/:memberId', ensureAuthenticated, async (req, res) =>
         team.updatedAt = new Date();
 
         await team.save();
+
+        // Audit log: member removed
+        try {
+            await AuditLogger.log({
+                req,
+                actorId: req.user.id,
+                workspaceId: team.workspaceId,
+                action: 'team.member.remove',
+                targetType: 'team',
+                targetId: team._id,
+                metadata: { memberId: req.params.memberId }
+            });
+        } catch (e) {
+            console.warn('Audit log failed (team member remove):', e.message);
+        }
 
         await team.populate('members.userId', 'displayName email');
         await team.populate('ownerId', 'displayName email');
