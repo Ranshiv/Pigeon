@@ -796,7 +796,8 @@
 
 .tryit-tab {
     max-width: 1200px;
-    height: 100%;
+    height: auto;
+    /* Changed from 100% to auto to allow scrolling */
     margin: 0 auto;
     display: flex;
     flex-direction: column;

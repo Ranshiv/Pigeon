@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Play, Save, Copy, Check, ChevronDown, ChevronRight, Loader } from 'lucide-react';
+import { Play, Save, Copy, Check, ChevronDown, ChevronRight, Loader, Code } from 'lucide-react';
+import { generateCodeSnippet } from '../../utils/codeGenerator';
 import './TryItConsole.css';
 
 const TryItConsole = ({ api, selectedEndpoint, onEndpointChange, onSaveRequest }) => {
@@ -17,6 +18,11 @@ const TryItConsole = ({ api, selectedEndpoint, onEndpointChange, onSaveRequest }
     const [copied, setCopied] = useState(false);
     const [showHeaders, setShowHeaders] = useState(false);
     const [showBody, setShowBody] = useState(false);
+
+    // Code Generation State
+    const [showCode, setShowCode] = useState(false);
+    const [selectedLang, setSelectedLang] = useState('curl');
+    const [codeCopied, setCodeCopied] = useState(false);
 
     useEffect(() => {
         if (selectedEndpoint) {
@@ -117,21 +123,57 @@ const TryItConsole = ({ api, selectedEndpoint, onEndpointChange, onSaveRequest }
         setResponse(null);
 
         try {
-            const finalUrl = getFinalUrl();
-            const requestHeaders = { ...headers };
+            const currentPathParams = { ...pathParams };
+            const currentQueryParams = { ...queryParams };
+            let requestHeaders = { ...headers };
+            let authInjected = false;
 
-            // Add authentication
-            if (authType === 'API Key' && authValue) {
-                requestHeaders['Authorization'] = `Bearer ${authValue}`;
-            } else if (authType === 'OAuth 2.0' && authValue) {
-                requestHeaders['Authorization'] = `Bearer ${authValue}`;
+            // Smart Auth Injection
+            // If the user provided an Auth Value (API Key), try to place it in the right parameter
+            if (authValue) {
+                const apiKeyNames = ['appid', 'api_key', 'apiKey', 'key', 'access_key'];
+
+                // 1. Check Path Parameters
+                for (const key of Object.keys(currentPathParams)) {
+                    if (apiKeyNames.includes(key.toLowerCase()) || key.toLowerCase().includes('api_key')) {
+                        currentPathParams[key] = authValue;
+                        authInjected = true;
+                    }
+                }
+
+                // 2. Check Query Parameters
+                if (!authInjected) {
+                    for (const key of Object.keys(currentQueryParams)) {
+                        if (apiKeyNames.includes(key.toLowerCase()) || key.toLowerCase().includes('api_key')) {
+                            currentQueryParams[key] = authValue;
+                            authInjected = true;
+                        }
+                    }
+                }
+
+                // 3. Fallback: Authorization Header
+                // If we didn't inject it into a parameter, or if explicit OAuth, add as Header
+                if (!authInjected) {
+                    if (authType === 'OAuth 2.0') {
+                        requestHeaders['Authorization'] = `Bearer ${authValue}`;
+                    } else if (authType === 'API Key') {
+                        // Default behavior for unknown API Key styles
+                        requestHeaders['Authorization'] = `Bearer ${authValue}`;
+                    }
+                }
             }
+
+            // Construct final URL with updated params
+            let finalUrl = url;
+            Object.entries(currentPathParams).forEach(([key, value]) => {
+                finalUrl = finalUrl.replace(`{${key}}`, value || `{${key}}`);
+            });
 
             const requestData = {
                 url: finalUrl,
                 method,
                 headers: requestHeaders,
-                queryParams,
+                queryParams: currentQueryParams,
                 body: showBody && body ? JSON.parse(body) : undefined
             };
 
@@ -176,6 +218,66 @@ const TryItConsole = ({ api, selectedEndpoint, onEndpointChange, onSaveRequest }
         navigator.clipboard.writeText(responseToCopy);
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
+    };
+
+    const handleCopyCode = (code) => {
+        navigator.clipboard.writeText(code);
+        setCodeCopied(true);
+        setTimeout(() => setCodeCopied(false), 2000);
+    };
+
+    const getGeneratedCode = () => {
+        // Prepare request object for generator
+        let currentPathParams = { ...pathParams };
+        let currentQueryParams = { ...queryParams };
+        let requestHeaders = { ...headers };
+        let authInjected = false;
+
+        // Logic must match executeRequest
+        if (authValue) {
+            const apiKeyNames = ['appid', 'api_key', 'apiKey', 'key', 'access_key'];
+
+            // 1. Check Path Parameters
+            for (const key of Object.keys(currentPathParams)) {
+                if (apiKeyNames.includes(key.toLowerCase()) || key.toLowerCase().includes('api_key')) {
+                    currentPathParams[key] = authValue;
+                    authInjected = true;
+                }
+            }
+
+            // 2. Check Query Parameters
+            if (!authInjected) {
+                for (const key of Object.keys(currentQueryParams)) {
+                    if (apiKeyNames.includes(key.toLowerCase()) || key.toLowerCase().includes('api_key')) {
+                        currentQueryParams[key] = authValue;
+                        authInjected = true;
+                    }
+                }
+            }
+
+            // 3. Fallback: Authorization Header
+            if (!authInjected) {
+                if (authType === 'OAuth 2.0') {
+                    requestHeaders['Authorization'] = `Bearer ${authValue}`;
+                } else if (authType === 'API Key') {
+                    requestHeaders['Authorization'] = `Bearer ${authValue}`;
+                }
+            }
+        }
+
+        // Reconstruct URL for display
+        let finalUrl = url;
+        Object.entries(currentPathParams).forEach(([key, value]) => {
+            finalUrl = finalUrl.replace(`{${key}}`, value || `{${key}}`);
+        });
+
+        return generateCodeSnippet(selectedLang, {
+            method,
+            url: finalUrl,
+            headers: requestHeaders,
+            queryParams: currentQueryParams,
+            body: showBody && body ? JSON.parse(body || '{}') : undefined
+        });
     };
 
     const getStatusColor = (status) => {
@@ -372,12 +474,45 @@ const TryItConsole = ({ api, selectedEndpoint, onEndpointChange, onSaveRequest }
                     </div>
                 )}
 
-                {/* Save Button */}
-                <button className="btn-save" onClick={handleSave}>
-                    <Save size={18} />
-                    Save Request
-                </button>
+                {/* Action Buttons */}
+                <div className="button-group">
+                    <button className="btn-save" onClick={handleSave}>
+                        <Save size={18} />
+                        Save Request
+                    </button>
+                    <button className="btn-code" onClick={() => setShowCode(!showCode)}>
+                        <Code size={18} />
+                        {showCode ? 'Hide Code' : 'View Code'}
+                    </button>
+                </div>
             </div>
+
+            {/* Code Generation Section */}
+            {showCode && (
+                <div className="code-section-container">
+                    <div className="code-header-actions">
+                        <h3 className="section-title" style={{ margin: 0 }}>Code Snippet</h3>
+                        <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                            <select
+                                value={selectedLang}
+                                onChange={(e) => setSelectedLang(e.target.value)}
+                                className="lang-select"
+                            >
+                                <option value="curl">cURL</option>
+                                <option value="javascript">JavaScript (Fetch)</option>
+                                <option value="axios">JavaScript (Axios)</option>
+                                <option value="python">Python (Requests)</option>
+                            </select>
+                            <button className="copy-btn" onClick={() => handleCopyCode(getGeneratedCode())}>
+                                {codeCopied ? <Check size={16} /> : <Copy size={16} />}
+                            </button>
+                        </div>
+                    </div>
+                    <div className="code-preview">
+                        <pre>{getGeneratedCode()}</pre>
+                    </div>
+                </div>
+            )}
 
             {/* Response Viewer */}
             {response && (
