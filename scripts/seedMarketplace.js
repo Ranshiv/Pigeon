@@ -368,6 +368,359 @@ const publicApiCatalog = [
             }
         ],
         documentation: 'https://ip-api.com/docs'
+    },
+    {
+        id: 'unsplash',
+        name: 'Unsplash API',
+        provider: 'Unsplash',
+        description: 'Access millions of high-quality, free-to-use images',
+        category: 'Images',
+        tags: ['photos', 'images', 'wallpaper', 'stock'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.9,
+        ratingCount: 12450,
+        usageCount: 890200,
+        baseUrl: 'https://api.unsplash.com',
+        endpoints: [
+            {
+                path: '/photos',
+                method: 'GET',
+                description: 'Get a list of photos',
+                parameters: [
+                    { name: 'page', type: 'query', required: false, description: 'Page number' },
+                    { name: 'per_page', type: 'query', required: false, description: 'Number of items per page' }
+                ]
+            },
+            {
+                path: '/search/photos',
+                method: 'GET',
+                description: 'Search for photos',
+                parameters: [
+                    { name: 'query', type: 'query', required: true, description: 'Search term' }
+                ]
+            }
+        ],
+        documentation: 'https://unsplash.com/documentation',
+        featured: true
+    },
+    {
+        id: 'dogapi',
+        name: 'Dog API',
+        provider: 'Dog CEO',
+        description: 'Access random dog images and list of breeds',
+        category: 'Animals',
+        tags: ['dogs', 'pets', 'animals', 'images'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.8,
+        ratingCount: 9320,
+        usageCount: 456700,
+        baseUrl: 'https://dog.ceo/api',
+        endpoints: [
+            {
+                path: '/breeds/image/random',
+                method: 'GET',
+                description: 'Get a random dog image'
+            },
+            {
+                path: '/breeds/list/all',
+                method: 'GET',
+                description: 'List all breeds'
+            }
+        ],
+        documentation: 'https://dog.ceo/dog-api/',
+        trending: true
+    },
+    {
+        id: 'pokeapi',
+        name: 'PokeAPI',
+        provider: 'PokeAPI',
+        description: 'Comprehensive database of Pokémon data',
+        category: 'Games',
+        tags: ['pokemon', 'games', 'data', 'entertainment'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.9,
+        ratingCount: 15600,
+        usageCount: 1240500,
+        baseUrl: 'https://pokeapi.co/api/v2',
+        endpoints: [
+            {
+                path: '/pokemon/{name}',
+                method: 'GET',
+                description: 'Get Pokemon details',
+                parameters: [
+                    { name: 'name', type: 'path', required: true, description: 'Pokemon name or ID' }
+                ]
+            }
+        ],
+        documentation: 'https://pokeapi.co/',
+        featured: true
+    },
+    {
+        id: 'boredapi',
+        name: 'Bored API',
+        provider: 'BoredAPI',
+        description: 'Suggestions for random activities to do when bored',
+        category: 'Lifestyle',
+        tags: ['activities', 'boredom', 'fun', 'suggestions'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.5,
+        ratingCount: 3200,
+        usageCount: 125000,
+        baseUrl: 'https://www.boredapi.com/api',
+        endpoints: [
+            {
+                path: '/activity',
+                method: 'GET',
+                description: 'Get a random activity'
+            }
+        ],
+        documentation: 'https://www.boredapi.com/'
+    },
+    {
+        id: 'quizapi',
+        name: 'Quiz API',
+        provider: 'QuizAPI.io',
+        description: 'Technical quiz questions for developers',
+        category: 'Education',
+        tags: ['quiz', 'learning', 'coding', 'technical'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.6,
+        ratingCount: 2100,
+        usageCount: 89000,
+        baseUrl: 'https://quizapi.io/api/v1',
+        endpoints: [
+            {
+                path: '/questions',
+                method: 'GET',
+                description: 'Get quiz questions',
+                parameters: [
+                    { name: 'apiKey', type: 'query', required: true, description: 'API Key' },
+                    { name: 'limit', type: 'query', required: false, description: 'Number of questions' }
+                ]
+            }
+        ],
+        documentation: 'https://quizapi.io/docs/1.0.0/overview'
+    },
+    {
+        id: 'openlibrary',
+        name: 'Open Library API',
+        provider: 'Internet Archive',
+        description: 'Access data about books, authors, and subjects',
+        category: 'Education',
+        tags: ['books', 'library', 'literature', 'data'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.7,
+        ratingCount: 4500,
+        usageCount: 230000,
+        baseUrl: 'https://openlibrary.org',
+        endpoints: [
+            {
+                path: '/search.json',
+                method: 'GET',
+                description: 'Search for books',
+                parameters: [
+                    { name: 'q', type: 'query', required: true, description: 'Search term' }
+                ]
+            }
+        ],
+        documentation: 'https://openlibrary.org/developers/api'
+    },
+    {
+        id: 'swapi',
+        name: 'Star Wars API',
+        provider: 'SWAPI',
+        description: 'Database of Star Wars films, characters, planets, and more',
+        category: 'Entertainment',
+        tags: ['star wars', 'movies', 'sci-fi', 'data'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.8,
+        ratingCount: 6700,
+        usageCount: 345000,
+        baseUrl: 'https://swapi.py.dev/api',
+        endpoints: [
+            {
+                path: '/people/{id}/',
+                method: 'GET',
+                description: 'Get a person',
+                parameters: [
+                    { name: 'id', type: 'path', required: true, description: 'Person ID' }
+                ]
+            },
+            {
+                path: '/planets/{id}/',
+                method: 'GET',
+                description: 'Get a planet',
+                parameters: [
+                    { name: 'id', type: 'path', required: true, description: 'Planet ID' }
+                ]
+            }
+        ],
+        documentation: 'https://swapi.dev/documentation'
+    },
+    {
+        id: 'rickandmorty',
+        name: 'Rick and Morty API',
+        provider: 'RickAndMortyAPI',
+        description: 'Information about the TV show Rick and Morty',
+        category: 'Entertainment',
+        tags: ['tv', 'animation', 'comedy', 'data'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.9,
+        ratingCount: 8900,
+        usageCount: 520000,
+        baseUrl: 'https://rickandmortyapi.com/api',
+        endpoints: [
+            {
+                path: '/character',
+                method: 'GET',
+                description: 'Get all characters'
+            },
+            {
+                path: '/character/{id}',
+                method: 'GET',
+                description: 'Get a single character',
+                parameters: [
+                    { name: 'id', type: 'path', required: true, description: 'Character ID' }
+                ]
+            }
+        ],
+        documentation: 'https://rickandmortyapi.com/documentation'
+    },
+    {
+        id: 'jikan',
+        name: 'Jikan (Anime API)',
+        provider: 'Jikan',
+        description: 'The most complete MyAnimeList API for anime and manga',
+        category: 'Entertainment',
+        tags: ['anime', 'manga', 'japan', 'data'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.8,
+        ratingCount: 7600,
+        usageCount: 410000,
+        baseUrl: 'https://api.jikan.moe/v4',
+        endpoints: [
+            {
+                path: '/anime',
+                method: 'GET',
+                description: 'Search anime',
+                parameters: [
+                    { name: 'q', type: 'query', required: false, description: 'Search term' }
+                ]
+            }
+        ],
+        documentation: 'https://docs.api.jikan.moe/'
+    },
+    {
+        id: 'giphy',
+        name: 'Giphy API',
+        provider: 'Giphy',
+        description: 'The worlds largest library of animated GIFs',
+        category: 'Media',
+        tags: ['gifs', 'stickers', 'media', 'social'],
+        authType: 'API Key',
+        pricing: 'Freemium',
+        ratingAverage: 4.7,
+        ratingCount: 11200,
+        usageCount: 980000,
+        baseUrl: 'https://api.giphy.com/v1',
+        endpoints: [
+            {
+                path: '/gifs/search',
+                method: 'GET',
+                description: 'Search for GIFs',
+                parameters: [
+                    { name: 'api_key', type: 'query', required: true, description: 'API Key' },
+                    { name: 'q', type: 'query', required: true, description: 'Search term' }
+                ]
+            }
+        ],
+        documentation: 'https://developers.giphy.com/docs/api/'
+    },
+    {
+        id: 'numbersapi',
+        name: 'Numbers API',
+        provider: 'NumbersAPI',
+        description: 'Interesting facts about numbers',
+        category: 'Trivia',
+        tags: ['numbers', 'facts', 'trivia', 'math'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.4,
+        ratingCount: 1800,
+        usageCount: 67000,
+        baseUrl: 'http://numbersapi.com',
+        endpoints: [
+            {
+                path: '/{number}',
+                method: 'GET',
+                description: 'Get a fact about a number',
+                parameters: [
+                    { name: 'number', type: 'path', required: true, description: 'The number to get a fact about' }
+                ]
+            }
+        ],
+        documentation: 'http://numbersapi.com/'
+    },
+    {
+        id: 'catapi',
+        name: 'The Cat API',
+        provider: 'That API Company',
+        description: 'Access random cat images and breed information',
+        category: 'Animals',
+        tags: ['cats', 'pets', 'animals', 'images'],
+        authType: 'API Key',
+        pricing: 'Freemium',
+        ratingAverage: 4.7,
+        ratingCount: 5400,
+        usageCount: 320000,
+        baseUrl: 'https://api.thecatapi.com/v1',
+        endpoints: [
+            {
+                path: '/images/search',
+                method: 'GET',
+                description: 'Get random cat image'
+            },
+            {
+                path: '/breeds',
+                method: 'GET',
+                description: 'List all breeds'
+            }
+        ],
+        documentation: 'https://docs.thecatapi.com/'
+    },
+    {
+        id: 'agify',
+        name: 'Agify.io',
+        provider: 'Genderize Group',
+        description: 'Predict the age of a person based on their name',
+        category: 'Data',
+        tags: ['demographics', 'name', 'age', 'ml'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.2,
+        ratingCount: 1500,
+        usageCount: 45000,
+        baseUrl: 'https://api.agify.io',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Predict age',
+                parameters: [
+                    { name: 'name', type: 'query', required: true, description: 'The name to predict' }
+                ]
+            }
+        ],
+        documentation: 'https://agify.io/'
     }
 ];
 

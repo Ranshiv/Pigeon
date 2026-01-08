@@ -28,7 +28,15 @@ const APINetworkExplore = () => {
         { id: 'Finance', name: 'Finance' },
         { id: 'Animals', name: 'Animals' },
         { id: 'Development', name: 'Development' },
-        { id: 'Music', name: 'Music' }
+        { id: 'Images', name: 'Images' },
+        { id: 'Entertainment', name: 'Entertainment' },
+        { id: 'Education', name: 'Education' },
+        { id: 'Games', name: 'Games' },
+        { id: 'Science', name: 'Science' },
+        { id: 'News', name: 'News' },
+        { id: 'Lifestyle', name: 'Lifestyle' },
+        { id: 'Trivia', name: 'Trivia' },
+        { id: 'Data', name: 'Data' }
     ];
 
     // Featured collections similar to Postman
@@ -125,7 +133,7 @@ const APINetworkExplore = () => {
 
     const fetchPopularAPIs = async () => {
         try {
-            const response = await fetch('/api/popular-apis', {
+            const response = await fetch('/api/history/popular-apis', {
                 credentials: 'include'
             });
             if (response.ok) {
@@ -139,12 +147,18 @@ const APINetworkExplore = () => {
 
     const fetchTrendingAPIs = async () => {
         try {
-            const response = await fetch('/api/trending-apis', {
+            const response = await fetch('/api/marketplace/trending', {
                 credentials: 'include'
             });
             if (response.ok) {
                 const data = await response.json();
-                setTrendingAPIs(data);
+                // Map marketplace data format to what the UI expects if needed
+                const formattedData = data.map(api => ({
+                    _id: { url: api.baseUrl, method: 'GET' },
+                    count: api.usageCount || 0,
+                    lastUsed: api.updatedAt || new Date()
+                }));
+                setTrendingAPIs(formattedData);
             }
         } catch (err) {
             console.error('Error fetching trending APIs:', err);
@@ -153,7 +167,7 @@ const APINetworkExplore = () => {
 
     const fetchRecommendedCollections = async () => {
         try {
-            const response = await fetch('/api/recommended-collections', {
+            const response = await fetch('/api/marketplace/recommended-collections', {
                 credentials: 'include'
             });
             if (response.ok) {

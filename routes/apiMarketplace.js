@@ -2,6 +2,7 @@
 const express = require('express');
 const router = express.Router();
 const MarketplaceApi = require('../models/MarketplaceApi');
+const https = require('https'); // Add https to handle SSL issues
 const fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args));
 
 // GET /api/marketplace/search - Search public APIs
@@ -143,6 +144,41 @@ router.get('/trending', async (req, res) => {
     }
 });
 
+// GET /api/marketplace/recommended-collections - Get recommended collections
+router.get('/recommended-collections', async (req, res) => {
+    try {
+        // For now, return some featured ones or a random selection
+        // In a real app, this would be based on user preferences
+        const collections = [
+            {
+                _id: 'rec-1',
+                name: 'Essential Web APIs',
+                description: 'A collection of the most useful APIs for web development',
+                author: { displayName: 'Pigeon Curator' },
+                stars: 450
+            },
+            {
+                _id: 'rec-2',
+                name: 'Data Science Toolkit',
+                description: 'APIs for data processing, ML, and visualization',
+                author: { displayName: 'DataMaster' },
+                stars: 320
+            },
+            {
+                _id: 'rec-3',
+                name: 'Entertainment & Fun',
+                description: 'Most popular joke, image, and trivia APIs',
+                author: { displayName: 'FunBot' },
+                stars: 280
+            }
+        ];
+        res.json(collections);
+    } catch (error) {
+        console.error('Recommended collections error:', error);
+        res.status(500).json({ error: 'Failed to get recommended collections', message: error.message });
+    }
+});
+
 // GET /api/marketplace/api/:id - Get specific API details
 router.get('/api/:id', async (req, res) => {
     try {
@@ -181,13 +217,19 @@ router.post('/proxy', async (req, res) => {
             }
         });
 
+        // Create an agent to allow insecure connections if needed
+        const agent = new https.Agent({
+            rejectUnauthorized: req.body.rejectUnauthorized !== undefined ? req.body.rejectUnauthorized : false // Default to false for marketplace trial to be more user-friendly
+        });
+
         // Prepare fetch options
         const fetchOptions = {
             method: method.toUpperCase(),
             headers: {
                 'User-Agent': 'Pigeon-API-Client/1.0',
                 ...headers
-            }
+            },
+            agent
         };
 
         // Add body for POST, PUT, PATCH requests

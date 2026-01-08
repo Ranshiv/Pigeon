@@ -10,8 +10,10 @@ const http = require('http');
 const path = require('path');
 const mongoose = require('mongoose');
 const axios = require('axios'); // Add axios import for proxy functionality
+const https = require('https'); // Add https to handle SSL issues
 const { initializeConnections } = require('./config/db');
 const User = require('./models/User');
+const MarketplaceApi = require('./models/MarketplaceApi');
 const { initializeSocketServer } = require('./utils/socket/socket-server');
 
 // Import monitoring service
@@ -167,133 +169,88 @@ let apiCache = {
     lastUpdated: null
 };
 
-// Function to fetch and cache APIs
+// Function to fetch and cache APIs from Database
 async function fetchAndCacheAPIs() {
     try {
-        console.log('Initializing API cache...');
+        console.log('Fetching APIs from database to initialize cache...');
 
-        // Using curated list of APIs
-        apiCache.data = [
-            {
-                name: "GitHub REST API",
-                description: "Access GitHub's features and data programmatically",
-                category: "Development",
-                url: "https://api.github.com",
-                auth: "OAuth",
-                https: true,
-                cors: "yes",
-                documentation: "https://docs.github.com/rest"
-            },
-            {
-                name: "WeatherAPI",
-                description: "Real-Time Weather API with historical weather information",
-                category: "Weather",
-                url: "https://api.weatherapi.com/v1",
-                auth: "apiKey",
-                https: true,
-                cors: "yes",
-                documentation: "https://www.weatherapi.com/docs/"
-            },
-            {
-                name: "NASA API",
-                description: "Access NASA space data, including Mars rover photos and astronomy pictures",
-                category: "Science",
-                url: "https://api.nasa.gov",
-                auth: "apiKey",
-                https: true,
-                cors: "yes",
-                documentation: "https://api.nasa.gov/"
-            },
-            {
-                name: "CoinGecko",
-                description: "Comprehensive cryptocurrency data API",
-                category: "Finance",
-                url: "https://api.coingecko.com/api/v3",
-                auth: "none",
-                https: true,
-                cors: "yes",
-                documentation: "https://www.coingecko.com/api/documentation"
-            },
-            {
-                name: "Movie Database (TMDB)",
-                description: "Movie and TV show data, including ratings, reviews, and cast information",
-                category: "Entertainment",
-                url: "https://api.themoviedb.org/3",
-                auth: "apiKey",
-                https: true,
-                cors: "yes",
-                documentation: "https://developers.themoviedb.org/3"
-            },
-            {
-                name: "Dog API",
-                description: "Dog breeds, images, and facts",
-                category: "Animals",
-                url: "https://dog.ceo/api",
-                auth: "none",
-                https: true,
-                cors: "yes",
-                documentation: "https://dog.ceo/dog-api/"
-            },
-            {
-                name: "Spotify Web API",
-                description: "Music catalog, playback control, and user data",
-                category: "Music",
-                url: "https://api.spotify.com/v1",
-                auth: "OAuth",
-                https: true,
-                cors: "yes",
-                documentation: "https://developer.spotify.com/documentation/web-api"
-            }
-        ];
+        // Fetch all APIs from the MarketplaceApi collection
+        const apis = await MarketplaceApi.find({});
+
+        if (apis.length === 0) {
+            console.log('No APIs found in database. Please run the seed script.');
+            // Fallback to a few essential ones if DB is empty, but we should really use the seed script
+            apiCache.data = [];
+        } else {
+            // Transform model data to the format expected by the frontend if necessary
+            apiCache.data = apis.map(api => ({
+                id: api.id,
+                name: api.name,
+                description: api.description,
+                category: api.category,
+                url: api.baseUrl, // Map baseUrl to url for frontend compatibility
+                auth: api.authType !== 'None' ? 'Required' : 'None',
+                https: true, // Standard for most APIs now
+                cors: "yes", // Most public APIs we've curated support CORS
+                documentation: api.documentation,
+                featured: api.featured,
+                trending: api.tags.includes('trending') || api.trending
+            }));
+            console.log(`API cache initialized with ${apiCache.data.length} APIs from database`);
+        }
+
         apiCache.lastUpdated = new Date();
-        console.log(`API cache initialized with ${apiCache.data.length} APIs`);
     } catch (error) {
-        console.error('Error initializing API cache:', error);
+        console.error('Error initializing API cache from database:', error);
     }
 }
 
 // Initial fetch
-fetchAndCacheAPIs();
+setTimeout(() => {
+    fetchAndCacheAPIs();
+}, 5000); // Give database connection some time to stabilize
 
 // Search endpoint for APIs
 app.get('/api/search', async (req, res) => {
     try {
         const { query, category } = req.query;
 
-        // If cache is empty, initialize it
-        if (!apiCache.data || apiCache.data.length === 0) {
-            await fetchAndCacheAPIs();
-        }
+        // Using database for real-time search if possible, or fallback to cache
+        let results = [];
 
-        // Search in cached APIs
-        let results = apiCache.data;
+        if (query || (category && category !== 'all')) {
+            const filter = {};
+            if (query) {
+                const searchRegex = new RegExp(query, 'i');
+                filter.$or = [
+                    { name: searchRegex },
+                    { description: searchRegex },
+                    { category: searchRegex },
+                    { tags: searchRegex }
+                ];
+            }
+            if (category && category !== 'all') {
+                filter.category = category;
+            }
 
-        if (query) {
-            const lowerCaseQuery = query.toLowerCase();
-            results = results.filter(api => {
-                return api.name.toLowerCase().includes(lowerCaseQuery) ||
-                    (api.description && api.description.toLowerCase().includes(lowerCaseQuery)) ||
-                    (api.category && api.category.toLowerCase().includes(lowerCaseQuery));
-            });
-        }
-
-        if (category && category !== 'all') {
-            results = results.filter(api => {
-                return api.category && api.category.toLowerCase() === category.toLowerCase();
-            });
-        }
-
-        // Sort results by relevance (name matches first)
-        if (query) {
-            const lowerCaseQuery = query.toLowerCase();
-            results.sort((a, b) => {
-                const aNameMatch = a.name.toLowerCase().includes(lowerCaseQuery);
-                const bNameMatch = b.name.toLowerCase().includes(lowerCaseQuery);
-
-                if (aNameMatch && !bNameMatch) return -1;
-                if (!aNameMatch && bNameMatch) return 1;
-                return 0;
-            });
+            const dbApis = await MarketplaceApi.find(filter);
+            results = dbApis.map(api => ({
+                id: api.id,
+                name: api.name,
+                description: api.description,
+                category: api.category,
+                url: api.baseUrl,
+                auth: api.authType !== 'None' ? 'Required' : 'None',
+                https: true,
+                cors: "yes",
+                documentation: api.documentation
+            }));
+        } else {
+            // Return from cache if no search criteria
+            if (!apiCache.data || apiCache.data.length === 0) {
+                await fetchAndCacheAPIs();
+            }
+            results = apiCache.data;
         }
 
         res.json(results);
@@ -543,6 +500,11 @@ app.post('/api/proxy', async (req, res) => {
         // Track request timing
         const requestStartTime = Date.now();
 
+        // Create a custom HTTPS agent to handle certificate issues if needed
+        const httpsAgent = new https.Agent({
+            rejectUnauthorized: req.body.rejectUnauthorized !== undefined ? req.body.rejectUnauthorized : true
+        });
+
         // Make the request with enhanced options
         const response = await axios({
             url,
@@ -553,7 +515,8 @@ app.post('/api/proxy', async (req, res) => {
             maxRedirects: 5,
             validateStatus: () => true, // Don't throw errors on non-2xx responses
             decompress: true, // Handle gzipped responses
-            responseType: 'json' // Default to JSON response
+            responseType: 'json', // Default to JSON response
+            httpsAgent: httpsAgent
         });
 
         const requestEndTime = Date.now();
@@ -641,6 +604,13 @@ app.post('/api/proxy', async (req, res) => {
                 "Check if the API URL is correct",
                 "Verify your internet connection",
                 "The API server might be down"
+            ];
+        } else if (err.message && err.message.includes('certificate has expired')) {
+            errorMessage = `SSL Certificate Expired: The API at ${url} has an expired security certificate.`;
+            errorTips = [
+                "The API provider needs to renew their SSL certificate",
+                "You can try to disable 'SSL Verification' in the request settings if available",
+                "Try using http instead of https if the provider supports it"
             ];
         } else if (err.code === 'ECONNREFUSED') {
             errorMessage = `Connection refused to ${err.address}:${err.port}`;
