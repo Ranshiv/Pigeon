@@ -5,6 +5,12 @@ const MarketplaceApi = require('../models/MarketplaceApi');
 const https = require('https'); // Add https to handle SSL issues
 const fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args));
 
+// Feature Services
+const ReviewService = require('../features/api-marketplace/ReviewService');
+const CommunityForums = require('../features/api-marketplace/CommunityForums');
+const GuideService = require('../features/api-marketplace/GuideService');
+const HealthService = require('../features/api-marketplace/HealthService');
+
 // GET /api/marketplace/search - Search public APIs
 router.get('/search', async (req, res) => {
     try {
@@ -196,6 +202,143 @@ router.get('/api/:id', async (req, res) => {
         console.error('API detail error:', error);
         res.status(500).json({ error: 'Failed to get API details', message: error.message });
     }
+});
+
+// Alias for client compatibility
+router.get('/listings/:id', async (req, res) => {
+    // Re-use logic or redirect? Re-use is cheaper for now.
+    try {
+        const id = req.params.id;
+        const api = await MarketplaceApi.findOne({ id: id });
+        if (!api) return res.status(404).json({ error: 'API not found' });
+        res.json(api);
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to get API details' });
+    }
+});
+
+router.get('/listings', async (req, res) => {
+    // Alias to search
+    // We need to re-route logic because res.redirect might change method or lose query
+    // But for a simple GET alias it works.
+    // Actually, let's just use the search handler logic if we can, or just redirect
+    const url = '/api/marketplace/search' + (req.url.includes('?') ? req.url.substring(req.url.indexOf('?')) : '');
+    res.redirect(url);
+});
+
+
+// --- V2 Feature Routes ---
+
+// 1. Reviews
+router.get('/listings/:id/reviews', async (req, res) => {
+    try {
+        const results = await ReviewService.getReviews(req.params.id, req.query);
+        res.json(results);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+router.post('/listings/:id/reviews', async (req, res) => {
+    try {
+        if (!req.user) return res.status(401).json({ error: 'Unauthorized' });
+        const review = await ReviewService.createReview(req.params.id, req.user._id, req.body);
+        res.json(review);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// 2. Forums
+router.get('/listings/:id/forums/threads', async (req, res) => {
+    try {
+        const results = await CommunityForums.listThreads(req.params.id, req.query);
+        res.json(results);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+router.post('/listings/:id/forums/threads', async (req, res) => {
+    try {
+        if (!req.user) return res.status(401).json({ error: 'Unauthorized' });
+        const thread = await CommunityForums.createThread(req.params.id, req.user._id, req.body);
+        res.json(thread);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+router.get('/forums/threads/:threadId', async (req, res) => {
+    try {
+        const result = await CommunityForums.getThread(req.params.threadId);
+        res.json(result);
+    } catch (err) {
+        res.status(404).json({ error: err.message });
+    }
+});
+
+router.post('/forums/threads/:threadId/posts', async (req, res) => {
+    try {
+        if (!req.user) return res.status(401).json({ error: 'Unauthorized' });
+        const post = await CommunityForums.replyToThread(req.params.threadId, req.user._id, req.body);
+        res.json(post);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// 3. Guides
+router.get('/listings/:id/guides', async (req, res) => {
+    try {
+        console.log(`[DEBUG] Fetching guides for listingId: ${req.params.id}`);
+        const results = await GuideService.listGuides(req.params.id);
+        console.log(`[DEBUG] Found ${results.length} guides for ${req.params.id}`);
+        res.json(results);
+    } catch (err) {
+        console.error(`[DEBUG] Error fetching guides: ${err.message}`);
+        res.status(500).json({ error: err.message });
+    }
+});
+
+router.get('/listings/:id/guides/:slug', async (req, res) => {
+    try {
+        const guide = await GuideService.getGuide(req.params.id, req.params.slug);
+        res.json(guide);
+    } catch (err) {
+        res.status(404).json({ error: err.message });
+    }
+});
+
+router.post('/listings/:id/guides', async (req, res) => {
+    try {
+        // In real app, check for admin/creator permissions
+        const guide = await GuideService.createGuide(req.params.id, req.body);
+        res.json(guide);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// 4. Health
+router.get('/listings/:id/health', async (req, res) => {
+    try {
+        const health = await HealthService.getHealth(req.params.id);
+        res.json(health);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// 5. Plans (Mock for now)
+router.get('/listings/:id/plans', (req, res) => {
+    res.json({
+        enabled: true,
+        plans: [
+            { _id: 'p1', name: 'Developer', description: 'For hobbyists', isFree: true, pricePerMonth: 0, currency: 'USD' },
+            { _id: 'p2', name: 'Pro', description: 'High rate limits', isFree: false, pricePerMonth: 29, currency: 'USD' }
+        ]
+    });
 });
 
 // POST /api/marketplace/proxy - Proxy requests to external APIs (for Try It feature)

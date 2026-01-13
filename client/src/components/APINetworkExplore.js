@@ -23,20 +23,20 @@ const APINetworkExplore = () => {
     // Updated categories to match common API categories
     const categories = [
         { id: 'all', name: 'All' },
-        { id: 'Authentication', name: 'Auth' },
-        { id: 'Weather', name: 'Weather' },
+        { id: 'AI', name: 'AI' },
         { id: 'Finance', name: 'Finance' },
-        { id: 'Animals', name: 'Animals' },
-        { id: 'Development', name: 'Development' },
-        { id: 'Images', name: 'Images' },
-        { id: 'Entertainment', name: 'Entertainment' },
-        { id: 'Education', name: 'Education' },
-        { id: 'Games', name: 'Games' },
         { id: 'Science', name: 'Science' },
+        { id: 'Entertainment', name: 'Entertainment' },
+        { id: 'Games', name: 'Games' },
         { id: 'News', name: 'News' },
         { id: 'Lifestyle', name: 'Lifestyle' },
-        { id: 'Trivia', name: 'Trivia' },
-        { id: 'Data', name: 'Data' }
+        { id: 'Data', name: 'Data' },
+        { id: 'Sports', name: 'Sports' },
+        { id: 'Weather', name: 'Weather' },
+        { id: 'Cryptocurrency', name: 'Crypto' },
+        { id: 'Tools', name: 'Tools' },
+        { id: 'Social', name: 'Social' },
+        { id: 'Marketing', name: 'Marketing' }
     ];
 
     // Featured collections similar to Postman
@@ -361,15 +361,17 @@ const APINetworkExplore = () => {
                                 <div className="api-meta">
                                     <span className="category-tag">{api.category}</span>
                                     <div className="api-features">
-                                        {api.https && <span className="feature https" title="HTTPS Support">
-                                            <FiLock /> HTTPS
-                                        </span>}
-                                        <span className={`feature cors-${api.cors.toLowerCase()}`} title="CORS Support">
-                                            {api.cors === 'yes' ? <FiCheck /> : <FiX />} CORS
+                                        <span className={`feature pricing-${(api.pricing || 'Free').toLowerCase()}`} title="Pricing Model">
+                                            {api.pricing || 'Free'}
                                         </span>
-                                        {api.auth && <span className="feature auth" title="Authentication Required">
-                                            <FiLock /> Auth
-                                        </span>}
+                                        <span className={`feature auth-${(api.authType || 'None').toLowerCase().replace(' ', '-')}`} title="Authentication Type">
+                                            <FiLock /> {api.authType || 'No Auth'}
+                                        </span>
+                                        {api.ratingAverage && (
+                                            <span className="feature rating" title="Average Rating">
+                                                <FiStar /> {api.ratingAverage}
+                                            </span>
+                                        )}
                                     </div>
                                 </div>
                                 <button

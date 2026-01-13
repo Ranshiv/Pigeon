@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Play, Save, Copy, Check, ChevronDown, ChevronRight, Loader, Code } from 'lucide-react';
+import { Play, Save, Copy, Check, ChevronDown, ChevronRight, Loader, Code, Trash2 } from 'lucide-react';
 import { generateCodeSnippet } from '../../utils/codeGenerator';
 import './TryItConsole.css';
 
@@ -8,7 +8,7 @@ const TryItConsole = ({ api, selectedEndpoint, onEndpointChange, onSaveRequest }
     const [method, setMethod] = useState(selectedEndpoint?.method || 'GET');
     const [url, setUrl] = useState('');
     const [pathParams, setPathParams] = useState({});
-    const [queryParams, setQueryParams] = useState({});
+    const [queryParams, setQueryParams] = useState([]);
     const [headers, setHeaders] = useState({});
     const [body, setBody] = useState('');
     const [authType] = useState(api.authType);
@@ -35,7 +35,7 @@ const TryItConsole = ({ api, selectedEndpoint, onEndpointChange, onSaveRequest }
     }, [selectedEndpoint]);
 
     const buildUrl = (ep) => {
-        let path = ep.path;
+        let path = ep.path || '';
         // Replace path parameters with placeholders
         const pathParamMatches = path.match(/\{([^}]+)\}/g);
         if (pathParamMatches) {
@@ -46,17 +46,26 @@ const TryItConsole = ({ api, selectedEndpoint, onEndpointChange, onSaveRequest }
             });
             setPathParams(params);
         }
-        setUrl(api.baseUrl + path);
+
+        const base = api.baseUrl || api.url || '';
+        const sanitizedBase = base.replace(/\/+$/, '');
+        const sanitizedPath = path.replace(/^\/+/, '');
+
+        setUrl(sanitizedPath ? `${sanitizedBase}/${sanitizedPath}` : sanitizedBase);
     };
 
     const initializeParams = (ep) => {
         if (ep.parameters) {
-            const qParams = {};
+            const qParams = [];
             const pParams = {};
 
             ep.parameters.forEach(param => {
                 if (param.type === 'query') {
-                    qParams[param.name] = '';
+                    qParams.push({
+                        id: Math.random().toString(36).substr(2, 9),
+                        name: param.name,
+                        value: ''
+                    });
                 } else if (param.type === 'path') {
                     pParams[param.name] = '';
                 }
@@ -79,8 +88,27 @@ const TryItConsole = ({ api, selectedEndpoint, onEndpointChange, onSaveRequest }
         setPathParams(prev => ({ ...prev, [key]: value }));
     };
 
-    const updateQueryParam = (key, value) => {
-        setQueryParams(prev => ({ ...prev, [key]: value }));
+    const updateQueryParam = (id, value) => {
+        setQueryParams(prev => prev.map(p => p.id === id ? { ...p, value } : p));
+    };
+
+    const addQueryParam = () => {
+        setQueryParams(prev => [
+            ...prev,
+            {
+                id: Math.random().toString(36).substr(2, 9),
+                name: `param${prev.length + 1}`,
+                value: ''
+            }
+        ]);
+    };
+
+    const removeQueryParam = (id) => {
+        setQueryParams(prev => prev.filter(p => p.id !== id));
+    };
+
+    const updateQueryParamKey = (id, newName) => {
+        setQueryParams(prev => prev.map(p => p.id === id ? { ...p, name: newName } : p));
     };
 
     const addHeader = () => {
@@ -115,6 +143,16 @@ const TryItConsole = ({ api, selectedEndpoint, onEndpointChange, onSaveRequest }
             finalUrl = finalUrl.replace(`{${key}}`, value || `{${key}}`);
         });
 
+        // Add query parameters for display
+        const qp = queryParams
+            .filter(p => p.name && p.value)
+            .map(p => `${encodeURIComponent(p.name)}=${encodeURIComponent(p.value)}`)
+            .join('&');
+
+        if (qp) {
+            finalUrl += (finalUrl.includes('?') ? '&' : '?') + qp;
+        }
+
         return finalUrl;
     };
 
@@ -124,7 +162,10 @@ const TryItConsole = ({ api, selectedEndpoint, onEndpointChange, onSaveRequest }
 
         try {
             const currentPathParams = { ...pathParams };
-            const currentQueryParams = { ...queryParams };
+            const currentQueryParams = {};
+            queryParams.forEach(p => {
+                if (p.name) currentQueryParams[p.name] = p.value;
+            });
             let requestHeaders = { ...headers };
             let authInjected = false;
 
@@ -202,12 +243,17 @@ const TryItConsole = ({ api, selectedEndpoint, onEndpointChange, onSaveRequest }
 
     const handleSave = () => {
         const finalUrl = getFinalUrl();
+        const currentQueryParams = {};
+        queryParams.forEach(p => {
+            if (p.name) currentQueryParams[p.name] = p.value;
+        });
+
         const requestData = {
             url: finalUrl,
             method,
             path: endpoint.path,
             headers,
-            queryParams,
+            queryParams: currentQueryParams,
             body: showBody && body ? body : undefined
         };
         onSaveRequest(requestData);
@@ -229,7 +275,10 @@ const TryItConsole = ({ api, selectedEndpoint, onEndpointChange, onSaveRequest }
     const getGeneratedCode = () => {
         // Prepare request object for generator
         let currentPathParams = { ...pathParams };
-        let currentQueryParams = { ...queryParams };
+        let currentQueryParams = {};
+        queryParams.forEach(p => {
+            if (p.name) currentQueryParams[p.name] = p.value;
+        });
         let requestHeaders = { ...headers };
         let authInjected = false;
 
@@ -369,25 +418,41 @@ const TryItConsole = ({ api, selectedEndpoint, onEndpointChange, onSaveRequest }
                 )}
 
                 {/* Query Parameters */}
-                {Object.keys(queryParams).length > 0 && (
-                    <div className="form-group">
+                <div className="form-group">
+                    <div className="section-header-inline">
                         <label>Query Parameters</label>
-                        <div className="params-grid">
-                            {Object.entries(queryParams).map(([key, value]) => (
-                                <div key={key} className="param-row">
-                                    <span className="param-key">{key}</span>
-                                    <input
-                                        type="text"
-                                        value={value}
-                                        onChange={(e) => updateQueryParam(key, e.target.value)}
-                                        placeholder={`Enter ${key}`}
-                                        className="param-input"
-                                    />
-                                </div>
-                            ))}
-                        </div>
+                        <button className="add-param-btn-text" onClick={addQueryParam}>
+                            + Add Parameter
+                        </button>
                     </div>
-                )}
+                    <div className="params-list-modern">
+                        {queryParams.map((param) => (
+                            <div key={param.id} className="modern-param-row">
+                                <input
+                                    type="text"
+                                    value={param.name}
+                                    onChange={(e) => updateQueryParamKey(param.id, e.target.value)}
+                                    placeholder="Key"
+                                    className="modern-param-key"
+                                />
+                                <input
+                                    type="text"
+                                    value={param.value}
+                                    onChange={(e) => updateQueryParam(param.id, e.target.value)}
+                                    placeholder="Value"
+                                    className="modern-param-value"
+                                />
+                                <button
+                                    className="modern-remove-btn"
+                                    onClick={() => removeQueryParam(param.id)}
+                                    title="Remove parameter"
+                                >
+                                    <Trash2 size={15} />
+                                </button>
+                            </div>
+                        ))}
+                    </div>
+                </div>
 
                 {/* Authentication */}
                 {authType !== 'None' && (
@@ -436,8 +501,9 @@ const TryItConsole = ({ api, selectedEndpoint, onEndpointChange, onSaveRequest }
                                     <button
                                         className="remove-btn"
                                         onClick={() => removeHeader(key)}
+                                        title="Remove header"
                                     >
-                                        ×
+                                        <Trash2 size={16} />
                                     </button>
                                 </div>
                             ))}

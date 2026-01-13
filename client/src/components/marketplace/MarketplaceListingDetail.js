@@ -186,6 +186,42 @@ const MarketplaceListingDetail = ({ basePath = '/marketplace' }) => {
 
                     {activeTab === 'reviews' && (
                         <div>
+                            <div className="marketplace-card" style={{ marginBottom: 20 }}>
+                                <h3>Write a review</h3>
+                                <form onSubmit={async (e) => {
+                                    e.preventDefault();
+                                    const form = e.target;
+                                    const rating = form.rating.value;
+                                    const title = form.title.value;
+                                    const body = form.body.value;
+
+                                    try {
+                                        await MarketplaceApi.submitReview(listingId, { rating: parseInt(rating), title, body });
+                                        // Reload reviews
+                                        setReviews(await MarketplaceApi.getReviews(listingId));
+                                        form.reset();
+                                    } catch (err) {
+                                        alert(err.message || 'Failed to submit review');
+                                    }
+                                }}>
+                                    <div style={{ display: 'grid', gap: 10, marginBottom: 10 }}>
+                                        <div>
+                                            <label style={{ display: 'block', marginBottom: 5 }}>Rating</label>
+                                            <select name="rating" style={{ padding: 8, borderRadius: 4, border: '1px solid var(--border-color)', background: 'var(--input-background)', color: 'var(--text-color)' }}>
+                                                <option value="5">⭐⭐⭐⭐⭐ 5 - Excellent</option>
+                                                <option value="4">⭐⭐⭐⭐ 4 - Very Good</option>
+                                                <option value="3">⭐⭐⭐ 3 - Average</option>
+                                                <option value="2">⭐⭐ 2 - Poor</option>
+                                                <option value="1">⭐ 1 - Terrible</option>
+                                            </select>
+                                        </div>
+                                        <input name="title" placeholder="Review Title" required style={{ padding: 8, borderRadius: 4, border: '1px solid var(--border-color)', background: 'var(--input-background)', color: 'var(--text-color)' }} />
+                                        <textarea name="body" placeholder="Share your experience..." rows={3} required style={{ padding: 8, borderRadius: 4, border: '1px solid var(--border-color)', background: 'var(--input-background)', color: 'var(--text-color)' }} />
+                                    </div>
+                                    <button type="submit" className="btn-primary-compact">Submit Review</button>
+                                </form>
+                            </div>
+
                             {!reviews ? (
                                 <div className="empty-state">Loading reviews…</div>
                             ) : (
@@ -200,11 +236,12 @@ const MarketplaceListingDetail = ({ basePath = '/marketplace' }) => {
                                             <div className="marketplace-meta">
                                                 <span className="pill"><strong>{r.rating}</strong> / 5</span>
                                                 <span>{new Date(r.createdAt).toLocaleDateString()}</span>
+                                                <span>by {r.userId?.displayName || 'User'}</span>
                                             </div>
                                             <p>{r.body || ''}</p>
                                         </div>
                                     ))}
-                                    {(reviews.items || []).length === 0 && <div className="empty-state">No reviews yet.</div>}
+                                    {(reviews.items || []).length === 0 && <div className="empty-state">No reviews yet. Be the first!</div>}
                                 </>
                             )}
                         </div>

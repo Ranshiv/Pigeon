@@ -459,18 +459,18 @@ const publicApiCatalog = [
         featured: true
     },
     {
-        id: 'boredapi',
-        name: 'Bored API',
-        provider: 'BoredAPI',
-        description: 'Suggestions for random activities to do when bored',
+        id: 'activity-suggestions',
+        name: 'Activity API',
+        provider: 'Dovahkiin',
+        description: 'Random activity suggestions for when you are bored',
         category: 'Lifestyle',
-        tags: ['activities', 'boredom', 'fun', 'suggestions'],
+        tags: ['activities', 'suggestions', 'fun'],
         authType: 'None',
         pricing: 'Free',
         ratingAverage: 4.5,
         ratingCount: 3200,
         usageCount: 125000,
-        baseUrl: 'https://www.boredapi.com/api',
+        baseUrl: 'https://www.activityapi.com/api',
         endpoints: [
             {
                 path: '/activity',
@@ -478,7 +478,7 @@ const publicApiCatalog = [
                 description: 'Get a random activity'
             }
         ],
-        documentation: 'https://www.boredapi.com/'
+        documentation: 'https://www.activityapi.com/'
     },
     {
         id: 'quizapi',
@@ -721,6 +721,942 @@ const publicApiCatalog = [
             }
         ],
         documentation: 'https://agify.io/'
+    },
+    // --- DEVELOPMENT TOOLS ---
+    {
+        id: 'reqres',
+        name: 'ReqRes',
+        provider: 'Ben Howdle',
+        description: 'A hosted REST-API ready to respond to your AJAX requests',
+        category: 'Development',
+        tags: ['testing', 'mock', 'api', 'rest'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.6,
+        ratingCount: 5200,
+        usageCount: 850000,
+        baseUrl: 'https://reqres.in/api',
+        endpoints: [
+            { path: '/users', method: 'GET', description: 'List users' },
+            { path: '/users/{id}', method: 'GET', description: 'Single user' }
+        ],
+        documentation: 'https://reqres.in/'
+    },
+    {
+        id: 'httpbin',
+        name: 'Httpbin',
+        provider: 'Postman',
+        description: 'A simple HTTP Request & Response Service',
+        category: 'Development',
+        tags: ['testing', 'http', 'debug', 'utility'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.8,
+        ratingCount: 12000,
+        usageCount: 2500000,
+        baseUrl: 'https://httpbin.org',
+        endpoints: [
+            { path: '/get', method: 'GET', description: 'Returns GET data' },
+            { path: '/post', method: 'POST', description: 'Returns POST data' },
+            { path: '/status/{code}', method: 'GET', description: 'Returns given status code' }
+        ],
+        documentation: 'https://httpbin.org/'
+    },
+    {
+        id: 'jsonbin',
+        name: 'JSONBin.io',
+        provider: 'JSONBin',
+        description: 'Free JSON Storage Service',
+        category: 'Development',
+        tags: ['storage', 'json', 'data', 'database'],
+        authType: 'API Key',
+        pricing: 'Freemium',
+        baseUrl: 'https://api.jsonbin.io/v3',
+        endpoints: [
+            { path: '/b/{id}', method: 'GET', description: 'Get a bin' }
+        ],
+        documentation: 'https://jsonbin.io/api-reference'
+    },
+    {
+        id: 'ipstack',
+        name: 'IPstack',
+        provider: 'apilayer',
+        description: 'Real-time IP Address Geolocation API',
+        category: 'Data',
+        tags: ['ip', 'geolocation', 'location'],
+        authType: 'API Key',
+        pricing: 'Freemium',
+        baseUrl: 'http://api.ipstack.com',
+        endpoints: [
+            { path: '/{ip}', method: 'GET', description: 'Check IP' }
+        ],
+        documentation: 'https://ipstack.com/documentation'
+    },
+    // --- AI & ML ---
+    {
+        id: 'genderize',
+        name: 'Genderize.io',
+        provider: 'Genderize Group',
+        description: 'Predict the gender of a person based on their name',
+        category: 'AI',
+        tags: ['geography', 'gender', 'ml'],
+        authType: 'None',
+        pricing: 'Free',
+        baseUrl: 'https://api.genderize.io',
+        endpoints: [
+            { path: '/', method: 'GET', description: 'Predict gender' }
+        ],
+        documentation: 'https://genderize.io/'
+    },
+    {
+        id: 'nationalize',
+        name: 'Nationalize.io',
+        provider: 'Genderize Group',
+        description: 'Predict the nationality of a person based on their name',
+        category: 'AI',
+        tags: ['geography', 'nationality', 'ml'],
+        authType: 'None',
+        pricing: 'Free',
+        baseUrl: 'https://api.nationalize.io',
+        endpoints: [
+            { path: '/', method: 'GET', description: 'Predict nationality' }
+        ],
+        documentation: 'https://nationalize.io/'
+    },
+    {
+        id: 'adviceslip',
+        name: 'Advice Slip',
+        provider: 'Advice Slip',
+        description: 'Random advice generator',
+        category: 'AI',
+        tags: ['advice', 'fun', 'wisdom'],
+        authType: 'None',
+        pricing: 'Free',
+        baseUrl: 'https://api.adviceslip.com/advice',
+        endpoints: [
+            { path: '/', method: 'GET', description: 'Get random advice' }
+        ],
+        documentation: 'https://adviceslip.com/'
+    },
+    {
+        id: 'kanye-rest',
+        name: 'Kanye Rest',
+        provider: 'Andrew @ajzbc',
+        description: 'Random Kanye West quotes API',
+        category: 'Entertainment',
+        tags: ['quotes', 'music', 'fun'],
+        baseUrl: 'https://api.kanye.rest',
+        endpoints: [
+            { path: '/', method: 'GET', description: 'Get random quote' }
+        ]
+    },
+    // --- FINANCE ---
+    {
+        id: 'marketstack',
+        name: 'Marketstack',
+        provider: 'apilayer',
+        description: 'Real-time, Intraday & Historical Stock Market Data API',
+        category: 'Finance',
+        tags: ['stocks', 'market', 'historical'],
+        authType: 'API Key',
+        pricing: 'Freemium',
+        baseUrl: 'http://api.marketstack.com/v1',
+        endpoints: [
+            { path: '/eod', method: 'GET', description: 'End-of-day data' }
+        ],
+        documentation: 'https://marketstack.com/documentation'
+    },
+    {
+        id: 'fixer',
+        name: 'Fixer.io',
+        provider: 'apilayer',
+        description: 'Foreign Exchange Rates and Currency Conversion API',
+        category: 'Finance',
+        tags: ['currency', 'forex', 'conversion'],
+        authType: 'API Key',
+        pricing: 'Freemium',
+        baseUrl: 'http://data.fixer.io/api',
+        endpoints: [
+            { path: '/latest', method: 'GET', description: 'Latest rates' }
+        ],
+        documentation: 'https://fixer.io/documentation'
+    },
+    {
+        id: 'frankfurter',
+        name: 'Frankfurter',
+        provider: 'Frankfurter',
+        description: 'Open source API for current and historical foreign exchange rates',
+        category: 'Finance',
+        tags: ['currency', 'forex', 'open-source'],
+        authType: 'None',
+        pricing: 'Free',
+        baseUrl: 'https://api.frankfurter.app',
+        endpoints: [
+            { path: '/latest', method: 'GET', description: 'Latest rates' }
+        ],
+        documentation: 'https://www.frankfurter.app/docs/'
+    },
+    {
+        id: 'nager-date',
+        name: 'Nager.Date',
+        provider: 'Nager',
+        description: 'Public Holidays API',
+        category: 'Data',
+        tags: ['holidays', 'calendar', 'global'],
+        authType: 'None',
+        pricing: 'Free',
+        baseUrl: 'https://date.nager.at/api/v3',
+        endpoints: [
+            { path: '/PublicHolidays/{year}/{countryCode}', method: 'GET', description: 'Get public holidays' }
+        ],
+        documentation: 'https://date.nager.at/swagger/index.html'
+    },
+    // --- ENTERTAINMENT & FUN ---
+    {
+        id: 'chucknorris',
+        name: 'Chuck Norris Facts',
+        provider: 'Chuck Norris API',
+        description: 'Hand-curated Chuck Norris facts',
+        category: 'Entertainment',
+        tags: ['jokes', 'fun', 'chuck-norris'],
+        authType: 'None',
+        pricing: 'Free',
+        baseUrl: 'https://api.chucknorris.io/jokes',
+        endpoints: [
+            { path: '/random', method: 'GET', description: 'Get random fact' }
+        ],
+        documentation: 'https://api.chucknorris.io/'
+    },
+    {
+        id: 'dadjokes',
+        name: 'I Can Haz Dad Joke',
+        provider: 'DadJokes',
+        description: 'The largest selection of dad jokes on the internet',
+        category: 'Entertainment',
+        tags: ['jokes', 'dad-jokes', 'humor'],
+        authType: 'None',
+        pricing: 'Free',
+        baseUrl: 'https://icanhazdadjoke.com',
+        endpoints: [
+            { path: '/', method: 'GET', description: 'Get random joke' }
+        ],
+        documentation: 'https://icanhazdadjoke.com/api'
+    },
+    {
+        id: 'opentdb',
+        name: 'Open Trivia DB',
+        provider: 'PIXELCAN',
+        description: 'User-contributed trivia question database',
+        category: 'Entertainment',
+        tags: ['trivia', 'games', 'quiz'],
+        authType: 'None',
+        pricing: 'Free',
+        baseUrl: 'https://opentdb.com/api.php',
+        endpoints: [
+            { path: '/', method: 'GET', description: 'Get trivia questions' }
+        ],
+        documentation: 'https://opentdb.com/api_config.php'
+    },
+    {
+        id: 'tmdb',
+        name: 'The Movie Database',
+        provider: 'TMDB',
+        description: 'The Movie Database (TMDB) is a community built movie and TV database',
+        category: 'Entertainment',
+        tags: ['movies', 'tv', 'media', 'data'],
+        authType: 'API Key',
+        pricing: 'Free',
+        baseUrl: 'https://api.themoviedb.org/3',
+        endpoints: [
+            { path: '/movie/popular', method: 'GET', description: 'Popular movies' },
+            { path: '/search/movie', method: 'GET', description: 'Search movies' }
+        ],
+        documentation: 'https://developers.themoviedb.org/3'
+    },
+    {
+        id: 'tvmaze',
+        name: 'TVmaze',
+        provider: 'TVmaze',
+        description: 'TV show data and schedules',
+        category: 'Entertainment',
+        tags: ['tv', 'shows', 'media'],
+        authType: 'None',
+        pricing: 'Free',
+        baseUrl: 'https://api.tvmaze.com',
+        endpoints: [
+            { path: '/search/shows', method: 'GET', description: 'Search shows' },
+            { path: '/schedule', method: 'GET', description: 'Show schedule' }
+        ],
+        documentation: 'https://www.tvmaze.com/api'
+    },
+    // --- IMAGES & ART ---
+    {
+        id: 'picsum',
+        name: 'Lorem Picsum',
+        provider: 'Picsum',
+        description: 'The Lorem Ipsum for photos',
+        category: 'Images',
+        tags: ['placeholder', 'images', 'photos'],
+        baseUrl: 'https://picsum.photos',
+        endpoints: [
+            { path: '/v2/list', method: 'GET', description: 'List images' },
+            { path: '/{width}/{height}', method: 'GET', description: 'Get image' }
+        ],
+        documentation: 'https://picsum.photos/'
+    },
+    {
+        id: 'dicebear',
+        name: 'DiceBear',
+        provider: 'DiceBear',
+        description: 'Avatar library for designers and developers',
+        category: 'Images',
+        tags: ['avatars', 'svg', 'design'],
+        baseUrl: 'https://api.dicebear.com/7.x',
+        endpoints: [
+            { path: '/{style}/svg', method: 'GET', description: 'Generate avatar' }
+        ],
+        documentation: 'https://www.dicebear.com/how-to-use/api/'
+    },
+    {
+        id: 'artic',
+        name: 'Art Institute of Chicago',
+        provider: 'Art Institute of Chicago',
+        description: 'Public API for the Art Institute of Chicago collection',
+        category: 'Images',
+        tags: ['art', 'museum', 'culture'],
+        baseUrl: 'https://api.artic.edu/api/v1',
+        endpoints: [
+            { path: '/artworks', method: 'GET', description: 'List artworks' }
+        ],
+        documentation: 'https://api.artic.edu/docs/'
+    },
+    {
+        id: 'metmus',
+        name: 'Met Museum',
+        provider: 'Metropolitan Museum of Art',
+        description: 'Open Access collection of the Metropolitan Museum of Art',
+        category: 'Images',
+        tags: ['art', 'museum', 'culture'],
+        baseUrl: 'https://collectionapi.metmuseum.org/public/collection/v1',
+        endpoints: [
+            { path: '/objects', method: 'GET', description: 'List objects' }
+        ],
+        documentation: 'https://metmuseum.github.io/'
+    },
+    // --- SCIENCES & NATURE ---
+    {
+        id: 'spacex',
+        name: 'SpaceX API',
+        provider: 'r-spacex',
+        description: 'Open Source REST API for SpaceX launch, rocket, core, capsule, starlink and launchpad data',
+        category: 'Science',
+        tags: ['space', 'spacex', 'rockets'],
+        baseUrl: 'https://api.spacexdata.com/v4',
+        endpoints: [
+            { path: '/launches/latest', method: 'GET', description: 'Latest launch' },
+            { path: '/rockets', method: 'GET', description: 'Rockets list' }
+        ],
+        documentation: 'https://github.com/r-spacex/SpaceX-API'
+    },
+    {
+        id: 'airvisual',
+        name: 'IQAir (AirVisual)',
+        provider: 'IQAir',
+        description: 'Real-time air quality data (AQI) and weather data',
+        category: 'Science',
+        tags: ['environment', 'air-quality', 'pollution'],
+        authType: 'API Key',
+        baseUrl: 'https://api.airvisual.com/v2',
+        endpoints: [
+            { path: '/nearest_city', method: 'GET', description: 'Nearest city AQI' }
+        ],
+        documentation: 'https://api-docs.iqair.com/'
+    },
+    {
+        id: 'sunrisesunset',
+        name: 'Sunrise-Sunset',
+        provider: 'Sunrise-Sunset.org',
+        description: 'Sunset and sunrise times for a given latitude and longitude',
+        category: 'Science',
+        tags: ['solar', 'time', 'geography'],
+        baseUrl: 'https://api.sunrise-sunset.org',
+        endpoints: [
+            {
+                path: '/json',
+                method: 'GET',
+                description: 'Get solar data',
+                parameters: [
+                    { name: 'lat', type: 'query', required: true, description: 'Latitude' },
+                    { name: 'lng', type: 'query', required: true, description: 'Longitude' }
+                ]
+            }
+        ],
+        documentation: 'https://sunrise-sunset.org/api'
+    },
+    // --- FOOD & DRINK ---
+    {
+        id: 'mealy',
+        name: 'TheMealDB',
+        provider: 'TheMealDB',
+        description: 'An open, crowd-sourced database of Recipes from around the world',
+        category: 'Food',
+        tags: ['recipes', 'cooking', 'food'],
+        baseUrl: 'https://www.themealdb.com/api/json/v1/1',
+        endpoints: [
+            { path: '/random.php', method: 'GET', description: 'Random meal' },
+            { path: '/search.php', method: 'GET', description: 'Search meal' }
+        ],
+        documentation: 'https://www.themealdb.com/api.php'
+    },
+    {
+        id: 'cocktaildb',
+        name: 'TheCocktailDB',
+        provider: 'TheCocktailDB',
+        description: 'An open, crowd-sourced database of Drinks and Cocktails from around the world',
+        category: 'Food',
+        tags: ['drinks', 'cocktails', 'recipes'],
+        baseUrl: 'https://www.thecocktaildb.com/api/json/v1/1',
+        endpoints: [
+            { path: '/random.php', method: 'GET', description: 'Random cocktail' }
+        ],
+        documentation: 'https://www.thecocktaildb.com/api.php'
+    },
+    // --- TRAVEL & GEODATA ---
+    {
+        id: 'teleport',
+        name: 'Teleport',
+        provider: 'Teleport',
+        description: 'API for city data, including quality of life, salaries, and more',
+        category: 'Travel',
+        tags: ['cities', 'salaries', 'quality-of-life'],
+        baseUrl: 'https://api.teleport.org/api',
+        endpoints: [
+            { path: '/urban_areas', method: 'GET', description: 'Urban areas' }
+        ],
+        documentation: 'https://developers.teleport.org/api/'
+    },
+    {
+        id: 'universities',
+        name: 'Universities API',
+        provider: 'Hipo',
+        description: 'A global database of university information',
+        category: 'Education',
+        tags: ['education', 'universities', 'global'],
+        baseUrl: 'http://universities.hipolabs.com',
+        endpoints: [
+            { path: '/search', method: 'GET', description: 'Search universities' }
+        ],
+        documentation: 'https://github.com/Hipo/university-domains-list'
+    },
+    {
+        id: 'dictionary',
+        name: 'Free Dictionary API',
+        provider: 'DictionaryAPI.dev',
+        description: 'Free English Dictionary API',
+        category: 'Education',
+        tags: ['dictionary', 'words', 'definitions'],
+        baseUrl: 'https://api.dictionaryapi.dev/api/v2/entries/en',
+        endpoints: [
+            { path: '/{word}', method: 'GET', description: 'Get definition' }
+        ],
+        documentation: 'https://dictionaryapi.dev/'
+    },
+    {
+        id: 'bible',
+        name: 'Bible-Api',
+        provider: 'Bible-Api',
+        description: 'Free Bible API with JSON support',
+        category: 'Data',
+        tags: ['religion', 'bible', 'text'],
+        baseUrl: 'https://bible-api.com',
+        endpoints: [
+            { path: '/{citation}', method: 'GET', description: 'Get verse' }
+        ],
+        documentation: 'https://bible-api.com/'
+    },
+    // --- ADDING MORE TO REACH 80+ ---
+    {
+        id: 'evilinsult',
+        name: 'Evil Insult Generator',
+        provider: 'Evil Insult',
+        description: 'Generate evil insults',
+        category: 'Entertainment',
+        tags: ['insults', 'fun', 'humor'],
+        baseUrl: 'https://evilinsult.com/generate_insult.php',
+        endpoints: [
+            { path: '/', method: 'GET', description: 'Get insult' }
+        ],
+        documentation: 'https://evilinsult.com/api/'
+    },
+    {
+        id: 'advice-api',
+        name: 'Advice Slip v2',
+        provider: 'Advice Slip',
+        description: 'Advice Slip generation',
+        category: 'Lifestyle',
+        tags: ['advice', 'life'],
+        baseUrl: 'https://api.adviceslip.com/advice',
+        endpoints: [
+            { path: '/', method: 'GET', description: 'Get advice' }
+        ]
+    },
+    {
+        id: 'yesno',
+        name: 'Yes No API',
+        provider: 'Yes No WTF',
+        description: 'Force a random yes or no answer',
+        category: 'Entertainment',
+        tags: ['decisions', 'fun'],
+        baseUrl: 'https://yesno.wtf/api',
+        endpoints: [
+            { path: '/', method: 'GET', description: 'Get answer' }
+        ]
+    },
+    {
+        id: 'cat-facts',
+        name: 'Cat Facts API',
+        provider: 'Cat Facts Ninja',
+        description: 'Daily facts about cats',
+        category: 'Animals',
+        tags: ['cats', 'facts'],
+        baseUrl: 'https://catfact.ninja',
+        endpoints: [
+            { path: '/fact', method: 'GET', description: 'Random fact' }
+        ]
+    },
+    {
+        id: 'dog-facts',
+        name: 'Dog Facts API',
+        provider: 'Kinduff',
+        description: 'Random dog facts',
+        category: 'Animals',
+        tags: ['dogs', 'facts'],
+        baseUrl: 'https://dog-api.kinduff.com/api/facts',
+        endpoints: [
+            { path: '/', method: 'GET', description: 'Random fact' }
+        ]
+    },
+    {
+        id: 'us-population',
+        name: 'DataUSA API',
+        provider: 'DataUSA',
+        description: 'Access public US government data',
+        category: 'Data',
+        tags: ['government', 'usa', 'population'],
+        baseUrl: 'https://datausa.io/api/data',
+        endpoints: [
+            { path: '/', method: 'GET', description: 'Get data' }
+        ]
+    },
+    {
+        id: 'zippopotamus',
+        name: 'Zippopotamus',
+        provider: 'Zippopotamus',
+        description: 'Free postal code information',
+        category: 'Data',
+        tags: ['zipcode', 'geography'],
+        baseUrl: 'http://api.zippopotam.us',
+        endpoints: [
+            { path: '/us/{zip}', method: 'GET', description: 'Get US zip data' }
+        ]
+    },
+    {
+        id: 'open-ligue-db',
+        name: 'OpenLigaDB',
+        provider: 'OpenLigaDB',
+        description: 'Open data for football leagues',
+        category: 'Sports',
+        tags: ['football', 'soccer', 'sports'],
+        baseUrl: 'https://api.openligadb.de',
+        endpoints: [
+            { path: '/getmatchdata/bl1/2023', method: 'GET', description: 'Bundesliga data' }
+        ]
+    },
+    {
+        id: 'official-joke-api',
+        name: 'Official Joke API',
+        provider: 'David Katz',
+        description: 'A simple API for random jokes (General, Programming, Knock-knock)',
+        category: 'Entertainment',
+        tags: ['jokes', 'humor', 'fun'],
+        authType: 'None',
+        pricing: 'Free',
+        baseUrl: 'https://official-joke-api.appspot.com',
+        endpoints: [
+            { path: '/random_joke', method: 'GET', description: 'Get a random joke' },
+            { path: '/jokes/programming/random', method: 'GET', description: 'Get a programming joke' }
+        ],
+        documentation: 'https://github.com/15Dkatz/official_joke_api'
+    },
+    {
+        id: 'cryptocompare',
+        name: 'CryptoCompare',
+        provider: 'CryptoCompare',
+        description: 'Cryptocurrency market data',
+        category: 'Finance',
+        tags: ['crypto', 'bitcoin'],
+        baseUrl: 'https://min-api.cryptocompare.com/data',
+        endpoints: [
+            { path: '/price', method: 'GET', description: 'Get price' }
+        ]
+    },
+    {
+        id: 'wallstreetbets',
+        name: 'WSB API',
+        provider: 'Tradestie',
+        description: 'Wall Street Bets sentiment analysis',
+        category: 'Finance',
+        tags: ['stocks', 'reddit', 'sentiment'],
+        baseUrl: 'https://tradestie.com/api/v1/apps/reddit',
+        endpoints: [
+            { path: '/', method: 'GET', description: 'Get sentiment' }
+        ]
+    },
+    {
+        id: 'itunes',
+        name: 'iTunes Search API',
+        provider: 'Apple',
+        description: 'Search for music and movies on iTunes',
+        category: 'Media',
+        tags: ['music', 'itunes', 'apple'],
+        baseUrl: 'https://itunes.apple.com',
+        endpoints: [
+            { path: '/search', method: 'GET', description: 'Search' }
+        ]
+    },
+    {
+        id: 'scryfall',
+        name: 'Scryfall API',
+        provider: 'Scryfall',
+        description: 'Magic: The Gathering card data',
+        category: 'Games',
+        tags: ['mtg', 'cards', 'games'],
+        baseUrl: 'https://api.scryfall.com',
+        endpoints: [
+            { path: '/cards/random', method: 'GET', description: 'Random card' }
+        ]
+    },
+    {
+        id: 'freetogame',
+        name: 'Free-To-Play Games API',
+        provider: 'FreeToGame',
+        description: 'Access a massive database of free-to-play games and news',
+        category: 'Games',
+        tags: ['games', 'f2p', 'gaming', 'database'],
+        authType: 'None',
+        pricing: 'Free',
+        baseUrl: 'https://www.freetogame.com/api',
+        endpoints: [
+            { path: '/games', method: 'GET', description: 'Get all games' },
+            { path: '/game?id={id}', method: 'GET', description: 'Get game details', parameters: [{ name: 'id', type: 'query', required: true }] }
+        ],
+        documentation: 'https://www.freetogame.com/api-doc'
+    },
+    {
+        id: 'deck-of-cards',
+        name: 'Deck of Cards API',
+        provider: 'Deck of Cards',
+        description: 'Simulate decks of cards',
+        category: 'Games',
+        tags: ['cards', 'deck'],
+        baseUrl: 'https://deckofcardsapi.com/api/deck',
+        endpoints: [
+            { path: '/new/shuffle', method: 'GET', description: 'Shuffle new' }
+        ]
+    },
+    {
+        id: 'boardgamegeek',
+        name: 'BoardGameGeek API',
+        provider: 'BoardGameGeek',
+        description: 'Board game data from BGG',
+        category: 'Games',
+        tags: ['boardgames', 'games'],
+        baseUrl: 'https://boardgamegeek.com/xmlapi2',
+        endpoints: [
+            { path: '/thing', method: 'GET', description: 'Get thing' }
+        ]
+    },
+    {
+        id: 'faker-api',
+        name: 'Faker API',
+        provider: 'FakerAPI.it',
+        description: 'Generate fake data',
+        category: 'Development',
+        tags: ['test-data', 'faker'],
+        baseUrl: 'https://fakerapi.it/api/v1',
+        endpoints: [
+            { path: '/persons', method: 'GET', description: 'Fake persons' }
+        ]
+    },
+    {
+        id: 'restfox',
+        name: 'RestFox API',
+        provider: 'RestFox',
+        description: 'Mock data generation',
+        category: 'Development',
+        tags: ['mock', 'rest'],
+        baseUrl: 'https://api.restfox.dev',
+        endpoints: [
+            { path: '/ping', method: 'GET', description: 'Ping' }
+        ]
+    },
+    {
+        id: 'ipify',
+        name: 'Ipify',
+        provider: 'Ipify',
+        description: 'Simple IP address API',
+        category: 'Tools',
+        tags: ['ip', 'utility'],
+        baseUrl: 'https://api.ipify.org',
+        endpoints: [
+            { path: '/', method: 'GET', description: 'Get IP' }
+        ]
+    },
+    {
+        id: 'updown-io',
+        name: 'Updown.io',
+        provider: 'Updown.io',
+        description: 'Monitoring API',
+        category: 'Development',
+        tags: ['monitoring', 'status'],
+        baseUrl: 'https://updown.io/api',
+        endpoints: [
+            { path: '/checks', method: 'GET', description: 'Get checks' }
+        ]
+    },
+    {
+        id: 'breach-api',
+        name: 'Have I Been Pwned',
+        provider: 'Troy Hunt',
+        description: 'Check for data breaches',
+        category: 'Security',
+        tags: ['security', 'breach'],
+        baseUrl: 'https://haveibeenpwned.com/api/v3',
+        endpoints: [
+            { path: '/breaches', method: 'GET', description: 'List breaches' }
+        ]
+    },
+    {
+        id: 'hackernews',
+        name: 'Hacker News API',
+        provider: 'Y Combinator',
+        description: 'Hacker News public API',
+        category: 'News',
+        tags: ['tech', 'news', 'hacker-news'],
+        baseUrl: 'https://hacker-news.firebaseio.com/v0',
+        endpoints: [
+            { path: '/topstories.json', method: 'GET', description: 'Top stories' }
+        ]
+    },
+    {
+        id: 'reddit-api',
+        name: 'Reddit API',
+        provider: 'Reddit',
+        description: 'Reddit JSON API',
+        category: 'Social',
+        tags: ['reddit', 'social-media'],
+        baseUrl: 'https://www.reddit.com',
+        endpoints: [
+            { path: '/r/{subreddit}/.json', method: 'GET', description: 'Subreddit data' }
+        ]
+    },
+    {
+        id: 'wikipedia',
+        name: 'Wikipedia API',
+        provider: 'Wikimedia',
+        description: 'MediaWiki API for Wikipedia',
+        category: 'Education',
+        tags: ['wiki', 'knowledge'],
+        baseUrl: 'https://en.wikipedia.org/w/api.php',
+        endpoints: [
+            { path: '/', method: 'GET', description: 'Generic API' }
+        ]
+    },
+    {
+        id: 'stack-exchange',
+        name: 'Stack Exchange API',
+        provider: 'Stack Overflow',
+        description: 'Stack Overflow and Stack Exchange data',
+        category: 'Development',
+        tags: ['qa', 'stackoverflow'],
+        baseUrl: 'https://api.stackexchange.com/2.3',
+        endpoints: [
+            { path: '/questions', method: 'GET', description: 'Questions' }
+        ]
+    },
+    {
+        id: 'world-clock',
+        name: 'World Clock API',
+        provider: 'WorldClockAPI',
+        description: 'Get current time across timezones',
+        category: 'Tools',
+        tags: ['time', 'clock'],
+        baseUrl: 'http://worldclockapi.com/api/json',
+        endpoints: [
+            { path: '/est/now', method: 'GET', description: 'EST Time' }
+        ]
+    },
+    {
+        id: 'country-layer',
+        name: 'CountryLayer API',
+        provider: 'apilayer',
+        description: 'A simple country data API',
+        category: 'Data',
+        tags: ['countries', 'geography'],
+        baseUrl: 'http://api.countrylayer.com/v2',
+        endpoints: [
+            { path: '/all', method: 'GET', description: 'All countries' }
+        ]
+    },
+    {
+        id: 'rest-countries-v2',
+        name: 'REST Countries v2',
+        provider: 'REST Countries',
+        description: 'Additional country data',
+        category: 'Data',
+        tags: ['countries', 'geography'],
+        baseUrl: 'https://restcountries.com/v2',
+        endpoints: [
+            { path: '/all', method: 'GET', description: 'All countries' }
+        ]
+    },
+    {
+        id: 'ghibli-api',
+        name: 'Studio Ghibli API',
+        provider: 'Studio Ghibli',
+        description: 'Data from Studio Ghibli films',
+        category: 'Entertainment',
+        tags: ['anime', 'movies', 'ghibli'],
+        baseUrl: 'https://ghibliapi.vercel.app',
+        endpoints: [
+            { path: '/films', method: 'GET', description: 'Films' }
+        ]
+    },
+    {
+        id: 'final-fantasy-api',
+        name: 'Final Fantasy API',
+        provider: 'MoogleAPI',
+        description: 'Final Fantasy universe data',
+        category: 'Games',
+        tags: ['ff', 'rpg', 'games'],
+        baseUrl: 'https://moogleapi.com/api/v1',
+        endpoints: [
+            { path: '/characters', method: 'GET', description: 'Characters' }
+        ]
+    },
+    {
+        id: 'marvel-api',
+        name: 'Marvel API',
+        provider: 'Marvel',
+        description: 'Access the Marvel Comics world (Requires Public/Private Keys and Hash)',
+        category: 'Entertainment',
+        tags: ['marvel', 'comics', 'superheroes'],
+        authType: 'API Key',
+        baseUrl: 'https://gateway.marvel.com/v1/public',
+        endpoints: [
+            { path: '/characters', method: 'GET', description: 'Characters' }
+        ],
+        documentation: 'https://developer.marvel.com/'
+    },
+    {
+        id: 'disney-api',
+        name: 'Disney API',
+        provider: 'Disney',
+        description: 'Disney characters data',
+        category: 'Entertainment',
+        tags: ['disney', 'characters'],
+        baseUrl: 'https://api.disneyapi.dev',
+        endpoints: [
+            { path: '/character', method: 'GET', description: 'Characters' }
+        ]
+    },
+    {
+        id: 'clash-of-clans',
+        name: 'Clash of Clans API',
+        provider: 'Supercell',
+        description: 'Official Clash of Clans API (Requires API Key)',
+        category: 'Games',
+        tags: ['clash-of-clans', 'supercell'],
+        authType: 'API Key',
+        baseUrl: 'https://api.clashofclans.com/v1',
+        endpoints: [
+            { path: '/clans', method: 'GET', description: 'Search clans' }
+        ]
+    },
+    {
+        id: 'fortnite-api',
+        name: 'Fortnite API',
+        provider: 'FortniteAPI.com',
+        description: 'Fortnite shop and stats data (No Key required for some endpoints)',
+        category: 'Games',
+        tags: ['fortnite', 'battle-royale'],
+        authType: 'None',
+        baseUrl: 'https://fortnite-api.com/v2',
+        endpoints: [
+            { path: '/shop/br', method: 'GET', description: 'BR Shop' }
+        ]
+    },
+    {
+        id: 'valorant-api',
+        name: 'Valorant API',
+        provider: 'ValorantAPI.com',
+        description: 'Valorant content and assets',
+        category: 'Games',
+        tags: ['valorant', 'fps', 'assets'],
+        baseUrl: 'https://valorant-api.com/v1',
+        endpoints: [
+            { path: '/agents', method: 'GET', description: 'Agents' }
+        ]
+    },
+    {
+        id: 'apex-legends',
+        name: 'Apex Legends API',
+        provider: 'Mozambiquehe.re',
+        description: 'Apex Legends player stats',
+        category: 'Games',
+        tags: ['apex', 'legends', 'stats'],
+        baseUrl: 'https://api.mozambiquehe.re',
+        endpoints: [
+            { path: '/maprotation', method: 'GET', description: 'Map rotation' }
+        ]
+    },
+    {
+        id: 'pubg-api',
+        name: 'PUBG API',
+        provider: 'PUBG Studios',
+        description: 'Official PUBG data API (Requires API Key)',
+        category: 'Games',
+        tags: ['pubg', 'battle-royale'],
+        authType: 'API Key',
+        baseUrl: 'https://api.pubg.com/shards/steam/matches',
+        endpoints: [
+            { path: '/', method: 'GET', description: 'Matches' }
+        ]
+    },
+    {
+        id: 'league-of-legends',
+        name: 'Riot Games API',
+        provider: 'Riot Games',
+        description: 'League of Legends data (Requires API Key)',
+        category: 'Games',
+        tags: ['lol', 'riot', 'league'],
+        authType: 'API Key',
+        baseUrl: 'https://{region}.api.riotgames.com/lol',
+        endpoints: [
+            { path: '/summoner/v4/summoners/by-name/{name}', method: 'GET', description: 'Summoner' }
+        ]
+    },
+    {
+        id: 'genshin-impact',
+        name: 'Genshin Impact API',
+        provider: 'Genshin.dev',
+        description: 'Genshin Impact game assets',
+        category: 'Games',
+        tags: ['genshin', 'rpg', 'anime'],
+        baseUrl: 'https://api.genshin.dev',
+        endpoints: [
+            { path: '/characters', method: 'GET', description: 'Characters' }
+        ]
     }
 ];
 
@@ -734,8 +1670,16 @@ async function seed() {
         console.log('Cleared existing marketplace APIs');
 
         // Insert new APIs
+        // Ensure every API has a provider
+        publicApiCatalog.forEach(api => {
+            if (!api.provider) {
+                api.provider = api.name || api.id || 'Unknown Provider';
+            }
+        });
+
         const result = await MarketplaceApi.insertMany(publicApiCatalog);
         console.log(`Successfully inserted ${result.length} APIs`);
+        require('fs').writeFileSync('seed_success.txt', `Inserted ${result.length} APIs`);
 
         // Create text index explicitly if needed, but schema handles it
         // await MarketplaceApi.createIndexes();
@@ -743,6 +1687,8 @@ async function seed() {
         console.log('Done!');
         process.exit(0);
     } catch (err) {
+        const errorMsg = `Error seeding database: ${err.message}\n${JSON.stringify(err.errors, null, 2)}`;
+        require('fs').writeFileSync('seed_error.txt', errorMsg);
         console.error('Error seeding database:', err);
         process.exit(1);
     }

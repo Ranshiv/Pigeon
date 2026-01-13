@@ -45,4 +45,4 @@ MarketplaceApiSchema.index({
     tags: 'text'
 });
 
-module.exports = mongoose.model('MarketplaceApi', MarketplaceApiSchema);
+module.exports = mongoose.models.MarketplaceApi || mongoose.model('MarketplaceApi', MarketplaceApiSchema);

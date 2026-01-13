@@ -1,12 +1,53 @@
 import React, { useState } from 'react';
-import { X, ExternalLink, BookOpen, Code, Play, Copy, Check, Star, TrendingUp } from 'lucide-react';
+import { X, ExternalLink, BookOpen, Code, Play, Copy, Check, Star, TrendingUp, MessageSquare, Book, Activity, Users, ArrowLeft } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import TryItConsole from './TryItConsole';
+import { MarketplaceApi } from './MarketplaceApi';
 import './ApiDetailModal.css';
 
 const ApiDetailModal = ({ api, onClose }) => {
     const [activeTab, setActiveTab] = useState('overview');
     const [selectedEndpoint, setSelectedEndpoint] = useState(api.endpoints[0] || null);
     const [copied, setCopied] = useState(false);
+
+    // Data states for new tabs
+    const [reviews, setReviews] = useState(null);
+    const [threads, setThreads] = useState(null);
+    const [guides, setGuides] = useState(null);
+    const [selectedGuide, setSelectedGuide] = useState(null);
+    const [health, setHealth] = useState(null);
+    const [loadingTab, setLoadingTab] = useState(false);
+    const [showThreadForm, setShowThreadForm] = useState(false);
+    const [reviewRating, setReviewRating] = useState(5);
+    const [hoverRating, setHoverRating] = useState(0);
+
+    // Fetch data when tab changes
+    React.useEffect(() => {
+        const fetchData = async () => {
+            if (activeTab === 'reviews' && !reviews) {
+                setLoadingTab(true);
+                try { setReviews(await MarketplaceApi.getReviews(api.id)); } catch (e) { console.error(e); }
+                setLoadingTab(false);
+            }
+            if (activeTab === 'forums' && !threads) {
+                setLoadingTab(true);
+                try { setThreads(await MarketplaceApi.listThreads(api.id)); } catch (e) { console.error(e); }
+                setLoadingTab(false);
+            }
+            if (activeTab === 'guides' && !guides) {
+                setLoadingTab(true);
+                try { setGuides(await MarketplaceApi.getGuides(api.id)); } catch (e) { console.error(e); }
+                setLoadingTab(false);
+            }
+            if (activeTab === 'health' && !health) {
+                setLoadingTab(true);
+                try { setHealth(await MarketplaceApi.getHealth(api.id)); } catch (e) { console.error(e); }
+                setLoadingTab(false);
+            }
+        };
+        fetchData();
+    }, [activeTab, api.id, reviews, threads, guides, health]);
 
     const copyToClipboard = (text) => {
         navigator.clipboard.writeText(text);
@@ -126,6 +167,34 @@ const ApiDetailModal = ({ api, onClose }) => {
                         >
                             <Code size={18} />
                             Endpoints
+                        </button>
+                        <button
+                            className={`tab-btn ${activeTab === 'reviews' ? 'active' : ''}`}
+                            onClick={() => setActiveTab('reviews')}
+                        >
+                            <Star size={18} />
+                            Reviews
+                        </button>
+                        <button
+                            className={`tab-btn ${activeTab === 'forums' ? 'active' : ''}`}
+                            onClick={() => setActiveTab('forums')}
+                        >
+                            <Users size={18} />
+                            Forums
+                        </button>
+                        <button
+                            className={`tab-btn ${activeTab === 'guides' ? 'active' : ''}`}
+                            onClick={() => setActiveTab('guides')}
+                        >
+                            <Book size={18} />
+                            Guides
+                        </button>
+                        <button
+                            className={`tab-btn ${activeTab === 'health' ? 'active' : ''}`}
+                            onClick={() => setActiveTab('health')}
+                        >
+                            <Activity size={18} />
+                            Health
                         </button>
                     </div>
                 </div>
@@ -334,6 +403,273 @@ const ApiDetailModal = ({ api, onClose }) => {
                                     </div>
                                 ))}
                             </div>
+                        </div>
+                    )}
+
+                    {/* Reviews Tab */}
+                    {activeTab === 'reviews' && (
+                        <div className="reviews-tab">
+                            <div className="write-review-section">
+                                <h3>Write a Review</h3>
+                                <form onSubmit={async (e) => {
+                                    e.preventDefault();
+                                    const form = e.target;
+                                    const rating = reviewRating;
+                                    const title = form.title.value;
+                                    const body = form.body.value;
+                                    try {
+                                        await MarketplaceApi.submitReview(api.id, { rating: parseInt(rating), title, body });
+                                        setReviews(await MarketplaceApi.getReviews(api.id)); // Refresh
+                                        form.reset();
+                                        setReviewRating(5);
+                                    } catch (err) { alert(err.message || 'Error'); }
+                                }}>
+                                    <div className="review-form-grid">
+                                        <div className="form-group">
+                                            <label>Rating</label>
+                                            <div className="star-rating-input">
+                                                {[1, 2, 3, 4, 5].map((star) => (
+                                                    <button
+                                                        type="button"
+                                                        key={star}
+                                                        className="star-btn"
+                                                        onClick={() => setReviewRating(star)}
+                                                        onMouseEnter={() => setHoverRating(star)}
+                                                        onMouseLeave={() => setHoverRating(0)}
+                                                    >
+                                                        <Star
+                                                            size={28}
+                                                            fill={star <= (hoverRating || reviewRating) ? "#FFB02E" : "none"}
+                                                            color={star <= (hoverRating || reviewRating) ? "#FFB02E" : "var(--text-muted)"}
+                                                            strokeWidth={1.5}
+                                                        />
+                                                    </button>
+                                                ))}
+                                                <span className="rating-label-text">
+                                                    {(hoverRating || reviewRating) === 1 ? 'Terrible' :
+                                                        (hoverRating || reviewRating) === 2 ? 'Poor' :
+                                                            (hoverRating || reviewRating) === 3 ? 'Average' :
+                                                                (hoverRating || reviewRating) === 4 ? 'Very Good' : 'Excellent'}
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div className="form-group">
+                                            <label>Title</label>
+                                            <input name="title" placeholder="Summarize your experience" required className="modal-input review-input" />
+                                        </div>
+                                        <div className="form-group full-width">
+                                            <label>Review</label>
+                                            <textarea name="body" placeholder="What did you like or dislike? How was the API performance?" rows={4} required className="modal-input review-textarea" />
+                                        </div>
+                                        <div className="form-actions">
+                                            <button type="submit" className="btn-primary-compact">Submit Review</button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+
+                            {loadingTab ? <div className="loading-state">Loading reviews...</div> : !reviews ? <div className="empty-state">No reviews loaded.</div> : (
+                                <div className="reviews-list-container">
+
+                                    <div className="reviews-list">
+                                        {reviews.items?.length === 0 ? (
+                                            <div className="empty-reviews-placeholder">
+                                                <MessageSquare size={32} />
+                                                <p>No reviews yet. Be the first to share your experience!</p>
+                                            </div>
+                                        ) : (
+                                            reviews.items?.map(r => (
+                                                <div key={r._id} className="review-card-modern">
+                                                    <div className="review-header">
+                                                        <div className="reviewer-info">
+                                                            <div className="reviewer-avatar-placeholder">
+                                                                {(r.userId?.displayName || 'U')[0].toUpperCase()}
+                                                            </div>
+                                                            <div className="reviewer-details">
+                                                                <strong>{r.userId?.displayName || 'User'}</strong>
+                                                                <span className="review-date">{new Date(r.createdAt).toLocaleDateString()}</span>
+                                                            </div>
+                                                        </div>
+                                                        <div className="review-rating-badge">
+                                                            <Star size={12} fill="#FFB02E" color="#FFB02E" />
+                                                            <span>{r.rating}.0</span>
+                                                        </div>
+                                                    </div>
+                                                    <h4 className="review-title-text">{r.title}</h4>
+                                                    <p className="review-body-text">{r.body}</p>
+                                                </div>
+                                            ))
+                                        )}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    )}
+
+                    {/* Forums Tab */}
+                    {activeTab === 'forums' && (
+                        <div className="forums-tab">
+                            {!showThreadForm ? (
+                                <div className="marketplace-card" style={{ marginBottom: 20 }}>
+                                    <button className="btn-primary-compact" onClick={() => setShowThreadForm(true)}>
+                                        + Start New Thread
+                                    </button>
+                                </div>
+                            ) : (
+                                <div className="write-review-section">
+                                    <h3>Start a New Thread</h3>
+                                    <form onSubmit={async (e) => {
+                                        e.preventDefault();
+                                        const form = e.target;
+                                        const title = form.title.value;
+                                        const body = form.body.value;
+
+                                        try {
+                                            await MarketplaceApi.createThread(api.id, { title, body });
+                                            setThreads(await MarketplaceApi.listThreads(api.id));
+                                            setShowThreadForm(false);
+                                        } catch (e) { alert(e.message); }
+                                    }}>
+                                        <div className="review-form-grid">
+                                            <div className="form-group full-width">
+                                                <label>Thread Title</label>
+                                                <input name="title" placeholder="What is this discussion about?" required className="modal-input review-input" />
+                                            </div>
+                                            <div className="form-group full-width">
+                                                <label>Initial Post</label>
+                                                <textarea name="body" placeholder="Describe your question or topic..." rows={5} required className="modal-input review-textarea" />
+                                            </div>
+                                            <div className="form-actions" style={{ gap: '12px' }}>
+                                                <button type="button" className="btn-secondary-compact" onClick={() => setShowThreadForm(false)}>Cancel</button>
+                                                <button type="submit" className="btn-primary-compact">Post Thread</button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            )}
+
+                            {loadingTab ? <div>Loading...</div> : !threads ? <div>No forums loaded.</div> : (
+                                <div className="threads-list">
+                                    {threads.items?.map(t => (
+                                        <div key={t._id} className="thread-card-modern">
+                                            <div className="thread-main">
+                                                <h4>{t.title}</h4>
+                                                <p>{t.body}</p>
+                                            </div>
+                                            <div className="thread-stats">
+                                                <span>{t.replyCount} replies</span>
+                                                <span>{t.views} views</span>
+                                            </div>
+                                        </div>
+                                    ))}
+                                    {threads.items?.length === 0 && <div className="empty-text">No threads yet.</div>}
+                                </div>
+                            )}
+                        </div>
+                    )}
+
+                    {/* Guides Tab */}
+                    {activeTab === 'guides' && (
+                        <div className="guides-tab">
+                            {loadingTab ? <div>Loading...</div> : !guides ? <div>No guides loaded.</div> : (
+                                <>
+                                    {!selectedGuide ? (
+                                        <div className="guides-list">
+                                            {guides.length === 0 ? <div className="empty-text">No guides available.</div> : (
+                                                guides.map(g => (
+                                                    <div key={g._id} className="guide-card-modern">
+                                                        <h4>{g.title}</h4>
+                                                        <p>{g.summary}</p>
+                                                        <button
+                                                            className="btn-secondary-compact"
+                                                            onClick={async () => {
+                                                                setLoadingTab(true);
+                                                                try {
+                                                                    const fullGuide = await MarketplaceApi.getGuide(api.id, g.slug);
+                                                                    setSelectedGuide(fullGuide);
+                                                                } catch (err) {
+                                                                    console.error(err);
+                                                                    alert('Failed to load guide details');
+                                                                }
+                                                                setLoadingTab(false);
+                                                            }}
+                                                        >
+                                                            Read Guide
+                                                        </button>
+                                                    </div>
+                                                ))
+                                            )}
+                                        </div>
+                                    ) : (
+                                        <div className="guide-detail-view">
+                                            <button
+                                                className="btn-text-back"
+                                                onClick={() => setSelectedGuide(null)}
+                                            >
+                                                <ArrowLeft size={16} />
+                                                Back to Guides
+                                            </button>
+                                            <div className="guide-content-wrapper">
+                                                <h1 className="guide-title">{selectedGuide.title}</h1>
+                                                <div className="guide-meta">
+                                                    <span>Last updated: {new Date(selectedGuide.updatedAt || selectedGuide.createdAt).toLocaleDateString()}</span>
+                                                </div>
+                                                <div className="markdown-body">
+                                                    <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                                                        {selectedGuide.contentMarkdown}
+                                                    </ReactMarkdown>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
+                                </>
+                            )}
+                        </div>
+                    )}
+
+                    {/* Health Tab */}
+                    {activeTab === 'health' && (
+                        <div className="health-tab">
+                            {loadingTab ? <div>Loading...</div> : !health ? <div>Health data unavailable.</div> : (
+                                <div className="health-dashboard">
+                                    <div className="health-score-card">
+                                        <div className="score-circle" style={{ borderColor: health.current?.status === 'operational' ? 'var(--success-color)' : 'var(--warning-color)' }}>
+                                            <span className="score-val">{health.current?.score}</span>
+                                            <span className="score-label">Score</span>
+                                        </div>
+                                        <div className="score-details">
+                                            <div className="score-row">
+                                                <span>Status:</span>
+                                                <span className={`status-badge status-${health.current?.status}`}>
+                                                    {health.current?.status}
+                                                </span>
+                                            </div>
+                                            <div className="score-row">
+                                                <span>Uptime:</span>
+                                                <strong>{health.current?.factors?.uptimePercent}%</strong>
+                                            </div>
+                                            <div className="score-row">
+                                                <span>Latency:</span>
+                                                <strong>{health.current?.factors?.avgResponseTimeMs}ms</strong>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div className="health-history-graph">
+                                        <h4>7-Day History</h4>
+                                        <div className="history-bars">
+                                            {health.history?.map((day, i) => (
+                                                <div key={i} className="history-bar-col" title={`${new Date(day.date).toLocaleDateString()}: ${day.score}`}>
+                                                    <div
+                                                        className="history-bar"
+                                                        style={{ height: `${day.score}%`, background: day.score > 90 ? 'var(--success-color)' : 'var(--warning-color)' }}
+                                                    />
+                                                    <span className="history-date">{new Date(day.date).getDate()}</span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     )}
                 </div>

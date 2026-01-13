@@ -15,15 +15,15 @@ async function jsonOrThrow(res) {
 
 export const MarketplaceApi = {
     async listCategories() {
-        const res = await fetch('/api/api-marketplace/categories', { credentials: 'include' });
+        const res = await fetch('/api/marketplace/categories', { credentials: 'include' });
         return jsonOrThrow(res);
     },
     async listTags(query = '') {
-        const res = await fetch(`/api/api-marketplace/tags?query=${encodeURIComponent(query)}`, { credentials: 'include' });
+        const res = await fetch(`/api/marketplace/tags?query=${encodeURIComponent(query)}`, { credentials: 'include' });
         return jsonOrThrow(res);
     },
     async browseListings({ query = '', category = '', tag = '', showcased = false, page = 1, limit = 20 } = {}) {
-        const url = new URL('/api/api-marketplace/listings', window.location.origin);
+        const url = new URL('/api/marketplace/listings', window.location.origin);
         if (query) url.searchParams.set('query', query);
         if (category) url.searchParams.set('category', category);
         if (tag) url.searchParams.set('tag', tag);
@@ -34,15 +34,15 @@ export const MarketplaceApi = {
         return jsonOrThrow(res);
     },
     async getListing(listingId) {
-        const res = await fetch(`/api/api-marketplace/listings/${listingId}`, { credentials: 'include' });
+        const res = await fetch(`/api/marketplace/listings/${listingId}`, { credentials: 'include' });
         return jsonOrThrow(res);
     },
     async getReviews(listingId, { page = 1, limit = 20 } = {}) {
-        const res = await fetch(`/api/api-marketplace/listings/${listingId}/reviews?page=${page}&limit=${limit}`, { credentials: 'include' });
+        const res = await fetch(`/api/marketplace/listings/${listingId}/reviews?page=${page}&limit=${limit}`, { credentials: 'include' });
         return jsonOrThrow(res);
     },
     async submitReview(listingId, payload) {
-        const res = await fetch(`/api/api-marketplace/listings/${listingId}/reviews`, {
+        const res = await fetch(`/api/marketplace/listings/${listingId}/reviews`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include',
@@ -51,31 +51,35 @@ export const MarketplaceApi = {
         return jsonOrThrow(res);
     },
     async getExamples(listingId) {
-        const res = await fetch(`/api/api-marketplace/listings/${listingId}/examples`, { credentials: 'include' });
+        const res = await fetch(`/api/marketplace/listings/${listingId}/examples`, { credentials: 'include' });
         return jsonOrThrow(res);
     },
     async getGuides(listingId) {
-        const res = await fetch(`/api/api-marketplace/listings/${listingId}/guides`, { credentials: 'include' });
+        const res = await fetch(`/api/marketplace/listings/${listingId}/guides`, { credentials: 'include' });
+        return jsonOrThrow(res);
+    },
+    async getGuide(listingId, slug) {
+        const res = await fetch(`/api/marketplace/listings/${listingId}/guides/${slug}`, { credentials: 'include' });
         return jsonOrThrow(res);
     },
     async getHealth(listingId, { windowDays = 7, limit = 30 } = {}) {
-        const res = await fetch(`/api/api-marketplace/listings/${listingId}/health?windowDays=${windowDays}&limit=${limit}`, { credentials: 'include' });
+        const res = await fetch(`/api/marketplace/listings/${listingId}/health?windowDays=${windowDays}&limit=${limit}`, { credentials: 'include' });
         return jsonOrThrow(res);
     },
     async getPlans(listingId) {
-        const res = await fetch(`/api/api-marketplace/listings/${listingId}/plans`, { credentials: 'include' });
+        const res = await fetch(`/api/marketplace/listings/${listingId}/plans`, { credentials: 'include' });
         return jsonOrThrow(res);
     },
     async listThreads(listingId, { page = 1, limit = 20 } = {}) {
-        const res = await fetch(`/api/api-marketplace/listings/${listingId}/forums/threads?page=${page}&limit=${limit}`, { credentials: 'include' });
+        const res = await fetch(`/api/marketplace/listings/${listingId}/forums/threads?page=${page}&limit=${limit}`, { credentials: 'include' });
         return jsonOrThrow(res);
     },
     async getThread(threadId) {
-        const res = await fetch(`/api/api-marketplace/forums/threads/${threadId}`, { credentials: 'include' });
+        const res = await fetch(`/api/marketplace/forums/threads/${threadId}`, { credentials: 'include' });
         return jsonOrThrow(res);
     },
     async createThread(listingId, payload) {
-        const res = await fetch(`/api/api-marketplace/listings/${listingId}/forums/threads`, {
+        const res = await fetch(`/api/marketplace/listings/${listingId}/forums/threads`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include',
@@ -84,7 +88,7 @@ export const MarketplaceApi = {
         return jsonOrThrow(res);
     },
     async createPost(threadId, payload) {
-        const res = await fetch(`/api/api-marketplace/forums/threads/${threadId}/posts`, {
+        const res = await fetch(`/api/marketplace/forums/threads/${threadId}/posts`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include',
@@ -93,7 +97,7 @@ export const MarketplaceApi = {
         return jsonOrThrow(res);
     },
     async createListing(payload) {
-        const res = await fetch('/api/api-marketplace/listings', {
+        const res = await fetch('/api/marketplace/listings', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include',
@@ -102,7 +106,7 @@ export const MarketplaceApi = {
         return jsonOrThrow(res);
     },
     async publishListing(listingId) {
-        const res = await fetch(`/api/api-marketplace/listings/${listingId}/publish`, {
+        const res = await fetch(`/api/marketplace/listings/${listingId}/publish`, {
             method: 'POST',
             credentials: 'include'
         });
