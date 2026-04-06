@@ -104,4 +104,17 @@ router.put('/user/profile', ensureAuthenticated, async (req, res) => {
     }
 });
 
+// Get all users for collaboration (simplified for dev/testing)
+router.get('/users/list', async (req, res) => {
+    console.log("Fetching user list...");
+    try {
+        const users = await User.find({}, 'displayName email profilePicture');
+        console.log(`Found ${users.length} users`);
+        res.json(users);
+    } catch (err) {
+        console.error("Error fetching users:", err);
+        res.status(500).json({ message: 'Error fetching users' });
+    }
+});
+
 module.exports = router;

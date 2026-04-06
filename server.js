@@ -56,6 +56,23 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
+function ensureDatabaseReady(req, res, next) {
+    // Keep health endpoint available for diagnostics even when DB is down.
+    if (req.path === '/health') {
+        return next();
+    }
+
+    if (mongoose.connection.readyState !== 1) {
+        return res.status(503).json({
+            error: true,
+            message: 'Database is not connected. Please try again shortly.',
+            dbState: mongoose.connection.readyState
+        });
+    }
+
+    next();
+}
+
 // --- PASSPORT CONFIGURATION ---
 passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
@@ -125,14 +142,19 @@ passport.deserializeUser(async (id, done) => {
 });
 
 // --- Use the central routes with /api prefix ---
-app.use('/api', routes);
+app.use('/api', ensureDatabaseReady, routes);
 
 // --- HEALTH CHECK ENDPOINT ---
 app.get('/api/health', (req, res) => {
+    const dbStates = ['disconnected', 'connected', 'connecting', 'disconnecting'];
     res.json({
         status: 'ok',
         service: 'pigeon-api',
         timestamp: new Date(),
+        database: {
+            readyState: mongoose.connection.readyState,
+            status: dbStates[mongoose.connection.readyState] || 'unknown'
+        },
         features: {
             linting: 'enabled',
             visualization: 'enabled',
@@ -658,6 +680,7 @@ async function startServer() {
         console.log('Database connections initialized successfully');
     } catch (err) {
         console.error('Failed to initialize database connections', err);
+        process.exit(1);
     }
 
     // Initialize socket.io server (after middleware/routes are registered, before listen)

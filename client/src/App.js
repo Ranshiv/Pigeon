@@ -1,6 +1,5 @@
-// client/src/App.js
 import React, { useState, useEffect } from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Workspace from './components/Workspace';
@@ -11,12 +10,75 @@ import EnhancedPublicStatusPage from './components/EnhancedPublicStatusPage';
 import OAuthCallback from './components/OAuthCallback';
 import AlertsDashboard from './components/alerting/AlertsDashboard';
 import AlertPolicyEditor from './components/alerting/AlertPolicyEditor';
+import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import './App.css';
+
+const APP_NAME = 'Pigeon';
+
+const formatSegment = (segment = '') =>
+  segment
+    .replaceAll(/[-_]/g, ' ')
+    .replaceAll(/\b\w/g, (char) => char.toUpperCase())
+    .trim();
+
+const getPageTitle = (pathname) => {
+  if (!pathname || pathname === '/') return 'Home';
+
+  if (/^\/workspace\/collections\/new\/?$/.test(pathname)) return 'New Collection';
+  if (/^\/workspace\/collections\/[^/]+\/documentation\/?$/.test(pathname)) return 'Collection Documentation';
+  if (/^\/workspace\/collections\/[^/]+\/?$/.test(pathname)) return 'Collection Details';
+  if (/^\/workspace\/monitoring\/[^/]+\/analytics\/?$/.test(pathname)) return 'Monitoring Analytics';
+  if (/^\/workspace\/monitoring\/[^/]+\/history\/?$/.test(pathname)) return 'Monitoring History';
+  if (/^\/status\/[^/]+\/?$/.test(pathname)) return 'Public Status Page';
+
+  const staticRouteTitles = {
+    '/workspace': 'Workspace',
+    '/workspace/home': 'Home',
+    '/workspace/workspaces': 'Workspaces',
+    '/workspace/reviews': 'Reviews',
+    '/workspace/collections': 'Collections',
+    '/workspace/api-network': 'API Network',
+    '/workspace/monitoring': 'Monitoring',
+    '/workspace/monitoring/reports': 'Monitoring Reports',
+    '/workspace/monitoring/teams': 'Teams',
+    '/workspace/monitoring/integrations': 'Integrations',
+    '/workspace/monitoring/maintenance': 'Maintenance',
+    '/workspace/graphql': 'GraphQL Tester',
+    '/workspace/protocols': 'Protocol Tester',
+    '/workspace/performance-tests': 'Performance Tests',
+    '/workspace/compliance': 'Compliance',
+    '/workspace/settings': 'Settings',
+    '/workspace/history': 'History',
+    '/alerts': 'Alerts Dashboard',
+    '/alerts/policies': 'Alert Policies',
+    '/status': 'Status',
+    '/documentation': 'Documentation',
+    '/oauth/callback': 'OAuth Callback'
+  };
+
+  if (staticRouteTitles[pathname]) {
+    return staticRouteTitles[pathname];
+  }
+
+  if (pathname.startsWith('/workspace/')) {
+    const [, , section] = pathname.split('/');
+    return formatSegment(section) || 'Workspace';
+  }
+
+  const [, topLevel] = pathname.split('/');
+  return formatSegment(topLevel) || 'Page';
+};
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const location = useLocation();
+
+  useEffect(() => {
+    const pageTitle = getPageTitle(location.pathname);
+    document.title = `${pageTitle} | ${APP_NAME}`;
+  }, [location.pathname]);
 
   useEffect(() => {
     // Check authentication status on app load
@@ -100,6 +162,7 @@ function App() {
           <a href="/" style={{ color: '#4a9eff', textDecoration: 'underline' }}>Go to Home</a>
         </div>} />
       </Routes>
+      <ToastContainer theme="dark" position="bottom-right" />
       <Footer />
     </div>
   );

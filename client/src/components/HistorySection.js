@@ -86,19 +86,21 @@ const HistorySection = ({ history = [], onSelectHistory, selectedId, loading = f
         );
     }
 
-    // Filter history based on search and method filter
-    const filteredHistory = history.filter(entry => {
-        const matchesSearch = searchTerm === '' ||
-            entry.url?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            (entry.method && entry.method.toLowerCase().includes(searchTerm.toLowerCase()));
+    // Filter and Sort history based on search and method filter
+    const filteredHistory = history
+        .filter(entry => {
+            const matchesSearch = searchTerm === '' ||
+                entry.url?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                (entry.method && entry.method.toLowerCase().includes(searchTerm.toLowerCase()));
 
-        const matchesFilter = activeFilter === 'all' ||
-            (entry.method && entry.method.toLowerCase() === activeFilter);
+            const matchesFilter = activeFilter === 'all' ||
+                (entry.method && entry.method.toLowerCase() === activeFilter);
 
-        return matchesSearch && matchesFilter;
-    });
+            return matchesSearch && matchesFilter;
+        })
+        .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
 
-    // Group the filtered history
+    // Group the filtered and sorted history
     const groupedHistory = groupHistoryByDate(filteredHistory);
 
     // Calculate test results stats for each history entry

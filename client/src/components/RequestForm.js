@@ -1,5 +1,22 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import './RequestForm.css';
+import {
+    List,
+    Link as LinkIcon,
+    Lock,
+    Box,
+    ShieldCheck,
+    Zap,
+    CheckCircle2,
+    Key,
+    Eye,
+    Activity,
+    Terminal,
+    FolderOutput,
+    Plus,
+    X,
+    Trash2
+} from 'lucide-react';
 import ResponseDisplay from './ResponseDisplay';
 import VariableEditor from './VariableEditor';
 import UnifiedVariableViewer from './UnifiedVariableViewer';
@@ -556,6 +573,7 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
     const handleSave = () => {
         // Build request object
         const requestData = {
+            _id: initialData._id || initialData.id,
             name: requestName,
             method,
             url,
@@ -1133,60 +1151,79 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
             case 'params':
                 return (
                     <div className="params-section">
+                        <div className="section-header-row">
+                            <div className="section-title">
+                                <List size={18} />
+                                <span>Query Parameters</span>
+                            </div>
+                            <span className="section-description">Parameters sent in the URL query string</span>
+                        </div>
                         <div className="table-container">
                             <table className="params-table">
                                 <thead>
                                     <tr>
-                                        <th width="30"></th>
+                                        <th width="40"></th>
                                         <th width="30%">Key</th>
                                         <th width="30%">Value</th>
-                                        <th width="30%">Description</th>
-                                        <th width="40"></th>
+                                        <th>Description</th>
+                                        <th width="48"></th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {params.map((param, index) => (
-                                        <tr key={`param-${index}`}>
-                                            <td>
-                                                <input
-                                                    type="checkbox"
-                                                    checked={param.enabled}
-                                                    onChange={(e) => handleParamChange(index, 'enabled', e.target.checked)}
-                                                />
+                                    {params.length === 0 ? (
+                                        <tr>
+                                            <td colSpan="5" className="empty-table-row">
+                                                No parameters added. Use the button below to add your first parameter.
+                                            </td>
+                                        </tr>
+                                    ) : params.map((param, index) => (
+                                        <tr key={`param-${index}`} className="param-row">
+                                            <td className="checkbox-cell">
+                                                <div className="custom-checkbox">
+                                                    <input
+                                                        type="checkbox"
+                                                        id={`param-check-${index}`}
+                                                        checked={param.enabled}
+                                                        onChange={(e) => handleParamChange(index, 'enabled', e.target.checked)}
+                                                    />
+                                                    <label htmlFor={`param-check-${index}`}></label>
+                                                </div>
                                             </td>
                                             <td>
                                                 <input
                                                     type="text"
-                                                    className={getVariableInputClass(param.key)}
+                                                    className={`table-input ${getVariableInputClass(param.key)}`}
                                                     value={param.key}
                                                     onChange={(e) => handleParamChange(index, 'key', e.target.value)}
-                                                    placeholder="Key"
+                                                    placeholder="Enter Key"
                                                 />
                                             </td>
                                             <td>
                                                 <input
                                                     type="text"
-                                                    className={getVariableInputClass(param.value)}
+                                                    className={`table-input ${getVariableInputClass(param.value)}`}
                                                     value={param.value}
                                                     onChange={(e) => handleParamChange(index, 'value', e.target.value)}
-                                                    placeholder="Value"
+                                                    placeholder="Enter Value"
                                                 />
                                             </td>
                                             <td>
                                                 <input
                                                     type="text"
+                                                    className="table-input"
                                                     value={param.description}
                                                     onChange={(e) => handleParamChange(index, 'description', e.target.value)}
-                                                    placeholder="Description"
+                                                    placeholder="Enter Description"
                                                 />
                                             </td>
-                                            <td>
+                                            <td className="action-cell">
                                                 <button
+                                                    type="button"
                                                     className="delete-row-btn"
                                                     onClick={() => handleRemoveParam(index)}
                                                     aria-label="Delete parameter"
                                                 >
-                                                    ×
+                                                    <Trash2 size={14} />
                                                 </button>
                                             </td>
                                         </tr>
@@ -1195,8 +1232,9 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
                             </table>
                         </div>
                         <div className="add-row-container">
-                            <button type="button" className="add-row-btn" onClick={handleAddParam}>
-                                <span className="add-icon">+</span> Add
+                            <button type="button" className="modern-add-btn" onClick={handleAddParam}>
+                                <Plus size={16} />
+                                <span>Add Parameter</span>
                             </button>
                         </div>
                     </div>
@@ -1205,31 +1243,48 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
             case 'headers':
                 return (
                     <div className="headers-section">
+                        <div className="section-header-row">
+                            <div className="section-title">
+                                <LinkIcon size={18} />
+                                <span>Request Headers</span>
+                            </div>
+                            <span className="section-description">Custom headers to include with the request</span>
+                        </div>
                         <div className="table-container">
                             <table className="params-table">
                                 <thead>
                                     <tr>
-                                        <th width="30"></th>
+                                        <th width="40"></th>
                                         <th width="30%">Key</th>
                                         <th width="30%">Value</th>
-                                        <th width="30%">Description</th>
-                                        <th width="40"></th>
+                                        <th>Description</th>
+                                        <th width="48"></th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {headers.map((header, index) => (
-                                        <tr key={`header-${index}`}>
-                                            <td>
-                                                <input
-                                                    type="checkbox"
-                                                    checked={header.enabled}
-                                                    onChange={(e) => handleHeaderChange(index, 'enabled', e.target.checked)}
-                                                />
+                                    {headers.length === 0 ? (
+                                        <tr>
+                                            <td colSpan="5" className="empty-table-row">
+                                                No headers added. Click below to add a custom header.
+                                            </td>
+                                        </tr>
+                                    ) : headers.map((header, index) => (
+                                        <tr key={`header-${index}`} className="param-row">
+                                            <td className="checkbox-cell">
+                                                <div className="custom-checkbox">
+                                                    <input
+                                                        type="checkbox"
+                                                        id={`header-check-${index}`}
+                                                        checked={header.enabled}
+                                                        onChange={(e) => handleHeaderChange(index, 'enabled', e.target.checked)}
+                                                    />
+                                                    <label htmlFor={`header-check-${index}`}></label>
+                                                </div>
                                             </td>
                                             <td>
                                                 <input
                                                     type="text"
-                                                    className={getVariableInputClass(header.key)}
+                                                    className={`table-input ${getVariableInputClass(header.key)}`}
                                                     value={header.key}
                                                     onChange={(e) => handleHeaderChange(index, 'key', e.target.value)}
                                                     placeholder="Key"
@@ -1238,7 +1293,7 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
                                             <td>
                                                 <input
                                                     type="text"
-                                                    className={getVariableInputClass(header.value)}
+                                                    className={`table-input ${getVariableInputClass(header.value)}`}
                                                     value={header.value}
                                                     onChange={(e) => handleHeaderChange(index, 'value', e.target.value)}
                                                     placeholder="Value"
@@ -1247,18 +1302,20 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
                                             <td>
                                                 <input
                                                     type="text"
+                                                    className="table-input"
                                                     value={header.description}
                                                     onChange={(e) => handleHeaderChange(index, 'description', e.target.value)}
                                                     placeholder="Description"
                                                 />
                                             </td>
-                                            <td>
+                                            <td className="action-cell">
                                                 <button
+                                                    type="button"
                                                     className="delete-row-btn"
                                                     onClick={() => handleRemoveHeader(index)}
                                                     aria-label="Delete header"
                                                 >
-                                                    ×
+                                                    <Trash2 size={14} />
                                                 </button>
                                             </td>
                                         </tr>
@@ -1267,8 +1324,9 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
                             </table>
                         </div>
                         <div className="add-row-container">
-                            <button type="button" className="add-row-btn" onClick={handleAddHeader}>
-                                <span className="add-icon">+</span> Add
+                            <button type="button" className="modern-add-btn" onClick={handleAddHeader}>
+                                <Plus size={16} />
+                                <span>Add Header</span>
                             </button>
                         </div>
                     </div>
@@ -1331,37 +1389,45 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
                                     <table className="params-table">
                                         <thead>
                                             <tr>
-                                                <th width="30"></th>
+                                                <th width="40"></th>
                                                 <th width="30%">Key</th>
                                                 <th width="30%">Value</th>
-                                                <th width="30%">Description</th>
-                                                <th width="40"></th>
+                                                <th>Description</th>
+                                                <th width="48"></th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr>
-                                                <td>
-                                                    <input type="checkbox" checked={true} />
+                                            <tr className="param-row">
+                                                <td className="checkbox-cell">
+                                                    <div className="custom-checkbox">
+                                                        <input type="checkbox" id="body-form-check-0" checked={true} readOnly />
+                                                        <label htmlFor="body-form-check-0"></label>
+                                                    </div>
                                                 </td>
                                                 <td>
-                                                    <input type="text" placeholder="Key" />
+                                                    <input type="text" className="table-input" placeholder="Key" />
                                                 </td>
                                                 <td>
-                                                    <input type="text" placeholder="Value" />
+                                                    <input type="text" className="table-input" placeholder="Value" />
                                                 </td>
                                                 <td>
-                                                    <input type="text" placeholder="Description" />
+                                                    <input type="text" className="table-input" placeholder="Description" />
                                                 </td>
-                                                <td>
-                                                    <button className="delete-row-btn">×</button>
+                                                <td className="action-cell">
+                                                    <button type="button" className="delete-row-btn">
+                                                        <Trash2 size={14} />
+                                                    </button>
                                                 </td>
                                             </tr>
                                         </tbody>
                                     </table>
                                 </div>
-                                <button className="add-row-btn">
-                                    + Add
-                                </button>
+                                <div className="add-row-container">
+                                    <button type="button" className="modern-add-btn">
+                                        <Plus size={16} />
+                                        <span>Add Form Field</span>
+                                    </button>
+                                </div>
                             </div>
                         )}
 
@@ -2873,6 +2939,17 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
         <div className="request-workspace">
             <form onSubmit={handleSubmit}>
 
+                {/* Request Name */}
+                <div className="request-name-container">
+                    <input
+                        type="text"
+                        className="request-name-input"
+                        value={requestName}
+                        onChange={(e) => setRequestName(e.target.value)}
+                        placeholder="Request Name"
+                    />
+                </div>
+
                 {/* URL bar */}
                 <div className="request-url-bar">
                     <select
@@ -2934,71 +3011,73 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
                         className={`request-tab ${activeTab === 'params' ? 'active' : ''}`}
                         onClick={() => handleTabChange('params')}
                     >
-                        Params
+                        <List size={16} /> <span>Params</span>
                     </div>
                     <div
                         className={`request-tab ${activeTab === 'headers' ? 'active' : ''}`}
                         onClick={() => handleTabChange('headers')}
                     >
-                        Headers
+                        <LinkIcon size={16} /> <span>Headers</span>
                     </div>
                     <div
                         className={`request-tab ${activeTab === 'authorization' ? 'active' : ''}`}
                         onClick={() => handleTabChange('authorization')}
                     >
-                        🔒 Authorization
+                        <Lock size={16} /> <span>Authorization</span>
                     </div>
                     <div
                         className={`request-tab ${activeTab === 'body' ? 'active' : ''}`}
                         onClick={() => handleTabChange('body')}
                     >
-                        Body
+                        <Box size={16} /> <span>Body</span>
                     </div>
                     <div
                         className={`request-tab ${activeTab === 'ssl' ? 'active' : ''}`}
                         onClick={() => handleTabChange('ssl')}
                     >
-                        🛡️ SSL
+                        <ShieldCheck size={16} /> <span>SSL</span>
                     </div>
                     <div
                         className={`request-tab ${activeTab === 'pre-request-script' ? 'active' : ''}`}
                         onClick={() => handleTabChange('pre-request-script')}
                     >
-                        Pre-request Script
-                    </div>                    <div
+                        <Zap size={16} /> <span>Script</span>
+                    </div>
+                    <div
                         className={`request-tab ${activeTab === 'tests' ? 'active' : ''}`}
                         onClick={() => handleTabChange('tests')}
                     >
-                        Tests
-                    </div>                    <div
+                        <CheckCircle2 size={16} /> <span>Tests</span>
+                    </div>
+                    <div
                         className={`request-tab ${activeTab === 'variables' ? 'active' : ''}`}
                         onClick={() => handleTabChange('variables')}
                     >
-                        Variables
+                        <Key size={16} /> <span>Variables</span>
                     </div>
                     <div
                         className={`request-tab ${activeTab === 'variable-preview' ? 'active' : ''}`}
                         onClick={() => handleTabChange('variable-preview')}
                     >
-                        Preview
+                        <Eye size={16} /> <span>Preview</span>
                     </div>
                     <div
                         className={`request-tab ${activeTab === 'network-flow' ? 'active' : ''}`}
                         onClick={() => handleTabChange('network-flow')}
                     >
-                        🌐 Network Flow
+                        <Activity size={16} /> <span>Flow</span>
                     </div>
                     <div
                         className={`request-tab ${activeTab === 'debug-console' ? 'active' : ''}`}
                         onClick={() => handleTabChange('debug-console')}
                     >
-                        🔍 Debug Console
+                        <Terminal size={16} /> <span>Debug</span>
                     </div>
                     <div
                         className={`request-tab ${activeTab === 'export-options' ? 'active' : ''}`}
                         onClick={() => handleTabChange('export-options')}
                     >
-                        📁 Export
+                        <FolderOutput size={16} /> <span>Export</span>
                     </div>
                 </div>
 

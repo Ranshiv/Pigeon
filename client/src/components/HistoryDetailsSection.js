@@ -32,7 +32,7 @@ const HistoryDetailsSection = () => {
         try {
             setLoading(true);
             setError(null);
-            const response = await fetch('http://localhost:5001/api/history', {
+            const response = await fetch('/api/history', {
                 credentials: 'include'
             });
 
@@ -41,7 +41,9 @@ const HistoryDetailsSection = () => {
             }
 
             const historyData = await response.json();
-            setHistory(historyData);
+            // Sort history descending by timestamp (newest first)
+            const sortedHistory = historyData.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+            setHistory(sortedHistory);
 
             // If we have an ID in the URL, select that history item
             if (urlParamId) {
@@ -64,7 +66,7 @@ const HistoryDetailsSection = () => {
         try {
             setLoading(true);
             setError(null);
-            const response = await fetch(`http://localhost:5001/api/history/${id}`, {
+            const response = await fetch(`/api/history/${id}`, {
                 credentials: 'include'
             });
 
@@ -95,7 +97,7 @@ const HistoryDetailsSection = () => {
 
         try {
             setDeletingId(id);
-            const response = await fetch(`http://localhost:5001/api/history/${id}`, {
+            const response = await fetch(`/api/history/${id}`, {
                 method: 'DELETE',
                 credentials: 'include'
             });
@@ -134,8 +136,8 @@ const HistoryDetailsSection = () => {
                 body: request.requestBody
             }));
 
-            // Navigate to the request form page
-            navigate('/workspace');
+            // Navigate to the API network workspace
+            navigate('/workspace/api-network/explore');
         }
     };
 

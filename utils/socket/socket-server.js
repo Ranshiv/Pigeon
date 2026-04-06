@@ -50,7 +50,8 @@ function initializeSocketServer(server) {
                     // Add important fields for consistent overlay display
                     displayName: userData.displayName || userData.name || 'Anonymous',
                     profilePicture: userData.profilePicture || userData.avatar || null,
-                    userStatus: userData.userStatus || 'online'
+                    userStatus: userData.userStatus || 'online',
+                    socketId: socket.id // Critical for precise WebRTC signaling even if users share account
                 };
 
                 // Explicitly set this on the socket object so other parts can access it
@@ -61,6 +62,58 @@ function initializeSocketServer(server) {
                     socket,
                     userData: authenticatedUser,
                     rooms: userRooms
+                });
+
+                // --- NEW: Shared Cursor Handling ---
+                socket.on('cursorMove', ({ room, position, route }) => {
+                    // Broadcast to everyone in the room EXCEPT sender
+                    // Using volatile to drop packets if network congested
+                    socket.to(room).volatile.emit('cursorMove', {
+                        userId: authenticatedUser.id,
+                        position,
+                        route
+                    });
+                });
+
+                // --- NEW: WebRTC Signaling ---
+                socket.on('callUser', ({ userToCall, signalData, from }) => {
+                    // Find target by either their User ID or Socket ID
+                    const targetSocketEntry = Array.from(userSockets.values()).find(u =>
+                        u.userData.id === userToCall || u.socket.id === userToCall
+                    );
+
+                    if (targetSocketEntry) {
+                        // Pass 'from' as the caller's Socket ID if not provided, or better:
+                        // Ensure we send a consistent ID that can be used to reply.
+                        // If we send socket.id, the reply must target socket.id.
+                        io.to(targetSocketEntry.socket.id).emit('callUser', { signal: signalData, from });
+                    }
+                });
+
+                socket.on('answerCall', ({ signal, to }) => {
+                    // 'to' is the caller's ID (could be socket ID or user ID)
+                    const targetSocketEntry = Array.from(userSockets.values()).find(u =>
+                        u.userData.id === to || u.socket.id === to
+                    );
+
+                    if (targetSocketEntry) {
+                        io.to(targetSocketEntry.socket.id).emit('callAccepted', signal);
+                    }
+                });
+
+                socket.on('endCall', ({ to }) => {
+                    console.log(`[DEBUG] Server received endCall from ${socket.id} to ${to}`);
+
+                    const targetSocketEntry = Array.from(userSockets.values()).find(u =>
+                        u.userData.id === to || u.socket.id === to
+                    );
+
+                    if (targetSocketEntry) {
+                        console.log(`[DEBUG] Found target socket ${targetSocketEntry.socket.id}, emitting callEnded`);
+                        io.to(targetSocketEntry.socket.id).emit('callEnded');
+                    } else {
+                        console.warn(`[DEBUG] Target user ${to} not found in userSockets`);
+                    }
                 });
 
                 // Remove excessive logging

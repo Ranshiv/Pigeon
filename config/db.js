@@ -2,16 +2,45 @@
 const mongoose = require('mongoose');
 const { MongoClient } = require('mongodb');
 
+// Fail fast when disconnected instead of buffering operations for 10s+.
+mongoose.set('bufferCommands', false);
+
 // MongoDB connection URI and DB name
 // Prefer explicit MONGODB_URI, but fall back to DATABASE_URL (used by this repo)
 // so the native driver doesn't try (and fail) to connect to localhost.
-const mongoURI = process.env.MONGODB_URI || process.env.DATABASE_URL || 'mongodb://localhost:27017';
+const rawMongoURI = process.env.MONGODB_URI || process.env.DATABASE_URL || 'mongodb://localhost:27017';
 const dbName = process.env.DB_NAME || 'pigeon_db';
+
+function normalizeMongoUri(uri) {
+    if (!uri || (!uri.startsWith('mongodb://') && !uri.startsWith('mongodb+srv://'))) {
+        return uri;
+    }
+
+    try {
+        const parsed = new URL(uri);
+        const hasCredentials = parsed.username || parsed.password;
+        if (!hasCredentials) {
+            return uri;
+        }
+
+        const decodedUser = decodeURIComponent(parsed.username || '');
+        const decodedPassword = decodeURIComponent(parsed.password || '');
+
+        // Re-encode to ensure special characters (e.g. @, :, /, #) are URL-safe.
+        parsed.username = encodeURIComponent(decodedUser);
+        parsed.password = encodeURIComponent(decodedPassword);
+        return parsed.toString();
+    } catch (error) {
+        console.warn('Mongo URI could not be normalized, using raw value:', error?.message || error);
+        return uri;
+    }
+}
+
+const mongoURI = normalizeMongoUri(rawMongoURI);
 
 // Create MongoDB client for native driver operations
 const client = new MongoClient(mongoURI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
+    // Keep defaults for MongoDB Node driver v4+
 });
 
 // Database reference
@@ -39,7 +68,10 @@ async function connectToDatabase() {
 // Connect to MongoDB using mongoose for schema-based operations
 async function connectMongoose() {
     try {
-        await mongoose.connect(process.env.DATABASE_URL || mongoURI);
+        await mongoose.connect(mongoURI, {
+            serverSelectionTimeoutMS: 10000,
+            socketTimeoutMS: 45000
+        });
         console.log('Connected to MongoDB using Mongoose');
     } catch (err) {
         console.error('Could not connect to MongoDB using Mongoose', err);
@@ -68,7 +100,7 @@ module.exports = {
     getDb: () => {
         if (db) return db;
         // In tests, routes may rely on a Mongoose-only connection (e.g. mongodb-memory-server).
-        if (mongoose.connection && mongoose.connection.readyState === 1 && mongoose.connection.db) {
+        if (mongoose.connection?.readyState === 1 && mongoose.connection?.db) {
             return mongoose.connection.db;
         }
         return null;

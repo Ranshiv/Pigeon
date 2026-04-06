@@ -7,25 +7,51 @@ import AIAgentToolsSection from './AIAgentToolsSection';
 import RequestWorkspace from './RequestWorkspace';
 import RequestForm from './RequestForm';
 import ResponseDisplay from './ResponseDisplay';
+import HistorySection from './HistorySection';
 import ExplorePage from './marketplace/ExplorePage';
+import { toast } from 'react-toastify';
+import { FiPlus, FiFileText, FiSearch, FiChevronRight, FiGrid, FiClock, FiSidebar, FiChevronsLeft } from 'react-icons/fi';
 import './APINetworkSection.css';
 
 const APINetworkSection = () => {
     const [requests, setRequests] = useState([]);
+    const [history, setHistory] = useState([]);
+    const [isLoadingRequests, setIsLoadingRequests] = useState(true);
+    const [isLoadingHistory, setIsLoadingHistory] = useState(false);
     const [response, setResponse] = useState(null);
+    const [isSidebarOpen, setIsSidebarOpen] = useState(true);
     const navigate = useNavigate();
 
     useEffect(() => {
         fetchRequests();
+        fetchHistory();
     }, []);
 
     const fetchRequests = async () => {
+        setIsLoadingRequests(true);
         try {
-            const res = await fetch('/api/requests');
+            const res = await fetch('/api/requests', { credentials: 'include' });
             const data = await res.json();
             setRequests(data);
         } catch (err) {
             console.error('Error fetching requests:', err);
+        } finally {
+            setIsLoadingRequests(false);
+        }
+    };
+
+    const fetchHistory = async () => {
+        setIsLoadingHistory(true);
+        try {
+            const res = await fetch('/api/history', { credentials: 'include' });
+            if (res.ok) {
+                const data = await res.json();
+                setHistory(data);
+            }
+        } catch (err) {
+            console.error('Error fetching history:', err);
+        } finally {
+            setIsLoadingHistory(false);
         }
     };
 
@@ -52,10 +78,11 @@ const APINetworkSection = () => {
             if (res.ok) {
                 const savedRequest = await res.json();
                 setRequests([...requests, savedRequest]);
-                fetchRequests();
+                toast.success('Request saved successfully');
                 navigate(`requests/${savedRequest._id}`);
             } else {
                 const errorData = await res.json();
+                toast.error('Failed to save request');
                 console.error('Failed to create', errorData);
             }
         } catch (err) {
@@ -76,9 +103,11 @@ const APINetworkSection = () => {
                     req._id === updatedRequest._id ? updatedRequest : req
                 );
                 setRequests(updatedRequests);
+                toast.success('Changes saved');
                 navigate(`requests/${updatedRequest._id}`);
             } else {
                 const errorData = await res.json();
+                toast.error('Failed to update request');
                 console.error("Failed to update", errorData);
             }
         } catch (err) {
@@ -93,9 +122,11 @@ const APINetworkSection = () => {
             });
             if (res.ok) {
                 setRequests(requests.filter((req) => req._id !== requestId));
+                toast.success('Request deleted');
                 navigate('explore');
             } else {
                 const errorData = await res.json();
+                toast.error('Failed to delete request');
                 console.error("Failed to delete", errorData);
             }
         } catch (err) {
@@ -149,6 +180,8 @@ const APINetworkSection = () => {
             const responseData = await response.json();
 
             setResponse(responseData);
+            // Refresh history after a successful request
+            fetchHistory();
         } catch (err) {
             console.error('Error making direct request:', err);
             setResponse({
@@ -163,33 +196,128 @@ const APINetworkSection = () => {
 
     return (
         <div className="api-network-section">
+            <aside className={`api-network-sidebar ${!isSidebarOpen ? 'collapsed' : ''}`}>
+                <div className="sidebar-header">
+                    <div className="sidebar-title">
+                        <FiGrid className="title-icon" />
+                        <span>Workspaces</span>
+                    </div>
+                    <div style={{ display: 'flex', gap: '8px' }}>
+                        <button
+                            className="sidebar-add-btn"
+                            onClick={() => navigate('requests/new')}
+                            title="New Request"
+                        >
+                            <FiPlus />
+                        </button>
+                        <button
+                            className="sidebar-toggle-btn"
+                            onClick={() => setIsSidebarOpen(false)}
+                            title="Hide Sidebar"
+                        >
+                            <FiChevronsLeft />
+                        </button>
+                    </div>
+                </div>
+
+                <div className="sidebar-search">
+                    <FiSearch className="search-icon" />
+                    <input type="text" placeholder="Filter requests..." className="sidebar-filter-input" />
+                </div>
+
+                <div className="sidebar-nav">
+                    <div className="nav-header">Personal Workspace</div>
+                    <div className="nav-items">
+                        <div
+                            className={`nav-item ${window.location.pathname.includes('/explore') ? 'active' : ''}`}
+                            onClick={() => {
+                                navigate('explore');
+                                fetchRequests();
+                            }}
+                        >
+                            <FiSearch className="nav-icon" />
+                            <span>Explore Marketplace</span>
+                        </div>
+
+                        <div
+                            className={`nav-item ${window.location.pathname.includes('/history') ? 'active' : ''}`}
+                            onClick={() => {
+                                navigate('history');
+                                fetchHistory();
+                            }}
+                        >
+                            <FiClock className="nav-icon" />
+                            <span>Request History</span>
+                        </div>
+
+                        <div className="nav-group-title">My Saved Requests</div>
+                        {isLoadingRequests ? (
+                            <div className="sidebar-loading">
+                                <div className="spinner-small"></div>
+                                <span>Syncing...</span>
+                            </div>
+                        ) : requests.length === 0 ? (
+                            <div className="sidebar-empty">
+                                <p>No saved requests</p>
+                            </div>
+                        ) : (
+                            requests.map(req => {
+                                const isActive = window.location.pathname.includes(`/requests/${req._id}`);
+                                return (
+                                    <div
+                                        key={req._id}
+                                        className={`nav-item request-item ${isActive ? 'active' : ''}`}
+                                        onClick={() => navigate(`requests/${req._id}`)}
+                                    >
+                                        <div className="method-indicator" data-method={req.method}>{req.method}</div>
+                                        <span className="request-name">{req.name || 'Untitled'}</span>
+                                        <FiChevronRight className="item-arrow" />
+                                    </div>
+                                );
+                            })
+                        )}
+                    </div>
+                </div>
+            </aside >
+
             <div className="api-network-main-content">
+                {!isSidebarOpen && (
+                    <button
+                        className="sidebar-open-btn"
+                        onClick={() => setIsSidebarOpen(true)}
+                        title="Show Sidebar"
+                    >
+                        <FiSidebar size={32} />
+                    </button>
+                )}
                 <Routes>
                     <Route index element={<Navigate to="explore" />} />
                     <Route path="explore" element={<ExplorePage />} />
+                    <Route path="history" element={<HistorySection history={history} onSelectHistory={(item) => navigate(`requests/${item._id || item.requestId}`)} loading={isLoadingHistory} />} />
                     <Route path="spotlight" element={<SpotlightSection />} />
                     <Route path="trending" element={<TrendingSection />} />
                     <Route path="ai-agent-tools" element={<AIAgentToolsSection />} />
                     <Route
                         path="requests/new"
-                        element={<UnifiedRequestWorkspace onSendRequest={handleDirectRequest} response={response} />}
+                        element={<UnifiedRequestWorkspace onSendRequest={handleDirectRequest} response={response} onCreateRequest={handleRequestCreate} />}
                     />
                     <Route
                         path="requests/edit/:id"
-                        element={<EditRequestWorkspace requests={requests} onSave={handleRequestUpdate} />}
+                        element={<EditRequestWorkspace requests={requests} onSave={handleRequestUpdate} isLoadingRequests={isLoadingRequests} />}
                     />
                     <Route
                         path="requests/:id"
-                        element={<RequestDetails requests={requests} response={response} onSend={handleRequestSend} />}
+                        element={<RequestDetails requests={requests} onSave={handleRequestUpdate} isLoadingRequests={isLoadingRequests} fetchHistory={fetchHistory} />}
                     />
                 </Routes>
             </div>
-        </div>
+        </div >
     );
 };
 
 // New component that integrates request form and response display on the same page
-const UnifiedRequestWorkspace = ({ onSendRequest, response }) => {
+const UnifiedRequestWorkspace = ({ onSendRequest, response, onCreateRequest }) => {
+    // ... existing implementation ...
     // Default request with GET method
     const defaultRequest = {
         name: 'New Request',
@@ -206,12 +334,13 @@ const UnifiedRequestWorkspace = ({ onSendRequest, response }) => {
 
     return (
         <div className="unified-request-workspace">
-            <h2 className="request-workspace-title">New Request</h2>
+            <div className="workspace-header-placeholder"></div>
             <div className="request-response-container">
                 <div className="request-form-section">
                     <RequestForm
                         request={defaultRequest}
                         onSendRequest={onSendRequest}
+                        onSave={onCreateRequest}
                     />
                 </div>
 
@@ -232,43 +361,89 @@ const UnifiedRequestWorkspace = ({ onSendRequest, response }) => {
     );
 }
 
-const RequestDetails = ({ requests, response, onSend }) => {
+const RequestDetails = ({ requests, onSave, isLoadingRequests, fetchHistory }) => {
     const { id } = useParams();
-    const request = requests.find((r) => r._id === id);
-    const navigate = useNavigate();
+    const [localRequest, setLocalRequest] = useState(null);
+    const [isLoading, setIsLoading] = useState(true);
 
-    if (!request) {
-        return <div>Loading request details...</div>;
+    useEffect(() => {
+        const foundRequest = requests.find((r) => r._id === id);
+        if (foundRequest) {
+            setLocalRequest(foundRequest);
+            setIsLoading(false);
+        } else if (!isLoadingRequests) {
+            // Not found in list and list is not loading, try fetching specifically
+            fetchRequestDetails();
+        }
+    }, [id, requests, isLoadingRequests]);
+
+    const fetchRequestDetails = async () => {
+        setIsLoading(true);
+        try {
+            const res = await fetch(`/api/requests/${id}`, { credentials: 'include' });
+            if (res.ok) {
+                const data = await res.json();
+                setLocalRequest(data);
+            } else {
+                console.error('Request not found even on direct fetch');
+            }
+        } catch (err) {
+            console.error('Error fetching direct request details:', err);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    if (isLoading || (isLoadingRequests && !localRequest)) {
+        return (
+            <div className="flex flex-col h-full items-center justify-center bg-slate-950 p-20 text-slate-400">
+                <div className="h-8 w-8 animate-spin rounded-full border-2 border-slate-700 border-t-blue-500 mb-4"></div>
+                <span>Loading request details...</span>
+            </div>
+        );
+    }
+
+    if (!localRequest) {
+        return (
+            <div className="flex flex-col h-full items-center justify-center bg-slate-950 p-20 text-slate-400">
+                <div className="text-4xl mb-4">🔍</div>
+                <h3 className="text-lg font-semibold text-slate-200">Request Not Found</h3>
+                <p className="text-sm mt-1">We couldn't find the request you're looking for.</p>
+                <button
+                    onClick={() => window.location.href = '/workspace/api-network/explore'}
+                    className="mt-6 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-md text-sm transition-colors"
+                >
+                    Back to Explore
+                </button>
+            </div>
+        );
     }
 
     return (
-        <>
-            <h2>Request Details</h2>
-            <p>
-                <strong>Name:</strong> {request.name}
-            </p>
-            <p>
-                <strong>URL:</strong> {request.url}
-            </p>
-            <p>
-                <strong>Method:</strong> {request.method}
-            </p>
-            <button className="send-request-button" onClick={() => onSend(request)}>
-                Send Request
-            </button>
-            <button className='edit-request-button' onClick={() => navigate(`../requests/edit/${request._id}`)}>Edit</button>
-            {response && <ResponseDisplay responseData={response} />}
-        </>
+        <RequestWorkspace
+            initialRequest={localRequest}
+            onSave={(updatedRequest) => onSave(updatedRequest)}
+            onSend={fetchHistory}
+        />
     );
 };
 
-const EditRequestWorkspace = ({ requests, onSave }) => {
+const EditRequestWorkspace = ({ requests, onSave, isLoadingRequests }) => {
     const { id } = useParams();
     const request = requests.find((r) => r._id === id);
     const navigate = useNavigate();
 
+    if (isLoadingRequests && !request) {
+        return (
+            <div className="flex flex-col h-full items-center justify-center bg-slate-950 p-20 text-slate-400">
+                <div className="h-8 w-8 animate-spin rounded-full border-2 border-slate-700 border-t-blue-500 mb-4"></div>
+                <span>Loading request details...</span>
+            </div>
+        );
+    }
+
     if (!request) {
-        return <div>Request not found</div>;
+        return <div className="p-10 text-slate-200">Request not found</div>;
     }
 
     const handleSave = (savedRequest) => {

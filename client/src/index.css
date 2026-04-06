@@ -1,3 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 /* Base CSS reset and global styles */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto+Mono:wght@400;500;600&display=swap');
 
@@ -290,7 +294,7 @@ body.light-theme {
 
 .workspace-sidebar>div:hover,
 .api-network-sidebar>div:hover {
-  background-color: var(--hover-background);
+  /* background-color: var(--hover-background); */
 }
 
 /* Example component styling */

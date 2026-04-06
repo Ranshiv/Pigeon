@@ -96,4 +96,9 @@ router.use('/protocols', protocolsRoutes);
 // Register API Marketplace routes
 router.use('/marketplace', apiMarketplaceRoutes);
 
+// Register Collaboration routes (Reviews & Comments & Activity)
+router.use('/reviews', require('./reviews'));
+router.use('/comments', require('./comments'));
+router.use('/activities', require('./activities'));
+
 module.exports = router;
