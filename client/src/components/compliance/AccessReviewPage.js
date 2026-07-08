@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { FiDownload, FiLock, FiRefreshCw } from 'react-icons/fi';
 import { useWorkspaceOptions } from './useWorkspaceOptions';
 import { downloadFromApi } from './download';
+import ThemedSelect from './ThemedSelect';
 
 const AccessReviewPage = () => {
     const { workspaces, defaultWorkspaceId, loading: workspacesLoading } = useWorkspaceOptions();
@@ -53,68 +54,64 @@ const AccessReviewPage = () => {
     };
 
     return (
-        <div className="compliance-card">
-            <div className="compliance-card-header">
-                <div className="compliance-card-title">
-                    <FiLock /> Access Review
+        <div className="cmp-card">
+            <div className="cmp-card-head">
+                <div className="cmp-card-title">
+                    <FiLock className="cmp-card-title-icon" />
+                    Access Review
                 </div>
-                <div className="compliance-actions">
-                    <button className="btn-secondary" onClick={exportJson}>
+                <div className="cmp-actions">
+                    <button className="cmp-btn cmp-btn--ghost" onClick={exportJson}>
                         <FiDownload /> Export
                     </button>
-                    <button className="btn-secondary" onClick={fetchSnapshot} disabled={loading}>
+                    <button className="cmp-btn cmp-btn--ghost" onClick={fetchSnapshot} disabled={loading}>
                         <FiRefreshCw /> Refresh
                     </button>
                 </div>
             </div>
 
-            <div className="compliance-filters">
-                <div className="filter-row">
-                    <div className="field">
+            <div className="cmp-filters">
+                <div className="cmp-filter-row cmp-filter-row--single">
+                    <div className="cmp-field">
                         <label>Workspace</label>
-                        <select
+                        <ThemedSelect
                             value={workspaceId}
-                            onChange={(e) => setWorkspaceId(e.target.value)}
+                            onChange={setWorkspaceId}
                             disabled={workspacesLoading || workspaces.length === 0}
-                        >
-                            {workspaces.length === 0 ? (
-                                <option value="">No workspaces found</option>
-                            ) : (
-                                workspaces.map((w) => (
-                                    <option key={w.id} value={w.id}>{w.label}</option>
-                                ))
-                            )}
-                        </select>
+                            options={workspaces.length === 0
+                                ? [{ value: '', label: 'No workspaces found' }]
+                                : workspaces.map((w) => ({ value: w.id, label: w.label }))}
+                        />
                     </div>
                 </div>
             </div>
 
-            {error && <div className="compliance-error">{error}</div>}
+            {error && <div className="cmp-error">{error}</div>}
 
             {loading || !data ? (
-                <div className="compliance-empty">Loading access review…</div>
+                <div className="cmp-empty">Loading access review…</div>
             ) : (
-                <div className="compliance-grid">
-                    <div className="compliance-subcard">
-                        <h3>Workspace</h3>
+                <div className="cmp-grid">
+                    <div className="cmp-subcard">
+                        <h3 className="cmp-subcard-title">Workspace</h3>
                         {!data.found ? (
-                            <div className="muted">Workspace not found.</div>
+                            <div className="cmp-empty cmp-empty--inline">Workspace not found.</div>
                         ) : (
                             <>
-                                <div className="kv">
-                                    <div className="k">Name</div>
-                                    <div className="v">{data.workspace?.name || '—'}</div>
+                                <div className="cmp-kv">
+                                    <div className="cmp-k">Name</div>
+                                    <div className="cmp-v">{data.workspace?.name || '—'}</div>
 
-                                    <div className="k">Owner</div>
-                                    <div className="v mono">{String(data.workspace?.owner ?? '—')}</div>
+                                    <div className="cmp-k">Owner</div>
+                                    <div className="cmp-v cmp-mono">{String(data.workspace?.owner ?? '—')}</div>
 
-                                    <div className="k">Visibility</div>
-                                    <div className="v">{data.workspace?.isPublic ? 'Public' : 'Private'}</div>
+                                    <div className="cmp-k">Visibility</div>
+                                    <div className="cmp-v">{data.workspace?.isPublic ? 'Public' : 'Private'}</div>
                                 </div>
 
-                                <h4 style={{ marginTop: 14 }}>Collaborators</h4>
-                                <div className="compliance-table-wrap">
-                                    <table className="compliance-table">
+                                <h4 className="cmp-subsection-title">Collaborators</h4>
+                                <div className="cmp-table-wrap">
+                                    <table className="cmp-table">
                                         <thead>
                                             <tr>
                                                 <th>User</th>
@@ -124,12 +121,11 @@ const AccessReviewPage = () => {
                                         </thead>
                                         <tbody>
                                             {(data.workspace?.collaborators || []).length === 0 ? (
-                                                <tr><td colSpan={3} className="compliance-empty">No collaborators.</td></tr>
+                                                <tr><td colSpan={3} className="cmp-empty">No collaborators.</td></tr>
                                             ) : (
                                                 (data.workspace?.collaborators || []).map((c, idx) => (
-                                                    <tr key={`${c.userId || c.email || idx}`}
-                                                    >
-                                                        <td className="mono">{String(c.userId ?? '')}</td>
+                                                    <tr key={`${c.userId || c.email || idx}`}>
+                                                        <td className="cmp-mono">{String(c.userId ?? '')}</td>
                                                         <td>{c.role || '—'}</td>
                                                         <td>{c.email || '—'}</td>
                                                     </tr>
@@ -142,21 +138,21 @@ const AccessReviewPage = () => {
                         )}
                     </div>
 
-                    <div className="compliance-subcard">
-                        <h3>Teams</h3>
-                        <p className="muted">Teams linked to this workspace (if any).</p>
+                    <div className="cmp-subcard">
+                        <h3 className="cmp-subcard-title">Teams</h3>
+                        <p className="cmp-muted">Teams linked to this workspace (if any).</p>
                         {(data.teams || []).length === 0 ? (
-                            <div className="compliance-empty">No teams found.</div>
+                            <div className="cmp-empty cmp-empty--inline">No teams found.</div>
                         ) : (
-                            <div className="stack">
+                            <div className="cmp-stack">
                                 {(data.teams || []).map((t) => (
-                                    <div key={t.teamId} className="team-card">
-                                        <div className="team-title">
+                                    <div key={t.teamId} className="cmp-team-card">
+                                        <div className="cmp-team-title">
                                             <span>{t.name}</span>
-                                            <span className="muted mono">{t.teamId}</span>
+                                            <span className="cmp-muted cmp-mono">{t.teamId}</span>
                                         </div>
-                                        <div className="muted">Owner: <span className="mono">{String(t.ownerId ?? '')}</span></div>
-                                        <div className="muted">Members: {(t.members || []).length}</div>
+                                        <div className="cmp-muted">Owner: <span className="cmp-mono">{String(t.ownerId ?? '')}</span></div>
+                                        <div className="cmp-muted">Members: {(t.members || []).length}</div>
                                     </div>
                                 ))}
                             </div>
@@ -164,11 +160,11 @@ const AccessReviewPage = () => {
 
                         {(data.issues || []).length > 0 && (
                             <>
-                                <h4 style={{ marginTop: 14 }}>Issues</h4>
-                                <ul className="issues">
+                                <h4 className="cmp-subsection-title">Issues</h4>
+                                <ul className="cmp-issues">
                                     {(data.issues || []).map((i, idx) => (
                                         <li key={idx}>
-                                            <span className="mono">{i.type}</span> — {i.message}
+                                            <span className="cmp-mono">{i.type}</span> — {i.message}
                                         </li>
                                     ))}
                                 </ul>

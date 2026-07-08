@@ -1,6 +1,7 @@
 // client/src/components/Home.js
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import './Home.css';
 import {
     FiSend, FiSearch, FiGrid, FiPackage, FiActivity,
@@ -41,7 +42,7 @@ const Home = () => {
                 }
 
                 // Fetch workspaces
-                const wsResponse = await fetch('http://localhost:5001/api/workspaces', {
+                const wsResponse = await fetch('/api/workspaces', {
                     credentials: 'include'
                 });
 
@@ -65,7 +66,7 @@ const Home = () => {
                     // Fetch all collections (global view) to populate stats and recent cards.
                     // The backend already returns all collections in dev when user filtering finds none.
                     const allCollectionsResponse = await fetch(
-                        'http://localhost:5001/api/collections',
+                        '/api/collections',
                         { credentials: 'include' }
                     );
 
@@ -88,7 +89,7 @@ const Home = () => {
                     // If we have workspaces, also fetch workspace-specific data for the first workspace (activity/merges)
                     if (allWorkspaces.length > 0) {
                         const collectionsResponse = await fetch(
-                            `http://localhost:5001/api/workspaces/${allWorkspaces[0]._id}/collections`,
+                            `/api/workspaces/${allWorkspaces[0]._id}/collections`,
                             { credentials: 'include' }
                         );
 
@@ -110,7 +111,7 @@ const Home = () => {
 
                         // Fetch activity for the first workspace
                         const activityResponse = await fetch(
-                            `http://localhost:5001/api/workspaces/${allWorkspaces[0]._id}/activity`,
+                            `/api/workspaces/${allWorkspaces[0]._id}/activity`,
                             { credentials: 'include' }
                         );
 
@@ -121,7 +122,7 @@ const Home = () => {
 
                         // Fetch pending merge requests
                         const mergeRequestsResponse = await fetch(
-                            `http://localhost:5001/api/workspaces/${allWorkspaces[0]._id}/merge-requests?status=pending`,
+                            `/api/workspaces/${allWorkspaces[0]._id}/merge-requests?status=pending`,
                             { credentials: 'include' }
                         );
 
@@ -143,6 +144,35 @@ const Home = () => {
 
         fetchDashboardData();
     }, []);
+
+    // Command palette (Cmd/Ctrl+K) — 2026 pro-tool pattern.
+    // Routes to key pages; lightweight, no new component.
+    const handleCommandShortcut = useCallback((e) => {
+        if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+            e.preventDefault();
+            const commands = [
+                { label: 'New Request', path: '../api-network/requests/new' },
+                { label: 'GraphQL', path: '../graphql' },
+                { label: 'New Collection', path: '../collections/new' },
+                { label: 'Monitoring', path: '../monitoring' },
+                { label: 'Workspaces', path: '../workspaces' },
+                { label: 'Settings', path: '../settings' }
+            ];
+            const choice = window.prompt(
+                'Command palette — jump to:\n' + commands.map((c, i) => `${i + 1}. ${c.label}`).join('\n'),
+                '1'
+            );
+            const idx = parseInt(choice, 10) - 1;
+            if (idx >= 0 && idx < commands.length) {
+                navigate(commands[idx].path);
+            }
+        }
+    }, [navigate]);
+
+    useEffect(() => {
+        window.addEventListener('keydown', handleCommandShortcut);
+        return () => window.removeEventListener('keydown', handleCommandShortcut);
+    }, [handleCommandShortcut]);
 
     // Helper function to format dates
     const formatDate = (dateString) => {
@@ -178,110 +208,108 @@ const Home = () => {
     };
 
     return (
-        <div className="dashboard-container">
+        <div className="pgh-root">
             {/* Welcome Section */}
-            <section className="welcome-section">
-                <div className="welcome-content">
+            <section className="pgh-hero">
+                <div className="pgh-hero-text">
                     <h1>Welcome{userData?.displayName ? `, ${userData.displayName}` : ''}!</h1>
                     <p>Manage your APIs, collaborate with your team, and streamline your development workflow.</p>
+                    <p className="pgh-kbd-hint">Press <kbd>Ctrl</kbd>+<kbd>K</kbd> to jump anywhere</p>
                 </div>
-                <div className="quick-actions">
-                    <button className="quick-action-btn primary" onClick={() => navigate('../../workspace/api-network/requests/new')}>
-                        <FiSend className="action-icon" />
+                <div className="pgh-actions">
+                    <button className="pgh-action-btn pgh-action-btn--primary" onClick={() => { toast.info('Opening new request…'); navigate('../../workspace/api-network/requests/new'); }}>
+                        <FiSend className="pgh-action-icon" />
                         <span>New Request</span>
                     </button>
-                    <button className="quick-action-btn" onClick={() => navigate('../graphql')}>
-                        <FiCode className="action-icon" />
+                    <button className="pgh-action-btn" onClick={() => navigate('../graphql')}>
+                        <FiCode className="pgh-action-icon" />
                         <span>GraphQL</span>
                     </button>
-                    <button className="quick-action-btn" onClick={() => navigate('../collections/new')}>
-                        <FiPackage className="action-icon" />
+                    <button className="pgh-action-btn" onClick={() => navigate('../collections/new')}>
+                        <FiPackage className="pgh-action-icon" />
                         <span>New Collection</span>
                     </button>
-                    <button className="quick-action-btn" onClick={() => navigate('../workspaces?create=true')}>
-                        <FiGrid className="action-icon" />
+                    <button className="pgh-action-btn" onClick={() => navigate('../workspaces?create=true')}>
+                        <FiGrid className="pgh-action-icon" />
                         <span>New Workspace</span>
                     </button>
                 </div>
             </section>
 
             {/* Main Dashboard Content */}
-            <div className="dashboard-content">
+            <div className="pgh-grid">
                 {/* Left Column - Stats and Recent Activity */}
-                <div className="dashboard-column">
+                <div className="pgh-col">
                     {/* Stats Overview */}
-                    <section className="dashboard-section stats-section">
-                        <h2><FiActivity /> Stats Overview</h2>
-                        <div className="stats-grid">
-                            <div className="stat-card">
-                                <div className="stat-icon collections">
+                    <section className="pgh-card">
+                        <h2 className="pgh-card-title"><FiActivity /> Stats Overview</h2>
+                        <div className="pgh-stats">
+                            <div className="pgh-stat">
+                                <div className="pgh-stat-icon pgh-stat-icon--collections">
                                     <FiPackage />
                                 </div>
-                                <div className="stat-info">
-                                    <span className="stat-value">{stats.collections}</span>
-                                    <span className="stat-label">Collections</span>
+                                <div className="pgh-stat-info">
+                                    <span className="pgh-stat-value">{stats.collections}</span>
+                                    <span className="pgh-stat-label">Collections</span>
                                 </div>
                             </div>
-                            <div className="stat-card">
-                                <div className="stat-icon workspaces">
+                            <div className="pgh-stat">
+                                <div className="pgh-stat-icon pgh-stat-icon--workspaces">
                                     <FiGrid />
                                 </div>
-                                <div className="stat-info">
-                                    <span className="stat-value">{stats.workspaces}</span>
-                                    <span className="stat-label">Workspaces</span>
+                                <div className="pgh-stat-info">
+                                    <span className="pgh-stat-value">{stats.workspaces}</span>
+                                    <span className="pgh-stat-label">Workspaces</span>
                                 </div>
                             </div>
-                            <div className="stat-card">
-                                <div className="stat-icon requests">
+                            <div className="pgh-stat">
+                                <div className="pgh-stat-icon pgh-stat-icon--requests">
                                     <FiSend />
                                 </div>
-                                <div className="stat-info">
-                                    <span className="stat-value">{stats.requests}</span>
-                                    <span className="stat-label">Requests</span>
+                                <div className="pgh-stat-info">
+                                    <span className="pgh-stat-value">{stats.requests}</span>
+                                    <span className="pgh-stat-label">Requests</span>
                                 </div>
                             </div>
-                            <div className="stat-card">
-                                <div className="stat-icon pending">
+                            <div className="pgh-stat">
+                                <div className="pgh-stat-icon pgh-stat-icon--pending">
                                     <FiGitPullRequest />
                                 </div>
-                                <div className="stat-info">
-                                    <span className="stat-value">{stats.pendingMergeRequests}</span>
-                                    <span className="stat-label">Pending Merges</span>
+                                <div className="pgh-stat-info">
+                                    <span className="pgh-stat-value">{stats.pendingMergeRequests}</span>
+                                    <span className="pgh-stat-label">Pending Merges</span>
                                 </div>
                             </div>
                         </div>
                     </section>
 
                     {/* Recent Activity */}
-                    <section className="dashboard-section activity-section">
-                        <div className="section-header">
-                            <h2><FiClock /> Recent Activity</h2>
-                            <button
-                                className="view-all-btn"
-                                onClick={() => navigate('../workspaces')}
-                            >
+                    <section className="pgh-card">
+                        <div className="pgh-card-header">
+                            <h2 className="pgh-card-title"><FiClock /> Recent Activity</h2>
+                            <button className="pgh-link-btn" onClick={() => navigate('../workspaces')}>
                                 View All
                             </button>
                         </div>
-                        <div className="activity-list">
+                        <div className="pgh-list">
                             {loading ? (
-                                <div className="loading">Loading recent activity...</div>
+                                <div className="pgh-loading">Loading recent activity...</div>
                             ) : recentActivity.length === 0 ? (
-                                <div className="empty-state">
+                                <div className="pgh-empty">
                                     <p>No recent activity to display. Start by creating collections or sending requests.</p>
                                 </div>
                             ) : (
                                 recentActivity.map((activity) => (
-                                    <div key={activity._id} className="activity-item">
-                                        <div className="activity-icon">
+                                    <div key={activity._id} className="pgh-activity-row">
+                                        <div className="pgh-activity-icon">
                                             {getActivityIcon(activity.type)}
                                         </div>
-                                        <div className="activity-content">
-                                            <div className="activity-header">
-                                                <span className="user">{activity.user?.displayName || 'A user'}</span>
-                                                <span className="time">{formatDate(activity.timestamp)}</span>
+                                        <div className="pgh-activity-body">
+                                            <div className="pgh-activity-top">
+                                                <span className="pgh-activity-user">{activity.user?.displayName || 'A user'}</span>
+                                                <span className="pgh-activity-time">{formatDate(activity.timestamp)}</span>
                                             </div>
-                                            <p className="activity-message">{activity.message}</p>
+                                            <p className="pgh-activity-message">{activity.message}</p>
                                         </div>
                                     </div>
                                 ))
@@ -291,28 +319,22 @@ const Home = () => {
                 </div>
 
                 {/* Right Column - Workspaces and Collections */}
-                <div className="dashboard-column">
+                <div className="pgh-col">
                     {/* Recent Workspaces */}
-                    <section className="dashboard-section workspaces-section">
-                        <div className="section-header">
-                            <h2><FiGrid /> Recent Workspaces</h2>
-                            <button
-                                className="view-all-btn"
-                                onClick={() => navigate('../workspaces')}
-                            >
+                    <section className="pgh-card">
+                        <div className="pgh-card-header">
+                            <h2 className="pgh-card-title"><FiGrid /> Recent Workspaces</h2>
+                            <button className="pgh-link-btn" onClick={() => navigate('../workspaces')}>
                                 View All
                             </button>
                         </div>
-                        <div className="workspaces-list">
+                        <div className="pgh-list">
                             {loading ? (
-                                <div className="loading">Loading workspaces...</div>
+                                <div className="pgh-loading">Loading workspaces...</div>
                             ) : recentWorkspaces.length === 0 ? (
-                                <div className="empty-state">
+                                <div className="pgh-empty">
                                     <p>You have no workspaces yet. Create your first workspace to get started.</p>
-                                    <button
-                                        className="empty-state-btn"
-                                        onClick={() => navigate('../workspaces?create=true')}
-                                    >
+                                    <button className="pgh-empty-btn" onClick={() => navigate('../workspaces?create=true')}>
                                         <FiPlus /> Create Workspace
                                     </button>
                                 </div>
@@ -320,24 +342,24 @@ const Home = () => {
                                 recentWorkspaces.map((workspace) => (
                                     <div
                                         key={workspace._id}
-                                        className="workspace-card"
+                                        className="pgh-row"
                                         onClick={() => navigate(`../workspaces/${workspace._id}`)}
                                     >
-                                        <div className="workspace-icon">
+                                        <div className="pgh-row-icon">
                                             {workspace.isPersonal ? (
                                                 <FiStar />
                                             ) : (
                                                 <FiUsers />
                                             )}
                                         </div>
-                                        <div className="workspace-info">
+                                        <div className="pgh-row-info">
                                             <h3>{workspace.name}</h3>
                                             <p>
                                                 {workspace.isPersonal ? "Personal" : "Team"} ·
                                                 {" "}{workspace.collectionsCount || 0} collections
                                             </p>
                                         </div>
-                                        <FiArrowRight className="view-arrow" />
+                                        <FiArrowRight className="pgh-row-arrow" />
                                     </div>
                                 ))
                             )}
@@ -345,26 +367,20 @@ const Home = () => {
                     </section>
 
                     {/* Recent Collections */}
-                    <section className="dashboard-section collections-section">
-                        <div className="section-header">
-                            <h2><FiPackage /> Recent Collections</h2>
-                            <button
-                                className="view-all-btn"
-                                onClick={() => navigate('../collections')}
-                            >
+                    <section className="pgh-card">
+                        <div className="pgh-card-header">
+                            <h2 className="pgh-card-title"><FiPackage /> Recent Collections</h2>
+                            <button className="pgh-link-btn" onClick={() => navigate('../collections')}>
                                 View All
                             </button>
                         </div>
-                        <div className="collections-grid">
+                        <div className="pgh-collections">
                             {loading ? (
-                                <div className="loading">Loading collections...</div>
+                                <div className="pgh-loading">Loading collections...</div>
                             ) : recentCollections.length === 0 ? (
-                                <div className="empty-state">
+                                <div className="pgh-empty">
                                     <p>You have no collections yet. Create your first collection to get started.</p>
-                                    <button
-                                        className="empty-state-btn"
-                                        onClick={() => navigate('../collections/new')}
-                                    >
+                                    <button className="pgh-empty-btn" onClick={() => navigate('../collections/new')}>
                                         <FiPlus /> Create Collection
                                     </button>
                                 </div>
@@ -372,12 +388,12 @@ const Home = () => {
                                 recentCollections.map((collection) => (
                                     <div
                                         key={collection._id}
-                                        className="collection-card"
+                                        className="pgh-collection-card"
                                         onClick={() => navigate(`../collections/${collection._id}`)}
                                     >
                                         <h3>{collection.name}</h3>
                                         <p>{collection.description || 'No description'}</p>
-                                        <div className="collection-meta">
+                                        <div className="pgh-collection-meta">
                                             <span>{collection.requestsCount || 0} requests</span>
                                             <span>Updated {formatDate(collection.updatedAt)}</span>
                                         </div>
@@ -390,26 +406,26 @@ const Home = () => {
             </div>
 
             {/* Quick Links Section */}
-            <section className="dashboard-section quick-links-section">
-                <h2><FiBookOpen /> Resource Links</h2>
-                <div className="quick-links">
-                    <a href="/documentation" className="quick-link">
-                        <FiBookOpen className="quick-link-icon" />
-                        <div className="quick-link-content">
+            <section className="pgh-card">
+                <h2 className="pgh-card-title"><FiBookOpen /> Resource Links</h2>
+                <div className="pgh-quick-links">
+                    <a href="/documentation" className="pgh-quick-link">
+                        <FiBookOpen className="pgh-quick-link-icon" />
+                        <div className="pgh-quick-link-body">
                             <h3>Documentation</h3>
                             <p>Learn how to use all features of Pigeon</p>
                         </div>
                     </a>
-                    <a href="/workspace/api-network/explore" className="quick-link">
-                        <FiSearch className="quick-link-icon" />
-                        <div className="quick-link-content">
+                    <a href="/workspace/api-network/explore" className="pgh-quick-link">
+                        <FiSearch className="pgh-quick-link-icon" />
+                        <div className="pgh-quick-link-body">
                             <h3>Explore Public APIs</h3>
                             <p>Discover and test popular public APIs</p>
                         </div>
                     </a>
-                    <a href="https://github.com/your-org/pigeon" target="_blank" rel="noopener noreferrer" className="quick-link">
-                        <FiCode className="quick-link-icon" />
-                        <div className="quick-link-content">
+                    <a href="https://github.com/your-org/pigeon" target="_blank" rel="noopener noreferrer" className="pgh-quick-link">
+                        <FiCode className="pgh-quick-link-icon" />
+                        <div className="pgh-quick-link-body">
                             <h3>GitHub</h3>
                             <p>View source code and contribute</p>
                         </div>

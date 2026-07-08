@@ -229,11 +229,6 @@
     font-size: 0.85rem;
 }
 
-.ws-setting input[type="checkbox"] {
-    width: 16px;
-    height: 16px;
-    accent-color: var(--ws-primary);
-}
 
 /* ============================================
    Error Display

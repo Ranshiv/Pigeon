@@ -108,6 +108,29 @@ body {
   --protocol-http: #014C75;
   /* HTTP - Primary Blue */
 
+  /* === 2026 spatial/depth + motion tokens (light) === */
+  --surface: #ffffff;
+  --surface-elevated: #ffffff;
+  --surface-sunken: #f1f3f5;
+  --accent: var(--primary-color);
+  --accent-hover: var(--primary-hover);
+  --ring: 0 0 0 2px var(--primary-color);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08), 0 2px 6px rgba(0, 0, 0, 0.05);
+  --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.12), 0 4px 12px rgba(0, 0, 0, 0.06);
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 22px;
+  --ease-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --dur-fast: 120ms;
+  --dur-base: 180ms;
+  --dur-slow: 280ms;
+  --glass-bg: rgba(255, 255, 255, 0.72);
+  --glass-border: rgba(255, 255, 255, 0.5);
+  --gradient-hero: linear-gradient(135deg, #014C75 0%, #003B5B 55%, #002940 100%);
+
   /* Designer-specific aliases (for backward compatibility) */
   --designer-primary: var(--primary-color);
   --designer-primary-hover: var(--primary-hover);
@@ -235,6 +258,20 @@ body.dark-theme {
   --debug-bg: #013B5B;
   --debug-bg2: #012A41;
   --border02-color: #1c4d66;
+
+  /* === 2026 spatial/depth + motion tokens (dark) === */
+  --surface: #002234;
+  --surface-elevated: #002e44;
+  --surface-sunken: #001721;
+  --accent: #38bdf8;
+  --accent-hover: #7dd3fc;
+  --ring: 0 0 0 2px #38bdf8;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4), 0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 14px rgba(0, 0, 0, 0.5), 0 2px 6px rgba(0, 0, 0, 0.35);
+  --shadow-lg: 0 16px 38px rgba(0, 0, 0, 0.6), 0 6px 16px rgba(0, 0, 0, 0.4);
+  --glass-bg: rgba(0, 34, 52, 0.6);
+  --glass-border: rgba(56, 189, 248, 0.18);
+  --gradient-hero: linear-gradient(135deg, #012A41 0%, #001927 55%, #00111A 100%);
 }
 
 /* Light theme override (explicit) */
@@ -544,4 +581,199 @@ input,
 select,
 textarea {
   font: inherit;
+}
+
+/* ============================================================
+   Global Checkbox / Radio — unified style across the whole app
+   Overrides all scattered component-level checkbox rules.
+   Use !important to beat per-component specificity collisions.
+   ============================================================ */
+input[type="checkbox"],
+input[type="radio"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  cursor: pointer;
+  flex-shrink: 0;
+  display: inline-block;
+  position: relative;
+  vertical-align: middle;
+  border: 1.5px solid var(--border-color, #d1d5db);
+  border-radius: 4px;
+  background: var(--card-bg, #fff);
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+input[type="radio"] {
+  border-radius: 50%;
+}
+
+input[type="checkbox"]:hover,
+input[type="radio"]:hover {
+  border-color: var(--primary-color);
+  background: rgba(1, 76, 117, 0.06);
+}
+
+input[type="checkbox"]:checked,
+input[type="radio"]:checked {
+  background: var(--primary-color);
+  border-color: var(--primary-color);
+}
+
+input[type="checkbox"]:checked::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 4px;
+  height: 8px;
+  border: solid #fff;
+  border-width: 0 1.5px 1.5px 0;
+  transform: translate(-55%, -60%) rotate(45deg);
+  transform-origin: center;
+  animation: globalCheckPop 0.2s ease-out;
+}
+
+input[type="radio"]:checked::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #fff;
+  transform: translate(-50%, -50%);
+  animation: globalCheckPop 0.2s ease-out;
+}
+
+input[type="checkbox"]:focus-visible,
+input[type="radio"]:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(1, 76, 117, 0.18);
+}
+
+@keyframes globalCheckPop {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  input[type="checkbox"]:checked::after,
+  input[type="radio"]:checked::after {
+    animation: none;
+  }
+}
+
+/* ============================================================
+   Global text inputs / textarea / select — unified style.
+   Applies to every text/email/password/number/tel/url/date/
+   datetime-local/search input, textarea, and select in the app.
+   Per-component rules that re-declare these props are purged;
+   components keep only layout-specific overrides (width: 100%,
+   grid spans, etc.) where needed.
+   ============================================================ */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input[type="tel"],
+input[type="url"],
+input[type="date"],
+input[type="datetime-local"],
+input[type="time"],
+input[type="search"],
+textarea,
+select {
+  width: 100%;
+  padding: 11px 14px;
+  border: 1px solid var(--border-color, #d1d5db);
+  border-radius: 8px;
+  background: var(--card-bg, #fff);
+  color: var(--text-color, #333);
+  font: inherit;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  box-sizing: border-box;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+
+input[type="text"]:hover,
+input[type="email"]:hover,
+input[type="password"]:hover,
+input[type="number"]:hover,
+input[type="tel"]:hover,
+input[type="url"]:hover,
+input[type="date"]:hover,
+input[type="datetime-local"]:hover,
+input[type="time"]:hover,
+input[type="search"]:hover,
+textarea:hover,
+select:hover {
+  border-color: rgba(1, 76, 117, 0.35);
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+input[type="number"]:focus,
+input[type="tel"]:focus,
+input[type="url"]:focus,
+input[type="date"]:focus,
+input[type="datetime-local"]:focus,
+input[type="time"]:focus,
+input[type="search"]:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  border-color: var(--primary-color, #014C75);
+  box-shadow: 0 0 0 3px rgba(1, 76, 117, 0.12);
+  background: var(--card-bg, #fff);
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--text-secondary, #6c757d);
+  opacity: 0.6;
+}
+
+textarea {
+  resize: vertical;
+  min-height: 90px;
+}
+
+select {
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236c757d' d='M2 4l4 4 4-4'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  padding-right: 36px;
+}
+
+input:disabled,
+textarea:disabled,
+select:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="number"],
+  input[type="tel"],
+  input[type="url"],
+  input[type="date"],
+  input[type="datetime-local"],
+  input[type="time"],
+  input[type="search"],
+  textarea,
+  select {
+    transition: none;
+  }
 }

@@ -39,8 +39,6 @@ body.dark-theme .mock-workspace {
     --mock-focus-ring: rgba(1, 76, 117, 0.4);
 }
 
-.documentation-
-
 /* ===== Base Layout ===== */
 .mock-workspace {
     display: flex;
@@ -643,21 +641,11 @@ body.dark-theme .mock-workspace {
 
 .form-group input,
 .form-group textarea {
-    width: 100%;
     padding: 10px 12px;
     background: var(--mock-bg-tertiary);
     border: 1px solid var(--mock-border-primary);
-    border-radius: 8px;
     color: var(--mock-text-primary);
-    font-size: 14px;
     transition: all 0.2s ease;
-}
-
-.form-group input:focus,
-.form-group textarea:focus {
-    outline: none;
-    border-color: var(--mock-primary-color);
-    box-shadow: 0 0 0 3px var(--mock-focus-ring);
 }
 
 .form-group input::placeholder,
@@ -666,7 +654,6 @@ body.dark-theme .mock-workspace {
 }
 
 .form-group textarea {
-    resize: vertical;
     min-height: 80px;
 }
 

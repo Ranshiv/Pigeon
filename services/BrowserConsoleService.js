@@ -215,6 +215,57 @@ class BrowserConsoleService {
     }
 
     /**
+     * Execute JavaScript in an active captured page session
+     */
+    async executeScript(sessionId, script, waitMs = 500) {
+        const session = this.activeSessions.get(sessionId);
+
+        if (!session) {
+            return {
+                success: false,
+                error: 'Session not found'
+            };
+        }
+
+        if (!script || typeof script !== 'string') {
+            return {
+                success: false,
+                error: 'A valid script string is required'
+            };
+        }
+
+        try {
+            const logsBefore = session.logs.length;
+
+            const result = await session.page.evaluate((scriptSource) => {
+                // eslint-disable-next-line no-new-func
+                const execute = new Function(scriptSource);
+                return execute();
+            }, script);
+
+            if (waitMs > 0) {
+                await new Promise(resolve => setTimeout(resolve, waitMs));
+            }
+
+            const newLogs = session.logs.slice(logsBefore);
+
+            return {
+                success: true,
+                sessionId,
+                result,
+                newLogs,
+                executedAt: new Date().toISOString()
+            };
+        } catch (error) {
+            return {
+                success: false,
+                sessionId,
+                error: error.message
+            };
+        }
+    }
+
+    /**
      * Get all active sessions
      */
     getActiveSessions() {
@@ -256,15 +307,8 @@ class BrowserConsoleService {
 // Export singleton instance
 const browserConsoleService = new BrowserConsoleService();
 
-// Cleanup on process exit
-process.on('SIGINT', async () => {
-    await browserConsoleService.cleanup();
-    process.exit(0);
-});
-
-process.on('SIGTERM', async () => {
-    await browserConsoleService.cleanup();
-    process.exit(0);
-});
+// Note: process-level SIGINT/SIGTERM handlers removed — server.js owns the
+// shutdown sequence and calls browserConsoleService.cleanup() itself. Duplicate
+// handlers here raced server.close() and could exit before sockets drained.
 
 module.exports = browserConsoleService;

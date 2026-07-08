@@ -394,7 +394,7 @@ const MonitoringDashboard = () => {
                                 <div className="metric">
                                     <span className="metric-label">Status</span>
                                     <span
-                                        className="metric-value status"
+                                        className="metric-value metric-status-value"
                                         style={{ color: getStatusColor(monitor.currentStatus) }}
                                     >
                                         {monitor.currentStatus?.toUpperCase() || 'UNKNOWN'}

@@ -1167,22 +1167,9 @@
 .form-group input,
 .form-group textarea,
 .form-group select {
-  width: 100%;
   padding: 10px 12px;
-  border: 1px solid var(--border-color);
   border-radius: var(--border-radius);
-  font-size: 14px;
   background-color: rgba(0, 0, 0, 0.2);
-  color: var(--text-color);
-  transition: all 0.2s ease;
-}
-
-.form-group input:focus,
-.form-group textarea:focus,
-.form-group select:focus {
-  border-color: var(--primary-color, #014C75);
-  outline: none;
-  box-shadow: 0 0 0 2px rgba(1, 76, 117, 0.2);
 }
 
 .form-group small {

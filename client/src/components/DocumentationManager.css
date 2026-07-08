@@ -317,19 +317,12 @@
 
 .form-group input,
 .form-group textarea {
-    width: 100%;
     padding: 8px 12px;
-    border: 1px solid var(--border-color);
     border-radius: 4px;
-    font-size: 14px;
-    background-color: var(--card-bg);
-    color: var(--text-color);
 }
 
 .form-group input:focus,
 .form-group textarea:focus {
-    outline: none;
-    border-color: var(--primary-color);
     box-shadow: 0 0 0 2px var(--primary-light);
 }
 

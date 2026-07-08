@@ -277,20 +277,14 @@
 }
 
 .search-input-container input {
-    width: 100%;
     padding: 8px 12px 8px 35px;
-    border: 1px solid var(--border-color);
     border-radius: var(--border-radius-sm, 6px);
     font-size: 0.9rem;
     transition: all var(--transition-speed, 0.2s);
-    background-color: var(--card-bg);
-    color: var(--text-color);
     box-shadow: var(--shadow);
 }
 
 .search-input-container input:focus {
-    outline: none;
-    border-color: var(--primary-color);
     background-color: var(--hover-bg);
     box-shadow: var(--shadow-md);
 }
@@ -787,25 +781,14 @@
 
 .form-group input[type="text"],
 .form-group textarea {
-    width: 100%;
     padding: 8px 12px;
-    border: 1px solid var(--border-color);
     border-radius: 4px;
     font-size: 0.9rem;
     font-family: inherit;
-    background-color: var(--card-bg);
-    color: var(--text-color);
 }
 
 .form-group textarea {
     font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', monospace;
-}
-
-.form-group input[type="text"]:focus,
-.form-group textarea:focus {
-    outline: none;
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(1, 76, 117, 0.15);
 }
 
 .modal-actions {

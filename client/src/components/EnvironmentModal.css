@@ -148,17 +148,14 @@ body.dark-theme .environment-modal-overlay {
 .form-group textarea {
     background: var(--modal-bg-tertiary);
     border: 1px solid var(--modal-border-primary);
-    border-radius: 8px;
     padding: 12px;
     color: var(--modal-text-primary);
-    font-size: 14px;
     transition: all 0.2s ease;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
 .form-group input:focus,
 .form-group textarea:focus {
-    outline: none;
     border-color: var(--modal-primary-color);
     box-shadow: 0 0 0 3px var(--modal-focus-ring);
 }
@@ -166,11 +163,9 @@ body.dark-theme .environment-modal-overlay {
 .form-group input:disabled,
 .form-group textarea:disabled {
     opacity: 0.6;
-    cursor: not-allowed;
 }
 
 .form-group textarea {
-    resize: vertical;
     min-height: 80px;
     font-family: inherit;
 }

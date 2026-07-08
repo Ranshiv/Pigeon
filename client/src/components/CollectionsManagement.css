@@ -300,20 +300,9 @@
 
 .form-group input,
 .form-group textarea {
-    width: 100%;
     padding: var(--spacing-sm);
-    border: 1px solid var(--border-color);
     border-radius: var(--border-radius-md);
     font-size: var(--font-size-base);
-    background-color: var(--card-bg);
-    color: var(--text-color);
-}
-
-.form-group input:focus,
-.form-group textarea:focus {
-    outline: none;
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 2px rgba(1, 76, 117, 0.2);
 }
 
 .role-selector {
@@ -658,21 +647,10 @@
 
 .create-collection-form .form-input,
 .create-collection-form .form-textarea {
-    width: 100%;
     padding: var(--spacing-sm);
     font-size: var(--font-size-base);
-    border: 1px solid var(--border-color);
     border-radius: var(--border-radius-md);
     transition: border-color var(--transition-speed);
-    background-color: var(--card-bg);
-    color: var(--text-color);
-}
-
-.create-collection-form .form-input:focus,
-.create-collection-form .form-textarea:focus {
-    outline: none;
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 2px rgba(1, 76, 117, 0.2);
 }
 
 .create-collection-form .form-actions {

@@ -172,11 +172,6 @@
     cursor: pointer;
 }
 
-.sse-checkbox input {
-    width: 16px;
-    height: 16px;
-    accent-color: var(--sse-primary);
-}
 
 .sse-event-types {
     display: flex;

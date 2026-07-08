@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+require('dotenv').config();
+
 /**
  * Pigeon CLI
  * Command-line tool for running Pigeon API tests in CI/CD pipelines
@@ -432,10 +434,17 @@ async function main() {
     else if (command === 'export') {
       console.log(chalk.cyan(`Exporting collection: ${argv.collection}`));
 
-      // TODO: Implement collection export
-      console.log(chalk.yellow('Export feature coming soon!'));
+      // Lazy-load export implementation
+      const { exportCollection } = require('./runner');
 
-      console.log(chalk.gray(`Collection exported to: ${argv.output}`));
+      const summary = await exportCollection(argv.collection, argv.output);
+
+      console.log(chalk.green('Collection export completed successfully.'));
+      console.log(chalk.gray(`Collection: ${summary.name}`));
+      console.log(chalk.gray(`Requests exported: ${summary.requestCount}`));
+      console.log(chalk.gray(`Output: ${summary.outputPath}`));
+
+      process.exit(0);
     }
     else {
       console.log(chalk.yellow('No command specified. Use --help for usage information.'));

@@ -509,8 +509,6 @@ body.dark-theme .view-collection-btn:hover {
     padding: 4px 8px;
     border-radius: 4px;
     border: 1px solid var(--ws-border-light);
-    background-color: var(--ws-bg-surface);
-    color: var(--ws-text-primary);
 }
 
 .remove-member-btn {
@@ -835,13 +833,9 @@ body.dark-theme .view-collection-btn:hover {
 }
 
 .form-group input {
-    width: 100%;
     padding: 10px 12px;
     border: 1px solid var(--ws-border-light);
     border-radius: 4px;
-    font-size: 14px;
-    background-color: var(--ws-bg-surface);
-    color: var(--ws-text-primary);
 }
 
 .role-options {

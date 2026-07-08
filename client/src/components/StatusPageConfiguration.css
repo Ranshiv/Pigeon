@@ -127,24 +127,6 @@
     font-size: 14px;
 }
 
-.form-group input[type="text"],
-.form-group input[type="number"],
-.form-group textarea {
-    width: 100%;
-    padding: 12px;
-    border: 1px solid #e9ecef;
-    border-radius: 6px;
-    font-size: 14px;
-    transition: border-color 0.2s ease;
-}
-
-.form-group input:focus,
-.form-group textarea:focus {
-    outline: none;
-    border-color: var(--primary-color, #014C75);
-    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
-}
-
 .color-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));

@@ -267,9 +267,9 @@ const AnalyticsDashboard = () => {
 
     // Get health score color and status
     const getHealthScoreInfo = (score) => {
-        if (score >= 90) return { color: '#10b981', status: 'Excellent', icon: <FiCheckCircle /> };
-        if (score >= 70) return { color: '#10b981', status: 'Good', icon: <FiCheckCircle /> };
-        if (score >= 50) return { color: '#f59e0b', status: 'Fair', icon: <FiAlertCircle /> };
+        if (score >= 90) return { color: 'var(--success)', status: 'Excellent', icon: <FiCheckCircle /> };
+        if (score >= 70) return { color: 'var(--success)', status: 'Good', icon: <FiCheckCircle /> };
+        if (score >= 50) return { color: 'var(--warning)', status: 'Fair', icon: <FiAlertCircle /> };
         return { color: '#ef4444', status: 'Poor', icon: <FiAlertCircle /> };
     };
 
@@ -378,7 +378,7 @@ const AnalyticsDashboard = () => {
                 </div>
 
                 <div className="summary-card">
-                    <div className="card-icon" style={{ color: '#10b981' }}>
+                    <div className="card-icon" style={{ color: 'var(--success)' }}>
                         <FiCheckCircle />
                     </div>
                     <div className="card-content">
@@ -393,7 +393,7 @@ const AnalyticsDashboard = () => {
                 </div>
 
                 <div className="summary-card">
-                    <div className="card-icon" style={{ color: '#014C75' }}>
+                    <div className="card-icon" style={{ color: 'var(--accent-color)' }}>
                         <FiZap />
                     </div>
                     <div className="card-content">
@@ -410,7 +410,7 @@ const AnalyticsDashboard = () => {
                 </div>
 
                 <div className="summary-card">
-                    <div className="card-icon" style={{ color: '#f59e0b' }}>
+                    <div className="card-icon" style={{ color: 'var(--warning)' }}>
                         <FiActivity />
                     </div>
                     <div className="card-content">

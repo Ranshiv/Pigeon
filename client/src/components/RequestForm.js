@@ -48,7 +48,7 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
     const [url, setUrl] = useState(initialData.url || '');
     const [requestName, setRequestName] = useState(initialData.name || 'Get Users');
     const [activeTab, setActiveTab] = useState('params');
-    const [isNew] = useState(initialData.isNew || false);
+    const [isNew, setIsNew] = useState(initialData.isNew || false);
 
     // Response state - new state for storing response
     const [responseData, setResponseData] = useState(null);
@@ -96,7 +96,9 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
     // Variable resolution state
     const [resolvedVariables, setResolvedVariables] = useState({});
     const [environmentVariables, setEnvironmentVariables] = useState({});
-    const [collectionVariables] = useState(collection?.variables || []);
+    // Derived from the collection prop — a useState would capture the initial
+    // value and stay stale when collection changes (edits in another tab, etc.).
+    const collectionVariables = collection?.variables || [];
     const [globalVariables, setGlobalVariables] = useState({});
     const [variableValidation, setVariableValidation] = useState({ isValid: true, missingVariables: [] });
 
@@ -112,6 +114,55 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
         includeMetadata: true
     });
     const [exportPreview, setExportPreview] = useState(null);
+
+    // Re-sync form state when user switches between requests.
+    useEffect(() => {
+        const nextData = request || initialRequest || {};
+
+        setMethod(nextData.method || 'GET');
+        setUrl(nextData.url || '');
+        setRequestName(nextData.name || 'Get Users');
+        setParams(nextData.params || []);
+        setHeaders(nextData.headers || []);
+        setBodyType(nextData.bodyType || 'none');
+        setBodyContent(nextData.body || '');
+        setPreRequestScript(nextData.preRequestScript || '');
+        setTests(nextData.tests || nextData.testScript || '');
+        setVariables(nextData.variables || []);
+        setAuthConfig(nextData.authConfig || {
+            type: 'No Auth',
+            bearer: { token: '' },
+            basic: { username: '', password: '' },
+            apiKey: { key: '', value: '', location: 'header' },
+            oauth2: {
+                grantType: 'authorization_code',
+                clientId: '',
+                clientSecret: '',
+                authUrl: '',
+                tokenUrl: '',
+                scope: '',
+                redirectUri: '',
+                accessToken: '',
+                refreshToken: '',
+                tokenStatus: 'not_authenticated'
+            }
+        });
+        setSSLConfig(nextData.sslConfig || {
+            verifyCert: true,
+            allowSelfSigned: false,
+            clientCert: null,
+            clientKey: null,
+            passphrase: ''
+        });
+        setIsNew(Boolean(nextData.isNew));
+
+        // Clear the previous request's response so switching requests doesn't
+        // leave a stale 200/error from the prior one on screen.
+        setResponseData(null);
+        setResponseError(null);
+        setIsLoading(false);
+        setPostRequestScriptResults(null);
+    }, [request, initialRequest]);
 
     // Debug console state
     const [currentDebugSession, setCurrentDebugSession] = useState(null);
@@ -574,6 +625,7 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
         // Build request object
         const requestData = {
             _id: initialData._id || initialData.id,
+            id: initialData.id || initialData._id,
             name: requestName,
             method,
             url,
@@ -599,6 +651,8 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
 
         // Build request object
         const requestData = {
+            _id: initialData._id || initialData.id,
+            id: initialData.id || initialData._id,
             name: requestName,
             method,
             url,
@@ -611,8 +665,7 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
             variables: variables.filter(v => v.key),
             authConfig,
             sslConfig,
-            isNew,
-            _id: initialData._id || initialData.id
+            isNew
         };
 
         // Apply variable interpolation to the request data
@@ -1649,7 +1702,7 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
                             {authFlowVisualization && (
                                 <div className="auth-flow-container">
                                     <h5>Authentication Flow</h5>
-                                    <div id="auth-flow-container" style={{ height: '400px', border: '1px solid #ddd', marginTop: '10px' }}></div>
+                                    <div id="auth-flow-container" style={{ height: '400px', border: '1px solid var(--border-color)', marginTop: '10px' }}></div>
                                 </div>
                             )}
 

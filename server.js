@@ -73,6 +73,33 @@ function ensureDatabaseReady(req, res, next) {
     next();
 }
 
+// --- SSRF GUARD ---
+// Block requests to private/internal IPs and link-local cloud metadata endpoints.
+// /api/proxy makes arbitrary outbound requests; without this, an unauthenticated
+// caller can read internal services (169.254.169.254 metadata, 10.x, 127.x, etc.).
+const dns = require('dns').promises;
+async function isPrivateHost(hostname) {
+    if (!hostname) return true;
+    const host = hostname.toLowerCase();
+    if (host === 'localhost' || host.endsWith('.localhost')) return true;
+    if (host === 'metadata.google.internal') return true;
+    // Link-local / metadata
+    if (host.startsWith('169.254.') || host.startsWith('fe80:')) return true;
+    // Resolve and check resolved IPs (covers DNS that points inward)
+    try {
+        const lookup = await dns.lookup(host, { all: true });
+        return lookup.some(({ address }) => {
+            return address === '127.0.0.1' || address === '::1' ||
+                   address.startsWith('10.') || address.startsWith('192.168.') ||
+                   /^172\.(1[6-9]|2\d|3[01])\./.test(address) ||
+                   address.startsWith('169.254.') || address.startsWith('fc') ||
+                   address.startsWith('fe80:') || address === '0.0.0.0';
+        });
+    } catch {
+        return false; // let axios surface the real DNS error
+    }
+}
+
 // --- PASSPORT CONFIGURATION ---
 passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
@@ -175,7 +202,8 @@ app.get('/auth/google/callback',
     passport.authenticate('google', { failureRedirect: '/' }),
     (req, res) => {
         // Successful authentication, redirect to the workspace.
-        res.redirect(process.env.FRONTEND_URL || 'http://localhost:3000' + '/workspace');
+        // `+` binds tighter than `||`, so parenthesize so /workspace always appends.
+        res.redirect((process.env.FRONTEND_URL || 'http://localhost:3000') + '/workspace');
     }
 );
 
@@ -244,7 +272,10 @@ app.get('/api/search', async (req, res) => {
         if (query || (category && category !== 'all')) {
             const filter = {};
             if (query) {
-                const searchRegex = new RegExp(query, 'i');
+                // Escape user input before building a RegExp — raw metachars
+                // cause ReDoS (catastrophic backtracking) and pattern injection.
+                const escaped = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                const searchRegex = new RegExp(escaped, 'i');
                 filter.$or = [
                     { name: searchRegex },
                     { description: searchRegex },
@@ -438,6 +469,20 @@ app.post('/api/proxy', async (req, res) => {
             });
         }
 
+        // SSRF guard: block internal/private/metadata targets and non-http(s) schemes.
+        let parsedTarget;
+        try {
+            parsedTarget = new URL(url);
+        } catch {
+            return res.status(400).json({ error: true, message: 'Invalid URL' });
+        }
+        if (parsedTarget.protocol !== 'http:' && parsedTarget.protocol !== 'https:') {
+            return res.status(400).json({ error: true, message: 'Only http/https URLs are allowed' });
+        }
+        if (await isPrivateHost(parsedTarget.hostname)) {
+            return res.status(403).json({ error: true, message: 'Requests to private/internal hosts are blocked' });
+        }
+
         if (isDebugging) {
             addDebugLog('info', `Starting proxy request: ${method || 'GET'} ${url}`);
             addDebugLog('debug', `Debug session: ${debugSessionId}`);
@@ -523,9 +568,10 @@ app.post('/api/proxy', async (req, res) => {
         // Track request timing
         const requestStartTime = Date.now();
 
-        // Create a custom HTTPS agent to handle certificate issues if needed
+        // Always enforce TLS certificate validation — letting the client
+        // pass rejectUnauthorized:false enables MITM downgrades via the proxy.
         const httpsAgent = new https.Agent({
-            rejectUnauthorized: req.body.rejectUnauthorized !== undefined ? req.body.rejectUnauthorized : true
+            rejectUnauthorized: true
         });
 
         // Make the request with enhanced options
@@ -728,8 +774,25 @@ module.exports.server = server;
 // --- Browser Console Capture API Endpoints ---
 const BrowserConsoleService = require('./services/BrowserConsoleService');
 
+// Console-capture runs puppeteer + new Function(script) in a real browser —
+// effectively RCE. Local single-user deployment: restrict to localhost callers.
+function localhostOnly(req, res, next) {
+    const ip = req.ip || req.socket?.remoteAddress || '';
+    const v4 = ip.replace(/^::ffff:/, '');
+    if (v4 === '127.0.0.1' || v4 === '::1' || v4 === '::') return next();
+    return res.status(403).json({ error: true, message: 'Console capture is only available from localhost' });
+}
+
+// Method guidance for browser/manual navigation
+app.get('/api/console-capture/start', (req, res) => {
+    res.status(405).json({
+        error: true,
+        message: 'Use POST /api/console-capture/start with JSON body: { sessionId, url }'
+    });
+});
+
 // Start browser console capture for a website
-app.post('/api/console-capture/start', async (req, res) => {
+app.post('/api/console-capture/start', localhostOnly, async (req, res) => {
     try {
         const { sessionId, url } = req.body;
 
@@ -738,6 +801,14 @@ app.post('/api/console-capture/start', async (req, res) => {
                 error: true,
                 message: 'sessionId and url are required'
             });
+        }
+
+        // Block non-http(s) schemes — puppeteer page.goto('file:///...') would
+        // let a caller read local files via the server.
+        let captureUrl;
+        try { captureUrl = new URL(url); } catch { return res.status(400).json({ error: true, message: 'Invalid URL' }); }
+        if (captureUrl.protocol !== 'http:' && captureUrl.protocol !== 'https:') {
+            return res.status(400).json({ error: true, message: 'Only http/https URLs are allowed' });
         }
 
         console.log(`Starting console capture for ${url} (session: ${sessionId})`);
@@ -790,7 +861,7 @@ app.get('/api/console-capture/:sessionId/logs', async (req, res) => {
 });
 
 // Stop console capture for a session
-app.post('/api/console-capture/:sessionId/stop', async (req, res) => {
+app.post('/api/console-capture/:sessionId/stop', localhostOnly, async (req, res) => {
     try {
         const { sessionId } = req.params;
 
@@ -806,10 +877,10 @@ app.post('/api/console-capture/:sessionId/stop', async (req, res) => {
 });
 
 // Execute script in captured page
-app.post('/api/console-capture/:sessionId/execute', async (req, res) => {
+app.post('/api/console-capture/:sessionId/execute', localhostOnly, async (req, res) => {
     try {
         const { sessionId } = req.params;
-        const { script } = req.body;
+        const { script, waitMs = 500 } = req.body;
 
         if (!script) {
             return res.status(400).json({
@@ -818,11 +889,18 @@ app.post('/api/console-capture/:sessionId/execute', async (req, res) => {
             });
         }
 
-        // This functionality would need to be added to BrowserConsoleService
-        res.status(501).json({
-            error: true,
-            message: 'Script execution not yet implemented'
-        });
+        const result = await BrowserConsoleService.executeScript(sessionId, script, waitMs);
+
+        if (!result.success) {
+            const statusCode = result.error === 'Session not found' ? 404 : 400;
+            return res.status(statusCode).json({
+                error: true,
+                message: result.error,
+                sessionId
+            });
+        }
+
+        res.json(result);
     } catch (error) {
         console.error('Console capture execute error:', error);
         res.status(500).json({
@@ -849,25 +927,18 @@ app.get('/api/console-capture/sessions', (req, res) => {
     }
 });
 
-// Graceful shutdown
-process.on('SIGTERM', () => {
-    console.log('SIGTERM received, shutting down gracefully');
+// Graceful shutdown — single handler for SIGTERM/SIGINT.
+// BrowserConsoleService.cleanup() is async (await it); its own module-level
+// SIGINT/SIGTERM handlers were removed to avoid racing this one.
+async function shutdown(signal) {
+    console.log(`${signal} received, shutting down gracefully`);
     MonitoringService.stop();
     AnalyticsScheduler.stop();
-    BrowserConsoleService.cleanup();
+    try { await BrowserConsoleService.cleanup(); } catch (e) { console.error('cleanup error:', e.message); }
     server.close(() => {
         console.log('Process terminated');
         process.exit(0);
     });
-});
-
-process.on('SIGINT', () => {
-    console.log('SIGINT received, shutting down gracefully');
-    MonitoringService.stop();
-    AnalyticsScheduler.stop();
-    BrowserConsoleService.cleanup();
-    server.close(() => {
-        console.log('Process terminated');
-        process.exit(0);
-    });
-});
+}
+process.on('SIGTERM', () => shutdown('SIGTERM'));
+process.on('SIGINT', () => shutdown('SIGINT'));

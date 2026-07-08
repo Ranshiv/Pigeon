@@ -1697,16 +1697,13 @@
 }
 
 .palette-search {
-    width: 100%;
     padding: 8px 10px 8px 32px;
     border: 1px solid var(--designer-border);
     border-radius: var(--designer-radius-sm);
     font-size: 12px;
-    outline: none;
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     background: var(--designer-component-bg);
     color: var(--designer-text-primary);
-    box-sizing: border-box;
 }
 
 .palette-search:focus {
@@ -1903,16 +1900,13 @@
 .form-group input,
 .form-group select,
 .form-group textarea {
-    width: 100%;
     padding: 8px 12px;
     border: 1px solid var(--designer-border);
     border-radius: var(--designer-radius-sm);
     font-size: 13px;
-    outline: none;
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     background: var(--designer-card);
     color: var(--designer-text-primary);
-    box-sizing: border-box;
 }
 
 .form-group input:focus,
@@ -1929,7 +1923,6 @@
 }
 
 .form-group textarea {
-    resize: vertical;
     min-height: 80px;
     font-family: inherit;
     line-height: 1.4;
@@ -1939,13 +1932,7 @@
     cursor: pointer;
 }
 
-/* Checkbox and Radio Styles */
-.form-group input[type="checkbox"],
-.form-group input[type="radio"] {
-    width: auto;
-    margin-right: 6px;
-    accent-color: var(--designer-primary);
-}
+/* Checkbox and Radio Styles — uses global index.css checkbox style */
 
 .form-group .checkbox-label,
 .form-group .radio-label {
@@ -3156,7 +3143,6 @@
     font-size: 11px;
     background: var(--designer-component-bg);
     color: var(--designer-text-primary);
-    outline: none;
     cursor: pointer;
 }
 
@@ -3800,7 +3786,6 @@
 .form-input,
 .form-select,
 .form-textarea {
-    width: 100%;
     padding: 10px 12px;
     border: 1px solid var(--designer-border);
     border-radius: var(--designer-radius-sm);
@@ -3808,9 +3793,7 @@
     color: var(--designer-text-primary);
     font-size: 13px;
     font-family: inherit;
-    outline: none;
     transition: all 0.2s ease;
-    box-sizing: border-box;
 }
 
 .form-input:focus,
@@ -3826,7 +3809,6 @@
 }
 
 .form-textarea {
-    resize: vertical;
     min-height: 80px;
     font-family: inherit;
     line-height: 1.4;

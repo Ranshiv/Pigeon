@@ -41,7 +41,6 @@ const MaintenanceManagement = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    // Effect to update the selected window when maintenance windows are refreshed
     useEffect(() => {
         if (selectedWindow && maintenanceWindows.length > 0) {
             const updatedSelectedWindow = maintenanceWindows.find(window => window._id === selectedWindow._id);
@@ -63,7 +62,6 @@ const MaintenanceManagement = () => {
                 const data = await response.json();
                 setMaintenanceWindows(data);
 
-                // If there's a selected window, update it with the latest data
                 if (selectedWindow) {
                     const updatedSelectedWindow = data.find(window => window._id === selectedWindow._id);
                     if (updatedSelectedWindow) {
@@ -100,7 +98,6 @@ const MaintenanceManagement = () => {
         setError(null);
 
         try {
-            // Validate form data before submission
             if (!formData.title.trim()) {
                 throw new Error('Title is required');
             }
@@ -114,7 +111,6 @@ const MaintenanceManagement = () => {
                 throw new Error('End time is required');
             }
 
-            // Validate and format dates
             const startDate = new Date(formData.startTime);
             const endDate = new Date(formData.endTime);
 
@@ -131,7 +127,6 @@ const MaintenanceManagement = () => {
                 throw new Error('Start time cannot be in the past');
             }
 
-            // Map frontend fields to backend expected fields
             const requestData = {
                 title: formData.title.trim(),
                 description: formData.description.trim(),
@@ -145,7 +140,7 @@ const MaintenanceManagement = () => {
                 recurrencePattern: formData.isRecurring ? formData.recurrencePattern : undefined,
                 notificationSettings: {
                     notifySubscribers: formData.notifySubscribers,
-                    reminderMinutes: [1440, 60] // 24 hours and 1 hour before
+                    reminderMinutes: [1440, 60]
                 }
             };
 
@@ -159,18 +154,11 @@ const MaintenanceManagement = () => {
             });
 
             if (response.ok) {
-                // Get the newly created maintenance window from the response
                 const newWindow = await response.json();
-
-                // Close the create modal and reset form
                 setShowCreateModal(false);
                 resetForm();
                 setError(null);
-
-                // Set the new window as the selected window
                 setSelectedWindow(newWindow);
-
-                // Refresh the maintenance windows list from server
                 await fetchMaintenanceWindows();
             } else {
                 const errorData = await response.json();
@@ -193,12 +181,9 @@ const MaintenanceManagement = () => {
             });
 
             if (response.ok) {
-                // If the deleted window was selected, clear the selection
                 if (selectedWindow?._id === id) {
                     setSelectedWindow(null);
                 }
-
-                // Refresh the maintenance windows list
                 await fetchMaintenanceWindows();
             } else {
                 const errorData = await response.json();
@@ -229,7 +214,6 @@ const MaintenanceManagement = () => {
 
     const handleEditClick = (window) => {
         setEditingWindow(window);
-        // Pre-populate form with existing data
         setFormData({
             title: window.title || '',
             description: window.description || '',
@@ -255,7 +239,6 @@ const MaintenanceManagement = () => {
         setError(null);
 
         try {
-            // Validate form data before submission
             if (!formData.title.trim()) {
                 throw new Error('Title is required');
             }
@@ -269,7 +252,6 @@ const MaintenanceManagement = () => {
                 throw new Error('End time is required');
             }
 
-            // Validate and format dates
             const startDate = new Date(formData.startTime);
             const endDate = new Date(formData.endTime);
 
@@ -283,7 +265,6 @@ const MaintenanceManagement = () => {
                 throw new Error('End time must be after start time');
             }
 
-            // Map frontend fields to backend expected fields
             const requestData = {
                 title: formData.title.trim(),
                 description: formData.description.trim(),
@@ -297,7 +278,7 @@ const MaintenanceManagement = () => {
                 recurrencePattern: formData.isRecurring ? formData.recurrencePattern : undefined,
                 notificationSettings: {
                     notifySubscribers: formData.notifySubscribers,
-                    reminderMinutes: [1440, 60] // 24 hours and 1 hour before
+                    reminderMinutes: [1440, 60]
                 }
             };
 
@@ -311,21 +292,15 @@ const MaintenanceManagement = () => {
             });
 
             if (response.ok) {
-                // Get the updated window from the server response to ensure we have latest data
                 const updatedWindow = await response.json();
-
-                // Close the edit modal and reset form
                 setShowEditModal(false);
                 setEditingWindow(null);
                 resetForm();
                 setError(null);
 
-                // Update the selected window with the fresh data
                 if (selectedWindow && selectedWindow._id === editingWindow._id) {
                     setSelectedWindow(updatedWindow);
                 }
-
-                // Fetch updated data from server to refresh the list
                 await fetchMaintenanceWindows();
             } else {
                 const errorData = await response.json();
@@ -344,11 +319,11 @@ const MaintenanceManagement = () => {
         const end = new Date(window.scheduledEndTime);
 
         if (now >= start && now <= end) {
-            return <span className="status-badge active">Active</span>;
+            return <span className="mtm-badge active">Active</span>;
         } else if (now < start) {
-            return <span className="status-badge scheduled">Scheduled</span>;
+            return <span className="mtm-badge scheduled">Scheduled</span>;
         } else {
-            return <span className="status-badge completed">Completed</span>;
+            return <span className="mtm-badge completed">Completed</span>;
         }
     };
 
@@ -375,11 +350,147 @@ const MaintenanceManagement = () => {
         setFormData({ ...formData, affectedMonitors: updatedMonitors });
     };
 
+    /* ---------- Modal form body (shared between create & edit) ---------- */
+    const renderFormBody = () => (
+        <div className="mtm-modal-body">
+            <div className="mtm-form-section">
+                <h4 className="mtm-form-section-title">Basic Information</h4>
+                <div className="mtm-field">
+                    <label>Maintenance Title *</label>
+                    <input
+                        type="text"
+                        value={formData.title}
+                        onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                        placeholder="e.g., Database Upgrade"
+                        required
+                    />
+                </div>
+                <div className="mtm-field">
+                    <label>Description *</label>
+                    <textarea
+                        value={formData.description}
+                        onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                        placeholder="Describe what maintenance will be performed..."
+                    />
+                </div>
+            </div>
+
+            <div className="mtm-form-section">
+                <h4 className="mtm-form-section-title">Schedule</h4>
+                <div className="mtm-time-row">
+                    <div className="mtm-field">
+                        <label>Start Time *</label>
+                        <input
+                            type="datetime-local"
+                            value={formData.startTime}
+                            onChange={(e) => setFormData({ ...formData, startTime: e.target.value })}
+                            required
+                        />
+                    </div>
+                    <div className="mtm-field">
+                        <label>End Time *</label>
+                        <input
+                            type="datetime-local"
+                            value={formData.endTime}
+                            onChange={(e) => setFormData({ ...formData, endTime: e.target.value })}
+                            required
+                        />
+                    </div>
+                </div>
+            </div>
+
+            <div className="mtm-form-section">
+                <h4 className="mtm-form-section-title">Affected Services</h4>
+                <div className="mtm-field">
+                    <label>Select Monitors</label>
+                    <div className="mtm-monitors-select">
+                        {monitors.map(monitor => (
+                            <label key={monitor._id} className="mtm-monitor-opt">
+                                <input
+                                    type="checkbox"
+                                    checked={formData.affectedMonitors.includes(monitor._id)}
+                                    onChange={() => handleMonitorSelection(monitor._id)}
+                                />
+                                <span>{monitor.name}</span>
+                            </label>
+                        ))}
+                    </div>
+                </div>
+            </div>
+
+            <div className="mtm-form-section">
+                <h4 className="mtm-form-section-title">Notification Settings</h4>
+                <div className="mtm-checkbox-wrap">
+                    <label className="mtm-checkbox-label">
+                        <input
+                            type="checkbox"
+                            checked={formData.notifySubscribers}
+                            onChange={(e) => setFormData({ ...formData, notifySubscribers: e.target.checked })}
+                        />
+                        Notify subscribers about this maintenance
+                    </label>
+                </div>
+            </div>
+
+            <div className="mtm-form-section">
+                <h4 className="mtm-form-section-title">Recurrence (Optional)</h4>
+                <div className="mtm-checkbox-wrap">
+                    <label className="mtm-checkbox-label">
+                        <input
+                            type="checkbox"
+                            checked={formData.isRecurring}
+                            onChange={(e) => setFormData({ ...formData, isRecurring: e.target.checked })}
+                        />
+                        Make this a recurring maintenance window
+                    </label>
+                </div>
+
+                {formData.isRecurring && (
+                    <div className="mtm-recurrence">
+                        <h3>Recurrence Pattern</h3>
+                        <div className="mtm-field">
+                            <label>Repeat</label>
+                            <select
+                                value={formData.recurrencePattern.type}
+                                onChange={(e) => setFormData({
+                                    ...formData,
+                                    recurrencePattern: {
+                                        ...formData.recurrencePattern,
+                                        type: e.target.value
+                                    }
+                                })}
+                            >
+                                <option value="daily">Daily</option>
+                                <option value="weekly">Weekly</option>
+                                <option value="monthly">Monthly</option>
+                            </select>
+                        </div>
+                        <div className="mtm-field">
+                            <label>Every</label>
+                            <input
+                                type="number"
+                                min="1"
+                                value={formData.recurrencePattern.interval}
+                                onChange={(e) => setFormData({
+                                    ...formData,
+                                    recurrencePattern: {
+                                        ...formData.recurrencePattern,
+                                        interval: parseInt(e.target.value)
+                                    }
+                                })}
+                            />
+                        </div>
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+
     if (loading && maintenanceWindows.length === 0) {
         return (
-            <div className="maintenance-management">
-                <div className="loading-state">
-                    <div className="loading-spinner"></div>
+            <div className="mtm-root">
+                <div className="mtm-loading">
+                    <div className="mtm-spinner"></div>
                     <p>Loading maintenance windows...</p>
                 </div>
             </div>
@@ -387,14 +498,15 @@ const MaintenanceManagement = () => {
     }
 
     return (
-        <div className="maintenance-management">
-            <div className="maintenance-header">
-                <div className="header-info">
+        <div className="mtm-root">
+            {/* Header */}
+            <div className="mtm-header">
+                <div className="mtm-header-info">
                     <h1><FiTool /> Maintenance Windows</h1>
                     <p>Schedule and manage planned maintenance periods for your monitored services</p>
                 </div>
                 <button
-                    className="btn-primary"
+                    className="mtm-btn-primary"
                     onClick={() => setShowCreateModal(true)}
                 >
                     <FiPlus /> Schedule Maintenance
@@ -402,99 +514,102 @@ const MaintenanceManagement = () => {
             </div>
 
             {/* Navigation Tabs */}
-            <div className="monitoring-nav">
+            <div className="mtm-nav">
                 <button
-                    className="nav-btn"
+                    className="mtm-nav-btn"
                     onClick={() => navigate('/workspace/monitoring')}
                 >
                     <FiActivity /> Dashboard
                 </button>
                 <button
-                    className="nav-btn"
+                    className="mtm-nav-btn"
                     onClick={() => navigate('/alerts/policies')}
                 >
                     <FiBell /> Alerts & Policies
                 </button>
                 <button
-                    className="nav-btn"
+                    className="mtm-nav-btn"
                     onClick={() => navigate('/workspace/monitoring/reports')}
                 >
                     <FiBarChart /> Reports
                 </button>
                 <button
-                    className="nav-btn"
+                    className="mtm-nav-btn"
                     onClick={() => navigate('/workspace/monitoring/teams')}
                 >
                     <FiUsers /> Teams
                 </button>
                 <button
-                    className="nav-btn"
+                    className="mtm-nav-btn"
                     onClick={() => navigate('/workspace/monitoring/integrations')}
                 >
                     <FiSettings /> Integrations
                 </button>
                 <button
-                    className="nav-btn active"
+                    className="mtm-nav-btn active"
                     onClick={() => navigate('/workspace/monitoring/maintenance')}
                 >
                     <FiTool /> Maintenance
                 </button>
             </div>
 
+            {/* Error */}
             {error && (
-                <div className="error-banner">
+                <div className="mtm-error">
                     <FiAlertCircle />
                     <span>{error}</span>
                     <button onClick={() => setError(null)}>Dismiss</button>
                 </div>
             )}
 
-            <div className="maintenance-layout">
-                <div className="maintenance-list">
-                    <div className="list-header">
+            {/* Main Layout */}
+            <div className="mtm-layout">
+                {/* List Panel */}
+                <div className="mtm-list-panel">
+                    <div className="mtm-list-head">
                         <h3>Maintenance Windows</h3>
-                        <span className="count">{maintenanceWindows.length} total</span>
+                        <span className="mtm-count">{maintenanceWindows.length} total</span>
                     </div>
                     {maintenanceWindows.length === 0 && (
-                        <div className="empty-state">
-                            <FiTool className="empty-icon" />
+                        <div className="mtm-empty">
+                            <FiTool className="mtm-empty-icon" />
                             <h3>No Maintenance Windows</h3>
                             <p>Schedule your first maintenance window to notify users about planned downtime</p>
                             <button
-                                className="btn-primary"
+                                className="mtm-btn-primary"
                                 onClick={() => setShowCreateModal(true)}
                             >
                                 <FiPlus /> Schedule Maintenance
                             </button>
                         </div>
                     )}
-                    <div className="windows-list">
+                    <div className="mtm-items">
                         {maintenanceWindows.map(window => (
                             <div
                                 key={window._id}
-                                className={`window-item ${selectedWindow?._id === window._id ? 'active' : ''}`}
+                                className={`mtm-item ${selectedWindow?._id === window._id ? 'active' : ''}`}
                                 onClick={() => setSelectedWindow(window)}
                             >
-                                <div className="window-header">
+                                <div className="mtm-item-head">
                                     <h4>{window.title}</h4>
                                     {getStatusBadge(window)}
                                 </div>
-                                <div className="window-meta">
-                                    <div className="meta-item">
+                                <div className="mtm-meta">
+                                    <div className="mtm-meta-item">
                                         <FiCalendar />
                                         <span>{formatDateTime(window.scheduledStartTime)}</span>
                                     </div>
-                                    <div className="meta-item">
+                                    <div className="mtm-meta-item">
                                         <FiClock />
                                         <span>{formatDuration(window.scheduledStartTime, window.scheduledEndTime)}</span>
                                     </div>
-                                    <div className="meta-item">
+                                    <div className="mtm-meta-item">
                                         <FiSettings />
                                         <span>{window.affectedServices?.length || 0} monitors</span>
                                     </div>
                                 </div>
                                 {window.isRecurring && (
-                                    <div className="recurring-indicator">
+                                    <div className="mtm-recurring">
                                         <FiRepeat />
                                         <span>Recurring</span>
                                     </div>
@@ -502,27 +617,26 @@ const MaintenanceManagement = () => {
                             </div>
                         ))}
                     </div>
-
-
                 </div>
 
-                <div className="maintenance-details">
+                {/* Details Panel */}
+                <div className="mtm-details">
                     {selectedWindow ? (
-                        <div className="detail-content">
-                            <div className="detail-header">
-                                <div className="detail-info">
+                        <div className="mtm-detail-content">
+                            <div className="mtm-detail-head">
+                                <div className="mtm-detail-info">
                                     <h2>{selectedWindow.title}</h2>
                                     {getStatusBadge(selectedWindow)}
                                 </div>
-                                <div className="detail-actions">
+                                <div className="mtm-detail-actions">
                                     <button
-                                        className="btn-secondary"
+                                        className="mtm-btn-secondary"
                                         onClick={() => handleEditClick(selectedWindow)}
                                     >
                                         <FiEdit /> Edit
                                     </button>
                                     <button
-                                        className="btn-secondary delete"
+                                        className="mtm-btn-secondary mtm-delete"
                                         onClick={() => deleteMaintenanceWindow(selectedWindow._id)}
                                     >
                                         <FiTrash2 /> Delete
@@ -530,23 +644,23 @@ const MaintenanceManagement = () => {
                                 </div>
                             </div>
 
-                            <div className="detail-body">
-                                <div className="info-section">
+                            <div className="mtm-detail-body">
+                                <div className="mtm-section">
                                     <h3>Details</h3>
-                                    <div className="info-grid">
-                                        <div className="info-item">
+                                    <div className="mtm-info-grid">
+                                        <div className="mtm-info-item">
                                             <label>Start Time</label>
                                             <span>{formatDateTime(selectedWindow.scheduledStartTime)}</span>
                                         </div>
-                                        <div className="info-item">
+                                        <div className="mtm-info-item">
                                             <label>End Time</label>
                                             <span>{formatDateTime(selectedWindow.scheduledEndTime)}</span>
                                         </div>
-                                        <div className="info-item">
+                                        <div className="mtm-info-item">
                                             <label>Duration</label>
                                             <span>{formatDuration(selectedWindow.scheduledStartTime, selectedWindow.scheduledEndTime)}</span>
                                         </div>
-                                        <div className="info-item">
+                                        <div className="mtm-info-item">
                                             <label>Affected Monitors</label>
                                             <span>{selectedWindow.affectedServices?.length || 0} monitors</span>
                                         </div>
@@ -554,16 +668,16 @@ const MaintenanceManagement = () => {
                                 </div>
 
                                 {selectedWindow.description && (
-                                    <div className="info-section">
+                                    <div className="mtm-section">
                                         <h3>Description</h3>
                                         <p>{selectedWindow.description}</p>
                                     </div>
                                 )}
 
                                 {selectedWindow.isRecurring && (
-                                    <div className="info-section">
+                                    <div className="mtm-section">
                                         <h3>Recurrence</h3>
-                                        <div className="recurrence-info">
+                                        <div className="mtm-recurrence-info">
                                             <FiRepeat />
                                             <span>
                                                 {selectedWindow.recurrencePattern?.type}
@@ -575,34 +689,30 @@ const MaintenanceManagement = () => {
                                     </div>
                                 )}
 
-                                <div className="info-section">
+                                <div className="mtm-section">
                                     <h3>Affected Monitors</h3>
-                                    <div className="monitors-list">
-                                        {selectedWindow.affectedServices?.map(service => {
-                                            return (
-                                                <div key={service.monitorId?._id || service.monitorId} className="monitor-item">
-                                                    <div className="monitor-info">
-                                                        <h4>{service.serviceName || service.monitorId?.name || 'Unknown Service'}</h4>
-                                                        <p>{service.monitorId?.url || 'No URL available'}</p>
-                                                    </div>
-                                                </div>
-                                            );
-                                        }) || (
-                                                <p className="no-monitors">No monitors affected</p>
-                                            )}
+                                    <div className="mtm-monitors-list">
+                                        {selectedWindow.affectedServices?.map(service => (
+                                            <div key={service.monitorId?._id || service.monitorId} className="mtm-monitor-item">
+                                                <h4>{service.serviceName || service.monitorId?.name || 'Unknown Service'}</h4>
+                                                <p>{service.monitorId?.url || 'No URL available'}</p>
+                                            </div>
+                                        )) || (
+                                            <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>No monitors affected</p>
+                                        )}
                                     </div>
                                 </div>
 
-                                <div className="info-section">
+                                <div className="mtm-section">
                                     <h3>Notifications</h3>
-                                    <div className="notification-status">
+                                    <div className="mtm-notif-status">
                                         {selectedWindow.notifySubscribers ? (
-                                            <div className="notification-item enabled">
+                                            <div className="mtm-notif-item enabled">
                                                 <FiBell />
                                                 <span>Subscribers will be notified</span>
                                             </div>
                                         ) : (
-                                            <div className="notification-item disabled">
+                                            <div className="mtm-notif-item disabled">
                                                 <FiBell />
                                                 <span>No notifications will be sent</span>
                                             </div>
@@ -612,8 +722,8 @@ const MaintenanceManagement = () => {
                             </div>
                         </div>
                     ) : (
-                        <div className="no-selection">
-                            <FiEye className="empty-icon" />
+                        <div className="mtm-no-selection">
+                            <FiEye className="mtm-empty-icon" />
                             <h3>Select a Maintenance Window</h3>
                             <p>Choose a maintenance window from the list to view details</p>
                         </div>
@@ -621,14 +731,14 @@ const MaintenanceManagement = () => {
                 </div>
             </div>
 
-            {/* Create Maintenance Window Modal */}
+            {/* Create Modal */}
             {showCreateModal && (
-                <div className="modal-overlay">
-                    <div className="modal-content large">
-                        <div className="modal-header">
+                <div className="mtm-overlay">
+                    <div className="mtm-modal">
+                        <div className="mtm-modal-head">
                             <h2>Schedule Maintenance Window</h2>
                             <button
-                                className="modal-close"
+                                className="mtm-modal-close"
                                 onClick={() => {
                                     setShowCreateModal(false);
                                     resetForm();
@@ -637,150 +747,10 @@ const MaintenanceManagement = () => {
                                 <FiX />
                             </button>
                         </div>
-                        <div className="modal-body">
-                            <div className="form-section">
-                                <h4 className="form-section-title">Basic Information</h4>
-                                <div className="form-group">
-                                    <label>Maintenance Title*</label>
-                                    <input
-                                        type="text"
-                                        value={formData.title}
-                                        onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                                        placeholder="e.g., Database Upgrade"
-                                        required
-                                    />
-                                </div>
-
-                                <div className="form-group">
-                                    <label>Description*</label>
-                                    <textarea
-                                        value={formData.description}
-                                        onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                                        placeholder="Describe what maintenance will be performed..."
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="form-section">
-                                <h4 className="form-section-title">Schedule</h4>
-                                <div className="time-inputs-row">
-                                    <div className="time-input-group">
-                                        <label>Start Time *</label>
-                                        <input
-                                            type="datetime-local"
-                                            value={formData.startTime}
-                                            onChange={(e) => setFormData({ ...formData, startTime: e.target.value })}
-                                            required
-                                        />
-                                    </div>
-                                    <div className="time-input-group">
-                                        <label>End Time *</label>
-                                        <input
-                                            type="datetime-local"
-                                            value={formData.endTime}
-                                            onChange={(e) => setFormData({ ...formData, endTime: e.target.value })}
-                                            required
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="form-section">
-                                <h4 className="form-section-title">Affected Services</h4>
-                                <div className="form-group">
-                                    <label>Select Monitors</label>
-                                    <div className="monitors-selection">
-                                        {monitors.map(monitor => (
-                                            <label key={monitor._id} className="monitor-checkbox">
-                                                <input
-                                                    type="checkbox"
-                                                    checked={formData.affectedMonitors.includes(monitor._id)}
-                                                    onChange={() => handleMonitorSelection(monitor._id)}
-                                                />
-                                                <span>{monitor.name}</span>
-                                            </label>
-                                        ))}
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="form-section">
-                                <h4 className="form-section-title">Notification Settings</h4>
-                                <div className="checkbox-section">
-                                    <div className="checkbox-group">
-                                        <input
-                                            type="checkbox"
-                                            id="notify-subscribers"
-                                            checked={formData.notifySubscribers}
-                                            onChange={(e) => setFormData({ ...formData, notifySubscribers: e.target.checked })}
-                                        />
-                                        <label htmlFor="notify-subscribers">
-                                            Notify subscribers about this maintenance
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="form-section">
-                                <h4 className="form-section-title">Recurrence (Optional)</h4>
-                                <div className="checkbox-section">
-                                    <div className="checkbox-group">
-                                        <input
-                                            type="checkbox"
-                                            id="is-recurring"
-                                            checked={formData.isRecurring}
-                                            onChange={(e) => setFormData({ ...formData, isRecurring: e.target.checked })}
-                                        />
-                                        <label htmlFor="is-recurring">
-                                            Make this a recurring maintenance window
-                                        </label>
-                                    </div>
-                                </div>
-
-                                {formData.isRecurring && (
-                                    <div className="recurrence-section">
-                                        <h3>Recurrence Pattern</h3>
-                                        <div className="form-group">
-                                            <label>Repeat</label>
-                                            <select
-                                                value={formData.recurrencePattern.type}
-                                                onChange={(e) => setFormData({
-                                                    ...formData,
-                                                    recurrencePattern: {
-                                                        ...formData.recurrencePattern,
-                                                        type: e.target.value
-                                                    }
-                                                })}
-                                            >
-                                                <option value="daily">Daily</option>
-                                                <option value="weekly">Weekly</option>
-                                                <option value="monthly">Monthly</option>
-                                            </select>
-                                        </div>
-
-                                        <div className="form-group">
-                                            <label>Every</label>
-                                            <input
-                                                type="number"
-                                                min="1"
-                                                value={formData.recurrencePattern.interval}
-                                                onChange={(e) => setFormData({
-                                                    ...formData,
-                                                    recurrencePattern: {
-                                                        ...formData.recurrencePattern,
-                                                        interval: parseInt(e.target.value)
-                                                    }
-                                                })}
-                                            />
-                                            <span>{formData.recurrencePattern.type.slice(0, -2)}(s)</span>
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                        <div className="modal-footer">
+                        {renderFormBody()}
+                        <div className="mtm-modal-foot">
                             <button
-                                className="btn-secondary"
+                                className="mtm-btn-secondary"
                                 onClick={() => {
                                     setShowCreateModal(false);
                                     resetForm();
@@ -789,7 +759,7 @@ const MaintenanceManagement = () => {
                                 Cancel
                             </button>
                             <button
-                                className="btn-primary"
+                                className="mtm-btn-primary"
                                 onClick={createMaintenanceWindow}
                                 disabled={!formData.title || !formData.startTime || !formData.endTime || loading}
                             >
@@ -800,14 +770,14 @@ const MaintenanceManagement = () => {
                 </div>
             )}
 
-            {/* Edit Maintenance Window Modal */}
+            {/* Edit Modal */}
             {showEditModal && (
-                <div className="modal-overlay">
-                    <div className="modal-content large">
-                        <div className="modal-header">
+                <div className="mtm-overlay">
+                    <div className="mtm-modal">
+                        <div className="mtm-modal-head">
                             <h2>Edit Maintenance Window</h2>
                             <button
-                                className="modal-close"
+                                className="mtm-modal-close"
                                 onClick={() => {
                                     setShowEditModal(false);
                                     setEditingWindow(null);
@@ -817,150 +787,10 @@ const MaintenanceManagement = () => {
                                 <FiX />
                             </button>
                         </div>
-                        <div className="modal-body">
-                            <div className="form-section">
-                                <h4 className="form-section-title">Basic Information</h4>
-                                <div className="form-group">
-                                    <label>Maintenance Title *</label>
-                                    <input
-                                        type="text"
-                                        value={formData.title}
-                                        onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                                        placeholder="e.g., Database Upgrade"
-                                        required
-                                    />
-                                </div>
-
-                                <div className="form-group">
-                                    <label>Description</label>
-                                    <textarea
-                                        value={formData.description}
-                                        onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                                        placeholder="Describe what maintenance will be performed..."
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="form-section">
-                                <h4 className="form-section-title">Schedule</h4>
-                                <div className="time-inputs-row">
-                                    <div className="time-input-group">
-                                        <label>Start Time *</label>
-                                        <input
-                                            type="datetime-local"
-                                            value={formData.startTime}
-                                            onChange={(e) => setFormData({ ...formData, startTime: e.target.value })}
-                                            required
-                                        />
-                                    </div>
-                                    <div className="time-input-group">
-                                        <label>End Time *</label>
-                                        <input
-                                            type="datetime-local"
-                                            value={formData.endTime}
-                                            onChange={(e) => setFormData({ ...formData, endTime: e.target.value })}
-                                            required
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="form-section">
-                                <h4 className="form-section-title">Affected Services</h4>
-                                <div className="form-group">
-                                    <label>Select Monitors</label>
-                                    <div className="monitors-selection">
-                                        {monitors.map(monitor => (
-                                            <label key={monitor._id} className="monitor-checkbox">
-                                                <input
-                                                    type="checkbox"
-                                                    checked={formData.affectedMonitors.includes(monitor._id)}
-                                                    onChange={() => handleMonitorSelection(monitor._id)}
-                                                />
-                                                <span>{monitor.name}</span>
-                                            </label>
-                                        ))}
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="form-section">
-                                <h4 className="form-section-title">Notification Settings</h4>
-                                <div className="checkbox-section">
-                                    <div className="checkbox-group">
-                                        <input
-                                            type="checkbox"
-                                            id="edit-notify-subscribers"
-                                            checked={formData.notifySubscribers}
-                                            onChange={(e) => setFormData({ ...formData, notifySubscribers: e.target.checked })}
-                                        />
-                                        <label htmlFor="edit-notify-subscribers">
-                                            Notify subscribers about this maintenance
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="form-section">
-                                <h4 className="form-section-title">Recurrence (Optional)</h4>
-                                <div className="checkbox-section">
-                                    <div className="checkbox-group">
-                                        <input
-                                            type="checkbox"
-                                            id="edit-is-recurring"
-                                            checked={formData.isRecurring}
-                                            onChange={(e) => setFormData({ ...formData, isRecurring: e.target.checked })}
-                                        />
-                                        <label htmlFor="edit-is-recurring">
-                                            Make this a recurring maintenance window
-                                        </label>
-                                    </div>
-                                </div>
-
-                                {formData.isRecurring && (
-                                    <div className="recurrence-section">
-                                        <h3>Recurrence Pattern</h3>
-                                        <div className="form-group">
-                                            <label>Repeat</label>
-                                            <select
-                                                value={formData.recurrencePattern.type}
-                                                onChange={(e) => setFormData({
-                                                    ...formData,
-                                                    recurrencePattern: {
-                                                        ...formData.recurrencePattern,
-                                                        type: e.target.value
-                                                    }
-                                                })}
-                                            >
-                                                <option value="daily">Daily</option>
-                                                <option value="weekly">Weekly</option>
-                                                <option value="monthly">Monthly</option>
-                                            </select>
-                                        </div>
-
-                                        <div className="form-group">
-                                            <label>Every</label>
-                                            <input
-                                                type="number"
-                                                min="1"
-                                                value={formData.recurrencePattern.interval}
-                                                onChange={(e) => setFormData({
-                                                    ...formData,
-                                                    recurrencePattern: {
-                                                        ...formData.recurrencePattern,
-                                                        interval: parseInt(e.target.value)
-                                                    }
-                                                })}
-                                            />
-                                            <span>{formData.recurrencePattern.type.slice(0, -2)}(s)</span>
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                        <div className="modal-footer">
+                        {renderFormBody()}
+                        <div className="mtm-modal-foot">
                             <button
-                                className="btn-secondary"
+                                className="mtm-btn-secondary"
                                 onClick={() => {
                                     setShowEditModal(false);
                                     setEditingWindow(null);
@@ -970,7 +800,7 @@ const MaintenanceManagement = () => {
                                 Cancel
                             </button>
                             <button
-                                className="btn-primary"
+                                className="mtm-btn-primary"
                                 onClick={handleUpdateMaintenanceWindow}
                                 disabled={!formData.title || !formData.startTime || !formData.endTime || loading}
                             >

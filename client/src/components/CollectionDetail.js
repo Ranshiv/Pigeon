@@ -114,9 +114,14 @@ function CollectionDetail() {
       setCollection(data);
       setRequests(data.requests || []);
 
-      // Select the first request by default if available
-      if (data.requests && data.requests.length > 0 && !selectedRequest) {
-        setSelectedRequest(data.requests[0]);
+      // Select the first request when this is a different collection than the
+      // current selection belongs to. `prev || data.requests[0]` alone kept the
+      // previous collection's request selected after navigating between collections.
+      if (data.requests && data.requests.length > 0) {
+        setSelectedRequest((prev) => {
+          const stillInCollection = prev && data.requests.some(r => r.id === prev.id);
+          return stillInCollection ? prev : data.requests[0];
+        });
       }
 
       setLoading(false);
@@ -125,7 +130,7 @@ function CollectionDetail() {
       setError('Failed to load collection. Please try again later.');
       setLoading(false);
     }
-  }, [collectionId, selectedRequest]);
+  }, [collectionId]);
 
   // Fetch documentation data when the documentation tab is selected
   const fetchDocumentation = useCallback(async () => {
@@ -422,16 +427,28 @@ function CollectionDetail() {
   // Handle saving a request
   const handleSaveRequest = (request) => {
     try {
-      // If it's a new request, add it to the collection
-      if (request.isNew) {
-        const newRequests = [...requests, { ...request, isNew: false }];
-        setRequests(newRequests);
+      const requestId = request._id || request.id;
+      const existingIndex = requests.findIndex(
+        (req) => (req._id || req.id) === requestId
+      );
+
+      // If explicitly new OR not found in current list, append it.
+      if (request.isNew || existingIndex === -1) {
+        const normalizedRequest = {
+          ...request,
+          _id: request._id || request.id || `req-${Date.now()}`,
+          isNew: false
+        };
+        setRequests(prev => [...prev, normalizedRequest]);
+        toast.success('Request added. Click top Save to persist to collection.');
       } else {
-        // Otherwise update the existing request
-        const newRequests = requests.map(req =>
-          (req.id === request.id || req._id === request._id) ? { ...request } : req
-        );
-        setRequests(newRequests);
+        // Otherwise update the existing request in place.
+        setRequests(prev => prev.map((req, index) => (
+          index === existingIndex
+            ? { ...req, ...request, isNew: false }
+            : req
+        )));
+        toast.success('Request updated. Click top Save to persist changes.');
       }
 
       // Update the selected request
@@ -877,7 +894,7 @@ function CollectionDetail() {
                       </span>
                       <div className="request-info">
                         <span className="request-name">{request.name}</span>
-                        <small className="request-url">{request.url ? new URL(request.url).pathname : '/'}</small>
+                        <small className="request-url">{(() => { try { return request.url ? new URL(request.url).pathname : '/'; } catch { return request.url || '/'; } })()}</small>
                       </div>
                       <button
                         className="delete-btn"
@@ -997,6 +1014,7 @@ function CollectionDetail() {
                 showRequestForm && selectedRequest && (
                   <div className="request-workspace">
                     <RequestForm
+                      key={selectedRequest?._id || selectedRequest?.id || 'new-request'}
                       request={selectedRequest}
                       onSave={handleSaveRequest}
                       onSendRequest={handleSendRequest}

@@ -11,6 +11,7 @@ import './IncidentManagement.css';
 const IncidentManagement = () => {
     const [incidents, setIncidents] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
     const [filter, setFilter] = useState('all');
     const [searchTerm, setSearchTerm] = useState('');
     const [showCreateForm, setShowCreateForm] = useState(false);
@@ -39,8 +40,9 @@ const IncidentManagement = () => {
                     const data = await response.json();
                     setIncidents(data);
                 }
-            } catch (error) {
-                console.error('Error fetching incidents:', error);
+            } catch (err) {
+                console.error('Error fetching incidents:', err);
+                setError('Failed to load incidents. Please try again later.');
             } finally {
                 setLoading(false);
             }
@@ -291,6 +293,12 @@ const IncidentManagement = () => {
 
     return (
         <div className="incident-management">
+            {error && (
+                <div className="error-banner" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 16px', background: 'var(--error-bg, #fef2f2)', color: 'var(--error-text, #ef4444)', borderRadius: '6px', marginBottom: '12px' }}>
+                    <span>{error}</span>
+                    <button onClick={() => setError(null)} style={{ background: 'none', border: 'none', color: 'inherit', cursor: 'pointer', fontSize: '18px' }}>×</button>
+                </div>
+            )}
             <div className="incident-header">
                 <div className="header-info">
                     <h1><FiAlertTriangle /> Incident Management</h1>

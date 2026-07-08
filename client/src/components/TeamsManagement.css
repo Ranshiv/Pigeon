@@ -305,11 +305,7 @@
 
 .role-select {
     padding: 6px 12px;
-    border: 1px solid var(--border-color);
     border-radius: 6px;
-    background: var(--card-bg);
-    color: var(--text-color);
-    font-size: 0.875rem;
 }
 
 .member-actions {
@@ -624,22 +620,9 @@
 .form-group input,
 .form-group textarea,
 .form-group select {
-    width: 100%;
     padding: 10px 12px;
-    border: 1px solid var(--border-color);
     border-radius: 6px;
-    background: var(--card-bg);
-    color: var(--text-color);
-    font-size: 0.875rem;
     transition: all 0.2s ease;
-}
-
-.form-group input:focus,
-.form-group textarea:focus,
-.form-group select:focus {
-    outline: none;
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
 .form-group textarea {

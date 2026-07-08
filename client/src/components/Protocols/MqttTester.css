@@ -338,12 +338,6 @@
     color: var(--mqtt-text);
 }
 
-.mqtt-retain-toggle input {
-    width: 16px;
-    height: 16px;
-    accent-color: var(--mqtt-primary);
-}
-
 .mqtt-btn-publish {
     margin-left: auto;
     background: var(--mqtt-primary);

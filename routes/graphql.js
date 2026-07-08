@@ -360,9 +360,16 @@ router.post('/lint/fix', async (req, res) => {
             });
         }
 
-        // First lint the query to find the issue
+        // First lint the query to find the issue.
+        // lintQuery returns {results:{errors,warnings,suggestions,info,quickFixes,...}}
+        // — no top-level `issues` array, so flatten the result arrays into one.
         const lintResult = GraphQLLintingService.lintQuery(query, schema);
-        const issue = lintResult.issues.find(i => i.id === issueId);
+        const r = lintResult.results || {};
+        const issues = [
+            ...(r.errors || []), ...(r.warnings || []),
+            ...(r.suggestions || []), ...(r.info || [])
+        ];
+        const issue = issues.find(i => (i.id || i.ruleId) === issueId);
 
         if (!issue) {
             return res.status(404).json({
@@ -468,7 +475,32 @@ router.post('/lint/report', async (req, res) => {
             });
         }
 
-        const report = GraphQLLintingService.generateReport(queries, schema, options || {});
+        // GraphQLLintingService has no generateReport() method. Build the report
+        // from the existing public helpers: lintQuery, calculateMetrics,
+        // generateOptimizationSuggestions, calculateGrade.
+        const perQuery = queries.map(q => {
+            const lint = GraphQLLintingService.lintQuery(q, schema, options || {});
+            const results = lint.results || {};
+            return {
+                query: q,
+                score: results.score,
+                grade: GraphQLLintingService.calculateGrade(results),
+                summary: results.summary,
+                errors: results.errors || [],
+                warnings: results.warnings || [],
+                suggestions: results.suggestions || [],
+                metrics: GraphQLLintingService.calculateMetrics(q),
+                optimizations: GraphQLLintingService.generateOptimizationSuggestions(q, results)
+            };
+        });
+
+        const totalScore = perQuery.reduce((s, r) => s + (r.score || 0), 0);
+        const report = {
+            totalQueries: perQuery.length,
+            averageScore: perQuery.length ? Math.round(totalScore / perQuery.length) : 0,
+            overallGrade: perQuery.length ? GraphQLLintingService.calculateGrade({ score: totalScore / perQuery.length }) : null,
+            results: perQuery
+        };
         res.json({
             success: true,
             ...report

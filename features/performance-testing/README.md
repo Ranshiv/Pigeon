@@ -1,8 +1,8 @@
-# Performance Testing & Load Generation (Initial Implementation)
+# Performance Testing & Load Generation
 
 This module adds **server-side** performance testing utilities using [`autocannon`](https://github.com/mcollina/autocannon).
 
-## What’s implemented (so far)
+## Current capabilities
 
 - **Load test runner** (`LoadTestRunner.js`) that runs a scenario with multiple phases.
 - **Virtual user simulation config** (`VirtualUserSimulator.js`) that validates/normalizes a scenario.
@@ -14,12 +14,12 @@ This module adds **server-side** performance testing utilities using [`autocanno
 - **Metrics aggregation** (`MetricsCollector.js`) merging load results and resource samples.
 - **Performance analysis** (`PerformanceAnalyzer.js`) for basic KPIs and run comparisons.
 
-## What is NOT implemented yet
+## Planned enhancements
 
 - Visual Load Test Designer UI
 - Distributed load testing (multi-region agents)
 - Threshold alerts + alerting routes/UI
-- Persistent storage + history/report pages (a basic persistence API is added separately in routes)
+- Advanced history/report pages (basic persistence APIs are available separately in routes)
 
 ## Scenario format
 

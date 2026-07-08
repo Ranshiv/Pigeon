@@ -662,11 +662,6 @@
     color: var(--text-color);
 }
 
-.policyMonitorCard input {
-    accent-color: var(--primary-color);
-    width: 18px;
-    height: 18px;
-}
 
 .policyMonitorName {
     min-width: 0;
@@ -757,12 +752,6 @@
 .policyCheckbox:has(input[type="checkbox"]:checked) {
     border-color: color-mix(in srgb, var(--primary-color) 55%, var(--border-color));
     background: color-mix(in srgb, var(--primary-color) 8%, var(--card-bg));
-}
-
-.policyCheckbox input[type="checkbox"] {
-    width: 18px;
-    height: 18px;
-    accent-color: var(--primary-color);
 }
 
 .policyCheckboxGroup {

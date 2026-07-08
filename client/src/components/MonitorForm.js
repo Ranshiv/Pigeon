@@ -250,31 +250,31 @@ const MonitorForm = ({ isOpen, onClose, onSave, editMonitor = null }) => {
     if (!isOpen) return null;
 
     return (
-        <div className="monitor-form-overlay">
-            <div className="monitor-form-modal">
-                <div className="monitor-form-header">
+        <div className="mfm-overlay">
+            <div className="mfm-modal">
+                <div className="mfm-header">
                     <div>
                         <h2>{editMonitor ? 'Edit Monitor' : 'Create New Monitor'}</h2>
                         <p>Configure monitoring for your API endpoints and services</p>
                     </div>
-                    <button className="close-btn" onClick={onClose}>
+                    <button className="mfm-close-btn" onClick={onClose}>
                         <FiX size={20} />
                     </button>
                 </div>
 
-                <form onSubmit={handleSubmit} className="monitor-form">
+                <form onSubmit={handleSubmit} className="mfm-form">
                     {/* Basic Information */}
-                    <div className="form-section">
-                        <div className="section-title">
+                    <div className="mfm-form-section">
+                        <div className="mfm-section-title">
                             <FiGlobe size={20} />
                             <div>
                                 <h3>Basic Information</h3>
-                                <p className="section-description">Essential details about your monitor endpoint</p>
+                                <p className="mfm-section-description">Essential details about your monitor endpoint</p>
                             </div>
                         </div>
 
-                        <div className="form-row">
-                            <div className="form-group">
+                        <div className="mfm-form-row">
+                            <div className="mfm-form-group">
                                 <label htmlFor="name">Monitor Name *</label>
                                 <input
                                     type="text"
@@ -283,12 +283,12 @@ const MonitorForm = ({ isOpen, onClose, onSave, editMonitor = null }) => {
                                     value={formData.name}
                                     onChange={handleInputChange}
                                     placeholder="e.g., Main API Health Check"
-                                    className={errors.name ? 'error' : ''}
+                                    className={errors.name ? 'mfm-error' : ''}
                                 />
-                                {errors.name && <span className="error-text">{errors.name}</span>}
+                                {errors.name && <span className="mfm-error-text">{errors.name}</span>}
                             </div>
 
-                            <div className="form-group">
+                            <div className="mfm-form-group">
                                 <label htmlFor="url">URL *</label>
                                 <input
                                     type="url"
@@ -297,14 +297,14 @@ const MonitorForm = ({ isOpen, onClose, onSave, editMonitor = null }) => {
                                     value={formData.url}
                                     onChange={handleInputChange}
                                     placeholder="https://api.example.com/health"
-                                    className={errors.url ? 'error' : ''}
+                                    className={errors.url ? 'mfm-error' : ''}
                                 />
-                                {errors.url && <span className="error-text">{errors.url}</span>}
+                                {errors.url && <span className="mfm-error-text">{errors.url}</span>}
                             </div>
                         </div>
 
-                        <div className="form-row">
-                            <div className="form-group">
+                        <div className="mfm-form-row">
+                            <div className="mfm-form-group">
                                 <label htmlFor="method">HTTP Method</label>
                                 <select
                                     id="method"
@@ -321,9 +321,9 @@ const MonitorForm = ({ isOpen, onClose, onSave, editMonitor = null }) => {
                                 </select>
                             </div>
 
-                            <div className="form-group">
+                            <div className="mfm-form-group">
                                 <label htmlFor="expectedStatusCode">Expected Status Code</label>
-                                <div className="number-input-container">
+                                <div className="mfm-number-input-container">
                                     <input
                                         type="number"
                                         id="expectedStatusCode"
@@ -335,14 +335,14 @@ const MonitorForm = ({ isOpen, onClose, onSave, editMonitor = null }) => {
                                         placeholder="200"
                                     />
                                 </div>
-                                <div className="number-input-range">
-                                    <span className="range-indicator">Min: 100</span>
-                                    <span className="range-indicator">Max: 599</span>
+                                <div className="mfm-number-input-range">
+                                    <span className="mfm-range-indicator">Min: 100</span>
+                                    <span className="mfm-range-indicator">Max: 599</span>
                                 </div>
                             </div>
                         </div>
 
-                        <div className="form-group">
+                        <div className="mfm-form-group">
                             <label htmlFor="description">Description</label>
                             <textarea
                                 id="description"
@@ -354,7 +354,7 @@ const MonitorForm = ({ isOpen, onClose, onSave, editMonitor = null }) => {
                             />
                         </div>
 
-                        <div className="form-group">
+                        <div className="mfm-form-group">
                             <label htmlFor="tags">Tags (comma-separated)</label>
                             <input
                                 type="text"
@@ -368,19 +368,19 @@ const MonitorForm = ({ isOpen, onClose, onSave, editMonitor = null }) => {
                     </div>
 
                     {/* Monitoring Configuration */}
-                    <div className="form-section">
-                        <div className="section-title">
+                    <div className="mfm-form-section">
+                        <div className="mfm-section-title">
                             <FiSettings size={20} />
                             <div>
                                 <h3>Monitoring Configuration</h3>
-                                <p className="section-description">Set check intervals and response time thresholds</p>
+                                <p className="mfm-section-description">Set check intervals and response time thresholds</p>
                             </div>
                         </div>
 
-                        <div className="form-row">
-                            <div className="form-group">
+                        <div className="mfm-form-row">
+                            <div className="mfm-form-group">
                                 <label htmlFor="interval">Check Interval</label>
-                                <div className="number-input-with-unit">
+                                <div className="mfm-number-input-with-unit">
                                     <input
                                         type="number"
                                         id="interval"
@@ -390,20 +390,20 @@ const MonitorForm = ({ isOpen, onClose, onSave, editMonitor = null }) => {
                                         min="1"
                                         max="60"
                                         placeholder="5"
-                                        className={errors.interval ? 'error' : ''}
+                                        className={errors.interval ? 'mfm-error' : ''}
                                     />
-                                    <span className="input-unit">min</span>
+                                    <span className="mfm-input-unit">min</span>
                                 </div>
-                                <div className="number-input-range">
-                                    <span className="range-indicator">Min: 1 min</span>
-                                    <span className="range-indicator">Max: 60 min</span>
+                                <div className="mfm-number-input-range">
+                                    <span className="mfm-range-indicator">Min: 1 min</span>
+                                    <span className="mfm-range-indicator">Max: 60 min</span>
                                 </div>
-                                {errors.interval && <span className="error-text">{errors.interval}</span>}
+                                {errors.interval && <span className="mfm-error-text">{errors.interval}</span>}
                             </div>
 
-                            <div className="form-group">
+                            <div className="mfm-form-group">
                                 <label htmlFor="expectedResponseTime">Max Response Time</label>
-                                <div className="number-input-with-unit">
+                                <div className="mfm-number-input-with-unit">
                                     <input
                                         type="number"
                                         id="expectedResponseTime"
@@ -413,70 +413,70 @@ const MonitorForm = ({ isOpen, onClose, onSave, editMonitor = null }) => {
                                         min="1000"
                                         step="100"
                                         placeholder="5000"
-                                        className={errors.expectedResponseTime ? 'error' : ''}
+                                        className={errors.expectedResponseTime ? 'mfm-error' : ''}
                                     />
-                                    <span className="input-unit">ms</span>
+                                    <span className="mfm-input-unit">ms</span>
                                 </div>
-                                <div className="number-input-range">
-                                    <span className="range-indicator">Min: 1000ms</span>
-                                    <span className="range-indicator">Step: 100ms</span>
+                                <div className="mfm-number-input-range">
+                                    <span className="mfm-range-indicator">Min: 1000ms</span>
+                                    <span className="mfm-range-indicator">Step: 100ms</span>
                                 </div>
-                                {errors.expectedResponseTime && <span className="error-text">{errors.expectedResponseTime}</span>}
+                                {errors.expectedResponseTime && <span className="mfm-error-text">{errors.expectedResponseTime}</span>}
                             </div>
                         </div>
 
-                        <div className="form-row checkbox-row">
-                            <div className="toggle-group">
-                                <div className="toggle-label-group">
-                                    <label className="toggle-label">Active (start monitoring immediately)</label>
-                                    <p className="toggle-description">Begin monitoring this endpoint right away</p>
+                        <div className="mfm-form-row mfm-checkbox-row">
+                            <div className="mfm-toggle-group">
+                                <div className="mfm-toggle-label-group">
+                                    <label className="mfm-toggle-label">Active (start monitoring immediately)</label>
+                                    <p className="mfm-toggle-description">Begin monitoring this endpoint right away</p>
                                 </div>
-                                <label className="toggle-switch">
+                                <label className="mfm-toggle-switch">
                                     <input
                                         type="checkbox"
                                         name="isActive"
                                         checked={formData.isActive}
                                         onChange={handleInputChange}
                                     />
-                                    <span className="toggle-slider"></span>
+                                    <span className="mfm-toggle-slider"></span>
                                 </label>
                             </div>
 
-                            <div className="toggle-group">
-                                <div className="toggle-label-group">
-                                    <label className="toggle-label">Show on public status page</label>
-                                    <p className="toggle-description">Display this monitor on your public status page</p>
+                            <div className="mfm-toggle-group">
+                                <div className="mfm-toggle-label-group">
+                                    <label className="mfm-toggle-label">Show on public status page</label>
+                                    <p className="mfm-toggle-description">Display this monitor on your public status page</p>
                                 </div>
-                                <label className="toggle-switch">
+                                <label className="mfm-toggle-switch">
                                     <input
                                         type="checkbox"
                                         name="isPublic"
                                         checked={formData.isPublic}
                                         onChange={handleInputChange}
                                     />
-                                    <span className="toggle-slider"></span>
+                                    <span className="mfm-toggle-slider"></span>
                                 </label>
                             </div>
                         </div>
                     </div>
 
                     {/* Custom Headers */}
-                    <div className="form-section">
-                        <div className="section-header">
-                            <div className="section-title">
+                    <div className="mfm-form-section">
+                        <div className="mfm-section-header">
+                            <div className="mfm-section-title">
                                 <FiList size={20} />
                                 <div>
                                     <h3>Custom Headers</h3>
-                                    <p className="section-description">Add custom HTTP headers to your requests</p>
+                                    <p className="mfm-section-description">Add custom HTTP headers to your requests</p>
                                 </div>
                             </div>
-                            <button type="button" onClick={addHeader} className="btn-add">
+                            <button type="button" onClick={addHeader} className="mfm-btn-add">
                                 + Add Header
                             </button>
                         </div>
 
                         {customHeaders.length > 0 && (
-                            <div className="header-labels">
+                            <div className="mfm-header-labels">
                                 <span>Header name</span>
                                 <span>Header value</span>
                                 <span></span>
@@ -484,7 +484,7 @@ const MonitorForm = ({ isOpen, onClose, onSave, editMonitor = null }) => {
                         )}
 
                         {customHeaders.map((header, index) => (
-                            <div key={index} className="header-row">
+                            <div key={index} className="mfm-header-row">
                                 <input
                                     type="text"
                                     value={header.key}
@@ -500,7 +500,7 @@ const MonitorForm = ({ isOpen, onClose, onSave, editMonitor = null }) => {
                                 <button
                                     type="button"
                                     onClick={() => removeHeader(index)}
-                                    className="remove-header-btn"
+                                    className="mfm-remove-header-btn"
                                 >
                                     <FiX />
                                 </button>
@@ -510,9 +510,9 @@ const MonitorForm = ({ isOpen, onClose, onSave, editMonitor = null }) => {
 
                     {/* Request Body (for POST/PUT/PATCH) */}
                     {['POST', 'PUT', 'PATCH'].includes(formData.method) && (
-                        <div className="form-section">
+                        <div className="mfm-form-section">
                             <h3><FiList size={20} /> Request Body</h3>
-                            <div className="form-group">
+                            <div className="mfm-form-group">
                                 <label htmlFor="body">Body Content</label>
                                 <textarea
                                     id="body"
@@ -527,79 +527,79 @@ const MonitorForm = ({ isOpen, onClose, onSave, editMonitor = null }) => {
                     )}
 
                     {/* Alert Settings */}
-                    <div className="form-section">
-                        <div className="section-title">
+                    <div className="mfm-form-section">
+                        <div className="mfm-section-title">
                             <FiBell size={20} />
                             <div>
                                 <h3>Alert Settings</h3>
-                                <p className="section-description">Configure when and how you want to be notified</p>
+                                <p className="mfm-section-description">Configure when and how you want to be notified</p>
                             </div>
                         </div>
 
-                        <div className="alert-checkboxes-grid">
-                            <div className="toggle-group">
-                                <div className="toggle-label-group">
-                                    <label className="toggle-label">Enable email alerts</label>
+                        <div className="mfm-alert-checkboxes-grid">
+                            <div className="mfm-toggle-group">
+                                <div className="mfm-toggle-label-group">
+                                    <label className="mfm-toggle-label">Enable email alerts</label>
                                 </div>
-                                <label className="toggle-switch">
+                                <label className="mfm-toggle-switch">
                                     <input
                                         type="checkbox"
                                         name="alertSettings.emailEnabled"
                                         checked={formData.alertSettings.emailEnabled}
                                         onChange={handleInputChange}
                                     />
-                                    <span className="toggle-slider"></span>
+                                    <span className="mfm-toggle-slider"></span>
                                 </label>
                             </div>
 
-                            <div className="toggle-group">
-                                <div className="toggle-label-group">
-                                    <label className="toggle-label">Alert on failure</label>
+                            <div className="mfm-toggle-group">
+                                <div className="mfm-toggle-label-group">
+                                    <label className="mfm-toggle-label">Alert on failure</label>
                                 </div>
-                                <label className="toggle-switch">
+                                <label className="mfm-toggle-switch">
                                     <input
                                         type="checkbox"
                                         name="alertSettings.alertOnFailure"
                                         checked={formData.alertSettings.alertOnFailure}
                                         onChange={handleInputChange}
                                     />
-                                    <span className="toggle-slider"></span>
+                                    <span className="mfm-toggle-slider"></span>
                                 </label>
                             </div>
 
-                            <div className="toggle-group">
-                                <div className="toggle-label-group">
-                                    <label className="toggle-label">Alert on slow response</label>
+                            <div className="mfm-toggle-group">
+                                <div className="mfm-toggle-label-group">
+                                    <label className="mfm-toggle-label">Alert on slow response</label>
                                 </div>
-                                <label className="toggle-switch">
+                                <label className="mfm-toggle-switch">
                                     <input
                                         type="checkbox"
                                         name="alertSettings.alertOnSlowResponse"
                                         checked={formData.alertSettings.alertOnSlowResponse}
                                         onChange={handleInputChange}
                                     />
-                                    <span className="toggle-slider"></span>
+                                    <span className="mfm-toggle-slider"></span>
                                 </label>
                             </div>
 
-                            <div className="toggle-group">
-                                <div className="toggle-label-group">
-                                    <label className="toggle-label">Alert on recovery</label>
+                            <div className="mfm-toggle-group">
+                                <div className="mfm-toggle-label-group">
+                                    <label className="mfm-toggle-label">Alert on recovery</label>
                                 </div>
-                                <label className="toggle-switch">
+                                <label className="mfm-toggle-switch">
                                     <input
                                         type="checkbox"
                                         name="alertSettings.alertOnRecovery"
                                         checked={formData.alertSettings.alertOnRecovery}
                                         onChange={handleInputChange}
                                     />
-                                    <span className="toggle-slider"></span>
+                                    <span className="mfm-toggle-slider"></span>
                                 </label>
                             </div>
                         </div>
 
-                        <div className="form-row">
-                            <div className="form-group">
+                        <div className="mfm-form-row">
+                            <div className="mfm-form-group">
                                 <label htmlFor="webhookUrl">Webhook URL (optional)</label>
                                 <input
                                     type="url"
@@ -611,7 +611,7 @@ const MonitorForm = ({ isOpen, onClose, onSave, editMonitor = null }) => {
                                 />
                             </div>
 
-                            <div className="form-group">
+                            <div className="mfm-form-group">
                                 <label htmlFor="slackWebhook">Slack Webhook (optional)</label>
                                 <input
                                     type="url"
@@ -626,38 +626,38 @@ const MonitorForm = ({ isOpen, onClose, onSave, editMonitor = null }) => {
                     </div>
 
                     {/* Advanced Monitoring Settings */}
-                    <div className="form-section">
-                        <div className="section-title">
+                    <div className="mfm-form-section">
+                        <div className="mfm-section-title">
                             <FiSettings size={20} />
                             <div>
                                 <h3>Advanced Monitoring Settings</h3>
-                                <p className="section-description">Additional monitoring capabilities and validations</p>
+                                <p className="mfm-section-description">Additional monitoring capabilities and validations</p>
                             </div>
                         </div>
 
                         {/* SSL Monitoring Card */}
-                        <div className="advanced-setting-card">
-                            <div className="advanced-setting-header">
-                                <div className="advanced-setting-title-with-icon">
-                                    <FiShield size={16} className="advanced-setting-icon" />
+                        <div className="mfm-advanced-setting-card">
+                            <div className="mfm-advanced-setting-header">
+                                <div className="mfm-advanced-setting-title-with-icon">
+                                    <FiShield size={16} className="mfm-advanced-setting-icon" />
                                     <div>
-                                        <label className="advanced-setting-label">SSL Monitoring</label>
-                                        <p className="advanced-setting-description">Monitor SSL certificate expiration</p>
+                                        <label className="mfm-advanced-setting-label">SSL Monitoring</label>
+                                        <p className="mfm-advanced-setting-description">Monitor SSL certificate expiration</p>
                                     </div>
                                 </div>
-                                <label className="toggle-switch">
+                                <label className="mfm-toggle-switch">
                                     <input
                                         type="checkbox"
                                         name="advancedSettings.sslMonitoring.enabled"
                                         checked={formData.advancedSettings.sslMonitoring.enabled}
                                         onChange={handleInputChange}
                                     />
-                                    <span className="toggle-slider"></span>
+                                    <span className="mfm-toggle-slider"></span>
                                 </label>
                             </div>
                             {formData.advancedSettings.sslMonitoring.enabled && (
-                                <div className="advanced-setting-content">
-                                    <div className="form-group">
+                                <div className="mfm-advanced-setting-content">
+                                    <div className="mfm-form-group">
                                         <label htmlFor="sslMonitoring.alertBeforeExpiry">Alert Before Expiry (days)</label>
                                         <input
                                             type="number"
@@ -667,37 +667,37 @@ const MonitorForm = ({ isOpen, onClose, onSave, editMonitor = null }) => {
                                             onChange={handleInputChange}
                                             min="1"
                                             placeholder="30"
-                                            className={errors.sslMonitoring?.alertBeforeExpiry ? 'error' : ''}
+                                            className={errors.sslMonitoring?.alertBeforeExpiry ? 'mfm-error' : ''}
                                         />
-                                        {errors.sslMonitoring?.alertBeforeExpiry && <span className="error-text">{errors.sslMonitoring.alertBeforeExpiry}</span>}
+                                        {errors.sslMonitoring?.alertBeforeExpiry && <span className="mfm-error-text">{errors.sslMonitoring.alertBeforeExpiry}</span>}
                                     </div>
                                 </div>
                             )}
                         </div>
 
                         {/* Content Validation Card */}
-                        <div className="advanced-setting-card">
-                            <div className="advanced-setting-header">
-                                <div className="advanced-setting-title-with-icon">
-                                    <FiCheckCircle size={16} className="advanced-setting-icon" />
+                        <div className="mfm-advanced-setting-card">
+                            <div className="mfm-advanced-setting-header">
+                                <div className="mfm-advanced-setting-title-with-icon">
+                                    <FiCheckCircle size={16} className="mfm-advanced-setting-icon" />
                                     <div>
-                                        <label className="advanced-setting-label">Content Validation</label>
-                                        <p className="advanced-setting-description">Verify response contains expected content</p>
+                                        <label className="mfm-advanced-setting-label">Content Validation</label>
+                                        <p className="mfm-advanced-setting-description">Verify response contains expected content</p>
                                     </div>
                                 </div>
-                                <label className="toggle-switch">
+                                <label className="mfm-toggle-switch">
                                     <input
                                         type="checkbox"
                                         name="advancedSettings.contentValidation.enabled"
                                         checked={formData.advancedSettings.contentValidation.enabled}
                                         onChange={handleInputChange}
                                     />
-                                    <span className="toggle-slider"></span>
+                                    <span className="mfm-toggle-slider"></span>
                                 </label>
                             </div>
                             {formData.advancedSettings.contentValidation.enabled && (
-                                <div className="advanced-setting-content">
-                                    <div className="form-group">
+                                <div className="mfm-advanced-setting-content">
+                                    <div className="mfm-form-group">
                                         <label htmlFor="contentValidation.expectedContent">Expected Content</label>
                                         <input
                                             type="text"
@@ -706,44 +706,44 @@ const MonitorForm = ({ isOpen, onClose, onSave, editMonitor = null }) => {
                                             value={formData.advancedSettings.contentValidation.expectedContent}
                                             onChange={handleInputChange}
                                             placeholder="e.g., Success"
-                                            className={errors.contentValidation?.expectedContent ? 'error' : ''}
+                                            className={errors.contentValidation?.expectedContent ? 'mfm-error' : ''}
                                         />
-                                        {errors.contentValidation?.expectedContent && <span className="error-text">{errors.contentValidation.expectedContent}</span>}
+                                        {errors.contentValidation?.expectedContent && <span className="mfm-error-text">{errors.contentValidation.expectedContent}</span>}
                                     </div>
                                 </div>
                             )}
                         </div>
 
                         {/* Geo-location Monitoring Card */}
-                        <div className="advanced-setting-card">
-                            <div className="advanced-setting-header">
-                                <div className="advanced-setting-title-with-icon">
-                                    <FiMapPin size={16} className="advanced-setting-icon" />
+                        <div className="mfm-advanced-setting-card">
+                            <div className="mfm-advanced-setting-header">
+                                <div className="mfm-advanced-setting-title-with-icon">
+                                    <FiMapPin size={16} className="mfm-advanced-setting-icon" />
                                     <div>
-                                        <label className="advanced-setting-label">Geo-location Monitoring</label>
-                                        <p className="advanced-setting-description">Monitor from multiple geographic locations</p>
+                                        <label className="mfm-advanced-setting-label">Geo-location Monitoring</label>
+                                        <p className="mfm-advanced-setting-description">Monitor from multiple geographic locations</p>
                                     </div>
                                 </div>
-                                <label className="toggle-switch">
+                                <label className="mfm-toggle-switch">
                                     <input
                                         type="checkbox"
                                         name="advancedSettings.geoMonitoring.enabled"
                                         checked={formData.advancedSettings.geoMonitoring.enabled}
                                         onChange={handleInputChange}
                                     />
-                                    <span className="toggle-slider"></span>
+                                    <span className="mfm-toggle-slider"></span>
                                 </label>
                             </div>
                             {formData.advancedSettings.geoMonitoring.enabled && (
-                                <div className="advanced-setting-content">
-                                    <div className="form-group">
+                                <div className="mfm-advanced-setting-content">
+                                    <div className="mfm-form-group">
                                         <label htmlFor="geoMonitoring.locations">Locations</label>
-                                        <div className="location-chips">
+                                        <div className="mfm-location-chips">
                                             {['US East', 'US West', 'EU Central', 'AP South'].map((location) => {
                                                 const value = location.toLowerCase().replace(' ', '-');
                                                 const isSelected = formData.advancedSettings.geoMonitoring.locations.includes(value);
                                                 return (
-                                                    <label key={value} className={`location-chip ${isSelected ? 'selected' : ''}`}>
+                                                    <label key={value} className={`mfm-location-chip ${isSelected ? 'selected' : ''}`}>
                                                         <input
                                                             type="checkbox"
                                                             checked={isSelected}
@@ -760,34 +760,34 @@ const MonitorForm = ({ isOpen, onClose, onSave, editMonitor = null }) => {
                         </div>
 
                         {/* Multi-step Monitoring Card */}
-                        <div className="advanced-setting-card">
-                            <div className="advanced-setting-header">
-                                <div className="advanced-setting-title-with-icon">
-                                    <FiLink2 size={16} className="advanced-setting-icon" />
+                        <div className="mfm-advanced-setting-card">
+                            <div className="mfm-advanced-setting-header">
+                                <div className="mfm-advanced-setting-title-with-icon">
+                                    <FiLink2 size={16} className="mfm-advanced-setting-icon" />
                                     <div>
-                                        <label className="advanced-setting-label">Multi-step Monitoring</label>
-                                        <p className="advanced-setting-description">Chain multiple requests together</p>
+                                        <label className="mfm-advanced-setting-label">Multi-step Monitoring</label>
+                                        <p className="mfm-advanced-setting-description">Chain multiple requests together</p>
                                     </div>
                                 </div>
-                                <label className="toggle-switch">
+                                <label className="mfm-toggle-switch">
                                     <input
                                         type="checkbox"
                                         name="advancedSettings.multiStep.enabled"
                                         checked={formData.advancedSettings.multiStep.enabled}
                                         onChange={handleInputChange}
                                     />
-                                    <span className="toggle-slider"></span>
+                                    <span className="mfm-toggle-slider"></span>
                                 </label>
                             </div>
                         </div>
 
                         {formData.advancedSettings.multiStep.enabled && (
-                            <div className="multi-step-settings">
+                            <div className="mfm-multi-step-settings">
                                 <h4>Multi-Step Configuration</h4>
 
                                 {formData.advancedSettings.multiStep.steps.map((step, index) => (
-                                    <div key={index} className="multi-step-row">
-                                        <div className="form-group">
+                                    <div key={index} className="mfm-multi-step-row">
+                                        <div className="mfm-form-group">
                                             <label htmlFor={`multiStep.steps.${index}.name`}>Step Name</label>                                            <input
                                                 type="text"
                                                 id={`multiStep.steps.${index}.name`}
@@ -797,7 +797,7 @@ const MonitorForm = ({ isOpen, onClose, onSave, editMonitor = null }) => {
                                             />
                                         </div>
 
-                                        <div className="form-group">
+                                        <div className="mfm-form-group">
                                             <label htmlFor={`multiStep.steps.${index}.url`}>Request URL</label>                                            <input
                                                 type="url"
                                                 id={`multiStep.steps.${index}.url`}
@@ -807,7 +807,7 @@ const MonitorForm = ({ isOpen, onClose, onSave, editMonitor = null }) => {
                                             />
                                         </div>
 
-                                        <div className="form-group">
+                                        <div className="mfm-form-group">
                                             <label htmlFor={`multiStep.steps.${index}.method`}>HTTP Method</label>                                            <select
                                                 id={`multiStep.steps.${index}.method`}
                                                 value={step.method}
@@ -822,9 +822,9 @@ const MonitorForm = ({ isOpen, onClose, onSave, editMonitor = null }) => {
                                             </select>
                                         </div>
 
-                                        <div className="form-group">
+                                        <div className="mfm-form-group">
                                             <label htmlFor={`multiStep.steps.${index}.expectedStatusCode`}>Expected Status Code</label>
-                                            <div className="number-input-container">                                                <input
+                                            <div className="mfm-number-input-container">                                                <input
                                                 type="number"
                                                 id={`multiStep.steps.${index}.expectedStatusCode`}
                                                 value={step.expectedStatusCode}
@@ -836,9 +836,9 @@ const MonitorForm = ({ isOpen, onClose, onSave, editMonitor = null }) => {
                                             </div>
                                         </div>
 
-                                        <div className="form-group">
+                                        <div className="mfm-form-group">
                                             <label htmlFor={`multiStep.steps.${index}.expectedResponseTime`}>Max Response Time</label>
-                                            <div className="number-input-with-unit">                                                <input
+                                            <div className="mfm-number-input-with-unit">                                                <input
                                                 type="number"
                                                 id={`multiStep.steps.${index}.expectedResponseTime`}
                                                 value={step.expectedResponseTime}
@@ -847,21 +847,21 @@ const MonitorForm = ({ isOpen, onClose, onSave, editMonitor = null }) => {
                                                 step="100"
                                                 placeholder="5000"
                                             />
-                                                <span className="input-unit">ms</span>
+                                                <span className="mfm-input-unit">ms</span>
                                             </div>
                                         </div>
 
                                         <button
                                             type="button"
                                             onClick={() => removeMultiStep(index)}
-                                            className="remove-multi-step-btn"
+                                            className="mfm-remove-multi-step-btn"
                                         >
                                             <FiX />
                                         </button>
                                     </div>
                                 ))}
 
-                                <button type="button" onClick={addMultiStep} className="btn-secondary small">
+                                <button type="button" onClick={addMultiStep} className="mfm-btn-secondary small">
                                     Add Another Step
                                 </button>
                             </div>
@@ -869,19 +869,19 @@ const MonitorForm = ({ isOpen, onClose, onSave, editMonitor = null }) => {
                     </div>
 
                     {errors.submit && (
-                        <div className="error-banner">
+                        <div className="mfm-error-banner">
                             {errors.submit}
                         </div>
                     )}
 
-                    <div className="form-actions">
-                        <button type="button" onClick={onClose} className="btn-secondary">
+                    <div className="mfm-form-actions">
+                        <button type="button" onClick={onClose} className="mfm-btn-secondary">
                             Cancel
                         </button>
-                        <button type="submit" disabled={loading} className="btn-primary">
+                        <button type="submit" disabled={loading} className="mfm-btn-primary">
                             {loading ? (
                                 <>
-                                    <FiLoader className="spinning" /> Saving...
+                                    <FiLoader className="mfm-spinning" /> Saving...
                                 </>
                             ) : (
                                 <>

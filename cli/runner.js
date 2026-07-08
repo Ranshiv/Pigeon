@@ -473,15 +473,18 @@ async function loadCollection(collectionId) {
       // Check if MongoDB connection exists
       if (!mongoose.connection || mongoose.connection.readyState !== 1) {
         // Connect to database (using connection string from env)
-        const connectionString = process.env.MONGODB_URI || 'mongodb://localhost:27017/pigeon';
+        const connectionString = process.env.MONGODB_URI || process.env.DATABASE_URL || 'mongodb://localhost:27017/pigeon';
         await mongoose.connect(connectionString, {
           useNewUrlParser: true,
           useUnifiedTopology: true
         });
       }
 
-      // Try to find collection by ID
-      const collection = await Collection.findById(collectionId);
+      // Try to find collection by ID when valid ObjectId, otherwise by name
+      const isObjectId = mongoose.Types.ObjectId.isValid(collectionId);
+      const collection = isObjectId
+        ? await Collection.findById(collectionId)
+        : await Collection.findOne({ name: collectionId }).sort({ updatedAt: -1 });
 
       if (collection) {
         return collection.toObject();
@@ -489,22 +492,73 @@ async function loadCollection(collectionId) {
         throw new Error(`Collection "${collectionId}" not found in database`);
       }
     } catch (dbError) {
-      console.warn(chalk.yellow(`Database error: ${dbError.message}`));
-
-      // As a fallback, try to treat it as a collection name and create a mock collection
-      console.log(chalk.gray(`Creating mock collection for "${collectionId}"`));
-      return {
-        _id: collectionId,
-        name: collectionId,
-        description: `Mock collection for ${collectionId}`,
-        requests: [],
-        variables: []
-      };
+      // Do not silently fall back to an empty mock collection — that makes
+      // runCollection run zero requests and report success (0/0/0) in CI,
+      // masking a total DB failure. Surface the error and exit non-zero.
+      console.error(chalk.red(`Database error loading collection "${collectionId}": ${dbError.message}`));
+      throw dbError;
     }
 
   } catch (error) {
     throw new Error(`Failed to load collection "${collectionId}": ${error.message}`);
   }
+}
+
+/**
+ * Export a collection to a CI/CD-friendly JSON file
+ * @param {string} collectionId - Collection ID or path to file
+ * @param {string} outputPath - Output JSON file path
+ * @returns {Object} Export metadata summary
+ */
+async function exportCollection(collectionId, outputPath) {
+  const collection = await loadCollection(collectionId);
+
+  const normalizedRequests = Array.isArray(collection.requests)
+    ? collection.requests.map((request, index) => ({
+      name: request.name || `Request ${index + 1}`,
+      url: request.url,
+      method: request.method || 'GET',
+      headers: Array.isArray(request.headers) ? request.headers : [],
+      params: Array.isArray(request.params) ? request.params : [],
+      body: request.body || '',
+      bodyType: request.bodyType || 'none',
+      preRequestScript: request.preRequestScript || '',
+      testScript: request.testScript || '',
+      graphql: request.graphql || null,
+      variables: Array.isArray(request.variables) ? request.variables : []
+    }))
+    : [];
+
+  const exportedPayload = {
+    schemaVersion: '1.0.0',
+    exportedAt: new Date().toISOString(),
+    source: {
+      collectionId: collection._id || collection.id || collectionId,
+      name: collection.name || String(collectionId)
+    },
+    // Keep top-level structure compatible with `runCollection` loader.
+    name: collection.name || String(collectionId),
+    description: collection.description || '',
+    variables: Array.isArray(collection.variables) ? collection.variables : [],
+    requests: normalizedRequests,
+    metadata: {
+      requestCount: normalizedRequests.length,
+      generatedBy: 'pigeon-cli'
+    }
+  };
+
+  const absoluteOutputPath = path.isAbsolute(outputPath)
+    ? outputPath
+    : path.join(process.cwd(), outputPath);
+
+  await fs.mkdir(path.dirname(absoluteOutputPath), { recursive: true });
+  await fs.writeFile(absoluteOutputPath, JSON.stringify(exportedPayload, null, 2), 'utf8');
+
+  return {
+    outputPath: absoluteOutputPath,
+    requestCount: normalizedRequests.length,
+    name: exportedPayload.name
+  };
 }
 
 /**
@@ -674,10 +728,55 @@ async function runLint(options) {
  * Save lint results to database via API
  */
 async function saveLintResults(apiVersionId, lintResult) {
-  // TODO: Implement API call to save lint results
-  // This would call the POST /api/apiVersions/:id/lint endpoint
-  // For now, just log the intent
-  console.log(chalk.gray(`Would save lint results for API version: ${apiVersionId}`));
+  // Ensure database connection
+  if (!mongoose.connection || mongoose.connection.readyState !== 1) {
+    const connectionString = process.env.MONGODB_URI || process.env.DATABASE_URL || 'mongodb://localhost:27017/pigeon';
+    await mongoose.connect(connectionString, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true
+    });
+  }
+
+  const ApiVersion = require('../models/ApiVersion');
+
+  const severityMap = {
+    0: 'error',
+    1: 'warn',
+    2: 'info',
+    3: 'hint',
+    error: 'error',
+    warn: 'warn',
+    warning: 'warn',
+    info: 'info',
+    hint: 'hint'
+  };
+
+  const findings = (lintResult.findings || []).map((finding) => ({
+    id: finding.code || finding.id || 'unknown-rule',
+    message: finding.message || 'Unknown lint finding',
+    severity: severityMap[finding.severity] || 'error',
+    path: Array.isArray(finding.path) ? finding.path : [],
+    range: finding.range || undefined,
+    docsUrl: finding.documentationUrl || finding.docsUrl || undefined,
+    suggested: Boolean(finding.suggested),
+    source: finding.source || undefined,
+    ruleTags: Array.isArray(finding.tags) ? finding.tags : []
+  }));
+
+  const updated = await ApiVersion.findByIdAndUpdate(
+    apiVersionId,
+    {
+      lintFindings: findings,
+      lintScore: typeof lintResult.score === 'number' ? lintResult.score : null,
+      lintedAt: lintResult.lintedAt ? new Date(lintResult.lintedAt) : new Date(),
+      rulesetInfo: lintResult.rulesetInfo || null
+    },
+    { new: true }
+  );
+
+  if (!updated) {
+    throw new Error(`API version not found: ${apiVersionId}`);
+  }
 }
 
 module.exports = {
@@ -685,5 +784,6 @@ module.exports = {
   runBatch,
   runRequest,
   replaceEnvVars,
-  runLint
+  runLint,
+  exportCollection
 };

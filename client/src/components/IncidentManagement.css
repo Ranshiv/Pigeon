@@ -130,19 +130,8 @@
 }
 
 .search-input {
-    width: 100%;
     padding: 12px 12px 12px 40px;
-    border: 1px solid var(--border-color, #e9ecef);
-    border-radius: 8px;
-    font-size: 14px;
     background: white;
-    transition: border-color 0.2s ease;
-}
-
-.search-input:focus {
-    outline: none;
-    border-color: var(--primary-color, #014C75);
-    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
 }
 
 .filter-buttons {
@@ -514,18 +503,7 @@
 
 .status-select,
 .update-textarea {
-    padding: 12px;
-    border: 1px solid var(--border-color, #e9ecef);
     border-radius: 6px;
-    font-size: 14px;
-    transition: border-color 0.2s ease;
-}
-
-.status-select:focus,
-.update-textarea:focus {
-    outline: none;
-    border-color: var(--primary-color, #014C75);
-    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
 }
 
 .empty-state {
@@ -640,31 +618,13 @@
 .form-group input,
 .form-group textarea,
 .form-group select {
-    width: 100%;
-    padding: 12px;
-    border: 1px solid var(--border-color, #e9ecef);
     border-radius: 6px;
-    font-size: 14px;
-    transition: border-color 0.2s ease;
-}
-
-.form-group input:focus,
-.form-group textarea:focus,
-.form-group select:focus {
-    outline: none;
-    border-color: var(--primary-color, #014C75);
-    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
 }
 
 .form-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 16px;
-}
-
-.form-group input[type="checkbox"] {
-    width: auto;
-    margin-right: 8px;
 }
 
 .services-grid {
@@ -690,10 +650,6 @@
 
 .service-checkbox:hover {
     background: var(--hover-background, #f8f9fa);
-}
-
-.service-checkbox input[type="checkbox"] {
-    margin: 0;
 }
 
 .form-actions {
@@ -1452,10 +1408,7 @@
 
 .resolution-textarea,
 .escalation-select {
-    width: 100%;
-    padding: 12px;
     border: 2px solid #e9ecef;
-    border-radius: 8px;
     font-size: 1rem;
     font-family: inherit;
     transition: all 0.3s ease;
@@ -1463,7 +1416,6 @@
 
 .resolution-textarea:focus,
 .escalation-select:focus {
-    outline: none;
     border-color: #007bff;
     box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
 }
