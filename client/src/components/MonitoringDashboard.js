@@ -191,9 +191,12 @@ const MonitoringDashboard = () => {
         <div className="monitoring-dashboard">
             {/* Header */}
             <div className="dashboard-header">
-                <div className="header-info">
-                    <h1><FiActivity /> API Monitoring</h1>
-                    <p>Monitor your API endpoints and get alerts when they go down</p>
+                <div className="header-left">
+                    <div className="header-icon" aria-hidden="true"><FiActivity /></div>
+                    <div className="header-info">
+                        <h1>API Monitoring</h1>
+                        <p>Monitor your API endpoints and get alerts when they go down</p>
+                    </div>
                 </div>
                 <div className="header-actions">
                     <button
