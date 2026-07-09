@@ -527,9 +527,12 @@ const IntegrationsManagement = () => {
         <div className="im-root">
             {/* Header */}
             <div className="im-header">
-                <div className="im-header-info">
-                    <h1><FiSettings /> Integrations & Alert Channels</h1>
-                    <p>Configure external services to receive monitoring alerts and notifications</p>
+                <div className="im-header-left">
+                    <div className="im-header-icon" aria-hidden="true"><FiSettings /></div>
+                    <div className="im-header-info">
+                        <h1>Integrations & Alert Channels</h1>
+                        <p>Configure external services to receive monitoring alerts and notifications</p>
+                    </div>
                 </div>
                 <button
                     className="im-btn-primary"

@@ -34,6 +34,12 @@
     color: #f87171;
 }
 
+.form-field.has-error .form-select {
+    border-color: #ef4444;
+    box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2);
+    animation: shake 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
 .form-label {
     display: flex;
     align-items: center;
@@ -470,7 +476,6 @@
 }
 
 .form-input,
-.form-select,
 .form-textarea {
     width: 100%;
     padding: 12px 14px;
@@ -480,7 +485,6 @@
     color: var(--text-color, #e0e0e0);
     font-size: 13px;
     line-height: 1.5;
-    /* Avoid animating background-related properties to keep select caret stable */
     transition: border-color 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275),
         box-shadow 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275),
         background-color 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275),
@@ -492,7 +496,6 @@
 }
 
 .form-input:hover,
-.form-select:hover,
 .form-textarea:hover {
     border-color: var(--primary-color, #014C75);
     background-color: var(--hover-bg, #013B5B);
@@ -500,7 +503,6 @@
 }
 
 .form-input:focus,
-.form-select:focus,
 .form-textarea:focus {
     border-color: var(--primary-color, #014C75);
     outline: none;
@@ -510,7 +512,6 @@
 }
 
 .form-input.error,
-.form-select.error,
 .form-textarea.error {
     border-color: #ef4444;
     box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2);
@@ -520,7 +521,6 @@
 .form-input::placeholder,
 .form-textarea::placeholder {
     color: var(--text-secondary, #7A9BAD);
-    /* Brighter placeholder text for better distinction */
     transition: opacity 0.2s ease;
 }
 
@@ -529,17 +529,15 @@
     opacity: 0.7;
 }
 
-/* Custom select dropdown arrow */
 .form-select {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23a0aec0' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'%3E%3C/path%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 12px center;
-    background-size: 16px;
-    padding-right: 40px;
-    /* Ensure the caret does not animate/slide on hover/focus */
-    transition: border-color 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275),
-        box-shadow 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275),
-        background-color 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    /* Inherit global index.css select styling; only layout/error overrides */
+    width: 100%;
+}
+
+.form-select.error {
+    border-color: #ef4444;
+    box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2);
+    animation: shake 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
 }
 
 .error-message {
@@ -1273,7 +1271,6 @@
     }
 
     .form-input,
-    .form-select,
     .form-textarea {
         padding: 10px 12px;
     }

@@ -291,7 +291,6 @@ const ContractDiffViewer = ({
                                 </option>
                             ))}
                         </select>
-                        <FiChevronDown className="select-icon" />
                     </div>
                 </div>
 
@@ -319,7 +318,6 @@ const ContractDiffViewer = ({
                                 </option>
                             ))}
                         </select>
-                        <FiChevronDown className="select-icon" />
                     </div>
                 </div>
 

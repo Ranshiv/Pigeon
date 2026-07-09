@@ -210,8 +210,7 @@ body.dark-theme .endpoint-editor {
 }
 
 .input-shell input,
-.input-field input,
-.input-field select {
+.input-field input:not([type="checkbox"]):not([type="radio"]) {
     width: 100%;
     padding: 12px;
     border-radius: 10px;
@@ -220,6 +219,11 @@ body.dark-theme .endpoint-editor {
     color: var(--editor-text-primary);
     font-size: 14px;
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.input-field select {
+    /* Inherit global index.css select styling; only layout overrides */
+    width: 100%;
 }
 
 /* Custom number input spinner styling */
@@ -236,7 +240,6 @@ body.dark-theme .endpoint-editor {
 
 .input-shell input:focus,
 .input-field input:focus,
-.input-field select:focus,
 .response-field textarea:focus {
     outline: none;
     border-color: var(--editor-primary-color);

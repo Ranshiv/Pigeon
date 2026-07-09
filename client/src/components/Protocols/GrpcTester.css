@@ -113,11 +113,8 @@
 }
 
 .grpc-select-group select {
-    padding: 10px;
-    border: 1px solid var(--grpc-border);
-    border-radius: 8px;
-    font-size: 0.9rem;
-    background: var(--grpc-bg);
+    /* Inherit global index.css select styling; only layout overrides */
+    width: 100%;
 }
 
 .grpc-status {
@@ -416,12 +413,6 @@ body.dark-theme .grpc-response-system {
 body.dark-theme .grpc-proto-editor,
 body.dark-theme .grpc-url-input,
 body.dark-theme .grpc-message-editor {
-    background: var(--card-bg, #002234);
-    color: var(--text-color, #e0e0e0);
-    border-color: var(--border-color, #003956);
-}
-
-body.dark-theme .grpc-select-group select {
     background: var(--card-bg, #002234);
     color: var(--text-color, #e0e0e0);
     border-color: var(--border-color, #003956);

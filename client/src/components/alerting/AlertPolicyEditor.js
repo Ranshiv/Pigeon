@@ -750,7 +750,7 @@ const AlertPolicyEditor = () => {
                                 </div>
                             </div>
 
-                            <div className="policyField">
+                            <div className="policyField policyFieldFull">
                                 <div className="policyLabel">Notification Channels</div>
                                 <div className="policyCheckboxGroup policyCheckboxGroupTwoCol">
                                     {CHANNEL_OPTIONS.map((opt) => (
@@ -771,7 +771,8 @@ const AlertPolicyEditor = () => {
                         </div>
 
                         <div className="policyRateLimit">
-                            <div className="policyField">
+                            <div className="policyRateLimitHead">
+                                <span className="policyRateLimitTitle">Rate Limiting <span className="policyRateLimitHint">(Recommended)</span></span>
                                 <label className="policyToggle">
                                     <input
                                         type="checkbox"
@@ -780,7 +781,6 @@ const AlertPolicyEditor = () => {
                                         onChange={(e) => updatePolicy('rateLimit', { ...currentPolicy.rateLimit, enabled: e.target.checked })}
                                     />
                                     <span className="policyToggleFill" aria-hidden="true"></span>
-                                    <span>Rate Limiting (Recommended)</span>
                                 </label>
                             </div>
 

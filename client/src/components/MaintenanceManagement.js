@@ -501,9 +501,12 @@ const MaintenanceManagement = () => {
         <div className="mtm-root">
             {/* Header */}
             <div className="mtm-header">
-                <div className="mtm-header-info">
-                    <h1><FiTool /> Maintenance Windows</h1>
-                    <p>Schedule and manage planned maintenance periods for your monitored services</p>
+                <div className="mtm-header-left">
+                    <div className="mtm-header-icon" aria-hidden="true"><FiTool /></div>
+                    <div className="mtm-header-info">
+                        <h1>Maintenance Windows</h1>
+                        <p>Schedule and manage planned maintenance periods for your monitored services</p>
+                    </div>
                 </div>
                 <button
                     className="mtm-btn-primary"

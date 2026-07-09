@@ -67,7 +67,6 @@
 }
 
 .form-input,
-.form-select,
 .form-textarea {
     padding: 0.75rem 1rem;
     border: 1px solid #d1d5db;
@@ -78,11 +77,15 @@
 }
 
 .form-input:focus,
-.form-select:focus,
 .form-textarea:focus {
     outline: none;
     border-color: #3b82f6;
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.form-select {
+    /* Inherit global index.css select styling; only layout overrides */
+    width: 100%;
 }
 
 .form-textarea {

@@ -147,25 +147,8 @@
 }
 
 .filter-select {
-    padding: 0.5rem 1rem;
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    font-size: 0.875rem;
+    /* Inherit global index.css select styling; only layout overrides */
     min-width: 180px;
-    background: color-mix(in srgb, var(--background-color) 82%, var(--card-bg));
-    color: var(--text-color);
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.filter-select:hover {
-    border-color: var(--primary-color);
-}
-
-.filter-select:focus {
-    outline: none;
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 4px color-mix(in srgb, var(--primary-color) 22%, transparent);
 }
 
 /* Alerts Container */
@@ -459,6 +442,7 @@
 
     .filter-select {
         width: 100%;
+        min-width: 0;
     }
 
     .alert-actions {

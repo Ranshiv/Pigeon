@@ -217,13 +217,8 @@
 }
 
 .pt-compare-select {
+    /* Inherit global index.css select styling; only layout overrides */
     width: 100%;
-    padding: 10px 12px;
-    border-radius: 10px;
-    border: 1px solid var(--border-color);
-    background: var(--card-bg);
-    color: var(--text-color);
-    outline: none;
 }
 
 .pt-compare-results {

@@ -53,8 +53,7 @@
     opacity: 0.85;
 }
 
-.form-input,
-.form-select {
+.form-input {
     width: 100%;
     padding: 12px 14px;
     border: 1px solid var(--border-color) !important;
@@ -65,13 +64,17 @@
     transition: all 0.2s;
 }
 
+.form-select {
+    /* Inherit global index.css select styling; only layout overrides */
+    width: 100%;
+}
+
 .form-input::placeholder {
     color: var(--text-muted) !important;
     opacity: 0.7;
 }
 
-.form-input:focus,
-.form-select:focus {
+.form-input:focus {
     outline: none;
     border-color: var(--primary-color) !important;
     box-shadow: 0 0 0 3px var(--primary-light) !important;
@@ -86,22 +89,14 @@
 }
 
 .method-select {
-    padding: 12px 14px;
-    border: 1px solid var(--border-color) !important;
-    border-radius: 8px;
-    background-color: var(--card-bg) !important;
-    color: var(--text-color) !important;
-    font-size: 0.9rem;
-    font-weight: 700;
-    cursor: pointer;
-    transition: all 0.2s;
+    /* Inherit global index.css select styling; only layout/weight overrides */
     width: 90px !important;
     min-width: 90px !important;
+    font-weight: 700;
 }
 
 .method-select:focus {
     outline: none;
-    border-color: var(--primary-color) !important;
 }
 
 .url-input {
@@ -599,18 +594,13 @@ button[class*="add"],
 }
 
 .lang-select {
-    padding: 8px 12px;
-    border-radius: 6px;
-    border: 1px solid var(--border-color) !important;
-    background-color: var(--background-color) !important;
-    color: var(--text-color) !important;
-    font-size: 0.85rem;
-    cursor: pointer;
+    /* Inherit global index.css select styling; only layout overrides */
+    width: auto;
+    min-width: 140px;
 }
 
 .lang-select:focus {
     outline: none;
-    border-color: var(--primary-color) !important;
 }
 
 .code-preview {

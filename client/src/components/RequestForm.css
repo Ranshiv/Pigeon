@@ -66,6 +66,7 @@
     font-size: 13px;
     padding: 0 16px;
     appearance: none;
+    -webkit-appearance: none;
     background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
     background-repeat: no-repeat;
     background-position: right 12px center;
@@ -79,32 +80,18 @@
 }
 
 /* Method colors using unified theme variables */
-.method-select[data-method="GET"] {
+.method-select[data-method="GET"] { background-color: var(--method-get); }
+.method-select[data-method="POST"] { background-color: var(--method-post); }
+.method-select[data-method="PUT"] { background-color: var(--method-put); }
+.method-select[data-method="DELETE"] { background-color: var(--method-delete); }
+.method-select[data-method="PATCH"] { background-color: var(--method-patch); }
+.method-select[data-method="OPTIONS"] { background-color: #06b6d4; }
+.method-select[data-method="HEAD"] { background-color: #64748b; }
+
+/* Override global select appearance so the colored HTTP-method picker keeps its white chevron and padding */
+.request-workspace .method-select {
     background-color: var(--method-get);
-}
-
-.method-select[data-method="POST"] {
-    background-color: var(--method-post);
-}
-
-.method-select[data-method="PUT"] {
-    background-color: var(--method-put);
-}
-
-.method-select[data-method="DELETE"] {
-    background-color: var(--method-delete);
-}
-
-.method-select[data-method="PATCH"] {
-    background-color: var(--method-patch);
-}
-
-.method-select[data-method="OPTIONS"] {
-    background-color: #06b6d4;
-}
-
-.method-select[data-method="HEAD"] {
-    background-color: #64748b;
+    padding-right: 28px;
 }
 
 .url-input {

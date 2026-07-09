@@ -14,31 +14,32 @@
 
 .time-range-selector {
     display: flex;
-    gap: 0.5rem;
-    background: white;
-    padding: 0.5rem;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    gap: 0.25rem;
+    padding: 4px;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
 }
 
 .time-btn {
     padding: 0.5rem 1rem;
     border: none;
     background: transparent;
-    color: #6b7280;
+    color: var(--text-secondary);
     font-weight: 600;
     font-size: 0.875rem;
     border-radius: 6px;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: background 0.2s ease, color 0.2s ease;
 }
 
 .time-btn:hover {
-    background-color: #f3f4f6;
+    background: var(--hover-bg);
+    color: var(--text-color);
 }
 
 .time-btn.active {
-    background-color: #3b82f6;
+    background: var(--primary-color);
     color: #ffffff;
 }
 
@@ -278,7 +279,12 @@
 
     .time-range-selector {
         width: 100%;
-        justify-content: space-between;
+        justify-content: stretch;
+    }
+
+    .time-range-selector .time-btn {
+        flex: 1;
+        text-align: center;
     }
 
     .metrics-grid {

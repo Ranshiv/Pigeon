@@ -97,26 +97,12 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    padding: 10px 16px;
-    background: var(--card-bg);
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    color: var(--text-secondary);
-    transition: all 0.2s ease;
-}
-
-.time-range-selector:hover {
-    border-color: var(--primary-color);
 }
 
 .time-range-selector select {
-    border: none;
-    background: transparent;
-    color: var(--text-color);
-    font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-    outline: none;
+    /* Inherit global index.css select styling; only layout overrides */
+    width: auto;
+    min-width: 160px;
 }
 
 .refresh-btn,

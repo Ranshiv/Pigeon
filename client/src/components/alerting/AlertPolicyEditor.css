@@ -14,7 +14,7 @@
 
 .policyLayout {
     padding: 24px;
-    max-width: 1200px;
+    max-width: none;
     margin: 0 auto;
 }
 
@@ -30,8 +30,28 @@
     }
 }
 
+@keyframes policySlideUp {
+    from { opacity: 0; transform: translateY(24px) scale(0.96); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
 .policyFadeIn {
     animation: fadeIn 0.18s ease-out;
+}
+
+/* Header + nav entrance */
+.policyHeader {
+    animation: fadeIn 0.35s ease both;
+}
+
+.policy-page .monitoring-nav {
+    animation: fadeIn 0.35s ease both;
+    animation-delay: 0.05s;
+}
+
+.policyToolbar {
+    animation: fadeIn 0.35s ease both;
+    animation-delay: 0.1s;
 }
 
 /* --- Header --- */
@@ -110,6 +130,7 @@
     border-radius: 6px;
     background: transparent;
     color: var(--text-secondary);
+    font-size: 0.875rem;
     font-weight: 500;
     cursor: pointer;
     transition: all 0.2s ease;
@@ -155,6 +176,11 @@
 .policyBtnPrimary:hover {
     background: var(--primary-hover);
     transform: translateY(-1px);
+    box-shadow: 0 4px 12px color-mix(in srgb, var(--primary-color) 30%, transparent);
+}
+
+.policyBtnPrimary:active {
+    transform: translateY(0) scale(0.97);
 }
 
 .policyBtnSecondary {
@@ -165,7 +191,17 @@
 
 .policyBtnSecondary:hover {
     background: var(--hover-bg);
-    border-color: var(--border-color);
+    border-color: var(--primary-color);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.policyBtnSecondary:active {
+    transform: translateY(0) scale(0.97);
+}
+
+.policy-page .nav-btn:active {
+    transform: scale(0.97);
 }
 
 .policyBtnGhost {
@@ -199,18 +235,38 @@
     border-radius: 10px;
     border: 1px solid var(--border-color);
     background: var(--card-bg);
-    color: var(--danger-text);
+    color: var(--danger-text, #dc2626);
     display: inline-flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: background 0.15s ease, border-color 0.15s ease;
+    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease, transform 0.15s ease;
+    flex-shrink: 0;
+    font-size: 1rem;
+    padding: 0;
+}
+
+.policyIconBtnDanger svg {
+    width: 16px;
+    height: 16px;
+    color: var(--danger-text, #dc2626);
     flex-shrink: 0;
 }
 
 .policyIconBtnDanger:hover {
-    background: var(--danger-bg);
-    border-color: var(--danger-border);
+    background: var(--danger-bg, #fef2f2);
+    border-color: var(--danger-border, #fecaca);
+    color: #dc2626;
+    transform: scale(1.05);
+}
+
+.policyIconBtnDanger:active {
+    transform: scale(0.92);
+}
+
+.policyIconBtnDanger:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary-color) 22%, transparent);
 }
 
 /* --- Toolbar --- */
@@ -259,7 +315,6 @@
 }
 
 .policyInput,
-.policySelect,
 .policyTextarea {
     width: 100%;
     padding: 10px 12px;
@@ -273,6 +328,11 @@
     transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
 }
 
+.policySelect {
+    /* Inherit global index.css select styling; only override layout here */
+    width: 100%;
+}
+
 /* Ensure placeholder text matches theme (esp. dark mode) */
 .policyInput::placeholder,
 .policyTextarea::placeholder {
@@ -281,7 +341,6 @@
 }
 
 .policyInput:focus,
-.policySelect:focus,
 .policyTextarea:focus {
     outline: none;
     border-color: var(--primary-color);
@@ -330,7 +389,16 @@
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    animation: fadeIn 0.35s ease both;
 }
+
+.policyGrid .policyCardItem:nth-child(1) { animation-delay: 0.12s; }
+.policyGrid .policyCardItem:nth-child(2) { animation-delay: 0.16s; }
+.policyGrid .policyCardItem:nth-child(3) { animation-delay: 0.2s; }
+.policyGrid .policyCardItem:nth-child(4) { animation-delay: 0.24s; }
+.policyGrid .policyCardItem:nth-child(5) { animation-delay: 0.28s; }
+.policyGrid .policyCardItem:nth-child(6) { animation-delay: 0.32s; }
+.policyGrid .policyCardItem:nth-child(n+7) { animation-delay: 0.36s; }
 
 .policyCardItem:hover {
     border-color: var(--primary-color);
@@ -489,6 +557,8 @@
     right: 0;
     bottom: 0;
     background: rgba(0, 0, 0, 0.45);
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -498,6 +568,8 @@
 
 .policyModalOverlay::backdrop {
     background: rgba(0, 0, 0, 0.45);
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
 }
 
 .policyModal {
@@ -505,14 +577,15 @@
     width: 100%;
     max-width: 900px;
     max-height: 90vh;
-    border-radius: 14px;
-    box-shadow: 0 22px 44px rgba(0, 0, 0, 0.18);
+    border-radius: 16px;
+    box-shadow: 0 25px 60px -12px rgba(0, 0, 0, 0.3);
     display: flex;
     flex-direction: column;
     overflow: hidden;
     border: 1px solid var(--border-color);
     min-height: 0;
     color: var(--text-color);
+    animation: policySlideUp 0.3s var(--ease-spring, cubic-bezier(0.22, 1, 0.36, 1)) both;
 }
 
 .policyModalHeader {
@@ -522,6 +595,18 @@
     align-items: center;
     justify-content: space-between;
     gap: 16px;
+    background: linear-gradient(180deg, var(--surface-elevated, var(--hover-bg)) 0%, var(--card-bg) 100%);
+    position: relative;
+}
+
+.policyModalHeader::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: var(--primary-color);
 }
 
 .policyModalTitle {
@@ -552,15 +637,27 @@
 .policySection {
     background: var(--card-bg);
     border-radius: 12px;
-    padding: 16px;
+    padding: 18px;
     border: 1px solid rgba(0, 0, 0, 0.08);
     border: 1px solid color-mix(in srgb, var(--border-color) 70%, transparent);
     color: var(--text-color);
+    animation: fadeIn 0.3s ease both;
+    transition: border-color 0.2s ease;
+}
+
+.policySection:hover {
+    border-color: color-mix(in srgb, var(--primary-color) 30%, var(--border-color));
 }
 
 .policySection+.policySection {
     margin-top: 14px;
 }
+
+.policyModalBody .policySection:nth-child(1) { animation-delay: 0.05s; }
+.policyModalBody .policySection:nth-child(2) { animation-delay: 0.1s; }
+.policyModalBody .policySection:nth-child(3) { animation-delay: 0.15s; }
+.policyModalBody .policySection:nth-child(4) { animation-delay: 0.2s; }
+.policyModalBody .policySection:nth-child(5) { animation-delay: 0.25s; }
 
 .policySectionHead {
     margin-bottom: 14px;
@@ -574,19 +671,29 @@
 }
 
 .policySectionHead h3 {
-    font-size: 1.1rem;
-    font-weight: 800;
+    font-size: 0.85rem;
+    font-weight: 700;
     margin: 0 0 4px 0;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
     color: var(--text-color);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.policySectionHead h3::before {
+    content: '';
+    width: 3px;
+    height: 15px;
+    background: var(--primary-color);
+    border-radius: 2px;
 }
 
 .policySectionHead p {
     margin: 0;
     color: var(--text-secondary);
-    font-size: 0.92rem;
+    font-size: 0.88rem;
 }
 
 .policySectionHeadRow {
@@ -598,6 +705,11 @@
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 14px;
+    align-items: start;
+}
+
+.policyFieldFull {
+    grid-column: 1 / -1;
 }
 
 /* --- Conditions --- */
@@ -614,6 +726,11 @@
     border-radius: 12px;
     border: 1px solid rgba(0, 0, 0, 0.08);
     border: 1px solid color-mix(in srgb, var(--border-color) 70%, transparent);
+    transition: border-color 0.15s ease;
+}
+
+.policyConditionItem:hover {
+    border-color: color-mix(in srgb, var(--primary-color) 35%, var(--border-color));
 }
 
 .policyConditionTop {
@@ -647,19 +764,26 @@
     align-items: center;
     gap: 12px;
     cursor: pointer;
-    transition: border-color 0.15s ease, background 0.15s ease;
+    transition: border-color 0.15s ease, background 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
     font-weight: 600;
     color: var(--text-color);
 }
 
 .policyMonitorCard:hover {
     background: color-mix(in srgb, var(--hover-bg) 55%, var(--card-bg));
+    border-color: color-mix(in srgb, var(--primary-color) 40%, var(--border-color));
+    transform: translateY(-1px);
+}
+
+.policyMonitorCard:active {
+    transform: scale(0.98);
 }
 
 .policyMonitorCard.selected {
     border-color: var(--primary-color);
     background: color-mix(in srgb, var(--primary-color) 10%, var(--card-bg));
     color: var(--text-color);
+    box-shadow: 0 0 0 1px var(--primary-color);
 }
 
 
@@ -766,8 +890,35 @@
 /* --- Rate Limit --- */
 .policyRateLimit {
     margin-top: 14px;
-    padding-top: 14px;
-    border-top: 1px solid var(--border-color);
+    padding: 16px 18px;
+    background: var(--surface-sunken, var(--background-color));
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.policyRateLimitHead {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.policyRateLimitTitle {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--text-color);
+}
+
+.policyRateLimitHint {
+    font-weight: 500;
+    color: var(--text-secondary);
+}
+
+.policyRateLimit .policyFormGrid {
+    margin-top: 2px;
 }
 
 /* --- Modal Footer --- */
@@ -843,5 +994,16 @@
 
     .policyCheckboxGroupTwoCol {
         grid-template-columns: 1fr;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .policyHeader,
+    .policy-page .monitoring-nav,
+    .policyToolbar,
+    .policyCardItem,
+    .policyFadeIn,
+    .policyModal {
+        animation: none;
     }
 }

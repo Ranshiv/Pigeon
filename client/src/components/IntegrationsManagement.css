@@ -16,27 +16,50 @@
 .im-header {
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    margin-bottom: 32px;
-    padding-bottom: 24px;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 20px;
+    padding-bottom: 20px;
     border-bottom: 1px solid var(--border-color);
     animation: imFadeInUp 0.35s ease both;
+}
+
+.im-header-left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    min-width: 0;
+}
+
+.im-header-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: color-mix(in srgb, var(--primary-color) 14%, transparent);
+    color: var(--primary-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
 }
 
 .im-header .im-header-info h1 {
     display: flex;
     align-items: center;
     gap: 12px;
-    margin: 0 0 8px 0;
+    margin: 0 0 4px 0;
     color: var(--text-color);
-    font-size: 2rem;
-    font-weight: 600;
+    font-size: 1.6rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
 }
 
 .im-header .im-header-info p {
     margin: 0;
     color: var(--text-secondary);
-    font-size: 1rem;
+    font-size: 0.95rem;
+    line-height: 1.4;
 }
 
 .im-btn-primary {

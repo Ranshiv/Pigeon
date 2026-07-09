@@ -117,18 +117,9 @@ body.dark-theme .analytics-dashboard {
 }
 
 .time-range-selector select {
-    padding: 8px 12px;
-    background: var(--analytics-bg-tertiary);
-    border: 1px solid var(--analytics-border-primary);
-    border-radius: 6px;
-    color: var(--analytics-text-primary);
-    font-size: 13px;
-    cursor: pointer;
-}
-
-.time-range-selector select:focus {
-    outline: none;
-    border-color: var(--analytics-primary-color);
+    /* Inherit global index.css select styling; only layout overrides */
+    width: auto;
+    min-width: 160px;
 }
 
 /* ===== Auto Refresh Toggle ===== */

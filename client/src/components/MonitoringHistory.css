@@ -162,11 +162,9 @@
 }
 
 .time-range-select {
-    padding: 8px 12px;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    background: white;
-    font-size: 0.9rem;
+    /* Inherit global index.css select styling; only layout overrides */
+    width: auto;
+    min-width: 160px;
 }
 
 .refresh-btn,

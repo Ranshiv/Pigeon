@@ -3137,17 +3137,9 @@
 }
 
 .filter-select {
-    padding: 4px 8px;
-    border: 1px solid var(--designer-border);
-    border-radius: var(--designer-radius-sm);
-    font-size: 11px;
-    background: var(--designer-component-bg);
-    color: var(--designer-text-primary);
-    cursor: pointer;
-}
-
-.filter-select:focus {
-    border-color: var(--designer-primary);
+    /* Inherit global index.css select styling; only layout overrides */
+    width: auto;
+    min-width: 120px;
 }
 
 .collapse-btn {
@@ -3751,8 +3743,12 @@
 }
 
 .form-field.has-error .form-input,
-.form-field.has-error .form-select,
 .form-field.has-error .form-textarea {
+    border-color: var(--designer-error);
+    box-shadow: 0 0 0 2px rgba(220, 53, 69, 0.1);
+}
+
+.form-field.has-error .form-select {
     border-color: var(--designer-error);
     box-shadow: 0 0 0 2px rgba(220, 53, 69, 0.1);
 }
@@ -3784,7 +3780,6 @@
 }
 
 .form-input,
-.form-select,
 .form-textarea {
     padding: 10px 12px;
     border: 1px solid var(--designer-border);
@@ -3797,7 +3792,6 @@
 }
 
 .form-input:focus,
-.form-select:focus,
 .form-textarea:focus {
     border-color: var(--designer-primary);
     box-shadow: 0 0 0 2px rgba(1, 76, 117, 0.1);
@@ -3815,13 +3809,8 @@
 }
 
 .form-select {
-    cursor: pointer;
-    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23888' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
-    background-repeat: no-repeat;
-    background-position: right 8px center;
-    background-size: 12px;
-    padding-right: 32px;
-    appearance: none;
+    /* Inherit global index.css select styling; only layout overrides */
+    width: 100%;
 }
 
 .form-checkbox-wrapper {

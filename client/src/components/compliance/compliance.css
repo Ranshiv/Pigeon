@@ -179,8 +179,7 @@
     text-transform: uppercase;
     letter-spacing: 0.03em;
 }
-.cmp-field input,
-.cmp-field select {
+.cmp-field input {
     width: 100%;
     padding: 9px 11px;
     border-radius: var(--radius-sm);
@@ -192,12 +191,16 @@
     font-size: 0.86rem;
     transition: border-color var(--dur-fast) var(--ease-out), box-shadow var(--dur-fast) var(--ease-out);
 }
-.cmp-field input:focus,
-.cmp-field select:focus {
+.cmp-field input:focus {
     border-color: var(--accent);
     box-shadow: var(--ring);
 }
 .cmp-field input::placeholder { color: var(--text-muted); opacity: 1; }
+
+.cmp-field select {
+    /* Inherit global index.css select styling; only layout overrides */
+    width: 100%;
+}
 
 /* ===== Custom themed select (replaces native <select> — full theme control) ===== */
 .cmp-select { position: relative; width: 100%; }

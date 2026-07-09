@@ -58,19 +58,9 @@
 }
 
 .filter-select {
-    padding: 0.375rem 0.75rem;
-    border: 1px solid var(--border-color);
-    border-radius: 6px;
-    background-color: var(--card-bg);
-    color: var(--text-color);
-    font-size: 0.9rem;
-    transition: border-color 0.2s;
-}
-
-.filter-select:focus {
-    outline: none;
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(1, 76, 117, 0.1);
+    /* Inherit global index.css select styling; only layout overrides */
+    width: auto;
+    min-width: 140px;
 }
 
 .trending-list {
@@ -279,12 +269,6 @@ body.dark-theme .meta-item {
 body.dark-theme .meta-category {
     background-color: rgba(1, 76, 117, 0.2);
     color: #B8D4E3;
-}
-
-body.dark-theme .filter-select {
-    background-color: var(--card-bg);
-    border-color: var(--border-color);
-    color: var(--text-color);
 }
 
 body.dark-theme .add-to-collection-btn {
