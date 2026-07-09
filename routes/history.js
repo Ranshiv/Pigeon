@@ -73,6 +73,44 @@ router.get('/popular-apis', ensureAuthenticated, async (req, res) => {
     }
 });
 
+// Get single history entry
+router.get('/:id', ensureAuthenticated, async (req, res) => {
+    try {
+        const historyId = req.params.id;
+        const userId = req.user.id;
+
+        // Verify it is a valid ObjectId
+        if (!ObjectId.isValid(historyId)) {
+            return res.status(400).json({ message: 'Invalid history ID format' });
+        }
+
+        const historyItem = await History.findOne({
+            _id: historyId,
+            userId: userId
+        });
+
+        if (!historyItem) {
+            return res.status(404).json({ message: 'History entry not found' });
+        }
+
+        let parsedEntry = historyItem.toObject();
+
+        // Parse testResults if it exists and is a string
+        if (parsedEntry.testResults && typeof parsedEntry.testResults === 'string') {
+            try {
+                parsedEntry.testResults = JSON.parse(parsedEntry.testResults);
+            } catch (e) {
+                console.error('Error parsing test results:', e);
+            }
+        }
+
+        res.json(parsedEntry);
+    } catch (err) {
+        console.error('Error fetching history entry:', err);
+        res.status(500).json({ message: 'Error fetching history entry', error: err.message });
+    }
+});
+
 // Delete history entry
 router.delete('/:id', ensureAuthenticated, async (req, res) => {
     try {

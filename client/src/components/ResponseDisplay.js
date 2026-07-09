@@ -2,7 +2,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './ResponseDisplay.css';
 import TestResultsDisplay from './TestResultsDisplay';
-import { FiCheckCircle, FiAlertCircle, FiClock, FiFileText, FiCode } from 'react-icons/fi';
+import PageLoader from './common/PageLoader/PageLoader';
+import { FiCheckCircle, FiAlertCircle, FiClock, FiFileText } from 'react-icons/fi';
 
 const ResponseDisplay = ({ requestId, responseData }) => {
     const [response, setResponse] = useState(responseData || null);
@@ -52,7 +53,7 @@ const ResponseDisplay = ({ requestId, responseData }) => {
         }
     }, [response, contentType]);
 
-    // Only fetch response data when requestId changes, a response is expected, 
+    // Only fetch response data when requestId changes, a response is expected,
     // and no direct response data is provided
     useEffect(() => {
         if (requestId && !responseData && sessionStorage.getItem(`request_${requestId}_sent`) === 'true') {
@@ -68,15 +69,15 @@ const ResponseDisplay = ({ requestId, responseData }) => {
         setError(null);
 
         try {
-            const response = await fetch(`/api/requests/${id}/response`, {
+            const res = await fetch(`/api/requests/${id}/response`, {
                 credentials: 'include'
             });
 
-            if (!response.ok) {
-                throw new Error(`Failed to fetch response: ${response.statusText}`);
+            if (!res.ok) {
+                throw new Error(`Failed to fetch response: ${res.statusText}`);
             }
 
-            const data = await response.json();
+            const data = await res.json();
             setResponse(data);
             // Clear the flag after successful fetch
             sessionStorage.removeItem(`request_${id}_sent`);
@@ -104,17 +105,17 @@ const ResponseDisplay = ({ requestId, responseData }) => {
     // Renders the response body with proper formatting and syntax highlighting
     const renderBody = () => {
         if (!response || !response.body) {
-            return <div className="empty-body">No response body available</div>;
+            return <div className="rd-empty"><span className="rd-empty-text">No response body available</span></div>;
         }
 
         let formattedBody;
         let language = 'text';
 
         // Determine content type and try to format accordingly
-        const contentType = response.headers && response.headers['content-type'];
+        const ct = response.headers && response.headers['content-type'];
 
         try {
-            if (contentType && contentType.includes('application/json')) {
+            if (ct && ct.includes('application/json')) {
                 // Format JSON
                 language = 'json';
                 if (typeof response.body === 'string') {
@@ -128,9 +129,9 @@ const ResponseDisplay = ({ requestId, responseData }) => {
                 } else {
                     formattedBody = JSON.stringify(response.body, null, 2);
                 }
-            } else if (contentType && (contentType.includes('text/html') || contentType.includes('application/xml'))) {
+            } else if (ct && (ct.includes('text/html') || ct.includes('application/xml'))) {
                 // Format HTML/XML without state changes in the render function
-                language = contentType.includes('text/html') ? 'html' : 'xml';
+                language = ct.includes('text/html') ? 'html' : 'xml';
                 formattedBody = typeof response.body === 'string' ? response.body : String(response.body);
             } else {
                 // Default text formatting
@@ -142,20 +143,19 @@ const ResponseDisplay = ({ requestId, responseData }) => {
         }
 
         // Show loading indicator when fetching HTML content
-        if (htmlLoading && (contentType && (contentType.includes('text/html') || contentType.includes('application/xml')))) {
+        if (htmlLoading && (ct && (ct.includes('text/html') || ct.includes('application/xml')))) {
             return (
-                <div className="html-loading-container">
-                    <div className="loading-spinner"></div>
-                    <span>Loading HTML content...</span>
+                <div className="rd-panel-inner">
+                    <PageLoader size="md" label="Loading HTML content..." />
                 </div>
             );
         }
 
         return (
-            <div className="body-content-container">
-                <pre className={`response-body-content language-${language}`}>
-                    {formattedBody}
-                </pre>
+            <div className="rd-body">
+                <div className={`rd-code language-${language}`}>
+                    <pre className="rd-code-pre">{formattedBody}</pre>
+                </div>
             </div>
         );
     };
@@ -163,12 +163,12 @@ const ResponseDisplay = ({ requestId, responseData }) => {
     // Renders the response headers in a clear, organized table
     const renderHeaders = () => {
         if (!response || !response.headers || Object.keys(response.headers).length === 0) {
-            return <div className="empty-headers">No headers received</div>;
+            return <div className="rd-empty"><span className="rd-empty-text">No headers received</span></div>;
         }
 
         return (
-            <div className="headers-content-container">
-                <table className="response-headers-table">
+            <div className="rd-headers">
+                <table className="rd-headers-table">
                     <thead>
                         <tr>
                             <th>Header</th>
@@ -178,8 +178,8 @@ const ResponseDisplay = ({ requestId, responseData }) => {
                     <tbody>
                         {Object.entries(response.headers).map(([key, value], index) => (
                             <tr key={index}>
-                                <td>{key}</td>
-                                <td>{String(value)}</td>
+                                <td className="rd-headers-key">{key}</td>
+                                <td className="rd-headers-val">{String(value)}</td>
                             </tr>
                         ))}
                     </tbody>
@@ -193,7 +193,7 @@ const ResponseDisplay = ({ requestId, responseData }) => {
         if (!response || !response.testResults ||
             (Array.isArray(response.testResults) && response.testResults.length === 0) ||
             (!Array.isArray(response.testResults) && Object.keys(response.testResults).length === 0)) {
-            return <div className="empty-tests">No test results available</div>;
+            return <div className="rd-empty"><span className="rd-empty-text">No test results available</span></div>;
         }
 
         // Ensure testResults is an array
@@ -201,15 +201,18 @@ const ResponseDisplay = ({ requestId, responseData }) => {
             ? response.testResults
             : Object.values(response.testResults);
 
-        return <TestResultsDisplay testResults={testResultsArray} />;
+        return (
+            <div className="rd-tests">
+                <TestResultsDisplay testResults={testResultsArray} />
+            </div>
+        );
     };
 
     if (loading) {
         return (
-            <div className="response-area loading">
-                <div className="response-header">
-                    <div className="loading-spinner"></div>
-                    <span>Loading response...</span>
+            <div className="rd-shell rd-shell--loading">
+                <div className="rd-panel-inner">
+                    <PageLoader size="md" label="Loading response..." />
                 </div>
             </div>
         );
@@ -217,15 +220,16 @@ const ResponseDisplay = ({ requestId, responseData }) => {
 
     if (error) {
         return (
-            <div className="response-area error">
-                <div className="response-header">
-                    <div className="response-status error">
-                        <FiAlertCircle className="status-icon" />
-                        <span>Error</span>
+            <div className="rd-shell">
+                <div className="rd-header">
+                    <div className="rd-status rd-status--error">
+                        <span className="rd-status-dot" />
+                        <FiAlertCircle className="rd-status-icon" />
+                        <span className="rd-status-text">Error</span>
                     </div>
                 </div>
-                <div className="response-body error-body">
-                    {error}
+                <div className="rd-panel">
+                    <div className="rd-error-body">{error}</div>
                 </div>
             </div>
         );
@@ -233,77 +237,80 @@ const ResponseDisplay = ({ requestId, responseData }) => {
 
     if (!response) {
         return (
-            <div className="response-area no-response">
-                <div className="response-header">
-                    <div className="no-response-message">
-                        Send a request to see the response
-                    </div>
+            <div className="rd-shell">
+                <div className="rd-empty rd-empty--hero">
+                    <FiFileText className="rd-empty-icon" />
+                    <span className="rd-empty-text">Send a request to see the response</span>
                 </div>
             </div>
         );
     }
 
     // Get status code class (2xx, 4xx, etc)
-    const statusClass = response.status ? `status-${Math.floor(response.status / 100)}xx` : '';
+    const statusClass = response.status ? `rd-status--${Math.floor(response.status / 100)}xx` : '';
     const isSuccess = response.status >= 200 && response.status < 300;
 
+    const passedTests = response.testResults && Array.isArray(response.testResults)
+        ? response.testResults.filter(t => t.passed).length
+        : (response.testResults ? Object.values(response.testResults).filter(t => t.passed).length : null);
+    const totalTests = response.testResults && Array.isArray(response.testResults)
+        ? response.testResults.length
+        : (response.testResults ? Object.keys(response.testResults).length : null);
+    const showTestBadge = response.testResults && totalTests !== null;
+
+    const tabs = [
+        { key: 'body', label: 'Body' },
+        { key: 'headers', label: 'Headers' },
+        { key: 'tests', label: 'Tests', badge: showTestBadge ? `${passedTests}/${totalTests}` : null }
+    ];
+
     return (
-        <div className="response-area">
-            <div className="response-header">
-                <div className={`response-status ${statusClass}`}>
+        <div className="rd-shell">
+            <div className="rd-header">
+                <div className={`rd-status ${statusClass}`}>
+                    <span className="rd-status-dot" />
                     {isSuccess ? (
-                        <FiCheckCircle className="status-icon success" />
+                        <FiCheckCircle className="rd-status-icon" />
                     ) : (
-                        <FiAlertCircle className="status-icon error" />
+                        <FiAlertCircle className="rd-status-icon" />
                     )}
-                    <span className="status-code">{response.status}</span>
-                    <span className="status-text">{response.statusText}</span>
+                    <span className="rd-status-code">{response.status}</span>
+                    <span className="rd-status-text">{response.statusText}</span>
                 </div>
-                <div className="response-meta">
+                <div className="rd-meta">
                     {response.duration !== undefined && (
-                        <span className="response-time">
-                            <FiClock className="meta-icon" />
+                        <span className="rd-meta-chip">
+                            <FiClock className="rd-meta-icon" />
                             {response.duration} ms
                         </span>
                     )}
                     {response.size !== undefined && (
-                        <span className="response-size">
-                            <FiFileText className="meta-icon" />
+                        <span className="rd-meta-chip">
+                            <FiFileText className="rd-meta-icon" />
                             {formatBytes(response.size)}
                         </span>
                     )}
                 </div>
             </div>
 
-            <div className="response-section-tabs">
-                <div
-                    className={`response-section-tab ${activeTab === 'body' ? 'active' : ''}`}
-                    onClick={() => setActiveTab('body')}
-                >
-                    Body
-                </div>
-                <div
-                    className={`response-section-tab ${activeTab === 'headers' ? 'active' : ''}`}
-                    onClick={() => setActiveTab('headers')}
-                >
-                    Headers
-                </div>
-                <div
-                    className={`response-section-tab ${activeTab === 'tests' ? 'active' : ''}`}
-                    onClick={() => setActiveTab('tests')}
-                >
-                    Tests
-                    {response.testResults && (
-                        <span className="test-badge">
-                            {Array.isArray(response.testResults)
-                                ? `${response.testResults.filter(t => t.passed).length}/${response.testResults.length}`
-                                : ''}
-                        </span>
-                    )}
-                </div>
+            <div className="rd-tabs" role="tablist">
+                {tabs.map(t => (
+                    <div
+                        key={t.key}
+                        role="tab"
+                        aria-selected={activeTab === t.key}
+                        tabIndex={0}
+                        className={`rd-tab ${activeTab === t.key ? 'rd-tab--active' : ''}`}
+                        onClick={() => setActiveTab(t.key)}
+                        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setActiveTab(t.key); } }}
+                    >
+                        {t.label}
+                        {t.badge && <span className="rd-test-badge">{t.badge}</span>}
+                    </div>
+                ))}
             </div>
 
-            <div className="response-body">
+            <div className="rd-panel">
                 {activeTab === 'body' && renderBody()}
                 {activeTab === 'headers' && renderHeaders()}
                 {activeTab === 'tests' && renderTestResults()}

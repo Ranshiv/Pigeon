@@ -1,6 +1,7 @@
 // client/src/components/TestResultsDisplay.js
 import React, { useState } from 'react';
 import './TestResultsDisplay.css';
+import { FiCheck, FiX, FiChevronRight, FiChevronDown, FiDownload } from 'react-icons/fi';
 
 /**
  * Component for displaying test results from API test scripts
@@ -13,9 +14,9 @@ const TestResultsDisplay = ({ testResults }) => {
     // Enhanced validation for test results
     if (!testResults) {
         return (
-            <div className="test-results-empty">
+            <div className="tr-empty">
                 <p>No test results available. Run tests to see results here.</p>
-                <p className="test-tip">
+                <p className="tr-tip">
                     Write test scripts to validate your API responses, check status codes,
                     and verify expected data.
                 </p>
@@ -30,9 +31,9 @@ const TestResultsDisplay = ({ testResults }) => {
 
     if (resultsArray.length === 0) {
         return (
-            <div className="test-results-empty">
+            <div className="tr-empty">
                 <p>No test results available. Run tests to see results here.</p>
-                <p className="test-tip">
+                <p className="tr-tip">
                     Write test scripts to validate your API responses, check status codes,
                     and verify expected data.
                 </p>
@@ -65,6 +66,9 @@ const TestResultsDisplay = ({ testResults }) => {
     const passedTests = normalizedResults.filter(test => test.passed).length;
     const failedTests = totalTests - passedTests;
     const successRate = totalTests > 0 ? Math.round((passedTests / totalTests) * 100) : 0;
+
+    // Progress bar variant by threshold
+    const progressVariant = successRate === 100 ? 'ok' : successRate >= 80 ? 'warn' : 'fail';
 
     // Apply filtering
     const filteredResults = normalizedResults.filter(test => {
@@ -108,122 +112,98 @@ const TestResultsDisplay = ({ testResults }) => {
         URL.revokeObjectURL(url);
     };
 
+    const stats = [
+        { value: totalTests, label: 'Total' },
+        { value: passedTests, label: 'Passed', modifier: 'passed' },
+        { value: failedTests, label: 'Failed', modifier: 'failed' },
+        { value: `${successRate}%`, label: 'Success Rate' }
+    ];
+
+    const filters = [
+        { key: 'all', label: `All (${totalTests})` },
+        { key: 'passed', label: `Passed (${passedTests})` },
+        { key: 'failed', label: `Failed (${failedTests})` }
+    ];
+
     return (
-        <div className="test-results-display">
-            <div className="test-summary">
-                <div className="summary-header">
-                    <h3>Test Results Summary</h3>
-                    <div className="test-actions">
-                        <button className="export-button" onClick={exportTestResults} title="Export results as JSON">
-                            Export Results
-                        </button>
-                    </div>
+        <div className="tr-shell">
+            <div className="tr-summary">
+                <div className="tr-summary-head">
+                    <h3 className="tr-h3">Test Results Summary</h3>
+                    <button className="tr-export-btn" onClick={exportTestResults} title="Export results as JSON">
+                        <FiDownload /> Export
+                    </button>
                 </div>
-                <div className="summary-stats">
-                    <div className="stat-item">
-                        <span className="stat-value">{totalTests}</span>
-                        <span className="stat-label">Total Tests</span>
-                    </div>
-                    <div className="stat-item passed">
-                        <span className="stat-value">{passedTests}</span>
-                        <span className="stat-label">Passed</span>
-                    </div>
-                    <div className="stat-item failed">
-                        <span className="stat-value">{failedTests}</span>
-                        <span className="stat-label">Failed</span>
-                    </div>
-                    <div className="stat-item">
-                        <span className="stat-value">{successRate}%</span>
-                        <span className="stat-label">Success Rate</span>
-                    </div>
+                <div className="tr-stats">
+                    {stats.map(s => (
+                        <div key={s.label} className={`tr-stat ${s.modifier ? `tr-stat--${s.modifier}` : ''}`}>
+                            <span className="tr-stat-value">{s.value}</span>
+                            <span className="tr-stat-label">{s.label}</span>
+                        </div>
+                    ))}
                 </div>
-                <div className="progress-bar">
-                    <div
-                        className="progress"
-                        style={{
-                            width: `${successRate}%`,
-                            backgroundColor: successRate === 100
-                                ? '#28a745'
-                                : successRate >= 80
-                                    ? '#ffc107'
-                                    : '#dc3545'
-                        }}
-                    ></div>
+                <div className="tr-progress">
+                    <div className={`tr-progress-fill tr-progress-fill--${progressVariant}`} style={{ width: `${successRate}%` }} />
                 </div>
             </div>
 
-            <div className="test-details">
-                <div className="test-details-header">
-                    <h3>Test Details</h3>
-                    <div className="test-filters">
-                        <button
-                            className={`filter-btn ${filterStatus === 'all' ? 'active' : ''}`}
-                            onClick={() => setFilterStatus('all')}
-                        >
-                            All ({totalTests})
-                        </button>
-                        <button
-                            className={`filter-btn ${filterStatus === 'passed' ? 'active' : ''}`}
-                            onClick={() => setFilterStatus('passed')}
-                        >
-                            Passed ({passedTests})
-                        </button>
-                        <button
-                            className={`filter-btn ${filterStatus === 'failed' ? 'active' : ''}`}
-                            onClick={() => setFilterStatus('failed')}
-                        >
-                            Failed ({failedTests})
-                        </button>
+            <div className="tr-details">
+                <div className="tr-details-head">
+                    <h3 className="tr-h3">Test Details</h3>
+                    <div className="tr-filters">
+                        {filters.map(f => (
+                            <button
+                                key={f.key}
+                                className={`tr-filter ${filterStatus === f.key ? 'tr-filter--active' : ''}`}
+                                onClick={() => setFilterStatus(f.key)}
+                            >
+                                {f.label}
+                            </button>
+                        ))}
                     </div>
                 </div>
-                <div className="test-list">
+                <div className="tr-list">
                     {filteredResults.length === 0 ? (
-                        <div className="no-results-message">
-                            No test results match the current filter.
-                        </div>
+                        <div className="tr-no-results">No test results match the current filter.</div>
                     ) : (
                         filteredResults.map((test, index) => (
                             <div
                                 key={index}
-                                className={`test-item ${test.passed ? 'passed' : 'failed'} ${expandedItems[index] ? 'expanded' : ''}`}
+                                className={`tr-item ${test.passed ? 'tr-item--passed' : 'tr-item--failed'} ${expandedItems[index] ? 'tr-item--expanded' : ''}`}
+                                role="button"
+                                aria-expanded={!!expandedItems[index]}
+                                tabIndex={0}
                                 onClick={() => toggleExpandItem(index)}
+                                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleExpandItem(index); } }}
                             >
-                                <div className="test-header">
-                                    <div className="test-status">
-                                        <span className={`status-icon ${test.passed ? 'passed' : 'failed'}`}>
-                                            {test.passed ? '✓' : '✗'}
-                                        </span>
-                                    </div>
-                                    <div className="test-info">
-                                        <div className="test-name">{test.name}</div>
-                                        <div className="test-meta">
+                                <div className="tr-item-head">
+                                    <span className={`tr-glyph ${test.passed ? 'tr-glyph--passed' : 'tr-glyph--failed'}`}>
+                                        {test.passed ? <FiCheck /> : <FiX />}
+                                    </span>
+                                    <div className="tr-item-info">
+                                        <div className="tr-name">{test.name}</div>
+                                        <div className="tr-meta">
                                             {test.duration !== undefined && (
-                                                <span className="test-duration">{test.duration} ms</span>
+                                                <span className="tr-duration">{test.duration} ms</span>
                                             )}
-                                            <span className="test-timestamp">
+                                            <span className="tr-timestamp">
                                                 {new Date(test.timestamp).toLocaleTimeString()}
                                             </span>
                                         </div>
                                     </div>
-                                    <div className="expand-icon">
-                                        {expandedItems[index] ? '▼' : '▶'}
-                                    </div>
+                                    <span className="tr-chevron">
+                                        {expandedItems[index] ? <FiChevronDown /> : <FiChevronRight />}
+                                    </span>
                                 </div>
 
                                 {expandedItems[index] && (
-                                    <div className="test-details-content">
-                                        <div className="test-result-code">
-                                            <pre className="test-code-block">
-                                                {test.passed
-                                                    ? `Test Passed: "${test.name}"\n` +
-                                                    `Result: ${test.passed}\n` +
-                                                    `Time: ${new Date(test.timestamp).toLocaleString()}`
-                                                    : `Test Failed: "${test.name}"\n` +
-                                                    `Error: ${test.error || 'Assertion failed'}\n` +
-                                                    `Time: ${new Date(test.timestamp).toLocaleString()}`
-                                                }
-                                            </pre>
-                                        </div>
+                                    <div className="tr-item-body">
+                                        <pre className="tr-code">
+                                            {test.passed
+                                                ? `Test Passed: "${test.name}"\nResult: ${test.passed}\nTime: ${new Date(test.timestamp).toLocaleString()}`
+                                                : `Test Failed: "${test.name}"\nError: ${test.error || 'Assertion failed'}\nTime: ${new Date(test.timestamp).toLocaleString()}`
+                                            }
+                                        </pre>
                                     </div>
                                 )}
                             </div>
@@ -232,13 +212,13 @@ const TestResultsDisplay = ({ testResults }) => {
                 </div>
             </div>
 
-            <div className="ci-cd-tips">
-                <h4>CI/CD Integration</h4>
+            <div className="tr-cicd">
+                <h4 className="tr-cicd-h4">CI/CD Integration</h4>
                 <p>These test results can be exported for use in CI/CD pipelines. Use the CLI runner to automate these tests.</p>
-                <pre className="ci-cd-command">
+                <pre className="tr-cicd-cmd">
                     pigeon run --collection "my-collection" --environment "production" --reporter junit
                 </pre>
-                <p className="small-note">See documentation for more CI/CD integration options.</p>
+                <p className="tr-small-note">See documentation for more CI/CD integration options.</p>
             </div>
         </div>
     );

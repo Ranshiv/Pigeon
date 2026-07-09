@@ -1,9 +1,9 @@
-// src/components/HistorySection.js
+// client/src/components/HistorySection.js
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import './HistorySection.css';
 import { FiClock, FiSearch, FiFilter, FiX } from 'react-icons/fi';
-
+import PageLoader from './common/PageLoader/PageLoader';
 
 // Group history entries by date categories without using date-fns comparison functions
 const groupHistoryByDate = (history) => {
@@ -37,7 +37,7 @@ const groupHistoryByDate = (history) => {
             if (entryDay.getTime() === today.getTime()) {
                 grouped.today.push(entry);
             }
-            // Check if date is yesterday 
+            // Check if date is yesterday
             else if (entryDay.getTime() === yesterday.getTime()) {
                 grouped.yesterday.push(entry);
             }
@@ -67,20 +67,18 @@ const HistorySection = ({ history = [], onSelectHistory, selectedId, loading = f
 
     if (!Array.isArray(history)) {
         console.error("History prop is not an array:", history);
-        return <div className="history-section error">Error loading history data.</div>;
+        return <div className="hst-root hst-root--error">Error loading history data.</div>;
     }
 
-    // Loading state with skeleton
+    // Loading state with PageLoader
     if (loading) {
         return (
-            <div className="history-section loading">
-                <div className="history-header">
-                    <h2><FiClock /> Request History</h2>
+            <div className="hst-root hst-root--loading">
+                <div className="hst-header">
+                    <h2 className="hst-title"><FiClock /> Request History</h2>
                 </div>
-                <div className="loading-state">
-                    <div className="loading-spinner-history"></div>
-                    <h3>Loading History</h3>
-                    <p>Fetching your request history...</p>
+                <div className="hst-loading-container">
+                    <PageLoader size="lg" label="Fetching your request history..." />
                 </div>
             </div>
         );
@@ -133,13 +131,13 @@ const HistorySection = ({ history = [], onSelectHistory, selectedId, loading = f
     // Empty state
     if (history.length === 0) {
         return (
-            <div className="history-section empty">
-                <div className="history-header">
-                    <h2><FiClock /> Request History</h2>
+            <div className="hst-root hst-root--empty">
+                <div className="hst-header">
+                    <h2 className="hst-title"><FiClock /> Request History</h2>
                 </div>
-                <div className="empty-state">
-                    <div className="empty-icon">📡</div>
-                    <p>No history yet. Send some requests!</p>
+                <div className="hst-empty-state">
+                    <div className="hst-empty-icon">📡</div>
+                    <p className="hst-empty-text">No history yet. Send some requests!</p>
                 </div>
             </div>
         );
@@ -148,30 +146,31 @@ const HistorySection = ({ history = [], onSelectHistory, selectedId, loading = f
     // Filtered to empty state
     if (filteredHistory.length === 0) {
         return (
-            <div className="history-section">
-                <div className="history-header">
-                    <h2><FiClock /> Request History</h2>
-                    <div className="history-search">
-                        <FiSearch className="search-icon" />
+            <div className="hst-root">
+                <div className="hst-header">
+                    <h2 className="hst-title"><FiClock /> Request History</h2>
+                    <div className="hst-search-container">
+                        <FiSearch className="hst-search-icon" />
                         <input
                             type="text"
+                            className="hst-search-input"
                             placeholder="Search history..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
                         {searchTerm && (
                             <FiX
-                                className="clear-search"
+                                className="hst-clear-search"
                                 onClick={() => setSearchTerm('')}
                                 title="Clear search"
                             />
                         )}
                     </div>
-                    <div className="method-filters">
+                    <div className="hst-tabs">
                         {['get', 'post', 'put', 'delete', 'patch'].map(method => (
                             <button
                                 key={method}
-                                className={`filter-btn method-${method} ${activeFilter === method ? 'active' : ''}`}
+                                className={`hst-tab hst-tab--method-${method} ${activeFilter === method ? 'hst-tab--active' : ''}`}
                                 onClick={() => handleFilterClick(method)}
                                 title={`Filter ${method.toUpperCase()} requests`}
                             >
@@ -180,11 +179,11 @@ const HistorySection = ({ history = [], onSelectHistory, selectedId, loading = f
                         ))}
                     </div>
                 </div>
-                <div className="empty-state">
-                    <FiFilter className="empty-icon" />
-                    <p>No matching requests found.</p>
+                <div className="hst-empty-state">
+                    <FiFilter className="hst-empty-icon" />
+                    <p className="hst-empty-text">No matching requests found.</p>
                     <button
-                        className="reset-filters"
+                        className="hst-btn hst-btn--primary hst-reset-btn"
                         onClick={() => {
                             setSearchTerm('');
                             setActiveFilter('all');
@@ -198,30 +197,31 @@ const HistorySection = ({ history = [], onSelectHistory, selectedId, loading = f
     }
 
     return (
-        <div className="history-section">
-            <div className="history-header">
-                <h2><FiClock /> Request History</h2>
-                <div className="history-search">
-                    <FiSearch className="search-icon" />
+        <div className="hst-root">
+            <div className="hst-header">
+                <h2 className="hst-title"><FiClock /> Request History</h2>
+                <div className="hst-search-container">
+                    <FiSearch className="hst-search-icon" />
                     <input
                         type="text"
+                        className="hst-search-input"
                         placeholder="Search history..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
                     {searchTerm && (
                         <FiX
-                            className="clear-search"
+                            className="hst-clear-search"
                             onClick={() => setSearchTerm('')}
                             title="Clear search"
                         />
                     )}
                 </div>
-                <div className="method-filters">
+                <div className="hst-tabs">
                     {['get', 'post', 'put', 'delete', 'patch'].map(method => (
                         <button
                             key={method}
-                            className={`filter-btn method-${method} ${activeFilter === method ? 'active' : ''}`}
+                            className={`hst-tab hst-tab--method-${method} ${activeFilter === method ? 'hst-tab--active' : ''}`}
                             onClick={() => handleFilterClick(method)}
                             title={`Filter ${method.toUpperCase()} requests`}
                         >
@@ -231,12 +231,12 @@ const HistorySection = ({ history = [], onSelectHistory, selectedId, loading = f
                 </div>
             </div>
 
-            <div className="history-content">
+            <div className="hst-content">
                 {/* Today's requests */}
                 {groupedHistory.today.length > 0 && (
-                    <div className="history-group">
-                        <h3 className="group-header">Today</h3>
-                        <ul className="history-list">
+                    <div className="hst-group">
+                        <h3 className="hst-group-title">Today</h3>
+                        <ul className="hst-list">
                             {groupedHistory.today.map(entry => renderHistoryItem(entry))}
                         </ul>
                     </div>
@@ -244,9 +244,9 @@ const HistorySection = ({ history = [], onSelectHistory, selectedId, loading = f
 
                 {/* Yesterday's requests */}
                 {groupedHistory.yesterday.length > 0 && (
-                    <div className="history-group">
-                        <h3 className="group-header">Yesterday</h3>
-                        <ul className="history-list">
+                    <div className="hst-group">
+                        <h3 className="hst-group-title">Yesterday</h3>
+                        <ul className="hst-list">
                             {groupedHistory.yesterday.map(entry => renderHistoryItem(entry))}
                         </ul>
                     </div>
@@ -254,9 +254,9 @@ const HistorySection = ({ history = [], onSelectHistory, selectedId, loading = f
 
                 {/* This week's requests */}
                 {groupedHistory.thisWeek.length > 0 && (
-                    <div className="history-group">
-                        <h3 className="group-header">Earlier this week</h3>
-                        <ul className="history-list">
+                    <div className="hst-group">
+                        <h3 className="hst-group-title">Earlier this week</h3>
+                        <ul className="hst-list">
                             {groupedHistory.thisWeek.map(entry => renderHistoryItem(entry))}
                         </ul>
                     </div>
@@ -264,9 +264,9 @@ const HistorySection = ({ history = [], onSelectHistory, selectedId, loading = f
 
                 {/* This month's requests */}
                 {groupedHistory.thisMonth.length > 0 && (
-                    <div className="history-group">
-                        <h3 className="group-header">Earlier this month</h3>
-                        <ul className="history-list">
+                    <div className="hst-group">
+                        <h3 className="hst-group-title">Earlier this month</h3>
+                        <ul className="hst-list">
                             {groupedHistory.thisMonth.map(entry => renderHistoryItem(entry))}
                         </ul>
                     </div>
@@ -274,9 +274,9 @@ const HistorySection = ({ history = [], onSelectHistory, selectedId, loading = f
 
                 {/* Older requests */}
                 {groupedHistory.older.length > 0 && (
-                    <div className="history-group">
-                        <h3 className="group-header">Older</h3>
-                        <ul className="history-list">
+                    <div className="hst-group">
+                        <h3 className="hst-group-title">Older</h3>
+                        <ul className="hst-list">
                             {groupedHistory.older.map(entry => renderHistoryItem(entry))}
                         </ul>
                     </div>
@@ -315,30 +315,30 @@ const HistorySection = ({ history = [], onSelectHistory, selectedId, loading = f
         return (
             <li
                 key={entry._id}
-                className={`history-item ${selectedId === entry._id ? 'active' : ''}`}
+                className={`hst-item ${selectedId === entry._id ? 'hst-item--active' : ''}`}
                 onClick={() => onSelectHistory(entry)}
                 title={`View details for ${entry.method} ${urlTip}`}
             >
-                <div className="history-item-header">
-                    <span className={`method-badge method-${entry.method?.toLowerCase()}`}>
+                <div className="hst-item-header">
+                    <span className={`hst-method-badge hst-method-badge--${entry.method?.toLowerCase()}`}>
                         {entry.method}
                     </span>
-                    <span className="history-url" title={urlTip}>{shortUrl || '/'}</span>
+                    <span className="hst-item-url" title={urlTip}>{shortUrl || '/'}</span>
                 </div>
-                <div className="history-item-details">
-                    <span className={`status-badge status-${String(entry.responseStatus || 0).charAt(0)}xx`}>
+                <div className="hst-item-meta">
+                    <span className={`hst-status-badge hst-status-badge--${String(entry.responseStatus || 0).charAt(0)}xx`}>
                         {entry.responseStatus || 'N/A'}
                     </span>
 
                     {/* Test Results Badge */}
                     {testResults && (
-                        <span className={`test-badge ${testResults.passed === testResults.total ? 'test-passed' : 'test-failed'}`}
+                        <span className={`hst-test-badge ${testResults.passed === testResults.total ? 'hst-test-badge--passed' : 'hst-test-badge--failed'}`}
                             title={`Tests: ${testResults.passed}/${testResults.total} passed`}>
                             {testResults.passed}/{testResults.total} tests
                         </span>
                     )}
 
-                    <span className="history-time">{formatTimeOnly(entry.timestamp)}</span>
+                    <span className="hst-item-time">{formatTimeOnly(entry.timestamp)}</span>
                 </div>
             </li>
         );

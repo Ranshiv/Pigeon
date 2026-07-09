@@ -843,8 +843,8 @@
     }
 }
 
-/* Tooltip-like enhancements */
-[title] {
+/* Tooltip-like enhancements (scoped to this panel only) */
+.spec-preview.modern [title] {
     cursor: help;
 }
 
