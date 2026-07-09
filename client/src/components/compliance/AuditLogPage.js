@@ -3,7 +3,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { FiDownload, FiFilter, FiRefreshCw, FiShield } from 'react-icons/fi';
 import { useWorkspaceOptions } from './useWorkspaceOptions';
 import { downloadFromApi } from './download';
-import ThemedSelect from './ThemedSelect';
+import AppSelect from '../common/AppSelect/AppSelect';
 
 function buildQuery(params) {
     const qs = new URLSearchParams();
@@ -98,7 +98,7 @@ const AuditLogPage = () => {
                 <div className="cmp-filter-row">
                     <div className="cmp-field">
                         <label>Workspace</label>
-                        <ThemedSelect
+                        <AppSelect
                             value={workspaceId}
                             onChange={(v) => { setWorkspaceId(v); setPage(1); }}
                             disabled={workspacesLoading || workspaces.length === 0}

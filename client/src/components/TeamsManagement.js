@@ -2,12 +2,28 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './TeamsManagement.css';
+import AppSelect from './common/AppSelect/AppSelect';
+import PageLoader from './common/PageLoader/PageLoader';
 import {
     FiUsers, FiPlus, FiEdit, FiTrash2, FiMail, FiShield,
     FiCheckCircle, FiX, FiAlertCircle, FiSettings,
     FiEye, FiActivity, FiBarChart, FiTool, FiUser,
     FiUserPlus, FiUserX, FiSave, FiBell
 } from 'react-icons/fi';
+
+const MEMBER_ROLES = [
+    { value: 'owner', label: 'Owner' },
+    { value: 'admin', label: 'Admin' },
+    { value: 'editor', label: 'Editor' },
+    { value: 'viewer', label: 'Viewer' }
+];
+
+const ALERT_CHANNELS = [
+    { value: 'email', label: 'Email' },
+    { value: 'slack', label: 'Slack' },
+    { value: 'teams', label: 'Microsoft Teams' },
+    { value: 'pagerduty', label: 'PagerDuty' }
+];
 
 const ROLES = [
     { key: 'viewer', label: 'Viewer', icon: <FiEye /> },
@@ -128,10 +144,7 @@ const TeamsManagement = () => {
     if (loading && teams.length === 0) {
         return (
             <div className="tm-root">
-                <div className="tm-loading">
-                    <div className="tm-spinner"></div>
-                    <p>Loading teams...</p>
-                </div>
+                <PageLoader label="Loading teams..." />
             </div>
         );
     }
@@ -253,28 +266,30 @@ const TeamsManagement = () => {
                             <div className="tm-members">
                                 <h3>Team Members</h3>
                                 <div className="tm-members-list">
-                                    {selectedTeam.members?.map(member => (
+                                    {selectedTeam.members?.map(member => {
+                                        const u = member.userId || {};
+                                        const name = u.displayName || u.name || u.email || 'Unknown';
+                                        const email = u.email || '';
+                                        const initial = (name || '?').charAt(0).toUpperCase();
+                                        return (
                                         <div key={member._id} className="tm-member">
                                             <div className="tm-member-info">
-                                                <div className="tm-member-avatar">
-                                                    {member.name?.charAt(0) || member.email?.charAt(0)}
-                                                </div>
+                                                <div className="tm-member-avatar">{initial}</div>
                                                 <div className="tm-member-details">
-                                                    <h4>{member.name || member.email}</h4>
-                                                    <p>{member.email}</p>
+                                                    <h4>{name}</h4>
+                                                    <p>{email}</p>
                                                 </div>
                                             </div>
                                             <div className="tm-member-role">
-                                                <select
-                                                    value={member.role}
-                                                    onChange={(e) => updateMemberRole(selectedTeam._id, member._id, e.target.value)}
+                                                <span className={`tm-role-badge tm-role-badge--${member.role}`}>
+                                                    {member.role}
+                                                </span>
+                                                <AppSelect
                                                     className="tm-role-select"
-                                                >
-                                                    <option value="viewer">Viewer</option>
-                                                    <option value="editor">Editor</option>
-                                                    <option value="admin">Admin</option>
-                                                </select>
-                                                {getRoleIcon(member.role)}
+                                                    value={member.role}
+                                                    onChange={(v) => updateMemberRole(selectedTeam._id, member._id, v)}
+                                                    options={MEMBER_ROLES}
+                                                />
                                             </div>
                                             <div className="tm-member-actions">
                                                 <button
@@ -286,7 +301,8 @@ const TeamsManagement = () => {
                                                 </button>
                                             </div>
                                         </div>
-                                    ))}
+                                        );
+                                    })}
                                 </div>
                             </div>
                         </div>
@@ -454,12 +470,11 @@ const TeamsManagement = () => {
                                 <h3>Alert Routing</h3>
                                 <div className="tm-field">
                                     <label>Default Alert Channel</label>
-                                    <select value={selectedTeam.alertRouting?.defaultChannel || 'email'} readOnly>
-                                        <option value="email">Email</option>
-                                        <option value="slack">Slack</option>
-                                        <option value="teams">Microsoft Teams</option>
-                                        <option value="pagerduty">PagerDuty</option>
-                                    </select>
+                                    <AppSelect
+                                        value={selectedTeam.alertRouting?.defaultChannel || 'email'}
+                                        disabled
+                                        options={ALERT_CHANNELS}
+                                    />
                                 </div>
                             </div>
 

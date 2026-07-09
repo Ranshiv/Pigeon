@@ -9,6 +9,7 @@ import {
 } from 'react-icons/fi';
 import MonitorForm from './MonitorForm';
 import './MonitoringDashboard.css';
+import PageLoader from './common/PageLoader/PageLoader';
 
 const MonitoringDashboard = () => {
     const navigate = useNavigate();
@@ -179,10 +180,7 @@ const MonitoringDashboard = () => {
     if (loading && monitors.length === 0) {
         return (
             <div className="monitoring-dashboard">
-                <div className="loading-state">
-                    <FiActivity className="loading-icon" />
-                    <p>Loading monitors...</p>
-                </div>
+                <PageLoader label="Loading monitors..." />
             </div>
         );
     }

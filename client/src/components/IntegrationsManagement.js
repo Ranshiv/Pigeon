@@ -2,6 +2,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './IntegrationsManagement.css';
+import AppSelect from './common/AppSelect/AppSelect';
+import PageLoader from './common/PageLoader/PageLoader';
 import {
     FiSettings, FiPlus, FiEdit, FiTrash2, FiCheck, FiX,
     FiAlertCircle, FiMail, FiMessageSquare, FiBell, FiActivity,
@@ -270,15 +272,11 @@ const IntegrationsManagement = () => {
                 return (
                     <div key={field.key} className="im-field">
                         {labelTxt}
-                        <select
+                        <AppSelect
                             value={value}
-                            onChange={(e) => updateFormConfig(field.key, e.target.value)}
-                            required={field.required}
-                        >
-                            {field.options.map(option => (
-                                <option key={option} value={option}>{option}</option>
-                            ))}
-                        </select>
+                            onChange={(v) => updateFormConfig(field.key, v)}
+                            options={field.options.map((o) => ({ value: o, label: o }))}
+                        />
                     </div>
                 );
             case 'textarea':
@@ -515,10 +513,7 @@ const IntegrationsManagement = () => {
     if (loading && integrations.length === 0) {
         return (
             <div className="im-root">
-                <div className="im-loading">
-                    <div className="im-spinner"></div>
-                    <p>Loading integrations...</p>
-                </div>
+                <PageLoader label="Loading integrations..." />
             </div>
         );
     }

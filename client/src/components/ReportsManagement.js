@@ -8,6 +8,43 @@ import {
     FiSave, FiX
 } from 'react-icons/fi';
 import './ReportsManagement.css';
+import AppSelect from './common/AppSelect/AppSelect';
+import PageLoader from './common/PageLoader/PageLoader';
+
+const REPORT_TYPES = [
+    { value: 'uptime', label: 'Uptime Report' },
+    { value: 'performance', label: 'Performance Report' },
+    { value: 'sla', label: 'SLA Report' },
+    { value: 'custom', label: 'Custom Report' }
+];
+
+const DATE_RANGES = [
+    { value: '7d', label: 'Last 7 days' },
+    { value: '30d', label: 'Last 30 days' },
+    { value: '90d', label: 'Last 90 days' }
+];
+
+const FREQUENCIES = [
+    { value: 'daily', label: 'Daily' },
+    { value: 'weekly', label: 'Weekly' },
+    { value: 'monthly', label: 'Monthly' }
+];
+
+const DAYS_OF_WEEK = [
+    { value: 1, label: 'Monday' },
+    { value: 2, label: 'Tuesday' },
+    { value: 3, label: 'Wednesday' },
+    { value: 4, label: 'Thursday' },
+    { value: 5, label: 'Friday' },
+    { value: 6, label: 'Saturday' },
+    { value: 0, label: 'Sunday' }
+];
+
+const RECIPIENT_FORMATS = [
+    { value: 'pdf', label: 'PDF' },
+    { value: 'html', label: 'HTML' },
+    { value: 'csv', label: 'CSV' }
+];
 
 const CONTENT_OPTIONS = [
     { key: 'includeExecutiveSummary', label: 'Executive Summary' },
@@ -197,10 +234,7 @@ const ReportsManagement = () => {
     if (loading) {
         return (
             <div className="rpt-root rpt-loading">
-                <div className="rpt-loading-content">
-                    <FiFileText className="rpt-loading-icon" />
-                    <p>Loading reports...</p>
-                </div>
+                <PageLoader label="Loading reports..." />
             </div>
         );
     }
@@ -444,29 +478,22 @@ const ReportsManagement = () => {
                                 <div className="rpt-form-row">
                                     <div className="rpt-field">
                                         <label>Report Type</label>
-                                        <select
+                                        <AppSelect
                                             value={formData.type}
-                                            onChange={(e) => setFormData({ ...formData, type: e.target.value })}
-                                        >
-                                            <option value="uptime">Uptime Report</option>
-                                            <option value="performance">Performance Report</option>
-                                            <option value="sla">SLA Report</option>
-                                            <option value="custom">Custom Report</option>
-                                        </select>
+                                            onChange={(v) => setFormData({ ...formData, type: v })}
+                                            options={REPORT_TYPES}
+                                        />
                                     </div>
                                     <div className="rpt-field">
                                         <label>Date Range</label>
-                                        <select
+                                        <AppSelect
                                             value={formData.filters.dateRange}
-                                            onChange={(e) => setFormData({
+                                            onChange={(v) => setFormData({
                                                 ...formData,
-                                                filters: { ...formData.filters, dateRange: e.target.value }
+                                                filters: { ...formData.filters, dateRange: v }
                                             })}
-                                        >
-                                            <option value="7d">Last 7 days</option>
-                                            <option value="30d">Last 30 days</option>
-                                            <option value="90d">Last 90 days</option>
-                                        </select>
+                                            options={DATE_RANGES}
+                                        />
                                     </div>
                                 </div>
                             </div>
@@ -477,37 +504,27 @@ const ReportsManagement = () => {
                                 <div className="rpt-form-row">
                                     <div className="rpt-field">
                                         <label>Frequency</label>
-                                        <select
+                                        <AppSelect
                                             value={formData.schedule.frequency}
-                                            onChange={(e) => setFormData({
+                                            onChange={(v) => setFormData({
                                                 ...formData,
-                                                schedule: { ...formData.schedule, frequency: e.target.value }
+                                                schedule: { ...formData.schedule, frequency: v }
                                             })}
-                                        >
-                                            <option value="daily">Daily</option>
-                                            <option value="weekly">Weekly</option>
-                                            <option value="monthly">Monthly</option>
-                                        </select>
+                                            options={FREQUENCIES}
+                                        />
                                     </div>
 
                                     {formData.schedule.frequency === 'weekly' && (
                                         <div className="rpt-field">
                                             <label>Day of Week</label>
-                                            <select
+                                            <AppSelect
                                                 value={formData.schedule.dayOfWeek}
-                                                onChange={(e) => setFormData({
+                                                onChange={(v) => setFormData({
                                                     ...formData,
-                                                    schedule: { ...formData.schedule, dayOfWeek: parseInt(e.target.value) }
+                                                    schedule: { ...formData.schedule, dayOfWeek: v }
                                                 })}
-                                            >
-                                                <option value={1}>Monday</option>
-                                                <option value={2}>Tuesday</option>
-                                                <option value={3}>Wednesday</option>
-                                                <option value={4}>Thursday</option>
-                                                <option value={5}>Friday</option>
-                                                <option value={6}>Saturday</option>
-                                                <option value={0}>Sunday</option>
-                                            </select>
+                                                options={DAYS_OF_WEEK}
+                                            />
                                         </div>
                                     )}
 
@@ -553,14 +570,11 @@ const ReportsManagement = () => {
                                             onChange={(e) => updateRecipient(index, 'email', e.target.value)}
                                             required
                                         />
-                                        <select
+                                        <AppSelect
                                             value={recipient.format}
-                                            onChange={(e) => updateRecipient(index, 'format', e.target.value)}
-                                        >
-                                            <option value="pdf">PDF</option>
-                                            <option value="html">HTML</option>
-                                            <option value="csv">CSV</option>
-                                        </select>
+                                            onChange={(v) => updateRecipient(index, 'format', v)}
+                                            options={RECIPIENT_FORMATS}
+                                        />
                                         <button
                                             type="button"
                                             className="rpt-remove-btn"

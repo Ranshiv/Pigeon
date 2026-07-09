@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { FiDownload, FiLock, FiRefreshCw } from 'react-icons/fi';
 import { useWorkspaceOptions } from './useWorkspaceOptions';
 import { downloadFromApi } from './download';
-import ThemedSelect from './ThemedSelect';
+import AppSelect from '../common/AppSelect/AppSelect';
 
 const AccessReviewPage = () => {
     const { workspaces, defaultWorkspaceId, loading: workspacesLoading } = useWorkspaceOptions();
@@ -74,7 +74,7 @@ const AccessReviewPage = () => {
                 <div className="cmp-filter-row cmp-filter-row--single">
                     <div className="cmp-field">
                         <label>Workspace</label>
-                        <ThemedSelect
+                        <AppSelect
                             value={workspaceId}
                             onChange={setWorkspaceId}
                             disabled={workspacesLoading || workspaces.length === 0}

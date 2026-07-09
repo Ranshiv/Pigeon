@@ -289,6 +289,16 @@
     width: 100%;
 }
 
+.policyToolbarLeft .policyField,
+.policyToolbarLeft .app-select {
+    margin: 0;
+    padding: 0;
+}
+
+.policyToolbarLeft .app-select-trigger {
+    padding: 9px 12px;
+}
+
 .policyToolbarRight {
     flex-shrink: 0;
 }

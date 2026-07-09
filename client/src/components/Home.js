@@ -3,6 +3,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import './Home.css';
+import PageLoader from './common/PageLoader/PageLoader';
 import {
     FiSend, FiSearch, FiGrid, FiPackage, FiActivity,
     FiUsers, FiGitPullRequest, FiStar, FiClock,
@@ -293,7 +294,7 @@ const Home = () => {
                         </div>
                         <div className="pgh-list">
                             {loading ? (
-                                <div className="pgh-loading">Loading recent activity...</div>
+                                <PageLoader label="Loading recent activity..." />
                             ) : recentActivity.length === 0 ? (
                                 <div className="pgh-empty">
                                     <p>No recent activity to display. Start by creating collections or sending requests.</p>
@@ -330,7 +331,7 @@ const Home = () => {
                         </div>
                         <div className="pgh-list">
                             {loading ? (
-                                <div className="pgh-loading">Loading workspaces...</div>
+                                <PageLoader label="Loading workspaces..." />
                             ) : recentWorkspaces.length === 0 ? (
                                 <div className="pgh-empty">
                                     <p>You have no workspaces yet. Create your first workspace to get started.</p>
@@ -376,7 +377,7 @@ const Home = () => {
                         </div>
                         <div className="pgh-collections">
                             {loading ? (
-                                <div className="pgh-loading">Loading collections...</div>
+                                <PageLoader label="Loading collections..." />
                             ) : recentCollections.length === 0 ? (
                                 <div className="pgh-empty">
                                     <p>You have no collections yet. Create your first collection to get started.</p>

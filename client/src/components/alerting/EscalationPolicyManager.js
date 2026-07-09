@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './EscalationPolicyManager.css';
+import PageLoader from '../common/PageLoader/PageLoader';
 
 const EscalationPolicyManager = () => {
     const [policies, setPolicies] = useState([]);
@@ -371,10 +372,7 @@ const EscalationPolicyManager = () => {
             ) : (
                 <div className="policies-list">
                     {loading ? (
-                        <div className="loading-state">
-                            <div className="spinner"></div>
-                            <p>Loading escalation policies...</p>
-                        </div>
+                        <PageLoader label="Loading escalation policies..." />
                     ) : policies.length === 0 ? (
                         <div className="empty-state">
                             <p className="text-gray-500">No escalation policies configured</p>

@@ -21,6 +21,7 @@ import {
     Filler
 } from 'chart.js';
 import './AnalyticsDashboard.css';
+import PageLoader from '../common/PageLoader/PageLoader';
 
 // Register ChartJS components
 ChartJS.register(
@@ -276,12 +277,7 @@ const AnalyticsDashboard = () => {
     if (loading && !dashboardData) {
         return (
             <div className="analytics-dashboard">
-                <div className="loading-state">
-                    <div className="loading-spinner">
-                        <FiActivity />
-                    </div>
-                    <p>Loading analytics...</p>
-                </div>
+                <PageLoader label="Loading analytics..." />
             </div>
         );
     }

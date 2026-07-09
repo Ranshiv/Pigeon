@@ -2,6 +2,16 @@
 import React, { useState, useEffect } from 'react';
 import { FiX, FiSave, FiLoader, FiGlobe, FiSettings, FiList, FiBell, FiMapPin, FiLink2, FiShield, FiCheckCircle } from 'react-icons/fi';
 import './MonitorForm.css';
+import AppSelect from './common/AppSelect/AppSelect';
+
+const HTTP_METHODS = [
+    { value: 'GET', label: 'GET' },
+    { value: 'POST', label: 'POST' },
+    { value: 'PUT', label: 'PUT' },
+    { value: 'DELETE', label: 'DELETE' },
+    { value: 'PATCH', label: 'PATCH' },
+    { value: 'HEAD', label: 'HEAD' }
+];
 
 const MonitorForm = ({ isOpen, onClose, onSave, editMonitor = null }) => {
     const getInitialFormData = (monitor) => ({
@@ -306,19 +316,12 @@ const MonitorForm = ({ isOpen, onClose, onSave, editMonitor = null }) => {
                         <div className="mfm-form-row">
                             <div className="mfm-form-group">
                                 <label htmlFor="method">HTTP Method</label>
-                                <select
+                                <AppSelect
                                     id="method"
-                                    name="method"
                                     value={formData.method}
-                                    onChange={handleInputChange}
-                                >
-                                    <option value="GET">GET</option>
-                                    <option value="POST">POST</option>
-                                    <option value="PUT">PUT</option>
-                                    <option value="DELETE">DELETE</option>
-                                    <option value="PATCH">PATCH</option>
-                                    <option value="HEAD">HEAD</option>
-                                </select>
+                                    onChange={(v) => handleInputChange({ target: { name: 'method', value: v } })}
+                                    options={HTTP_METHODS}
+                                />
                             </div>
 
                             <div className="mfm-form-group">
@@ -808,18 +811,13 @@ const MonitorForm = ({ isOpen, onClose, onSave, editMonitor = null }) => {
                                         </div>
 
                                         <div className="mfm-form-group">
-                                            <label htmlFor={`multiStep.steps.${index}.method`}>HTTP Method</label>                                            <select
+                                            <label htmlFor={`multiStep.steps.${index}.method`}>HTTP Method</label>
+                                            <AppSelect
                                                 id={`multiStep.steps.${index}.method`}
                                                 value={step.method}
-                                                onChange={(e) => handleMultiStepChange(index, 'method', e.target.value)}
-                                            >
-                                                <option value="GET">GET</option>
-                                                <option value="POST">POST</option>
-                                                <option value="PUT">PUT</option>
-                                                <option value="DELETE">DELETE</option>
-                                                <option value="PATCH">PATCH</option>
-                                                <option value="HEAD">HEAD</option>
-                                            </select>
+                                                onChange={(v) => handleMultiStepChange(index, 'method', v)}
+                                                options={HTTP_METHODS}
+                                            />
                                         </div>
 
                                         <div className="mfm-form-group">

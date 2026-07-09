@@ -9,6 +9,36 @@ import {
     FiCheck, FiAlertTriangle, FiShield
 } from 'react-icons/fi';
 import './AlertPolicyEditor.css';
+import AppSelect from '../common/AppSelect/AppSelect';
+import PageLoader from '../common/PageLoader/PageLoader';
+
+const POLICY_STATUSES = [
+    { value: 'all', label: 'All' },
+    { value: 'active', label: 'Active' },
+    { value: 'disabled', label: 'Disabled' }
+];
+
+const CONDITION_METRICS = [
+    { value: 'responseTime', label: 'Response Time' },
+    { value: 'uptime', label: 'Uptime / Success Rate' },
+    { value: 'statusCode', label: 'Status Code' }
+];
+
+const CONDITION_OPERATORS = [
+    { value: 'gt', label: 'Greater Than' },
+    { value: 'gte', label: 'Greater Than or Equal' },
+    { value: 'lt', label: 'Less Than' },
+    { value: 'lte', label: 'Less Than or Equal' },
+    { value: 'eq', label: 'Equals' },
+    { value: 'neq', label: 'Not Equals' }
+];
+
+const POLICY_SEVERITIES = [
+    { value: 'critical', label: 'Critical' },
+    { value: 'high', label: 'High' },
+    { value: 'medium', label: 'Medium' },
+    { value: 'low', label: 'Low' }
+];
 
 const AlertPolicyEditor = () => {
     const navigate = useNavigate();
@@ -368,10 +398,7 @@ const AlertPolicyEditor = () => {
 
         if (loading) {
             listContent = (
-                <div className="policyLoading">
-                    <div className="policySpinner" aria-hidden="true"></div>
-                    <p>Loading policies…</p>
-                </div>
+                <PageLoader label="Loading policies..." />
             );
         } else if (policies.length === 0) {
             listContent = (
@@ -488,16 +515,13 @@ const AlertPolicyEditor = () => {
                         </div>
                         <div className="policyField">
                             <label className="policyLabel" htmlFor="policyStatus">Status</label>
-                            <select
+                            <AppSelect
                                 id="policyStatus"
                                 className="policySelect"
                                 value={statusFilter}
-                                onChange={(e) => setStatusFilter(e.target.value)}
-                            >
-                                <option value="all">All</option>
-                                <option value="active">Active</option>
-                                <option value="disabled">Disabled</option>
-                            </select>
+                                onChange={setStatusFilter}
+                                options={POLICY_STATUSES}
+                            />
                         </div>
                     </div>
                     <div className="policyToolbarRight">
@@ -655,36 +679,23 @@ const AlertPolicyEditor = () => {
                                     <div className="policyFormGrid">
                                         <div className="policyField">
                                             <label className="policyLabel" htmlFor={`cond-metric-${condition._key || idx}`}>Metric</label>
-                                            <select
+                                            <AppSelect
                                                 id={`cond-metric-${condition._key || idx}`}
                                                 className="policySelect"
                                                 value={condition.metric}
-                                                onChange={(e) => {
-                                                    updateCondition(idx, { metric: e.target.value });
-                                                }}
-                                            >
-                                                <option value="responseTime">Response Time</option>
-                                                <option value="uptime">Uptime / Success Rate</option>
-                                                <option value="statusCode">Status Code</option>
-                                            </select>
+                                                onChange={(v) => updateCondition(idx, { metric: v })}
+                                                options={CONDITION_METRICS}
+                                            />
                                         </div>
                                         <div className="policyField">
                                             <label className="policyLabel" htmlFor={`cond-operator-${condition._key || idx}`}>Operator</label>
-                                            <select
+                                            <AppSelect
                                                 id={`cond-operator-${condition._key || idx}`}
                                                 className="policySelect"
                                                 value={condition.operator}
-                                                onChange={(e) => {
-                                                    updateCondition(idx, { operator: e.target.value });
-                                                }}
-                                            >
-                                                <option value="gt">Greater Than</option>
-                                                <option value="gte">Greater Than or Equal</option>
-                                                <option value="lt">Less Than</option>
-                                                <option value="lte">Less Than or Equal</option>
-                                                <option value="eq">Equals</option>
-                                                <option value="neq">Not Equals</option>
-                                            </select>
+                                                onChange={(v) => updateCondition(idx, { operator: v })}
+                                                options={CONDITION_OPERATORS}
+                                            />
                                         </div>
                                         <div className="policyField">
                                             <label className="policyLabel" htmlFor={`cond-threshold-${condition._key || idx}`}>Threshold Value</label>
@@ -715,17 +726,13 @@ const AlertPolicyEditor = () => {
                         <div className="policyFormGrid">
                             <div className="policyField">
                                 <label className="policyLabel" htmlFor="policySeverity">Default Severity</label>
-                                <select
+                                <AppSelect
                                     id="policySeverity"
                                     className="policySelect"
                                     value={currentPolicy.severity}
-                                    onChange={(e) => updatePolicy('severity', e.target.value)}
-                                >
-                                    <option value="critical">Critical</option>
-                                    <option value="high">High</option>
-                                    <option value="medium">Medium</option>
-                                    <option value="low">Low</option>
-                                </select>
+                                    onChange={(v) => updatePolicy('severity', v)}
+                                    options={POLICY_SEVERITIES}
+                                />
                             </div>
 
                             <div className="policyField">

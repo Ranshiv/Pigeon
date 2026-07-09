@@ -2,11 +2,19 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './MaintenanceManagement.css';
+import AppSelect from './common/AppSelect/AppSelect';
+import PageLoader from './common/PageLoader/PageLoader';
 import {
     FiTool, FiPlus, FiEdit, FiTrash2, FiClock, FiCalendar,
     FiRepeat, FiX, FiSave, FiAlertCircle, FiSettings, FiBell, FiEye,
     FiActivity, FiBarChart, FiUsers
 } from 'react-icons/fi';
+
+const RECURRENCE_TYPES = [
+    { value: 'daily', label: 'Daily' },
+    { value: 'weekly', label: 'Weekly' },
+    { value: 'monthly', label: 'Monthly' }
+];
 
 const MaintenanceManagement = () => {
     const navigate = useNavigate();
@@ -450,20 +458,14 @@ const MaintenanceManagement = () => {
                         <h3>Recurrence Pattern</h3>
                         <div className="mtm-field">
                             <label>Repeat</label>
-                            <select
+                            <AppSelect
                                 value={formData.recurrencePattern.type}
-                                onChange={(e) => setFormData({
+                                onChange={(v) => setFormData({
                                     ...formData,
-                                    recurrencePattern: {
-                                        ...formData.recurrencePattern,
-                                        type: e.target.value
-                                    }
+                                    recurrencePattern: { ...formData.recurrencePattern, type: v }
                                 })}
-                            >
-                                <option value="daily">Daily</option>
-                                <option value="weekly">Weekly</option>
-                                <option value="monthly">Monthly</option>
-                            </select>
+                                options={RECURRENCE_TYPES}
+                            />
                         </div>
                         <div className="mtm-field">
                             <label>Every</label>
@@ -489,10 +491,7 @@ const MaintenanceManagement = () => {
     if (loading && maintenanceWindows.length === 0) {
         return (
             <div className="mtm-root">
-                <div className="mtm-loading">
-                    <div className="mtm-spinner"></div>
-                    <p>Loading maintenance windows...</p>
-                </div>
+                <PageLoader label="Loading maintenance windows..." />
             </div>
         );
     }

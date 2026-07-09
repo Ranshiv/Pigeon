@@ -7,6 +7,14 @@ import {
     FiXCircle
 } from 'react-icons/fi';
 import './MonitoringHistory.css';
+import AppSelect from './common/AppSelect/AppSelect';
+
+const TIME_RANGES = [
+    { value: '1h', label: 'Last Hour' },
+    { value: '24h', label: 'Last 24 Hours' },
+    { value: '7d', label: 'Last 7 Days' },
+    { value: '30d', label: 'Last 30 Days' }
+];
 
 const MonitoringHistory = () => {
     const { id: monitorId } = useParams();
@@ -192,16 +200,12 @@ const MonitoringHistory = () => {
                 <div className="history-controls">
                     <div className="time-range-selector">
                         <FiFilter className="filter-icon" />
-                        <select
-                            value={timeRange}
-                            onChange={(e) => handleTimeRangeChange(e.target.value)}
+                        <AppSelect
                             className="time-range-select"
-                        >
-                            <option value="1h">Last Hour</option>
-                            <option value="24h">Last 24 Hours</option>
-                            <option value="7d">Last 7 Days</option>
-                            <option value="30d">Last 30 Days</option>
-                        </select>
+                            value={timeRange}
+                            onChange={handleTimeRangeChange}
+                            options={TIME_RANGES}
+                        />
                     </div>
 
                     <button

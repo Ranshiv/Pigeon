@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { FiArrowLeft } from 'react-icons/fi';
 import './AlertsDashboard.css';
+import PageLoader from '../common/PageLoader/PageLoader';
 
 const AlertsDashboard = () => {
     const navigate = useNavigate();
@@ -220,10 +221,7 @@ const AlertsDashboard = () => {
             {/* Alerts List */}
             <div className="alerts-container">
                 {loading ? (
-                    <div className="loading-state">
-                        <div className="spinner"></div>
-                        <p>Loading alerts...</p>
-                    </div>
+                    <PageLoader label="Loading alerts..." />
                 ) : alerts.length === 0 ? (
                     <div className="empty-state">
                         <p className="muted">No alerts found</p>

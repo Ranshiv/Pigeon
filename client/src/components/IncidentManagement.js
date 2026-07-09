@@ -7,6 +7,7 @@ import {
     FiUsers, FiArrowUp, FiCheck, FiLink, FiCalendar, FiMessageCircle
 } from 'react-icons/fi';
 import './IncidentManagement.css';
+import PageLoader from './common/PageLoader/PageLoader';
 
 const IncidentManagement = () => {
     const [incidents, setIncidents] = useState([]);
@@ -283,9 +284,7 @@ const IncidentManagement = () => {
     if (loading) {
         return (
             <div className="incident-management">
-                <div className="loading-state">
-                    <div className="loading-spinner"></div>
-                    <p>Loading incidents...</p>
+                <PageLoader label="Loading incidents..." />
                 </div>
             </div>
         );
