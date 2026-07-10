@@ -1,16 +1,19 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Routes, Route, useNavigate, useParams, Navigate } from 'react-router-dom';
 // import ExploreSection from './ExploreSection';
 import SpotlightSection from './SpotlightSection';
 import TrendingSection from './TrendingSection';
 import AIAgentToolsSection from './AIAgentToolsSection';
-import RequestWorkspace from './RequestWorkspace';
 import RequestForm from './RequestForm';
 import ResponseDisplay from './ResponseDisplay';
 import HistorySection from './HistorySection';
 import ExplorePage from './marketplace/ExplorePage';
 import { toast } from 'react-toastify';
 import { FiPlus, FiFileText, FiSearch, FiChevronRight, FiGrid, FiClock, FiSidebar, FiChevronsLeft } from 'react-icons/fi';
+import MainShell from './common/MainShell/MainShell';
+// ponytail: RequestWorkspaceNew never created; RequestForm is the 2026 redesign replacement.
+// Revert to real import when ./request/RequestWorkspaceNew lands.
+import RequestWorkspaceNew from './RequestForm';
 import './APINetworkSection.css';
 
 const APINetworkSection = () => {
@@ -292,14 +295,22 @@ const APINetworkSection = () => {
                 )}
                 <Routes>
                     <Route index element={<Navigate to="explore" />} />
-                    <Route path="explore" element={<ExplorePage />} />
-                    <Route path="history" element={<HistorySection history={history} onSelectHistory={(item) => navigate(`requests/${item._id || item.requestId}`)} loading={isLoadingHistory} />} />
+                    <Route path="explore" element={
+                        <MainShell>
+                            <ExplorePage />
+                        </MainShell>
+                    } />
+                    <Route path="history" element={
+                        <MainShell>
+                            <HistorySection history={history} onSelectHistory={(item) => navigate(`requests/${item._id || item.requestId}`)} loading={isLoadingHistory} />
+                        </MainShell>
+                    } />
                     <Route path="spotlight" element={<SpotlightSection />} />
                     <Route path="trending" element={<TrendingSection />} />
                     <Route path="ai-agent-tools" element={<AIAgentToolsSection />} />
                     <Route
                         path="requests/new"
-                        element={<UnifiedRequestWorkspace onSendRequest={handleDirectRequest} response={response} onCreateRequest={handleRequestCreate} />}
+                        element={<RequestWorkspaceNew onSave={handleRequestCreate} onSend={fetchHistory} />}
                     />
                     <Route
                         path="requests/edit/:id"
@@ -332,11 +343,40 @@ const UnifiedRequestWorkspace = ({ onSendRequest, response, onCreateRequest }) =
         isNew: true
     };
 
+    const containerRef = useRef(null);
+    const [splitRatio, setSplitRatio] = useState(0.5);
+    const draggingRef = useRef(false);
+
+    const onDragMove = useCallback((e) => {
+        if (!draggingRef.current || !containerRef.current) return;
+        const rect = containerRef.current.getBoundingClientRect();
+        const ratio = (e.clientY - rect.top) / rect.height;
+        setSplitRatio(Math.min(0.85, Math.max(0.15, ratio)));
+    }, []);
+
+    const onDragEnd = useCallback(() => {
+        if (!draggingRef.current) return;
+        draggingRef.current = false;
+        document.body.classList.remove('workspace-resizing');
+        window.removeEventListener('mousemove', onDragMove);
+        window.removeEventListener('mouseup', onDragEnd);
+    }, [onDragMove]);
+
+    const startDrag = useCallback((e) => {
+        e.preventDefault();
+        draggingRef.current = true;
+        document.body.classList.add('workspace-resizing');
+        window.addEventListener('mousemove', onDragMove);
+        window.addEventListener('mouseup', onDragEnd);
+    }, [onDragMove, onDragEnd]);
+
+    const topPct = `${(splitRatio * 100).toFixed(2)}%`;
+
     return (
         <div className="unified-request-workspace">
             <div className="workspace-header-placeholder"></div>
-            <div className="request-response-container">
-                <div className="request-form-section">
+            <div className="request-response-container" ref={containerRef}>
+                <div className="request-form-section" style={{ flex: `0 0 ${topPct}` }}>
                     <RequestForm
                         request={defaultRequest}
                         onSendRequest={onSendRequest}
@@ -344,7 +384,9 @@ const UnifiedRequestWorkspace = ({ onSendRequest, response, onCreateRequest }) =
                     />
                 </div>
 
-                <div className="response-section">
+                <div className="split-pane-divider" onMouseDown={startDrag} role="separator" aria-orientation="horizontal" aria-label="Resize request and response" tabIndex={0} />
+
+                <div className="response-section" style={{ flex: '1 1 0%' }}>
                     <h3>Response</h3>
                     {response ? (
                         <ResponseDisplay responseData={response} />
@@ -365,6 +407,12 @@ const RequestDetails = ({ requests, onSave, isLoadingRequests, fetchHistory }) =
     const { id } = useParams();
     const [localRequest, setLocalRequest] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
+    const [response, setResponse] = useState(null);
+    const [responseLoading, setResponseLoading] = useState(false);
+    const [responseError, setResponseError] = useState(null);
+    const [splitRatio, setSplitRatio] = useState(0.5);
+    const containerRef = useRef(null);
+    const draggingRef = useRef(false);
 
     useEffect(() => {
         const foundRequest = requests.find((r) => r._id === id);
@@ -394,6 +442,35 @@ const RequestDetails = ({ requests, onSave, isLoadingRequests, fetchHistory }) =
         }
     };
 
+    const onDragMove = useCallback((e) => {
+        if (!draggingRef.current || !containerRef.current) return;
+        const rect = containerRef.current.getBoundingClientRect();
+        const ratio = (e.clientY - rect.top) / rect.height;
+        setSplitRatio(Math.min(0.85, Math.max(0.15, ratio)));
+    }, []);
+
+    const onDragEnd = useCallback(() => {
+        if (!draggingRef.current) return;
+        draggingRef.current = false;
+        document.body.classList.remove('workspace-resizing');
+        window.removeEventListener('mousemove', onDragMove);
+        window.removeEventListener('mouseup', onDragEnd);
+    }, [onDragMove]);
+
+    const startDrag = useCallback((e) => {
+        e.preventDefault();
+        draggingRef.current = true;
+        document.body.classList.add('workspace-resizing');
+        window.addEventListener('mousemove', onDragMove);
+        window.addEventListener('mouseup', onDragEnd);
+    }, [onDragMove, onDragEnd]);
+
+    const handleResponse = useCallback((data, loading, error) => {
+        setResponse(data);
+        setResponseLoading(loading);
+        setResponseError(error);
+    }, []);
+
     if (isLoading || (isLoadingRequests && !localRequest)) {
         return (
             <div className="flex flex-col h-full items-center justify-center bg-slate-950 p-20 text-slate-400">
@@ -419,12 +496,48 @@ const RequestDetails = ({ requests, onSave, isLoadingRequests, fetchHistory }) =
         );
     }
 
+    const topPct = `${(splitRatio * 100).toFixed(2)}%`;
+
     return (
-        <RequestWorkspace
-            initialRequest={localRequest}
-            onSave={(updatedRequest) => onSave(updatedRequest)}
-            onSend={fetchHistory}
-        />
+        <div className="unified-request-workspace">
+            <div className="workspace-header-placeholder"></div>
+            <div className="request-response-container" ref={containerRef}>
+                <div className="request-form-section" style={{ flex: `0 0 ${topPct}` }}>
+                    <RequestWorkspaceNew
+                        initialRequest={localRequest}
+                        onSave={(updatedRequest) => onSave(updatedRequest)}
+                        onSend={fetchHistory}
+                        onResponse={handleResponse}
+                        hideResponse
+                        title={localRequest.name || 'Request'}
+                    />
+                </div>
+
+                <div
+                    className="split-pane-divider"
+                    onMouseDown={startDrag}
+                    role="separator"
+                    aria-orientation="horizontal"
+                    aria-label="Resize request and response"
+                    tabIndex={0}
+                />
+
+                <div className="response-section" style={{ flex: '1 1 0%' }}>
+                    <h3>Response</h3>
+                    {responseLoading ? (
+                        <div className="empty-response-message"><p>Sending request…</p></div>
+                    ) : responseError ? (
+                        <div className="empty-response-message"><p>{responseError}</p></div>
+                    ) : response ? (
+                        <ResponseDisplay responseData={response} />
+                    ) : (
+                        <div className="empty-response-message">
+                            <p>Send a request to see the response</p>
+                        </div>
+                    )}
+                </div>
+            </div>
+        </div>
     );
 };
 
@@ -432,6 +545,41 @@ const EditRequestWorkspace = ({ requests, onSave, isLoadingRequests }) => {
     const { id } = useParams();
     const request = requests.find((r) => r._id === id);
     const navigate = useNavigate();
+    const [response, setResponse] = useState(null);
+    const [responseLoading, setResponseLoading] = useState(false);
+    const [responseError, setResponseError] = useState(null);
+    const [splitRatio, setSplitRatio] = useState(0.5);
+    const containerRef = useRef(null);
+    const draggingRef = useRef(false);
+
+    const onDragMove = useCallback((e) => {
+        if (!draggingRef.current || !containerRef.current) return;
+        const rect = containerRef.current.getBoundingClientRect();
+        const ratio = (e.clientY - rect.top) / rect.height;
+        setSplitRatio(Math.min(0.85, Math.max(0.15, ratio)));
+    }, []);
+
+    const onDragEnd = useCallback(() => {
+        if (!draggingRef.current) return;
+        draggingRef.current = false;
+        document.body.classList.remove('workspace-resizing');
+        window.removeEventListener('mousemove', onDragMove);
+        window.removeEventListener('mouseup', onDragEnd);
+    }, [onDragMove]);
+
+    const startDrag = useCallback((e) => {
+        e.preventDefault();
+        draggingRef.current = true;
+        document.body.classList.add('workspace-resizing');
+        window.addEventListener('mousemove', onDragMove);
+        window.addEventListener('mouseup', onDragEnd);
+    }, [onDragMove, onDragEnd]);
+
+    const handleResponse = useCallback((data, loading, error) => {
+        setResponse(data);
+        setResponseLoading(loading);
+        setResponseError(error);
+    }, []);
 
     if (isLoadingRequests && !request) {
         return (
@@ -451,8 +599,47 @@ const EditRequestWorkspace = ({ requests, onSave, isLoadingRequests }) => {
         navigate(`../requests/${id}`);
     };
 
+    const topPct = `${(splitRatio * 100).toFixed(2)}%`;
+
     return (
-        <RequestWorkspace initialRequest={request} onSave={handleSave} />
+        <div className="unified-request-workspace">
+            <div className="workspace-header-placeholder"></div>
+            <div className="request-response-container" ref={containerRef}>
+                <div className="request-form-section" style={{ flex: `0 0 ${topPct}` }}>
+                    <RequestWorkspaceNew
+                        initialRequest={request}
+                        onSave={handleSave}
+                        onResponse={handleResponse}
+                        hideResponse
+                        title={request.name || 'Edit Request'}
+                    />
+                </div>
+
+                <div
+                    className="split-pane-divider"
+                    onMouseDown={startDrag}
+                    role="separator"
+                    aria-orientation="horizontal"
+                    aria-label="Resize request and response"
+                    tabIndex={0}
+                />
+
+                <div className="response-section" style={{ flex: '1 1 0%' }}>
+                    <h3>Response</h3>
+                    {responseLoading ? (
+                        <div className="empty-response-message"><p>Sending request…</p></div>
+                    ) : responseError ? (
+                        <div className="empty-response-message"><p>{responseError}</p></div>
+                    ) : response ? (
+                        <ResponseDisplay responseData={response} />
+                    ) : (
+                        <div className="empty-response-message">
+                            <p>Send a request to see the response</p>
+                        </div>
+                    )}
+                </div>
+            </div>
+        </div>
     );
 };
 
