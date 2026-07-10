@@ -4,6 +4,10 @@ import {
     List,
     Link as LinkIcon,
     Lock,
+    ShieldOff,
+    UserCheck,
+    KeyRound,
+    Fingerprint,
     Box,
     ShieldCheck,
     Zap,
@@ -1682,20 +1686,39 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
 
 
                         <div className="auth-config">
-                            <div className="auth-type-selector">
-                                <label htmlFor="auth-type">Authentication Type:</label>
-                                <select
-                                    id="auth-type"
-                                    value={authConfig.type}
-                                    onChange={(e) => handleAuthConfigChange('type', e.target.value)}
-                                    className="auth-type-select"
-                                >
-                                    <option value="No Auth">No Auth</option>
-                                    <option value="Bearer Token">Bearer Token</option>
-                                    <option value="Basic Auth">Basic Auth</option>
-                                    <option value="API Key">API Key</option>
-                                    <option value="OAuth 2.0">OAuth 2.0</option>
-                                </select>
+                            <div className="auth-type-section">
+                                <div className="section-header-row">
+                                    <div className="section-title">
+                                        <Lock size={18} />
+                                        <span>Authentication</span>
+                                    </div>
+                                    <span className="section-description">Choose how the request authenticates against the API</span>
+                                </div>
+                                <div className="auth-type-grid" role="radiogroup" aria-label="Authentication type">
+                                    {[
+                                        { v: 'No Auth', label: 'No Auth', desc: 'Send request without credentials', icon: ShieldOff },
+                                        { v: 'Bearer Token', label: 'Bearer', desc: 'Token in Authorization header', icon: Key },
+                                        { v: 'Basic Auth', label: 'Basic', desc: 'Username + password (base64)', icon: UserCheck },
+                                        { v: 'API Key', label: 'API Key', desc: 'Key sent via header or query', icon: KeyRound },
+                                        { v: 'OAuth 2.0', label: 'OAuth 2.0', desc: 'Authorize + token exchange flow', icon: Fingerprint },
+                                    ].map(({ v, label, desc, icon: Icon }) => {
+                                        const active = authConfig.type === v;
+                                        return (
+                                            <button
+                                                key={v}
+                                                type="button"
+                                                role="radio"
+                                                aria-checked={active}
+                                                className={`auth-type-card${active ? ' active' : ''}`}
+                                                onClick={() => handleAuthConfigChange('type', v)}
+                                            >
+                                                <span className="auth-type-card-icon"><Icon size={20} /></span>
+                                                <span className="auth-type-card-label">{label}</span>
+                                                <span className="auth-type-card-desc">{desc}</span>
+                                            </button>
+                                        );
+                                    })}
+                                </div>
                             </div>
 
                             {/* Auth flow visualization container */}

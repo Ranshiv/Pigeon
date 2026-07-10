@@ -469,7 +469,7 @@ body.dark-theme .auto-refresh-toggle.active .auto-refresh-indicator {
     border-bottom: none;
 }
 
-.table-container tr:hover td {
+.analytics-dashboard .table-container tr:hover td {
     background: var(--analytics-bg-tertiary);
 }
 
