@@ -19,7 +19,11 @@ import {
     FolderOutput,
     Plus,
     X,
-    Trash2
+    Trash2,
+    Upload,
+    File as FileIcon,
+    Bug,
+    FileText
 } from 'lucide-react';
 import ResponseDisplay from './ResponseDisplay';
 import VariableEditor from './VariableEditor';
@@ -64,6 +68,14 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
     const [headers, setHeaders] = useState(initialData.headers || []);
     const [bodyType, setBodyType] = useState(initialData.bodyType || 'none');
     const [bodyContent, setBodyContent] = useState(initialData.body || '');
+    const [binaryFile, setBinaryFile] = useState(null);
+    const [isFileDragging, setIsFileDragging] = useState(false);
+    const formatFileSize = (bytes) => {
+        if (!bytes) return '0 Bytes';
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.min(Math.floor(Math.log(bytes) / Math.log(1024)), sizes.length - 1);
+        return parseFloat((bytes / Math.pow(1024, i)).toFixed(2)) + ' ' + sizes[i];
+    };
     const [preRequestScript, setPreRequestScript] = useState(initialData.preRequestScript || '');
     const [tests, setTests] = useState(initialData.tests || '');
     const [variables, setVariables] = useState(initialData.variables || []);
@@ -130,6 +142,7 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
         setHeaders(nextData.headers || []);
         setBodyType(nextData.bodyType || 'none');
         setBodyContent(nextData.body || '');
+        setBinaryFile(null);
         setPreRequestScript(nextData.preRequestScript || '');
         setTests(nextData.tests || nextData.testScript || '');
         setVariables(nextData.variables || []);
@@ -1490,7 +1503,52 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
 
                         {bodyType === 'binary' && (
                             <div className="binary-upload">
-                                <input type="file" />
+                                {!binaryFile ? (
+                                    <label
+                                        className={`binary-dropzone ${isFileDragging ? 'dragging' : ''}`}
+                                        onDragOver={(e) => { e.preventDefault(); setIsFileDragging(true); }}
+                                        onDragLeave={() => setIsFileDragging(false)}
+                                        onDrop={(e) => {
+                                            e.preventDefault();
+                                            setIsFileDragging(false);
+                                            const file = e.dataTransfer.files?.[0];
+                                            if (file) setBinaryFile(file);
+                                        }}
+                                    >
+                                        <input
+                                            type="file"
+                                            className="binary-file-input"
+                                            onChange={(e) => setBinaryFile(e.target.files?.[0] || null)}
+                                        />
+                                        <Upload size={28} />
+                                        <span className="binary-dropzone-title">Drop a file here or click to browse</span>
+                                        <span className="binary-dropzone-hint">Sent as the raw request body</span>
+                                    </label>
+                                ) : (
+                                    <div className="binary-file-selected">
+                                        <FileIcon size={20} />
+                                        <div className="binary-file-meta">
+                                            <span className="binary-file-name">{binaryFile.name}</span>
+                                            <span className="binary-file-size">{formatFileSize(binaryFile.size)}</span>
+                                        </div>
+                                        <label className="binary-file-replace" title="Replace file">
+                                            <input
+                                                type="file"
+                                                className="binary-file-input"
+                                                onChange={(e) => setBinaryFile(e.target.files?.[0] || null)}
+                                            />
+                                            Replace
+                                        </label>
+                                        <button
+                                            type="button"
+                                            className="binary-file-remove"
+                                            onClick={() => setBinaryFile(null)}
+                                            title="Remove file"
+                                        >
+                                            <X size={16} />
+                                        </button>
+                                    </div>
+                                )}
                             </div>
                         )}
                     </div>
@@ -1514,12 +1572,15 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
                             <h4>Tests & Post-Request Scripts</h4>
                             <div className="script-actions">
                                 <button
+                                    type="button"
                                     className="btn btn-small"
                                     onClick={() => setShowVisualizationDebugger(!showVisualizationDebugger)}
                                 >
-                                    🔍 Debug Console
+                                    <Bug size={14} />
+                                    Debug Console
                                 </button>
                                 <button
+                                    type="button"
                                     className="btn btn-small"
                                     onClick={() => {
                                         const templates = PostRequestScriptService.getScriptTemplates();
@@ -1527,7 +1588,8 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
                                         console.log('Available templates:', templates);
                                     }}
                                 >
-                                    📋 Templates
+                                    <FileText size={14} />
+                                    Templates
                                 </button>
                             </div>
                         </div>
@@ -1815,11 +1877,7 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
                             {authConfig.type === 'OAuth 2.0' && (
                                 <div className="auth-form oauth-form">
                                     <div className="oauth-status">
-                                        <div className={`status-indicator ${authConfig.oauth2.tokenStatus}`}>
-                                            {authConfig.oauth2.tokenStatus === 'authenticated' ? '🟢' :
-                                                authConfig.oauth2.tokenStatus === 'authorizing' ? '🟡' :
-                                                    authConfig.oauth2.tokenStatus === 'error' ? '🔴' : '⚪'}
-                                        </div>
+                                        <div className={`status-indicator ${authConfig.oauth2.tokenStatus}`} />
                                         <span className="status-text">
                                             {authConfig.oauth2.tokenStatus === 'authenticated' ? 'Authenticated' :
                                                 authConfig.oauth2.tokenStatus === 'authorizing' ? 'Authorizing...' :
@@ -1965,6 +2023,8 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
                     <div className="ssl-section">
                         <div className="ssl-config">
                             <div className="ssl-options">
+                                <h4 className="ssl-section-title">Certificate Validation</h4>
+                                <p className="ssl-section-hint">Control how Pigeon validates the server's TLS certificate.</p>
                                 <div className="form-group">
                                     <label className="checkbox-label">
                                         <input
@@ -1988,7 +2048,8 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
                             </div>
 
                             <div className="certificate-upload">
-                                <h4>Client Certificates</h4>
+                                <h4 className="ssl-section-title">Client Certificates</h4>
+                                <p className="ssl-section-hint">Attach a client certificate and key for mutual TLS authentication.</p>
                                 <div className="cert-upload-section">
                                     {/* Client Certificate Upload */}
                                     <div className="cert-upload-container">
@@ -2237,7 +2298,7 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
                                                 type="password"
                                                 value={sslConfig.passphrase}
                                                 onChange={(e) => handleSSLConfigChange('passphrase', e.target.value)}
-                                                placeholder="Enter passphrase if your certificate is encrypted"
+                                                placeholder="Enter passphrase"
                                                 className="passphrase-input"
                                             />
                                             {sslConfig.passphrase && (
@@ -2249,6 +2310,7 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
                                                 </div>
                                             )}
                                         </div>
+                                        <p className="passphrase-hint">Only required if your certificate is encrypted.</p>
                                     </div>
                                 </div>
                             </div>
