@@ -10,7 +10,8 @@ const VariableEditor = ({
     title,
     environmentId,
     collectionId,
-    workspaceId
+    workspaceId,
+    hideHeader = false
 }) => {
     const [localVariables, setLocalVariables] = useState(variables);
     const [editingVariable, setEditingVariable] = useState(null);
@@ -99,6 +100,7 @@ const VariableEditor = ({
 
     return (
         <div className="variable-editor">
+            {!hideHeader && (
             <div className="variable-editor-header">
                 <div className="scope-indicator">
                     <span
@@ -112,6 +114,7 @@ const VariableEditor = ({
 
                 {/* Removed Save button logic */}
             </div>
+            )}
 
             <div className="variables-list">
                 {localVariables.length === 0 ? (
