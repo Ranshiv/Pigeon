@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { Bug, Play, Trash2, TestTube2 } from 'lucide-react';
 import { VisualizationDebugger } from '../services/VisualizationDebugger';
 
 const DebugConsoleHost = ({ method, url, headers, bodyContent, bodyType, authConfig, setCurrentDebugSession }) => {
@@ -69,9 +70,7 @@ const DebugConsoleHost = ({ method, url, headers, bodyContent, bodyType, authCon
             <div className="debug-console-header">
                 <div className="debug-title">
                     <div className="debug-icon">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M20 4L3 11L10 13.5L12.5 20L20 4Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                        </svg>
+                        <Bug size={18} />
                     </div>
                     <h4>Debug Console</h4>
                     <div className="debug-status">
@@ -85,10 +84,7 @@ const DebugConsoleHost = ({ method, url, headers, bodyContent, bodyType, authCon
                         className="debug-btn debug-btn-primary"
                         onClick={startSession}
                     >
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <circle cx="11" cy="11" r="8" stroke="currentColor" strokeWidth="2" />
-                            <path d="M21 21l-4.35-4.35" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                        </svg>
+                        <Play size={14} />
                         Start Debugging
                     </button>
                     <button
@@ -100,9 +96,7 @@ const DebugConsoleHost = ({ method, url, headers, bodyContent, bodyType, authCon
                             }
                         }}
                     >
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m3 0v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6h14z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                        </svg>
+                        <Trash2 size={14} />
                         Clear Console
                     </button>
                     <button
@@ -120,13 +114,13 @@ const DebugConsoleHost = ({ method, url, headers, bodyContent, bodyType, authCon
                             }
                         }}
                     >
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M9 12l2 2 4-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                            <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" />
-                        </svg>
+                        <TestTube2 size={14} />
                         Test Console Capture
                     </button>
                 </div>
+            </div>
+            <div className="debug-content">
+                <div className="modern-debug-placeholder"></div>
             </div>
         </div>
     );

@@ -13,7 +13,6 @@ import {
     Zap,
     CheckCircle2,
     Key,
-    Eye,
     Activity,
     Terminal,
     FolderOutput,
@@ -25,10 +24,14 @@ import {
     Bug,
     Play,
     BarChart2,
-    FileText
+    FileText,
+    ZoomIn,
+    Maximize,
+    RotateCcw,
+    Globe,
+    AlertCircle
 } from 'lucide-react';
 import ResponseDisplay from './ResponseDisplay';
-import VariableEditor from './VariableEditor';
 import UnifiedVariableViewer from './UnifiedVariableViewer';
 import { interpolateRequest, resolveVariables, validateVariables, extractVariables } from '../utils/variableInterpolation';
 import { PostRequestScriptService } from './VisualApiDesigner/services/PostRequestScriptService';
@@ -117,11 +120,13 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
     // Variable resolution state
     const [resolvedVariables, setResolvedVariables] = useState({});
     const [environmentVariables, setEnvironmentVariables] = useState({});
-    // Derived from the collection prop — a useState would capture the initial
-    // value and stay stale when collection changes (edits in another tab, etc.).
-    const collectionVariables = collection?.variables || [];
+    // Local override after an in-panel add; falls back to the collection prop
+    // (which a useState would otherwise capture stale on remount).
+    const [collectionVariablesOverride, setCollectionVariablesOverride] = useState(null);
+    const collectionVariables = collectionVariablesOverride || collection?.variables || [];
     const [globalVariables, setGlobalVariables] = useState({});
     const [variableValidation, setVariableValidation] = useState({ isValid: true, missingVariables: [] });
+    const [requestAddSignal, setRequestAddSignal] = useState(0);
 
     // Advanced features state
     const [showVisualizationDebugger, setShowVisualizationDebugger] = useState(false);
@@ -240,6 +245,50 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
 
         loadVariables();
     }, [environmentId, workspaceId]);
+
+    const handleAddVariable = async (variable, scopeId) => {
+        if (scopeId === 'request') {
+            setVariables(prev => [...prev, { id: Date.now().toString(), ...variable }]);
+            return;
+        }
+        try {
+            if (scopeId === 'environment' && environmentId) {
+                const res = await fetch(getApiUrl(`/api/environments/${environmentId}/variables`), {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify(variable)
+                });
+                if (res.ok) {
+                    const env = await res.json();
+                    setEnvironmentVariables(env.variables || []);
+                }
+            } else if (scopeId === 'collection' && collectionId) {
+                const res = await fetch(getApiUrl(`/api/collections/${collectionId}/variables`), {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify(variable)
+                });
+                if (res.ok) {
+                    setCollectionVariablesOverride([...collectionVariables, variable]);
+                }
+            } else if (scopeId === 'global' && workspaceId) {
+                const nextVariables = [...(Array.isArray(globalVariables) ? globalVariables : []), variable];
+                const res = await fetch(getApiUrl(`/api/workspaces/${workspaceId}/global-variables`), {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({ variables: nextVariables })
+                });
+                if (res.ok) {
+                    setGlobalVariables(nextVariables);
+                }
+            }
+        } catch (error) {
+            console.error('Error adding variable:', error);
+        }
+    };
 
     // Resolve variables whenever any variable set changes
     useEffect(() => {
@@ -1654,27 +1703,24 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
                             </div>
                         )}
                     </div>
-                ); case 'variables':
-                return (
-                    <div className="variables-section">
-                        <VariableEditor
-                            scope="request"
-                            variables={variables}
-                            onVariablesChange={setVariables}
-                            helpText="Request-level variables override collection and environment variables during execution."
-                        />
-                    </div>
                 ); case 'variable-preview':
                 return (
                     <div className="variable-preview-section">
-                        <div className="preview-header">
+                        <div className="vp-preview-header">
                             <h4>Variable Overview</h4>
-                            <div className="preview-status">
+                            <div className="vp-preview-header-actions">
                                 {variableValidation.isValid ? (
-                                    <span className="status-valid">✅ All variables resolved</span>
+                                    <span className="vp-status-valid"><CheckCircle2 size={13} /> All variables resolved</span>
                                 ) : (
-                                    <span className="status-invalid">⚠️ {variableValidation.missingVariables.length} missing variables</span>
+                                    <span className="vp-status-invalid"><AlertCircle size={13} /> {variableValidation.missingVariables.length} missing variable{variableValidation.missingVariables.length === 1 ? '' : 's'}</span>
                                 )}
+                                <button
+                                    type="button"
+                                    className="vp-add-variable-btn"
+                                    onClick={() => setRequestAddSignal(n => n + 1)}
+                                >
+                                    <Plus size={13} /> Add request variable
+                                </button>
                             </div>
                         </div>
 
@@ -1686,26 +1732,30 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
                             resolvedVariables={resolvedVariables}
                             compact={true}
                             showActions={false}
+                            editableScope={['request', environmentId && 'environment', collectionId && 'collection', workspaceId && 'global'].filter(Boolean)}
+                            onAddVariable={handleAddVariable}
+                            openAddSignal={requestAddSignal}
+                            openAddScope="request"
                         />
 
                         {!variableValidation.isValid && (
-                            <div className="missing-variables-alert">
+                            <div className="vp-missing-alert">
                                 <h5>Missing Variables ({variableValidation.missingVariables.length})</h5>
                                 <p>The following variables are referenced but not defined:</p>
-                                <div className="missing-variables-list">
+                                <div className="vp-missing-list">
                                     {variableValidation.missingVariables.map(varName => (
-                                        <code key={varName} className="missing-variable-name">{varName}</code>
+                                        <code key={varName} className="vp-missing-name">{varName}</code>
                                     ))}
                                 </div>
-                                <p className="missing-variables-help">
+                                <p className="vp-missing-help">
                                     Define these variables in your environment, collection, or request variables.
                                 </p>
                             </div>
                         )}
 
-                        <div className="interpolated-preview">
+                        {/\{\{[^}]+\}\}/.test(url + headers.map(h => h.key + h.value).join('') + (bodyContent || '')) && <div className="vp-interpolated">
                             <h5>Request Preview (with variables)</h5>
-                            <div className="preview-url">
+                            <div className="vp-url">
                                 <strong>URL:</strong>
                                 <code>{resolvedVariables ?
                                     url.replace(/\{\{([^}]+)\}\}/g, (match, varName) =>
@@ -1715,11 +1765,11 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
                             </div>
 
                             {headers.filter(h => h.enabled && h.key).length > 0 && (
-                                <div className="preview-headers">
+                                <div className="vp-headers">
                                     <strong>Headers:</strong>
-                                    <div className="header-list">
+                                    <div className="vp-header-list">
                                         {headers.filter(h => h.enabled && h.key).map((header, index) => (
-                                            <div key={index} className="header-item">
+                                            <div key={index} className="vp-header-item">
                                                 <code>
                                                     {header.key.replace(/\{\{([^}]+)\}\}/g, (match, varName) =>
                                                         resolvedVariables[varName.trim()] || match
@@ -1735,16 +1785,16 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
                             )}
 
                             {bodyType === 'raw' && bodyContent && (
-                                <div className="preview-body">
+                                <div className="vp-body">
                                     <strong>Body:</strong>
-                                    <pre className="body-preview">
+                                    <pre className="vp-body-preview">
                                         {bodyContent.replace(/\{\{([^}]+)\}\}/g, (match, varName) =>
                                             resolvedVariables[varName.trim()] || match
                                         )}
                                     </pre>
                                 </div>
                             )}
-                        </div>
+                        </div>}
                     </div>
                 );
 
@@ -2338,13 +2388,16 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
             case 'network-flow':
                 return (
                     <div className="network-flow-section">
-                        <div className="network-flow-header">
-                            <div className="flow-title-section">
-                                <h4>Network Flow Visualization</h4>
-                                <p className="flow-subtitle">Visualize your request journey through the network</p>
+                        <div className="flow-header-row">
+                            <div className="flow-header-text">
+                                <div className="section-title">
+                                    <Activity size={18} />
+                                    <span>Network Flow Visualization</span>
+                                </div>
+                                <span className="section-description">Visualize your request journey through the network</span>
                             </div>
                             <div className="flow-actions">
-                                <button
+                            <button
                                     className="flow-btn primary"
                                     onClick={async () => {
                                         try {
@@ -2400,7 +2453,7 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
                                         }
                                     }}
                                 >
-                                    <Play size={14} className="btn-icon" />
+                                    <Play size={14} />
                                     Generate Flow
                                 </button>
                                 <button
@@ -2473,7 +2526,7 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
                                         }
                                     }}
                                 >
-                                    <BarChart2 size={14} className="btn-icon" />
+                                    <BarChart2 size={14} />
                                     Visualize Request
                                 </button>
                             </div>
@@ -2482,7 +2535,10 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
                         <div className="flow-content">
                             <div className="flow-diagram-container">
                                 <div className="diagram-header">
-                                    <h5>Request Flow</h5>
+                                    <div className="diagram-title-row">
+                                        <span className="diagram-title-icon"><BarChart2 size={14} /></span>
+                                        <h5>Request Flow</h5>
+                                    </div>
                                     <div className="diagram-controls">
                                         <button
                                             className="control-btn"
@@ -2495,7 +2551,7 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
                                                 }
                                             }}
                                         >
-                                            <span>🔍</span>
+                                            <ZoomIn size={14} />
                                         </button>
                                         <button
                                             className="control-btn"
@@ -2507,7 +2563,7 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
                                                 }
                                             }}
                                         >
-                                            <span>⛶</span>
+                                            <Maximize size={14} />
                                         </button>
                                         <button
                                             className="control-btn"
@@ -2520,13 +2576,13 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
                                                 }
                                             }}
                                         >
-                                            <span>↺</span>
+                                            <RotateCcw size={14} />
                                         </button>
                                     </div>
                                 </div>
                                 <div id="network-flow-diagram" className="flow-diagram">
                                     <div className="flow-empty-state">
-                                        <div className="empty-icon">🌐</div>
+                                        <Globe size={48} className="empty-icon" />
                                         <h4>Ready to visualize</h4>
                                         <p>Click "Generate Flow" to create a visual representation of your request flow</p>
                                     </div>
@@ -2535,7 +2591,10 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
 
                             <div className="flow-details">
                                 <div className="details-header">
-                                    <h5>Flow Details</h5>
+                                    <div className="details-title-row">
+                                        <span className="details-title-icon"><List size={14} /></span>
+                                        <h5>Flow Details</h5>
+                                    </div>
                                     <div className="flow-status">
                                         <span className="status-indicator ready"></span>
                                         <span className="status-text">Ready</span>
@@ -2583,7 +2642,7 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
                     </div>
                 );
 
-                        case 'debug-console':
+            case 'debug-console':
                 return (
                     <DebugConsoleHost
                         method={method}
@@ -2716,16 +2775,10 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
                         <CheckCircle2 size={16} /> <span>Tests</span>
                     </div>
                     <div
-                        className={`request-tab ${activeTab === 'variables' ? 'active' : ''}`}
-                        onClick={() => handleTabChange('variables')}
-                    >
-                        <Key size={16} /> <span>Variables</span>
-                    </div>
-                    <div
                         className={`request-tab ${activeTab === 'variable-preview' ? 'active' : ''}`}
                         onClick={() => handleTabChange('variable-preview')}
                     >
-                        <Eye size={16} /> <span>Preview</span>
+                        <Key size={16} /> <span>Variables</span>
                     </div>
                     <div
                         className={`request-tab ${activeTab === 'network-flow' ? 'active' : ''}`}

@@ -1075,14 +1075,13 @@ export class VisualizationDebugger {
                 justify-content: flex-start;
                 align-items: stretch;
                 overflow: hidden;
-                max-height: 400px; /* Ensure container has defined height for scrolling */
                 font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', 'Source Code Pro', monospace;
                 line-height: 1.6;
                 position: relative;
-                color: #e6e6e6;
-                margin-top: 0px; /* Remove margin to prevent content cutoff */
+                color: var(--text-color, #e6e6e6);
                 height: 100%;
-                min-height: 300px;
+                min-height: 0;
+                background-color: var(--background-color, #0b1220);
             }
 
             /* Console logs container - this holds all the log entries */
@@ -1123,10 +1122,10 @@ export class VisualizationDebugger {
                 display: flex;
                 align-items: center;
                 gap: 16px;
-                padding: 16px 24px; /* Reduced top/bottom padding */
-                margin: 8px 16px 16px 16px; /* Reduced top margin */
-                background: #161b22;
-                border: 1px solid #21262d;
+                padding: 14px 20px;
+                margin: 12px 12px 4px 12px;
+                background: var(--card-bg, #161b22);
+                border: 1px solid var(--border-color, #21262d);
                 border-radius: 8px;
                 box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
             }
@@ -1143,7 +1142,7 @@ export class VisualizationDebugger {
             }
 
             .welcome-title {
-                color: #f0f6fc;
+                color: var(--text-color, #f0f6fc);
                 font-weight: 600;
                 font-size: 15px;
                 margin-bottom: 6px;
@@ -1151,7 +1150,7 @@ export class VisualizationDebugger {
             }
 
             .welcome-subtitle {
-                color: #8b949e;
+                color: var(--text-muted, #8b949e);
                 font-size: 13px;
                 line-height: 1.5;
                 font-weight: 400;
@@ -1159,32 +1158,30 @@ export class VisualizationDebugger {
 
             /* Log Entry - Clean Modern Design */
             .log-entry {
-                padding: 12px 16px;
-                margin-bottom: 1px;
-                border-radius: 4px;
-                transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+                padding: 10px 16px;
+                margin: 0 8px;
+                border-radius: 6px;
+                transition: background 0.2s ease, border-left-color 0.2s ease;
                 position: relative;
                 border-left: 3px solid transparent;
-                background: transparent;
                 opacity: 1;
                 display: block;
                 transform: translateY(0);
             }
 
             .log-entry:hover {
-                background: #161b22;
-                border-left-color: #30363d;
+                filter: brightness(1.12);
             }
 
             .log-entry-content {
                 display: flex;
                 align-items: flex-start;
-                gap: 12px;
+                gap: 10px;
             }
 
             /* Improved Timestamp */
             .log-timestamp {
-                color: #6e7681;
+                color: var(--text-muted, #6e7681);
                 font-size: 11px;
                 min-width: 65px;
                 font-weight: 500;
@@ -1205,7 +1202,7 @@ export class VisualizationDebugger {
             /* Log Message - Better Typography */
             .log-message {
                 flex: 1;
-                color: #e6e6e6;
+                color: var(--text-color, #e6e6e6);
                 font-size: 13px;
                 line-height: 1.5;
                 font-weight: 400;
@@ -1215,69 +1212,73 @@ export class VisualizationDebugger {
             .log-data {
                 margin-top: 8px;
                 padding: 12px;
-                background: #0d1117;
-                border: 1px solid #21262d;
+                background: var(--background-color, #0d1117);
+                border: 1px solid var(--border-color, #21262d);
                 border-radius: 4px;
                 font-size: 12px;
-                color: #8b949e;
+                color: var(--text-muted, #8b949e);
                 white-space: pre-wrap;
+                word-break: break-word;
+                overflow-wrap: anywhere;
+                max-height: 220px;
+                overflow-y: auto;
                 font-family: inherit;
                 box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
             }
 
             /* Log Type Styles - Modern Color Palette */
-            .log-info .log-icon { 
-                color: var(--primary-color, #014C75); 
+            .log-info .log-icon {
+                color: #4FC3E7;
             }
-            .log-success .log-icon { 
-                color: #3fb950; 
+            .log-success .log-icon {
+                color: #3fb950;
             }
-            .log-warn .log-icon { 
-                color: #d29922; 
+            .log-warn .log-icon {
+                color: #d29922;
             }
-            .log-error .log-icon { 
-                color: #f85149; 
+            .log-error .log-icon {
+                color: #f85149;
             }
-            .log-debug .log-icon { 
-                color: #a5a5f5; 
+            .log-debug .log-icon {
+                color: #a5a5f5;
             }
 
             /* Clean Border Indicators */
-            .log-info { 
-                border-left-color: var(--primary-hover, #013B5B);
+            .log-info {
+                border-left-color: #4FC3E7;
+                background: rgba(79, 195, 231, 0.05);
             }
-            .log-success { 
-                border-left-color: #238636;
+            .log-success {
+                border-left-color: #3fb950;
+                background: rgba(63, 185, 80, 0.05);
             }
-            .log-warn { 
-                border-left-color: #bf8700;
+            .log-warn {
+                border-left-color: #d29922;
+                background: rgba(210, 153, 34, 0.05);
             }
-            .log-error { 
-                border-left-color: #da3633;
+            .log-error {
+                border-left-color: #f85149;
+                background: rgba(248, 81, 73, 0.07);
             }
-            .log-debug { 
-                border-left-color: #6f42c1;
+            .log-debug {
+                border-left-color: #a5a5f5;
+                background: rgba(165, 165, 245, 0.05);
             }
 
-            .log-info:hover { 
-                background: rgba(31, 111, 235, 0.05);
-                border-left-color: var(--primary-color, #014C75);
+            .log-info:hover {
+                background: rgba(79, 195, 231, 0.12);
             }
-            .log-success:hover { 
-                background: rgba(35, 134, 54, 0.05);
-                border-left-color: #3fb950;
+            .log-success:hover {
+                background: rgba(63, 185, 80, 0.12);
             }
-            .log-warn:hover { 
-                background: rgba(191, 135, 0, 0.05);
-                border-left-color: #d29922;
+            .log-warn:hover {
+                background: rgba(210, 153, 34, 0.12);
             }
-            .log-error:hover { 
-                background: rgba(218, 54, 51, 0.05);
-                border-left-color: #f85149;
+            .log-error:hover {
+                background: rgba(248, 81, 73, 0.14);
             }
-            .log-debug:hover { 
-                background: rgba(111, 66, 193, 0.05);
-                border-left-color: #a5a5f5;
+            .log-debug:hover {
+                background: rgba(165, 165, 245, 0.12);
             }
 
             /* Smooth Entry Animation */
@@ -1465,7 +1466,10 @@ export class VisualizationDebugger {
             this.debugSessions.delete(oldestSessionId);
         }
 
-        if (!this.debugPanel) {
+        // Only create the detached popup panel if there is no in-RequestForm
+        // debug container — otherwise logs would land in a hidden duplicate
+        // #console-output element appended to document.body.
+        if (!document.getElementById('visualization-debugger-container') && !this.debugPanel) {
             this.createDebugPanel();
         }
 
@@ -1604,7 +1608,16 @@ export class VisualizationDebugger {
         this._isUpdatingDOM = true;
 
         try {
-            let consoleOutput = document.getElementById('console-output');
+            // Prefer the in-RequestForm console output over any duplicate
+            // #console-output appended to document.body, so logs render in the
+            // visible tab instead of a hidden popup panel.
+            const requestFormContainer = document.getElementById('visualization-debugger-container');
+            let consoleOutput = requestFormContainer
+                ? requestFormContainer.querySelector('#console-output')
+                : null;
+            if (!consoleOutput) {
+                consoleOutput = document.getElementById('console-output');
+            }
 
             if (!consoleOutput) {
                 // Try to create the console output area if it doesn't exist
