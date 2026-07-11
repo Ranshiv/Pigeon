@@ -1177,6 +1177,9 @@ export class VisualizationDebugger {
                 display: flex;
                 align-items: flex-start;
                 gap: 10px;
+                min-width: 0;
+                max-width: 100%;
+                flex-wrap: wrap;
             }
 
             /* Improved Timestamp */
@@ -1202,10 +1205,14 @@ export class VisualizationDebugger {
             /* Log Message - Better Typography */
             .log-message {
                 flex: 1;
+                min-width: 0;
                 color: var(--text-color, #e6e6e6);
                 font-size: 13px;
                 line-height: 1.5;
                 font-weight: 400;
+                word-break: break-word;
+                overflow-wrap: anywhere;
+                white-space: pre-wrap;
             }
 
             /* Log Data - Refined Design */

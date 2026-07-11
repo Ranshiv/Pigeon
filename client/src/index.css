@@ -18,10 +18,12 @@
 
 html {
   scroll-behavior: smooth;
+  overflow-x: hidden;
 }
 
 /* Centralized CSS Variables - 2025 Blue Palette */
 body {
+  overflow-x: hidden;
   /* === Light Theme (Default) === */
   /* Primary Blue Palette */
   --primary-color: #014C75;

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import './RequestForm.css';
 import {
     List,
@@ -123,7 +123,12 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
     // Local override after an in-panel add; falls back to the collection prop
     // (which a useState would otherwise capture stale on remount).
     const [collectionVariablesOverride, setCollectionVariablesOverride] = useState(null);
-    const collectionVariables = collectionVariablesOverride || collection?.variables || [];
+    // ponytail: useMemo keeps this stable across renders so the resolve-variables effect
+    // (line ~294) doesn't loop on a fresh []/object ref every render → "Maximum update depth".
+    const collectionVariables = useMemo(
+        () => collectionVariablesOverride || collection?.variables || [],
+        [collectionVariablesOverride, collection]
+    );
     const [globalVariables, setGlobalVariables] = useState({});
     const [variableValidation, setVariableValidation] = useState({ isValid: true, missingVariables: [] });
     const [requestAddSignal, setRequestAddSignal] = useState(0);
