@@ -23,6 +23,8 @@ import {
     Upload,
     File as FileIcon,
     Bug,
+    Play,
+    BarChart2,
     FileText
 } from 'lucide-react';
 import ResponseDisplay from './ResponseDisplay';
@@ -34,6 +36,9 @@ import { VisualizationDebugger } from './VisualApiDesigner/services/Visualizatio
 import { ExportService } from './VisualApiDesigner/services/ExportService';
 import { AuthVisualizationService } from './VisualApiDesigner/services/AuthVisualizationService';
 import { NetworkFlowService } from './VisualApiDesigner/services/NetworkFlowService';
+import NetworkFlowHost from "./VisualApiDesigner/components/NetworkFlowHost";
+import AuthFlowHost from "./VisualApiDesigner/components/AuthFlowHost";
+import DebugConsoleHost from "./VisualApiDesigner/components/DebugConsoleHost";
 
 // Helper function to get the correct API base URL
 const getApiUrl = (path) => {
@@ -183,6 +188,7 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
 
     // Debug console state
     const [currentDebugSession, setCurrentDebugSession] = useState(null);
+
     const [consoleFilter, setConsoleFilter] = useState('all');
 
     // Utility function to get CSS classes for inputs with variables
@@ -2394,7 +2400,7 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
                                         }
                                     }}
                                 >
-                                    <span className="btn-icon">🔄</span>
+                                    <Play size={14} className="btn-icon" />
                                     Generate Flow
                                 </button>
                                 <button
@@ -2467,7 +2473,7 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
                                         }
                                     }}
                                 >
-                                    <span className="btn-icon">📊</span>
+                                    <BarChart2 size={14} className="btn-icon" />
                                     Visualize Request
                                 </button>
                             </div>
@@ -2577,495 +2583,17 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
                     </div>
                 );
 
-            case 'debug-console':
-                // Ensure VisualizationDebugger is initialized when this tab is shown
-                if (typeof VisualizationDebugger !== 'undefined') {
-                    VisualizationDebugger.initialize();
-                    // Explicitly hide any popup panels since we're using the integrated console
-                    VisualizationDebugger.hidePopupPanel();
-                    // Also remove any popup panels from DOM completely
-                    VisualizationDebugger.removePopupPanels();
-                }
-
+                        case 'debug-console':
                 return (
-                    <div className="debug-console-section" id="visualization-debugger-container">
-                        <div className="debug-console-header">
-                            <div className="debug-title">
-                                <div className="debug-icon">
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M20 4L3 11L10 13.5L12.5 20L20 4Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                                    </svg>
-                                </div>
-                                <h4>Debug Console</h4>
-                                <div className="debug-status">
-                                    <span className="status-indicator"></span>
-                                    Ready
-                                </div>
-                            </div>
-                            <div className="debug-actions">
-                                <button
-                                    type="button"
-                                    className="debug-btn debug-btn-primary"
-                                    onClick={() => {
-                                        try {
-                                            const debugSessionId = `${method.toLowerCase()}-${encodeURIComponent(url || "no-url")}-${Date.now()}`;
-                                            const sessionData = {
-                                                method,
-                                                url,
-                                                headers: headers.filter(h => h.enabled),
-                                                body: bodyType !== 'none' ? bodyContent : null,
-                                                bodyType,
-                                                authConfig,
-                                                timestamp: Date.now()
-                                            };
-
-                                            // Make sure the debug panel is visible
-                                            if (typeof VisualizationDebugger !== 'undefined') {
-                                                VisualizationDebugger.showDebugPanel();
-
-                                                // Create a new session
-                                                const session = VisualizationDebugger.startSession(
-                                                    debugSessionId,
-                                                    document.getElementById('visualization-debugger-container'),
-                                                    sessionData
-                                                );
-                                                setCurrentDebugSession(session);
-
-                                                // Add a clear instruction to user
-                                                VisualizationDebugger.addLog(debugSessionId, 'info', `🎯 Debug session active. Click "Send" button to see request logs.`);
-                                                VisualizationDebugger.addLog(debugSessionId, 'info', `💻 Use the filter buttons and search box above to filter logs.`);
-
-                                                // Start browser console capture for external websites
-                                                if (url && url !== 'no-url' && url.startsWith('http')) {
-                                                    setTimeout(async () => {
-                                                        const success = await VisualizationDebugger.startBrowserConsoleCapture(url);
-                                                        if (success) {
-                                                            VisualizationDebugger.addLog(debugSessionId, 'success', `🌐 Now capturing real-time console logs from ${url}`);
-                                                            VisualizationDebugger.addLog(debugSessionId, 'info', `💡 Browser console output (console.log, errors, warnings) will appear here in real-time`);
-                                                        } else {
-                                                            VisualizationDebugger.addLog(debugSessionId, 'warn', `⚠️ Could not start browser console capture for ${url}`);
-                                                            VisualizationDebugger.addLog(debugSessionId, 'info', `💡 You can still see Pigeon internal logs and proxy request/response data`);
-                                                        }
-                                                    }, 1000);
-                                                } else {
-                                                    VisualizationDebugger.addLog(debugSessionId, 'info', `💡 Enter a valid HTTP/HTTPS URL to capture external website console logs`);
-                                                }
-
-                                                // Test console interception with sample logs
-                                                setTimeout(() => {
-                                                    console.log("Test console.log - this should appear in debug console");
-                                                    console.warn("Test console.warn - this should appear in debug console");
-                                                    console.error("Test console.error - this should appear in debug console");
-                                                }, 1000);
-                                            }
-                                        } catch (error) {
-                                            console.error('Error starting debug session:', error);
-                                        }
-                                    }}
-                                >
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <circle cx="11" cy="11" r="8" stroke="currentColor" strokeWidth="2" />
-                                        <path d="M21 21l-4.35-4.35" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                                    </svg>
-                                    Start Debugging
-                                </button>
-                                <button
-                                    type="button"
-                                    className="debug-btn debug-btn-ghost"
-                                    onClick={() => {
-                                        // Use VisualizationDebugger to clear the console
-                                        if (typeof VisualizationDebugger !== 'undefined') {
-                                            VisualizationDebugger.clearConsole();
-                                        }
-                                    }}
-                                >
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m3 0v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6h14z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                                    </svg>
-                                    Clear Console
-                                </button>
-                                <button
-                                    type="button"
-                                    className="debug-btn debug-btn-ghost"
-                                    onClick={() => {
-                                        // Test console interception
-                                        if (typeof VisualizationDebugger !== 'undefined') {
-                                            VisualizationDebugger.activateConsoleCapture();
-
-                                            // Test with actual console calls
-                                            setTimeout(() => {
-                                                console.log("✅ Test log message - this should appear in debug console");
-                                                console.warn("⚠️ Test warning message");
-                                                console.error("❌ Test error message");
-                                                console.log("Demo object:", { test: "data", number: 42 });
-                                            }, 500);
-                                        }
-                                    }}
-                                >
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M9 12l2 2 4-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                                        <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" />
-                                    </svg>
-                                    Test Console Capture
-                                </button>
-                                <button
-                                    type="button"
-                                    className="debug-btn debug-btn-accent"
-                                    onClick={async () => {
-                                        // Toggle browser console capture with optimized polling
-                                        if (typeof VisualizationDebugger !== 'undefined') {
-                                            if (VisualizationDebugger._browserCaptureSession) {
-                                                await VisualizationDebugger.stopBrowserConsoleCapture();
-                                            } else if (url && url !== 'no-url' && url.startsWith('http')) {
-                                                const success = await VisualizationDebugger.startBrowserConsoleCapture(url);
-                                                if (success) {
-                                                    if (currentDebugSession?.id) {
-                                                        VisualizationDebugger.log(`🌐 Browser console capture started for ${url}`, 'success');
-                                                    }
-
-                                                    // Add a message in the UI about optimized capture
-                                                    const consoleOutput = document.getElementById('console-output');
-                                                    if (consoleOutput) {
-                                                        const message = document.createElement('div');
-                                                        message.className = 'log-entry log-info';
-                                                        message.innerHTML = `
-                                                            <div class="log-time">${new Date().toLocaleTimeString()}</div>
-                                                            <div class="log-icon">ℹ️</div>
-                                                            <div class="log-message">Console capture started with optimized polling (every 5s) to prevent excessive logging</div>
-                                                        `;
-                                                        consoleOutput.appendChild(message);
-                                                        consoleOutput.scrollTop = consoleOutput.scrollHeight;
-                                                    }
-                                                } else {
-                                                    if (currentDebugSession?.id) {
-                                                        VisualizationDebugger.log(`❌ Failed to start browser console capture`, 'error');
-                                                    }
-                                                }
-                                            } else {
-                                                if (currentDebugSession?.id) {
-                                                    VisualizationDebugger.log(`⚠️ Enter a valid HTTP/HTTPS URL to capture website console logs`, 'warn');
-                                                }
-                                            }
-                                        }
-                                    }}
-                                >
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 11-7.778 7.778 5.5 5.5 0 017.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                                    </svg>
-                                    {(typeof VisualizationDebugger !== 'undefined' && VisualizationDebugger._browserCaptureSession) ? 'Stop Website Capture' : 'Capture Website Console'}
-                                </button>
-                            </div>
-                        </div>
-
-                        <div className="debug-content">
-                            <div className="debug-tabs">
-                                <button type="button" className="debug-tab active" data-tab="console">
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                        <rect x="2" y="4" width="20" height="16" rx="2" ry="2"></rect>
-                                        <line x1="8" y1="12" x2="16" y2="12"></line>
-                                        <line x1="8" y1="16" x2="14" y2="16"></line>
-                                        <line x1="2" y1="8" x2="22" y2="8"></line>
-                                    </svg>
-                                    <span>Console</span>
-                                </button>
-                                <button type="button" className="debug-tab" data-tab="network">
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                        <circle cx="12" cy="12" r="10"></circle>
-                                        <path d="M2 12h20"></path>
-                                        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
-                                    </svg>
-                                    <span>Network</span>
-                                </button>
-                                <button type="button" className="debug-tab" data-tab="performance">
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                        <path d="M12 20v-6"></path>
-                                        <path d="M6 20v-12"></path>
-                                        <path d="M18 20V8"></path>
-                                    </svg>
-                                    <span>Performance</span>
-                                </button>
-                                <button className="debug-tab" data-tab="elements">
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                                        <line x1="3" y1="9" x2="21" y2="9"></line>
-                                        <line x1="9" y1="21" x2="9" y2="9"></line>
-                                    </svg>
-                                    <span>Elements</span>
-                                </button>
-                            </div>
-                            <div className="debug-panels">
-                                <div className="debug-panel active" id="console-panel">
-                                    <div className="console-filters">
-                                        <div className="filter-group">
-                                            <button
-                                                type="button"
-                                                className={`filter-btn ${consoleFilter === 'all' ? 'active' : ''}`}
-                                                onClick={() => {
-                                                    setConsoleFilter('all');
-                                                    if (typeof VisualizationDebugger !== 'undefined') {
-                                                        VisualizationDebugger.setFilter('all');
-                                                    }
-                                                }}
-                                            >
-                                                All
-                                            </button>
-                                            <button
-                                                type="button"
-                                                className={`filter-btn ${consoleFilter === 'info' ? 'active' : ''}`}
-                                                onClick={() => {
-                                                    setConsoleFilter('info');
-                                                    if (typeof VisualizationDebugger !== 'undefined') {
-                                                        VisualizationDebugger.setFilter('info');
-                                                    }
-                                                }}
-                                            >
-                                                Info
-                                            </button>
-                                            <button
-                                                type="button"
-                                                className={`filter-btn ${consoleFilter === 'warn' ? 'active' : ''}`}
-                                                onClick={() => {
-                                                    setConsoleFilter('warn');
-                                                    if (typeof VisualizationDebugger !== 'undefined') {
-                                                        VisualizationDebugger.setFilter('warn');
-                                                    }
-                                                }}
-                                            >
-                                                Warnings
-                                            </button>
-                                            <button
-                                                type="button"
-                                                className={`filter-btn ${consoleFilter === 'error' ? 'active' : ''}`}
-                                                onClick={() => {
-                                                    setConsoleFilter('error');
-                                                    if (typeof VisualizationDebugger !== 'undefined') {
-                                                        VisualizationDebugger.setFilter('error');
-                                                    }
-                                                }}
-                                            >
-                                                Errors
-                                            </button>
-                                            <button
-                                                type="button"
-                                                className={`filter-btn ${consoleFilter === 'debug' ? 'active' : ''}`}
-                                                onClick={() => {
-                                                    setConsoleFilter('debug');
-                                                    if (typeof VisualizationDebugger !== 'undefined') {
-                                                        VisualizationDebugger.setFilter('debug');
-                                                    }
-                                                }}
-                                            >
-                                                Debug
-                                            </button>
-                                        </div>
-                                        <div className="search-box">
-                                            <span className="search-icon">🔍</span>
-                                            <input
-                                                type="text"
-                                                placeholder="Search logs..."
-                                                className="search-input"
-                                                onChange={(e) => {
-                                                    if (typeof VisualizationDebugger !== 'undefined') {
-                                                        VisualizationDebugger.applyTextFilter(e.target.value.trim().toLowerCase());
-                                                    }
-                                                }}
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="modern-debug-placeholder">
-                                        <div className="modern-debug-message">
-                                            <h3>🔍 Modern Debug Console</h3>
-                                            <p>Click "Start Debugging" to use the enhanced debug console with advanced filtering capabilities</p>
-                                        </div>
-                                    </div>
-                                    <div className="console-input">
-                                        <input
-                                            type="text"
-                                            id="console-input"
-                                            placeholder="Enter command (type 'help' for available commands)..."
-                                            onKeyDown={(e) => {
-                                                if (e.key === 'Enter') {
-                                                    e.preventDefault();
-                                                    e.stopPropagation();
-                                                    // Let VisualizationDebugger handle the command
-                                                    return false;
-                                                }
-                                            }}
-                                        />
-                                    </div>
-                                </div>
-                                <div className="debug-panel" id="network-panel">
-                                    <div className="network-requests" id="network-requests">
-                                        <div className="empty-state">
-                                            <h4>📡 Network Requests</h4>
-                                            <p>Start debugging to see network request details</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="debug-panel" id="performance-panel">
-                                    <div className="performance-metrics" id="performance-metrics">
-                                        <div className="empty-state">
-                                            <h4>⚡ Performance Metrics</h4>
-                                            <p>Start debugging to see performance data</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="debug-panel" id="elements-panel">
-                                    <div className="elements-tree" id="elements-tree">
-                                        <div className="empty-state">
-                                            <h4>🏗️ Request Elements</h4>
-                                            <p>Start debugging to inspect request structure</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                );
-
-            case 'export-options':
-                return (
-                    <div className="export-options-section">
-                        <div className="export-header">
-                            <h4>Export & Share Options</h4>
-                            <div className="export-actions">
-                                <button
-                                    className="btn btn-small"
-                                    onClick={() => {
-                                        const requestData = {
-                                            method,
-                                            url,
-                                            headers: headers.filter(h => h.enabled),
-                                            body: bodyType !== 'none' ? bodyContent : null
-                                        };
-                                        ExportService.exportRequest(requestData, 'postman');
-                                    }}
-                                >
-                                    📤 Export to Postman
-                                </button>
-                                <button
-                                    className="btn btn-small"
-                                    onClick={() => {
-                                        const requestData = {
-                                            method,
-                                            url,
-                                            headers: headers.filter(h => h.enabled),
-                                            body: bodyType !== 'none' ? bodyContent : null
-                                        };
-                                        ExportService.exportRequest(requestData, 'curl');
-                                    }}
-                                >
-                                    📋 Export as cURL
-                                </button>
-                                <button
-                                    className="btn btn-small"
-                                    onClick={() => {
-                                        const requestData = {
-                                            method,
-                                            url,
-                                            headers: headers.filter(h => h.enabled),
-                                            body: bodyType !== 'none' ? bodyContent : null
-                                        };
-                                        ExportService.exportRequest(requestData, 'openapi');
-                                    }}
-                                >
-                                    📄 Export as OpenAPI
-                                </button>
-                            </div>
-                        </div>
-
-                        <div className="export-content">
-                            <div className="export-formats">
-                                <h5>Export Formats</h5>
-                                <div className="format-grid">
-                                    <div className="format-item"
-                                        onClick={() => generateExportPreview('postman')}
-                                        role="button"
-                                        tabIndex={0}
-                                        onKeyDown={(e) => e.key === 'Enter' && generateExportPreview('postman')}>
-                                        <div className="format-icon">📤</div>
-                                        <div className="format-details">
-                                            <div className="format-name">Postman</div>
-                                            <div className="format-description">Collection file</div>
-                                        </div>
-                                    </div>
-                                    <div className="format-item"
-                                        onClick={() => generateExportPreview('curl')}
-                                        role="button"
-                                        tabIndex={0}
-                                        onKeyDown={(e) => e.key === 'Enter' && generateExportPreview('curl')}>
-                                        <div className="format-icon">📋</div>
-                                        <div className="format-details">
-                                            <div className="format-name">cURL</div>
-                                            <div className="format-description">Terminal command</div>
-                                        </div>
-                                    </div>
-                                    <div className="format-item"
-                                        onClick={() => generateExportPreview('openapi')}
-                                        role="button"
-                                        tabIndex={0}
-                                        onKeyDown={(e) => e.key === 'Enter' && generateExportPreview('openapi')}>
-                                        <div className="format-icon">📄</div>
-                                        <div className="format-details">
-                                            <div className="format-name">OpenAPI</div>
-                                            <div className="format-description">API specification</div>
-                                        </div>
-                                    </div>
-                                    <div className="format-item"
-                                        onClick={() => generateExportPreview('share')}
-                                        role="button"
-                                        tabIndex={0}
-                                        onKeyDown={(e) => e.key === 'Enter' && generateExportPreview('share')}>
-                                        <div className="format-icon">🔗</div>
-                                        <div className="format-details">
-                                            <div className="format-name">Share</div>
-                                            <div className="format-description">Shareable link</div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="export-preview">
-                                <h5>Preview</h5>
-                                <div className="preview-container">
-                                    {exportPreview ? (
-                                        <>
-                                            <div className="preview-header">
-                                                <h6 className="preview-title">{exportPreview.title}</h6>
-                                                <div className="preview-actions">
-                                                    {exportPreview.copyable && (
-                                                        <button
-                                                            className="preview-btn"
-                                                            onClick={() => navigator.clipboard.writeText(exportPreview.content)}
-                                                            title="Copy to clipboard"
-                                                        >
-                                                            📋 Copy
-                                                        </button>
-                                                    )}
-                                                    <button
-                                                        className="preview-btn"
-                                                        onClick={() => setExportPreview(null)}
-                                                        title="Clear preview"
-                                                    >
-                                                        ✕ Clear
-                                                    </button>
-                                                </div>
-                                            </div>
-                                            <div className="preview-content">
-                                                <pre className="preview-code">{exportPreview.content}</pre>
-                                            </div>
-                                        </>
-                                    ) : (
-                                        <div className="preview-empty">
-                                            <div className="preview-empty-icon">📋</div>
-                                            <p className="preview-empty-text">Select an export format to preview</p>
-                                            <p className="preview-empty-hint">Click on any format above to see the generated output</p>
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    <DebugConsoleHost
+                        method={method}
+                        url={url}
+                        headers={headers}
+                        bodyContent={bodyContent}
+                        bodyType={bodyType}
+                        authConfig={authConfig}
+                        setCurrentDebugSession={setCurrentDebugSession}
+                    />
                 );
 
             default:
