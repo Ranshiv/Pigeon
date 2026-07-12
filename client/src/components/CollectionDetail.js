@@ -4,7 +4,6 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import './CollectionDetail.css';
 import ActiveCollaborators from './ActiveCollaborators';
 import RequestForm from './RequestForm';
-import ResponseDisplay from './ResponseDisplay';
 import SampleDataManager from './SampleDataManager';
 import DocumentationViewer from './DocumentationViewer';
 import EnvironmentSelector from './EnvironmentSelector';
@@ -1016,6 +1015,10 @@ function CollectionDetail() {
                     <RequestForm
                       key={selectedRequest?._id || selectedRequest?.id || 'new-request'}
                       request={selectedRequest}
+                      collection={collection}
+                      collectionId={collectionId}
+                      workspaceId={collection?.workspaceId}
+                      environmentId={selectedEnvironmentId}
                       onSave={handleSaveRequest}
                       onSendRequest={handleSendRequest}
                       onRunRequest={(requestId) => {
@@ -1025,11 +1028,6 @@ function CollectionDetail() {
                           collectionName: collection.name
                         });
                       }}
-                    />
-                    {/* Pass responseData to ResponseDisplay */}
-                    <ResponseDisplay
-                      requestId={selectedRequest._id || selectedRequest.id}
-                      responseData={responseData}
                     />
                   </div>
                 )

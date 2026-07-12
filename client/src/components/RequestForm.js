@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import './RequestForm.css';
 import {
     List,
@@ -55,7 +55,7 @@ const getApiUrl = (path) => {
 const HTTP_METHODS = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD', 'OPTIONS'];
 
 const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialRequest, request,
-    collectionId, workspaceId, environmentId, collection }) => {
+    collectionId, workspaceId, environmentId, collection, onResponse, hideResponse }) => {
     // Use either initialRequest or request prop (for backward compatibility)
     const initialData = request || initialRequest || {};
 
@@ -70,6 +70,14 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
     const [responseData, setResponseData] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
     const [responseError, setResponseError] = useState(null);
+
+    // Notify parent split-pane view of response state changes (used when
+    // this form is embedded with an external ResponseDisplay pane).
+    useEffect(() => {
+        if (onResponse) {
+            onResponse(responseData, isLoading, responseError);
+        }
+    }, [responseData, isLoading, responseError, onResponse]);
 
     // Tab content states
     const [params, setParams] = useState(initialData.params || []);
@@ -145,8 +153,10 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
         includeMetadata: true
     });
     const [exportPreview, setExportPreview] = useState(null);
+    const [exportFormat, setExportFormat] = useState(null);
 
     // Re-sync form state when user switches between requests.
+    const prevRequestIdRef = useRef(null);
     useEffect(() => {
         const nextData = request || initialRequest || {};
 
@@ -188,12 +198,19 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
         });
         setIsNew(Boolean(nextData.isNew));
 
-        // Clear the previous request's response so switching requests doesn't
-        // leave a stale 200/error from the prior one on screen.
-        setResponseData(null);
-        setResponseError(null);
-        setIsLoading(false);
-        setPostRequestScriptResults(null);
+        // Clear the previous request's response ONLY when switching to a
+        // different request — saving the same request returns a new object
+        // reference for the same id, and clipping responseData there wipes
+        // the just-rendered response (matches the "flashes then disappears"
+        // symptom on Send).
+        const nextId = nextData._id || nextData.id;
+        if (prevRequestIdRef.current !== nextId) {
+            setResponseData(null);
+            setResponseError(null);
+            setIsLoading(false);
+            setPostRequestScriptResults(null);
+            prevRequestIdRef.current = nextId;
+        }
     }, [request, initialRequest]);
 
     // Debug console state
@@ -750,7 +767,19 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
 
         // Check for external handlers first
         if (onSendRequest) {
-            onSendRequest(interpolatedRequest);
+            setIsLoading(true);
+            setResponseData(null);
+            setResponseError(null);
+            try {
+                const result = await onSendRequest(interpolatedRequest);
+                if (result) {
+                    setResponseData(result);
+                }
+            } catch (err) {
+                setResponseError(err.message || 'Failed to send request');
+            } finally {
+                setIsLoading(false);
+            }
             return;
         } else if (onSubmit) {
             onSubmit(interpolatedRequest);
@@ -2660,6 +2689,65 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
                     />
                 );
 
+            case 'export-options':
+                return (
+                    <div className="export-options-section">
+                        <div className="section-header-row">
+                            <div className="section-title">
+                                <FolderOutput size={18} />
+                                <span>Export Request</span>
+                            </div>
+                            <span className="section-description">
+                                Generate a shareable format of this request — Postman collection, cURL command, OpenAPI spec, or a link
+                            </span>
+                        </div>
+
+                        <div className="auth-type-grid" role="radiogroup" aria-label="Export format">
+                            {[
+                                { key: 'postman', label: 'Postman', desc: 'Collection v2.1 JSON', icon: FileText },
+                                { key: 'curl', label: 'cURL', desc: 'Shell command', icon: Terminal },
+                                { key: 'openapi', label: 'OpenAPI', desc: '3.0 spec JSON', icon: FileText },
+                                { key: 'share', label: 'Share Link', desc: 'Encoded URL', icon: Globe }
+                            ].map(({ key, label, desc, icon: Icon }) => {
+                                const active = exportFormat === key;
+                                return (
+                                    <button
+                                        key={key}
+                                        type="button"
+                                        role="radio"
+                                        aria-checked={active}
+                                        className={`auth-type-card${active ? ' active' : ''}`}
+                                        onClick={() => { setExportFormat(key); generateExportPreview(key); }}
+                                    >
+                                        <span className="auth-type-card-icon"><Icon size={20} /></span>
+                                        <span className="auth-type-card-label">{label}</span>
+                                        <span className="auth-type-card-desc">{desc}</span>
+                                    </button>
+                                );
+                            })}
+                        </div>
+
+                        {exportPreview && (
+                            <div className="export-preview-box">
+                                <div className="export-preview-head">
+                                    <FileText size={15} />
+                                    <span className="export-preview-title">{exportPreview.title}</span>
+                                    {exportPreview.copyable && (
+                                        <button
+                                            type="button"
+                                            className="export-copy-btn"
+                                            onClick={() => navigator.clipboard?.writeText(exportPreview.content)}
+                                        >
+                                            Copy
+                                        </button>
+                                    )}
+                                </div>
+                                <pre className="export-preview-code">{exportPreview.content}</pre>
+                            </div>
+                        )}
+                    </div>
+                );
+
             default:
                 return null;
         }
@@ -2809,8 +2897,9 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
                 {renderTabContent()}
             </form>
 
-            {/* Only show this response section when there's data to display */}
-            {(responseData || isLoading || responseError) && (
+            {/* Only show this response section when there's data to display and
+                the parent isn't rendering its own split-pane response view. */}
+            {!hideResponse && (responseData || isLoading || responseError) && (
                 <div className="response-section">
                     <h3>Response</h3>
 
