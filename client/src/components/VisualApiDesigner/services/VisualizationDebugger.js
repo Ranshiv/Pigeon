@@ -1123,7 +1123,7 @@ export class VisualizationDebugger {
                 align-items: center;
                 gap: 16px;
                 padding: 14px 20px;
-                margin: 12px 12px 4px 12px;
+                margin: 12px;
                 background: var(--card-bg, #161b22);
                 border: 1px solid var(--border-color, #21262d);
                 border-radius: 8px;
@@ -1747,11 +1747,11 @@ export class VisualizationDebugger {
         const consoleOutput = document.getElementById('console-output');
         if (consoleOutput) {
             consoleOutput.innerHTML = `
-    <div style="display: flex; align-items: flex-start; justify-content: flex-start; min-height: 200px; padding: 20px;">
-        <div style="text-align: center; background: #161b22; border: 1px solid #21262d; border-radius: 12px; padding: 32px 40px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); max-width: 400px; width: 100%;">
-            <div style="font-size: 32px; margin-bottom: 16px; line-height: 1;">🧹</div>
-            <div style="color: #f0f6fc; font-weight: 600; font-size: 16px; margin-bottom: 8px; letter-spacing: -0.01em;">Console Cleared</div>
-            <div style="color: #8b949e; font-size: 14px; line-height: 1.5; font-weight: 400;">Ready for new logs...</div>
+    <div class="console-welcome-message">
+        <div class="welcome-icon">🧹</div>
+        <div class="welcome-content">
+            <div class="welcome-title">Console Cleared</div>
+            <div class="welcome-subtitle">Ready for new logs...</div>
         </div>
     </div>`;
         }

@@ -24,7 +24,7 @@ const HistoryDetailsSection = () => {
     }, []);
 
     useEffect(() => {
-        if (urlParamId && !selectedHistoryItem) {
+        if (urlParamId && selectedHistoryItem?._id !== urlParamId) {
             fetchHistoryById(urlParamId);
         }
     }, [urlParamId]);

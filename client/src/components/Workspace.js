@@ -45,7 +45,7 @@ const Workspace = () => {
     };
 
     return (
-        <div style={{ position: 'relative', minHeight: '100vh' }} onMouseMove={handleMouseMove}>
+        <div style={{ position: 'relative' }} onMouseMove={handleMouseMove}>
             <CursorOverlay />
             <VideoChatOverlay />
             <ActivityFeed />

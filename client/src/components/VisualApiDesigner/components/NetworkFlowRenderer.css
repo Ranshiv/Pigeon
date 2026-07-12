@@ -580,8 +580,8 @@ edge.traffic-pulse {
     }
 
     .sidebar-header {
-        background: #0f172a;
-        border-color: #334155;
+        background: var(--sidebar-bg);
+        border-bottom-color: var(--border-color);
     }
 
     .sidebar-header h4 {

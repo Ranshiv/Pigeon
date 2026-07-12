@@ -138,8 +138,7 @@
     border: 1px solid var(--border-color);
     border-radius: var(--border-radius-lg);
     padding: 20px;
-    max-height: calc(100vh - 140px);
-    overflow-y: auto;
+    align-self: start;
 }
 
 .filter-section {
@@ -191,7 +190,7 @@
 }
 
 .filter-select {
-    /* Inherit global index.css select styling; only layout overrides */
+    /* Layout only — AppSelect's own CSS (app-select-trigger) owns the box chrome. */
     width: 100%;
 }
 
@@ -624,7 +623,6 @@
     .filters-sidebar {
         position: relative;
         top: 0;
-        max-height: none;
     }
 }
 

@@ -1,7 +1,14 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Search, Filter, Star, TrendingUp, Zap, ChevronDown, X } from 'lucide-react';
 import ApiDetailModal from './ApiDetailModal';
+import AppSelect from '../common/AppSelect/AppSelect';
 import './ExplorePage.css';
+
+const SORT_OPTIONS = [
+    { value: 'popular', label: 'Most Popular' },
+    { value: 'rating', label: 'Highest Rated' },
+    { value: 'name', label: 'Name (A-Z)' }
+];
 
 const ExplorePage = () => {
     const [searchQuery, setSearchQuery] = useState('');
@@ -197,18 +204,15 @@ const ExplorePage = () => {
                             {/* Sort By */}
                             <div className="filter-group">
                                 <label className="filter-label">Sort By</label>
-                                <select
+                                <AppSelect
+                                    className="filter-select"
                                     value={sortBy}
-                                    onChange={(e) => {
-                                        setSortBy(e.target.value);
+                                    onChange={(v) => {
+                                        setSortBy(v);
                                         setPage(1);
                                     }}
-                                    className="filter-select"
-                                >
-                                    <option value="popular">Most Popular</option>
-                                    <option value="rating">Highest Rated</option>
-                                    <option value="name">Name (A-Z)</option>
-                                </select>
+                                    options={SORT_OPTIONS}
+                                />
                             </div>
 
                             {/* Categories */}

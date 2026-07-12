@@ -60,19 +60,21 @@
 }
 
 .new-workspace-btn {
-    display: flex;
+    display: inline-flex;
     align-items: center;
     gap: 8px;
-    background: linear-gradient(135deg, var(--primary-color) 0%, #013B5B 100%);
+    background-color: var(--primary-color);
     color: #ffffff;
     border: none;
-    padding: 0.75rem 1.5rem;
-    border-radius: 8px;
+    padding: 10px 18px;
+    border-radius: var(--border-radius-md, 8px);
     font-size: 0.95rem;
-    font-weight: 500;
+    font-weight: var(--font-weight-medium, 500);
+    line-height: 1.4;
     cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 4px 12px rgba(1, 76, 117, 0.3);
+    transition: background-color var(--transition-speed) ease,
+                transform var(--transition-speed) ease,
+                box-shadow var(--transition-speed) ease;
 }
 
 .new-workspace-btn svg {
@@ -80,9 +82,16 @@
 }
 
 .new-workspace-btn:hover {
-    background: linear-gradient(135deg, var(--primary-hover) 0%, #012A41 100%);
-    box-shadow: 0 6px 16px rgba(1, 76, 117, 0.4);
-    transform: translateY(-2px);
+    background-color: var(--primary-hover);
+}
+
+.new-workspace-btn:active {
+    transform: translateY(1px);
+}
+
+.new-workspace-btn:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px var(--primary-light, rgba(1, 76, 117, 0.25));
 }
 
 /* Workspace Type Tabs Styling - Enhanced with 2025 Blue Palette */
@@ -347,27 +356,36 @@
 }
 
 .create-workspace-btn {
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    gap: 8px;
-    background: linear-gradient(135deg, var(--primary-color) 0%, #013B5B 100%);
+    gap: var(--spacing-xs, 8px);
+    background-color: var(--primary-color);
     color: #ffffff;
     border: none;
-    padding: 0.75rem 1.5rem;
-    border-radius: 8px;
+    padding: 10px 18px;
+    border-radius: var(--border-radius-md, 8px);
     font-size: 0.95rem;
-    font-weight: 500;
+    font-weight: var(--font-weight-medium, 500);
+    line-height: 1.4;
     cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 4px 12px rgba(1, 76, 117, 0.3);
+    transition: background-color var(--transition-speed) ease,
+                transform var(--transition-speed) ease,
+                box-shadow var(--transition-speed) ease;
     margin: 10px;
-    width: 90%;
+    width: auto;
 }
 
 .create-workspace-btn:hover {
-    background: linear-gradient(135deg, var(--primary-hover) 0%, #012A41 100%);
-    box-shadow: 0 6px 16px rgba(1, 76, 117, 0.4);
-    transform: translateY(-2px);
+    background-color: var(--primary-hover);
+}
+
+.create-workspace-btn:active {
+    transform: translateY(1px);
+}
+
+.create-workspace-btn:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px var(--primary-light, rgba(1, 76, 117, 0.25));
 }
 
 /* Modal Styles - Enhanced with 2025 Blue Palette */

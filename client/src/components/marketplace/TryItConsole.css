@@ -64,8 +64,7 @@
     transition: all 0.2s;
 }
 
-.form-select {
-    /* Inherit global index.css select styling; only layout overrides */
+.tryit-endpoint-select {
     width: 100%;
 }
 
@@ -88,16 +87,13 @@
     align-items: center;
 }
 
-.method-select {
-    /* Inherit global index.css select styling; only layout/weight overrides */
+.tryit-method-select {
+    /* Layout only — AppSelect's own CSS (app-select-trigger) owns the box chrome. */
     width: 90px !important;
     min-width: 90px !important;
     font-weight: 700;
 }
 
-.method-select:focus {
-    outline: none;
-}
 
 .url-input {
     padding: 12px 16px;
@@ -593,13 +589,13 @@ button[class*="add"],
     margin-bottom: 16px;
 }
 
-.lang-select {
+.tryit-lang-select {
     /* Inherit global index.css select styling; only layout overrides */
     width: auto;
     min-width: 140px;
 }
 
-.lang-select:focus {
+.tryit-lang-select:focus {
     outline: none;
 }
 

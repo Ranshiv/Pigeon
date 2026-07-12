@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { FiGlobe, FiLayers, FiDatabase, FiSettings, FiEye, FiEyeOff, FiInfo, FiChevronDown, FiChevronUp } from 'react-icons/fi';
+import React, { useState, useEffect } from 'react';
+import { FiGlobe, FiLayers, FiDatabase, FiSettings, FiEye, FiEyeOff, FiInfo, FiPlus } from 'react-icons/fi';
 import './UnifiedVariableViewer.css';
 
 const UnifiedVariableViewer = ({
@@ -9,22 +9,36 @@ const UnifiedVariableViewer = ({
     requestVariables = [],
     resolvedVariables = {},
     onEditVariable,
+    onAddVariable,
+    editableScope,
     showActions = false,
-    compact = false
+    compact = false,
+    defaultScope = 'request',
+    openAddSignal,
+    openAddScope
 }) => {
-    const [expandedSections, setExpandedSections] = useState({
-        global: true,
-        collection: true,
-        environment: true,
-        request: true
-    });
+    const smartDefault = requestVariables.length ? 'request'
+        : environmentVariables.length ? 'environment'
+        : collectionVariables.length ? 'collection'
+        : globalVariables.length ? 'global'
+        : defaultScope;
+    const [activeScope, setActiveScope] = useState(smartDefault);
     const [showValues, setShowValues] = useState({});
+    const [showAddForm, setShowAddForm] = useState(false);
+    const [newVariable, setNewVariable] = useState({ key: '', value: '', description: '', type: 'string' });
+
+    useEffect(() => {
+        if (!openAddSignal) return;
+        setActiveScope(openAddScope || 'request');
+        setShowAddForm(true);
+    }, [openAddSignal]);
 
     // Variable precedence levels with metadata
     const variableLevels = [
         {
             id: 'request',
             name: 'Request Variables',
+            tab: 'Request',
             icon: FiSettings,
             color: '#22c55e',
             description: 'Variables specific to this request (highest priority)',
@@ -34,6 +48,7 @@ const UnifiedVariableViewer = ({
         {
             id: 'environment',
             name: 'Environment Variables',
+            tab: 'Environment',
             icon: FiLayers,
             color: '#014C75',
             description: 'Variables for the current environment',
@@ -43,6 +58,7 @@ const UnifiedVariableViewer = ({
         {
             id: 'collection',
             name: 'Collection Variables',
+            tab: 'Collection',
             icon: FiDatabase,
             color: '#f59e0b',
             description: 'Variables shared across all requests in this collection',
@@ -52,6 +68,7 @@ const UnifiedVariableViewer = ({
         {
             id: 'global',
             name: 'Global Variables',
+            tab: 'Global',
             icon: FiGlobe,
             color: '#014C75',
             description: 'Variables available across all workspaces (lowest priority)',
@@ -60,11 +77,11 @@ const UnifiedVariableViewer = ({
         }
     ];
 
-    const toggleSection = (sectionId) => {
-        setExpandedSections(prev => ({
-            ...prev,
-            [sectionId]: !prev[sectionId]
-        }));
+    const handleAddVariable = (levelId) => {
+        if (!newVariable.key.trim() || !onAddVariable) return;
+        onAddVariable({ ...newVariable, key: newVariable.key.trim() }, levelId);
+        setNewVariable({ key: '', value: '', description: '', type: 'string' });
+        setShowAddForm(false);
     };
 
     const toggleShowValue = (variableKey) => {
@@ -171,54 +188,112 @@ const UnifiedVariableViewer = ({
     };
 
     const renderVariableLevel = (level) => {
-        const isExpanded = expandedSections[level.id];
-        const variableCount = level.variables.length;
-        const activeCount = level.variables.filter(v =>
-            resolvedVariables.hasOwnProperty(v.key) && !isVariableOverridden(v.key, level)
-        ).length;
+        const isEditable = !!onAddVariable && (
+            editableScope === 'all' ||
+            editableScope === level.id ||
+            (Array.isArray(editableScope) && editableScope.includes(level.id))
+        );
 
         return (
             <div key={level.id} className={`variable-level ${level.id}`}>
-                <div
-                    className="level-header"
-                    onClick={() => toggleSection(level.id)}
-                    style={{ '--level-color': level.color }}
-                >
-                    <div className="level-info">
-                        <level.icon className="level-icon" size={18} />
-                        <div className="level-details">
-                            <h4 className="level-name">{level.name}</h4>
-                            <p className="level-description">{level.description}</p>
-                        </div>
-                    </div>
-                    <div className="level-stats">
-                        <span className="variable-count">
-                            {variableCount} variable{variableCount !== 1 ? 's' : ''}
-                            {activeCount > 0 && (
-                                <span className="active-count"> • {activeCount} active</span>
+                <div className="level-content">
+                    {level.variables.length > 0 ? (
+                        <div className="variables-list">
+                            {level.variables.map(variable => renderVariableItem(variable, level))}
+                            {isEditable && (
+                                showAddForm ? (
+                                    <div className="inline-add-form inline-add-form-inline">
+                                        <div className="inline-form-row">
+                                            <input
+                                                type="text"
+                                                placeholder="Variable name"
+                                                value={newVariable.key}
+                                                onChange={(e) => setNewVariable({ ...newVariable, key: e.target.value })}
+                                                className="inline-form-input"
+                                                autoFocus
+                                            />
+                                            <input
+                                                type="text"
+                                                placeholder="Value"
+                                                value={newVariable.value}
+                                                onChange={(e) => setNewVariable({ ...newVariable, value: e.target.value })}
+                                                className="inline-form-input"
+                                            />
+                                        </div>
+                                        <div className="inline-form-actions">
+                                            <button
+                                                className="inline-add-confirm"
+                                                onClick={() => handleAddVariable(level.id)}
+                                                disabled={!newVariable.key.trim()}
+                                            >
+                                                <FiPlus size={14} /> Add Variable
+                                            </button>
+                                            <button
+                                                className="inline-add-cancel"
+                                                onClick={() => { setShowAddForm(false); setNewVariable({ key: '', value: '', description: '', type: 'string' }); }}
+                                            >
+                                                Cancel
+                                            </button>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <button className="add-variable-row-btn" onClick={() => setShowAddForm(true)}>
+                                        <FiPlus size={13} /> Add variable
+                                    </button>
+                                )
                             )}
-                        </span>
-                        <div className="priority-indicator">
-                            Priority: {level.priority}
                         </div>
-                        {isExpanded ? <FiChevronUp size={16} /> : <FiChevronDown size={16} />}
-                    </div>
+                    ) : (
+                        <div className="empty-variables-card">
+                            <FiInfo className="empty-icon" />
+                            <p className="empty-title">No {level.name.toLowerCase()} yet</p>
+                            <p className="empty-subtitle">
+                                Create reusable values such as API URLs, tokens, and user IDs.
+                            </p>
+                            {isEditable && !showAddForm && (
+                                <button className="empty-add-btn" onClick={() => setShowAddForm(true)}>
+                                    <FiPlus size={14} /> Add {level.tab.toLowerCase()} variable
+                                </button>
+                            )}
+                            {isEditable && showAddForm && (
+                                <div className="inline-add-form">
+                                    <div className="inline-form-row">
+                                        <input
+                                            type="text"
+                                            placeholder="Variable name"
+                                            value={newVariable.key}
+                                            onChange={(e) => setNewVariable({ ...newVariable, key: e.target.value })}
+                                            className="inline-form-input"
+                                            autoFocus
+                                        />
+                                        <input
+                                            type="text"
+                                            placeholder="Value"
+                                            value={newVariable.value}
+                                            onChange={(e) => setNewVariable({ ...newVariable, value: e.target.value })}
+                                            className="inline-form-input"
+                                        />
+                                    </div>
+                                    <div className="inline-form-actions">
+                                        <button
+                                            className="inline-add-confirm"
+                                            onClick={handleAddVariable}
+                                            disabled={!newVariable.key.trim()}
+                                        >
+                                            <FiPlus size={14} /> Add Variable
+                                        </button>
+                                        <button
+                                            className="inline-add-cancel"
+                                            onClick={() => { setShowAddForm(false); setNewVariable({ key: '', value: '', description: '', type: 'string' }); }}
+                                        >
+                                            Cancel
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    )}
                 </div>
-
-                {isExpanded && (
-                    <div className="level-content">
-                        {level.variables.length > 0 ? (
-                            <div className="variables-list">
-                                {level.variables.map(variable => renderVariableItem(variable, level))}
-                            </div>
-                        ) : (
-                            <div className="empty-variables">
-                                <FiInfo className="empty-icon" />
-                                <span>No {level.name.toLowerCase()} defined</span>
-                            </div>
-                        )}
-                    </div>
-                )}
             </div>
         );
     };
@@ -247,28 +322,30 @@ const UnifiedVariableViewer = ({
                 </div>
             </div>
 
-            <div className="precedence-indicator">
-                <div className="precedence-flow">
-                    {variableLevels.map((level, index) => (
-                        <React.Fragment key={level.id}>
-                            <div className="precedence-step" style={{ '--level-color': level.color }}>
-                                <level.icon size={14} />
-                                <span>{level.name.split(' ')[0]}</span>
-                            </div>
-                            {index < variableLevels.length - 1 && (
-                                <div className="precedence-arrow">→</div>
-                            )}
-                        </React.Fragment>
-                    ))}
-                </div>
-                <div className="precedence-note">
-                    <FiInfo size={12} />
-                    Variables on the left override variables on the right
-                </div>
+            <div className="variable-scope-tabs">
+                {variableLevels.map(level => {
+                    const count = level.variables.length;
+                    const active = activeScope === level.id;
+                    return (
+                        <div
+                            key={level.id}
+                            className={`scope-tab${active ? ' active' : ''}`}
+                            onClick={() => setActiveScope(level.id)}
+                            role="tab"
+                            aria-selected={active}
+                        >
+                            <level.icon size={13} />
+                            <span>{level.tab}</span>
+                            <span className="scope-tab-count">{count}</span>
+                        </div>
+                    );
+                })}
             </div>
 
             <div className="variable-levels">
-                {variableLevels.map(renderVariableLevel)}
+                {variableLevels
+                    .filter(level => level.id === activeScope)
+                    .map(renderVariableLevel)}
             </div>
         </div>
     );

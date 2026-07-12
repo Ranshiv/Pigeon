@@ -54,6 +54,54 @@ const getApiUrl = (path) => {
 // HTTP Methods
 const HTTP_METHODS = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD', 'OPTIONS'];
 
+/* Resizable key/value/description columns for the Params + Headers tables.
+   Usage: call useColumnResizer(tableId) -> returns { widths, startDrag, resizer }.
+   widths is keyed by column id ('key'|'value'|'description'); resizer is the
+   <span> to drop inside each resizable <th>. Drag updates pixels; min 60px. */
+const useColumnResizer = () => {
+    const [widths, setWidths] = useState({ key: 0, value: 0, description: 0 });
+    const dragRef = useRef(null);
+
+    const startDrag = useCallback((colId, e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const th = e.currentTarget.closest('th');
+        if (!th) return;
+        const startX = e.clientX;
+        const startW = th.getBoundingClientRect().width;
+        dragRef.current = { colId, startX, startW };
+
+        const onMove = (ev) => {
+            const d = dragRef.current;
+            if (!d) return;
+            const next = Math.max(60, d.startW + (ev.clientX - d.startX));
+            setWidths((w) => ({ ...w, [d.colId]: next }));
+        };
+        const onUp = () => {
+            dragRef.current = null;
+            document.body.classList.remove('workspace-resizing');
+            window.removeEventListener('mousemove', onMove);
+            window.removeEventListener('mouseup', onUp);
+        };
+        document.body.classList.add('workspace-resizing');
+        window.addEventListener('mousemove', onMove);
+        window.addEventListener('mouseup', onUp);
+    }, []);
+
+    const resizer = useCallback((colId) => (
+        <span
+            className="col-resizer"
+            onMouseDown={(e) => startDrag(colId, e)}
+            role="separator"
+            aria-orientation="vertical"
+            aria-label={`Resize ${colId} column`}
+            tabIndex={0}
+        />
+    ), [startDrag]);
+
+    return { widths, resizer };
+};
+
 const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialRequest, request,
     collectionId, workspaceId, environmentId, collection, onResponse, hideResponse }) => {
     // Use either initialRequest or request prop (for backward compatibility)
@@ -65,6 +113,10 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
     const [requestName, setRequestName] = useState(initialData.name || 'Get Users');
     const [activeTab, setActiveTab] = useState('params');
     const [isNew, setIsNew] = useState(initialData.isNew || false);
+
+    // Resizable columns for the Params + Headers KV tables.
+    const paramCols = useColumnResizer();
+    const headerCols = useColumnResizer();
 
     // Response state - new state for storing response
     const [responseData, setResponseData] = useState(null);
@@ -81,6 +133,7 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
 
     // Tab content states
     const [params, setParams] = useState(initialData.params || []);
+    const [bodyFormData, setBodyFormData] = useState(initialData.bodyFormData || [{ enabled: true, key: '', value: '', description: '' }]);
     const [headers, setHeaders] = useState(initialData.headers || []);
     const [bodyType, setBodyType] = useState(initialData.bodyType || 'none');
     const [bodyContent, setBodyContent] = useState(initialData.body || '');
@@ -353,6 +406,23 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
         const newParams = [...params];
         newParams.splice(index, 1);
         setParams(newParams);
+    };
+
+    // Body form-data handlers
+    const handleBodyFormDataChange = (index, field, value) => {
+        const next = [...bodyFormData];
+        next[index] = { ...next[index], [field]: value };
+        setBodyFormData(next);
+    };
+
+    const handleAddBodyFormData = () => {
+        setBodyFormData([...bodyFormData, { enabled: true, key: '', value: '', description: '' }]);
+    };
+
+    const handleRemoveBodyFormData = (index) => {
+        const next = [...bodyFormData];
+        next.splice(index, 1);
+        setBodyFormData(next);
     };
 
     // Header handlers
@@ -833,9 +903,14 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
             if (interpolatedRequest.method !== 'GET' && interpolatedRequest.method !== 'HEAD' && bodyType !== 'none') {
                 if (bodyType === 'raw') {
                     requestBody = interpolatedRequest.body;
-                } else if (bodyType === 'form-data' || bodyType === 'x-www-form-urlencoded') {
-                    // Form data not implemented in this version
-                    requestBody = '';
+                } else if (bodyType === 'x-www-form-urlencoded') {
+                    const usp = new URLSearchParams();
+                    bodyFormData.filter(f => f.enabled && f.key).forEach(f => usp.append(f.key, f.value || ''));
+                    requestBody = usp.toString();
+                } else if (bodyType === 'form-data') {
+                    const fd = new FormData();
+                    bodyFormData.filter(f => f.enabled && f.key).forEach(f => fd.append(f.key, f.value || ''));
+                    requestBody = fd;
                 }
             }
 
@@ -1322,9 +1397,15 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
                                 <thead>
                                     <tr>
                                         <th width="40"></th>
-                                        <th width="30%">Key</th>
-                                        <th width="30%">Value</th>
-                                        <th>Description</th>
+                                        <th width="30%" style={paramCols.widths.key ? { width: paramCols.widths.key } : undefined}>
+                                            Key {paramCols.resizer('key')}
+                                        </th>
+                                        <th width="30%" style={paramCols.widths.value ? { width: paramCols.widths.value } : undefined}>
+                                            Value {paramCols.resizer('value')}
+                                        </th>
+                                        <th style={paramCols.widths.description ? { width: paramCols.widths.description } : undefined}>
+                                            Description {paramCols.resizer('description')}
+                                        </th>
                                         <th width="48"></th>
                                     </tr>
                                 </thead>
@@ -1348,7 +1429,7 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
                                                     <label htmlFor={`param-check-${index}`}></label>
                                                 </div>
                                             </td>
-                                            <td>
+                                            <td style={paramCols.widths.key ? { width: paramCols.widths.key } : undefined}>
                                                 <input
                                                     type="text"
                                                     className={`table-input ${getVariableInputClass(param.key)}`}
@@ -1357,7 +1438,7 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
                                                     placeholder="Enter Key"
                                                 />
                                             </td>
-                                            <td>
+                                            <td style={paramCols.widths.value ? { width: paramCols.widths.value } : undefined}>
                                                 <input
                                                     type="text"
                                                     className={`table-input ${getVariableInputClass(param.value)}`}
@@ -1366,7 +1447,7 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
                                                     placeholder="Enter Value"
                                                 />
                                             </td>
-                                            <td>
+                                            <td style={paramCols.widths.description ? { width: paramCols.widths.description } : undefined}>
                                                 <input
                                                     type="text"
                                                     className="table-input"
@@ -1414,9 +1495,15 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
                                 <thead>
                                     <tr>
                                         <th width="40"></th>
-                                        <th width="30%">Key</th>
-                                        <th width="30%">Value</th>
-                                        <th>Description</th>
+                                        <th width="30%" style={headerCols.widths.key ? { width: headerCols.widths.key } : undefined}>
+                                            Key {headerCols.resizer('key')}
+                                        </th>
+                                        <th width="30%" style={headerCols.widths.value ? { width: headerCols.widths.value } : undefined}>
+                                            Value {headerCols.resizer('value')}
+                                        </th>
+                                        <th style={headerCols.widths.description ? { width: headerCols.widths.description } : undefined}>
+                                            Description {headerCols.resizer('description')}
+                                        </th>
                                         <th width="48"></th>
                                     </tr>
                                 </thead>
@@ -1440,7 +1527,7 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
                                                     <label htmlFor={`header-check-${index}`}></label>
                                                 </div>
                                             </td>
-                                            <td>
+                                            <td style={headerCols.widths.key ? { width: headerCols.widths.key } : undefined}>
                                                 <input
                                                     type="text"
                                                     className={`table-input ${getVariableInputClass(header.key)}`}
@@ -1449,7 +1536,7 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
                                                     placeholder="Key"
                                                 />
                                             </td>
-                                            <td>
+                                            <td style={headerCols.widths.value ? { width: headerCols.widths.value } : undefined}>
                                                 <input
                                                     type="text"
                                                     className={`table-input ${getVariableInputClass(header.value)}`}
@@ -1458,7 +1545,7 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
                                                     placeholder="Value"
                                                 />
                                             </td>
-                                            <td>
+                                            <td style={headerCols.widths.description ? { width: headerCols.widths.description } : undefined}>
                                                 <input
                                                     type="text"
                                                     className="table-input"
@@ -1556,33 +1643,58 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr className="param-row">
-                                                <td className="checkbox-cell">
-                                                    <div className="custom-checkbox">
-                                                        <input type="checkbox" id="body-form-check-0" checked={true} readOnly />
-                                                        <label htmlFor="body-form-check-0"></label>
-                                                    </div>
-                                                </td>
-                                                <td>
-                                                    <input type="text" className="table-input" placeholder="Key" />
-                                                </td>
-                                                <td>
-                                                    <input type="text" className="table-input" placeholder="Value" />
-                                                </td>
-                                                <td>
-                                                    <input type="text" className="table-input" placeholder="Description" />
-                                                </td>
-                                                <td className="action-cell">
-                                                    <button type="button" className="delete-row-btn">
-                                                        <Trash2 size={14} />
-                                                    </button>
-                                                </td>
-                                            </tr>
+                                            {bodyFormData.map((field, index) => (
+                                                <tr className="param-row" key={index}>
+                                                    <td className="checkbox-cell">
+                                                        <div className="custom-checkbox">
+                                                            <input
+                                                                type="checkbox"
+                                                                id={`body-form-check-${index}`}
+                                                                checked={field.enabled}
+                                                                onChange={(e) => handleBodyFormDataChange(index, 'enabled', e.target.checked)}
+                                                            />
+                                                            <label htmlFor={`body-form-check-${index}`}></label>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <input
+                                                            type="text"
+                                                            className="table-input"
+                                                            placeholder="Key"
+                                                            value={field.key}
+                                                            onChange={(e) => handleBodyFormDataChange(index, 'key', e.target.value)}
+                                                        />
+                                                    </td>
+                                                    <td>
+                                                        <input
+                                                            type="text"
+                                                            className="table-input"
+                                                            placeholder="Value"
+                                                            value={field.value}
+                                                            onChange={(e) => handleBodyFormDataChange(index, 'value', e.target.value)}
+                                                        />
+                                                    </td>
+                                                    <td>
+                                                        <input
+                                                            type="text"
+                                                            className="table-input"
+                                                            placeholder="Description"
+                                                            value={field.description}
+                                                            onChange={(e) => handleBodyFormDataChange(index, 'description', e.target.value)}
+                                                        />
+                                                    </td>
+                                                    <td className="action-cell">
+                                                        <button type="button" className="delete-row-btn" onClick={() => handleRemoveBodyFormData(index)}>
+                                                            <Trash2 size={14} />
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            ))}
                                         </tbody>
                                     </table>
                                 </div>
                                 <div className="add-row-container">
-                                    <button type="button" className="modern-add-btn">
+                                    <button type="button" className="modern-add-btn" onClick={handleAddBodyFormData}>
                                         <Plus size={16} />
                                         <span>Add Form Field</span>
                                     </button>

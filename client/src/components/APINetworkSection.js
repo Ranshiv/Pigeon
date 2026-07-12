@@ -245,14 +245,13 @@ const APINetworkSection = () => {
                         <div
                             className={`nav-item ${window.location.pathname.includes('/history') ? 'active' : ''}`}
                             onClick={() => {
-                                navigate('history');
+                                navigate('/workspace/history');
                                 fetchHistory();
                             }}
                         >
                             <FiClock className="nav-icon" />
                             <span>Request History</span>
                         </div>
-
                         <div className="nav-group-title">My Saved Requests</div>
                         {isLoadingRequests ? (
                             <div className="sidebar-loading">
@@ -300,12 +299,8 @@ const APINetworkSection = () => {
                             <ExplorePage />
                         </MainShell>
                     } />
-                    <Route path="history" element={
-                        <MainShell>
-                            <HistorySection history={history} onSelectHistory={(item) => navigate(`requests/${item._id || item.requestId}`)} loading={isLoadingHistory} />
-                        </MainShell>
-                    } />
-                    <Route path="spotlight" element={<SpotlightSection />} />
+                    <Route path="history" element={<Navigate to="/workspace/history" replace />} />
+<Route path="spotlight" element={<SpotlightSection />} />
                     <Route path="trending" element={<TrendingSection />} />
                     <Route path="ai-agent-tools" element={<AIAgentToolsSection />} />
                     <Route
@@ -473,8 +468,8 @@ const RequestDetails = ({ requests, onSave, isLoadingRequests, fetchHistory }) =
 
     if (isLoading || (isLoadingRequests && !localRequest)) {
         return (
-            <div className="flex flex-col h-full items-center justify-center bg-slate-950 p-20 text-slate-400">
-                <div className="h-8 w-8 animate-spin rounded-full border-2 border-slate-700 border-t-blue-500 mb-4"></div>
+            <div className="empty-state h-full" style={{ background: 'var(--card-bg)', borderColor: 'var(--border-color)', color: 'var(--text-secondary)' }}>
+                <div className="h-8 w-8 animate-spin rounded-full border-2 border-slate-300 border-t-blue-500 mb-4"></div>
                 <span>Loading request details...</span>
             </div>
         );
@@ -482,13 +477,14 @@ const RequestDetails = ({ requests, onSave, isLoadingRequests, fetchHistory }) =
 
     if (!localRequest) {
         return (
-            <div className="flex flex-col h-full items-center justify-center bg-slate-950 p-20 text-slate-400">
-                <div className="text-4xl mb-4">🔍</div>
-                <h3 className="text-lg font-semibold text-slate-200">Request Not Found</h3>
+            <div className="empty-state h-full" style={{ background: 'var(--card-bg)', borderColor: 'var(--border-color)', color: 'var(--text-secondary)' }}>
+                <div className="text-4xl mb-2">🔍</div>
+                <h3 className="text-lg font-semibold" style={{ color: 'var(--text-color)' }}>Request Not Found</h3>
                 <p className="text-sm mt-1">We couldn't find the request you're looking for.</p>
                 <button
                     onClick={() => window.location.href = '/workspace/api-network/explore'}
-                    className="mt-6 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-md text-sm transition-colors"
+                    className="mt-6 px-4 py-2 rounded-md text-sm transition-colors"
+                    style={{ background: 'var(--primary-color)', color: '#fff' }}
                 >
                     Back to Explore
                 </button>
@@ -583,15 +579,28 @@ const EditRequestWorkspace = ({ requests, onSave, isLoadingRequests }) => {
 
     if (isLoadingRequests && !request) {
         return (
-            <div className="flex flex-col h-full items-center justify-center bg-slate-950 p-20 text-slate-400">
-                <div className="h-8 w-8 animate-spin rounded-full border-2 border-slate-700 border-t-blue-500 mb-4"></div>
+            <div className="empty-state h-full" style={{ background: 'var(--card-bg)', borderColor: 'var(--border-color)', color: 'var(--text-secondary)' }}>
+                <div className="h-8 w-8 animate-spin rounded-full border-2 border-slate-300 border-t-blue-500 mb-4"></div>
                 <span>Loading request details...</span>
             </div>
         );
     }
 
     if (!request) {
-        return <div className="p-10 text-slate-200">Request not found</div>;
+        return (
+            <div className="empty-state h-full" style={{ background: 'var(--card-bg)', borderColor: 'var(--border-color)', color: 'var(--text-secondary)' }}>
+                <div className="text-4xl mb-2">🔍</div>
+                <h3 className="text-lg font-semibold" style={{ color: 'var(--text-color)' }}>Request Not Found</h3>
+                <p className="text-sm mt-1">We couldn't find the request you're looking for.</p>
+                <button
+                    onClick={() => window.location.href = '/workspace/api-network/explore'}
+                    className="mt-6 px-4 py-2 rounded-md text-sm transition-colors"
+                    style={{ background: 'var(--primary-color)', color: '#fff' }}
+                >
+                    Back to Explore
+                </button>
+            </div>
+        );
     }
 
     const handleSave = (savedRequest) => {

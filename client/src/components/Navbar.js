@@ -310,17 +310,19 @@ const Navbar = ({ isAuthenticated }) => {
                                                     setShowWorkspaceDropdown(false);
                                                 }}
                                             >
-                                                Create Workspace
+                                                <FiPlus size={14} /> Create Workspace
                                             </button>
 
                                             {/* Recently visited section */}
                                             <div className="workspace-section">
                                                 <h3 className="workspace-section-title">Recently visited</h3>
                                                 <div className="workspace-list">
-                                                    {recentWorkspaces.length > 0 ? recentWorkspaces.map(workspace => (
+                                                    {recentWorkspaces.length > 0 ? recentWorkspaces.map(workspace => {
+                                                        const isCurrent = workspace._id === location.pathname.split('/').pop();
+                                                        return (
                                                         <div
                                                             key={workspace._id}
-                                                            className="workspace-item"
+                                                            className={`workspace-item${isCurrent ? ' is-current' : ''}`}
                                                             onClick={(e) => {
                                                                 e.stopPropagation();
                                                                 handleNavigation(`/workspace/workspaces/${workspace._id}`);
@@ -335,19 +337,20 @@ const Navbar = ({ isAuthenticated }) => {
                                                                 )}
                                                             </div>
                                                             <div className="workspace-name">
-                                                                {workspace.name}
-                                                                {workspace._id === location.pathname.split('/').pop() && (
+                                                                <span>{workspace.name}</span>
+                                                                {isCurrent && (
                                                                     <FiCheck className="current-workspace-indicator" />
                                                                 )}
                                                             </div>
                                                         </div>
-                                                    )) : (
+                                                        );
+                                                    }) : (
                                                         <div className="workspace-item">
                                                             <div className="workspace-icon-small">
                                                                 <FiUser />
                                                             </div>
                                                             <div className="workspace-name">
-                                                                My Workspace
+                                                                <span>My Workspace</span>
                                                             </div>
                                                         </div>
                                                     )}

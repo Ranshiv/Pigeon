@@ -1,7 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import { Play, Save, Copy, Check, ChevronDown, ChevronRight, Loader, Code, Trash2 } from 'lucide-react';
 import { generateCodeSnippet } from '../../utils/codeGenerator';
+import AppSelect from '../common/AppSelect/AppSelect';
 import './TryItConsole.css';
+
+const METHOD_OPTIONS = [
+    { value: 'GET', label: 'GET' },
+    { value: 'POST', label: 'POST' },
+    { value: 'PUT', label: 'PUT' },
+    { value: 'PATCH', label: 'PATCH' },
+    { value: 'DELETE', label: 'DELETE' }
+];
+
+const LANG_OPTIONS = [
+    { value: 'curl', label: 'cURL' },
+    { value: 'javascript', label: 'JavaScript (Fetch)' },
+    { value: 'axios', label: 'JavaScript (Axios)' },
+    { value: 'python', label: 'Python (Requests)' }
+];
 
 const TryItConsole = ({ api, selectedEndpoint, onEndpointChange, onSaveRequest }) => {
     const [endpoint, setEndpoint] = useState(selectedEndpoint);
@@ -344,41 +360,37 @@ const TryItConsole = ({ api, selectedEndpoint, onEndpointChange, onSaveRequest }
                 <h3 className="section-title">Request</h3>
 
                 {/* Endpoint Selector */}
-                {api.endpoints.length > 1 && (
-                    <div className="form-group">
-                        <label>Endpoint</label>
-                        <select
-                            value={endpoint?.path || ''}
-                            onChange={(e) => {
-                                const selected = api.endpoints.find(ep => ep.path === e.target.value);
-                                onEndpointChange(selected);
-                            }}
-                            className="form-select"
-                        >
-                            {api.endpoints.map((ep, idx) => (
-                                <option key={idx} value={ep.path}>
-                                    {ep.method} {ep.path} - {ep.description}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
-                )}
+                {api.endpoints.length > 1 && (() => {
+                    const epOptions = api.endpoints.map((ep, idx) => ({
+                        value: ep.path,
+                        label: `${ep.method} ${ep.path} - ${ep.description || ''}`
+                    }));
+                    return (
+                        <div className="form-group">
+                            <label>Endpoint</label>
+                            <AppSelect
+                                className="tryit-endpoint-select"
+                                value={endpoint?.path || ''}
+                                onChange={(v) => {
+                                    const selected = api.endpoints.find(ep => ep.path === v);
+                                    onEndpointChange(selected);
+                                }}
+                                options={epOptions}
+                            />
+                        </div>
+                    );
+                })()}
 
                 {/* Method and URL */}
                 <div className="form-group">
                     <label>Request URL</label>
                     <div className="url-input-row">
-                        <select
+                        <AppSelect
+                            className="tryit-method-select"
                             value={method}
-                            onChange={(e) => setMethod(e.target.value)}
-                            className="method-select"
-                        >
-                            <option value="GET">GET</option>
-                            <option value="POST">POST</option>
-                            <option value="PUT">PUT</option>
-                            <option value="PATCH">PATCH</option>
-                            <option value="DELETE">DELETE</option>
-                        </select>
+                            onChange={setMethod}
+                            options={METHOD_OPTIONS}
+                        />
                         <input
                             type="text"
                             value={getFinalUrl()}
@@ -559,16 +571,12 @@ const TryItConsole = ({ api, selectedEndpoint, onEndpointChange, onSaveRequest }
                     <div className="code-header-actions">
                         <h3 className="section-title" style={{ margin: 0 }}>Code Snippet</h3>
                         <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-                            <select
+                            <AppSelect
+                                className="tryit-lang-select"
                                 value={selectedLang}
-                                onChange={(e) => setSelectedLang(e.target.value)}
-                                className="lang-select"
-                            >
-                                <option value="curl">cURL</option>
-                                <option value="javascript">JavaScript (Fetch)</option>
-                                <option value="axios">JavaScript (Axios)</option>
-                                <option value="python">Python (Requests)</option>
-                            </select>
+                                onChange={setSelectedLang}
+                                options={LANG_OPTIONS}
+                            />
                             <button className="copy-btn" onClick={() => handleCopyCode(getGeneratedCode())}>
                                 {codeCopied ? <Check size={16} /> : <Copy size={16} />}
                             </button>
