@@ -2111,34 +2111,71 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
             case 'ssl':
                 return (
                     <div className="ssl-section">
+                        <div className="section-header-row">
+                            <div className="section-title">
+                                <ShieldCheck size={18} />
+                                <span>TLS & SSL</span>
+                            </div>
+                            <span className="section-description">Configure certificate validation and manage keys for mutual TLS authentication.</span>
+                        </div>
                         <div className="ssl-config">
                             <div className="ssl-options">
-                                <h4 className="ssl-section-title">Certificate Validation</h4>
-                                <p className="ssl-section-hint">Control how Pigeon validates the server's TLS certificate.</p>
-                                <div className="form-group">
-                                    <label className="checkbox-label">
-                                        <input
-                                            type="checkbox"
-                                            checked={sslConfig.verifyCert}
-                                            onChange={(e) => handleSSLConfigChange('verifyCert', e.target.checked)}
-                                        />
-                                        <span>Verify SSL certificates</span>
-                                    </label>
+                                <div className="ssl-options-header">
+                                    <ShieldCheck size={16} />
+                                    <span className="ssl-options-title">Certificate Validation</span>
                                 </div>
-                                <div className="form-group">
-                                    <label className="checkbox-label">
-                                        <input
-                                            type="checkbox"
-                                            checked={sslConfig.allowSelfSigned}
-                                            onChange={(e) => handleSSLConfigChange('allowSelfSigned', e.target.checked)}
-                                        />
-                                        <span>Allow self-signed certificates</span>
+                                <p className="ssl-section-hint">Control how Pigeon validates the server's TLS certificate.</p>
+                                <div className="toggle-group">
+                                    <label className={`toggle-row${sslConfig.verifyCert ? ' on' : ''}`}>
+                                        <div className="toggle-text">
+                                            <span className="toggle-label">Verify SSL certificates</span>
+                                            <span className="toggle-hint">Require server certificate to be signed by a trusted CA.</span>
+                                        </div>
+                                        <span
+                                            className="toggle-switch"
+                                            role="switch"
+                                            aria-checked={sslConfig.verifyCert}
+                                            tabIndex={0}
+                                            onClick={() => handleSSLConfigChange('verifyCert', !sslConfig.verifyCert)}
+                                            onKeyDown={(e) => {
+                                                if (e.key === ' ' || e.key === 'Enter') {
+                                                    e.preventDefault();
+                                                    handleSSLConfigChange('verifyCert', !sslConfig.verifyCert);
+                                                }
+                                            }}
+                                        >
+                                            <span className="toggle-knob" />
+                                        </span>
+                                    </label>
+                                    <label className={`toggle-row${sslConfig.allowSelfSigned ? ' on' : ''}`}>
+                                        <div className="toggle-text">
+                                            <span className="toggle-label">Allow self-signed certificates</span>
+                                            <span className="toggle-hint">Permit certificates not issued by a trusted CA.</span>
+                                        </div>
+                                        <span
+                                            className="toggle-switch"
+                                            role="switch"
+                                            aria-checked={sslConfig.allowSelfSigned}
+                                            tabIndex={0}
+                                            onClick={() => handleSSLConfigChange('allowSelfSigned', !sslConfig.allowSelfSigned)}
+                                            onKeyDown={(e) => {
+                                                if (e.key === ' ' || e.key === 'Enter') {
+                                                    e.preventDefault();
+                                                    handleSSLConfigChange('allowSelfSigned', !sslConfig.allowSelfSigned);
+                                                }
+                                            }}
+                                        >
+                                            <span className="toggle-knob" />
+                                        </span>
                                     </label>
                                 </div>
                             </div>
 
                             <div className="certificate-upload">
-                                <h4 className="ssl-section-title">Client Certificates</h4>
+                                <div className="cert-section-header">
+                                    <KeyRound size={16} />
+                                    <span className="ssl-section-title">Client Certificates</span>
+                                </div>
                                 <p className="ssl-section-hint">Attach a client certificate and key for mutual TLS authentication.</p>
                                 <div className="cert-upload-section">
                                     {/* Client Certificate Upload */}
@@ -2408,10 +2445,11 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
                             <div className="ssl-actions">
                                 <button
                                     type="button"
-                                    className="btn-secondary"
+                                    className="btn-primary send-btn"
                                     onClick={handleTestSSLConnection}
                                     disabled={!url}
                                 >
+                                    <ShieldCheck size={14} />
                                     Test SSL Connection
                                 </button>
                             </div>

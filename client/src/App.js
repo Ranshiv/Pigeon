@@ -162,7 +162,16 @@ function App() {
           <a href="/" style={{ color: '#4a9eff', textDecoration: 'underline' }}>Go to Home</a>
         </div>} />
       </Routes>
-      <ToastContainer theme="dark" position="bottom-right" />
+      <ToastContainer
+        theme="dark"
+        position="bottom-right"
+        autoClose={2800}
+        hideProgressBar={false}
+        newestOnTop
+        closeOnClick
+        pauseOnHover
+        icon
+      />
       <Footer />
     </div>
   );

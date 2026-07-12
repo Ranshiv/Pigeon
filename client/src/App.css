@@ -29,6 +29,50 @@ body {
   /* Ensure no max width constraint */
 }
 
+/* Toast notifications - themed to match app tokens instead of react-toastify defaults */
+.Toastify__toast {
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  min-height: 0;
+  border-radius: var(--border-radius-lg, 10px);
+  border: 1px solid var(--border-color);
+  background: var(--card-bg);
+  color: var(--text-color);
+  box-shadow: var(--shadow-lg);
+  font-family: var(--font-family);
+  font-size: 13.5px;
+}
+
+.Toastify__toast-body {
+  padding: 0;
+  margin: 0;
+}
+
+.Toastify__toast--success .Toastify__toast-icon svg {
+  fill: var(--success-color);
+}
+
+.Toastify__progress-bar {
+  background: var(--primary-color);
+  opacity: 0.6;
+  height: 2px;
+}
+
+.Toastify__toast--success .Toastify__progress-bar {
+  background: var(--success-color);
+}
+
+.Toastify__close-button {
+  color: var(--text-muted);
+  opacity: 0.7;
+}
+
+.Toastify__close-button:hover {
+  opacity: 1;
+  color: var(--text-color);
+}
+
 /* Remove the .container class that was constraining the layout */
 
 /* Updated for open design - add padding directly to route components */
