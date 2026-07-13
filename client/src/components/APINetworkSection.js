@@ -23,7 +23,45 @@ const APINetworkSection = () => {
     const [isLoadingHistory, setIsLoadingHistory] = useState(false);
     const [response, setResponse] = useState(null);
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+    const [sidebarBtnCorner, setSidebarBtnCorner] = useState(() => {
+        const c = localStorage.getItem('sidebarBtnCorner');
+        return c === 'bottom-left' ? c : 'top-left'; // left side only
+    });
+    const [dragPos, setDragPos] = useState(null); // {top,left} while dragging, else null
+    const dragState = useRef({ moved: false });
     const navigate = useNavigate();
+
+    // Drag the "Show Sidebar" button; it snaps to the nearest corner on release.
+    // Click still opens the sidebar unless the button was dragged.
+    const startDragSidebarBtn = useCallback((e) => {
+        e.preventDefault();
+        const rect = e.currentTarget.offsetParent.getBoundingClientRect();
+        const startX = e.clientX, startY = e.clientY;
+        dragState.current.moved = false;
+
+        const onMove = (ev) => {
+            const left = ev.clientX - rect.left - 16;
+            const top = ev.clientY - rect.top - 16;
+            if (Math.abs(ev.clientX - startX) > 3 || Math.abs(ev.clientY - startY) > 3) dragState.current.moved = true;
+            setDragPos({
+                top: Math.max(0, Math.min(rect.height - 32, top)),
+                left: Math.max(0, Math.min(rect.width / 2 - 32, left)), // left side only
+            });
+        };
+        const onUp = (ev) => {
+            window.removeEventListener('pointermove', onMove);
+            window.removeEventListener('pointerup', onUp);
+            if (dragState.current.moved) {
+                // Left side only: snap to top-left or bottom-left by vertical position.
+                const corner = (ev.clientY - rect.top) < rect.height / 2 ? 'top-left' : 'bottom-left';
+                setSidebarBtnCorner(corner);
+                localStorage.setItem('sidebarBtnCorner', corner);
+            }
+            setDragPos(null);
+        };
+        window.addEventListener('pointermove', onMove);
+        window.addEventListener('pointerup', onUp);
+    }, []);
 
     useEffect(() => {
         fetchRequests();
@@ -285,9 +323,11 @@ const APINetworkSection = () => {
             <div className="api-network-main-content">
                 {!isSidebarOpen && (
                     <button
-                        className="sidebar-open-btn"
-                        onClick={() => setIsSidebarOpen(true)}
-                        title="Show Sidebar"
+                        className={`sidebar-open-btn corner-${sidebarBtnCorner}`}
+                        style={dragPos ? { top: dragPos.top, left: dragPos.left, right: 'auto', bottom: 'auto' } : undefined}
+                        onPointerDown={startDragSidebarBtn}
+                        onClick={() => { if (!dragState.current.moved) setIsSidebarOpen(true); }}
+                        title="Show Sidebar (drag to a corner)"
                     >
                         <FiSidebar size={32} />
                     </button>

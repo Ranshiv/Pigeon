@@ -139,6 +139,56 @@
     min-width: 0;
 }
 
+/* Draggable card wrapper — grab handle for reordering dashboard cards */
+.pgh-card-drag {
+    position: relative;
+    display: flex;
+    min-width: 0;
+    cursor: grab;
+}
+.pgh-card-drag > .pgh-card {
+    flex: 1;
+    transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+}
+
+/* Grip-dots affordance in the top-right — signals the card is draggable */
+.pgh-card-drag::after {
+    content: "";
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    width: 16px;
+    height: 10px;
+    z-index: 2;
+    opacity: 0.35;
+    background-image: radial-gradient(currentColor 1.4px, transparent 1.6px);
+    background-size: 5px 5px;
+    color: var(--text-muted);
+    transition: opacity 0.18s ease, color 0.18s ease;
+    pointer-events: none;
+}
+.pgh-card-drag:hover::after {
+    opacity: 0.9;
+    color: var(--accent);
+}
+.pgh-card-drag:hover > .pgh-card {
+    transform: translateY(-3px);
+    border-color: var(--accent);
+    box-shadow: var(--shadow-md);
+}
+.pgh-card-drag:active { cursor: grabbing; }
+.pgh-card-drag:active > .pgh-card {
+    transform: scale(0.99);
+    opacity: 0.92;
+    box-shadow: var(--shadow-lg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .pgh-card-drag > .pgh-card,
+    .pgh-card-drag:hover > .pgh-card,
+    .pgh-card-drag:active > .pgh-card { transform: none; transition: none; }
+}
+
 /* ===== Card shell ===== */
 .pgh-card {
     display: flex;

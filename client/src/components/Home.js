@@ -24,6 +24,34 @@ const Home = () => {
     const [loading, setLoading] = useState(true);
     const [userData, setUserData] = useState(null);
 
+    // Draggable dashboard cards. Flat order maps row-major into the 2-col grid:
+    // [0]=top-left, [1]=top-right, [2]=bottom-left, [3]=bottom-right.
+    const DEFAULT_CARDS = ['stats', 'workspaces', 'activity', 'collections'];
+    const [cardOrder, setCardOrder] = useState(() => {
+        try {
+            const s = JSON.parse(localStorage.getItem('pghCardOrder'));
+            if (Array.isArray(s) && s.length === DEFAULT_CARDS.length && DEFAULT_CARDS.every(c => s.includes(c))) return s;
+        } catch { /* fall through */ }
+        return DEFAULT_CARDS;
+    });
+    const dragCard = React.useRef(null);
+
+    const handleCardDragOver = (index) => {
+        const from = dragCard.current;
+        if (from === null || from === index) return;
+        setCardOrder(prev => {
+            const next = [...prev];
+            const [moved] = next.splice(from, 1);
+            next.splice(index, 0, moved);
+            return next;
+        });
+        dragCard.current = index;
+    };
+    const persistCardOrder = () => {
+        dragCard.current = null;
+        setCardOrder(prev => { localStorage.setItem('pghCardOrder', JSON.stringify(prev)); return prev; });
+    };
+
     // Fetch dashboard data on component mount
     useEffect(() => {
         const fetchDashboardData = async () => {
@@ -208,6 +236,137 @@ const Home = () => {
         }
     };
 
+    // Card content by id — rendered into draggable wrappers below.
+    const cardContent = {
+        stats: (
+            <section className="pgh-card">
+                <h2 className="pgh-card-title"><FiActivity /> Stats Overview</h2>
+                <div className="pgh-stats">
+                    <div className="pgh-stat">
+                        <div className="pgh-stat-icon pgh-stat-icon--collections"><FiPackage /></div>
+                        <div className="pgh-stat-info">
+                            <span className="pgh-stat-value">{stats.collections}</span>
+                            <span className="pgh-stat-label">Collections</span>
+                        </div>
+                    </div>
+                    <div className="pgh-stat">
+                        <div className="pgh-stat-icon pgh-stat-icon--workspaces"><FiGrid /></div>
+                        <div className="pgh-stat-info">
+                            <span className="pgh-stat-value">{stats.workspaces}</span>
+                            <span className="pgh-stat-label">Workspaces</span>
+                        </div>
+                    </div>
+                    <div className="pgh-stat">
+                        <div className="pgh-stat-icon pgh-stat-icon--requests"><FiSend /></div>
+                        <div className="pgh-stat-info">
+                            <span className="pgh-stat-value">{stats.requests}</span>
+                            <span className="pgh-stat-label">Requests</span>
+                        </div>
+                    </div>
+                    <div className="pgh-stat">
+                        <div className="pgh-stat-icon pgh-stat-icon--pending"><FiGitPullRequest /></div>
+                        <div className="pgh-stat-info">
+                            <span className="pgh-stat-value">{stats.pendingMergeRequests}</span>
+                            <span className="pgh-stat-label">Pending Merges</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        ),
+        activity: (
+            <section className="pgh-card">
+                <div className="pgh-card-header">
+                    <h2 className="pgh-card-title"><FiClock /> Recent Activity</h2>
+                    <button className="pgh-link-btn" onClick={() => navigate('../workspaces')}>View All</button>
+                </div>
+                <div className="pgh-list">
+                    {loading ? (
+                        <PageLoader label="Loading recent activity..." />
+                    ) : recentActivity.length === 0 ? (
+                        <div className="pgh-empty">
+                            <p>No recent activity to display. Start by creating collections or sending requests.</p>
+                        </div>
+                    ) : (
+                        recentActivity.map((activity) => (
+                            <div key={activity._id} className="pgh-activity-row">
+                                <div className="pgh-activity-icon">{getActivityIcon(activity.type)}</div>
+                                <div className="pgh-activity-body">
+                                    <div className="pgh-activity-top">
+                                        <span className="pgh-activity-user">{activity.user?.displayName || 'A user'}</span>
+                                        <span className="pgh-activity-time">{formatDate(activity.timestamp)}</span>
+                                    </div>
+                                    <p className="pgh-activity-message">{activity.message}</p>
+                                </div>
+                            </div>
+                        ))
+                    )}
+                </div>
+            </section>
+        ),
+        workspaces: (
+            <section className="pgh-card">
+                <div className="pgh-card-header">
+                    <h2 className="pgh-card-title"><FiGrid /> Recent Workspaces</h2>
+                    <button className="pgh-link-btn" onClick={() => navigate('../workspaces')}>View All</button>
+                </div>
+                <div className="pgh-list">
+                    {loading ? (
+                        <PageLoader label="Loading workspaces..." />
+                    ) : recentWorkspaces.length === 0 ? (
+                        <div className="pgh-empty">
+                            <p>You have no workspaces yet. Create your first workspace to get started.</p>
+                            <button className="pgh-empty-btn" onClick={() => navigate('../workspaces?create=true')}>
+                                <FiPlus /> Create Workspace
+                            </button>
+                        </div>
+                    ) : (
+                        recentWorkspaces.map((workspace) => (
+                            <div key={workspace._id} className="pgh-row" onClick={() => navigate(`../workspaces/${workspace._id}`)}>
+                                <div className="pgh-row-icon">{workspace.isPersonal ? <FiStar /> : <FiUsers />}</div>
+                                <div className="pgh-row-info">
+                                    <h3>{workspace.name}</h3>
+                                    <p>{workspace.isPersonal ? "Personal" : "Team"} · {workspace.collectionsCount || 0} collections</p>
+                                </div>
+                                <FiArrowRight className="pgh-row-arrow" />
+                            </div>
+                        ))
+                    )}
+                </div>
+            </section>
+        ),
+        collections: (
+            <section className="pgh-card">
+                <div className="pgh-card-header">
+                    <h2 className="pgh-card-title"><FiPackage /> Recent Collections</h2>
+                    <button className="pgh-link-btn" onClick={() => navigate('../collections')}>View All</button>
+                </div>
+                <div className="pgh-collections">
+                    {loading ? (
+                        <PageLoader label="Loading collections..." />
+                    ) : recentCollections.length === 0 ? (
+                        <div className="pgh-empty">
+                            <p>You have no collections yet. Create your first collection to get started.</p>
+                            <button className="pgh-empty-btn" onClick={() => navigate('../collections/new')}>
+                                <FiPlus /> Create Collection
+                            </button>
+                        </div>
+                    ) : (
+                        recentCollections.map((collection) => (
+                            <div key={collection._id} className="pgh-collection-card" onClick={() => navigate(`../collections/${collection._id}`)}>
+                                <h3>{collection.name}</h3>
+                                <p>{collection.description || 'No description'}</p>
+                                <div className="pgh-collection-meta">
+                                    <span>{collection.requestsCount || 0} requests</span>
+                                    <span>Updated {formatDate(collection.updatedAt)}</span>
+                                </div>
+                            </div>
+                        ))
+                    )}
+                </div>
+            </section>
+        ),
+    };
+
     return (
         <div className="pgh-root">
             {/* Welcome Section */}
@@ -237,173 +396,22 @@ const Home = () => {
                 </div>
             </section>
 
-            {/* Main Dashboard Content */}
+            {/* Main Dashboard Content — drag cards to reorder */}
             <div className="pgh-grid">
-                {/* Left Column - Stats and Recent Activity */}
-                <div className="pgh-col">
-                    {/* Stats Overview */}
-                    <section className="pgh-card">
-                        <h2 className="pgh-card-title"><FiActivity /> Stats Overview</h2>
-                        <div className="pgh-stats">
-                            <div className="pgh-stat">
-                                <div className="pgh-stat-icon pgh-stat-icon--collections">
-                                    <FiPackage />
-                                </div>
-                                <div className="pgh-stat-info">
-                                    <span className="pgh-stat-value">{stats.collections}</span>
-                                    <span className="pgh-stat-label">Collections</span>
-                                </div>
-                            </div>
-                            <div className="pgh-stat">
-                                <div className="pgh-stat-icon pgh-stat-icon--workspaces">
-                                    <FiGrid />
-                                </div>
-                                <div className="pgh-stat-info">
-                                    <span className="pgh-stat-value">{stats.workspaces}</span>
-                                    <span className="pgh-stat-label">Workspaces</span>
-                                </div>
-                            </div>
-                            <div className="pgh-stat">
-                                <div className="pgh-stat-icon pgh-stat-icon--requests">
-                                    <FiSend />
-                                </div>
-                                <div className="pgh-stat-info">
-                                    <span className="pgh-stat-value">{stats.requests}</span>
-                                    <span className="pgh-stat-label">Requests</span>
-                                </div>
-                            </div>
-                            <div className="pgh-stat">
-                                <div className="pgh-stat-icon pgh-stat-icon--pending">
-                                    <FiGitPullRequest />
-                                </div>
-                                <div className="pgh-stat-info">
-                                    <span className="pgh-stat-value">{stats.pendingMergeRequests}</span>
-                                    <span className="pgh-stat-label">Pending Merges</span>
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-
-                    {/* Recent Activity */}
-                    <section className="pgh-card">
-                        <div className="pgh-card-header">
-                            <h2 className="pgh-card-title"><FiClock /> Recent Activity</h2>
-                            <button className="pgh-link-btn" onClick={() => navigate('../workspaces')}>
-                                View All
-                            </button>
-                        </div>
-                        <div className="pgh-list">
-                            {loading ? (
-                                <PageLoader label="Loading recent activity..." />
-                            ) : recentActivity.length === 0 ? (
-                                <div className="pgh-empty">
-                                    <p>No recent activity to display. Start by creating collections or sending requests.</p>
-                                </div>
-                            ) : (
-                                recentActivity.map((activity) => (
-                                    <div key={activity._id} className="pgh-activity-row">
-                                        <div className="pgh-activity-icon">
-                                            {getActivityIcon(activity.type)}
-                                        </div>
-                                        <div className="pgh-activity-body">
-                                            <div className="pgh-activity-top">
-                                                <span className="pgh-activity-user">{activity.user?.displayName || 'A user'}</span>
-                                                <span className="pgh-activity-time">{formatDate(activity.timestamp)}</span>
-                                            </div>
-                                            <p className="pgh-activity-message">{activity.message}</p>
-                                        </div>
-                                    </div>
-                                ))
-                            )}
-                        </div>
-                    </section>
-                </div>
-
-                {/* Right Column - Workspaces and Collections */}
-                <div className="pgh-col">
-                    {/* Recent Workspaces */}
-                    <section className="pgh-card">
-                        <div className="pgh-card-header">
-                            <h2 className="pgh-card-title"><FiGrid /> Recent Workspaces</h2>
-                            <button className="pgh-link-btn" onClick={() => navigate('../workspaces')}>
-                                View All
-                            </button>
-                        </div>
-                        <div className="pgh-list">
-                            {loading ? (
-                                <PageLoader label="Loading workspaces..." />
-                            ) : recentWorkspaces.length === 0 ? (
-                                <div className="pgh-empty">
-                                    <p>You have no workspaces yet. Create your first workspace to get started.</p>
-                                    <button className="pgh-empty-btn" onClick={() => navigate('../workspaces?create=true')}>
-                                        <FiPlus /> Create Workspace
-                                    </button>
-                                </div>
-                            ) : (
-                                recentWorkspaces.map((workspace) => (
-                                    <div
-                                        key={workspace._id}
-                                        className="pgh-row"
-                                        onClick={() => navigate(`../workspaces/${workspace._id}`)}
-                                    >
-                                        <div className="pgh-row-icon">
-                                            {workspace.isPersonal ? (
-                                                <FiStar />
-                                            ) : (
-                                                <FiUsers />
-                                            )}
-                                        </div>
-                                        <div className="pgh-row-info">
-                                            <h3>{workspace.name}</h3>
-                                            <p>
-                                                {workspace.isPersonal ? "Personal" : "Team"} ·
-                                                {" "}{workspace.collectionsCount || 0} collections
-                                            </p>
-                                        </div>
-                                        <FiArrowRight className="pgh-row-arrow" />
-                                    </div>
-                                ))
-                            )}
-                        </div>
-                    </section>
-
-                    {/* Recent Collections */}
-                    <section className="pgh-card">
-                        <div className="pgh-card-header">
-                            <h2 className="pgh-card-title"><FiPackage /> Recent Collections</h2>
-                            <button className="pgh-link-btn" onClick={() => navigate('../collections')}>
-                                View All
-                            </button>
-                        </div>
-                        <div className="pgh-collections">
-                            {loading ? (
-                                <PageLoader label="Loading collections..." />
-                            ) : recentCollections.length === 0 ? (
-                                <div className="pgh-empty">
-                                    <p>You have no collections yet. Create your first collection to get started.</p>
-                                    <button className="pgh-empty-btn" onClick={() => navigate('../collections/new')}>
-                                        <FiPlus /> Create Collection
-                                    </button>
-                                </div>
-                            ) : (
-                                recentCollections.map((collection) => (
-                                    <div
-                                        key={collection._id}
-                                        className="pgh-collection-card"
-                                        onClick={() => navigate(`../collections/${collection._id}`)}
-                                    >
-                                        <h3>{collection.name}</h3>
-                                        <p>{collection.description || 'No description'}</p>
-                                        <div className="pgh-collection-meta">
-                                            <span>{collection.requestsCount || 0} requests</span>
-                                            <span>Updated {formatDate(collection.updatedAt)}</span>
-                                        </div>
-                                    </div>
-                                ))
-                            )}
-                        </div>
-                    </section>
-                </div>
+                {cardOrder.map((id, index) => (
+                    <div
+                        key={id}
+                        className="pgh-card-drag"
+                        title="Drag to rearrange"
+                        draggable
+                        onDragStart={() => { dragCard.current = index; }}
+                        onDragOver={(e) => { e.preventDefault(); handleCardDragOver(index); }}
+                        onDragEnd={persistCardOrder}
+                        onDrop={(e) => e.preventDefault()}
+                    >
+                        {cardContent[id]}
+                    </div>
+                ))}
             </div>
 
             {/* Quick Links Section */}
