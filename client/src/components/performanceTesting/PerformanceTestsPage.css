@@ -51,9 +51,7 @@
     box-shadow: var(--card-shadow);
 }
 
-.pt-panel.create {
-    margin-top: 16px;
-}
+
 
 .pt-panel-title {
     display: flex;
@@ -596,4 +594,104 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+}
+
+/* Modal Styles */
+.pt-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--modal-overlay, rgba(0, 0, 0, 0.4));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    animation: ptFadeIn 0.2s ease;
+}
+
+[data-theme="dark"] .pt-modal-overlay,
+body.dark-theme .pt-modal-overlay {
+    background: rgba(0, 0, 0, 0.7);
+}
+
+.pt-modal {
+    background: var(--card-bg);
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(1, 76, 117, 0.15);
+    width: 90%;
+    max-width: 650px;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--border-color);
+    animation: ptSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.pt-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border-color);
+    background: var(--hover-bg, var(--background-color));
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+}
+
+.pt-modal-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--text-color);
+}
+
+.pt-modal-title svg {
+    color: var(--primary-color);
+    font-size: 1.25rem;
+}
+
+.pt-modal-close {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 1.5rem;
+    line-height: 1;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 6px;
+    transition: background 0.2s, color 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.pt-modal-close:hover {
+    background: rgba(0, 0, 0, 0.05);
+    color: var(--text-color);
+}
+
+[data-theme="dark"] .pt-modal-close:hover,
+body.dark-theme .pt-modal-close:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.pt-modal-content {
+    padding: 24px;
+    overflow-y: auto;
+}
+
+@keyframes ptFadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes ptSlideUp {
+    from { opacity: 0; transform: translateY(20px) scale(0.98); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
 }

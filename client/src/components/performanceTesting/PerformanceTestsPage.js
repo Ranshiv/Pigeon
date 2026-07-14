@@ -838,10 +838,15 @@ const PerformanceTestsPage = () => {
             </div>
 
             {showCreate && (
-                <div className="pt-panel create">
-                    <div className="pt-panel-title">
-                        <FiSave /> Create load test
-                    </div>
+                <div className="pt-modal-overlay" onClick={() => setShowCreate(false)} style={{ zIndex: 100000 }}>
+                    <div className="pt-modal" onClick={e => e.stopPropagation()}>
+                        <div className="pt-modal-header">
+                            <div className="pt-modal-title">
+                                <FiSave /> Create load test
+                            </div>
+                            <button className="pt-modal-close" onClick={() => setShowCreate(false)}>×</button>
+                        </div>
+                        <div className="pt-modal-content">
 
                     <form className="pt-form" onSubmit={onCreateTest}>
                         <div className="pt-form-row">
