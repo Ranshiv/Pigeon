@@ -104,6 +104,10 @@
     display: flex;
     flex-direction: column;
     gap: 20px;
+    /* Override unscoped global .endpoints-list bg (MockServerWorkspace.css)
+       whose --mock-bg-primary falls back to #fff here. */
+    background-color: transparent !important;
+    overflow-y: visible;
 }
 
 /* Modern Endpoint Card */
@@ -263,27 +267,35 @@
     border: 1px solid var(--border-color) !important;
     border-radius: 8px;
     overflow: hidden;
+    background-color: var(--card-bg) !important;
 }
 
 .params-header {
     display: grid;
     grid-template-columns: 2fr 1fr 3fr;
     padding: 10px 16px;
-    background-color: var(--card-bg) !important;
+    background-color: var(--background-color) !important;
     border-bottom: 1px solid var(--border-color) !important;
-    font-size: 0.85rem;
+    font-size: 0.72rem;
     font-weight: 600;
-    color: var(--text-muted) !important;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-secondary) !important;
 }
 
 .params-row-modern {
     display: grid;
     grid-template-columns: 2fr 1fr 3fr;
     padding: 12px 16px;
-    background-color: var(--background-color) !important;
+    background-color: var(--card-bg) !important;
     border-bottom: 1px solid var(--border-color) !important;
     align-items: center;
     font-size: 0.9rem;
+    transition: background-color 0.15s ease;
+}
+
+.params-row-modern:hover {
+    background-color: var(--hover-bg) !important;
 }
 
 .params-row-modern:last-child {
@@ -327,11 +339,12 @@
 .body-snippet pre {
     margin: 0;
     padding: 16px;
-    background-color: #0d1117 !important;
+    background-color: var(--code-bg, var(--background-color)) !important;
     border-radius: 8px;
-    color: #e6edf3 !important;
+    color: var(--text-color) !important;
     font-family: 'Roboto Mono', monospace;
     font-size: 0.85rem;
+    line-height: 1.5;
     overflow-x: auto;
     border: 1px solid var(--border-color) !important;
 }
@@ -474,13 +487,20 @@
     border: 1px solid var(--border-color) !important;
     color: var(--text-muted) !important;
     cursor: pointer;
-    padding: 8px;
+    padding: 0 !important;
+    width: 38px;
+    height: 38px;
     border-radius: 8px;
-    display: flex;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
+    line-height: 0;
     transition: all 0.2s;
 }
+.close-btn svg { display: block; }
+/* Neutralize a global .close-btn::before "✕" (OAuthCallback.css) that
+   otherwise double-renders next to this button's SVG icon. */
+.close-btn::before { content: none !important; }
 
 .close-btn:hover {
     background-color: var(--hover-bg) !important;
@@ -867,10 +887,10 @@ textarea.modal-input {
 .star-rating-input {
     display: flex;
     align-items: center;
-    gap: 4px;
-    background-color: var(--background-color) !important;
-    border: 1px solid var(--border-color) !important;
-    padding: 10px 16px;
+    gap: 6px;
+    background-color: transparent !important;
+    border: none !important;
+    padding: 4px 0;
     border-radius: 8px;
     min-height: 48px;
 }
@@ -878,21 +898,25 @@ textarea.modal-input {
 .star-btn {
     background: none !important;
     border: none !important;
-    padding: 2px;
+    padding: 2px !important;
     cursor: pointer;
-    transition: transform 0.1s;
+    transition: transform 0.12s ease;
     display: flex;
+    line-height: 0;
 }
 
 .star-btn:hover {
-    transform: scale(1.1);
+    transform: scale(1.15);
 }
 
 .rating-label-text {
-    margin-left: 12px;
-    font-size: 0.9rem;
+    margin-left: 14px;
+    font-size: 0.82rem;
     font-weight: 600;
-    color: var(--text-color) !important;
+    color: #FFB02E !important;
+    background-color: rgba(255, 176, 46, 0.1) !important;
+    padding: 4px 12px;
+    border-radius: 100px;
 }
 
 /* Reviews Tab */
@@ -994,16 +1018,19 @@ textarea.modal-input {
 }
 
 .review-card-modern {
+    position: relative;
     background-color: var(--card-bg) !important;
     border: 1px solid var(--border-color) !important;
+    border-left: 3px solid transparent !important;
     border-radius: 12px;
     padding: 24px;
-    transition: transform 0.2s, box-shadow 0.2s;
+    transition: transform 0.2s, box-shadow 0.2s, border-left-color 0.2s;
 }
 
 .review-card-modern:hover {
     transform: translateY(-1px);
-    box-shadow: var(--shadow-sm) !important;
+    box-shadow: var(--shadow-md) !important;
+    border-left-color: var(--primary-color) !important;
 }
 
 .review-header {
@@ -1022,16 +1049,18 @@ textarea.modal-input {
 }
 
 .reviewer-avatar-placeholder {
-    width: 40px;
-    height: 40px;
+    width: 42px;
+    height: 42px;
     border-radius: 50%;
-    background-color: var(--primary-color) !important;
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-hover)) !important;
     color: white !important;
     display: flex;
     align-items: center;
     justify-content: center;
     font-weight: 700;
     font-size: 1.1rem;
+    flex-shrink: 0;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 }
 
 .reviewer-details {
@@ -1081,12 +1110,16 @@ textarea.modal-input {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 16px;
-    padding: 60px 20px;
-    color: var(--text-muted) !important;
+    gap: 14px;
+    padding: 56px 20px;
+    color: var(--text-secondary) !important;
     text-align: center;
-    opacity: 0.7;
+    background-color: var(--card-bg) !important;
+    border: 1px dashed var(--border-color) !important;
+    border-radius: 12px;
 }
+.empty-reviews-placeholder svg { color: var(--primary-color) !important; opacity: 0.6; }
+.empty-reviews-placeholder p { margin: 0; font-size: 0.95rem; }
 
 @media (max-width: 700px) {
     .review-form-grid {
@@ -1451,7 +1484,7 @@ textarea.modal-input {
 
 /* Improved Markdown Code Styles */
 .markdown-body pre {
-    background-color: #1e1e1e !important;
+    background-color: var(--background-color) !important;
     padding: 16px;
     border-radius: 8px;
     overflow-x: auto;
@@ -1462,19 +1495,17 @@ textarea.modal-input {
 .markdown-body code {
     font-family: 'Roboto Mono', monospace;
     font-size: 0.9em;
-    color: #e6edf3 !important;
-    /* Force light text for visibility */
+    color: var(--text-color) !important;
 }
 
 /* Inline code specific */
 .markdown-body p code,
 .markdown-body li code {
-    background-color: rgba(255, 255, 255, 0.1) !important;
+    background-color: var(--card-bg) !important;
     padding: 2px 6px;
     border-radius: 4px;
-    color: #61afef !important;
-    /* Bright blue for inline code */
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--primary-color) !important;
+    border: 1px solid var(--border-color) !important;
 }
 
 .markdown-body blockquote {

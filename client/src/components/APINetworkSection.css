@@ -411,8 +411,8 @@
 }
 
 .sidebar-open-btn {
-    position: absolute;
-    z-index: 20;
+    position: fixed;
+    z-index: 50;
     width: 32px;
     height: 32px;
     padding: 0;
@@ -433,7 +433,7 @@
     cursor: grabbing;
 }
 
-.sidebar-open-btn.corner-top-left { top: 16px; left: 16px; }
+.sidebar-open-btn.corner-top-left { top: 76px; left: 16px; }
 .sidebar-open-btn.corner-bottom-left { bottom: 16px; left: 16px; }
 
 .sidebar-open-btn:hover {

@@ -1,14 +1,17 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Search, Filter, Star, TrendingUp, Zap, ChevronDown, X } from 'lucide-react';
+import { Search, Filter, Star, TrendingUp, ChevronDown, X, Play, BookOpen, Bookmark } from 'lucide-react';
 import ApiDetailModal from './ApiDetailModal';
-import AppSelect from '../common/AppSelect/AppSelect';
 import './ExplorePage.css';
 
+// Segmented sort. Backend must accept these `sort` keys; unknown keys fall back to default order.
 const SORT_OPTIONS = [
-    { value: 'popular', label: 'Most Popular' },
-    { value: 'rating', label: 'Highest Rated' },
-    { value: 'name', label: 'Name (A-Z)' }
+    { value: 'popular', label: 'Popular' },
+    { value: 'trending', label: 'Trending' },
+    { value: 'newest', label: 'Newest' },
+    { value: 'name', label: 'A–Z' }
 ];
+
+const FAVORITES_KEY = 'exploreFavorites';
 
 const ExplorePage = () => {
     const [searchQuery, setSearchQuery] = useState('');
@@ -24,6 +27,19 @@ const ExplorePage = () => {
     const [showApiModal, setShowApiModal] = useState(false);
     const [page, setPage] = useState(1);
     const [hasMore, setHasMore] = useState(true);
+    const [favorites, setFavorites] = useState(() => {
+        try { return new Set(JSON.parse(localStorage.getItem(FAVORITES_KEY) || '[]')); }
+        catch { return new Set(); }
+    });
+
+    const toggleFavorite = (id) => {
+        setFavorites(prev => {
+            const next = new Set(prev);
+            next.has(id) ? next.delete(id) : next.add(id);
+            localStorage.setItem(FAVORITES_KEY, JSON.stringify([...next]));
+            return next;
+        });
+    };
 
     const fetchApis = useCallback(async () => {
         setLoading(true);
@@ -114,37 +130,22 @@ const ExplorePage = () => {
         setSelectedApi(null);
     };
 
-    const getAuthBadgeColor = (authType) => {
-        switch (authType) {
-            case 'None': return 'var(--success-color)';
-            case 'API Key': return 'var(--info-color)';
-            case 'OAuth 2.0': return 'var(--warning-color)';
-            default: return 'var(--text-muted)';
-        }
-    };
-
-    const getPricingBadgeColor = (pricing) => {
-        switch (pricing) {
-            case 'Free': return 'var(--success-color)';
-            case 'Freemium': return 'var(--info-color)';
-            case 'Paid': return 'var(--warning-color)';
-            default: return 'var(--text-muted)';
-        }
-    };
+    const formatRating = (r) => (r == null ? '—' : Number(r).toFixed(1));
 
     return (
         <div className="explore-page">
             {/* Header */}
             <div className="explore-header">
                 <div className="header-content">
-                    <h1>
-                        <Zap size={32} style={{ color: 'var(--primary-color)' }} />
-                        Explore Public APIs
-                    </h1>
+                    <span className="eyebrow">MARKETPLACE</span>
+                    <h1>Explore APIs</h1>
                     <p>Discover, test, and integrate thousands of public APIs directly in your workspace</p>
                 </div>
+            </div>
 
-                {/* Search Bar */}
+            {/* Single sticky unit: toolbar row 1 (search + filters toggle + sort) + row 2 (chips) */}
+            <div className="explore-sticky">
+            <div className="explore-toolbar">
                 <div className="search-section">
                     <div className="search-input-wrapper">
                         <Search size={20} className="search-icon" />
@@ -170,7 +171,6 @@ const ExplorePage = () => {
                             </button>
                         )}
                     </div>
-
                     <button
                         className="filter-toggle"
                         onClick={() => setShowFilters(!showFilters)}
@@ -186,6 +186,40 @@ const ExplorePage = () => {
                         />
                     </button>
                 </div>
+
+                <div className="sort-segmented" role="tablist" aria-label="Sort APIs">
+                    {SORT_OPTIONS.map(opt => (
+                        <button
+                            key={opt.value}
+                            role="tab"
+                            aria-selected={sortBy === opt.value}
+                            className={`sort-segment ${sortBy === opt.value ? 'active' : ''}`}
+                            onClick={() => { setSortBy(opt.value); setPage(1); }}
+                        >
+                            {opt.label}
+                        </button>
+                    ))}
+                </div>
+            </div>
+
+            {/* Row 2: category chips — reparented into sticky unit */}
+            <div className="category-chips" role="tablist" aria-label="Filter by category">
+                {categories.map(category => (
+                    <button
+                        key={category.name}
+                        role="tab"
+                        aria-selected={selectedCategory === category.name}
+                        className={`category-chip ${selectedCategory === category.name ? 'active' : ''}`}
+                        onClick={() => {
+                            setSelectedCategory(category.name);
+                            setPage(1);
+                        }}
+                    >
+                        <span>{category.name}</span>
+                        {category.count > 0 && <span className="chip-count">{category.count}</span>}
+                    </button>
+                ))}
+            </div>
             </div>
 
             <div className="explore-body">
@@ -200,40 +234,6 @@ const ExplorePage = () => {
                                     </button>
                                 </div>
                             )}
-
-                            {/* Sort By */}
-                            <div className="filter-group">
-                                <label className="filter-label">Sort By</label>
-                                <AppSelect
-                                    className="filter-select"
-                                    value={sortBy}
-                                    onChange={(v) => {
-                                        setSortBy(v);
-                                        setPage(1);
-                                    }}
-                                    options={SORT_OPTIONS}
-                                />
-                            </div>
-
-                            {/* Categories */}
-                            <div className="filter-group">
-                                <label className="filter-label">Category</label>
-                                <div className="category-list">
-                                    {categories.map(category => (
-                                        <button
-                                            key={category.name}
-                                            className={`category-btn ${selectedCategory === category.name ? 'active' : ''}`}
-                                            onClick={() => {
-                                                setSelectedCategory(category.name);
-                                                setPage(1);
-                                            }}
-                                        >
-                                            <span>{category.name}</span>
-                                            {category.count > 0 && <span className="count">{category.count}</span>}
-                                        </button>
-                                    ))}
-                                </div>
-                            </div>
 
                             {/* Tags */}
                             <div className="filter-group">
@@ -289,26 +289,42 @@ const ExplorePage = () => {
 
                     {/* APIs Grid */}
                     {loading && page === 1 ? (
-                        <div className="loading-state">
-                            <div className="spinner"></div>
-                            <p>Loading APIs...</p>
+                        <div className="apis-grid">
+                            {Array.from({ length: 6 }).map((_, i) => (
+                                <div className="api-card skeleton-card" key={i} style={{ '--i': i }}>
+                                    <div className="sk sk-top">
+                                        <div className="sk sk-avatar" />
+                                        <div className="sk-lines">
+                                            <div className="sk sk-line sk-line-lg" />
+                                            <div className="sk sk-line sk-line-sm" />
+                                        </div>
+                                    </div>
+                                    <div className="sk sk-line sk-body" />
+                                    <div className="sk sk-line sk-body sk-body-short" />
+                                    <div className="sk sk-footer">
+                                        <div className="sk sk-pill" />
+                                        <div className="sk sk-pill" />
+                                    </div>
+                                </div>
+                            ))}
                         </div>
                     ) : apis.length === 0 ? (
-                        <div className="empty-state">
-                            <Search size={48} style={{ color: 'var(--text-muted)' }} />
-                            <h3>No APIs found</h3>
-                            <p>Try adjusting your search or filters</p>
-                            <button className="btn-primary" onClick={clearFilters}>
-                                Clear Filters
+                        <div className="empty">
+                            <Search size={32} strokeWidth={1.5} className="empty-icon" />
+                            <h3 className="empty-title">No APIs match your filters</h3>
+                            <p className="empty-text">Try a different search term or clear the filters to see everything.</p>
+                            <button className="empty-btn" onClick={clearFilters}>
+                                Clear filters
                             </button>
                         </div>
                     ) : (
                         <>
                             <div className="apis-grid">
-                                {apis.map(api => (
+                                {apis.map((api, i) => (
                                     <div
                                         key={api.id}
                                         className="api-card"
+                                        style={{ '--i': i % 12 }}
                                         onClick={() => openApiDetail(api)}
                                     >
                                         {/* Card Top: Identity & Badges */}
@@ -329,8 +345,8 @@ const ExplorePage = () => {
                                                 </div>
                                             </div>
 
-                                            {/* Badges - positioned top right */}
-                                            <div className="api-badges">
+                                            {/* Meta row: badges + category pill, inline under title block */}
+                                            <div className="api-meta-row">
                                                 {api.featured && (
                                                     <span className="badge badge-featured" title="Featured">
                                                         <Star size={10} fill="currentColor" />
@@ -343,6 +359,7 @@ const ExplorePage = () => {
                                                         <span>Trending</span>
                                                     </span>
                                                 )}
+                                                <span className="api-category-pill">{api.category}</span>
                                             </div>
                                         </div>
 
@@ -356,25 +373,39 @@ const ExplorePage = () => {
                                             <div className="stats-row">
                                                 <div className="stat-item" title="Rating">
                                                     <Star size={14} className="star-icon" fill="currentColor" />
-                                                    <span className="stat-value">{api.ratingAverage}</span>
+                                                    <span className="stat-value">{formatRating(api.ratingAverage)}</span>
                                                     <span className="stat-sub">({api.ratingCount})</span>
                                                 </div>
                                             </div>
 
                                             <div className="tags-row">
-                                                <span
-                                                    className="tech-badge"
-                                                    style={{ borderColor: getAuthBadgeColor(api.authType), color: getAuthBadgeColor(api.authType) }}
-                                                >
-                                                    {api.authType}
-                                                </span>
-                                                <span
-                                                    className="tech-badge"
-                                                    style={{ borderColor: getPricingBadgeColor(api.pricing), color: getPricingBadgeColor(api.pricing) }}
-                                                >
-                                                    {api.pricing}
-                                                </span>
+                                                <span className="tech-badge">{api.authType}</span>
+                                                <span className="tech-badge">{api.pricing}</span>
                                             </div>
+                                        </div>
+
+                                        {/* Hover action row */}
+                                        <div className="api-card-actions">
+                                            <button
+                                                className="card-action card-action-primary"
+                                                onClick={(e) => { e.stopPropagation(); openApiDetail(api); }}
+                                            >
+                                                <Play size={14} /> Try It
+                                            </button>
+                                            <button
+                                                className="card-action"
+                                                onClick={(e) => { e.stopPropagation(); openApiDetail(api); }}
+                                            >
+                                                <BookOpen size={14} /> Docs
+                                            </button>
+                                            <button
+                                                className={`card-action card-action-icon ${favorites.has(api.id) ? 'saved' : ''}`}
+                                                title={favorites.has(api.id) ? 'Saved' : 'Save'}
+                                                aria-pressed={favorites.has(api.id)}
+                                                onClick={(e) => { e.stopPropagation(); toggleFavorite(api.id); }}
+                                            >
+                                                <Bookmark size={14} fill={favorites.has(api.id) ? 'currentColor' : 'none'} />
+                                            </button>
                                         </div>
                                     </div>
                                 ))}

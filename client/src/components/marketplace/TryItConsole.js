@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Play, Save, Copy, Check, ChevronDown, ChevronRight, Loader, Code, Trash2 } from 'lucide-react';
 import { generateCodeSnippet } from '../../utils/codeGenerator';
 import AppSelect from '../common/AppSelect/AppSelect';
@@ -22,6 +22,7 @@ const LANG_OPTIONS = [
 const TryItConsole = ({ api, selectedEndpoint, onEndpointChange, onSaveRequest }) => {
     const [endpoint, setEndpoint] = useState(selectedEndpoint);
     const [method, setMethod] = useState(selectedEndpoint?.method || 'GET');
+    const userChangedMethodRef = useRef(false);
     const [url, setUrl] = useState('');
     const [pathParams, setPathParams] = useState({});
     const [queryParams, setQueryParams] = useState([]);
@@ -43,7 +44,10 @@ const TryItConsole = ({ api, selectedEndpoint, onEndpointChange, onSaveRequest }
     useEffect(() => {
         if (selectedEndpoint) {
             setEndpoint(selectedEndpoint);
-            setMethod(selectedEndpoint.method);
+            if (!userChangedMethodRef.current) {
+                setMethod(selectedEndpoint.method);
+            }
+            userChangedMethodRef.current = false;
             buildUrl(selectedEndpoint);
             initializeParams(selectedEndpoint);
         }
@@ -388,7 +392,7 @@ const TryItConsole = ({ api, selectedEndpoint, onEndpointChange, onSaveRequest }
                         <AppSelect
                             className="tryit-method-select"
                             value={method}
-                            onChange={setMethod}
+                            onChange={(v) => { setMethod(v); userChangedMethodRef.current = true; }}
                             options={METHOD_OPTIONS}
                         />
                         <input
@@ -490,38 +494,55 @@ const TryItConsole = ({ api, selectedEndpoint, onEndpointChange, onSaveRequest }
                             {showHeaders ? <ChevronDown size={18} /> : <ChevronRight size={18} />}
                             <span>Headers</span>
                         </div>
-                        <span className="header-meta">({Object.keys(headers).length})</span>
+                        <span className="header-meta">{Object.keys(headers).length}</span>
                     </button>
                     {showHeaders && (
                         <div className="collapsible-content">
-                            {Object.entries(headers).map(([key, value]) => (
-                                <div key={key} className="header-row">
-                                    <input
-                                        type="text"
-                                        value={key}
-                                        onChange={(e) => updateHeader(key, e.target.value, value)}
-                                        placeholder="Header name"
-                                        className="header-key-input"
-                                    />
-                                    <input
-                                        type="text"
-                                        value={value}
-                                        onChange={(e) => updateHeader(key, key, e.target.value)}
-                                        placeholder="Header value"
-                                        className="header-value-input"
-                                    />
-                                    <button
-                                        className="remove-btn"
-                                        onClick={() => removeHeader(key)}
-                                        title="Remove header"
-                                    >
-                                        <Trash2 size={16} />
+                            <div className="kv-table">
+                                <div className="kv-table-head">
+                                    <div className="kv-col-head">Key</div>
+                                    <div className="kv-col-head">Value</div>
+                                    <div className="kv-col-head kv-col-action" />
+                                </div>
+                                <div className="kv-table-body">
+                                    {Object.entries(headers).map(([key, value]) => (
+                                        <div key={key} className="kv-row">
+                                            <input
+                                                type="text"
+                                                value={key}
+                                                onChange={(e) => updateHeader(key, e.target.value, value)}
+                                                placeholder="Header name"
+                                                className="kv-input kv-key"
+                                            />
+                                            <input
+                                                type="text"
+                                                value={value}
+                                                onChange={(e) => updateHeader(key, key, e.target.value)}
+                                                placeholder="Header value"
+                                                className="kv-input kv-value"
+                                            />
+                                            <button
+                                                type="button"
+                                                className="kv-remove"
+                                                onClick={() => removeHeader(key)}
+                                                title="Remove header"
+                                                aria-label="Remove header"
+                                            >
+                                                <Trash2 size={15} />
+                                            </button>
+                                        </div>
+                                    ))}
+                                    {Object.keys(headers).length === 0 && (
+                                        <div className="kv-empty">No headers yet — add one below.</div>
+                                    )}
+                                </div>
+                                <div className="kv-table-foot">
+                                    <button type="button" className="kv-add-btn" onClick={addHeader}>
+                                        <span className="kv-add-plus">+</span>
+                                        <span>Add Header</span>
                                     </button>
                                 </div>
-                            ))}
-                            <button className="add-header-btn" onClick={addHeader}>
-                                + Add Header
-                            </button>
+                            </div>
                         </div>
                     )}
                 </div>
@@ -540,13 +561,19 @@ const TryItConsole = ({ api, selectedEndpoint, onEndpointChange, onSaveRequest }
                         </button>
                         {showBody && (
                             <div className="collapsible-content">
-                                <textarea
-                                    value={body}
-                                    onChange={(e) => setBody(e.target.value)}
-                                    placeholder='{"key": "value"}'
-                                    className="body-textarea"
-                                    rows={8}
-                                />
+                                <div className="kv-table">
+                                    <div className="kv-editor">
+                                        <label className="kv-editor-label">JSON Body</label>
+                                        <textarea
+                                            value={body}
+                                            onChange={(e) => setBody(e.target.value)}
+                                            placeholder='{"key": "value"}'
+                                            className="kv-textarea"
+                                            rows={8}
+                                            spellCheck={false}
+                                        />
+                                    </div>
+                                </div>
                             </div>
                         )}
                     </div>

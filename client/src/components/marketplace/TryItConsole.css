@@ -89,8 +89,8 @@
 
 .tryit-method-select {
     /* Layout only — AppSelect's own CSS (app-select-trigger) owns the box chrome. */
-    width: 90px !important;
-    min-width: 90px !important;
+    width: 120px !important;
+    min-width: 120px !important;
     font-weight: 700;
 }
 
@@ -214,7 +214,7 @@
     align-items: center;
     justify-content: space-between;
     padding: 14px 20px;
-    background-color: var(--background-color) !important;
+    background-color: transparent !important;
     border: none !important;
     color: var(--text-color) !important;
     font-size: 0.9rem;
@@ -243,13 +243,13 @@
 
 .collapsible-content {
     all: unset !important;
-    padding: 20px;
-    margin: 10px !important;
-    background-color: var(--background-color) !important;
+    display: block !important;
+    padding: 16px 20px 20px !important;
+    margin: 0 !important;
+    background-color: transparent !important;
     border-top: 1px solid var(--border-color) !important;
     opacity: 1 !important;
     max-height: none;
-
 }
 
 button[class*="add"],
@@ -282,6 +282,171 @@ button[class*="add"],
 }
 
 /* Legacy remove-btn style removed */
+
+/* ----- Modern KV table (Headers + Body editor) ----- */
+.kv-table {
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    overflow: hidden;
+    background: var(--surface);
+    margin: 12px;
+}
+
+/* When .kv-table is inside a .collapsible wrapper, the wrapper already
+   draws the border — drop the inner duplicate. */
+.collapsible > .collapsible-content .kv-table {
+    border: none;
+    border-radius: 0;
+    margin: 0;
+    overflow: visible;
+    background: transparent;
+}
+
+/* Same drops for the inner body editor table */
+.collapsible > .collapsible-content .kv-table .kv-table-head,
+.collapsible > .collapsible-content .kv-table .kv-table-foot {
+    background: transparent;
+}
+
+.kv-table-head {
+    display: grid;
+    grid-template-columns: 1fr 2fr 36px;
+    gap: 12px;
+    padding: 10px 14px;
+    background: transparent;
+    border-bottom: 1px solid var(--border-color);
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-secondary, #9aa8bd);
+}
+
+.kv-col-head { padding-left: 2px; }
+.kv-col-action { padding: 0; }
+
+.kv-table-body {
+    display: flex;
+    flex-direction: column;
+}
+
+.kv-row {
+    display: grid;
+    grid-template-columns: 1fr 2fr 36px;
+    gap: 12px;
+    align-items: center;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border-color);
+}
+.kv-row:last-child { border-bottom: none; }
+
+.kv-input {
+    width: 100%;
+    padding: 8px 10px !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: 6px !important;
+    background-color: var(--card-bg) !important;
+    color: var(--text-color) !important;
+    font-size: 0.88rem;
+    font-family: 'Roboto Mono', monospace;
+    transition: border-color 0.15s ease;
+}
+.kv-input:focus,
+.kv-input:focus-visible {
+    outline: none !important;
+    box-shadow: none !important;
+    border-color: var(--primary-color) !important;
+}
+.kv-input::placeholder { color: var(--text-secondary, #9aa8bd); opacity: 0.7; }
+
+.kv-remove {
+    width: 34px;
+    height: 34px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--border-color) !important;
+    background-color: transparent !important;
+    color: var(--text-secondary, #9aa8bd) !important;
+    border-radius: 6px !important;
+    padding: 0 !important;
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+.kv-remove:hover {
+    color: #f87171 !important;
+    border-color: #f87171 !important;
+    background-color: rgba(248, 113, 113, 0.08) !important;
+}
+.kv-remove svg { display: block; }
+
+.kv-empty {
+    padding: 18px 14px;
+    text-align: center;
+    font-size: 0.85rem;
+    color: var(--text-secondary, #9aa8bd);
+    font-style: italic;
+}
+
+.kv-table-foot {
+    padding: 12px 14px;
+    border-top: 1px solid var(--border-color);
+    background: transparent;
+}
+
+.kv-add-btn {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 100%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 14px !important;
+    border: 1px dashed var(--border-color) !important;
+    border-radius: 8px !important;
+    background-color: transparent !important;
+    color: var(--primary-color) !important;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease;
+}
+.kv-add-btn:hover {
+    background-color: var(--primary-light) !important;
+    border-color: var(--primary-color) !important;
+}
+.kv-add-plus { font-size: 1.05rem; line-height: 1; }
+
+.kv-editor {
+    padding: 14px;
+}
+.kv-editor-label {
+    display: block;
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-secondary, #9aa8bd);
+    margin-bottom: 8px;
+}
+.kv-textarea {
+    width: 100%;
+    padding: 14px !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: 8px !important;
+    background-color: var(--card-bg) !important;
+    color: var(--text-color) !important;
+    font-size: 0.88rem;
+    font-family: 'Roboto Mono', monospace;
+    line-height: 1.55;
+    resize: vertical;
+    transition: border-color 0.15s ease;
+}
+.kv-textarea:focus {
+    outline: none;
+    border-color: var(--primary-color) !important;
+}
 
 .add-header-btn {
     padding: 10px 20px;
@@ -605,12 +770,12 @@ button[class*="add"],
 
 .code-preview pre {
     padding: 16px;
-    background-color: #0d1117 !important;
+    background-color: var(--background-color) !important;
     border: 1px solid var(--border-color) !important;
     border-radius: 8px;
     overflow-x: auto;
     font-size: 0.85rem;
-    color: #e6edf3 !important;
+    color: var(--text-color) !important;
     font-family: 'Roboto Mono', monospace;
     line-height: 1.6;
     margin: 0;

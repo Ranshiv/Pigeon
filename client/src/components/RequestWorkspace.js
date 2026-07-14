@@ -107,10 +107,10 @@ const RequestWorkspace = ({ initialRequest, onSave, onSend }) => {
     const ResponseDisplayWithData = ({ requestId, directResponse, loading, error }) => {
         if (loading) {
             return (
-                <div className="flex h-40 w-full items-center justify-center border-t border-slate-800 bg-slate-950 p-4">
-                    <div className="flex flex-col items-center gap-2 text-slate-400">
-                        <div className="h-6 w-6 animate-spin rounded-full border-2 border-slate-600 border-t-blue-500"></div>
-                        <span className="text-sm">Loading response...</span>
+                <div style={{ display: 'flex', height: '10rem', width: '100%', alignItems: 'center', justifyContent: 'center', borderTop: '1px solid var(--border-color)', background: 'var(--card-bg)', padding: '1rem' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem', color: 'var(--text-secondary)' }}>
+                        <div style={{ height: '1.5rem', width: '1.5rem', borderRadius: '50%', borderWidth: '2px', borderStyle: 'solid', borderColor: 'var(--border-color)', borderTopColor: 'var(--primary-color)', animation: 'spin 0.8s linear infinite' }}></div>
+                        <span style={{ fontSize: '0.875rem' }}>Loading response...</span>
                     </div>
                 </div>
             );
@@ -118,11 +118,11 @@ const RequestWorkspace = ({ initialRequest, onSave, onSend }) => {
 
         if (error) {
             return (
-                <div className="w-full border-t border-red-900/20 bg-red-950/10 p-4">
-                    <div className="flex items-center gap-2 text-red-500 mb-2">
-                        <span className="text-sm font-semibold">Error</span>
+                <div style={{ width: '100%', borderTop: '1px solid var(--border-color)', background: 'var(--card-bg)', padding: '1rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--danger-color, #dc2626)', marginBottom: '0.5rem' }}>
+                        <span style={{ fontSize: '0.875rem', fontWeight: 600 }}>Error</span>
                     </div>
-                    <div className="text-sm text-red-400 font-mono">
+                    <div style={{ fontSize: '0.875rem', fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace', color: 'var(--danger-color, #dc2626)' }}>
                         {error}
                     </div>
                 </div>
@@ -139,36 +139,39 @@ const RequestWorkspace = ({ initialRequest, onSave, onSend }) => {
     };
 
     return (
-        <div className="flex flex-col h-full bg-slate-950 relative">
+        <div style={{ display: 'flex', flexDirection: 'column', height: '100%', background: 'var(--background-color)', position: 'relative' }}>
             {/* Collaboration Toolbar - Now integrated as a sleek header bar */}
             {requestId && (
-                <div className="flex items-center justify-end gap-2 border-b border-slate-800 bg-slate-950 px-4 py-2">
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '0.5rem', borderBottom: '1px solid var(--border-color)', background: 'var(--card-bg)', padding: '0.5rem 1rem' }}>
                     <button
                         onClick={() => setShowComments(!showComments)}
-                        className={`
-                            inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors 
-                            focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring 
-                            h-9 px-4 py-2 shadow-sm
-                            ${showComments
-                                ? 'bg-slate-800 text-white hover:bg-slate-700'
-                                : 'bg-transparent border border-slate-800 text-slate-300 hover:bg-slate-800 hover:text-white'}
-                        `}
+                        style={{
+                            display: 'inline-flex', alignItems: 'center', justifyContent: 'center', borderRadius: 'var(--border-radius, 6px)',
+                            fontSize: '0.875rem', fontWeight: 500, height: '2.25rem', padding: '0 1rem', cursor: 'pointer', transition: 'all 0.15s ease',
+                            background: showComments ? 'var(--primary-color)' : 'transparent',
+                            color: showComments ? '#fff' : 'var(--text-secondary)',
+                            border: `1px solid ${showComments ? 'var(--primary-color)' : 'var(--border-color)'}`
+                        }}
                     >
-                        <svg className="mr-2 h-4 w-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                        <svg style={{ marginRight: '0.5rem', height: '1rem', width: '1rem' }} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
                         Comments
                     </button>
 
                     <button
                         onClick={() => setShowReviewModal(true)}
-                        className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring h-9 px-4 py-2 bg-emerald-600 text-white shadow hover:bg-emerald-500"
+                        style={{
+                            display: 'inline-flex', alignItems: 'center', justifyContent: 'center', borderRadius: 'var(--border-radius, 6px)',
+                            fontSize: '0.875rem', fontWeight: 500, height: '2.25rem', padding: '0 1rem', cursor: 'pointer', transition: 'all 0.15s ease',
+                            background: 'var(--success-color, #16a34a)', color: '#fff', border: 'none'
+                        }}
                     >
-                        <svg className="mr-2 h-4 w-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22h6a2 2 0 0 0 2-2V7l-5-5H6a2 2 0 0 0-2 2v10"></path><path d="M14 2v4a2 2 0 0 0 2 2h4"></path><path d="M9 15a2 2 0 0 1 2-2 2 2 0 0 0-2-2"></path><path d="M9 15v2"></path></svg>
+                        <svg style={{ marginRight: '0.5rem', height: '1rem', width: '1rem' }} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22h6a2 2 0 0 0 2-2V7l-5-5H6a2 2 0 0 0-2 2v10"></path><path d="M14 2v4a2 2 0 0 0 2 2h4"></path><path d="M9 15a2 2 0 0 1 2-2 2 2 0 0 0-2-2"></path><path d="M9 15v2"></path></svg>
                         Request Review
                     </button>
                 </div>
             )}
 
-            <div className="flex-1 overflow-auto">
+            <div style={{ flex: 1, overflow: 'auto' }}>
                 <RequestForm
                     initialRequest={initialRequest}
                     onSendRequest={handleSendRequest}
@@ -176,7 +179,7 @@ const RequestWorkspace = ({ initialRequest, onSave, onSend }) => {
                 />
             </div>
 
-            <div className="border-t border-slate-800 min-h-[200px]">
+            <div style={{ borderTop: '1px solid var(--border-color)', minHeight: '200px' }}>
                 <ResponseDisplayWithData
                     requestId={requestId}
                     directResponse={response}
@@ -194,7 +197,7 @@ const RequestWorkspace = ({ initialRequest, onSave, onSend }) => {
             />
 
             {showComments && requestId && (
-                <div className="absolute right-4 top-16 z-50 w-80 rounded-lg border border-slate-800 bg-slate-900 shadow-xl">
+                <div style={{ position: 'absolute', right: '1rem', top: '4rem', zIndex: 50, width: '20rem', borderRadius: 'var(--border-radius-lg, 8px)', border: '1px solid var(--border-color)', background: 'var(--card-bg)', boxShadow: 'var(--shadow-lg, 0 10px 15px -3px rgba(0,0,0,0.1))' }}>
                     <InlineCommentThread
                         resourceId={requestId}
                         resourceType="request"

@@ -7,7 +7,7 @@
  * This class standardizes a report and supports comparing runs.
  */
 class PerformanceAnalyzer {
-    analyze(metrics) {
+    analyze(metrics, thresholds = null) {
         const http = metrics?.http || {};
         const latency = http.latency || {};
         const requests = http.requests || {};
@@ -42,6 +42,10 @@ class PerformanceAnalyzer {
             resourcesSummary
         });
 
+        // SLO / Quality gates: evaluate thresholds if provided.
+        const gates = thresholds ? this._evaluateGates({ p95Latency, p99Latency, errorRate, avgRps }, thresholds) : null;
+        const apdexScore = this._apdex(latency, metrics);
+
         return {
             kpis: {
                 avgRps,
@@ -52,7 +56,8 @@ class PerformanceAnalyzer {
                 maxLatencyMs: latency.max || null,
                 throughputAvgBytes: throughput.average || null,
                 throughputMaxBytes: throughput.max || null,
-                errorRate
+                errorRate,
+                apdexScore
             },
             errors: {
                 errors: errorCount,
@@ -61,12 +66,59 @@ class PerformanceAnalyzer {
             },
             resourcesSummary,
             insights,
+            gates,
+            passedGates: gates ? gates.every(g => g.passed) : null,
             raw: {
                 requests,
                 latency,
                 throughput
             }
         };
+    }
+
+    /**
+     * SLO evaluation. thresholds shape (per LoadTest schema):
+     * { p95LatencyMs, p99LatencyMs, errorRate, minRps }
+     * A gate passes when the metric is within its limit.
+     */
+    _evaluateGates(measured, thresholds) {
+        const gates = [];
+        const checks = [
+            { key: 'p95LatencyMs', op: 'max', value: measured.p95LatencyMs, label: 'P95 latency ≤' },
+            { key: 'p99LatencyMs', op: 'max', value: measured.p99LatencyMs, label: 'P99 latency ≤' },
+            { key: 'errorRate', op: 'max', value: measured.errorRate, label: 'Error rate ≤' },
+            { key: 'minRps', op: 'min', value: measured.avgRps, label: 'Avg RPS ≥' }
+        ];
+
+        for (const c of checks) {
+            const limit = thresholds?.[c.key];
+            if (limit === null || limit === undefined) continue;
+            if (c.value === null || c.value === undefined) {
+                gates.push({ metric: c.key, label: c.label, limit, value: null, passed: false, reason: 'no_data' });
+                continue;
+            }
+            const passed = c.op === 'max' ? c.value <= limit : c.value >= limit;
+            gates.push({ metric: c.key, label: c.label, limit, value: c.value, passed });
+        }
+        return gates;
+    }
+
+    /**
+     * Apdex (Application Performance Index): satisfying = T, tolerable = 4T, frustrating = >4T.
+     * T defaults to 100ms (p95-latency-oriented). Uses latency histogram if available.
+     * ponytail: no latency histogram per-bucket counts available, so approximate via distribution
+     * skew. Add actual histogram at metrics.http.histogram to make this exact.
+     */
+    _apdex(latency, metrics, T = 100) {
+        const p50 = latency?.p50 ?? latency?.average ?? null;
+        const p95 = latency?.p95 ?? null;
+        const p99 = latency?.p99 ?? null;
+        if (p50 === null) return null;
+        // Estimate: satisfied share = p50 node, tolerable = (p95 - p50), frustrated = (p99 - p95).
+        const s = Math.max(0, 1 - (p95 !== null ? (p95 - p50) / Math.max(p50, 1) : 0));
+        const f = (p99 !== null && p99 > 4 * T) ? Math.max(0, Math.min(1, (p99 - 4 * T) / Math.max(p99, 1))) : 0;
+        const score = Number(Math.max(0, Math.min(1, s - f / 2)).toFixed(3));
+        return score;
     }
 
     compare(a, b) {

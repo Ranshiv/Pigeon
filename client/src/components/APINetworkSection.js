@@ -11,6 +11,7 @@ import ExplorePage from './marketplace/ExplorePage';
 import { toast } from 'react-toastify';
 import { FiPlus, FiFileText, FiSearch, FiChevronRight, FiGrid, FiClock, FiSidebar, FiChevronsLeft } from 'react-icons/fi';
 import MainShell from './common/MainShell/MainShell';
+import Footer from './Footer';
 // ponytail: RequestWorkspaceNew never created; RequestForm is the 2026 redesign replacement.
 // Revert to real import when ./request/RequestWorkspaceNew lands.
 import RequestWorkspaceNew from './RequestForm';
@@ -35,25 +36,27 @@ const APINetworkSection = () => {
     // Click still opens the sidebar unless the button was dragged.
     const startDragSidebarBtn = useCallback((e) => {
         e.preventDefault();
-        const rect = e.currentTarget.offsetParent.getBoundingClientRect();
+        // Button is position:fixed, so drag/snap math is in viewport coords (navbar = 60px tall).
+        const NAV = 60;
+        const vh = window.innerHeight, vw = window.innerWidth;
         const startX = e.clientX, startY = e.clientY;
         dragState.current.moved = false;
 
         const onMove = (ev) => {
-            const left = ev.clientX - rect.left - 16;
-            const top = ev.clientY - rect.top - 16;
+            const left = ev.clientX - 16;
+            const top = ev.clientY - 16;
             if (Math.abs(ev.clientX - startX) > 3 || Math.abs(ev.clientY - startY) > 3) dragState.current.moved = true;
             setDragPos({
-                top: Math.max(0, Math.min(rect.height - 32, top)),
-                left: Math.max(0, Math.min(rect.width / 2 - 32, left)), // left side only
+                top: Math.max(NAV + 16, Math.min(vh - 48, top)),
+                left: Math.max(16, Math.min(vw / 2 - 32, left)), // left side only
             });
         };
         const onUp = (ev) => {
             window.removeEventListener('pointermove', onMove);
             window.removeEventListener('pointerup', onUp);
             if (dragState.current.moved) {
-                // Left side only: snap to top-left or bottom-left by vertical position.
-                const corner = (ev.clientY - rect.top) < rect.height / 2 ? 'top-left' : 'bottom-left';
+                // Left side only: snap to top-left or bottom-left by vertical midpoint of viewport.
+                const corner = ev.clientY < vh / 2 ? 'top-left' : 'bottom-left';
                 setSidebarBtnCorner(corner);
                 localStorage.setItem('sidebarBtnCorner', corner);
             }
@@ -356,6 +359,7 @@ const APINetworkSection = () => {
                         element={<RequestDetails requests={requests} onSave={handleRequestUpdate} isLoadingRequests={isLoadingRequests} fetchHistory={fetchHistory} />}
                     />
                 </Routes>
+                <Footer />
             </div>
         </div >
     );

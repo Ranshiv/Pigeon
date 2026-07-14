@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import Home from './Home';
 import APINetworkSection from './APINetworkSection';
@@ -31,6 +31,7 @@ import ReviewDashboard from './collaboration/ReviewDashboard';
 
 const Workspace = () => {
     const { emitCursorMove } = useCollaboration();
+    const [isActivityOpen, setIsActivityOpen] = useState(false);
 
     const handleMouseMove = (e) => {
         // Debounce happens in context or socket layer usually, but simple throttling here is okay too
@@ -48,7 +49,7 @@ const Workspace = () => {
         <div style={{ position: 'relative' }} onMouseMove={handleMouseMove}>
             <CursorOverlay />
             <VideoChatOverlay />
-            <ActivityFeed />
+            <ActivityFeed isOpen={isActivityOpen} onToggle={() => setIsActivityOpen(o => !o)} />
 
             <Routes>
                 <Route index element={<Navigate to="/workspace/home" />} />

@@ -12,6 +12,14 @@ const loadTestRunSchema = new mongoose.Schema({
     // Snapshot of the scenario used for this run
     scenario: { type: mongoose.Schema.Types.Mixed, default: {} },
 
+    // SLO thresholds snapshot (from LoadTest at run time)
+    thresholds: {
+        p95LatencyMs: { type: Number, default: null },
+        p99LatencyMs: { type: Number, default: null },
+        errorRate: { type: Number, default: null },
+        minRps: { type: Number, default: null }
+    },
+
     // Results
     metrics: { type: mongoose.Schema.Types.Mixed, default: null },
     analysis: { type: mongoose.Schema.Types.Mixed, default: null },

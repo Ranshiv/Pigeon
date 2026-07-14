@@ -7,6 +7,7 @@ const AppSelect = ({ value, onChange, options, disabled, className = '', id }) =
     const [open, setOpen] = useState(false);
     const [pos, setPos] = useState({ top: 0, left: 0, width: 0 });
     const rootRef = useRef(null);
+    const listRef = useRef(null);
     const triggerRef = useRef(null);
 
     useLayoutEffect(() => {
@@ -26,7 +27,9 @@ const AppSelect = ({ value, onChange, options, disabled, className = '', id }) =
 
     useEffect(() => {
         const onDocClick = (e) => {
-            if (rootRef.current && !rootRef.current.contains(e.target)) setOpen(false);
+            const t = e.target;
+            const inside = (rootRef.current && rootRef.current.contains(t)) || (listRef.current && listRef.current.contains(t));
+            if (!inside) setOpen(false);
         };
         const onKey = (e) => { if (e.key === 'Escape') setOpen(false); };
         document.addEventListener('mousedown', onDocClick);
@@ -41,6 +44,7 @@ const AppSelect = ({ value, onChange, options, disabled, className = '', id }) =
 
     const list = open && !disabled ? (
         <ul
+            ref={listRef}
             className="app-select-list"
             role="listbox"
             style={{ top: `${pos.top}px`, left: `${pos.left}px`, width: `${pos.width}px` }}

@@ -1,4 +1,5 @@
 // features/performance-testing/LoadTestRunner.js
+const { EventEmitter } = require('events');
 const autocannon = require('autocannon');
 const VirtualUserSimulator = require('./VirtualUserSimulator');
 const ResourceMonitor = require('./ResourceMonitor');
@@ -8,12 +9,13 @@ const PerformanceAnalyzer = require('./PerformanceAnalyzer');
 /**
  * Runs a load test scenario using autocannon.
  *
- * Initial implementation:
  * - sequential phases (ramp patterns)
  * - collects server resource samples during the run
+ * - emits 'tick' events with live KPI snapshots during execution
  */
-class LoadTestRunner {
+class LoadTestRunner extends EventEmitter {
     constructor(options = {}) {
+        super();
         this.simulator = new VirtualUserSimulator();
         this.resourceMonitor = new ResourceMonitor({
             sampleIntervalMs: options.sampleIntervalMs || 1000
@@ -22,6 +24,7 @@ class LoadTestRunner {
         this.analyzer = new PerformanceAnalyzer();
 
         this._runs = new Map(); // runId -> { status, result }
+        this._liveInstances = new Map(); // runId -> autocannon instance
     }
 
     getRun(runId) {
@@ -36,12 +39,16 @@ class LoadTestRunner {
 
         this._runs.set(runId, { status: 'running', startedAt: new Date(), scenario });
 
+        this.emit('phase', { runId, phase: 'running', scenario: { name: scenario.name, targetUrl: scenario.targetUrl } });
+
         try {
-            // Run each phase sequentially and merge results.
             const phaseResults = [];
-            for (const phase of scenario.phases) {
-                const res = await this._runPhase(scenario, phase);
+            for (let i = 0; i < scenario.phases.length; i++) {
+                const phase = scenario.phases[i];
+                this.emit('phase', { runId, phase: 'phase-start', index: i, connections: phase.connections, durationSeconds: phase.durationSeconds });
+                const res = await this._runPhase(runId, i, scenario, phase);
                 phaseResults.push(res);
+                this.emit('phase', { runId, phase: 'phase-end', index: i });
             }
 
             const merged = this._mergeAutocannonResults(phaseResults);
@@ -56,24 +63,21 @@ class LoadTestRunner {
             };
 
             this._runs.set(runId, { status: 'completed', finishedAt: new Date(), scenario, result: finalResult });
+            this.emit('done', { runId, result: finalResult });
             return finalResult;
         } catch (err) {
             this._runs.set(runId, { status: 'failed', finishedAt: new Date(), scenario, error: err?.message || String(err) });
+            this.emit('error', { runId, error: err?.message || String(err) });
             throw err;
         } finally {
             this.metricsCollector.stop();
+            this._liveInstances.delete(runId);
         }
     }
 
-    _runPhase(scenario, phase) {
+    _runPhase(runId, phaseIndex, scenario, phase) {
         const timeout = (scenario.timeoutSeconds || 30) * 1000;
 
-        // Autocannon expects:
-        //  - url
-        //  - connections
-        //  - duration (seconds)
-        //  - pipelining
-        //  - method/headers/body for requests
         const options = {
             url: scenario.targetUrl,
             connections: phase.connections,
@@ -82,7 +86,6 @@ class LoadTestRunner {
             timeout,
             method: scenario.method,
             headers: scenario.headers,
-            // Collect status code histogram (e.g. {"200": 1200, "302": 50, "403": 10})
             trackStatusCodes: true
         };
 
@@ -91,10 +94,31 @@ class LoadTestRunner {
         }
 
         return new Promise((resolve, reject) => {
-            autocannon(options, (err, result) => {
+            const instance = autocannon(options, (err, result) => {
                 if (err) return reject(err);
                 return resolve(result);
             });
+            this._liveInstances.set(runId, instance);
+
+            // Live tick: autocannon emits 'tick' with running counters.
+            instance.on('tick', (stats) => {
+                this.emit('tick', {
+                    runId,
+                    phaseIndex,
+                    ts: Date.now(),
+                    live: {
+                        connections: phase.connections,
+                        rps: typeof stats?.requests === 'number' ? stats.requests : null,
+                        latencyMs: stats?.latency || null,
+                        errors: typeof stats?.errors === 'number' ? stats.errors : null,
+                        timeouts: typeof stats?.timeouts === 'number' ? stats.timeouts : null,
+                        bytes: stats?.throughput || null
+                    }
+                });
+            });
+
+            // Ensure the instance is cleaned if the process ends early.
+            instance.on('done', () => this._liveInstances.delete(runId));
         });
     }
 

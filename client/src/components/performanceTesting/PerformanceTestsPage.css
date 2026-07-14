@@ -695,3 +695,22 @@ body.dark-theme .pt-modal-close:hover {
     from { opacity: 0; transform: translateY(20px) scale(0.98); }
     to { opacity: 1; transform: translateY(0) scale(1); }
 }
+
+.pt-kpi.failed {
+    border-color: var(--danger-color);
+    background: color-mix(in srgb, var(--danger-color) 4%, var(--card-bg));
+}
+.pt-kpi.failed .value { color: var(--danger-color); }
+
+.live-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: var(--success-color);
+    animation: livePulse 1.5s ease-in-out infinite;
+}
+@keyframes livePulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.8); }
+}

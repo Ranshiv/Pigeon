@@ -34,6 +34,17 @@ function initializeSocketServer(server) {
     io.on('connection', (socket) => {
         // Remove excessive logging
 
+        // Performance testing telemetry subscription.
+        // Lightweight: joins a perf room without collab/user-join side-effects.
+        socket.on('perf:subscribe', (runId) => {
+            if (!runId || typeof runId !== 'string') return;
+            socket.join(`performance:run:${runId}`);
+        });
+        socket.on('perf:unsubscribe', (runId) => {
+            if (!runId || typeof runId !== 'string') return;
+            socket.leave(`performance:run:${runId}`);
+        });
+
         // Track user rooms (workspaces/collections they are in)
         const userRooms = new Set();
         let authenticatedUser = null;

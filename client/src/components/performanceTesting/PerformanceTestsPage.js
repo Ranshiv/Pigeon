@@ -1,6 +1,9 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import './PerformanceTestsPage.css';
 import { FiActivity, FiBarChart2, FiPlay, FiPlus, FiRefreshCw, FiSave, FiTrash2 } from 'react-icons/fi';
+import AppSelect from '../common/AppSelect/AppSelect';
+import '../common/AppSelect/AppSelect.css';
+import { io } from 'socket.io-client';
 
 import {
     Chart as ChartJS,
@@ -143,7 +146,13 @@ const defaultForm = () => ({
     timeoutSeconds: 30,
     headersJson: '{\n  "Content-Type": "application/json"\n}',
     body: '',
-    phases: [{ durationSeconds: 10, connections: 10, pipelining: 1 }]
+    phases: [{ durationSeconds: 10, connections: 10, pipelining: 1 }],
+    thresholds: {
+        p95LatencyMs: '',
+        p99LatencyMs: '',
+        errorRatePct: '',
+        minRps: ''
+    }
 });
 
 const PerformanceTestsPage = () => {
@@ -162,6 +171,9 @@ const PerformanceTestsPage = () => {
 
     const [startingRun, setStartingRun] = useState(false);
     const [pollRunId, setPollRunId] = useState(null);
+    const [liveMetrics, setLiveMetrics] = useState(null);
+    const [rca, setRca] = useState(null);
+    const [loadingRca, setLoadingRca] = useState(false);
 
     // Benchmarking / comparison
     const [baselineRunId, setBaselineRunId] = useState('');
@@ -265,6 +277,7 @@ const PerformanceTestsPage = () => {
     // Reset comparison state when selection changes
     useEffect(() => {
         setComparison(null);
+        setRca(null);
         // Keep baseline if still exists, otherwise clear.
         if (baselineRunId && !runs.some(r => r._id === baselineRunId)) {
             setBaselineRunId('');
@@ -272,7 +285,36 @@ const PerformanceTestsPage = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [selectedRunId, runs.length]);
 
-    // Polling for an active run
+    // Live WebSocket connection for telemetry
+    useEffect(() => {
+        if (!selectedRunId) return;
+        const run = runs.find(r => r._id === selectedRunId);
+        if (!run || (run.status !== 'running' && run.status !== 'queued')) return;
+
+        const socket = io('/', { withCredentials: true });
+
+        socket.on('connect', () => {
+            socket.emit('perf:subscribe', selectedRunId);
+        });
+
+        socket.on('perf:tick', (data) => {
+            if (data.runId === selectedRunId && data.live) {
+                setLiveMetrics(data.live);
+            }
+        });
+
+        socket.on('perf:done', () => {
+            // Force a final poll immediately
+            setPollRunId(selectedRunId);
+        });
+
+        return () => {
+            socket.emit('perf:unsubscribe', selectedRunId);
+            socket.disconnect();
+        };
+    }, [selectedRunId, runs]);
+
+    // Polling for an active run (fallback + final state)
     useEffect(() => {
         if (!pollRunId) return;
 
@@ -337,7 +379,13 @@ const PerformanceTestsPage = () => {
                     durationSeconds: Number(p.durationSeconds),
                     connections: Number(p.connections),
                     pipelining: Number(p.pipelining ?? 1)
-                }))
+                })),
+                thresholds: {
+                    p95LatencyMs: toNumberOrNull(form.thresholds.p95LatencyMs),
+                    p99LatencyMs: toNumberOrNull(form.thresholds.p99LatencyMs),
+                    errorRate: toNumberOrNull(form.thresholds.errorRatePct) !== null ? toNumberOrNull(form.thresholds.errorRatePct) / 100 : null,
+                    minRps: toNumberOrNull(form.thresholds.minRps)
+                }
             };
 
             const created = await apiFetch('/api/performance-tests', {
@@ -519,6 +567,20 @@ const PerformanceTestsPage = () => {
             setError(e.message || 'Failed to export report');
         } finally {
             setExporting(false);
+        }
+    };
+
+    const loadRca = async () => {
+        if (!selectedRunId) return;
+        setLoadingRca(true);
+        setError(null);
+        try {
+            const data = await apiFetch(`/api/performance-tests/runs/${selectedRunId}/rca`);
+            setRca(data.rca);
+        } catch (e) {
+            setError(e.message || 'Failed to load RCA');
+        } finally {
+            setLoadingRca(false);
         }
     };
 
@@ -704,40 +766,79 @@ const PerformanceTestsPage = () => {
                                 </div>
                             </div>
 
-                            <div className="pt-kpis">
-                                <div className="pt-kpi">
-                                    <div className="label">Avg RPS</div>
-                                    <div className="value">{formatNumber(kpis?.avgRps, 1)}</div>
+                            {selectedRun.status === 'running' || selectedRun.status === 'queued' ? (
+                                <div className="pt-kpis">
+                                    <div className="pt-kpi live">
+                                        <div className="label">Live RPS</div>
+                                        <div className="value">{liveMetrics ? formatNumber(liveMetrics.rps, 1) : '—'}</div>
+                                    </div>
+                                    <div className="pt-kpi live">
+                                        <div className="label">Live Latency (avg)</div>
+                                        <div className="value">{liveMetrics ? formatNumber(liveMetrics.latencyMs?.average, 2) : '—'} ms</div>
+                                    </div>
+                                    <div className="pt-kpi live">
+                                        <div className="label">Live Errors</div>
+                                        <div className="value">{liveMetrics ? liveMetrics.errors : '—'}</div>
+                                    </div>
+                                    <div className="pt-kpi live">
+                                        <div className="label">Active VUs</div>
+                                        <div className="value">{liveMetrics ? liveMetrics.connections : '—'}</div>
+                                    </div>
                                 </div>
-                                <div className="pt-kpi">
-                                    <div className="label">P95 latency</div>
-                                    <div className="value">{formatNumber(kpis?.p95LatencyMs, 2)} ms</div>
+                            ) : (
+                                <div className="pt-kpis">
+                                    <div className={`pt-kpi ${selectedRun.analysis?.gates?.find(g => g.metric === 'minRps')?.passed === false ? 'failed' : ''}`}>
+                                        <div className="label">Avg RPS</div>
+                                        <div className="value">{formatNumber(kpis?.avgRps, 1)}</div>
+                                    </div>
+                                    <div className={`pt-kpi ${selectedRun.analysis?.gates?.find(g => g.metric === 'p95LatencyMs')?.passed === false ? 'failed' : ''}`}>
+                                        <div className="label">P95 latency</div>
+                                        <div className="value">{formatNumber(kpis?.p95LatencyMs, 2)} ms</div>
+                                    </div>
+                                    <div className={`pt-kpi ${selectedRun.analysis?.gates?.find(g => g.metric === 'p99LatencyMs')?.passed === false ? 'failed' : ''}`}>
+                                        <div className="label">P99 latency</div>
+                                        <div className="value">{formatNumber(kpis?.p99LatencyMs, 2)} ms</div>
+                                    </div>
+                                    <div className={`pt-kpi ${selectedRun.analysis?.gates?.find(g => g.metric === 'errorRate')?.passed === false ? 'failed' : ''}`}>
+                                        <div className="label">Error rate</div>
+                                        <div className="value">{formatPct(kpis?.errorRate, 2)}</div>
+                                    </div>
+                                    <div className="pt-kpi">
+                                        <div className="label">Apdex Score</div>
+                                        <div className="value" style={{ color: kpis?.apdexScore >= 0.85 ? chartTheme.success : kpis?.apdexScore >= 0.5 ? chartTheme.warning : chartTheme.danger }}>
+                                            {formatNumber(kpis?.apdexScore, 2)}
+                                        </div>
+                                    </div>
+                                    <div className="pt-kpi">
+                                        <div className="label">Throughput avg</div>
+                                        <div className="value">{formatBytes(kpis?.throughputAvgBytes)}/s</div>
+                                    </div>
                                 </div>
-                                <div className="pt-kpi">
-                                    <div className="label">P99 latency</div>
-                                    <div className="value">{formatNumber(kpis?.p99LatencyMs, 2)} ms</div>
-                                </div>
-                                <div className="pt-kpi">
-                                    <div className="label">Error rate</div>
-                                    <div className="value">{formatPct(kpis?.errorRate, 2)}</div>
-                                </div>
-                                <div className="pt-kpi">
-                                    <div className="label">Total req</div>
-                                    <div className="value">{kpis?.totalRequests ?? '—'}</div>
-                                </div>
-                                <div className="pt-kpi">
-                                    <div className="label">Throughput avg</div>
-                                    <div className="value">{formatBytes(kpis?.throughputAvgBytes)}/s</div>
-                                </div>
-                            </div>
+                            )}
 
                             {selectedRun.status === 'running' || selectedRun.status === 'queued' ? (
-                                <div className="pt-muted">This run is {selectedRun.status}. Live updates will appear automatically.</div>
+                                <div className="pt-muted" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                    <span className="live-dot" /> This run is {selectedRun.status}. Live updates are streaming.
+                                </div>
                             ) : null}
 
                             {selectedRun.status === 'failed' && selectedRun.error ? (
                                 <div className="pt-alert error">{selectedRun.error}</div>
                             ) : null}
+
+                            <div className="pt-subsection">
+                                <div className="pt-subsection-title" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                    <span>AI Root Cause Analysis</span>
+                                    <button className="pt-btn" onClick={loadRca} disabled={loadingRca || selectedRun.status !== 'completed'}>
+                                        {loadingRca ? 'Analyzing...' : 'Generate Analysis'}
+                                    </button>
+                                </div>
+                                {rca && (
+                                    <div className="pt-rca-box" style={{ background: 'color-mix(in srgb, var(--primary-color) 4%, transparent)', border: '1px solid var(--primary-color)', padding: '16px', borderRadius: '12px', whiteSpace: 'pre-wrap', fontSize: '0.9rem', lineHeight: 1.6 }}>
+                                        {rca.summary}
+                                    </div>
+                                )}
+                            </div>
 
                             <div className="pt-subsection">
                                 <div className="pt-subsection-title">Bottleneck hints</div>
@@ -994,6 +1095,45 @@ const PerformanceTestsPage = () => {
                                 <button type="button" className="pt-btn" onClick={onAddPhase}>
                                     <FiPlus /> Add phase
                                 </button>
+                            </div>
+                        </div>
+
+                        <div className="pt-form-row">
+                            <label>Quality Gates (SLOs)</label>
+                            <div className="pt-muted" style={{ marginBottom: '10px' }}>Fail the run or lower Apdex score if these bounds are breached. Leave empty to skip.</div>
+                            <div className="pt-form-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))' }}>
+                                <div>
+                                    <div className="pt-phase-label">P95 Latency ≤ (ms)</div>
+                                    <input
+                                        type="number" min="0" placeholder="e.g. 200"
+                                        value={form.thresholds.p95LatencyMs}
+                                        onChange={e => setForm(p => ({ ...p, thresholds: { ...p.thresholds, p95LatencyMs: e.target.value } }))}
+                                    />
+                                </div>
+                                <div>
+                                    <div className="pt-phase-label">P99 Latency ≤ (ms)</div>
+                                    <input
+                                        type="number" min="0" placeholder="e.g. 500"
+                                        value={form.thresholds.p99LatencyMs}
+                                        onChange={e => setForm(p => ({ ...p, thresholds: { ...p.thresholds, p99LatencyMs: e.target.value } }))}
+                                    />
+                                </div>
+                                <div>
+                                    <div className="pt-phase-label">Max Error Rate (%)</div>
+                                    <input
+                                        type="number" min="0" max="100" step="0.1" placeholder="e.g. 1.0"
+                                        value={form.thresholds.errorRatePct}
+                                        onChange={e => setForm(p => ({ ...p, thresholds: { ...p.thresholds, errorRatePct: e.target.value } }))}
+                                    />
+                                </div>
+                                <div>
+                                    <div className="pt-phase-label">Min Avg RPS</div>
+                                    <input
+                                        type="number" min="0" placeholder="e.g. 100"
+                                        value={form.thresholds.minRps}
+                                        onChange={e => setForm(p => ({ ...p, thresholds: { ...p.thresholds, minRps: e.target.value } }))}
+                                    />
+                                </div>
                             </div>
                         </div>
 

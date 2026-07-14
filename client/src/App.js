@@ -172,7 +172,9 @@ function App() {
         pauseOnHover
         icon
       />
-      <Footer />
+      {/* api-network is a fixed-height app-shell that renders its own footer inside
+          the scroll region — a second global footer here would create a 2nd scrollbar */}
+      {!location.pathname.startsWith('/workspace/api-network') && <Footer />}
     </div>
   );
 }

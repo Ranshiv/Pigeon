@@ -1,9 +1,9 @@
 .marketplace-page {
-    padding: 32px;
+    padding: 32px 32px 100px 32px;
     width: 100%;
     box-sizing: border-box;
     background-color: var(--background-color);
-    min-height: calc(100vh - 64px);
+    min-height: calc(100vh - 60px);
 }
 
 .marketplace-header {
@@ -179,7 +179,7 @@
 
 @media (max-width: 768px) {
     .marketplace-page {
-        padding: 20px;
+        padding: 20px 20px 100px 20px;
     }
 
     .marketplace-toolbar {
