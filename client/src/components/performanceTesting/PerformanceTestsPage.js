@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import './PerformanceTestsPage.css';
-import { FiActivity, FiBarChart2, FiPlay, FiPlus, FiRefreshCw, FiSave, FiTrash2 } from 'react-icons/fi';
+import { FiActivity, FiPlay, FiPlus, FiRefreshCw, FiSave, FiTrash2 } from 'react-icons/fi';
 import AppSelect from '../common/AppSelect/AppSelect';
 import '../common/AppSelect/AppSelect.css';
 import { io } from 'socket.io-client';
@@ -92,6 +92,36 @@ const formatNumber = (n, digits = 2) => {
 const formatPct = (n, digits = 2) => {
     if (n === null || n === undefined) return '—';
     return `${(n * 100).toFixed(digits)}%`;
+};
+
+const RcaSummary = ({ text }) => {
+    if (!text) return null;
+
+    // Split on blank lines, then bold leading labels like "**Verdict:**"
+    const blocks = String(text).split(/\n\s*\n/).filter(Boolean);
+
+    return (
+        <div className="pt-rca-summary">
+            {blocks.map((block, i) => {
+                const lines = block.split('\n').filter(Boolean);
+                return (
+                    <div key={i} className="pt-rca-block">
+                        {lines.map((line, j) => {
+                            const match = line.match(/^\*\*(.+?):\*\*\s*(.*)$/);
+                            if (match) {
+                                return (
+                                    <p key={j} className="pt-rca-line">
+                                        <span className="pt-rca-label">{match[1]}</span> {match[2]}
+                                    </p>
+                                );
+                            }
+                            return <p key={j} className="pt-rca-line">{line}</p>;
+                        })}
+                    </div>
+                );
+            })}
+        </div>
+    );
 };
 
 const formatDelta = (d, digits = 2, suffix = '') => {
@@ -203,8 +233,10 @@ const PerformanceTestsPage = () => {
             success: readCssVar('--success-color', '#28a745'),
             warning: readCssVar('--warning-color', '#ffc107'),
             danger: readCssVar('--danger-color', '#dc3545'),
+            text: readCssVar('--text-color', '#212529'),
             textSecondary: readCssVar('--text-secondary', '#6c757d'),
-            border: readCssVar('--border-color', '#e1e4e8')
+            border: readCssVar('--border-color', '#e1e4e8'),
+            surface: readCssVar('--surface-elevated', readCssVar('--card-bg', '#ffffff'))
         };
     }, [themeKey]);
 
@@ -451,64 +483,43 @@ const PerformanceTestsPage = () => {
         }));
     };
 
-    const resourceSeries = useMemo(() => {
+    const resourceCharts = useMemo(() => {
         const samples = selectedRun?.metrics?.resources || [];
         if (!Array.isArray(samples) || samples.length === 0) return null;
 
         const labels = samples.map(s => new Date(s.ts).toLocaleTimeString());
-        const cpuUser = samples.map(s => s?.cpu?.userPct ?? null);
-        const cpuSys = samples.map(s => s?.cpu?.systemPct ?? null);
-        const elMean = samples.map(s => s?.eventLoopDelayMs?.mean ?? null);
-        const rssMb = samples.map(s => (typeof s?.memory?.rss === 'number' ? s.memory.rss / (1024 * 1024) : null));
+        const makeDataset = (label, data, color, { fill = false, area = false } = {}) => ({
+            label,
+            data,
+            borderColor: color,
+            backgroundColor: area ? colorWithAlpha(color, 0.12) : colorWithAlpha(color, 0.06),
+            tension: 0.35,
+            pointRadius: 0,
+            pointHoverRadius: 5,
+            fill: area ? 'origin' : false,
+            borderWidth: 2,
+            borderCapStyle: 'round',
+            borderJoinStyle: 'round'
+        });
 
         return {
             labels,
-            datasets: [
-                {
-                    label: 'CPU user %',
-                    data: cpuUser,
-                    borderColor: chartTheme.primary,
-                    backgroundColor: colorWithAlpha(chartTheme.primary, 0.06),
-                    tension: 0.3,
-                    pointRadius: 0,
-                    fill: false,
-                    borderWidth: 3,
-                    yAxisID: 'y'
-                },
-                {
-                    label: 'CPU system %',
-                    data: cpuSys,
-                    borderColor: chartTheme.danger,
-                    backgroundColor: colorWithAlpha(chartTheme.danger, 0.06),
-                    tension: 0.3,
-                    pointRadius: 0,
-                    fill: false,
-                    borderWidth: 3,
-                    yAxisID: 'y'
-                },
-                {
-                    label: 'Event loop mean (ms)',
-                    data: elMean,
-                    borderColor: chartTheme.success,
-                    backgroundColor: colorWithAlpha(chartTheme.success, 0.10),
-                    tension: 0.3,
-                    pointRadius: 0,
-                    fill: true,
-                    borderWidth: 2,
-                    yAxisID: 'y'
-                },
-                {
-                    label: 'RSS (MB)',
-                    data: rssMb,
-                    borderColor: chartTheme.warning,
-                    backgroundColor: colorWithAlpha(chartTheme.warning, 0.10),
-                    tension: 0.3,
-                    pointRadius: 0,
-                    fill: true,
-                    borderWidth: 2,
-                    yAxisID: 'y1'
-                }
-            ]
+            cpu: {
+                datasets: [
+                    makeDataset('CPU user %', samples.map(s => s?.cpu?.userPct ?? null), chartTheme.primary, { area: true }),
+                    makeDataset('CPU system %', samples.map(s => s?.cpu?.systemPct ?? null), chartTheme.danger)
+                ]
+            },
+            latency: {
+                datasets: [
+                    makeDataset('Event loop mean (ms)', samples.map(s => s?.eventLoopDelayMs?.mean ?? null), chartTheme.success, { area: true })
+                ]
+            },
+            memory: {
+                datasets: [
+                    makeDataset('RSS (MB)', samples.map(s => (typeof s?.memory?.rss === 'number' ? s.memory.rss / (1024 * 1024) : null)), chartTheme.warning, { area: true })
+                ]
+            }
         };
     }, [selectedRun, chartTheme]);
 
@@ -588,7 +599,8 @@ const PerformanceTestsPage = () => {
         <div className="perf-tests-page">
             <div className="perf-tests-header">
                 <div>
-                    <h1><FiBarChart2 /> Performance Testing</h1>
+                    <div className="pt-eyebrow">Pigeon · Telemetry</div>
+                    <h1>Performance Testing</h1>
                     <p>Create load tests, run them, and inspect latency, throughput, and resource impact.</p>
                 </div>
 
@@ -615,6 +627,7 @@ const PerformanceTestsPage = () => {
                 <div className="pt-panel">
                     <div className="pt-panel-title">
                         <FiActivity /> Tests
+                        {tests.length > 0 && <span className="pt-count">{tests.length}</span>}
                     </div>
 
                     {loadingTests ? (
@@ -677,8 +690,11 @@ const PerformanceTestsPage = () => {
                                     onClick={() => setSelectedRunId(r._id)}
                                 >
                                     <div className="pt-run-row-main">
-                                        <span className={`status ${r.status}`}>{r.status}</span>
-                                        <span className="mono">{r._id.slice(0, 8)}</span>
+                                        <span className={`pt-status ${r.status}`}>
+                                            <span className="pt-status-dot" />
+                                            {r.status}
+                                        </span>
+                                        <span className="mono pt-run-id">{r._id.slice(0, 8)}</span>
                                     </div>
                                     <div className="pt-run-row-sub">
                                         {r.startedAt ? `Started ${new Date(r.startedAt).toLocaleString()}` : `Created ${new Date(r.createdAt).toLocaleString()}`}
@@ -696,20 +712,20 @@ const PerformanceTestsPage = () => {
                                 <div className="pt-compare">
                                     <div className="pt-compare-row">
                                         <label className="pt-compare-label">Compare to baseline</label>
-                                        <select
+                                        <AppSelect
                                             className="pt-compare-select"
                                             value={baselineRunId}
-                                            onChange={(e) => setBaselineRunId(e.target.value)}
-                                        >
-                                            <option value="">Select a completed run…</option>
-                                            {completedRuns
-                                                .filter(r => r._id !== selectedRunId)
-                                                .map(r => (
-                                                    <option key={r._id} value={r._id}>
-                                                        {r._id.slice(0, 8)} — {new Date(r.createdAt).toLocaleString()}
-                                                    </option>
-                                                ))}
-                                        </select>
+                                            onChange={setBaselineRunId}
+                                            options={[
+                                                { value: '', label: 'Select a completed run…' },
+                                                ...completedRuns
+                                                    .filter(r => r._id !== selectedRunId)
+                                                    .map(r => ({
+                                                        value: r._id,
+                                                        label: `${r._id.slice(0, 8)} — ${new Date(r.createdAt).toLocaleString()}`
+                                                    }))
+                                            ]}
+                                        />
 
                                         <button
                                             className="pt-btn"
@@ -827,15 +843,15 @@ const PerformanceTestsPage = () => {
                             ) : null}
 
                             <div className="pt-subsection">
-                                <div className="pt-subsection-title" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                <div className="pt-subsection-title">
                                     <span>AI Root Cause Analysis</span>
                                     <button className="pt-btn" onClick={loadRca} disabled={loadingRca || selectedRun.status !== 'completed'}>
                                         {loadingRca ? 'Analyzing...' : 'Generate Analysis'}
                                     </button>
                                 </div>
                                 {rca && (
-                                    <div className="pt-rca-box" style={{ background: 'color-mix(in srgb, var(--primary-color) 4%, transparent)', border: '1px solid var(--primary-color)', padding: '16px', borderRadius: '12px', whiteSpace: 'pre-wrap', fontSize: '0.9rem', lineHeight: 1.6 }}>
-                                        {rca.summary}
+                                    <div className="pt-rca-box">
+                                        <RcaSummary text={rca.summary} />
                                     </div>
                                 )}
                             </div>
@@ -872,65 +888,83 @@ const PerformanceTestsPage = () => {
                                 )}
                             </div>
 
-                            {resourceSeries && (
-                                <div className="pt-chart">
-                                    <Line
-                                        data={resourceSeries}
-                                        options={{
-                                            responsive: true,
-                                            maintainAspectRatio: false,
-                                            interaction: { mode: 'index', intersect: false },
-                                            plugins: {
-                                                legend: {
-                                                    position: 'top',
-                                                    labels: {
-                                                        color: chartTheme.textSecondary
-                                                    }
-                                                },
-                                                tooltip: {
-                                                    backgroundColor: colorWithAlpha(chartTheme.border, 0.20),
-                                                    borderColor: chartTheme.border,
-                                                    borderWidth: 1,
-                                                    titleColor: chartTheme.textSecondary,
-                                                    bodyColor: chartTheme.textSecondary,
-                                                    displayColors: true,
-                                                    callbacks: {
-                                                        label: (ctx) => {
-                                                            const label = ctx.dataset?.label || '';
-                                                            const v = ctx.parsed?.y;
-                                                            if (v === null || v === undefined) return label;
-                                                            if (label.includes('CPU')) return `${label}: ${Number(v).toFixed(1)}%`;
-                                                            if (label.includes('Event loop')) return `${label}: ${Number(v).toFixed(2)} ms`;
-                                                            if (label.includes('RSS')) return `${label}: ${Number(v).toFixed(2)} MB`;
-                                                            return `${label}: ${Number(v).toFixed(2)}`;
+                            {resourceCharts && (
+                                <div className="pt-chart-grid">
+                                    {[
+                                        { key: 'cpu', title: 'CPU utilization', unit: '%', max: 100 },
+                                        { key: 'latency', title: 'Event loop latency', unit: 'ms' },
+                                        { key: 'memory', title: 'Memory RSS', unit: 'MB' }
+                                    ].map(({ key, title, unit, max }) => {
+                                        const data = { labels: resourceCharts.labels, datasets: resourceCharts[key].datasets };
+                                        const formatValue = (v) => Number.isFinite(v) ? `${Number(v).toFixed(unit === '%' ? 1 : 2)} ${unit}` : '—';
+                                        return (
+                                            <div key={key} className="pt-chart">
+                                                <div className="pt-chart-title">{title}</div>
+                                                <Line
+                                                    data={data}
+                                                    options={{
+                                                        responsive: true,
+                                                        maintainAspectRatio: false,
+                                                        interaction: { mode: 'index', intersect: false },
+                                                        plugins: {
+                                                            legend: {
+                                                                position: 'top',
+                                                                align: 'end',
+                                                                labels: {
+                                                                    color: chartTheme.textSecondary,
+                                                                    usePointStyle: true,
+                                                                    pointStyle: 'line',
+                                                                    boxWidth: 24,
+                                                                    boxHeight: 2,
+                                                                    padding: 16,
+                                                                    font: { size: 11, family: "'Inter', sans-serif" }
+                                                                }
+                                                            },
+                                                            tooltip: {
+                                                                backgroundColor: chartTheme.surface,
+                                                                borderColor: chartTheme.border,
+                                                                borderWidth: 1,
+                                                                titleColor: chartTheme.text,
+                                                                bodyColor: chartTheme.text,
+                                                                boxPadding: 4,
+                                                                titleFont: { size: 12, weight: '600', family: "'Inter', sans-serif" },
+                                                                bodyFont: { size: 12, family: "'Inter', sans-serif" },
+                                                                padding: 12,
+                                                                cornerRadius: 8,
+                                                                displayColors: true,
+                                                                usePointStyle: true,
+                                                                callbacks: {
+                                                                    label: (ctx) => `${ctx.dataset.label}: ${formatValue(ctx.parsed?.y)}`
+                                                                }
+                                                            },
+                                                            title: { display: false }
+                                                        },
+                                                        scales: {
+                                                            x: {
+                                                                ticks: {
+                                                                    color: chartTheme.textSecondary,
+                                                                    font: { size: 10, family: "'Inter', sans-serif" },
+                                                                    maxRotation: 0
+                                                                },
+                                                                grid: { color: chartTheme.border }
+                                                            },
+                                                            y: {
+                                                                beginAtZero: true,
+                                                                ...(max ? { suggestedMax: max } : {}),
+                                                                ticks: {
+                                                                    color: chartTheme.textSecondary,
+                                                                    font: { size: 10, family: "'Inter', sans-serif" },
+                                                                    callback: (v) => `${v}${unit === '%' ? '' : ''}`
+                                                                },
+                                                                grid: { color: chartTheme.border, tickLength: 4 },
+                                                                border: { display: false }
+                                                            }
                                                         }
-                                                    }
-                                                },
-                                                title: { display: false }
-                                            },
-                                            scales: {
-                                                x: {
-                                                    ticks: { color: chartTheme.textSecondary },
-                                                    grid: { color: chartTheme.border }
-                                                },
-                                                y: {
-                                                    beginAtZero: true,
-                                                    suggestedMax: 100,
-                                                    ticks: { color: chartTheme.textSecondary },
-                                                    grid: { color: chartTheme.border }
-                                                },
-                                                y1: {
-                                                    beginAtZero: true,
-                                                    position: 'right',
-                                                    ticks: { color: chartTheme.textSecondary },
-                                                    grid: {
-                                                        drawOnChartArea: false,
-                                                        color: chartTheme.border
-                                                    }
-                                                }
-                                            }
-                                        }}
-                                    />
+                                                    }}
+                                                />
+                                            </div>
+                                        );
+                                    })}
                                 </div>
                             )}
                         </div>
@@ -982,16 +1016,17 @@ const PerformanceTestsPage = () => {
 
                             <div className="pt-form-row">
                                 <label>Method</label>
-                                <select
+                                <AppSelect
                                     value={form.method}
-                                    onChange={(e) => setForm(prev => ({ ...prev, method: e.target.value }))}
-                                >
-                                    <option value="GET">GET</option>
-                                    <option value="POST">POST</option>
-                                    <option value="PUT">PUT</option>
-                                    <option value="PATCH">PATCH</option>
-                                    <option value="DELETE">DELETE</option>
-                                </select>
+                                    onChange={(v) => setForm(prev => ({ ...prev, method: v }))}
+                                    options={[
+                                        { value: 'GET', label: 'GET' },
+                                        { value: 'POST', label: 'POST' },
+                                        { value: 'PUT', label: 'PUT' },
+                                        { value: 'PATCH', label: 'PATCH' },
+                                        { value: 'DELETE', label: 'DELETE' }
+                                    ]}
+                                />
                             </div>
 
                             <div className="pt-form-row">
