@@ -195,15 +195,6 @@
   min-height: 0;
 }
 
-.converter-content {
-  background: var(--pt-surface);
-  margin: clamp(20px, 4vw, 40px);
-  border-radius: var(--pt-radius);
-  border: 1px solid var(--pt-hairline);
-  padding: 0;
-  overflow-y: auto;
-}
-
 /* Welcome bento */
 .protocol-welcome {
   display: flex;

@@ -142,9 +142,7 @@ const ProtocolTestPage = () => {
                     </div>
                 </>
             ) : (
-                <div className="protocol-content converter-content">
-                    <ProtocolConverterUI />
-                </div>
+                <ProtocolConverterUI />
             )}
         </div>
     );
