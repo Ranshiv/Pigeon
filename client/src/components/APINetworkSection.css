@@ -515,12 +515,6 @@
     cursor: row-resize;
 }
 
-.add-button,
-button[class*="add"],
-[class*="add-button"] {
-    margin-bottom: 16px;
-}
-
 .response-section {
     flex: 1;
     min-height: 240px;

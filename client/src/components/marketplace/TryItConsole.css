@@ -252,11 +252,6 @@
     max-height: none;
 }
 
-button[class*="add"],
-[class*="add-button"] {
-    margin: 8px !important;
-}
-
 /* Headers Section */
 .header-row {
     display: grid;

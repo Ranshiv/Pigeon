@@ -64,19 +64,19 @@
   padding: 4px;
   background: var(--pt-inset);
   border: 1px solid var(--pt-hairline);
-  border-radius: 999px;
+  border-radius: var(--pt-radius-sm);
 }
 
 .pt-tab {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 8px 16px;
+  gap: 8px;
+  padding: 10px 24px;
   border: none;
   border-radius: var(--pt-radius-btn);
   background: transparent;
   color: var(--text-secondary);
-  font-size: 0.78rem;
+  font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
   transition: all var(--dur-fast, 120ms) var(--ease-out, ease);
@@ -88,9 +88,8 @@
 }
 
 .pt-tab.active {
-  background: var(--primary-light);
+  background: color-mix(in srgb, var(--pt-accent) 12%, transparent);
   color: var(--pt-accent);
-  box-shadow: 0 2px 8px var(--primary-light);
 }
 
 /* Protocol selector bar */

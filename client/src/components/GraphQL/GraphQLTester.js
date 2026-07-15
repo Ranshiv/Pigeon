@@ -35,11 +35,11 @@ const GraphQLTester = () => {
             inherit: true,
             rules: [],
             colors: {
-                'editor.background': '#00111A',
-                'editor.lineHighlightBackground': '#002234',
+                'editor.background': '#002234',
+                'editor.lineHighlightBackground': '#013B5B',
                 'editorLineNumber.foreground': '#5b7c93',
-                'editorGutter.background': '#00111A',
-                'editorWidget.background': '#002234',
+                'editorGutter.background': '#002234',
+                'editorWidget.background': '#00111A',
                 'editorWidget.border': '#003956'
             }
         });
@@ -350,7 +350,7 @@ const GraphQLTester = () => {
             <div className="graphql-content">
                 <PanelGroup direction="horizontal" className="graphql-split-panels">
                 {/* Editor Panel */}
-                <Panel className="graphql-editor-panel" minSize={25} defaultSize={50}>
+                <Panel className="graphql-editor-panel" minSize={25} defaultSize={60}>
                     <div className="editor-tabs">
                         <button
                             className={`editor-tab ${activeTab === 'query' ? 'active' : ''}`}
@@ -429,36 +429,56 @@ const GraphQLTester = () => {
 
                         {activeTab === 'headers' && (
                             <div className="headers-editor">
-                                {headers.map((header, index) => (
-                                    <div key={index} className="key-value-pair">
-                                        <input
-                                            type="text"
-                                            className="key-value-input"
-                                            placeholder="Header name"
-                                            value={header.key}
-                                            onChange={(e) => updateHeader(index, 'key', e.target.value)}
-                                        />
-                                        <input
-                                            type="text"
-                                            className="key-value-input"
-                                            placeholder="Header value"
-                                            value={header.value}
-                                            onChange={(e) => updateHeader(index, 'value', e.target.value)}
-                                        />
-                                        <button
-                                            className="icon-button"
-                                            onClick={() => removeHeader(index)}
-                                        >
-                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                                <line x1="18" y1="6" x2="6" y2="18" />
-                                                <line x1="6" y1="6" x2="18" y2="18" />
+                                <div className="headers-card">
+                                    <div className="headers-card-head">
+                                        <div className="headers-card-title">
+                                            <span>Request Headers</span>
+                                            <small>Sent with every GraphQL request</small>
+                                        </div>
+                                        <button className="add-pair-button" onClick={addHeader}>
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                                                <line x1="12" y1="5" x2="12" y2="19" />
+                                                <line x1="5" y1="12" x2="19" y2="12" />
                                             </svg>
+                                            Add Header
                                         </button>
                                     </div>
-                                ))}
-                                <button className="add-pair-button" onClick={addHeader}>
-                                    + Add Header
-                                </button>
+                                    <div className="headers-rows">
+                                    {headers.length === 0 && (
+                                        <div className="headers-empty">
+                                            <p>No headers added</p>
+                                            <small>Click "Add Header" to include headers with your requests</small>
+                                        </div>
+                                    )}
+                                    {headers.map((header, index) => (
+                                        <div key={index} className="key-value-pair">
+                                            <input
+                                                type="text"
+                                                className="key-value-input"
+                                                placeholder="Header name"
+                                                value={header.key}
+                                                onChange={(e) => updateHeader(index, 'key', e.target.value)}
+                                            />
+                                            <input
+                                                type="text"
+                                                className="key-value-input"
+                                                placeholder="Header value"
+                                                value={header.value}
+                                                onChange={(e) => updateHeader(index, 'value', e.target.value)}
+                                            />
+                                            <button
+                                                className="icon-button"
+                                                onClick={() => removeHeader(index)}
+                                            >
+                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                                    <line x1="18" y1="6" x2="6" y2="18" />
+                                                    <line x1="6" y1="6" x2="18" y2="18" />
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    ))}
+                                    </div>
+                                </div>
                             </div>
                         )}
                     </div>
