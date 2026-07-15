@@ -1,14 +1,10 @@
 /* CollectionDetail.css - Updated for dark theme matching Postman UI */
 
-:root {
-  /* 2025 Blue Palette Theme Variables - Aligned with project theme */
-  --background-color: var(--background-color, #00111A);
-  --sidebar-bg: var(--sidebar-bg, #001927);
-  --primary-color: var(--primary-color, #014C75);
-  --primary-hover: var(--primary-hover, #013B5B);
-  --text-color: var(--text-color, #e0e0e0);
-  --text-secondary: var(--text-secondary, #B8D4E3);
-  --border-color: var(--border-color, #003956);
+/* Component-scoped extras only — global theme vars come from index.css.
+   (The old :root block here used self-referencing vars like
+   --card-bg: var(--card-bg, ...), which is a cyclic reference: it made
+   those variables invalid app-wide and broke theme colors globally.) */
+.collection-detail {
   --hover-color: var(--hover-bg, #013B5B);
   --method-get: #10b981;
   --method-post: #014C75;
@@ -19,7 +15,6 @@
   --shadow-md: 0 2px 6px rgba(0, 0, 0, 0.4);
   --border-radius: 4px;
   --success-color: #10b981;
-  --card-bg: var(--card-bg, #002234);
 }
 
 /* Main container */

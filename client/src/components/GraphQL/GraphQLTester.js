@@ -1,8 +1,10 @@
 // client/src/components/GraphQL/GraphQLTester.js
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Editor from '@monaco-editor/react';
+import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 import { useTheme } from '../../context/ThemeContext';
 import GraphQLLintingPanel from './GraphQLLintingPanel';
+import '../Protocols/tester-shell.css';
 import './GraphQLTester.css';
 
 const GraphQLTester = () => {
@@ -24,6 +26,25 @@ const GraphQLTester = () => {
     const [showLinting, setShowLinting] = useState(true);
     const [lintResults, setLintResults] = useState(null);
     const editorRef = useRef(null);
+
+    // Register a Monaco theme matching the app's dark-navy palette instead
+    // of Monaco's stock vs-dark (flat #1e1e1e), which clashed with the UI.
+    const handleEditorWillMount = (monaco) => {
+        monaco.editor.defineTheme('pigeon-dark', {
+            base: 'vs-dark',
+            inherit: true,
+            rules: [],
+            colors: {
+                'editor.background': '#00111A',
+                'editor.lineHighlightBackground': '#002234',
+                'editorLineNumber.foreground': '#5b7c93',
+                'editorGutter.background': '#00111A',
+                'editorWidget.background': '#002234',
+                'editorWidget.border': '#003956'
+            }
+        });
+    };
+    const editorTheme = theme === 'dark' ? 'pigeon-dark' : 'vs-light';
 
     // Execute GraphQL query
     const executeQuery = async () => {
@@ -298,6 +319,22 @@ const GraphQLTester = () => {
                     Introspect
                 </button>
                 <button
+                    className={`lint-toggle-button ${showLinting ? 'active' : ''}`}
+                    onClick={() => setShowLinting(!showLinting)}
+                    title={showLinting ? "Hide Linting Panel" : "Show Linting Panel (Ctrl+Shift+L)"}
+                >
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                        <path d="m9 12 2 2 4-4" />
+                    </svg>
+                    Linting
+                    {!showLinting && lintResults && lintResults.summary?.totalIssues > 0 && (
+                        <span className="lint-score-badge poor" style={{ padding: '0 4px', fontSize: '10px', marginLeft: '4px' }}>
+                            {lintResults.summary.totalIssues}
+                        </span>
+                    )}
+                </button>
+                <button
                     className="execute-button"
                     onClick={executeQuery}
                     disabled={loading || !url || !query}
@@ -311,8 +348,9 @@ const GraphQLTester = () => {
 
             {/* Main Content */}
             <div className="graphql-content">
+                <PanelGroup direction="horizontal" className="graphql-split-panels">
                 {/* Editor Panel */}
-                <div className="graphql-editor-panel">
+                <Panel className="graphql-editor-panel" minSize={25} defaultSize={50}>
                     <div className="editor-tabs">
                         <button
                             className={`editor-tab ${activeTab === 'query' ? 'active' : ''}`}
@@ -342,7 +380,8 @@ const GraphQLTester = () => {
                                     defaultLanguage="graphql"
                                     value={query}
                                     onChange={(value) => setQuery(value || '')}
-                                    theme={theme === 'dark' ? 'vs-dark' : 'vs-light'}
+                                    theme={editorTheme}
+                                    beforeMount={handleEditorWillMount}
                                     options={{
                                         minimap: { enabled: false },
                                         fontSize: 14,
@@ -370,7 +409,8 @@ const GraphQLTester = () => {
                                     defaultLanguage="json"
                                     value={variables}
                                     onChange={(value) => setVariables(value || '{}')}
-                                    theme={theme === 'dark' ? 'vs-dark' : 'vs-light'}
+                                    theme={editorTheme}
+                                    beforeMount={handleEditorWillMount}
                                     options={{
                                         minimap: { enabled: false },
                                         fontSize: 14,
@@ -435,10 +475,12 @@ const GraphQLTester = () => {
                             <span>{complexity.score}/100</span>
                         </div>
                     )}
-                </div>
+                </Panel>
+
+                <PanelResizeHandle className="graphql-split-handle" />
 
                 {/* Response Panel */}
-                <div className="graphql-response-panel">
+                <Panel className="graphql-response-panel" minSize={25} defaultSize={50}>
                     <div className="response-header">
                         <div className="response-status">
                             {response && (
@@ -496,7 +538,24 @@ const GraphQLTester = () => {
                             </>
                         )}
                     </div>
-                </div>
+                </Panel>
+
+                {showLinting && (
+                    <>
+                <PanelResizeHandle className="graphql-split-handle" />
+                <Panel className="graphql-linting-container" minSize={18} defaultSize={26}>
+                        <GraphQLLintingPanel
+                            query={query}
+                            onLintComplete={handleLintComplete}
+                            autoLint={true}
+                            debounceMs={800}
+                            preset="standard"
+                            onToggleCollapse={() => setShowLinting(false)}
+                        />
+                </Panel>
+                    </>
+                )}
+                </PanelGroup>
 
                 {/* Schema Panel */}
                 {showSchema && schemaTypes.length > 0 && (
@@ -519,38 +578,7 @@ const GraphQLTester = () => {
                         </div>
                     </div>
                 )}
-
-                {/* GraphQL Linting Panel */}
-                {showLinting && (
-                    <div className="graphql-linting-container">
-                        <GraphQLLintingPanel
-                            query={query}
-                            onLintComplete={handleLintComplete}
-                            autoLint={true}
-                            debounceMs={800}
-                            preset="standard"
-                            onToggleCollapse={() => setShowLinting(false)}
-                        />
-                    </div>
-                )}
             </div>
-
-            {/* Linting Toggle Button (when hidden) */}
-            {!showLinting && (
-                <button
-                    className="show-linting-button"
-                    onClick={() => setShowLinting(true)}
-                    title="Show Linting Panel (Ctrl+Shift+L)"
-                >
-                    <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18">
-                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
-                    </svg>
-                    <span>Lint</span>
-                    {lintResults && lintResults.summary?.totalIssues > 0 && (
-                        <span className="lint-badge">{lintResults.summary.totalIssues}</span>
-                    )}
-                </button>
-            )}
         </div>
     );
 };

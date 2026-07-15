@@ -5,6 +5,7 @@
 
 import React, { useState, useCallback } from 'react';
 import { ProtocolIcon } from './ProtocolSelector';
+import './tester-shell.css';
 import './ProtocolConverterUI.css';
 
 // Icon Components

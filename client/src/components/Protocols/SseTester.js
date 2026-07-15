@@ -4,6 +4,7 @@
  */
 
 import React, { useState, useCallback, useRef, useEffect } from 'react';
+import './tester-shell.css';
 import './SseTester.css';
 
 // Icon Components

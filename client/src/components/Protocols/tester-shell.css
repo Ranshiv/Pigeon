@@ -1,0 +1,314 @@
+/* tester-shell.css - Shared 2026 instrument-panel token + class layer for Protocol testers */
+
+/* Tokens live on body (NOT :root) so they resolve AFTER body.dark-theme
+   overrides --primary-color etc. Each tester can override --tester-accent. */
+body {
+  --tester-accent: var(--primary-color);
+  --tester-hairline: var(--border-color);
+  --tester-surface: var(--card-bg);
+  --tester-inset: var(--background-color);
+  --tester-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  --tester-radius: var(--radius-lg, 16px);
+  --tester-radius-sm: var(--radius-md, 12px);
+  --tester-radius-btn: var(--radius-sm, 8px);
+}
+
+.ts-shell {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: clamp(16px, 3vw, 24px);
+  animation: tsRise 0.42s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.ts-panel {
+  background: var(--tester-surface);
+  border: 1px solid var(--tester-hairline);
+  border-radius: var(--tester-radius);
+  box-shadow: 0 6px 24px color-mix(in srgb, var(--tester-accent) 6%, transparent);
+  padding: 18px;
+}
+
+.ts-panel-title {
+  font-family: var(--tester-mono);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  margin-bottom: 14px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--tester-hairline);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ts-inset {
+  background: var(--tester-inset);
+  border: 1px solid var(--tester-hairline);
+  border-radius: var(--tester-radius-sm);
+  padding: 12px;
+}
+
+.ts-eyebrow {
+  font-family: var(--tester-mono);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--tester-accent);
+}
+
+.ts-muted {
+  color: var(--text-secondary);
+}
+
+.ts-mono {
+  font-family: var(--tester-mono);
+}
+
+/* Buttons */
+.ts-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border: 1px solid var(--tester-hairline);
+  border-radius: var(--tester-radius-btn);
+  background: var(--tester-inset);
+  color: var(--text-color);
+  font-family: var(--font-family);
+  font-size: 0.82rem;
+  font-weight: 550;
+  cursor: pointer;
+  transition: all var(--dur-fast, 120ms) var(--ease-out, ease);
+}
+
+.ts-btn:hover {
+  background: color-mix(in srgb, var(--tester-accent) 8%, var(--tester-inset));
+  border-color: color-mix(in srgb, var(--tester-accent) 45%, var(--tester-hairline));
+}
+
+.ts-btn.primary {
+  background: var(--tester-accent);
+  border-color: var(--tester-accent);
+  color: var(--button-text);
+}
+
+.ts-btn.primary:hover {
+  filter: brightness(1.1);
+}
+
+.ts-btn.danger {
+  color: var(--danger-color);
+  border-color: color-mix(in srgb, var(--danger-color) 35%, var(--tester-hairline));
+}
+
+.ts-btn.danger:hover {
+  background: color-mix(in srgb, var(--danger-color) 10%, var(--tester-inset));
+  border-color: var(--danger-color);
+}
+
+.ts-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* Status chips */
+.ts-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-family: var(--tester-mono);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  border: 1px solid var(--tester-hairline);
+  background: var(--tester-inset);
+  color: var(--text-secondary);
+}
+
+.ts-status::before {
+  content: '';
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.ts-status.connected {
+  color: var(--success-color);
+  border-color: color-mix(in srgb, var(--success-color) 35%, var(--tester-hairline));
+  background: color-mix(in srgb, var(--success-color) 8%, var(--tester-inset));
+}
+
+.ts-status.running,
+.ts-status.live {
+  color: var(--success-color);
+  border-color: color-mix(in srgb, var(--success-color) 35%, var(--tester-hairline));
+  background: color-mix(in srgb, var(--success-color) 8%, var(--tester-inset));
+}
+
+.ts-status.running::before,
+.ts-status.live::before {
+  animation: livePulse 1.5s ease-in-out infinite;
+}
+
+.ts-status.disconnected {
+  color: var(--text-secondary);
+}
+
+.ts-status.error {
+  color: var(--danger-color);
+  border-color: color-mix(in srgb, var(--danger-color) 35%, var(--tester-hairline));
+  background: color-mix(in srgb, var(--danger-color) 8%, var(--tester-inset));
+}
+
+/* KPI tiles */
+.ts-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+}
+
+.ts-kpi {
+  position: relative;
+  background: var(--tester-inset);
+  border: 1px solid var(--tester-hairline);
+  border-radius: var(--tester-radius-sm);
+  padding: 14px;
+  overflow: hidden;
+}
+
+.ts-kpi::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 28px;
+  height: 3px;
+  background: color-mix(in srgb, var(--tester-accent) 80%, transparent);
+}
+
+.ts-kpi-label {
+  font-family: var(--tester-mono);
+  font-size: 0.64rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+}
+
+.ts-kpi-value {
+  font-size: 1.35rem;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-color);
+}
+
+.ts-kpi-unit {
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+  margin-left: 3px;
+}
+
+.ts-kpi.live::before {
+  background: var(--success-color);
+  animation: livePulse 1.5s ease-in-out infinite;
+}
+
+.ts-kpi.failed::before {
+  background: var(--danger-color);
+}
+
+/* Inputs */
+.ts-input,
+.ts-select,
+.ts-textarea {
+  background: var(--tester-inset);
+  border: 1px solid var(--tester-hairline);
+  border-radius: var(--tester-radius-btn);
+  color: var(--text-color);
+  padding: 8px 12px;
+  font-family: var(--font-family);
+  font-size: 0.85rem;
+  transition: border-color var(--dur-fast, 120ms) var(--ease-out, ease), box-shadow var(--dur-fast, 120ms) var(--ease-out, ease);
+}
+
+.ts-input:focus,
+.ts-select:focus,
+.ts-textarea:focus {
+  outline: none;
+  border-color: var(--tester-accent);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--tester-accent) 15%, transparent);
+}
+
+.ts-textarea {
+  font-family: var(--tester-mono);
+  line-height: 1.5;
+  min-height: 120px;
+  resize: vertical;
+}
+
+/* Badge / protocol pill */
+.ts-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: var(--tester-radius-btn);
+  font-family: var(--tester-mono);
+  font-size: 0.66rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  background: color-mix(in srgb, var(--tester-accent) 12%, var(--tester-inset));
+  color: var(--tester-accent);
+  border: 1px solid color-mix(in srgb, var(--tester-accent) 25%, var(--tester-hairline));
+}
+
+/* Sparkline */
+.ts-sparkline {
+  width: 120px;
+  height: 32px;
+}
+
+.ts-sparkline polyline {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2;
+}
+
+/* Animations */
+@keyframes tsRise {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes tsSlideUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes tsFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ts-shell,
+  .ts-panel,
+  .ts-status.running::before,
+  .ts-status.live::before,
+  .ts-kpi.live::before {
+    animation: none;
+  }
+}

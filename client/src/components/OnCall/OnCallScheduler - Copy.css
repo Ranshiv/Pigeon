@@ -1,0 +1,361 @@
+/* client/src/components/OnCall/OnCallScheduler.css */
+.oncall-scheduler {
+    padding: 2rem;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.scheduler-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+/* Schedule Editor */
+.schedule-editor {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+.editor-header {
+    padding: 2rem;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.editor-content {
+    padding: 2rem;
+}
+
+.editor-section {
+    margin-bottom: 2.5rem;
+}
+
+.section-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #111827;
+    margin-bottom: 1.5rem;
+}
+
+.section-subtitle {
+    display: block;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 1rem;
+}
+
+/* Forms */
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.form-group label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #374151;
+}
+
+.form-input,
+.form-textarea {
+    padding: 0.75rem 1rem;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    transition: all 0.2s;
+    background: white;
+}
+
+.form-input:focus,
+.form-textarea:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.form-select {
+    /* Inherit global index.css select styling; only layout overrides */
+    width: 100%;
+}
+
+.form-textarea {
+    resize: vertical;
+    font-family: inherit;
+}
+
+/* Participants */
+.participants-section {
+    margin-top: 1.5rem;
+}
+
+.participants-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.participant-card {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.participant-card .form-select {
+    flex: 1;
+}
+
+/* Days Selector */
+.days-selector {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.day-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: white;
+}
+
+.day-checkbox:hover {
+    border-color: #3b82f6;
+    background-color: #f0f9ff;
+}
+
+.day-checkbox input[type="checkbox"] {
+    cursor: pointer;
+}
+
+.day-checkbox input[type="checkbox"]:checked+span {
+    font-weight: 600;
+}
+
+.day-checkbox span {
+    font-size: 0.875rem;
+    color: #374151;
+}
+
+/* Coverage Windows */
+.coverage-window-card {
+    padding: 1.5rem;
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+}
+
+/* Buttons */
+.btn-primary,
+.btn-secondary {
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: none;
+}
+
+.btn-primary {
+    background-color: #3b82f6;
+    color: #ffffff;
+}
+
+.btn-primary:hover {
+    background-color: #2563eb;
+}
+
+.btn-secondary {
+    background-color: #f3f4f6;
+    color: #374151;
+}
+
+.btn-secondary:hover {
+    background-color: #e5e7eb;
+}
+
+.btn-icon {
+    padding: 0.5rem;
+    background: transparent;
+    border: none;
+    font-size: 1.125rem;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.btn-icon:hover {
+    transform: scale(1.1);
+}
+
+.btn-remove {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #fee2e2;
+    color: #b91c1c;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: all 0.2s;
+}
+
+.btn-remove:hover {
+    background-color: #fecaca;
+}
+
+/* Editor Actions */
+.editor-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    padding: 1.5rem 2rem;
+    border-top: 1px solid #e5e7eb;
+    background: #f9fafb;
+}
+
+/* Schedules List */
+.schedules-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+    gap: 1.5rem;
+}
+
+.schedule-card {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 1.5rem;
+    transition: all 0.2s;
+}
+
+.schedule-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+    transform: translateY(-2px);
+}
+
+.schedule-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    margin-bottom: 1.5rem;
+}
+
+.schedule-name {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #111827;
+    margin-bottom: 0.5rem;
+}
+
+.schedule-description {
+    font-size: 0.875rem;
+    color: #6b7280;
+}
+
+.schedule-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.schedule-details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.detail-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.875rem;
+}
+
+.detail-label {
+    color: #6b7280;
+    font-weight: 500;
+}
+
+.detail-value {
+    color: #111827;
+    font-weight: 600;
+}
+
+.current-oncall {
+    margin-top: 0.5rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid #e5e7eb;
+}
+
+.oncall-name {
+    color: #3b82f6;
+}
+
+/* Loading and Empty States */
+.loading-state,
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem 2rem;
+    color: #6b7280;
+}
+
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid #f3f4f6;
+    border-top-color: #3b82f6;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin-bottom: 1rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .oncall-scheduler {
+        padding: 1rem;
+    }
+
+    .scheduler-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .schedules-list {
+        grid-template-columns: 1fr;
+    }
+
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .editor-actions {
+        flex-direction: column;
+    }
+
+    .btn-primary,
+    .btn-secondary {
+        width: 100%;
+    }
+}

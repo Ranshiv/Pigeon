@@ -1,35 +1,42 @@
 /* client/src/components/Protocols/GrpcTester.css */
 
 .grpc-tester {
-    --grpc-bg: var(--card-bg, #ffffff);
-    --grpc-border: var(--border-color, #e0e0e0);
-    --grpc-text: var(--text-color, #333333);
-    --grpc-text-muted: var(--text-secondary, #666666);
-    --grpc-primary: var(--protocol-grpc, #06B6D4);
-    --grpc-success: #22C55E;
-    --grpc-error: #EF4444;
+    --grpc-bg: var(--tester-surface, var(--card-bg));
+    --grpc-border: var(--tester-hairline);
+    --grpc-text: var(--text-color);
+    --grpc-text-muted: var(--text-secondary);
+    --grpc-primary: var(--primary-color);
+    --grpc-success: var(--success-color, #22C55E);
+    --grpc-error: var(--danger-color, #EF4444);
+    --tester-accent: var(--primary-color);
 
     display: flex;
     flex-direction: column;
     gap: 16px;
     padding: 16px;
     background: var(--grpc-bg);
-    border-radius: 12px;
+    border-radius: var(--tester-radius);
     border: 1px solid var(--grpc-border);
+    animation: tsRise 0.42s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 .grpc-section {
     padding: 16px;
     background: var(--grpc-bg);
     border: 1px solid var(--grpc-border);
-    border-radius: 10px;
+    border-radius: var(--tester-radius-sm);
 }
 
 .grpc-section-title {
     margin: 0 0 12px 0;
-    font-size: 0.95rem;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--tester-hairline);
+    font-family: var(--tester-mono);
+    font-size: 0.72rem;
     font-weight: 600;
-    color: var(--grpc-text);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
 }
 
 /* Proto Section */
@@ -44,24 +51,28 @@
     font-size: 0.85rem;
     color: var(--grpc-text-muted);
     padding: 4px 10px;
-    background: #f5f5f5;
-    border-radius: 4px;
+    background: var(--tester-inset);
+    border-radius: var(--tester-radius-btn);
+    font-family: var(--tester-mono);
 }
 
 .grpc-proto-editor {
     width: 100%;
     min-height: 120px;
     padding: 12px;
-    font-family: 'Monaco', 'Menlo', monospace;
+    font-family: var(--tester-mono);
     font-size: 0.85rem;
     border: 1px solid var(--grpc-border);
-    border-radius: 8px;
+    border-radius: var(--tester-radius-btn);
     resize: vertical;
+    background: var(--tester-inset);
+    color: var(--grpc-text);
 }
 
 .grpc-proto-editor:focus {
     outline: none;
     border-color: var(--grpc-primary);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--grpc-primary) 15%, transparent);
 }
 
 /* Connection Section */
@@ -73,25 +84,28 @@
 
 .grpc-protocol-badge {
     padding: 10px 16px;
-    background: linear-gradient(135deg, var(--grpc-primary), color-mix(in srgb, var(--grpc-primary) 70%, #000));
-    color: white;
+    background: linear-gradient(135deg, var(--grpc-primary), color-mix(in srgb, var(--grpc-primary) 70%, var(--background-color)));
+    color: var(--button-text, #fff);
     font-weight: 600;
     font-size: 0.85rem;
-    border-radius: 8px 0 0 8px;
+    border-radius: var(--tester-radius-btn) 0 0 var(--tester-radius-btn);
 }
 
 .grpc-url-input {
     flex: 1;
     padding: 10px 14px;
-    border: 2px solid var(--grpc-border);
+    border: 1px solid var(--grpc-border);
     border-radius: 0;
     font-size: 0.95rem;
-    font-family: 'Monaco', 'Menlo', monospace;
+    font-family: var(--tester-mono);
+    background: var(--tester-inset);
+    color: var(--grpc-text);
 }
 
 .grpc-url-input:focus {
     outline: none;
     border-color: var(--grpc-primary);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--grpc-primary) 15%, transparent);
 }
 
 .grpc-service-method-selector {
@@ -108,12 +122,14 @@
 }
 
 .grpc-select-group label {
-    font-size: 0.8rem;
-    color: var(--grpc-text-muted);
+    font-size: 0.72rem;
+    color: var(--text-secondary);
+    font-family: var(--tester-mono);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
 }
 
 .grpc-select-group select {
-    /* Inherit global index.css select styling; only layout overrides */
     width: 100%;
 }
 
@@ -121,31 +137,41 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    padding: 8px 12px;
-    border-radius: 6px;
-    font-size: 0.85rem;
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-size: 0.7rem;
+    font-family: var(--tester-mono);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
 }
 
 .grpc-status-connected {
-    background: color-mix(in srgb, var(--grpc-success) 15%, transparent);
+    background: color-mix(in srgb, var(--grpc-success) 8%, var(--tester-inset));
     color: var(--grpc-success);
+    border: 1px solid color-mix(in srgb, var(--grpc-success) 35%, var(--tester-hairline));
 }
 
 .grpc-status-disconnected {
-    background: #f5f5f5;
+    background: var(--tester-inset);
     color: var(--grpc-text-muted);
+    border: 1px solid var(--tester-hairline);
 }
 
 .grpc-status-dot {
-    width: 8px;
-    height: 8px;
+    width: 7px;
+    height: 7px;
     border-radius: 50%;
     background: currentColor;
 }
 
+.grpc-status-connected .grpc-status-dot {
+    animation: livePulse 1.5s ease-in-out infinite;
+}
+
 .grpc-stats {
     color: var(--grpc-text-muted);
-    font-size: 0.8rem;
+    font-size: 0.78rem;
+    font-family: var(--tester-mono);
 }
 
 /* Request Section */
@@ -158,8 +184,11 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: 8px;
-    font-size: 0.85rem;
-    color: var(--grpc-text-muted);
+    font-size: 0.72rem;
+    color: var(--text-secondary);
+    font-family: var(--tester-mono);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
 }
 
 .grpc-metadata-row {
@@ -172,8 +201,10 @@
     flex: 1;
     padding: 8px 10px;
     border: 1px solid var(--grpc-border);
-    border-radius: 6px;
+    border-radius: var(--tester-radius-btn);
     font-size: 0.85rem;
+    background: var(--tester-surface);
+    color: var(--grpc-text);
 }
 
 .grpc-btn-remove {
@@ -181,36 +212,46 @@
     background: transparent;
     border: 1px solid var(--grpc-error);
     color: var(--grpc-error);
-    border-radius: 6px;
+    border-radius: var(--tester-radius-btn);
     cursor: pointer;
+    transition: all var(--dur-fast, 120ms) var(--ease-out, ease);
+}
+
+.grpc-btn-remove:hover {
+    background: color-mix(in srgb, var(--grpc-error) 10%, var(--tester-inset));
 }
 
 .grpc-message-editor {
     width: 100%;
     min-height: 100px;
     padding: 12px;
-    font-family: 'Monaco', 'Menlo', monospace;
+    font-family: var(--tester-mono);
     font-size: 0.85rem;
     border: 1px solid var(--grpc-border);
-    border-radius: 8px;
+    border-radius: var(--tester-radius-btn);
     margin-bottom: 12px;
     resize: vertical;
+    background: var(--tester-inset);
+    color: var(--grpc-text);
 }
 
 .grpc-message-editor:focus {
     outline: none;
     border-color: var(--grpc-primary);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--grpc-primary) 15%, transparent);
 }
 
 /* Buttons */
 .grpc-btn {
     padding: 10px 20px;
-    border: none;
-    border-radius: 8px;
+    border: 1px solid var(--tester-hairline);
+    border-radius: var(--tester-radius-btn);
+    background: var(--tester-inset);
+    color: var(--grpc-text);
     font-weight: 600;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all var(--dur-fast, 120ms) var(--ease-out, ease);
 }
 
 .grpc-btn:disabled {
@@ -221,7 +262,7 @@
 .grpc-btn-upload,
 .grpc-btn-parse,
 .grpc-btn-sample {
-    background: #f5f5f5;
+    background: var(--tester-inset);
     border: 1px solid var(--grpc-border);
     color: var(--grpc-text);
 }
@@ -229,46 +270,52 @@
 .grpc-btn-upload:hover,
 .grpc-btn-parse:hover,
 .grpc-btn-sample:hover {
-    background: #e5e5e5;
+    background: color-mix(in srgb, var(--grpc-primary) 8%, var(--tester-inset));
 }
 
 .grpc-btn-sample {
-    background: color-mix(in srgb, var(--grpc-primary) 15%, #f5f5f5);
+    background: color-mix(in srgb, var(--grpc-primary) 12%, var(--tester-inset));
     border-color: var(--grpc-primary);
     color: var(--grpc-primary);
 }
 
 .grpc-btn-sample:hover {
-    background: color-mix(in srgb, var(--grpc-primary) 25%, #f5f5f5);
+    background: color-mix(in srgb, var(--grpc-primary) 20%, var(--tester-inset));
 }
 
 .grpc-btn-connect,
 .grpc-btn-invoke {
     background: var(--grpc-primary);
-    color: white;
-    border-radius: 0 8px 8px 0;
+    color: var(--button-text, #fff);
+    border-color: var(--grpc-primary);
+    border-radius: 0 var(--tester-radius-btn) var(--tester-radius-btn) 0;
 }
 
 .grpc-btn-connect:hover:not(:disabled),
 .grpc-btn-invoke:hover:not(:disabled) {
-    background: color-mix(in srgb, var(--grpc-primary) 85%, #000);
+    filter: brightness(1.1);
 }
 
 .grpc-btn-invoke {
     width: 100%;
-    border-radius: 8px;
+    border-radius: var(--tester-radius-btn);
 }
 
 .grpc-btn-disconnect {
     background: var(--grpc-error);
-    color: white;
-    border-radius: 0 8px 8px 0;
+    color: var(--button-text, #fff);
+    border-color: var(--grpc-error);
+    border-radius: 0 var(--tester-radius-btn) var(--tester-radius-btn) 0;
+}
+
+.grpc-btn-disconnect:hover {
+    filter: brightness(1.1);
 }
 
 .grpc-btn-small {
     padding: 6px 12px;
-    font-size: 0.8rem;
-    background: transparent;
+    font-size: 0.78rem;
+    background: var(--tester-inset);
     border: 1px solid var(--grpc-border);
 }
 
@@ -278,6 +325,16 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: 12px;
+}
+
+.grpc-response-header::before {
+    content: 'RESPONSES';
+    font-family: var(--tester-mono);
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
 }
 
 .grpc-responses-list {
@@ -297,27 +354,27 @@
 
 .grpc-response {
     padding: 12px;
-    border-radius: 8px;
+    border-radius: var(--tester-radius-sm);
     border: 1px solid var(--grpc-border);
 }
 
 .grpc-response-request {
-    background: #EFF6FF;
-    border-color: #BFDBFE;
+    background: color-mix(in srgb, var(--grpc-primary) 8%, var(--tester-inset));
+    border-color: color-mix(in srgb, var(--grpc-primary) 25%, var(--tester-hairline));
 }
 
 .grpc-response-response {
-    background: #F0FDF4;
-    border-color: #BBF7D0;
+    background: color-mix(in srgb, var(--grpc-success) 8%, var(--tester-inset));
+    border-color: color-mix(in srgb, var(--grpc-success) 25%, var(--tester-hairline));
 }
 
 .grpc-response-error {
-    background: #FEF2F2;
-    border-color: #FECACA;
+    background: color-mix(in srgb, var(--grpc-error) 8%, var(--tester-inset));
+    border-color: color-mix(in srgb, var(--grpc-error) 25%, var(--tester-hairline));
 }
 
 .grpc-response-system {
-    background: #f5f5f5;
+    background: var(--tester-inset);
     font-style: italic;
 }
 
@@ -335,28 +392,29 @@
 
 .grpc-response-method {
     color: var(--grpc-primary);
-    font-family: monospace;
+    font-family: var(--tester-mono);
 }
 
-.grpc-response-latency {
+.grpc-response-latency,
+.grpc-response-time {
     color: var(--grpc-text-muted);
 }
 
 .grpc-response-time {
     margin-left: auto;
-    color: var(--grpc-text-muted);
 }
 
 .grpc-response-content {
     margin: 0;
     padding: 10px;
-    background: rgba(0, 0, 0, 0.03);
-    border-radius: 6px;
-    font-family: 'Monaco', 'Menlo', monospace;
+    background: color-mix(in srgb, var(--tester-accent) 4%, var(--tester-inset));
+    border-radius: var(--tester-radius-btn);
+    font-family: var(--tester-mono);
     font-size: 0.8rem;
     overflow-x: auto;
     white-space: pre-wrap;
     word-break: break-word;
+    color: var(--grpc-text);
 }
 
 .grpc-response-code {
@@ -371,9 +429,9 @@
     justify-content: space-between;
     align-items: center;
     padding: 12px 16px;
-    background: #FEF2F2;
-    border: 1px solid #FECACA;
-    border-radius: 8px;
+    background: color-mix(in srgb, var(--grpc-error) 8%, var(--tester-inset));
+    border: 1px solid color-mix(in srgb, var(--grpc-error) 30%, transparent);
+    border-radius: var(--tester-radius-sm);
     color: var(--grpc-error);
     font-size: 0.9rem;
 }
@@ -386,67 +444,6 @@
     color: var(--grpc-error);
 }
 
-/* Dark Mode */
-body.dark-theme .grpc-tester {
-    --grpc-bg: var(--card-bg, #002234);
-    --grpc-border: var(--border-color, #003956);
-    --grpc-text: var(--text-color, #e0e0e0);
-    --grpc-text-muted: var(--text-secondary, #d0d0d0);
-}
-
-body.dark-theme .grpc-response-request {
-    background: #013B5B;
-}
-
-body.dark-theme .grpc-response-response {
-    background: #0D3D2B;
-}
-
-body.dark-theme .grpc-response-error {
-    background: #3D1F1F;
-}
-
-body.dark-theme .grpc-response-system {
-    background: var(--sidebar-bg, #001927);
-}
-
-body.dark-theme .grpc-proto-editor,
-body.dark-theme .grpc-url-input,
-body.dark-theme .grpc-message-editor {
-    background: var(--card-bg, #002234);
-    color: var(--text-color, #e0e0e0);
-    border-color: var(--border-color, #003956);
-}
-
-body.dark-theme .grpc-metadata-row input {
-    background: var(--card-bg, #002234);
-    color: var(--text-color, #e0e0e0);
-    border-color: var(--border-color, #003956);
-}
-
-body.dark-theme .grpc-proto-filename,
-body.dark-theme .grpc-status-disconnected {
-    background: var(--sidebar-bg, #001927);
-}
-
-body.dark-theme .grpc-btn-upload,
-body.dark-theme .grpc-btn-parse,
-body.dark-theme .grpc-btn-small {
-    background: var(--sidebar-bg, #001927);
-    color: var(--text-color, #e0e0e0);
-    border-color: var(--border-color, #003956);
-}
-
-body.dark-theme .grpc-btn-upload:hover,
-body.dark-theme .grpc-btn-parse:hover,
-body.dark-theme .grpc-btn-small:hover {
-    background: var(--hover-bg, #013B5B);
-}
-
-body.dark-theme .grpc-response-content {
-    background: rgba(0, 0, 0, 0.2);
-}
-
 /* Responsive */
 @media (max-width: 768px) {
     .grpc-url-group {
@@ -454,19 +451,19 @@ body.dark-theme .grpc-response-content {
     }
 
     .grpc-protocol-badge {
-        border-radius: 8px;
+        border-radius: var(--tester-radius-btn);
     }
 
     .grpc-url-input {
         order: 1;
         width: 100%;
-        border-radius: 8px;
+        border-radius: var(--tester-radius-btn);
         margin-top: 8px;
     }
 
     .grpc-btn-connect,
     .grpc-btn-disconnect {
-        border-radius: 8px;
+        border-radius: var(--tester-radius-btn);
     }
 
     .grpc-service-method-selector {

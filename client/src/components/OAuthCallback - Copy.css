@@ -1,0 +1,271 @@
+/* client/src/components/OAuthCallback.css - Updated with 2025 Blue Palette */
+
+/* Theme Variables matching project theme */
+:root {
+    /* 2025 Blue Palette - Light Theme */
+    --oauth-primary-color: #014C75;
+    --oauth-primary-hover: #013B5B;
+    --oauth-primary-light: #E5F3FF;
+    --oauth-bg-primary: #f8f9fa;
+    --oauth-text-primary: #333333;
+    --oauth-text-secondary: #6c757d;
+    --oauth-border-light: #e1e4e8;
+}
+
+/* Dark theme variables - matching project dark theme */
+body.dark-theme,
+[data-theme="dark"] {
+    --oauth-bg-primary: #00111A;
+    --oauth-bg-surface: #002234;
+    --oauth-bg-hover: #013B5B;
+    --oauth-text-primary: #ffffff;
+    --oauth-text-secondary: #B8D4E3;
+    --oauth-text-tertiary: #7A9BAD;
+    --oauth-border-color: #003956;
+}
+
+.oauth-callback-container {
+    min-height: 100vh;
+    background: linear-gradient(135deg, var(--oauth-bg-primary, #00111A) 0%, var(--oauth-bg-surface, #002234) 100%);
+    color: var(--oauth-text-primary, #ffffff);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", sans-serif;
+    padding: 20px;
+}
+
+.oauth-callback-content {
+    text-align: center;
+    max-width: 500px;
+    width: 100%;
+    background: var(--oauth-bg-surface, rgba(0, 34, 52, 0.8));
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    border-radius: 16px;
+    padding: 40px 30px;
+    border: 1px solid var(--oauth-border-color, #003956);
+    box-shadow: 0 8px 24px rgba(1, 76, 117, 0.15);
+    position: relative;
+}
+
+/* Header close button (top-right corner) - for modal-style close */
+.modal-close-btn {
+    position: absolute;
+    top: 16px;
+    right: 20px;
+    background: none;
+    border: none;
+    color: var(--oauth-text-tertiary, #7A9BAD);
+    font-size: 20px;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    line-height: 1;
+}
+
+.modal-close-btn::before {
+    content: "✕";
+    font-weight: 400;
+}
+
+.modal-close-btn:hover {
+    background: var(--oauth-bg-hover, rgba(1, 59, 91, 0.1));
+    color: var(--oauth-text-primary, #ffffff);
+}
+
+.logo {
+    font-size: 28px;
+    font-weight: 600;
+    color: var(--oauth-primary-color, #014C75);
+    margin-bottom: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.status {
+    margin: 30px 0;
+    padding: 20px;
+    border-radius: 12px;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    flex-direction: column;
+}
+
+.status-icon {
+    font-size: 48px;
+    margin-bottom: 10px;
+}
+
+.status-message {
+    font-size: 18px;
+    font-weight: 500;
+}
+
+.success {
+    background: rgba(16, 185, 129, 0.1);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    color: #10b981;
+}
+
+.error {
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    color: #ef4444;
+}
+
+.loading {
+    background: var(--oauth-primary-light, rgba(1, 76, 117, 0.1));
+    border: 1px solid var(--oauth-primary-color, rgba(1, 76, 117, 0.3));
+    color: var(--oauth-primary-color, #014C75);
+}
+
+.instructions {
+    margin-top: 25px;
+    color: var(--oauth-text-tertiary, #7A9BAD);
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.instructions p {
+    margin-bottom: 20px;
+}
+
+.oauth-callback .close-button {
+    background: var(--oauth-primary-color, #014C75);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 8px rgba(1, 76, 117, 0.12);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    position: relative;
+}
+
+.oauth-callback .close-button::before {
+    content: "✕";
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 1;
+    margin-left: 8px;
+}
+
+.oauth-callback .close-button:hover {
+    background: var(--oauth-primary-hover, #013B5B);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 16px rgba(1, 76, 117, 0.2);
+}
+
+.oauth-callback .close-button:active {
+    transform: translateY(0);
+}
+
+/* Loading animation for the loading state */
+.loading .status-icon {
+    animation: spin 2s linear infinite;
+}
+
+/* Light theme overrides */
+body:not(.dark-theme):not([data-theme="dark"]) .oauth-callback-container {
+    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+    color: #333333;
+}
+
+body:not(.dark-theme):not([data-theme="dark"]) .oauth-callback-content {
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid #e1e4e8;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+body:not(.dark-theme):not([data-theme="dark"]) .instructions {
+    color: #6c757d;
+}
+
+body:not(.dark-theme):not([data-theme="dark"]) .loading {
+    background: var(--oauth-primary-light, #E5F3FF);
+    border: 1px solid var(--oauth-primary-color, #014C75);
+    color: var(--oauth-primary-color, #014C75);
+}
+
+/* Additional close button variations matching project patterns */
+.close-btn {
+    background: none;
+    border: none;
+    color: var(--oauth-text-tertiary, #7A9BAD);
+    font-size: 20px;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    line-height: 1;
+}
+
+.close-btn::before {
+    content: "✕";
+    font-weight: 400;
+}
+
+.close-btn:hover {
+    background: var(--oauth-bg-hover, rgba(1, 59, 91, 0.1));
+    color: var(--oauth-text-primary, #ffffff);
+}
+
+/* Light theme close button */
+body:not(.dark-theme):not([data-theme="dark"]) .close-btn,
+body:not(.dark-theme):not([data-theme="dark"]) .modal-close-btn {
+    color: #6c757d;
+}
+
+body:not(.dark-theme):not([data-theme="dark"]) .close-btn:hover,
+body:not(.dark-theme):not([data-theme="dark"]) .modal-close-btn:hover {
+    background: rgba(0, 0, 0, 0.05);
+    color: #333333;
+}
+
+/* Responsive design */
+@media (max-width: 600px) {
+    .oauth-callback-content {
+        padding: 30px 20px;
+        margin: 10px;
+    }
+
+    .logo {
+        font-size: 24px;
+    }
+
+    .status-icon {
+        font-size: 36px;
+    }
+
+    .status-message {
+        font-size: 16px;
+    }
+
+    .modal-close-btn {
+        top: 12px;
+        right: 16px;
+    }
+}

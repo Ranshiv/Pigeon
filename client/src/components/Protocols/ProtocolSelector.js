@@ -91,7 +91,7 @@ const ProtocolSelector = ({
             id: 'http',
             name: 'HTTP/REST',
             icon: 'http',
-            color: '#3B82F6',
+            color: 'var(--protocol-http)',
             description: 'Standard HTTP requests with REST conventions',
             features: ['GET, POST, PUT, DELETE', 'JSON/XML bodies', 'Headers & Auth']
         },
@@ -99,7 +99,7 @@ const ProtocolSelector = ({
             id: 'websocket',
             name: 'WebSocket',
             icon: 'websocket',
-            color: '#8B5CF6',
+            color: 'var(--protocol-ws)',
             description: 'Full-duplex real-time communication',
             features: ['Bidirectional', 'Persistent connection', 'Low latency']
         },
@@ -107,7 +107,7 @@ const ProtocolSelector = ({
             id: 'grpc',
             name: 'gRPC',
             icon: 'grpc',
-            color: '#06B6D4',
+            color: 'var(--protocol-grpc)',
             description: 'High-performance RPC with Protocol Buffers',
             features: ['Streaming', 'Strong typing', 'HTTP/2']
         },
@@ -115,7 +115,7 @@ const ProtocolSelector = ({
             id: 'graphql',
             name: 'GraphQL',
             icon: 'graphql',
-            color: '#E535AB',
+            color: 'var(--protocol-graphql)',
             description: 'Query language for flexible data fetching',
             features: ['Flexible queries', 'Type system', 'Subscriptions']
         },
@@ -123,7 +123,7 @@ const ProtocolSelector = ({
             id: 'soap',
             name: 'SOAP',
             icon: 'soap',
-            color: '#F59E0B',
+            color: 'var(--protocol-soap)',
             description: 'XML-based enterprise web services',
             features: ['WSDL', 'WS-Security', 'Standardized']
         },
@@ -131,7 +131,7 @@ const ProtocolSelector = ({
             id: 'mqtt',
             name: 'MQTT',
             icon: 'mqtt',
-            color: '#22C55E',
+            color: 'var(--protocol-mqtt)',
             description: 'Lightweight pub/sub messaging for IoT',
             features: ['Publish/Subscribe', 'QoS levels', 'Retained messages']
         },
@@ -139,7 +139,7 @@ const ProtocolSelector = ({
             id: 'sse',
             name: 'SSE',
             icon: 'sse',
-            color: '#EF4444',
+            color: 'var(--protocol-sse)',
             description: 'Server-Sent Events for real-time updates',
             features: ['Server push', 'Auto-reconnect', 'Event types']
         }
@@ -250,13 +250,13 @@ export const ProtocolSwitcher = ({
     disabled = false
 }) => {
     const defaultProtocols = [
-        { id: 'http', name: 'HTTP', icon: 'http', color: '#3B82F6' },
-        { id: 'websocket', name: 'WS', icon: 'websocket', color: '#8B5CF6' },
-        { id: 'grpc', name: 'gRPC', icon: 'grpc', color: '#06B6D4' },
-        { id: 'graphql', name: 'GQL', icon: 'graphql', color: '#E535AB' },
-        { id: 'soap', name: 'SOAP', icon: 'soap', color: '#F59E0B' },
-        { id: 'mqtt', name: 'MQTT', icon: 'mqtt', color: '#22C55E' },
-        { id: 'sse', name: 'SSE', icon: 'sse', color: '#EF4444' }
+        { id: 'http', name: 'HTTP', icon: 'http', color: 'var(--protocol-http)' },
+        { id: 'websocket', name: 'WS', icon: 'websocket', color: 'var(--protocol-ws)' },
+        { id: 'grpc', name: 'gRPC', icon: 'grpc', color: 'var(--protocol-grpc)' },
+        { id: 'graphql', name: 'GQL', icon: 'graphql', color: 'var(--protocol-graphql)' },
+        { id: 'soap', name: 'SOAP', icon: 'soap', color: 'var(--protocol-soap)' },
+        { id: 'mqtt', name: 'MQTT', icon: 'mqtt', color: 'var(--protocol-mqtt)' },
+        { id: 'sse', name: 'SSE', icon: 'sse', color: 'var(--protocol-sse)' }
     ];
 
     const protocolList = protocols || defaultProtocols;
@@ -295,13 +295,13 @@ export const ProtocolDropdown = ({
     const [isOpen, setIsOpen] = useState(false);
 
     const defaultProtocols = [
-        { id: 'http', name: 'HTTP/REST', icon: 'http', color: '#3B82F6' },
-        { id: 'websocket', name: 'WebSocket', icon: 'websocket', color: '#8B5CF6' },
-        { id: 'grpc', name: 'gRPC', icon: 'grpc', color: '#06B6D4' },
-        { id: 'graphql', name: 'GraphQL', icon: 'graphql', color: '#E535AB' },
-        { id: 'soap', name: 'SOAP', icon: 'soap', color: '#F59E0B' },
-        { id: 'mqtt', name: 'MQTT', icon: 'mqtt', color: '#22C55E' },
-        { id: 'sse', name: 'SSE', icon: 'sse', color: '#EF4444' }
+        { id: 'http', name: 'HTTP/REST', icon: 'http', color: 'var(--protocol-http)' },
+        { id: 'websocket', name: 'WebSocket', icon: 'websocket', color: 'var(--protocol-ws)' },
+        { id: 'grpc', name: 'gRPC', icon: 'grpc', color: 'var(--protocol-grpc)' },
+        { id: 'graphql', name: 'GraphQL', icon: 'graphql', color: 'var(--protocol-graphql)' },
+        { id: 'soap', name: 'SOAP', icon: 'soap', color: 'var(--protocol-soap)' },
+        { id: 'mqtt', name: 'MQTT', icon: 'mqtt', color: 'var(--protocol-mqtt)' },
+        { id: 'sse', name: 'SSE', icon: 'sse', color: 'var(--protocol-sse)' }
     ];
 
     const protocolList = protocols || defaultProtocols;

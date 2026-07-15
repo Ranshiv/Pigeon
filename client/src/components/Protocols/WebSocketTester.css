@@ -5,24 +5,25 @@
    ============================================ */
 
 .websocket-tester {
-    --ws-bg: var(--card-bg, #ffffff);
-    --ws-border: var(--border-color, #e0e0e0);
-    --ws-text: var(--text-color, #333333);
-    --ws-text-muted: var(--text-secondary, #666666);
-    --ws-primary: var(--protocol-ws, #8B5CF6);
-    --ws-success: #22C55E;
-    --ws-error: #EF4444;
-    --ws-warning: #F59E0B;
-    --ws-sent-bg: #EFF6FF;
-    --ws-received-bg: #F0FDF4;
-    --ws-system-bg: #F5F5F5;
-    --ws-error-bg: #FEF2F2;
+    --ws-bg: var(--tester-surface, var(--card-bg));
+    --ws-border: var(--tester-hairline);
+    --ws-text: var(--text-color);
+    --ws-text-muted: var(--text-secondary);
+    --ws-primary: var(--primary-color);
+    --ws-success: var(--success-color, #22C55E);
+    --ws-error: var(--danger-color, #EF4444);
+    --ws-warning: var(--warning-color, #F59E0B);
+    --ws-sent-bg: color-mix(in srgb, var(--tester-accent) 8%, var(--tester-inset));
+    --ws-received-bg: color-mix(in srgb, var(--success-color) 8%, var(--tester-inset));
+    --ws-system-bg: var(--tester-inset);
+    --ws-error-bg: color-mix(in srgb, var(--danger-color) 8%, var(--tester-inset));
+    --tester-accent: var(--primary-color);
 
     display: flex;
     flex-direction: column;
     height: 100%;
     background: var(--ws-bg);
-    border-radius: 12px;
+    border-radius: var(--tester-radius);
     overflow: hidden;
     border: 1px solid var(--ws-border);
 }
@@ -37,6 +38,20 @@
     border-bottom: 1px solid var(--ws-border);
 }
 
+.ws-connection-panel::before {
+    content: 'CONNECTION';
+    display: block;
+    font-family: var(--tester-mono);
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--tester-hairline);
+}
+
 .ws-url-input-group {
     display: flex;
     gap: 8px;
@@ -45,8 +60,8 @@
 
 .ws-protocol-badge {
     padding: 8px 12px;
-    background: linear-gradient(135deg, var(--ws-primary), color-mix(in srgb, var(--ws-primary) 70%, #000));
-    color: white;
+    background: linear-gradient(135deg, var(--ws-primary), color-mix(in srgb, var(--ws-primary) 70%, var(--background-color)));
+    color: var(--button-text, #fff);
     font-weight: 600;
     font-size: 0.85rem;
     border-radius: 8px 0 0 8px;
@@ -56,16 +71,19 @@
 .ws-url-input {
     flex: 1;
     padding: 10px 14px;
-    border: 2px solid var(--ws-border);
+    border: 1px solid var(--ws-border);
     border-radius: 0;
     font-size: 0.95rem;
-    font-family: 'Monaco', 'Menlo', monospace;
+    font-family: var(--tester-mono);
+    background: var(--tester-inset);
+    color: var(--ws-text);
     transition: border-color 0.2s ease;
 }
 
 .ws-url-input:focus {
     outline: none;
     border-color: var(--ws-primary);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--ws-primary) 15%, transparent);
 }
 
 .ws-url-input:disabled {
@@ -75,12 +93,14 @@
 
 .ws-btn {
     padding: 10px 20px;
-    border: none;
-    border-radius: 8px;
+    border: 1px solid var(--tester-hairline);
+    border-radius: var(--tester-radius-btn);
+    background: var(--tester-inset);
+    color: var(--ws-text);
     font-weight: 600;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all var(--dur-fast, 120ms) var(--ease-out, ease);
     white-space: nowrap;
 }
 
@@ -91,33 +111,35 @@
 
 .ws-btn-connect {
     background: var(--ws-primary);
-    color: white;
-    border-radius: 0 8px 8px 0;
+    color: var(--button-text, #fff);
+    border-color: var(--ws-primary);
+    border-radius: 0 var(--tester-radius-btn) var(--tester-radius-btn) 0;
 }
 
 .ws-btn-connect:hover:not(:disabled) {
-    background: color-mix(in srgb, var(--ws-primary) 85%, #000);
+    filter: brightness(1.1);
 }
 
 .ws-btn-disconnect {
     background: var(--ws-error);
-    color: white;
-    border-radius: 0 8px 8px 0;
+    color: var(--button-text, #fff);
+    border-color: var(--ws-error);
+    border-radius: 0 var(--tester-radius-btn) var(--tester-radius-btn) 0;
 }
 
 .ws-btn-disconnect:hover {
-    background: color-mix(in srgb, var(--ws-error) 85%, #000);
+    filter: brightness(1.1);
 }
 
 .ws-btn-settings {
     padding: 10px;
-    background: transparent;
-    border: 2px solid var(--ws-border);
-    border-radius: 8px;
+    background: var(--tester-inset);
+    border: 1px solid var(--tester-hairline);
+    border-radius: var(--tester-radius-btn);
 }
 
 .ws-btn-settings:hover {
-    background: var(--ws-system-bg);
+    background: color-mix(in srgb, var(--tester-accent) 8%, var(--tester-inset));
 }
 
 /* ============================================
@@ -129,9 +151,10 @@
     justify-content: space-between;
     align-items: center;
     margin-top: 12px;
-    padding: 8px 12px;
-    background: var(--ws-system-bg);
-    border-radius: 8px;
+    padding: 10px 14px;
+    background: var(--tester-inset);
+    border: 1px solid var(--tester-hairline);
+    border-radius: var(--tester-radius-sm);
 }
 
 .ws-status-indicator {
@@ -141,10 +164,10 @@
 }
 
 .ws-status-dot {
-    width: 10px;
-    height: 10px;
+    width: 8px;
+    height: 8px;
     border-radius: 50%;
-    animation: pulse 2s infinite;
+    animation: livePulse 1.5s ease-in-out infinite;
 }
 
 .ws-status-disconnected .ws-status-dot {
@@ -165,22 +188,13 @@
     animation: none;
 }
 
-@keyframes pulse {
-
-    0%,
-    100% {
-        opacity: 1;
-    }
-
-    50% {
-        opacity: 0.5;
-    }
-}
-
 .ws-status-text {
-    font-size: 0.85rem;
-    font-weight: 500;
+    font-size: 0.8rem;
+    font-weight: 600;
     color: var(--ws-text);
+    font-family: var(--tester-mono);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
 }
 
 .ws-stats {
@@ -189,8 +203,9 @@
 }
 
 .ws-stat {
-    font-size: 0.8rem;
+    font-size: 0.78rem;
     color: var(--ws-text-muted);
+    font-family: var(--tester-mono);
 }
 
 /* ============================================
@@ -203,8 +218,9 @@
     gap: 12px;
     margin-top: 12px;
     padding: 12px;
-    background: var(--ws-system-bg);
-    border-radius: 8px;
+    background: var(--tester-inset);
+    border: 1px solid var(--tester-hairline);
+    border-radius: var(--tester-radius-sm);
 }
 
 .ws-setting {
@@ -214,19 +230,24 @@
 }
 
 .ws-setting label {
-    font-size: 0.8rem;
-    color: var(--ws-text-muted);
+    font-size: 0.72rem;
+    color: var(--text-secondary);
     display: flex;
     align-items: center;
     gap: 6px;
+    font-family: var(--tester-mono);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
 }
 
 .ws-setting input[type="text"],
 .ws-setting input[type="number"] {
     padding: 8px 10px;
-    border: 1px solid var(--ws-border);
-    border-radius: 6px;
+    border: 1px solid var(--tester-hairline);
+    border-radius: var(--tester-radius-btn);
     font-size: 0.85rem;
+    background: var(--tester-surface);
+    color: var(--ws-text);
 }
 
 
@@ -241,7 +262,7 @@
     margin-top: 12px;
     padding: 10px 14px;
     background: var(--ws-error-bg);
-    border-radius: 8px;
+    border-radius: var(--tester-radius-sm);
     border: 1px solid color-mix(in srgb, var(--ws-error) 30%, transparent);
 }
 
@@ -285,9 +306,19 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 12px 16px;
+    padding: 14px 16px;
     background: var(--ws-bg);
     border-bottom: 1px solid var(--ws-border);
+}
+
+.ws-messages-header::before {
+    content: 'MESSAGES';
+    font-family: var(--tester-mono);
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
 }
 
 .ws-messages-filter {
@@ -297,33 +328,34 @@
 
 .ws-filter-btn {
     padding: 6px 12px;
-    background: transparent;
-    border: 1px solid var(--ws-border);
-    border-radius: 6px;
-    font-size: 0.8rem;
+    background: var(--tester-inset);
+    border: 1px solid var(--tester-hairline);
+    border-radius: var(--tester-radius-btn);
+    font-size: 0.78rem;
     cursor: pointer;
-    transition: all 0.15s ease;
+    transition: all var(--dur-fast, 120ms) var(--ease-out, ease);
 }
 
 .ws-filter-btn:hover {
-    background: var(--ws-system-bg);
+    background: color-mix(in srgb, var(--tester-accent) 8%, var(--tester-inset));
 }
 
 .ws-filter-btn.active {
     background: var(--ws-primary);
-    color: white;
+    color: var(--button-text, #fff);
     border-color: var(--ws-primary);
 }
 
 .ws-btn-clear {
     padding: 6px 12px;
-    background: transparent;
-    border: 1px solid var(--ws-border);
-    font-size: 0.8rem;
+    background: var(--tester-inset);
+    border: 1px solid var(--tester-hairline);
+    border-radius: var(--tester-radius-btn);
+    font-size: 0.78rem;
 }
 
 .ws-btn-clear:hover {
-    background: var(--ws-error-bg);
+    background: color-mix(in srgb, var(--ws-error) 10%, var(--tester-inset));
     border-color: var(--ws-error);
     color: var(--ws-error);
 }
@@ -373,19 +405,19 @@
 
 .ws-message {
     padding: 12px;
-    border-radius: 8px;
+    border-radius: var(--tester-radius-sm);
     border: 1px solid transparent;
 }
 
 .ws-message-sent {
     background: var(--ws-sent-bg);
-    border-color: #BFDBFE;
+    border-color: color-mix(in srgb, var(--tester-accent) 25%, var(--tester-hairline));
     margin-left: 20px;
 }
 
 .ws-message-received {
     background: var(--ws-received-bg);
-    border-color: #BBF7D0;
+    border-color: color-mix(in srgb, var(--success-color) 25%, var(--tester-hairline));
     margin-right: 20px;
 }
 
@@ -414,11 +446,11 @@
 }
 
 .ws-direction-sent {
-    color: #2563EB;
+    color: var(--ws-primary, var(--tester-accent));
 }
 
 .ws-direction-received {
-    color: #16A34A;
+    color: var(--ws-success, var(--success-color));
 }
 
 .ws-message-time {
@@ -431,10 +463,11 @@
 }
 
 .ws-message-content {
-    font-family: 'Monaco', 'Menlo', monospace;
+    font-family: var(--tester-mono);
     font-size: 0.85rem;
     line-height: 1.5;
     overflow-x: auto;
+    color: var(--ws-text);
 }
 
 .ws-message-content pre {
@@ -453,6 +486,20 @@
     border-top: 1px solid var(--ws-border);
 }
 
+.ws-input-panel::before {
+    content: 'SEND MESSAGE';
+    display: block;
+    font-family: var(--tester-mono);
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--tester-hairline);
+}
+
 .ws-input-type-selector {
     display: flex;
     gap: 4px;
@@ -461,21 +508,21 @@
 
 .ws-type-btn {
     padding: 6px 14px;
-    background: transparent;
-    border: 1px solid var(--ws-border);
-    border-radius: 6px;
-    font-size: 0.8rem;
+    background: var(--tester-inset);
+    border: 1px solid var(--tester-hairline);
+    border-radius: var(--tester-radius-btn);
+    font-size: 0.78rem;
     cursor: pointer;
-    transition: all 0.15s ease;
+    transition: all var(--dur-fast, 120ms) var(--ease-out, ease);
 }
 
 .ws-type-btn:hover {
-    background: var(--ws-system-bg);
+    background: color-mix(in srgb, var(--tester-accent) 8%, var(--tester-inset));
 }
 
 .ws-type-btn.active {
     background: var(--ws-primary);
-    color: white;
+    color: var(--button-text, #fff);
     border-color: var(--ws-primary);
 }
 
@@ -487,9 +534,11 @@
 .ws-message-input {
     flex: 1;
     padding: 12px;
-    border: 2px solid var(--ws-border);
-    border-radius: 8px;
-    font-family: 'Monaco', 'Menlo', monospace;
+    border: 1px solid var(--tester-hairline);
+    border-radius: var(--tester-radius-btn);
+    font-family: var(--tester-mono);
+    background: var(--tester-inset);
+    color: var(--ws-text);
     font-size: 0.9rem;
     resize: none;
     min-height: 60px;
@@ -500,6 +549,7 @@
 .ws-message-input:focus {
     outline: none;
     border-color: var(--ws-primary);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--ws-primary) 15%, transparent);
 }
 
 .ws-message-input:disabled {
@@ -510,64 +560,20 @@
 .ws-btn-send {
     padding: 12px 24px;
     background: var(--ws-primary);
-    color: white;
+    color: var(--button-text, #fff);
     align-self: flex-end;
+    border-color: var(--ws-primary);
 }
 
 .ws-btn-send:hover:not(:disabled) {
-    background: color-mix(in srgb, var(--ws-primary) 85%, #000);
+    filter: brightness(1.1);
 }
 
 .ws-input-hint {
     margin-top: 6px;
-    font-size: 0.75rem;
+    font-size: 0.72rem;
     color: var(--ws-text-muted);
-}
-
-/* ============================================
-   Dark Mode Support
-   ============================================ */
-
-body.dark-theme .websocket-tester {
-    --ws-bg: var(--card-bg, #002234);
-    --ws-border: var(--border-color, #003956);
-    --ws-text: var(--text-color, #e0e0e0);
-    --ws-text-muted: var(--text-secondary, #d0d0d0);
-    --ws-sent-bg: #013B5B;
-    --ws-received-bg: #0D3D2B;
-    --ws-system-bg: var(--sidebar-bg, #001927);
-    --ws-error-bg: #3D1F1F;
-}
-
-body.dark-theme .ws-url-input,
-body.dark-theme .ws-message-input {
-    background: var(--card-bg, #002234);
-    color: var(--text-color, #e0e0e0);
-    border-color: var(--border-color, #003956);
-}
-
-body.dark-theme .ws-status-bar,
-body.dark-theme .ws-settings-panel {
-    background: var(--sidebar-bg, #001927);
-}
-
-body.dark-theme .ws-filter-btn,
-body.dark-theme .ws-type-btn,
-body.dark-theme .ws-btn-clear {
-    border-color: var(--border-color, #003956);
-    color: var(--text-color, #e0e0e0);
-}
-
-body.dark-theme .ws-filter-btn:hover,
-body.dark-theme .ws-type-btn:hover {
-    background: var(--hover-bg, #013B5B);
-}
-
-body.dark-theme .ws-setting input[type="text"],
-body.dark-theme .ws-setting input[type="number"] {
-    background: var(--card-bg, #002234);
-    color: var(--text-color, #e0e0e0);
-    border-color: var(--border-color, #003956);
+    font-family: var(--tester-mono);
 }
 
 /* ============================================

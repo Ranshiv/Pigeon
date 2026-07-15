@@ -1,0 +1,151 @@
+- generic [ref=f2e3]:
+  - navigation [ref=f2e4]:
+    - generic [ref=f2e5]:
+      - generic [ref=f2e6] [cursor=pointer]: Pigeon
+      - generic [ref=f2e8]:
+        - generic [ref=f2e9] [cursor=pointer]: Home
+        - generic [ref=f2e14] [cursor=pointer]: Workspaces
+        - generic [ref=f2e21] [cursor=pointer]: API Network
+        - generic [ref=f2e26] [cursor=pointer]: History
+        - generic [ref=f2e31] [cursor=pointer]: Monitoring
+        - generic [ref=f2e36] [cursor=pointer]: Compliance
+        - generic [ref=f2e40] [cursor=pointer]: Docs
+  - generic [ref=f2e62]:
+    - button "Activity" [ref=f2e63] [cursor=pointer]
+    - generic [ref=f2e67]:
+      - generic [ref=f2e68]:
+        - heading "Team Activity" [level=3] [ref=f2e69]
+        - generic [ref=f2e70]: "0"
+      - generic [ref=f2e71]: No recent activity
+    - generic [ref=f2e73]:
+      - generic [ref=f2e74]:
+        - generic [ref=f2e75]:
+          - generic [ref=f2e76]: Protocol Testing
+          - heading "Protocol Testing" [level=1] [ref=f2e77]
+          - paragraph [ref=f2e81]: Test WebSocket, gRPC, GraphQL, SOAP, MQTT, and SSE protocols
+        - generic [ref=f2e82]:
+          - button "Protocol Tester" [ref=f2e83] [cursor=pointer]
+          - button "Protocol Converter" [ref=f2e87] [cursor=pointer]
+      - generic [ref=f2e93]:
+        - generic [ref=f2e94]:
+          - generic [ref=f2e95]:
+            - button "HTTP/REST Standard" [ref=f2e96] [cursor=pointer]:
+              - generic [ref=f2e103]:
+                - heading "HTTP/REST" [level=4] [ref=f2e104]
+                - generic [ref=f2e105]: Standard
+            - button "✓ WebSocket Real-time" [active] [ref=f2e316] [cursor=pointer]:
+              - generic [ref=f2e107]: ✓
+              - generic [ref=f2e113]:
+                - heading "WebSocket" [level=4] [ref=f2e114]
+                - generic [ref=f2e115]: Real-time
+            - button "gRPC High-perf" [ref=f2e116] [cursor=pointer]:
+              - generic [ref=f2e122]:
+                - heading "gRPC" [level=4] [ref=f2e123]
+                - generic [ref=f2e124]: High-perf
+            - button "GraphQL Flexible" [ref=f2e125] [cursor=pointer]:
+              - generic [ref=f2e136]:
+                - heading "GraphQL" [level=4] [ref=f2e137]
+                - generic [ref=f2e138]: Flexible
+            - button "SOAP Enterprise" [ref=f2e139] [cursor=pointer]:
+              - generic [ref=f2e146]:
+                - heading "SOAP" [level=4] [ref=f2e147]
+                - generic [ref=f2e148]: Enterprise
+            - button "MQTT IoT" [ref=f2e149] [cursor=pointer]:
+              - generic [ref=f2e158]:
+                - heading "MQTT" [level=4] [ref=f2e159]
+                - generic [ref=f2e160]: IoT
+            - button "SSE Push" [ref=f2e161] [cursor=pointer]:
+              - generic [ref=f2e167]:
+                - heading "SSE" [level=4] [ref=f2e168]
+                - generic [ref=f2e169]: Push
+          - generic: Click to switch to WebSocket
+        - button "✕ Clear Selection" [ref=f2e319] [cursor=pointer]
+      - generic [ref=f2e320]:
+        - generic [ref=f2e321]:
+          - text: CONNECTION
+          - generic [ref=f2e322]:
+            - generic [ref=f2e323]: WS
+            - textbox "wss://echo.websocket.org" [ref=f2e324]
+            - button "Connect" [ref=f2e325] [cursor=pointer]
+            - button "⚙️" [ref=f2e326] [cursor=pointer]
+          - generic [ref=f2e327]: Disconnected
+        - generic [ref=f2e331]:
+          - generic [ref=f2e332]:
+            - text: MESSAGES
+            - generic [ref=f2e333]:
+              - button "All (0)" [ref=f2e334] [cursor=pointer]
+              - button "Sent (0)" [ref=f2e335] [cursor=pointer]
+              - button "Received (0)" [ref=f2e336] [cursor=pointer]
+            - button "Clear" [ref=f2e337] [cursor=pointer]
+          - generic [ref=f2e339]:
+            - paragraph [ref=f2e343]: No messages yet
+            - paragraph [ref=f2e344]: Connect to a WebSocket server to start
+        - generic [ref=f2e345]:
+          - text: SEND MESSAGE
+          - generic [ref=f2e346]:
+            - button "Text" [ref=f2e347] [cursor=pointer]
+            - button "JSON" [ref=f2e348] [cursor=pointer]
+          - generic [ref=f2e349]:
+            - textbox "Type a message..." [disabled] [ref=f2e350]
+            - button "Send" [disabled] [ref=f2e351]
+          - generic [ref=f2e352]: Press Enter to send, Shift+Enter for new line
+  - region "Notifications Alt+T"
+  - contentinfo [ref=f2e240]:
+    - generic [ref=f2e241]:
+      - generic [ref=f2e242]:
+        - generic [ref=f2e243]:
+          - heading "Pigeon" [level=3] [ref=f2e244]
+          - paragraph [ref=f2e245]: The ultimate API development platform
+          - generic [ref=f2e246]:
+            - link [ref=f2e247] [cursor=pointer]:
+              - /url: https://github.com
+            - link [ref=f2e250] [cursor=pointer]:
+              - /url: https://twitter.com
+            - link [ref=f2e253] [cursor=pointer]:
+              - /url: https://linkedin.com
+        - generic [ref=f2e256]:
+          - heading "Product" [level=4] [ref=f2e257]
+          - list [ref=f2e258]:
+            - listitem [ref=f2e259]:
+              - link "API Network" [ref=f2e260] [cursor=pointer]:
+                - /url: /workspace/api-network
+            - listitem [ref=f2e263]:
+              - link "Collections" [ref=f2e264] [cursor=pointer]:
+                - /url: /workspace/collections
+            - listitem [ref=f2e268]:
+              - link "Documentation" [ref=f2e269] [cursor=pointer]:
+                - /url: /documentation
+            - listitem [ref=f2e273]:
+              - link "History" [ref=f2e274] [cursor=pointer]:
+                - /url: /workspace/history
+        - generic [ref=f2e278]:
+          - heading "Resources" [level=4] [ref=f2e279]
+          - list [ref=f2e280]:
+            - listitem [ref=f2e281]:
+              - link "Help Center" [ref=f2e282] [cursor=pointer]:
+                - /url: "#"
+            - listitem [ref=f2e286]:
+              - link "API Status" [ref=f2e287] [cursor=pointer]:
+                - /url: "#"
+            - listitem [ref=f2e291]:
+              - link "Tutorials" [ref=f2e292] [cursor=pointer]:
+                - /url: "#"
+            - listitem [ref=f2e296]:
+              - link "Blog" [ref=f2e297] [cursor=pointer]:
+                - /url: "#"
+        - generic [ref=f2e302]:
+          - heading "Contact Us" [level=4] [ref=f2e303]
+          - link "support@pigeonapp.io" [ref=f2e304] [cursor=pointer]:
+            - /url: mailto:support@pigeonapp.io
+          - paragraph [ref=f2e308]: Have questions or feedback? We'd love to hear from you!
+      - generic [ref=f2e309]:
+        - generic [ref=f2e310]: © 2026 Pigeon. All rights reserved.
+        - generic [ref=f2e311]:
+          - link "Privacy Policy" [ref=f2e312] [cursor=pointer]:
+            - /url: "#"
+          - link "Terms of Service" [ref=f2e313] [cursor=pointer]:
+            - /url: "#"
+          - link "Cookies" [ref=f2e314] [cursor=pointer]:
+            - /url: "#"
+          - link "System Status" [ref=f2e315] [cursor=pointer]:
+            - /url: /status

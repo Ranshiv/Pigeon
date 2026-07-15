@@ -97,20 +97,14 @@ body {
   --method-patch: #50e3c2;
 
   /* Protocol Testing colors */
-  --protocol-ws: #8B5CF6;
-  /* WebSocket - Purple */
-  --protocol-grpc: #06B6D4;
-  /* gRPC - Cyan */
-  --protocol-graphql: #E535AB;
-  /* GraphQL - Pink */
-  --protocol-soap: #F97316;
-  /* SOAP - Orange */
-  --protocol-mqtt: #22C55E;
-  /* MQTT - Green */
-  --protocol-sse: #EC4899;
-  /* SSE - Pink */
+  /* Protocol accents — project blue family */
+  --protocol-ws: #0369a1;
+  --protocol-grpc: #0284c7;
+  --protocol-graphql: #2563eb;
+  --protocol-soap: #1d4ed8;
+  --protocol-mqtt: #0891b2;
+  --protocol-sse: #4f46e5;
   --protocol-http: #014C75;
-  /* HTTP - Primary Blue */
 
   /* === 2026 spatial/depth + motion tokens (light) === */
   --surface: #ffffff;
@@ -210,6 +204,12 @@ body {
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
+/* Global animations */
+@keyframes livePulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.45; transform: scale(0.8); }
+}
+
 /* Dark theme variables - 2025 Blue Palette */
 body.dark-theme {
   --background-color: #00111A;
@@ -246,6 +246,22 @@ body.dark-theme {
   --icon-color: #f8fafc;
   --secondary-hover: #94a3b8;
   --active-color: #0c4a6e;
+
+  /* Dark overrides for light semantic tints (matrix cells, banners, chips) */
+  --success-light: rgba(34, 197, 94, 0.14);
+  --warning-light: rgba(245, 158, 11, 0.14);
+  --danger-bg: rgba(239, 68, 68, 0.12);
+  --danger-bg-hover: rgba(239, 68, 68, 0.2);
+  --info-light: rgba(56, 189, 248, 0.14);
+
+  /* Protocol accents toned to the project blue palette (monitoring style) */
+  --protocol-ws: #7dd3fc;
+  --protocol-grpc: #38bdf8;
+  --protocol-graphql: #60a5fa;
+  --protocol-soap: #93c5fd;
+  --protocol-mqtt: #22d3ee;
+  --protocol-sse: #a5b4fc;
+  --protocol-http: #38bdf8;
 
   /* Designer-specific overrides for dark theme */
   --designer-bg: #00111A;

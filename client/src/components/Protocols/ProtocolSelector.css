@@ -5,12 +5,12 @@
    ============================================ */
 
 .protocol-selector {
-    --selector-bg: var(--card-bg, #ffffff);
-    --selector-border: var(--border-color, #e0e0e0);
-    --selector-text: var(--text-color, #333333);
-    --selector-text-muted: var(--text-secondary, #666666);
-    --selector-hover-bg: var(--hover-bg, #f5f5f5);
-    --selector-radius: 12px;
+    --selector-bg: var(--card-bg);
+    --selector-border: var(--border-color);
+    --selector-text: var(--text-color);
+    --selector-text-muted: var(--text-secondary);
+    --selector-hover-bg: var(--hover-bg);
+    --selector-radius: var(--radius-md, 12px);
 
     padding: 20px;
     background: var(--selector-bg);
@@ -77,27 +77,25 @@
     flex-direction: column;
     padding: 16px;
     background: var(--selector-bg);
-    border: 2px solid var(--selector-border);
-    border-radius: 10px;
+    border: 1px solid var(--selector-border);
+    border-radius: var(--selector-radius);
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all var(--dur-fast, 120ms) var(--ease-out, ease);
     overflow: hidden;
 }
 
 .protocol-card:hover,
 .protocol-card--hovered {
-    border-color: var(--protocol-color);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border-color: var(--primary-color);
 }
 
 .protocol-card--selected {
-    border-color: var(--protocol-color);
-    background: color-mix(in srgb, var(--protocol-color) 8%, var(--selector-bg));
+    border-color: var(--primary-color);
+    background: var(--hover-bg);
 }
 
 .protocol-card--selected .protocol-card__indicator {
-    transform: scaleX(1);
+    transform: scaleX(0);
 }
 
 .protocol-card__icon-wrapper {
@@ -105,11 +103,11 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 48px;
-    height: 48px;
+    width: 40px;
+    height: 40px;
     margin-bottom: 12px;
-    background: color-mix(in srgb, var(--protocol-color) 15%, transparent);
-    border-radius: 12px;
+    background: transparent;
+    border-radius: 8px;
 }
 
 .protocol-card__icon {
@@ -117,20 +115,7 @@
 }
 
 .protocol-card__check {
-    position: absolute;
-    top: -4px;
-    right: -4px;
-    width: 18px;
-    height: 18px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.7rem;
-    font-weight: bold;
-    color: white;
-    background: var(--protocol-color);
-    border-radius: 50%;
-    border: 2px solid var(--selector-bg);
+    display: none;
 }
 
 .protocol-card__content {
@@ -153,12 +138,13 @@
 
 .protocol-card__badge {
     font-size: 0.65rem;
-    font-weight: 600;
+    font-weight: 500;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    color: var(--protocol-color);
+    color: var(--text-secondary);
     padding: 2px 6px;
-    background: color-mix(in srgb, var(--protocol-color) 15%, transparent);
+    background: transparent;
+    border: 1px solid var(--border-color);
     border-radius: 4px;
 }
 
@@ -192,19 +178,11 @@
 }
 
 .protocol-card__indicator {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 3px;
-    background: var(--protocol-color);
-    transform: scaleX(0);
-    transform-origin: left;
-    transition: transform 0.2s ease;
+    display: none;
 }
 
 .protocol-card:hover .protocol-card__indicator {
-    transform: scaleX(0.5);
+    transform: scaleX(0);
 }
 
 /* ============================================
@@ -242,8 +220,9 @@
     display: flex;
     gap: 4px;
     padding: 4px;
-    background: var(--card-bg, #f5f5f5);
-    border-radius: 8px;
+    background: var(--background-color);
+    border: 1px solid var(--selector-border);
+    border-radius: var(--radius-md, 8px);
     overflow-x: auto;
 }
 
@@ -262,21 +241,21 @@
     border-radius: 6px;
     cursor: pointer;
     transition: all 0.15s ease;
-    white-space: nowrap;
+    var(--card-bg)-space: nowrap;
     font-family: inherit;
 }
 
 .protocol-switcher__btn:hover {
-    background: color-mix(in srgb, var(--protocol-color) 15%, transparent);
+    background: var(--primary-light);
 }
 
 .protocol-switcher__btn--active {
     background: var(--protocol-color);
-    color: white;
+    color: var(--button-text);
 }
 
 .protocol-switcher__btn--active .protocol-switcher__name {
-    color: white;
+    color: var(--button-text);
 }
 
 .protocol-switcher__icon {
@@ -286,7 +265,7 @@
 .protocol-switcher__name {
     font-size: 0.8rem;
     font-weight: 500;
-    color: var(--text-color, #333);
+    color: var(--text-color);
 }
 
 /* ============================================
@@ -308,11 +287,11 @@
     align-items: center;
     gap: 8px;
     padding: 8px 12px;
-    background: var(--card-bg, #ffffff);
-    border: 1px solid var(--border-color, #e0e0e0);
-    border-radius: 8px;
+    background: var(--card-bg);
+    border: 1px solid var(--selector-border);
+    border-radius: var(--radius-sm, 8px);
     cursor: pointer;
-    transition: all 0.15s ease;
+    transition: all var(--dur-fast, 120ms) var(--ease-out, ease);
     font-family: inherit;
     min-width: 140px;
 }
@@ -323,7 +302,7 @@
 
 .protocol-dropdown--open .protocol-dropdown__trigger {
     border-color: var(--protocol-color);
-    box-shadow: 0 0 0 3px color-mix(in srgb, var(--protocol-color) 20%, transparent);
+    box-shadow: 0 0 0 3px var(--primary-color);
 }
 
 .protocol-dropdown__icon {
@@ -335,12 +314,12 @@
     text-align: left;
     font-size: 0.9rem;
     font-weight: 500;
-    color: var(--text-color, #333);
+    color: var(--text-color);
 }
 
 .protocol-dropdown__arrow {
     font-size: 0.6rem;
-    color: var(--text-secondary, #666);
+    color: var(--text-secondary);
     transition: transform 0.2s ease;
 }
 
@@ -354,10 +333,10 @@
     left: 0;
     right: 0;
     min-width: 180px;
-    background: var(--card-bg, #ffffff);
-    border: 1px solid var(--border-color, #e0e0e0);
-    border-radius: 8px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    background: var(--card-bg);
+    border: 1px solid var(--selector-border);
+    border-radius: var(--radius-sm, 8px);
+    box-shadow: var(--shadow-lg, 0 4px 20px color-mix(in srgb, var(--primary-color) 10%, transparent));
     z-index: 1000;
     overflow: hidden;
     animation: dropdownFadeIn 0.15s ease;
@@ -390,11 +369,11 @@
 }
 
 .protocol-dropdown__item:hover {
-    background: var(--hover-bg, #f5f5f5);
+    background: var(--hover-bg);
 }
 
 .protocol-dropdown__item--selected {
-    background: color-mix(in srgb, var(--protocol-color) 10%, transparent);
+    background: var(--primary-light);
 }
 
 .protocol-dropdown__item-icon {
@@ -404,7 +383,7 @@
 .protocol-dropdown__item-name {
     flex: 1;
     font-size: 0.9rem;
-    color: var(--text-color, #333);
+    color: var(--text-color);
 }
 
 .protocol-dropdown__item-check {
@@ -423,9 +402,9 @@
     left: 50%;
     transform: translateX(-50%);
     padding: 8px 16px;
-    background: rgba(0, 0, 0, 0.8);
-    color: white;
-    border-radius: 6px;
+    background: var(--text-color);
+    color: var(--background-color);
+    border-radius: var(--border-radius);
     font-size: 0.85rem;
     pointer-events: none;
     animation: tooltipFadeIn 0.2s ease;
@@ -442,49 +421,6 @@
         opacity: 1;
         transform: translateX(-50%) translateY(0);
     }
-}
-
-/* ============================================
-   Dark Mode Support
-   ============================================ */
-
-body.dark-theme .protocol-selector {
-    --selector-bg: var(--card-bg, #002234);
-    --selector-border: var(--border-color, #003956);
-    --selector-text: var(--text-color, #e0e0e0);
-    --selector-text-muted: var(--text-secondary, #d0d0d0);
-    --selector-hover-bg: var(--hover-bg, #013B5B);
-}
-
-body.dark-theme .protocol-switcher {
-    background: var(--card-bg, #002234);
-}
-
-body.dark-theme .protocol-switcher__name {
-    color: var(--text-color, #e0e0e0);
-}
-
-body.dark-theme .protocol-dropdown__trigger,
-body.dark-theme .protocol-dropdown__menu {
-    background: var(--card-bg, #002234);
-    border-color: var(--border-color, #003956);
-}
-
-body.dark-theme .protocol-dropdown__item:hover {
-    background: var(--hover-bg, #013B5B);
-}
-
-body.dark-theme .protocol-card {
-    background: var(--card-bg, #002234);
-    border-color: var(--border-color, #003956);
-}
-
-body.dark-theme .protocol-card:hover {
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-}
-
-body.dark-theme .protocol-dropdown__item-name {
-    color: var(--text-color, #e0e0e0);
 }
 
 /* ============================================

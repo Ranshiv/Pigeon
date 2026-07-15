@@ -1,6 +1,6 @@
 /**
  * ProtocolTestPage.js - Multi-Protocol Testing Hub
- * Unified interface for testing WebSocket, gRPC, SOAP, MQTT, SSE protocols
+ * Unified interface for testing WebSocket, gRPC, GraphQL, SOAP, MQTT, SSE protocols
  */
 
 import React, { useState } from 'react';
@@ -16,6 +16,7 @@ import {
     PROTOCOLS
 } from './Protocols';
 import GraphQLTester from './GraphQL/GraphQLTester';
+import './Protocols/tester-shell.css';
 import './ProtocolTestPage.css';
 
 // Header Icon Component
@@ -48,19 +49,17 @@ const ProtocolTestPage = () => {
             default:
                 return (
                     <div className="protocol-welcome">
-                        <div className="welcome-icon">
-                            <HeaderIcon />
-                        </div>
-                        <h2>Select a Protocol to Begin Testing</h2>
-                        <p>Choose from the protocols above to start testing your APIs</p>
+                        <div className="pt-eyebrow">Select a Protocol</div>
+                        <h2>Choose a protocol to begin testing</h2>
+                        <p>Connect to WebSocket, gRPC, GraphQL, SOAP, MQTT, or SSE endpoints and inspect real-time traffic.</p>
 
                         <div className="protocol-cards">
-                            {Object.values(PROTOCOLS).filter(p => p.id !== 'http' && p.id !== 'graphql').map(protocol => (
+                            {Object.values(PROTOCOLS).filter(p => p.id !== 'http').map((protocol, i) => (
                                 <div
                                     key={protocol.id}
                                     className="protocol-card"
                                     onClick={() => setSelectedProtocol(protocol.id)}
-                                    style={{ '--protocol-color': protocol.color }}
+                                    style={{ '--protocol-color': protocol.color, '--i': i }}
                                 >
                                     <span className="card-icon">
                                         <ProtocolIcon type={protocol.icon} size={28} color={protocol.color} />
@@ -83,15 +82,16 @@ const ProtocolTestPage = () => {
     return (
         <div className="protocol-test-page">
             {/* Header */}
-            <div className="protocol-header">
-                <div className="header-title">
+            <div className="pt-header">
+                <div className="pt-header-title">
+                    <div className="pt-eyebrow">Protocol Testing</div>
                     <h1><HeaderIcon /> Protocol Testing</h1>
-                    <p>Test WebSocket, gRPC, SOAP, MQTT, and SSE protocols</p>
+                    <p>Test WebSocket, gRPC, GraphQL, SOAP, MQTT, and SSE protocols</p>
                 </div>
 
-                <div className="header-tabs">
+                <div className="pt-header-tabs">
                     <button
-                        className={`tab-btn ${activeTab === 'tester' ? 'active' : ''}`}
+                        className={`pt-tab ${activeTab === 'tester' ? 'active' : ''}`}
                         onClick={() => setActiveTab('tester')}
                     >
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -102,7 +102,7 @@ const ProtocolTestPage = () => {
                         Protocol Tester
                     </button>
                     <button
-                        className={`tab-btn ${activeTab === 'converter' ? 'active' : ''}`}
+                        className={`pt-tab ${activeTab === 'converter' ? 'active' : ''}`}
                         onClick={() => setActiveTab('converter')}
                     >
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -128,7 +128,7 @@ const ProtocolTestPage = () => {
 
                         {selectedProtocol && (
                             <button
-                                className="clear-btn"
+                                className="pt-clear-btn"
                                 onClick={() => setSelectedProtocol(null)}
                             >
                                 ✕ Clear Selection

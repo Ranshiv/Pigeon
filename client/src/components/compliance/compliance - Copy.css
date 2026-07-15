@@ -1,0 +1,401 @@
+/* client/src/components/compliance/compliance.css — 2026 restyle, namespaced cmp-* */
+
+.cmp-root {
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: clamp(16px, 2vw, 32px);
+    display: flex;
+    flex-direction: column;
+    gap: clamp(16px, 2vw, 24px);
+}
+
+.cmp-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.cmp-title {
+    margin: 0;
+    font-size: clamp(1.4rem, 1.1rem + 1vw, 1.9rem);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+    color: var(--text-color);
+}
+
+.cmp-subtitle {
+    margin: 6px 0 0;
+    font-size: clamp(0.88rem, 0.84rem + 0.2vw, 1rem);
+    color: var(--text-secondary);
+}
+
+/* ===== Tabs ===== */
+.cmp-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 6px;
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-sm);
+    overflow-x: auto;
+}
+
+.cmp-tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 16px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-decoration: none;
+    border-radius: var(--radius-md);
+    border: 1px solid transparent;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background var(--dur-fast) var(--ease-out),
+                color var(--dur-fast) var(--ease-out),
+                border-color var(--dur-fast) var(--ease-out);
+}
+
+.cmp-tab:hover { background: var(--hover-bg); color: var(--text-color); }
+
+.cmp-tab--active {
+    color: var(--accent);
+    background: var(--surface-sunken);
+    border-color: var(--border-color);
+}
+
+.cmp-tab-icon { font-size: 1rem; flex-shrink: 0; }
+
+.cmp-content {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(16px, 2vw, 24px);
+}
+
+/* ===== Card ===== */
+.cmp-card {
+    display: flex;
+    flex-direction: column;
+    background: var(--surface);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+    min-width: 0;
+    transition: box-shadow var(--dur-base) var(--ease-out);
+}
+.cmp-card:hover { box-shadow: var(--shadow-md); }
+
+.cmp-card-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 16px 18px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.cmp-card-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-color);
+}
+.cmp-card-title-icon { color: var(--accent); flex-shrink: 0; }
+
+.cmp-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+/* ===== Buttons ===== */
+.cmp-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 14px;
+    font-size: 0.86rem;
+    font-weight: 600;
+    border-radius: var(--radius-sm);
+    border: 1px solid transparent;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background var(--dur-fast) var(--ease-out),
+                border-color var(--dur-fast) var(--ease-out),
+                transform var(--dur-fast) var(--ease-spring),
+                box-shadow var(--dur-base) var(--ease-out);
+}
+
+.cmp-btn--primary {
+    background: var(--accent);
+    color: #ffffff;
+}
+.cmp-btn--primary:hover { background: var(--accent-hover); transform: translateY(-1px); }
+
+.cmp-btn--ghost {
+    background: transparent;
+    color: var(--text-color);
+    border-color: var(--border-color);
+}
+.cmp-btn--ghost:hover { background: var(--hover-bg); border-color: var(--accent); }
+
+.cmp-btn:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
+
+/* ===== Filters ===== */
+.cmp-filters {
+    padding: 16px 18px;
+    border-bottom: 1px solid var(--border-color);
+    background: var(--surface);
+}
+
+.cmp-filter-row {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 12px;
+}
+.cmp-filter-row--single { grid-template-columns: minmax(0, 1fr); max-width: 460px; }
+
+@media (max-width: 980px) {
+    .cmp-filter-row { grid-template-columns: 1fr; }
+}
+
+.cmp-field { display: flex; flex-direction: column; min-width: 0; }
+.cmp-field label {
+    display: block;
+    font-size: 0.74rem;
+    color: var(--text-secondary);
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+.cmp-field input {
+    width: 100%;
+    padding: 9px 11px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-color);
+    background: var(--surface);
+    color: var(--text-color);
+    outline: none;
+    font: inherit;
+    font-size: 0.86rem;
+    transition: border-color var(--dur-fast) var(--ease-out), box-shadow var(--dur-fast) var(--ease-out);
+}
+.cmp-field input:focus {
+    border-color: var(--accent);
+    box-shadow: var(--ring);
+}
+.cmp-field input::placeholder { color: var(--text-muted); opacity: 1; }
+
+.cmp-field select {
+    /* Inherit global index.css select styling; only layout overrides */
+    width: 100%;
+}
+
+/* ===== Custom themed select moved to common/AppSelect/AppSelect.css ===== */
+
+
+.cmp-filter-actions {
+    margin-top: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+/* ===== States ===== */
+.cmp-error {
+    padding: 12px 18px;
+    font-size: 0.86rem;
+    color: var(--danger-text);
+    background: var(--danger-bg);
+    border-top: 1px solid var(--danger-border);
+    border-bottom: 1px solid var(--danger-border);
+}
+
+.cmp-empty {
+    padding: 24px 18px;
+    text-align: center;
+    font-size: 0.86rem;
+    color: var(--text-secondary);
+    background: var(--surface-sunken);
+}
+.cmp-empty--inline { padding: 16px; border-radius: var(--radius-md); border: 1px dashed var(--border-color); }
+
+.cmp-muted { color: var(--text-secondary); font-size: 0.82rem; }
+
+.cmp-mono {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    font-size: 0.78rem;
+}
+
+/* ===== Table ===== */
+.cmp-table-wrap { overflow: auto; }
+
+.cmp-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.cmp-table th,
+.cmp-table td {
+    text-align: left;
+    padding: 11px 18px;
+    border-bottom: 1px solid var(--border-color);
+    vertical-align: top;
+    font-size: 0.84rem;
+}
+
+.cmp-table th {
+    color: var(--text-secondary);
+    font-weight: 700;
+    font-size: 0.74rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    background: var(--surface-sunken);
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+.cmp-table tbody tr { transition: background var(--dur-fast) var(--ease-out); }
+.cmp-table tbody tr:hover { background: var(--hover-bg); }
+
+.cmp-metadata-cell { max-width: 620px; }
+.cmp-metadata {
+    margin: 0;
+    white-space: pre-wrap;
+    word-break: break-word;
+    background: var(--surface-sunken);
+    border: 1px solid var(--border-color);
+    padding: 10px;
+    border-radius: var(--radius-sm);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.76rem;
+    color: var(--text-secondary);
+    max-height: 240px;
+    overflow: auto;
+}
+
+/* ===== Pagination ===== */
+.cmp-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 14px 18px;
+    border-top: 1px solid var(--border-color);
+    flex-wrap: wrap;
+}
+
+.cmp-pager { display: flex; gap: 8px; }
+
+/* ===== Policies / Access-review grids ===== */
+.cmp-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+    padding: 18px;
+}
+@media (max-width: 980px) { .cmp-grid { grid-template-columns: minmax(0, 1fr); } }
+
+.cmp-subcard {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 0;
+    border: 1px solid var(--border-color);
+    background: var(--surface-sunken);
+    border-radius: var(--radius-md);
+    padding: 18px;
+}
+
+.cmp-subcard-title {
+    margin: 0 0 4px;
+    font-size: 0.98rem;
+    font-weight: 700;
+    color: var(--text-color);
+}
+
+.cmp-subsection-title {
+    margin: 16px 0 8px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.cmp-form-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+    margin-top: 12px;
+}
+@media (max-width: 980px) { .cmp-form-grid { grid-template-columns: minmax(0, 1fr); } }
+
+.cmp-kv {
+    display: grid;
+    grid-template-columns: 140px minmax(0, 1fr);
+    gap: 10px 12px;
+    margin-top: 10px;
+    align-items: center;
+}
+.cmp-k { color: var(--text-secondary); font-size: 0.82rem; }
+.cmp-v { color: var(--text-color); font-size: 0.86rem; word-break: break-word; }
+
+.cmp-stack { display: flex; flex-direction: column; gap: 10px; margin-top: 8px; }
+
+.cmp-team-card {
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    padding: 12px;
+    background: var(--surface);
+    transition: border-color var(--dur-fast) var(--ease-out);
+}
+.cmp-team-card:hover { border-color: var(--accent); }
+
+.cmp-team-title {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 10px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: var(--text-color);
+    margin-bottom: 6px;
+}
+
+.cmp-issues {
+    margin: 8px 0 0;
+    padding-left: 18px;
+    color: var(--text-secondary);
+    font-size: 0.84rem;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.cmp-tip { margin-top: 12px; }
+
+/* ===== Focus + reduced-motion ===== */
+.cmp-btn:focus-visible,
+.cmp-tab:focus-visible {
+    outline: none;
+    box-shadow: var(--ring);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .cmp-card, .cmp-btn, .cmp-tab, .cmp-table tbody tr, .cmp-team-card { transition: none; }
+    .cmp-btn--primary:hover, .cmp-btn--ghost:hover { transform: none; }
+}

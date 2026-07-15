@@ -1,0 +1,174 @@
+/* client/src/components/common/TabBar/TabBar.css */
+.tb {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    padding: 0 12px;
+    background-color: var(--surface-elevated);
+    border-bottom: 1px solid var(--border-color);
+    position: relative;
+    box-sizing: border-box;
+    min-height: 42px;
+    overflow: visible;
+}
+
+.tb__measure {
+    position: absolute;
+    visibility: hidden;
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    top: 0;
+    left: 0;
+}
+
+.tb__tab--measure {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.tb__tab {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    border: none;
+    border-bottom: 2px solid transparent;
+    background: transparent;
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+    font-weight: 500;
+    cursor: pointer;
+    white-space: nowrap;
+    border-radius: 6px 6px 0 0;
+    transition: color 0.15s ease, border-color 0.15s ease, background-color 0.15s ease;
+    box-sizing: border-box;
+}
+
+.tb__tab:hover {
+    color: var(--text-color);
+    background-color: var(--hover-bg);
+}
+
+.tb__tab:focus-visible {
+    outline: none;
+    box-shadow: var(--ring, 0 0 0 2px var(--primary-color));
+}
+
+.tb__tab--active {
+    color: var(--primary-color);
+    border-bottom-color: var(--primary-color);
+    font-weight: 600;
+}
+
+.tb__icon {
+    display: inline-flex;
+    align-items: center;
+    font-size: 0.85rem;
+    opacity: 0.85;
+}
+
+.tb__badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 1px 7px;
+    border-radius: 999px;
+    font-size: 0.66rem;
+    font-weight: 700;
+    background-color: color-mix(in srgb, var(--success-color) 15%, transparent);
+    color: var(--success-color);
+}
+
+.tb__overflow {
+    position: relative;
+    flex: 0 0 auto;
+    margin-left: auto;
+}
+
+.tb .tb__more {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    margin: 0;
+    border-radius: var(--radius-sm);
+    color: var(--text-secondary);
+    background: transparent;
+    border: 1px solid var(--border-color);
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease;
+}
+
+.tb .tb__more svg {
+    width: 18px;
+    height: 18px;
+    stroke: currentColor;
+    fill: none;
+    flex-shrink: 0;
+}
+
+.tb .tb__more:hover,
+.tb .tb__more--open {
+    background: var(--hover-bg);
+    color: var(--text-color);
+}
+
+.tb__menu {
+    position: absolute;
+    right: 0;
+    top: calc(100% + 6px);
+    z-index: 50;
+    min-width: 170px;
+    background: var(--surface-elevated);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+    padding: 4px;
+    display: none;
+}
+
+.tb__menu--open {
+    display: block;
+}
+
+.tb__menu-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 8px 12px;
+    border-radius: var(--radius-sm);
+    color: var(--text-secondary);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 0.82rem;
+    text-align: left;
+    white-space: nowrap;
+}
+
+.tb__menu-item:hover {
+    background: var(--hover-bg);
+    color: var(--text-color);
+}
+
+.tb__menu-item--active {
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+@media (max-width: 640px) {
+    .tb { padding: 0 8px; }
+    .tb__tab,
+    .tb__tab--measure { padding: 8px 10px; }
+}

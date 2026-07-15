@@ -1,5 +1,6 @@
 // client/src/components/Protocols/MqttTester.js
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import './tester-shell.css';
 import './MqttTester.css';
 
 // Icon Components

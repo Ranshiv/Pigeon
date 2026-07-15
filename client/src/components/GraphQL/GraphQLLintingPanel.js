@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { useTheme } from '../../context/ThemeContext';
+import AppSelect from '../common/AppSelect/AppSelect';
 import './GraphQLLintingPanel.css';
 
 /**
@@ -114,26 +115,34 @@ const GraphQLLintingPanel = ({
         switch (severity) {
             case 'error':
                 return (
-                    <svg className="severity-icon error" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" />
+                    <svg className="severity-icon error" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <circle cx="12" cy="12" r="10" />
+                        <line x1="12" y1="8" x2="12" y2="12" />
+                        <line x1="12" y1="16" x2="12.01" y2="16" />
                     </svg>
                 );
             case 'warning':
                 return (
-                    <svg className="severity-icon warning" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z" />
+                    <svg className="severity-icon warning" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z" />
+                        <line x1="12" y1="9" x2="12" y2="13" />
+                        <line x1="12" y1="17" x2="12.01" y2="17" />
                     </svg>
                 );
             case 'suggestion':
                 return (
-                    <svg className="severity-icon suggestion" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M9 21c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-1H9v1zm3-19C8.14 2 5 5.14 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.86-3.14-7-7-7z" />
+                    <svg className="severity-icon suggestion" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M9 18h6" />
+                        <path d="M10 22h4" />
+                        <path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8a6 6 0 0 0-12 0c0 1.39.5 2.5 1.5 3.5.76.76 1.23 1.52 1.41 2.5" />
                     </svg>
                 );
             case 'info':
                 return (
-                    <svg className="severity-icon info" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z" />
+                    <svg className="severity-icon info" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <circle cx="12" cy="12" r="10" />
+                        <line x1="12" y1="16" x2="12" y2="12" />
+                        <line x1="12" y1="8" x2="12.01" y2="8" />
                     </svg>
                 );
             default:
@@ -145,34 +154,39 @@ const GraphQLLintingPanel = ({
         switch (category) {
             case 'security':
                 return (
-                    <svg className="category-icon" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z" />
+                    <svg className="category-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                        <circle cx="12" cy="11" r="3" />
                     </svg>
                 );
             case 'performance':
                 return (
-                    <svg className="category-icon" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M19.03 3.56c-1.67-1.39-3.74-2.3-6.03-2.51v2.01c1.73.19 3.31.88 4.61 1.92l1.42-1.42zM11 3.06V1.05c-2.29.2-4.36 1.12-6.03 2.51l1.42 1.42c1.3-1.04 2.88-1.73 4.61-1.92zM4.97 6.98L3.56 5.57C2.17 7.24 1.26 9.31 1.05 11.6h2.01c.19-1.73.88-3.31 1.91-4.62zM20.94 11.6h2.01c-.21-2.29-1.12-4.36-2.51-6.03l-1.42 1.42c1.04 1.3 1.73 2.88 1.92 4.61z" />
-                        <path d="M12 21c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7zm0-12c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5z" />
-                        <path d="M12.5 10v5l4.28 2.54-.72 1.21-5.06-3V10h1.5z" />
+                    <svg className="category-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <polyline points="13 2 13 10 21 10" />
+                        <path d="m21 22-8-8H3v-2.3" />
                     </svg>
                 );
             case 'naming':
                 return (
-                    <svg className="category-icon" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M2.5 4v3h5v12h3V7h5V4h-13zm19 5h-9v3h3v7h3v-7h3V9z" />
+                    <svg className="category-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M4 7V4h16v3" />
+                        <path d="M9 20h6" />
+                        <path d="M12 4v16" />
                     </svg>
                 );
             case 'best-practices':
                 return (
-                    <svg className="category-icon" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z" />
+                    <svg className="category-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="m9 12 2 2 4-4" />
+                        <circle cx="12" cy="12" r="10" />
                     </svg>
                 );
             default:
                 return (
-                    <svg className="category-icon" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
+                    <svg className="category-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <circle cx="12" cy="12" r="10" />
+                        <line x1="12" y1="16" x2="12" y2="12" />
+                        <line x1="12" y1="8" x2="12.01" y2="8" />
                     </svg>
                 );
         }
@@ -308,62 +322,63 @@ const GraphQLLintingPanel = ({
             <div className="linting-header">
                 <div className="header-left">
                     <h3 className="panel-title">
-                        <svg className="panel-icon" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
+                        <svg className="panel-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                            <path d="m9 12 2 2 4-4" />
                         </svg>
                         GraphQL Linting
+                        {lintResults && (
+                            <span className={`score-badge ${getScoreColor(lintResults.score)}`}>
+                                {lintResults.score}/100
+                            </span>
+                        )}
                     </h3>
-                    {lintResults && (
-                        <div className={`score-badge ${getScoreColor(lintResults.score)}`}>
-                            {lintResults.score}/100
-                        </div>
-                    )}
                 </div>
                 <div className="header-right">
-                    <select
+                    <AppSelect
                         className="preset-select"
                         value={selectedPreset}
-                        onChange={(e) => setSelectedPreset(e.target.value)}
-                    >
-                        {presets.map(p => (
-                            <option key={p.name} value={p.name}>
-                                {p.name.charAt(0).toUpperCase() + p.name.slice(1)}
-                            </option>
-                        ))}
-                    </select>
+                        onChange={setSelectedPreset}
+                        options={presets.map(p => ({
+                            value: p.name,
+                            label: p.name.charAt(0).toUpperCase() + p.name.slice(1)
+                        }))}
+                        id="lint-preset-select"
+                    />
                     <button
                         className="rules-button"
                         onClick={() => setShowRulesModal(true)}
-                        title="View Rules"
+                        title="Rules"
                     >
-                        <svg viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z" />
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20" />
                         </svg>
                     </button>
                     <button
                         className="lint-button"
                         onClick={lintQuery}
                         disabled={loading || !query}
+                        title="Run Lint"
                     >
                         {loading ? (
                             <span className="loading-spinner"></span>
                         ) : (
-                            <>
-                                <svg viewBox="0 0 24 24" fill="currentColor">
-                                    <path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z" />
-                                </svg>
-                                Lint
-                            </>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+                                <path d="M3 3v5h5" />
+                                <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16" />
+                                <path d="M16 21h5v-5" />
+                            </svg>
                         )}
                     </button>
                     {onToggleCollapse && (
                         <button
                             className="collapse-button"
                             onClick={onToggleCollapse}
-                            title="Collapse Panel"
+                            title="Collapse"
                         >
-                            <svg viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M15 18l-6-6 6-6" />
                             </svg>
                         </button>
                     )}
@@ -408,10 +423,13 @@ const GraphQLLintingPanel = ({
             <div className="linting-content">
                 {!query ? (
                     <div className="empty-state">
-                        <svg className="empty-icon" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0l4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z" />
+                        <svg className="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Z" />
+                            <path d="M12 8v8" />
+                            <path d="M8 12h8" />
                         </svg>
-                        <p>Write a GraphQL query to see linting results</p>
+                        <h4>Ready to analyze</h4>
+                        <p>Enter a query to lint</p>
                     </div>
                 ) : loading ? (
                     <div className="loading-state">
@@ -515,23 +533,31 @@ const GraphQLLintingPanel = ({
                         {activeTab === 'metrics' && lintResults && lintResults.summary && (
                             <div className="metrics-tab">
                                 <div className="metrics-grid">
-                                    <div className="metric-card">
+                                    <div className="metric-card score">
                                         <span className="metric-label">Score</span>
                                         <span className={`metric-value score ${getScoreColor(lintResults.score)}`}>
                                             {lintResults.score}
                                         </span>
                                     </div>
                                     <div className="metric-card">
-                                        <span className="metric-label">Total Issues</span>
+                                        <span className="metric-label">Total</span>
                                         <span className="metric-value">{lintResults.summary.totalIssues || 0}</span>
                                     </div>
-                                    <div className="metric-card">
+                                    <div className="metric-card error">
                                         <span className="metric-label">Errors</span>
-                                        <span className="metric-value error">{lintResults.summary.errorCount || 0}</span>
+                                        <span className="metric-value">{lintResults.summary.errorCount || 0}</span>
                                     </div>
-                                    <div className="metric-card">
+                                    <div className="metric-card warning">
                                         <span className="metric-label">Warnings</span>
-                                        <span className="metric-value warning">{lintResults.summary.warningCount || 0}</span>
+                                        <span className="metric-value">{lintResults.summary.warningCount || 0}</span>
+                                    </div>
+                                    <div className="metric-card suggestion">
+                                        <span className="metric-label">Suggestions</span>
+                                        <span className="metric-value">{lintResults.summary.suggestionCount || lintResults.suggestions?.length || 0}</span>
+                                    </div>
+                                    <div className="metric-card info">
+                                        <span className="metric-label">Info</span>
+                                        <span className="metric-value">{lintResults.summary.infoCount || lintResults.info?.length || 0}</span>
                                     </div>
                                 </div>
 
@@ -552,53 +578,6 @@ const GraphQLLintingPanel = ({
                                         </div>
                                     </div>
                                 )}
-
-                                {/* Severity Breakdown */}
-                                <div className="severity-breakdown">
-                                    <h4>Issues by Severity</h4>
-                                    <div className="severity-bars">
-                                        <div className="severity-bar-row">
-                                            <span className="severity-label error">Errors</span>
-                                            <div className="severity-bar">
-                                                <div
-                                                    className="severity-fill error"
-                                                    style={{ width: `${Math.min((lintResults.errors?.length || 0) * 20, 100)}%` }}
-                                                ></div>
-                                            </div>
-                                            <span className="severity-count">{lintResults.errors?.length || 0}</span>
-                                        </div>
-                                        <div className="severity-bar-row">
-                                            <span className="severity-label warning">Warnings</span>
-                                            <div className="severity-bar">
-                                                <div
-                                                    className="severity-fill warning"
-                                                    style={{ width: `${Math.min((lintResults.warnings?.length || 0) * 10, 100)}%` }}
-                                                ></div>
-                                            </div>
-                                            <span className="severity-count">{lintResults.warnings?.length || 0}</span>
-                                        </div>
-                                        <div className="severity-bar-row">
-                                            <span className="severity-label suggestion">Suggestions</span>
-                                            <div className="severity-bar">
-                                                <div
-                                                    className="severity-fill suggestion"
-                                                    style={{ width: `${Math.min((lintResults.suggestions?.length || 0) * 10, 100)}%` }}
-                                                ></div>
-                                            </div>
-                                            <span className="severity-count">{lintResults.suggestions?.length || 0}</span>
-                                        </div>
-                                        <div className="severity-bar-row">
-                                            <span className="severity-label info">Info</span>
-                                            <div className="severity-bar">
-                                                <div
-                                                    className="severity-fill info"
-                                                    style={{ width: `${Math.min((lintResults.info?.length || 0) * 10, 100)}%` }}
-                                                ></div>
-                                            </div>
-                                            <span className="severity-count">{lintResults.info?.length || 0}</span>
-                                        </div>
-                                    </div>
-                                </div>
                             </div>
                         )}
                     </>
@@ -610,39 +589,48 @@ const GraphQLLintingPanel = ({
                 <div className="rules-modal-overlay" onClick={() => setShowRulesModal(false)}>
                     <div className="rules-modal" onClick={e => e.stopPropagation()}>
                         <div className="modal-header">
-                            <h3>Linting Rules</h3>
+                            <h3>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20" />
+                                </svg>
+                                Linting Rules
+                            </h3>
                             <button
                                 className="close-button"
                                 onClick={() => setShowRulesModal(false)}
+                                title="Close"
                             >
-                                <svg viewBox="0 0 24 24" fill="currentColor">
-                                    <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <path d="M18 6 6 18" />
+                                    <path d="m6 6 12 12" />
                                 </svg>
                             </button>
                         </div>
                         <div className="modal-content">
-                            {['security', 'performance', 'naming', 'best-practices'].map(category => (
-                                <div key={category} className="rule-category">
-                                    <h4 className={`category-title ${category}`}>
-                                        {getCategoryIcon(category)}
-                                        {category.charAt(0).toUpperCase() + category.slice(1).replace('-', ' ')}
-                                    </h4>
-                                    <div className="rules-list">
-                                        {rules
-                                            .filter(r => r.category === category)
-                                            .map(rule => (
+                            {['security', 'performance', 'naming', 'best-practices'].map(category => {
+                                const categoryRules = rules.filter(r => r.category === category);
+                                if (categoryRules.length === 0) return null;
+                                return (
+                                    <div key={category} className="rule-category">
+                                        <h4 className={`category-title ${category}`}>
+                                            {getCategoryIcon(category)}
+                                            <span>{category.charAt(0).toUpperCase() + category.slice(1).replace('-', ' ')}</span>
+                                            <span className="category-count">{categoryRules.length}</span>
+                                        </h4>
+                                        <div className="rules-list">
+                                            {categoryRules.map(rule => (
                                                 <div key={rule.id} className="rule-item">
-                                                    <span className={`severity-dot ${rule.severity}`}></span>
+                                                    <span className={`severity-badge ${rule.severity}`}>{rule.severity}</span>
                                                     <div className="rule-info">
                                                         <span className="rule-name">{rule.name}</span>
                                                         <span className="rule-desc">{rule.description}</span>
                                                     </div>
                                                 </div>
-                                            ))
-                                        }
+                                            ))}
+                                        </div>
                                     </div>
-                                </div>
-                            ))}
+                                );
+                            })}
                         </div>
                     </div>
                 </div>

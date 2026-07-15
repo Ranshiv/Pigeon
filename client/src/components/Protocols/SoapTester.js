@@ -4,6 +4,7 @@
  */
 
 import React, { useState, useCallback } from 'react';
+import './tester-shell.css';
 import './SoapTester.css';
 
 // Icon Components

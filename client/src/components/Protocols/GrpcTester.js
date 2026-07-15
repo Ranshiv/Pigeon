@@ -1,5 +1,6 @@
 // client/src/components/Protocols/GrpcTester.js
 import React, { useState, useCallback, useRef } from 'react';
+import './tester-shell.css';
 import './GrpcTester.css';
 
 // Icon Components

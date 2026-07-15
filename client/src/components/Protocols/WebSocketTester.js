@@ -1,5 +1,6 @@
 // client/src/components/Protocols/WebSocketTester.js
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import './tester-shell.css';
 import './WebSocketTester.css';
 
 // Icon Components

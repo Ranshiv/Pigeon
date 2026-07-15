@@ -1,13 +1,15 @@
+@import url('./tester-shell.css');
 /* client/src/components/Protocols/SoapTester.css */
 
 .soap-tester {
-    --soap-bg: var(--card-bg, #ffffff);
-    --soap-border: var(--border-color, #e0e0e0);
-    --soap-text: var(--text-color, #333333);
-    --soap-text-muted: var(--text-secondary, #666666);
-    --soap-primary: var(--protocol-soap, #F97316);
-    --soap-success: #22C55E;
-    --soap-error: #EF4444;
+    --soap-bg: var(--tester-surface, var(--card-bg));
+    --soap-border: var(--tester-hairline);
+    --soap-text: var(--text-color);
+    --soap-text-muted: var(--text-secondary);
+    --soap-primary: var(--primary-color);
+    --soap-success: var(--success-color, #22C55E);
+    --soap-error: var(--danger-color, #EF4444);
+    --tester-accent: var(--primary-color);
 
     display: flex;
     flex-direction: column;
@@ -15,20 +17,28 @@
     height: 100%;
     padding: 20px;
     background: var(--soap-bg);
+    border: 1px solid var(--tester-hairline);
+    border-radius: var(--tester-radius);
+    animation: tsRise 0.42s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 .soap-panel {
     padding: 16px;
     background: var(--soap-bg);
     border: 1px solid var(--soap-border);
-    border-radius: 10px;
+    border-radius: var(--tester-radius-sm);
 }
 
 .soap-panel-title {
     margin: 0 0 12px 0;
-    font-size: 0.95rem;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--tester-hairline);
+    font-family: var(--tester-mono);
+    font-size: 0.72rem;
     font-weight: 600;
-    color: var(--soap-text);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
 }
 
 /* Error Display */
@@ -37,9 +47,9 @@
     justify-content: space-between;
     align-items: center;
     padding: 12px 16px;
-    background: #FEF2F2;
-    border: 1px solid #FECACA;
-    border-radius: 8px;
+    background: color-mix(in srgb, var(--danger-color) 8%, var(--tester-inset));
+    border: 1px solid color-mix(in srgb, var(--danger-color) 30%, transparent);
+    border-radius: var(--tester-radius-btn);
     color: var(--soap-error);
     font-size: 0.9rem;
 }
@@ -65,8 +75,8 @@
 
 .soap-protocol-badge {
     padding: 10px 16px;
-    background: linear-gradient(135deg, var(--soap-primary), color-mix(in srgb, var(--soap-primary) 70%, #000));
-    color: white;
+    background: linear-gradient(135deg, var(--soap-primary), color-mix(in srgb, var(--soap-primary) 70%, var(--background-color)));
+    color: var(--button-text, #fff);
     font-weight: 600;
     font-size: 0.85rem;
     border-radius: 8px 0 0 8px;
@@ -81,7 +91,9 @@
     border-left: none;
     border-right: none;
     font-size: 0.95rem;
-    font-family: 'Monaco', 'Menlo', monospace;
+    font-family: var(--tester-mono);
+    background: var(--tester-inset);
+    color: var(--soap-text);
 }
 
 .soap-url-input:focus {
@@ -106,12 +118,12 @@
 
 .soap-btn-parse {
     background: var(--soap-primary);
-    color: white;
+    color: var(--button-text, #fff);
     border-radius: 0 8px 8px 0;
 }
 
 .soap-btn-parse:hover:not(:disabled) {
-    background: color-mix(in srgb, var(--soap-primary) 85%, #000);
+    background: color-mix(in srgb, var(--soap-primary) 85%, var(--background-color));
 }
 
 .soap-version-group {
@@ -314,8 +326,11 @@
     margin-bottom: 12px;
 }
 
-.soap-request-header .soap-panel-title {
+.soap-request-header .soap-panel-title,
+.soap-response-header .soap-panel-title {
     margin: 0;
+    padding-bottom: 0;
+    border-bottom: none;
 }
 
 .soap-request-actions {
@@ -331,12 +346,12 @@
 }
 
 .soap-btn-small:hover {
-    background: #f5f5f5;
+    background: color-mix(in srgb, var(--tester-accent) 8%, var(--tester-inset));
 }
 
 .soap-btn-small.active {
     background: var(--soap-primary);
-    color: white;
+    color: var(--button-text, #fff);
     border-color: var(--soap-primary);
 }
 
@@ -350,7 +365,7 @@
 .soap-operation-badge {
     padding: 6px 12px;
     background: var(--soap-primary);
-    color: white;
+    color: var(--button-text, #fff);
     border-radius: 6px;
     font-weight: 600;
     font-size: 0.85rem;
@@ -358,10 +373,10 @@
 
 .soap-action-badge {
     padding: 6px 12px;
-    background: #f5f5f5;
+    background: var(--tester-inset);
     border-radius: 6px;
     font-size: 0.75rem;
-    font-family: 'Monaco', 'Menlo', monospace;
+    font-family: var(--tester-mono);
 }
 
 .soap-headers-input {
@@ -381,7 +396,7 @@
     padding: 10px;
     border: 1px solid var(--soap-border);
     border-radius: 6px;
-    font-family: 'Monaco', 'Menlo', monospace;
+    font-family: var(--tester-mono);
     font-size: 0.8rem;
     resize: none;
 }
@@ -392,7 +407,7 @@
     padding: 12px;
     border: 1px solid var(--soap-border);
     border-radius: 8px;
-    font-family: 'Monaco', 'Menlo', monospace;
+    font-family: var(--tester-mono);
     font-size: 0.85rem;
     resize: none;
     margin-bottom: 12px;
@@ -406,11 +421,11 @@
 .soap-btn-invoke {
     align-self: flex-start;
     background: var(--soap-primary);
-    color: white;
+    color: var(--button-text, #fff);
 }
 
 .soap-btn-invoke:hover:not(:disabled) {
-    background: color-mix(in srgb, var(--soap-primary) 85%, #000);
+    background: color-mix(in srgb, var(--soap-primary) 85%, var(--background-color));
 }
 
 /* Response Panel */
@@ -426,10 +441,6 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: 12px;
-}
-
-.soap-response-header .soap-panel-title {
-    margin: 0;
 }
 
 .soap-response-tabs {
@@ -448,12 +459,12 @@
 }
 
 .soap-tab:hover {
-    background: #f5f5f5;
+    background: color-mix(in srgb, var(--tester-accent) 8%, var(--tester-inset));
 }
 
 .soap-tab.active {
     background: var(--soap-primary);
-    color: white;
+    color: var(--button-text, #fff);
     border-color: var(--soap-primary);
 }
 
@@ -488,10 +499,10 @@
     flex: 1;
     margin: 0;
     padding: 12px;
-    background: #f9f9f9;
+    background: var(--tester-inset);
     border: 1px solid var(--soap-border);
     border-radius: 8px;
-    font-family: 'Monaco', 'Menlo', monospace;
+    font-family: var(--tester-mono);
     font-size: 0.8rem;
     overflow: auto;
     white-space: pre-wrap;
@@ -559,7 +570,7 @@
     align-items: center;
     gap: 8px;
     padding: 12px 20px;
-    background: #f5f5f5;
+    background: var(--tester-inset);
     border-radius: 8px;
     font-size: 0.9rem;
 }
@@ -568,66 +579,28 @@
     font-size: 1.2rem;
 }
 
-/* Dark Mode */
-body.dark-theme .soap-tester {
-    --soap-bg: var(--card-bg, #002234);
-    --soap-border: var(--border-color, #003956);
-    --soap-text: var(--text-color, #e0e0e0);
-    --soap-text-muted: var(--text-secondary, #d0d0d0);
-}
+/* Dark Mode removed - token-driven dark mode via index.css */
 
-body.dark-theme .soap-response-body,
-body.dark-theme .soap-feature {
-    background: var(--sidebar-bg, #001927);
-}
 
-body.dark-theme .soap-url-input,
-body.dark-theme .soap-body-input {
-    background: var(--card-bg, #002234);
-    color: var(--text-color, #e0e0e0);
-    border-color: var(--border-color, #003956);
-}
 
-body.dark-theme .soap-select-group select {
-    background: var(--card-bg, #002234);
-    color: var(--text-color, #e0e0e0);
-    border-color: var(--border-color, #003956);
-}
 
-body.dark-theme .soap-headers-input textarea {
-    background: var(--card-bg, #002234);
-    color: var(--text-color, #e0e0e0);
-    border-color: var(--border-color, #003956);
-}
 
-body.dark-theme .soap-operation {
-    border-color: var(--border-color, #003956);
-}
 
-body.dark-theme .soap-operation:hover {
-    background: var(--hover-bg, #013B5B);
-}
 
-body.dark-theme .soap-version-option {
-    border-color: var(--border-color, #003956);
-    color: var(--text-color, #e0e0e0);
-}
 
-body.dark-theme .soap-tab,
-body.dark-theme .soap-btn-small {
-    border-color: var(--border-color, #003956);
-    color: var(--text-color, #e0e0e0);
-}
 
-body.dark-theme .soap-tab:hover,
-body.dark-theme .soap-btn-small:hover {
-    background: var(--hover-bg, #013B5B);
-}
 
-body.dark-theme .soap-action-badge {
-    background: var(--sidebar-bg, #001927);
-    color: var(--text-color, #e0e0e0);
-}
+
+
+
+
+
+
+
+
+
+
+
 
 /* Responsive */
 @media (max-width: 900px) {

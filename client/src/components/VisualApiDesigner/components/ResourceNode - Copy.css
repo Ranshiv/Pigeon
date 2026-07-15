@@ -1,0 +1,207 @@
+/* Modern Resource Node Styles */
+.resource-node-modern {
+    position: relative;
+    background: #1a1a1a;
+    background-color: #1a1a1a;
+    border: 1px solid #333;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    min-width: 280px;
+    max-width: 320px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    overflow: hidden;
+    user-select: none;
+    color: #fff;
+    isolation: isolate;
+}
+
+.resource-node-modern:hover {
+    border-color: #ff6c37;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    transform: translateY(-2px);
+}
+
+.resource-node-modern.selected {
+    border-color: #ff6c37;
+    box-shadow: 0 0 0 2px rgba(255, 108, 55, 0.2);
+}
+
+.resource-node-modern.dragging {
+    opacity: 1.0;
+    transform: rotate(1deg) scale(1.02);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+    background: #1a1a1a;
+    z-index: 1000;
+    backdrop-filter: blur(0);
+    -webkit-backdrop-filter: blur(0);
+}
+
+/* Old style rules removed as they're replaced by the node-card-* classes */
+
+/* Selection Outline */
+.resource-node-modern .selection-outline {
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    border: 1px dashed #ff6c37;
+    border-radius: 9px;
+    pointer-events: none;
+    animation: selectionPulse 2s infinite;
+}
+
+@keyframes selectionPulse {
+
+    0%,
+    100% {
+        opacity: 0.4;
+    }
+
+    50% {
+        opacity: 0.7;
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+    .resource-node-modern {
+        min-width: 260px;
+        max-width: 300px;
+    }
+}
+
+/* Accessibility */
+.resource-node-modern:focus {
+    outline: none;
+    border-color: #ff6c37;
+    box-shadow: 0 0 0 2px rgba(255, 108, 55, 0.2);
+}
+
+.resource-node-modern:focus-visible {
+    outline: 2px solid #ff6c37;
+    outline-offset: 2px;
+}
+
+/* Dark theme is the default theme now */
+.resource-node-modern .connection-dot {
+    border-color: #1a1a1a;
+}
+
+/* Animation states */
+.resource-node-modern.appear {
+    animation: nodeAppear 0.3s ease-out;
+}
+
+@keyframes nodeAppear {
+    from {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.resource-node-modern.disappear {
+    animation: nodeDisappear 0.2s ease-in forwards;
+}
+
+@keyframes nodeDisappear {
+    to {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+}
+
+/* Node Card Styling for Screenshot 2 */
+.resource-node-modern .node-card-outer {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+}
+
+.resource-node-modern .node-card-header {
+    display: flex;
+    align-items: center;
+    padding: 12px;
+    background: #252525;
+    border-bottom: 1px solid #333;
+}
+
+.resource-node-modern .node-card-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 8px;
+}
+
+.resource-node-modern .icon-bg {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    background: #333;
+    border-radius: 4px;
+    color: #ff6c37;
+}
+
+.resource-node-modern .node-card-type-badge {
+    font-size: 11px;
+    font-weight: 600;
+    color: #aaa;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-right: auto;
+}
+
+.resource-node-modern .node-card-status {
+    padding: 2px 6px;
+    font-size: 10px;
+    font-weight: 500;
+    border-radius: 4px;
+    text-transform: uppercase;
+    background: rgba(255, 108, 55, 0.2);
+    color: #ff6c37;
+}
+
+.resource-node-modern .node-card-content {
+    padding: 12px;
+    flex-grow: 1;
+    overflow: hidden;
+}
+
+.resource-node-modern .node-card-title {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 4px;
+    color: #fff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.resource-node-modern .node-card-desc {
+    font-size: 12px;
+    color: #aaa;
+    line-height: 1.4;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+
+.resource-node-modern .node-card-children {
+    padding: 0;
+    margin: 0;
+    background-color: #1a1a1a;
+    overflow: hidden;
+}

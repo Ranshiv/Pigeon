@@ -1,14 +1,8 @@
-/* Add variables matching the application theme */
-:root {
-    --background-color: #1c1c1e;
+/* Local fallbacks only — scoped to the component, NOT :root,
+   so global theme variables from index.css are untouched. */
+.sample-data-manager {
     --sidebar-bg: #262626;
-    --primary-color: #014C75;
-    --primary-hover: #013B5B;
-    --text-color: #e6e6e6;
-    --text-secondary: #a0a0a0;
-    --border-color: #3e3e3e;
-    --hover-color: #333333;
-    --card-bg: rgba(255, 255, 255, 0.05);
+    --hover-color: var(--hover-bg, #333333);
     --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.25);
     --shadow-md: 0 2px 6px rgba(0, 0, 0, 0.35);
 }

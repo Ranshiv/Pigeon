@@ -1,0 +1,439 @@
+/* client/src/components/PublicStatusPage.css */
+.public-status-page {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 0;
+}
+
+.status-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0;
+}
+
+/* Header */
+.status-header {
+    background: rgba(255, 255, 255, 0.1);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    padding: 2rem;
+    text-align: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.status-header h1 {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin: 0 0 16px 0;
+    font-size: 2.5rem;
+    font-weight: 700;
+}
+
+.status-header p {
+    margin: 0;
+    font-size: 1.2rem;
+    opacity: 0.9;
+}
+
+.header-actions {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    margin-top: 24px;
+}
+
+.refresh-btn,
+.auto-refresh-toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 20px;
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 8px;
+    color: white;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.refresh-btn:hover,
+.auto-refresh-toggle:hover {
+    background: rgba(255, 255, 255, 0.25);
+    transform: translateY(-1px);
+}
+
+.auto-refresh-toggle.active {
+    background: rgba(40, 167, 69, 0.3);
+    border-color: rgba(40, 167, 69, 0.5);
+}
+
+/* Loading State */
+.loading-status {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 80px 20px;
+    text-align: center;
+}
+
+.loading-icon {
+    font-size: 4rem;
+    margin-bottom: 24px;
+    animation: spin 2s linear infinite;
+}
+
+/* Status Content */
+.status-content {
+    padding: 2rem;
+}
+
+.status-section {
+    background: rgba(255, 255, 255, 0.1);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    border-radius: 12px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.status-section h3 {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 0 0 24px 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+/* Overall Status */
+.overall-status {
+    text-align: center;
+    padding: 3rem 2rem;
+}
+
+.status-indicator {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+}
+
+.status-icon {
+    font-size: 4rem;
+}
+
+.status-icon.operational {
+    color: #10b981;
+}
+
+.status-icon.degraded {
+    color: #f59e0b;
+}
+
+.status-icon.down {
+    color: #ef4444;
+}
+
+.status-icon.unknown {
+    color: #6b7280;
+}
+
+.status-message {
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0;
+}
+
+.status-description {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    margin: 8px 0 0 0;
+}
+
+/* Services Grid */
+.services-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.service-card {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 20px;
+    transition: all 0.2s ease;
+}
+
+.service-card:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-2px);
+}
+
+.service-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 12px;
+}
+
+.service-info h4 {
+    margin: 0 0 4px 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.service-description {
+    margin: 0;
+    font-size: 0.9rem;
+    opacity: 0.8;
+}
+
+.service-metrics {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.service-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.status-text {
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.status-text.operational {
+    color: #10b981;
+}
+
+.status-text.degraded {
+    color: #f59e0b;
+}
+
+.status-text.down {
+    color: #ef4444;
+}
+
+.status-text.unknown {
+    color: #6b7280;
+}
+
+.service-uptime,
+.service-response-time {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85rem;
+}
+
+.uptime-value {
+    font-weight: 600;
+    color: #10b981;
+}
+
+.response-time-value {
+    font-weight: 600;
+}
+
+.uptime-label,
+.response-time-label {
+    opacity: 0.7;
+}
+
+/* Incidents */
+.incidents-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.no-incidents {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    padding: 40px 20px;
+    text-align: center;
+    opacity: 0.8;
+}
+
+.no-incidents-icon {
+    font-size: 3rem;
+    color: #10b981;
+}
+
+.incident-item {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 20px;
+}
+
+.incident-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 12px;
+}
+
+.incident-status {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.incident-title {
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+.incident-date {
+    font-size: 0.9rem;
+    opacity: 0.7;
+}
+
+.incident-description {
+    margin: 0 0 16px 0;
+    opacity: 0.9;
+    line-height: 1.5;
+}
+
+.incident-updates {
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding-top: 16px;
+}
+
+.incident-update {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+}
+
+.update-time {
+    font-weight: 600;
+    opacity: 0.8;
+    white-space: nowrap;
+}
+
+.update-message {
+    opacity: 0.9;
+}
+
+/* Statistics */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+}
+
+.stat-card {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 24px;
+    text-align: center;
+}
+
+.stat-value {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: 4px;
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: #10b981;
+}
+
+.stat-total {
+    font-size: 1.5rem;
+    opacity: 0.7;
+}
+
+.stat-label {
+    font-size: 0.9rem;
+    opacity: 0.8;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* Footer */
+.status-footer {
+    background: rgba(0, 0, 0, 0.2);
+    padding: 2rem;
+    text-align: center;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.status-footer p {
+    margin: 0;
+    opacity: 0.8;
+}
+
+.auto-refresh-status {
+    color: #6b7280;
+}
+
+.auto-refresh-status.active {
+    color: #10b981;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .status-header {
+        padding: 1.5rem;
+    }
+
+    .status-header h1 {
+        font-size: 2rem;
+    }
+
+    .status-content {
+        padding: 1rem;
+    }
+
+    .status-section {
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .services-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .header-actions {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .incident-header {
+        flex-direction: column;
+        gap: 8px;
+        align-items: flex-start;
+    }
+}
+
+@media (max-width: 480px) {
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .stat-value {
+        font-size: 2rem;
+    }
+}

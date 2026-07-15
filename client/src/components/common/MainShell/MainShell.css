@@ -1,0 +1,97 @@
+/* client/src/components/common/MainShell/MainShell.css */
+.mn-shell {
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
+    height: 100%;
+    width: 100%;
+    box-sizing: border-box;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    overflow: hidden;
+}
+
+.mn-shell__header {
+    position: relative;
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 20px;
+    background-color: var(--surface-elevated);
+    border-bottom: 1px solid var(--border-color);
+    min-height: 56px;
+    box-sizing: border-box;
+    flex-shrink: 0;
+}
+
+.mn-shell__icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary-color);
+    font-size: 1.1rem;
+    flex-shrink: 0;
+}
+
+.mn-shell__heading {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    min-width: 0;
+}
+
+.mn-shell__crumb {
+    color: var(--text-secondary);
+    font-size: 0.72rem;
+    line-height: 1.2;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.mn-shell__title {
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--text-color);
+    line-height: 1.25;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.mn-shell__actions {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.mn-shell__subbar {
+    flex-shrink: 0;
+    background-color: var(--surface);
+    border-bottom: 1px solid var(--border-color);
+    box-sizing: border-box;
+}
+
+.mn-shell__body {
+    flex: 1;
+    min-height: 0;
+    padding: 16px 20px;
+    overflow: auto;
+    box-sizing: border-box;
+}
+
+.mn-shell__body--flush {
+    padding: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+@media (max-width: 640px) {
+    .mn-shell__header { padding: 8px 14px; min-height: 50px; }
+    .mn-shell__actions { gap: 6px; }
+    .mn-shell__body { padding: 12px 14px; }
+}

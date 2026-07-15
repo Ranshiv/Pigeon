@@ -1,0 +1,192 @@
+.marketplace-page {
+    padding: 32px;
+    width: 100%;
+    box-sizing: border-box;
+    background-color: var(--background-color);
+    min-height: calc(100vh - 64px);
+}
+
+.marketplace-header {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 24px;
+}
+
+.marketplace-header h1 {
+    font-size: 1.75rem;
+    font-weight: 650;
+    color: var(--text-color);
+}
+
+.marketplace-header p {
+    color: var(--text-secondary);
+    max-width: 72ch;
+}
+
+.marketplace-surface {
+    background: var(--card-background);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
+
+.marketplace-toolbar {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 12px;
+    padding: 16px;
+    align-items: center;
+}
+
+.marketplace-search {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.marketplace-search input {
+    width: 100%;
+    min-width: 240px;
+}
+
+.marketplace-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+    padding: 16px;
+}
+
+.marketplace-card {
+    background: var(--card-background);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    transition: box-shadow var(--transition-speed) ease, transform var(--transition-speed) ease;
+}
+
+.marketplace-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-hover);
+}
+
+.marketplace-card h3 {
+    font-size: 1.05rem;
+    margin: 0;
+    color: var(--text-color);
+}
+
+.marketplace-card p {
+    margin: 0;
+    color: var(--text-secondary);
+    line-height: 1.45;
+}
+
+.marketplace-meta {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+
+.pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    border: 1px solid var(--border-color);
+    background: var(--hover-background);
+    color: var(--text-color);
+    font-size: 0.85rem;
+}
+
+.pill strong {
+    font-weight: 650;
+}
+
+.marketplace-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 8px;
+}
+
+.btn-link {
+    background: transparent;
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+    padding: 8px 12px;
+    border-radius: 10px;
+}
+
+.btn-link:hover {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+}
+
+.btn-primary-compact {
+    background: var(--primary-color);
+    color: white;
+    border: 1px solid var(--primary-color);
+    padding: 8px 12px;
+    border-radius: 10px;
+}
+
+.btn-primary-compact:hover {
+    background: var(--primary-hover);
+    border-color: var(--primary-hover);
+}
+
+.marketplace-tabs {
+    display: flex;
+    gap: 8px;
+    border-bottom: 1px solid var(--border-color);
+    padding: 0 16px;
+}
+
+.marketplace-tab {
+    border: none;
+    background: transparent;
+    padding: 12px 12px;
+    border-bottom: 2px solid transparent;
+    color: var(--text-secondary);
+}
+
+.marketplace-tab[aria-selected="true"] {
+    color: var(--text-color);
+    border-bottom-color: var(--primary-color);
+}
+
+.marketplace-tab:focus-visible {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+}
+
+.marketplace-panel {
+    padding: 16px;
+}
+
+.empty-state {
+    padding: 28px 16px;
+    color: var(--text-secondary);
+    text-align: center;
+}
+
+@media (max-width: 768px) {
+    .marketplace-page {
+        padding: 20px;
+    }
+
+    .marketplace-toolbar {
+        grid-template-columns: 1fr;
+    }
+
+    .marketplace-search input {
+        min-width: 0;
+    }
+}

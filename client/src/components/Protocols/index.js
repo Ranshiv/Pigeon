@@ -31,7 +31,7 @@ export const PROTOCOLS = {
         id: 'http',
         name: 'HTTP/REST',
         icon: 'http',
-        color: '#3B82F6',
+        color: 'var(--protocol-http)',
         description: 'Standard HTTP requests for REST APIs',
         features: ['GET/POST/PUT/DELETE', 'Headers', 'Authentication', 'Response parsing']
     },
@@ -39,7 +39,7 @@ export const PROTOCOLS = {
         id: 'websocket',
         name: 'WebSocket',
         icon: 'websocket',
-        color: '#8B5CF6',
+        color: 'var(--protocol-ws)',
         description: 'Full-duplex communication over a single TCP connection',
         features: ['Real-time messaging', 'Bi-directional', 'Subprotocols', 'Auto-reconnect']
     },
@@ -47,7 +47,7 @@ export const PROTOCOLS = {
         id: 'grpc',
         name: 'gRPC',
         icon: 'grpc',
-        color: '#06B6D4',
+        color: 'var(--protocol-grpc)',
         description: 'High-performance RPC framework using Protocol Buffers',
         features: ['Proto definition', 'Streaming', 'Metadata', 'Service discovery']
     },
@@ -55,7 +55,7 @@ export const PROTOCOLS = {
         id: 'soap',
         name: 'SOAP',
         icon: 'soap',
-        color: '#F97316',
+        color: 'var(--protocol-soap)',
         description: 'XML-based messaging protocol for web services',
         features: ['WSDL parsing', 'Operation discovery', 'XML formatting', 'SOAP 1.1/1.2']
     },
@@ -63,7 +63,7 @@ export const PROTOCOLS = {
         id: 'mqtt',
         name: 'MQTT',
         icon: 'mqtt',
-        color: '#22C55E',
+        color: 'var(--protocol-mqtt)',
         description: 'Lightweight pub/sub messaging for IoT',
         features: ['Publish/Subscribe', 'QoS levels', 'Topic wildcards', 'Retained messages']
     },
@@ -71,7 +71,7 @@ export const PROTOCOLS = {
         id: 'sse',
         name: 'SSE',
         icon: 'sse',
-        color: '#EC4899',
+        color: 'var(--protocol-sse)',
         description: 'Server-Sent Events for real-time server-to-client updates',
         features: ['Auto-reconnect', 'Event types', 'Event IDs', 'Text-based']
     },
@@ -79,7 +79,7 @@ export const PROTOCOLS = {
         id: 'graphql',
         name: 'GraphQL',
         icon: 'graphql',
-        color: '#E535AB',
+        color: 'var(--protocol-graphql)',
         description: 'Query language for APIs',
         features: ['Queries', 'Mutations', 'Subscriptions', 'Schema introspection']
     }
@@ -92,7 +92,7 @@ export const getProtocol = (id) => PROTOCOLS[id] || null;
 export const getAllProtocols = () => Object.values(PROTOCOLS);
 
 // Get protocol color
-export const getProtocolColor = (id) => PROTOCOLS[id]?.color || '#666666';
+export const getProtocolColor = (id) => PROTOCOLS[id]?.color || 'var(--text-secondary)';
 
 // Check if protocol supports real-time
 export const isRealTimeProtocol = (id) => {

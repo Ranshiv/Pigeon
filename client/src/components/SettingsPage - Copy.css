@@ -1,0 +1,181 @@
+/* src/components/SettingsPage.css */
+.settings-page {
+    padding: 20px;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.settings-page h1 {
+    text-align: center;
+    margin-bottom: 30px;
+    color: var(--text-color);
+}
+
+.setting-section {
+    margin-bottom: 30px;
+    padding: 20px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background-color: var(--card-background);
+    box-shadow: var(--card-shadow);
+}
+
+.setting-section h2 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 10px;
+    color: var(--text-color);
+}
+
+.settings-page form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.settings-page label {
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: var(--text-color);
+}
+
+.settings-page input[type="text"] {
+    padding: 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background-color: var(--background-color);
+    color: var(--text-color);
+}
+
+.settings-page button {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 4px;
+    background-color: var(--button-background);
+    color: var(--button-text);
+    cursor: pointer;
+    transition: background-color 0.2s;
+    align-self: flex-start;
+    /* Align button to the start */
+}
+
+.settings-page button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+.settings-page button:not(:disabled):hover {
+    opacity: 0.9;
+}
+
+#theme-toggle {
+    margin-left: 10px;
+    /* Add some space */
+}
+
+.message {
+    padding: 10px;
+    margin-bottom: 15px;
+    border-radius: 4px;
+    text-align: center;
+}
+
+.message.success {
+    background-color: rgba(21, 87, 36, 0.2);
+    color: #2ecc71;
+    border: 1px solid rgba(21, 87, 36, 0.3);
+}
+
+.message.error {
+    background-color: rgba(114, 28, 36, 0.2);
+    color: #e74c3c;
+    border: 1px solid rgba(114, 28, 36, 0.3);
+}
+
+/* src/components/SettingsPage.css */
+/* ... (previous styles) ... */
+
+/* Add styles for consistent form groups */
+.form-group {
+    margin-bottom: 20px;
+    /* Add space between settings */
+    display: flex;
+    flex-direction: column;
+    /* Stack label and input/select */
+}
+
+.form-group label {
+    margin-bottom: 8px;
+    /* Space between label and control */
+}
+
+.settings-page select {
+    padding: 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background-color: var(--background-color);
+    /* Use theme background */
+    color: var(--text-color);
+    /* Use theme text color */
+    max-width: 300px;
+    /* Prevent select from becoming too wide */
+}
+
+/* Optional: Style the button next to the theme label differently */
+.form-group>div {
+    /* Target the div containing the button */
+    display: flex;
+    align-items: center;
+}
+
+/* Adjust button alignment if needed within form-group */
+.setting-section form button {
+    margin-top: 10px;
+    /* Add space above button if needed */
+}
+
+.icon-selection {
+    margin-top: 20px;
+    /* Add space above icon selection */
+}
+
+.icon-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+    /* Responsive grid for icons */
+    gap: 15px;
+    /* Spacing between icons */
+    margin-top: 10px;
+}
+
+.profile-icon-option {
+    width: 50px;
+    /* Size of the icon previews */
+    height: 50px;
+    object-fit: contain;
+    /* Ensure icon fits well */
+    border: 2px solid transparent;
+    /* Border for selection indicator */
+    border-radius: 50%;
+    /* Make them circular */
+    cursor: pointer;
+    transition: border-color 0.2s ease, transform 0.2s ease;
+    background-color: var(--card-background);
+    /* Match background */
+    padding: 5px;
+    /* Inner padding */
+    box-sizing: border-box;
+}
+
+.profile-icon-option:hover {
+    transform: scale(1.1);
+    /* Slight zoom on hover */
+}
+
+.profile-icon-option.selected {
+    border-color: var(--button-background);
+    /* Highlight selected icon */
+    box-shadow: 0 0 5px var(--button-background);
+}

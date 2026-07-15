@@ -1,34 +1,43 @@
 /* client/src/components/Protocols/MqttTester.css */
 
 .mqtt-tester {
-    --mqtt-bg: var(--card-bg, #ffffff);
-    --mqtt-border: var(--border-color, #e0e0e0);
-    --mqtt-text: var(--text-color, #333333);
-    --mqtt-text-muted: var(--text-secondary, #666666);
-    --mqtt-primary: var(--protocol-mqtt, #22C55E);
-    --mqtt-success: #22C55E;
-    --mqtt-error: #EF4444;
+    --mqtt-bg: var(--tester-surface, var(--card-bg));
+    --mqtt-border: var(--tester-hairline);
+    --mqtt-text: var(--text-color);
+    --mqtt-text-muted: var(--text-secondary);
+    --mqtt-primary: var(--primary-color);
+    --mqtt-success: var(--success-color, #22C55E);
+    --mqtt-error: var(--danger-color, #EF4444);
+    --tester-accent: var(--primary-color);
 
     display: flex;
     flex-direction: column;
     gap: 16px;
     height: 100%;
-    padding: 20px;
+    padding: 16px;
     background: var(--mqtt-bg);
+    border: 1px solid var(--mqtt-border);
+    border-radius: var(--tester-radius);
+    animation: tsRise 0.42s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 .mqtt-panel {
     padding: 16px;
     background: var(--mqtt-bg);
     border: 1px solid var(--mqtt-border);
-    border-radius: 10px;
+    border-radius: var(--tester-radius-sm);
 }
 
 .mqtt-panel-title {
     margin: 0 0 12px 0;
-    font-size: 0.95rem;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--tester-hairline);
+    font-family: var(--tester-mono);
+    font-size: 0.72rem;
     font-weight: 600;
-    color: var(--mqtt-text);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
 }
 
 /* Connection Panel */
@@ -44,35 +53,40 @@
 
 .mqtt-protocol-badge {
     padding: 10px 16px;
-    background: linear-gradient(135deg, var(--mqtt-primary), color-mix(in srgb, var(--mqtt-primary) 70%, #000));
-    color: white;
+    background: linear-gradient(135deg, var(--mqtt-primary), color-mix(in srgb, var(--mqtt-primary) 70%, var(--background-color)));
+    color: var(--button-text, #fff);
     font-weight: 600;
     font-size: 0.85rem;
-    border-radius: 8px 0 0 8px;
+    border-radius: var(--tester-radius-btn) 0 0 var(--tester-radius-btn);
 }
 
 .mqtt-url-input {
     flex: 1;
     padding: 10px 14px;
-    border: 2px solid var(--mqtt-border);
+    border: 1px solid var(--mqtt-border);
     border-radius: 0;
     font-size: 0.95rem;
-    font-family: 'Monaco', 'Menlo', monospace;
+    font-family: var(--tester-mono);
+    background: var(--tester-inset);
+    color: var(--mqtt-text);
 }
 
 .mqtt-url-input:focus {
     outline: none;
     border-color: var(--mqtt-primary);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--mqtt-primary) 15%, transparent);
 }
 
 .mqtt-btn {
     padding: 10px 20px;
-    border: none;
-    border-radius: 8px;
+    border: 1px solid var(--tester-hairline);
+    border-radius: var(--tester-radius-btn);
+    background: var(--tester-inset);
+    color: var(--mqtt-text);
     font-weight: 600;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all var(--dur-fast, 120ms) var(--ease-out, ease);
 }
 
 .mqtt-btn:disabled {
@@ -82,24 +96,34 @@
 
 .mqtt-btn-connect {
     background: var(--mqtt-primary);
-    color: white;
-    border-radius: 0 8px 8px 0;
+    color: var(--button-text, #fff);
+    border-color: var(--mqtt-primary);
+    border-radius: 0 var(--tester-radius-btn) var(--tester-radius-btn) 0;
 }
 
 .mqtt-btn-connect:hover:not(:disabled) {
-    background: color-mix(in srgb, var(--mqtt-primary) 85%, #000);
+    filter: brightness(1.1);
 }
 
 .mqtt-btn-disconnect {
     background: var(--mqtt-error);
-    color: white;
-    border-radius: 0 8px 8px 0;
+    color: var(--button-text, #fff);
+    border-color: var(--mqtt-error);
+    border-radius: 0 var(--tester-radius-btn) var(--tester-radius-btn) 0;
+}
+
+.mqtt-btn-disconnect:hover {
+    filter: brightness(1.1);
 }
 
 .mqtt-btn-settings {
     padding: 10px;
-    background: transparent;
-    border: 2px solid var(--mqtt-border);
+    background: var(--tester-inset);
+    border: 1px solid var(--tester-hairline);
+}
+
+.mqtt-btn-settings:hover {
+    background: color-mix(in srgb, var(--mqtt-primary) 8%, var(--tester-inset));
 }
 
 .mqtt-settings {
@@ -108,8 +132,9 @@
     gap: 12px;
     margin-bottom: 12px;
     padding: 12px;
-    background: #f9f9f9;
-    border-radius: 8px;
+    background: var(--tester-inset);
+    border: 1px solid var(--tester-hairline);
+    border-radius: var(--tester-radius-sm);
 }
 
 .mqtt-setting {
@@ -119,53 +144,69 @@
 }
 
 .mqtt-setting label {
-    font-size: 0.8rem;
-    color: var(--mqtt-text-muted);
+    font-size: 0.72rem;
+    color: var(--text-secondary);
+    font-family: var(--tester-mono);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
 }
 
 .mqtt-setting input {
     padding: 8px 10px;
     border: 1px solid var(--mqtt-border);
-    border-radius: 6px;
+    border-radius: var(--tester-radius-btn);
     font-size: 0.85rem;
+    background: var(--tester-surface);
+    color: var(--mqtt-text);
 }
 
 .mqtt-status {
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    gap: 8px;
-    padding: 8px 12px;
-    border-radius: 6px;
-    font-size: 0.85rem;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 0.7rem;
+    font-family: var(--tester-mono);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    border: 1px solid var(--tester-hairline);
 }
 
 .mqtt-status-connected {
-    background: color-mix(in srgb, var(--mqtt-success) 15%, transparent);
+    background: color-mix(in srgb, var(--mqtt-success) 8%, var(--tester-inset));
     color: var(--mqtt-success);
+    border-color: color-mix(in srgb, var(--mqtt-success) 35%, var(--tester-hairline));
+}
+
+.mqtt-status-connected .mqtt-status-dot {
+    animation: livePulse 1.5s ease-in-out infinite;
 }
 
 .mqtt-status-connecting {
-    background: #FEF3C7;
-    color: #F59E0B;
+    background: color-mix(in srgb, var(--warning-color) 8%, var(--tester-inset));
+    color: var(--warning-color);
+    border-color: color-mix(in srgb, var(--warning-color) 35%, var(--tester-hairline));
 }
 
 .mqtt-status-disconnected,
 .mqtt-status-error {
-    background: #f5f5f5;
+    background: var(--tester-inset);
     color: var(--mqtt-text-muted);
 }
 
 .mqtt-status-dot {
-    width: 8px;
-    height: 8px;
+    width: 7px;
+    height: 7px;
     border-radius: 50%;
     background: currentColor;
 }
 
 .mqtt-sub-count {
     margin-left: auto;
-    font-size: 0.8rem;
+    font-size: 0.78rem;
     color: var(--mqtt-text-muted);
+    font-family: var(--tester-mono);
 }
 
 /* Main Content Layout */
@@ -206,30 +247,35 @@
     flex: 1;
     padding: 10px 12px;
     border: 1px solid var(--mqtt-border);
-    border-radius: 8px;
-    font-family: 'Monaco', 'Menlo', monospace;
+    border-radius: var(--tester-radius-btn);
+    font-family: var(--tester-mono);
     font-size: 0.9rem;
+    background: var(--tester-inset);
+    color: var(--mqtt-text);
 }
 
 .mqtt-topic-input:focus {
     outline: none;
     border-color: var(--mqtt-primary);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--mqtt-primary) 15%, transparent);
 }
 
 .mqtt-subscribe-form select {
     padding: 10px;
     border: 1px solid var(--mqtt-border);
-    border-radius: 8px;
-    background: var(--mqtt-bg);
+    border-radius: var(--tester-radius-btn);
+    background: var(--tester-surface);
+    color: var(--mqtt-text);
 }
 
 .mqtt-btn-subscribe {
     background: var(--mqtt-primary);
-    color: white;
+    color: var(--button-text, #fff);
+    border-color: var(--mqtt-primary);
 }
 
 .mqtt-btn-subscribe:hover:not(:disabled) {
-    background: color-mix(in srgb, var(--mqtt-primary) 85%, #000);
+    filter: brightness(1.1);
 }
 
 .mqtt-subscriptions-list {
@@ -246,22 +292,25 @@
     align-items: center;
     gap: 8px;
     padding: 8px 12px;
-    background: #f5f5f5;
-    border-radius: 6px;
+    background: var(--tester-inset);
+    border: 1px solid var(--tester-hairline);
+    border-radius: var(--tester-radius-btn);
 }
 
 .mqtt-sub-topic {
     flex: 1;
-    font-family: 'Monaco', 'Menlo', monospace;
+    font-family: var(--tester-mono);
     font-size: 0.85rem;
+    color: var(--mqtt-text);
 }
 
 .mqtt-sub-qos {
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     padding: 2px 6px;
     background: var(--mqtt-primary);
-    color: white;
-    border-radius: 4px;
+    color: var(--button-text, #fff);
+    border-radius: var(--tester-radius-btn);
+    font-family: var(--tester-mono);
 }
 
 .mqtt-btn-unsub {
@@ -276,15 +325,18 @@
 .mqtt-topic-hints {
     display: flex;
     gap: 16px;
-    font-size: 0.75rem;
+    font-size: 0.72rem;
     color: var(--mqtt-text-muted);
+    font-family: var(--tester-mono);
 }
 
 .mqtt-hint code {
     padding: 2px 6px;
-    background: #e5e5e5;
-    border-radius: 4px;
+    background: var(--tester-inset);
+    border: 1px solid var(--tester-hairline);
+    border-radius: var(--tester-radius-btn);
     font-weight: 600;
+    color: var(--mqtt-primary);
 }
 
 /* Publish Panel */
@@ -306,15 +358,18 @@
     min-height: 100px;
     padding: 12px;
     border: 1px solid var(--mqtt-border);
-    border-radius: 8px;
-    font-family: 'Monaco', 'Menlo', monospace;
+    border-radius: var(--tester-radius-btn);
+    font-family: var(--tester-mono);
     font-size: 0.85rem;
     resize: none;
+    background: var(--tester-inset);
+    color: var(--mqtt-text);
 }
 
 .mqtt-message-input:focus {
     outline: none;
     border-color: var(--mqtt-primary);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--mqtt-primary) 15%, transparent);
 }
 
 .mqtt-publish-options {
@@ -326,8 +381,9 @@
 .mqtt-publish-options select {
     padding: 8px 12px;
     border: 1px solid var(--mqtt-border);
-    border-radius: 6px;
-    background: var(--mqtt-bg);
+    border-radius: var(--tester-radius-btn);
+    background: var(--tester-surface);
+    color: var(--mqtt-text);
 }
 
 .mqtt-retain-toggle {
@@ -341,11 +397,12 @@
 .mqtt-btn-publish {
     margin-left: auto;
     background: var(--mqtt-primary);
-    color: white;
+    color: var(--button-text, #fff);
+    border-color: var(--mqtt-primary);
 }
 
 .mqtt-btn-publish:hover:not(:disabled) {
-    background: color-mix(in srgb, var(--mqtt-primary) 85%, #000);
+    filter: brightness(1.1);
 }
 
 /* Messages Panel */
@@ -374,34 +431,35 @@
 
 .mqtt-filter-btn {
     padding: 6px 12px;
-    background: transparent;
-    border: 1px solid var(--mqtt-border);
-    border-radius: 6px;
-    font-size: 0.8rem;
+    background: var(--tester-inset);
+    border: 1px solid var(--tester-hairline);
+    border-radius: var(--tester-radius-btn);
+    font-size: 0.78rem;
     cursor: pointer;
-    transition: all 0.15s ease;
+    transition: all var(--dur-fast, 120ms) var(--ease-out, ease);
 }
 
 .mqtt-filter-btn:hover {
-    background: #f5f5f5;
+    background: color-mix(in srgb, var(--mqtt-primary) 8%, var(--tester-inset));
 }
 
 .mqtt-filter-btn.active {
     background: var(--mqtt-primary);
-    color: white;
+    color: var(--button-text, #fff);
     border-color: var(--mqtt-primary);
 }
 
 .mqtt-btn-clear {
     margin-left: auto;
     padding: 6px 12px;
-    background: transparent;
-    border: 1px solid var(--mqtt-border);
-    font-size: 0.8rem;
+    background: var(--tester-inset);
+    border: 1px solid var(--tester-hairline);
+    border-radius: var(--tester-radius-btn);
+    font-size: 0.78rem;
 }
 
 .mqtt-btn-clear:hover {
-    background: #FEF2F2;
+    background: color-mix(in srgb, var(--mqtt-error) 10%, var(--tester-inset));
     border-color: var(--mqtt-error);
     color: var(--mqtt-error);
 }
@@ -438,22 +496,22 @@
 
 .mqtt-message {
     padding: 12px;
-    border-radius: 8px;
+    border-radius: var(--tester-radius-sm);
     border: 1px solid var(--mqtt-border);
 }
 
 .mqtt-message-published {
-    background: #EFF6FF;
-    border-color: #BFDBFE;
+    background: color-mix(in srgb, var(--mqtt-primary) 8%, var(--tester-inset));
+    border-color: color-mix(in srgb, var(--mqtt-primary) 25%, var(--tester-hairline));
 }
 
 .mqtt-message-received {
-    background: #F0FDF4;
-    border-color: #BBF7D0;
+    background: color-mix(in srgb, var(--mqtt-success) 8%, var(--tester-inset));
+    border-color: color-mix(in srgb, var(--mqtt-success) 25%, var(--tester-hairline));
 }
 
 .mqtt-message-system {
-    background: #f5f5f5;
+    background: var(--tester-inset);
     font-style: italic;
 }
 
@@ -471,24 +529,26 @@
 }
 
 .mqtt-message-topic {
-    font-family: 'Monaco', 'Menlo', monospace;
+    font-family: var(--tester-mono);
     color: var(--mqtt-primary);
 }
 
 .mqtt-message-qos {
     padding: 2px 6px;
     background: var(--mqtt-primary);
-    color: white;
-    border-radius: 4px;
+    color: var(--button-text, #fff);
+    border-radius: var(--tester-radius-btn);
     font-size: 0.7rem;
+    font-family: var(--tester-mono);
 }
 
 .mqtt-message-retain {
     padding: 2px 6px;
-    background: #F59E0B;
-    color: white;
-    border-radius: 4px;
+    background: var(--warning-color);
+    color: var(--background-color);
+    border-radius: var(--tester-radius-btn);
     font-size: 0.7rem;
+    font-family: var(--tester-mono);
 }
 
 .mqtt-message-time {
@@ -499,13 +559,14 @@
 .mqtt-message-content {
     margin: 0;
     padding: 10px;
-    background: rgba(0, 0, 0, 0.03);
-    border-radius: 6px;
-    font-family: 'Monaco', 'Menlo', monospace;
+    background: color-mix(in srgb, var(--mqtt-primary) 4%, var(--tester-inset));
+    border-radius: var(--tester-radius-btn);
+    font-family: var(--tester-mono);
     font-size: 0.8rem;
     overflow-x: auto;
     white-space: pre-wrap;
     word-break: break-word;
+    color: var(--mqtt-text);
 }
 
 /* Error Display */
@@ -514,9 +575,9 @@
     justify-content: space-between;
     align-items: center;
     padding: 12px 16px;
-    background: #FEF2F2;
-    border: 1px solid #FECACA;
-    border-radius: 8px;
+    background: color-mix(in srgb, var(--mqtt-error) 8%, var(--tester-inset));
+    border: 1px solid color-mix(in srgb, var(--mqtt-error) 30%, transparent);
+    border-radius: var(--tester-radius-sm);
     color: var(--mqtt-error);
     font-size: 0.9rem;
 }
@@ -527,70 +588,6 @@
     font-size: 1.2rem;
     cursor: pointer;
     color: var(--mqtt-error);
-}
-
-/* Dark Mode */
-body.dark-theme .mqtt-tester {
-    --mqtt-bg: var(--card-bg, #002234);
-    --mqtt-border: var(--border-color, #003956);
-    --mqtt-text: var(--text-color, #e0e0e0);
-    --mqtt-text-muted: var(--text-secondary, #d0d0d0);
-}
-
-body.dark-theme .mqtt-settings,
-body.dark-theme .mqtt-subscription {
-    background: var(--sidebar-bg, #001927);
-}
-
-body.dark-theme .mqtt-message-published {
-    background: #013B5B;
-}
-
-body.dark-theme .mqtt-message-received {
-    background: #0D3D2B;
-}
-
-body.dark-theme .mqtt-message-system {
-    background: var(--sidebar-bg, #001927);
-}
-
-body.dark-theme .mqtt-url-input,
-body.dark-theme .mqtt-topic-input,
-body.dark-theme .mqtt-message-input {
-    background: var(--card-bg, #002234);
-    color: var(--text-color, #e0e0e0);
-    border-color: var(--border-color, #003956);
-}
-
-body.dark-theme .mqtt-setting input {
-    background: var(--card-bg, #002234);
-    color: var(--text-color, #e0e0e0);
-    border-color: var(--border-color, #003956);
-}
-
-body.dark-theme .mqtt-subscribe-form select,
-body.dark-theme .mqtt-publish-options select {
-    background: var(--card-bg, #002234);
-    color: var(--text-color, #e0e0e0);
-    border-color: var(--border-color, #003956);
-}
-
-body.dark-theme .mqtt-filter-btn {
-    border-color: var(--border-color, #003956);
-    color: var(--text-color, #e0e0e0);
-}
-
-body.dark-theme .mqtt-filter-btn:hover {
-    background: var(--hover-bg, #013B5B);
-}
-
-body.dark-theme .mqtt-hint code {
-    background: var(--sidebar-bg, #001927);
-    color: var(--text-color, #e0e0e0);
-}
-
-body.dark-theme .mqtt-message-content {
-    background: rgba(0, 0, 0, 0.2);
 }
 
 /* Responsive */
@@ -610,19 +607,19 @@ body.dark-theme .mqtt-message-content {
     }
 
     .mqtt-protocol-badge {
-        border-radius: 8px;
+        border-radius: var(--tester-radius-btn);
     }
 
     .mqtt-url-input {
         order: 1;
         width: 100%;
-        border-radius: 8px;
+        border-radius: var(--tester-radius-btn);
         margin-top: 8px;
     }
 
     .mqtt-btn-connect,
     .mqtt-btn-disconnect {
-        border-radius: 8px;
+        border-radius: var(--tester-radius-btn);
     }
 
     .mqtt-subscribe-form {

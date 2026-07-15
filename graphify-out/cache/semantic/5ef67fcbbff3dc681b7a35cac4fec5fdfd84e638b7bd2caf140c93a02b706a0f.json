@@ -1,0 +1,1 @@
+{"nodes": [{"id": "codacy_tools_configs_semgrep", "label": "Semgrep Config", "file_type": "concept", "source_file": ".codacy/tools-configs/semgrep.yaml", "source_location": null, "source_url": null, "captured_at": null, "author": null, "contributor": null}], "edges": [], "hyperedges": []}

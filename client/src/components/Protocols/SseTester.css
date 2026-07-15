@@ -1,13 +1,15 @@
+@import url('./tester-shell.css');
 /* client/src/components/Protocols/SseTester.css */
 
 .sse-tester {
-    --sse-bg: var(--card-bg, #ffffff);
-    --sse-border: var(--border-color, #e0e0e0);
-    --sse-text: var(--text-color, #333333);
-    --sse-text-muted: var(--text-secondary, #666666);
-    --sse-primary: var(--protocol-sse, #EC4899);
-    --sse-success: #22C55E;
-    --sse-error: #EF4444;
+    --sse-bg: var(--tester-surface, var(--card-bg));
+    --sse-border: var(--tester-hairline);
+    --sse-text: var(--text-color);
+    --sse-text-muted: var(--text-secondary);
+    --sse-primary: var(--primary-color);
+    --sse-success: var(--success-color, #22C55E);
+    --sse-error: var(--danger-color, #EF4444);
+    --tester-accent: var(--primary-color);
 
     display: flex;
     flex-direction: column;
@@ -15,20 +17,28 @@
     height: 100%;
     padding: 20px;
     background: var(--sse-bg);
+    border: 1px solid var(--tester-hairline);
+    border-radius: var(--tester-radius);
+    animation: tsRise 0.42s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 .sse-panel {
     padding: 16px;
     background: var(--sse-bg);
     border: 1px solid var(--sse-border);
-    border-radius: 10px;
+    border-radius: var(--tester-radius-sm);
 }
 
 .sse-panel-title {
     margin: 0 0 12px 0;
-    font-size: 0.95rem;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--tester-hairline);
+    font-family: var(--tester-mono);
+    font-size: 0.72rem;
     font-weight: 600;
-    color: var(--sse-text);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
 }
 
 /* Error Display */
@@ -37,9 +47,9 @@
     justify-content: space-between;
     align-items: center;
     padding: 12px 16px;
-    background: #FEF2F2;
-    border: 1px solid #FECACA;
-    border-radius: 8px;
+    background: color-mix(in srgb, var(--danger-color) 8%, var(--tester-inset));
+    border: 1px solid color-mix(in srgb, var(--danger-color) 30%, transparent);
+    border-radius: var(--tester-radius-btn);
     color: var(--sse-error);
     font-size: 0.9rem;
 }
@@ -65,11 +75,11 @@
 
 .sse-protocol-badge {
     padding: 10px 16px;
-    background: linear-gradient(135deg, var(--sse-primary), color-mix(in srgb, var(--sse-primary) 70%, #000));
-    color: white;
+    background: linear-gradient(135deg, var(--sse-primary), color-mix(in srgb, var(--sse-primary) 70%, var(--background-color)));
+    color: var(--button-text, #fff);
     font-weight: 600;
     font-size: 0.85rem;
-    border-radius: 8px 0 0 8px;
+    border-radius: var(--tester-radius-btn) 0 0 var(--tester-radius-btn);
     display: flex;
     align-items: center;
 }
@@ -80,7 +90,9 @@
     border: 2px solid var(--sse-border);
     border-left: none;
     font-size: 0.95rem;
-    font-family: 'Monaco', 'Menlo', monospace;
+    font-family: var(--tester-mono);
+    background: var(--tester-inset);
+    color: var(--sse-text);
 }
 
 .sse-url-input:focus {
@@ -89,13 +101,13 @@
 }
 
 .sse-url-input:disabled {
-    background: #f5f5f5;
+    background: color-mix(in srgb, var(--tester-accent) 5%, var(--tester-inset));
 }
 
 .sse-btn {
     padding: 10px 20px;
     border: none;
-    border-radius: 8px;
+    border-radius: var(--tester-radius-sm);
     font-weight: 600;
     font-size: 0.9rem;
     cursor: pointer;
@@ -109,43 +121,43 @@
 
 .sse-btn-connect {
     background: var(--sse-primary);
-    color: white;
+    color: var(--button-text, #fff);
     border-radius: 0;
 }
 
 .sse-btn-connect:hover:not(:disabled) {
-    background: color-mix(in srgb, var(--sse-primary) 85%, #000);
+    background: color-mix(in srgb, var(--sse-primary) 85%, var(--background-color));
 }
 
 .sse-btn-disconnect {
     background: var(--sse-error);
-    color: white;
+    color: var(--button-text, #fff);
     border-radius: 0;
 }
 
 .sse-btn-settings {
     padding: 10px 14px;
-    background: #f5f5f5;
+    background: var(--tester-inset);
     border: 2px solid var(--sse-border);
     border-left: none;
-    border-radius: 0 8px 8px 0;
+    border-radius: 0 var(--tester-radius-btn) var(--tester-radius-btn) 0;
 }
 
 .sse-btn-settings:hover {
-    background: #e5e5e5;
+    background: color-mix(in srgb, var(--tester-accent) 8%, var(--tester-inset));
 }
 
 .sse-btn-settings.active {
     background: var(--sse-primary);
-    color: white;
+    color: var(--button-text, #fff);
     border-color: var(--sse-primary);
 }
 
 /* Configuration */
 .sse-config {
     padding: 12px;
-    background: #f9f9f9;
-    border-radius: 8px;
+    background: var(--tester-inset);
+    border-radius: var(--tester-radius-sm);
     margin-bottom: 12px;
 }
 
@@ -186,15 +198,15 @@
     gap: 4px;
     padding: 4px 10px;
     background: var(--sse-primary);
-    color: white;
-    border-radius: 4px;
+    color: var(--button-text, #fff);
+    border-radius: var(--tester-radius-btn);
     font-size: 0.8rem;
 }
 
 .sse-event-type-tag button {
     background: transparent;
     border: none;
-    color: white;
+    color: var(--button-text, #fff);
     cursor: pointer;
     font-size: 1rem;
     padding: 0 2px;
@@ -208,7 +220,7 @@
 .sse-add-event-type input {
     padding: 4px 8px;
     border: 1px solid var(--sse-border);
-    border-radius: 4px;
+    border-radius: var(--tester-radius-btn);
     font-size: 0.8rem;
     width: 120px;
 }
@@ -216,9 +228,9 @@
 .sse-add-event-type button {
     padding: 4px 10px;
     background: var(--sse-primary);
-    color: white;
+    color: var(--button-text, #fff);
     border: none;
-    border-radius: 4px;
+    border-radius: var(--tester-radius-btn);
     cursor: pointer;
 }
 
@@ -228,7 +240,7 @@
     align-items: center;
     gap: 8px;
     padding: 10px 14px;
-    border-radius: 8px;
+    border-radius: var(--tester-radius-btn);
     font-size: 0.85rem;
 }
 
@@ -239,12 +251,12 @@
 
 .sse-status-connecting,
 .sse-status-reconnecting {
-    background: #FEF3C7;
-    color: #F59E0B;
+    background: color-mix(in srgb, var(--warning-color) 8%, var(--tester-inset));
+    color: var(--warning-color);
 }
 
 .sse-status-disconnected {
-    background: #f5f5f5;
+    background: var(--tester-inset);
     color: var(--sse-text-muted);
 }
 
@@ -299,6 +311,8 @@
 
 .sse-events-header .sse-panel-title {
     margin: 0;
+    padding-bottom: 0;
+    border-bottom: none;
 }
 
 .sse-events-controls {
@@ -310,7 +324,7 @@
 .sse-filter-group select {
     padding: 6px 12px;
     border: 1px solid var(--sse-border);
-    border-radius: 6px;
+    border-radius: var(--tester-radius-btn);
     font-size: 0.85rem;
     background: var(--sse-bg);
 }
@@ -328,7 +342,7 @@
 }
 
 .sse-btn-clear:hover:not(:disabled) {
-    background: #FEF2F2;
+    background: color-mix(in srgb, var(--sse-error) 8%, var(--tester-inset));
     border-color: var(--sse-error);
     color: var(--sse-error);
 }
@@ -365,18 +379,18 @@
 /* Event Items */
 .sse-event {
     padding: 12px;
-    border-radius: 8px;
+    border-radius: var(--tester-radius-sm);
     border: 1px solid var(--sse-border);
 }
 
 .sse-event-message {
-    background: #F0FDF4;
-    border-color: #BBF7D0;
+    background: color-mix(in srgb, var(--sse-success) 8%, var(--tester-inset));
+    border-color: color-mix(in srgb, var(--sse-success) 25%, var(--tester-hairline));
 }
 
 .sse-event-system {
-    background: #f5f5f5;
-    border-color: #e0e0e0;
+    background: var(--tester-inset);
+    border-color: var(--tester-hairline);
 }
 
 .sse-event-header {
@@ -390,22 +404,22 @@
 .sse-event-type {
     padding: 3px 8px;
     background: var(--sse-primary);
-    color: white;
-    border-radius: 4px;
+    color: var(--button-text, #fff);
+    border-radius: var(--tester-radius-btn);
     font-weight: 600;
     text-transform: uppercase;
     font-size: 0.7rem;
 }
 
 .sse-event-system .sse-event-type {
-    background: #9CA3AF;
+    background: var(--text-secondary);
 }
 
 .sse-event-id {
     padding: 2px 6px;
-    background: #e5e5e5;
-    border-radius: 4px;
-    font-family: 'Monaco', 'Menlo', monospace;
+    background: var(--tester-inset);
+    border-radius: var(--tester-radius-btn);
+    font-family: var(--tester-mono);
     font-size: 0.7rem;
 }
 
@@ -422,9 +436,9 @@
 .sse-event-text {
     margin: 0;
     padding: 10px;
-    background: rgba(0, 0, 0, 0.03);
-    border-radius: 6px;
-    font-family: 'Monaco', 'Menlo', monospace;
+    background: color-mix(in srgb, var(--tester-accent) 5%, var(--tester-inset));
+    border-radius: var(--tester-radius-btn);
+    font-family: var(--tester-mono);
     font-size: 0.8rem;
     overflow-x: auto;
     white-space: pre-wrap;
@@ -442,7 +456,7 @@
     padding: 20px;
     background: linear-gradient(135deg, color-mix(in srgb, var(--sse-primary) 10%, transparent), transparent);
     border: 1px solid color-mix(in srgb, var(--sse-primary) 30%, transparent);
-    border-radius: 10px;
+    border-radius: var(--tester-radius-sm);
 }
 
 .sse-info-panel h4 {
@@ -467,8 +481,8 @@
     align-items: center;
     gap: 8px;
     padding: 8px 12px;
-    background: rgba(255, 255, 255, 0.5);
-    border-radius: 6px;
+    background: color-mix(in srgb, var(--tester-accent) 5%, var(--tester-inset));
+    border-radius: var(--tester-radius-btn);
     font-size: 0.85rem;
 }
 
@@ -488,8 +502,8 @@
     justify-content: space-between;
     align-items: center;
     padding: 10px 12px;
-    background: #f5f5f5;
-    border-radius: 6px;
+    background: var(--tester-inset);
+    border-radius: var(--tester-radius-btn);
     cursor: pointer;
     transition: all 0.15s ease;
 }
@@ -499,7 +513,7 @@
 }
 
 .sse-saved-url {
-    font-family: 'Monaco', 'Menlo', monospace;
+    font-family: var(--tester-mono);
     font-size: 0.85rem;
     color: var(--sse-text);
 }
@@ -510,51 +524,21 @@
 }
 
 /* Dark Mode */
-body.dark-theme .sse-tester {
-    --sse-bg: var(--card-bg, #002234);
-    --sse-border: var(--border-color, #003956);
-    --sse-text: var(--text-color, #e0e0e0);
-    --sse-text-muted: var(--text-secondary, #d0d0d0);
-}
 
-body.dark-theme .sse-config,
-body.dark-theme .sse-btn-settings,
-body.dark-theme .sse-status-disconnected,
-body.dark-theme .sse-event-system,
-body.dark-theme .sse-saved-item {
-    background: var(--sidebar-bg, #001927);
-}
 
-body.dark-theme .sse-event-message {
-    background: #0D3D2B;
-}
 
-body.dark-theme .sse-info-feature {
-    background: rgba(0, 0, 0, 0.3);
-}
 
-body.dark-theme .sse-url-input {
-    background: var(--card-bg, #002234);
-    color: var(--text-color, #e0e0e0);
-    border-color: var(--border-color, #003956);
-}
 
-body.dark-theme .sse-filter-group select {
-    background: var(--card-bg, #002234);
-    color: var(--text-color, #e0e0e0);
-    border-color: var(--border-color, #003956);
-}
 
-body.dark-theme .sse-add-event-type input {
-    background: var(--card-bg, #002234);
-    color: var(--text-color, #e0e0e0);
-    border-color: var(--border-color, #003956);
-}
 
-body.dark-theme .sse-event-json,
-body.dark-theme .sse-event-text {
-    background: rgba(0, 0, 0, 0.2);
-}
+
+
+
+
+
+
+
+
 
 /* Responsive */
 @media (max-width: 600px) {
