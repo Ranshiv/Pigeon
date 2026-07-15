@@ -1,5 +1,6 @@
 // client/src/components/Protocols/MqttTester.js
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import AppSelect from '../common/AppSelect/AppSelect';
 import './tester-shell.css';
 import './MqttTester.css';
 
@@ -38,9 +39,46 @@ const RadioIcon = ({ size = 16 }) => (
     </svg>
 );
 
+const GearIcon = ({ size = 16 }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="12" cy="12" r="3" />
+        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+    </svg>
+);
+
+const ArrowUpIcon = ({ size = 12 }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+        <line x1="12" y1="19" x2="12" y2="5" />
+        <polyline points="5 12 12 5 19 12" />
+    </svg>
+);
+
+const ArrowDownIcon = ({ size = 12 }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+        <line x1="12" y1="5" x2="12" y2="19" />
+        <polyline points="19 12 12 19 5 12" />
+    </svg>
+);
+
+const InfoIcon = ({ size = 12 }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="12" cy="12" r="10" />
+        <line x1="12" y1="16" x2="12" y2="12" />
+        <line x1="12" y1="8" x2="12.01" y2="8" />
+    </svg>
+);
+
+const AlertIcon = ({ size = 14 }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+        <line x1="12" y1="9" x2="12" y2="13" />
+        <line x1="12" y1="17" x2="12.01" y2="17" />
+    </svg>
+);
+
 /**
  * MqttTester Component
- * 
+ *
  * A comprehensive UI for testing MQTT pub/sub messaging.
  * Supports broker connection, topic subscription, and message publishing.
  */
@@ -77,7 +115,7 @@ const MqttTester = ({
 
     // UI state
     const [showSettings, setShowSettings] = useState(false);
-    const [autoScroll, setAutoScroll] = useState(true);
+    const [autoScroll] = useState(true);
 
     const messagesEndRef = useRef(null);
 
@@ -253,23 +291,42 @@ const MqttTester = ({
     const clearMessages = () => setMessages([]);
 
     const filteredMessages = messages.filter(m => {
-        if (filter === 'all') return true;
         if (filter === 'published') return m.type === 'published';
         if (filter === 'received') return m.type === 'received';
         return true;
     });
 
-    const qosLabels = {
-        0: 'QoS 0 - At most once',
-        1: 'QoS 1 - At least once',
-        2: 'QoS 2 - Exactly once'
-    };
+    const sentCount = messages.filter(m => m.type === 'published').length;
+    const receivedCount = messages.filter(m => m.type === 'received').length;
+    const isConnected = connectionState === 'connected';
+
+    const QOS_OPTIONS = [
+        { value: 0, label: 'QoS 0' },
+        { value: 1, label: 'QoS 1' },
+        { value: 2, label: 'QoS 2' }
+    ];
+
+    const qosSelect = (value, onChange, id) => (
+        <AppSelect
+            id={id}
+            className="mqtt-qos-select"
+            value={value}
+            onChange={onChange}
+            options={QOS_OPTIONS}
+            disabled={!isConnected}
+        />
+    );
 
     return (
         <div className={`mqtt-tester ${className}`}>
-            {/* Connection Panel */}
+            {/* Connection Topbar */}
             <div className="mqtt-panel mqtt-connection-panel">
-                <h3 className="mqtt-panel-title"><ConnectionIcon size={16} /> Broker Connection</h3>
+                <div className="mqtt-connection-header">
+                    <h3 className="mqtt-panel-title"><ConnectionIcon size={16} /> Broker Connection</h3>
+                    <div className={`ts-status ${connectionState}`}>
+                        {connectionState}
+                    </div>
+                </div>
 
                 <div className="mqtt-url-group">
                     <div className="mqtt-protocol-badge">MQTT</div>
@@ -279,9 +336,11 @@ const MqttTester = ({
                         placeholder="mqtt://broker.example.com:1883"
                         value={brokerUrl}
                         onChange={(e) => setBrokerUrl(e.target.value)}
-                        disabled={connectionState === 'connected'}
+                        onKeyDown={(e) => e.key === 'Enter' && !isConnected && !loading && connect()}
+                        disabled={isConnected}
+                        aria-label="Broker URL"
                     />
-                    {connectionState === 'connected' ? (
+                    {isConnected ? (
                         <button className="mqtt-btn mqtt-btn-disconnect" onClick={disconnect}>
                             Disconnect
                         </button>
@@ -291,58 +350,71 @@ const MqttTester = ({
                             onClick={connect}
                             disabled={loading}
                         >
-                            {loading ? 'Connecting...' : 'Connect'}
+                            {loading ? 'Connecting…' : 'Connect'}
                         </button>
                     )}
                     <button
-                        className="mqtt-btn mqtt-btn-settings"
+                        className={`mqtt-btn mqtt-btn-settings ${showSettings ? 'active' : ''}`}
                         onClick={() => setShowSettings(!showSettings)}
+                        aria-label="Connection settings"
+                        aria-expanded={showSettings}
+                        title="Connection settings"
                     >
-                        ⚙️
+                        <GearIcon size={16} />
                     </button>
                 </div>
 
                 {showSettings && (
                     <div className="mqtt-settings">
                         <div className="mqtt-setting">
-                            <label>Client ID</label>
+                            <label htmlFor="mqtt-client-id">Client ID</label>
                             <input
+                                id="mqtt-client-id"
                                 type="text"
                                 value={clientId}
                                 onChange={(e) => setClientId(e.target.value)}
                                 placeholder="Auto-generated if empty"
-                                disabled={connectionState === 'connected'}
+                                disabled={isConnected}
                             />
                         </div>
                         <div className="mqtt-setting">
-                            <label>Username</label>
+                            <label htmlFor="mqtt-username">Username</label>
                             <input
+                                id="mqtt-username"
                                 type="text"
                                 value={username}
                                 onChange={(e) => setUsername(e.target.value)}
                                 placeholder="Optional"
-                                disabled={connectionState === 'connected'}
+                                disabled={isConnected}
                             />
                         </div>
                         <div className="mqtt-setting">
-                            <label>Password</label>
+                            <label htmlFor="mqtt-password">Password</label>
                             <input
+                                id="mqtt-password"
                                 type="password"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                                 placeholder="Optional"
-                                disabled={connectionState === 'connected'}
+                                disabled={isConnected}
                             />
                         </div>
                     </div>
                 )}
 
-                <div className={`mqtt-status mqtt-status-${connectionState}`}>
-                    <span className="mqtt-status-dot"></span>
-                    <span>{connectionState.charAt(0).toUpperCase() + connectionState.slice(1)}</span>
-                    {subscriptions.length > 0 && (
-                        <span className="mqtt-sub-count">{subscriptions.length} subscription(s)</span>
-                    )}
+                <div className="mqtt-kpi-strip">
+                    <div className={`ts-kpi ${isConnected ? 'live' : ''}`}>
+                        <div className="ts-kpi-label">Sent</div>
+                        <div className="ts-kpi-value">{sentCount}</div>
+                    </div>
+                    <div className={`ts-kpi ${isConnected ? 'live' : ''}`}>
+                        <div className="ts-kpi-label">Received</div>
+                        <div className="ts-kpi-value">{receivedCount}</div>
+                    </div>
+                    <div className="ts-kpi">
+                        <div className="ts-kpi-label">Subscriptions</div>
+                        <div className="ts-kpi-value">{subscriptions.length}</div>
+                    </div>
                 </div>
             </div>
 
@@ -361,21 +433,15 @@ const MqttTester = ({
                                 placeholder="sensor/+/temperature"
                                 value={newTopic}
                                 onChange={(e) => setNewTopic(e.target.value)}
-                                disabled={connectionState !== 'connected'}
+                                onKeyDown={(e) => e.key === 'Enter' && subscribe()}
+                                disabled={!isConnected}
+                                aria-label="Topic to subscribe"
                             />
-                            <select
-                                value={newQos}
-                                onChange={(e) => setNewQos(parseInt(e.target.value))}
-                                disabled={connectionState !== 'connected'}
-                            >
-                                <option value={0}>QoS 0</option>
-                                <option value={1}>QoS 1</option>
-                                <option value={2}>QoS 2</option>
-                            </select>
+                            {qosSelect(newQos, setNewQos, 'mqtt-subscribe-qos')}
                             <button
                                 className="mqtt-btn mqtt-btn-subscribe"
                                 onClick={subscribe}
-                                disabled={connectionState !== 'connected' || loading}
+                                disabled={!isConnected || loading}
                             >
                                 Subscribe
                             </button>
@@ -383,7 +449,11 @@ const MqttTester = ({
 
                         <div className="mqtt-subscriptions-list">
                             {subscriptions.length === 0 ? (
-                                <div className="mqtt-empty">No active subscriptions</div>
+                                <div className="mqtt-empty mqtt-empty-compact">
+                                    {isConnected
+                                        ? 'No active subscriptions'
+                                        : 'Connect to a broker to subscribe'}
+                                </div>
                             ) : (
                                 subscriptions.map((sub, idx) => (
                                     <div key={idx} className="mqtt-subscription">
@@ -392,6 +462,8 @@ const MqttTester = ({
                                         <button
                                             className="mqtt-btn-unsub"
                                             onClick={() => unsubscribe(sub.topic)}
+                                            aria-label={`Unsubscribe from ${sub.topic}`}
+                                            title="Unsubscribe"
                                         >
                                             ×
                                         </button>
@@ -417,7 +489,8 @@ const MqttTester = ({
                                 placeholder="sensor/living-room/temperature"
                                 value={publishTopic}
                                 onChange={(e) => setPublishTopic(e.target.value)}
-                                disabled={connectionState !== 'connected'}
+                                disabled={!isConnected}
+                                aria-label="Topic to publish to"
                             />
 
                             <textarea
@@ -425,26 +498,19 @@ const MqttTester = ({
                                 placeholder='{"temperature": 23.5, "unit": "celsius"}'
                                 value={publishMessage}
                                 onChange={(e) => setPublishMessage(e.target.value)}
-                                disabled={connectionState !== 'connected'}
+                                disabled={!isConnected}
+                                aria-label="Message payload"
                             />
 
                             <div className="mqtt-publish-options">
-                                <select
-                                    value={publishQos}
-                                    onChange={(e) => setPublishQos(parseInt(e.target.value))}
-                                    disabled={connectionState !== 'connected'}
-                                >
-                                    <option value={0}>QoS 0</option>
-                                    <option value={1}>QoS 1</option>
-                                    <option value={2}>QoS 2</option>
-                                </select>
+                                {qosSelect(publishQos, setPublishQos, 'mqtt-publish-qos')}
 
-                                <label className="mqtt-retain-toggle">
+                                <label className={`mqtt-retain-toggle ${publishRetain ? 'checked' : ''}`}>
                                     <input
                                         type="checkbox"
                                         checked={publishRetain}
                                         onChange={(e) => setPublishRetain(e.target.checked)}
-                                        disabled={connectionState !== 'connected'}
+                                        disabled={!isConnected}
                                     />
                                     Retain
                                 </label>
@@ -452,9 +518,9 @@ const MqttTester = ({
                                 <button
                                     className="mqtt-btn mqtt-btn-publish"
                                     onClick={publish}
-                                    disabled={connectionState !== 'connected' || loading}
+                                    disabled={!isConnected || loading}
                                 >
-                                    Publish
+                                    <SendIcon size={13} /> Publish
                                 </button>
                             </div>
                         </div>
@@ -466,27 +532,29 @@ const MqttTester = ({
                     <div className="mqtt-panel mqtt-messages-panel">
                         <div className="mqtt-messages-header">
                             <h3 className="mqtt-panel-title"><MessageIcon size={16} /> Messages</h3>
-                            <div className="mqtt-message-filters">
-                                <button
-                                    className={`mqtt-filter-btn ${filter === 'all' ? 'active' : ''}`}
-                                    onClick={() => setFilter('all')}
-                                >
-                                    All
-                                </button>
-                                <button
-                                    className={`mqtt-filter-btn ${filter === 'published' ? 'active' : ''}`}
-                                    onClick={() => setFilter('published')}
-                                >
-                                    Sent
-                                </button>
-                                <button
-                                    className={`mqtt-filter-btn ${filter === 'received' ? 'active' : ''}`}
-                                    onClick={() => setFilter('received')}
-                                >
-                                    Received
-                                </button>
+                            <div className="mqtt-message-filters" role="tablist" aria-label="Message filter">
+                                {[
+                                    { key: 'all', label: 'All', count: messages.length },
+                                    { key: 'published', label: 'Sent', count: sentCount },
+                                    { key: 'received', label: 'Received', count: receivedCount }
+                                ].map(f => (
+                                    <button
+                                        key={f.key}
+                                        role="tab"
+                                        aria-selected={filter === f.key}
+                                        className={`mqtt-filter-btn ${filter === f.key ? 'active' : ''}`}
+                                        onClick={() => setFilter(f.key)}
+                                    >
+                                        {f.label}
+                                        {f.count > 0 && <span className="mqtt-filter-count">{f.count}</span>}
+                                    </button>
+                                ))}
                             </div>
-                            <button className="mqtt-btn mqtt-btn-clear" onClick={clearMessages}>
+                            <button
+                                className="mqtt-btn mqtt-btn-clear"
+                                onClick={clearMessages}
+                                disabled={messages.length === 0}
+                            >
                                 Clear
                             </button>
                         </div>
@@ -494,8 +562,8 @@ const MqttTester = ({
                         <div className="mqtt-messages-list">
                             {filteredMessages.length === 0 ? (
                                 <div className="mqtt-empty">
-                                    <span className="mqtt-empty-icon"><RadioIcon size={48} /></span>
-                                    <p>No messages yet</p>
+                                    <span className="mqtt-empty-icon"><RadioIcon size={44} /></span>
+                                    <p className="mqtt-empty-title">No messages yet</p>
                                     <p className="mqtt-empty-hint">
                                         Subscribe to topics and publish messages to see activity
                                     </p>
@@ -504,10 +572,10 @@ const MqttTester = ({
                                 filteredMessages.map(msg => (
                                     <div key={msg.id} className={`mqtt-message mqtt-message-${msg.type}`}>
                                         <div className="mqtt-message-header">
-                                            <span className="mqtt-message-type">
-                                                {msg.type === 'published' && '⬆️ Published'}
-                                                {msg.type === 'received' && '⬇️ Received'}
-                                                {msg.type === 'system' && 'ℹ️ System'}
+                                            <span className={`mqtt-message-type mqtt-type-${msg.type}`}>
+                                                {msg.type === 'published' && <><ArrowUpIcon /> Published</>}
+                                                {msg.type === 'received' && <><ArrowDownIcon /> Received</>}
+                                                {msg.type === 'system' && <><InfoIcon /> System</>}
                                             </span>
                                             {msg.topic && (
                                                 <span className="mqtt-message-topic">{msg.topic}</span>
@@ -534,9 +602,9 @@ const MqttTester = ({
 
             {/* Error Display */}
             {error && (
-                <div className="mqtt-error">
-                    <span>⚠️ {error}</span>
-                    <button onClick={() => setError(null)}>×</button>
+                <div className="mqtt-error" role="alert">
+                    <span className="mqtt-error-text"><AlertIcon /> {error}</span>
+                    <button onClick={() => setError(null)} aria-label="Dismiss error">×</button>
                 </div>
             )}
         </div>

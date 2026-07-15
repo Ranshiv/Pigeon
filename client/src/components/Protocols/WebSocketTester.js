@@ -19,6 +19,64 @@ const MessageIcon = ({ size = 16 }) => (
     </svg>
 );
 
+const LinkIcon = ({ size = 16 }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M4 17l6-6-6-6" />
+        <path d="M20 7l-6 6 6 6" />
+    </svg>
+);
+
+const GearIcon = ({ size = 16 }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="12" cy="12" r="3" />
+        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+    </svg>
+);
+
+const ArrowUpIcon = ({ size = 12 }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+        <line x1="12" y1="19" x2="12" y2="5" />
+        <polyline points="5 12 12 5 19 12" />
+    </svg>
+);
+
+const ArrowDownIcon = ({ size = 12 }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+        <line x1="12" y1="5" x2="12" y2="19" />
+        <polyline points="19 12 12 19 5 12" />
+    </svg>
+);
+
+const ClockIcon = ({ size = 12 }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="12" cy="12" r="10" />
+        <polyline points="12 6 12 12 16 14" />
+    </svg>
+);
+
+const InfoIcon = ({ size = 12 }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="12" cy="12" r="10" />
+        <line x1="12" y1="16" x2="12" y2="12" />
+        <line x1="12" y1="8" x2="12.01" y2="8" />
+    </svg>
+);
+
+const AlertIcon = ({ size = 14 }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+        <line x1="12" y1="9" x2="12" y2="13" />
+        <line x1="12" y1="17" x2="12.01" y2="17" />
+    </svg>
+);
+
+const SendIcon = ({ size = 14 }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <line x1="22" y1="2" x2="11" y2="13" />
+        <polygon points="22 2 15 22 11 13 2 9 22 2" />
+    </svg>
+);
+
 /**
  * WebSocketTester Component
  * 
@@ -279,6 +337,11 @@ const WebSocketTester = ({
         <div className={`websocket-tester ${className}`}>
             {/* Connection Panel */}
             <div className="ws-connection-panel">
+                <div className="ws-panel-head">
+                    <span className="ws-eyebrow"><LinkIcon size={14} /> Connection</span>
+                    <div className={`ts-status ${connectionState}`}>{connectionState}</div>
+                </div>
+
                 <div className="ws-url-input-group">
                     <div className="ws-protocol-badge">WS</div>
                     <input
@@ -289,6 +352,7 @@ const WebSocketTester = ({
                         onChange={(e) => setUrl(e.target.value)}
                         onKeyDown={(e) => e.key === 'Enter' && connectionState !== 'connected' && connect()}
                         disabled={connectionState === 'connected'}
+                        aria-label="WebSocket URL"
                     />
                     {connectionState === 'connected' ? (
                         <button
@@ -303,107 +367,111 @@ const WebSocketTester = ({
                             onClick={connect}
                             disabled={connectionState === 'connecting'}
                         >
-                            {connectionState === 'connecting' ? 'Connecting...' : 'Connect'}
+                            {connectionState === 'connecting' ? 'Connecting…' : 'Connect'}
                         </button>
                     )}
                     <button
-                        className="ws-btn ws-btn-settings"
+                        className={`ws-btn ws-btn-settings ${showSettings ? 'active' : ''}`}
                         onClick={() => setShowSettings(!showSettings)}
                         title="Settings"
+                        aria-label="Connection settings"
+                        aria-expanded={showSettings}
                     >
-                        ⚙️
+                        <GearIcon size={16} />
                     </button>
                 </div>
 
-                {/* Connection Status */}
-                <div className="ws-status-bar">
-                    <div className={`ws-status-indicator ws-status-${connectionState}`}>
-                        <span className="ws-status-dot"></span>
-                        <span className="ws-status-text">
-                            {connectionState.charAt(0).toUpperCase() + connectionState.slice(1)}
-                        </span>
+                {/* KPI + Settings merged strip */}
+                <div className="ws-metrics-strip">
+                    <div className={`ts-kpi ${connectionState === 'connected' ? 'live' : ''}`}>
+                        <div className="ts-kpi-label">Sent</div>
+                        <div className="ts-kpi-value">
+                            {stats.messagesSent}
+                            <span className="ts-kpi-unit">{formatBytes(stats.bytesSent)}</span>
+                        </div>
+                    </div>
+                    <div className={`ts-kpi ${connectionState === 'connected' ? 'live' : ''}`}>
+                        <div className="ts-kpi-label">Received</div>
+                        <div className="ts-kpi-value">
+                            {stats.messagesReceived}
+                            <span className="ts-kpi-unit">{formatBytes(stats.bytesReceived)}</span>
+                        </div>
+                    </div>
+                    <div className="ts-kpi">
+                        <div className="ts-kpi-label">Uptime</div>
+                        <div className="ts-kpi-value">{getConnectionDuration() || '—'}</div>
+                    </div>
+                    <div className="ts-kpi">
+                        <div className="ts-kpi-label">Latency</div>
+                        <div className="ts-kpi-value">
+                            {stats.latency ? stats.latency : '—'}
+                            {stats.latency ? <span className="ts-kpi-unit">ms</span> : null}
+                        </div>
                     </div>
 
-                    {connectionState === 'connected' && (
-                        <div className="ws-stats">
-                            <span className="ws-stat">
-                                ⬆️ {stats.messagesSent} ({formatBytes(stats.bytesSent)})
-                            </span>
-                            <span className="ws-stat">
-                                ⬇️ {stats.messagesReceived} ({formatBytes(stats.bytesReceived)})
-                            </span>
-                            {getConnectionDuration() && (
-                                <span className="ws-stat">⏱️ {getConnectionDuration()}</span>
-                            )}
-                            {stats.latency && (
-                                <span className="ws-stat"><SignalIcon size={14} /> {stats.latency}ms</span>
-                            )}
+                    {showSettings && (
+                        <div className="ws-settings-group">
+                            <div className="ws-setting ws-setting-subprotocol">
+                                <label htmlFor="ws-subprotocol">Subprotocol</label>
+                                <input
+                                    id="ws-subprotocol"
+                                    type="text"
+                                    value={subprotocol}
+                                    onChange={(e) => setSubprotocol(e.target.value)}
+                                    placeholder="e.g., graphql-ws"
+                                    disabled={connectionState === 'connected'}
+                                />
+                            </div>
+                            <div className="ws-setting ws-setting-toggle">
+                                <label>
+                                    <input
+                                        type="checkbox"
+                                        checked={reconnectOnClose}
+                                        onChange={(e) => setReconnectOnClose(e.target.checked)}
+                                    />
+                                    Auto-reconnect
+                                </label>
+                            </div>
+                            <div className="ws-setting ws-setting-toggle">
+                                <label>
+                                    <input
+                                        type="checkbox"
+                                        checked={formatJson}
+                                        onChange={(e) => setFormatJson(e.target.checked)}
+                                    />
+                                    Format JSON
+                                </label>
+                            </div>
+                            <div className="ws-setting ws-setting-toggle">
+                                <label>
+                                    <input
+                                        type="checkbox"
+                                        checked={showTimestamps}
+                                        onChange={(e) => setShowTimestamps(e.target.checked)}
+                                    />
+                                    Show timestamps
+                                </label>
+                            </div>
+                            <div className="ws-setting ws-setting-toggle">
+                                <label>
+                                    <input
+                                        type="checkbox"
+                                        checked={autoScroll}
+                                        onChange={(e) => setAutoScroll(e.target.checked)}
+                                    />
+                                    Auto-scroll
+                                </label>
+                            </div>
                         </div>
                     )}
                 </div>
 
-                {/* Settings Panel */}
-                {showSettings && (
-                    <div className="ws-settings-panel">
-                        <div className="ws-setting">
-                            <label>Subprotocol</label>
-                            <input
-                                type="text"
-                                value={subprotocol}
-                                onChange={(e) => setSubprotocol(e.target.value)}
-                                placeholder="e.g., graphql-ws"
-                                disabled={connectionState === 'connected'}
-                            />
-                        </div>
-                        <div className="ws-setting">
-                            <label>
-                                <input
-                                    type="checkbox"
-                                    checked={reconnectOnClose}
-                                    onChange={(e) => setReconnectOnClose(e.target.checked)}
-                                />
-                                Auto-reconnect
-                            </label>
-                        </div>
-                        <div className="ws-setting">
-                            <label>
-                                <input
-                                    type="checkbox"
-                                    checked={formatJson}
-                                    onChange={(e) => setFormatJson(e.target.checked)}
-                                />
-                                Format JSON
-                            </label>
-                        </div>
-                        <div className="ws-setting">
-                            <label>
-                                <input
-                                    type="checkbox"
-                                    checked={showTimestamps}
-                                    onChange={(e) => setShowTimestamps(e.target.checked)}
-                                />
-                                Show timestamps
-                            </label>
-                        </div>
-                        <div className="ws-setting">
-                            <label>
-                                <input
-                                    type="checkbox"
-                                    checked={autoScroll}
-                                    onChange={(e) => setAutoScroll(e.target.checked)}
-                                />
-                                Auto-scroll
-                            </label>
-                        </div>
-                    </div>
-                )}
-
                 {/* Error Display */}
                 {error && (
-                    <div className="ws-error">
-                        <span className="ws-error-icon">⚠️</span>
+                    <div className="ws-error" role="alert">
+                        <span className="ws-error-icon"><AlertIcon size={15} /></span>
                         <span className="ws-error-text">{error}</span>
-                        <button className="ws-error-close" onClick={() => setError(null)}>×</button>
+                        <button className="ws-error-close" onClick={() => setError(null)} aria-label="Dismiss error">×</button>
                     </div>
                 )}
             </div>
@@ -411,27 +479,26 @@ const WebSocketTester = ({
             {/* Messages Panel */}
             <div className="ws-messages-panel">
                 <div className="ws-messages-header">
-                    <div className="ws-messages-filter">
-                        <button
-                            className={`ws-filter-btn ${filter === 'all' ? 'active' : ''}`}
-                            onClick={() => setFilter('all')}
-                        >
-                            All ({messages.length})
-                        </button>
-                        <button
-                            className={`ws-filter-btn ${filter === 'sent' ? 'active' : ''}`}
-                            onClick={() => setFilter('sent')}
-                        >
-                            Sent ({messages.filter(m => m.type === 'sent').length})
-                        </button>
-                        <button
-                            className={`ws-filter-btn ${filter === 'received' ? 'active' : ''}`}
-                            onClick={() => setFilter('received')}
-                        >
-                            Received ({messages.filter(m => m.type === 'received').length})
-                        </button>
+                    <span className="ws-eyebrow"><MessageIcon size={14} /> Messages</span>
+                    <div className="ws-messages-filter" role="tablist" aria-label="Message filter">
+                        {[
+                            { key: 'all', label: 'All', count: messages.length },
+                            { key: 'sent', label: 'Sent', count: messages.filter(m => m.type === 'sent').length },
+                            { key: 'received', label: 'Received', count: messages.filter(m => m.type === 'received').length }
+                        ].map(f => (
+                            <button
+                                key={f.key}
+                                role="tab"
+                                aria-selected={filter === f.key}
+                                className={`ws-filter-btn ${filter === f.key ? 'active' : ''}`}
+                                onClick={() => setFilter(f.key)}
+                            >
+                                {f.label}
+                                {f.count > 0 && <span className="ws-filter-count">{f.count}</span>}
+                            </button>
+                        ))}
                     </div>
-                    <button className="ws-btn ws-btn-clear" onClick={clearMessages}>
+                    <button className="ws-btn ws-btn-clear" onClick={clearMessages} disabled={messages.length === 0}>
                         Clear
                     </button>
                 </div>
@@ -439,8 +506,8 @@ const WebSocketTester = ({
                 <div className="ws-messages-list">
                     {filteredMessages.length === 0 ? (
                         <div className="ws-messages-empty">
-                            <span className="ws-empty-icon"><MessageIcon size={48} /></span>
-                            <p>No messages yet</p>
+                            <span className="ws-empty-icon"><MessageIcon size={44} /></span>
+                            <p className="ws-empty-title">No messages yet</p>
                             <p className="ws-empty-hint">
                                 {connectionState === 'connected'
                                     ? 'Send a message or wait for incoming data'
@@ -455,14 +522,14 @@ const WebSocketTester = ({
                             >
                                 <div className="ws-message-header">
                                     <span className={`ws-message-direction ws-direction-${msg.type}`}>
-                                        {msg.type === 'sent' ? '⬆️ Sent' :
-                                            msg.type === 'received' ? '⬇️ Received' :
-                                                msg.type === 'system' ? 'ℹ️ System' :
-                                                    '⚠️ Error'}
+                                        {msg.type === 'sent' ? <><ArrowUpIcon /> Sent</> :
+                                            msg.type === 'received' ? <><ArrowDownIcon /> Received</> :
+                                                msg.type === 'system' ? <><InfoIcon /> System</> :
+                                                    <><AlertIcon size={12} /> Error</>}
                                     </span>
                                     {showTimestamps && (
                                         <span className="ws-message-time">
-                                            {msg.timestamp.toLocaleTimeString()}
+                                            <ClockIcon /> {msg.timestamp.toLocaleTimeString()}
                                         </span>
                                     )}
                                     {msg.size && (
@@ -516,7 +583,7 @@ const WebSocketTester = ({
                         onClick={sendMessage}
                         disabled={connectionState !== 'connected' || !messageInput.trim()}
                     >
-                        Send
+                        <SendIcon size={14} /> Send
                     </button>
                 </div>
                 <div className="ws-input-hint">
