@@ -131,10 +131,21 @@
   transition: all var(--dur-fast, 120ms) var(--ease-out, ease);
 }
 
-.protocol-selector-bar .protocol-card.active,
 .protocol-selector-bar .protocol-card:hover {
   border-color: var(--primary-color);
   background: var(--hover-bg);
+}
+
+.protocol-selector-bar .protocol-card--selected,
+.protocol-selector-bar .protocol-card--selected:hover {
+  border-color: var(--protocol-color, var(--primary-color));
+  background: color-mix(in srgb, var(--protocol-color, var(--primary-color)) 12%, var(--pt-inset));
+  box-shadow: 0 0 0 1px var(--protocol-color, var(--primary-color)),
+    0 0 14px color-mix(in srgb, var(--protocol-color, var(--primary-color)) 25%, transparent);
+}
+
+.protocol-selector-bar .protocol-card--selected .protocol-card__name {
+  color: var(--protocol-color, var(--primary-color));
 }
 
 .protocol-selector-bar .protocol-card__icon-wrapper {
@@ -244,17 +255,6 @@
   overflow: hidden;
   animation: ptCardRise 0.42s cubic-bezier(0.16, 1, 0.3, 1) both;
   animation-delay: calc(var(--i, 0) * 60ms);
-}
-
-.protocol-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 28px;
-  height: 3px;
-  background: var(--protocol-color, var(--pt-accent));
-  opacity: 0.85;
 }
 
 .protocol-card:hover {

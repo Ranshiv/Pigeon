@@ -1,6 +1,6 @@
 ---
 name: pigeon-priorities
-description: Activate for any task on the Pigeon codebase — API testing/automation tool (Express + React). Drives task triage priority order (security/data-loss > bug > feature > refactor > docs), repo conventions, reuse-vs-add decisions, and UI/styling discipline (read existing design tokens + reusable components first, match monitoring-dashboard aesthetic, suggest 2026 styles when redesigning). Triggered by /pigeon or keywords: pigeon, protocol tester, graphql, grpc, soap, mqtt, websocket, sse, performance test, load test, ai agent tools, marketplace, explore page, dashboard, contract diff.
+description: Activate for any task on the Pigeon codebase — API testing/automation tool (Express + React). Drives task triage priority order (security/data-loss > bug > feature > refactor > docs), repo conventions, reuse-vs-add decisions, and UI/styling discipline using ONLY the project's existing BLUE palette tokens + reusable components (never introduce off-palette colors, never run dev servers/npm start/build, never drive the browser). Triggered by /pigeon or keywords: pigeon, protocol tester, graphql, grpc, soap, mqtt, websocket, sse, performance test, load test, ai agent tools, marketplace, explore page, dashboard, contract diff.
 ---
 
 # Pigeon Priorities
@@ -67,56 +67,58 @@ Libraries already installed — use instead of hand-rolling:
 
 ## 5. UI / Styling Discipline
 
-### Tokens — read & match existing, propose if missing
+### Tokens — read & match the project's blue palette, never introduce off-palette colors
 
-1. **Read first**: `client/src/index.css` defines the centralized token system (light theme default + explicit dark theme). Match these.
-2. **Only if tokens are missing/ugly** → propose a 2026-dark-monitoring palette and **ask before applying**.
+**Hard rule: the project uses a Blue palette. Use only the existing blue-based tokens. Do NOT introduce green/teal/purple gradients or random accent colors; do NOT switch to a dark-theme-default. Status colors (success/warning/danger) remain as-is.**
 
-Current canonical tokens (from `index.css`):
+1. **Read first**: `client/src/index.css` defines the centralized blue token system (light theme default; dark theme available but stay on light default unless user asks). Match these.
+2. **Only if blue tokens are genuinely missing** → propose a blue-consistent value and **ask before applying**. Never invent off-palette colors.
+
+Canonical blue tokens (from `index.css`) — use these:
 ```
 --primary-color: #014C75   --primary-hover: #013B5B   --primary-light: #E5F3FF
---accent: var(--primary-color)
+--accent: var(--primary-color)        /* the blue accent — accent for all primary UI */
+--info-color: #014C75  --info-light: #E5F3FF         /* also blue */
 --background-color, --card-bg / --card-background, --hover-bg / --hover-background
 --text-color, --text-secondary, --text-muted
 --border-color   --card-shadow: 0 1px 3px rgba(0,0,0,.08)
 --radius-sm:8px  --radius-md:12px  --radius-lg:16px  --radius-xl:22px
---success-color:#28a745  --warning-color:#ffc107  --danger-color:#dc3545  --info-color:#014C75
+--success-color:#28a745  --warning-color:#ffc107  --danger-color:#dc3545   (status only)
 Fonts: Inter (400-700) body, Roboto Mono (code/metrics)
-Dark theme defined explicitly — both supported.
 ```
-Per-section local tokens (match the section's own): e.g. `PerformanceTestsPage.css` uses `--pt-accent`, `--pt-radius`(18px), `--pt-radius-sm`(12px), `--pt-hairline`, `--pt-surface`, `--pt-inset`, `--pt-mono`. Mirror these names inside perf-section work; fall back to global tokens otherwise.
+Per-section local tokens (match the section's own, and keep them blue-anchored): e.g. `PerformanceTestsPage.css` uses `--pt-accent` (defaults to `--accent` = blue), `--pt-radius`(18px), `--pt-radius-sm`(12px), `--pt-hairline`, `--pt-surface`, `--pt-inset`, `--pt-mono`. Mirror these names inside perf-section work; fall back to global blue tokens otherwise. Glows/tints must derive from the blue accent via `color-mix(in srgb, var(--accent) 10%, transparent)`, not a foreign hue.
 
 ### Core component styles (apply on new UI)
 
-- **Button**: variant by intent (primary=`--accent`, ghost=transparent+border, danger=`--danger-color`). Always hover + focus-visible ring. 2026: subtle scale (1.02) / border-glow on hover, `prefers-reduced-motion` respected.
-- **Card**: `--card-bg`, `--radius-lg`, `--card-shadow`, 1px `--border-color`. Hover → lift shadow.
+- **Button**: variant by intent (primary=`--accent` the blue, ghost=transparent+`--border-color`, danger=`--danger-color`). Always hover + focus-visible ring. 2026: subtle scale (1.02) / blue border-glow on hover, `prefers-reduced-motion` respected.
+- **Card**: `--card-bg`, `--radius-lg`, `--card-shadow`, 1px `--border-color`. Hover → lift shadow; blue hairline/glow optional.
 - **Modal**: overlay blur, `--radius-xl`, `--card-bg`, ESC + backdrop-click to close, focus-trap.
-- **Input/Select**: `--radius-sm`, focused → `--accent` ring. Erroneous → `--danger-color`.
+- **Input/Select**: `--radius-sm`, focused → blue `--accent` ring. Erroneous → `--danger-color`.
 - **Table**: hairline rows (`--border-color`), sticky header, zebra optional via `--hover-bg`.
-- **Tabs**: active = `--accent` underline/pill, inactive = `--text-secondary`.
+- **Tabs**: active = blue `--accent` underline/pill, inactive = `--text-secondary`.
 
-### Dashboard / monitoring section layout (2026 style)
+### Dashboard / monitoring section layout (blue theme, light default)
 
 Use this pattern for monitoring pages, performance dashboards, and their inner sections (teams, metrics, alerts, logs, runs):
 ```
-[ sticky topbar: title + live status + primary actions ]
+[ sticky topbar: title + live status + primary actions (blue buttons) ]
 [ KPI row: 3-4 metric cards (big number + trend + mini-sparkline) ]
 [ main grid: left = primary chart/timeline (2/3 width), right = side panel (1/3) ]
 [ secondary grid: charts/widgets row, equal cards ]
 [ data table: recent runs/events, sticky header, row-density toggle ]
 ```
-- Dark monitoring theme (when section or user picks): elevated surfaces (`--pt-surface`/`--card-bg`), hairline borders, accent-tinted glows (`color-mix(in srgb, var(--pt-accent) 10-12%, transparent)`), mono font (`--pt-mono`) for metrics/latency.
-- Live data → smooth transitions, not jumps. Charts: chart.js, re-render on data, axis in `--text-muted`, series in `--accent` + status colors.
+- Light monitoring theme (default): elevated surfaces (`--pt-surface`/`--card-bg`), hairline borders, blue accent-tinted glows (`color-mix(in srgb, var(--pt-accent) 10-12%, transparent)`, blue), mono font (`--pt-mono`) for metrics/latency. Dark theme only if user explicitly asks.
+- Live data → smooth transitions, not jumps. Charts: chart.js, re-render on data, axis in `--text-muted`, primary series in blue `--accent`, status series in success/warning/danger.
 - Inner sections (teams, alerts, logs): each gets its card with a header row + body. Reuse `PageShell`/`MainShell` for outer chrome.
 
-### When (and only when) redesigning → suggest 2026 options
+### When (and only when) redesigning → offer blue-palette layout options
 
-Offer these as named options when the user wants a style update:
-- **"Observability Dark"** — the monitoring aesthetic above (default for perf/protocol pages).
-- **"Clean SaaS"** — light, large radius, soft shadows, generous whitespace (marketplace/explore).
-- **"Data-viz"** — bold type, big metric numbers, animated grid, status-color coded (alerts/health).
+If the user wants a style update, offer blue-palette *layout* directions (never off-palette colors — the hue stays blue):
+- **"Observability (light blue)"** — the monitoring layout above (default for perf/protocol pages): KPI cards, charts, data table, blue accents.
+- **"Clean SaaS (blue)"** — light, large radius, soft shadows, generous whitespace (marketplace/explore).
+- **"Data-viz (blue)"** — bold type, big metric numbers, animated grid, blue primary series + status-color coded series (alerts/health).
 
-Ask which for the specific page; pick per-page based on purpose (testing/dashboard=observability, marketplace=clean SaaS).
+All three stay on the blue palette. Ask which for the specific page; pick per-page based on purpose (testing/dashboard=observability, marketplace=clean SaaS). Dark theme only if user explicitly asks, and even then keep it blue-anchored (`--primary-color` family).
 
 ## 6. Repo Layout & Conventions
 
@@ -147,11 +149,10 @@ Rules:
 
 ## 7. Build / Test / Verify (mandate)
 
-- **NEVER use `npm run build`. ALWAYS `npm run dev`** to verify changes (project rule).
-- Backend: `node server.js` (or the dev script). Frontend: `cd client && npm start`.
-- Tests: `npm test` (jest, `--passWithNoTests`). Test files in `tests/` or beside component, not root.
-- **Before any UI change**: use the browser MCP tools (`chrome-devtools` or `playwright`) to screenshot the current state, make the change, re-screenshot, compare. Catches regressions. (Both MCP toolsets are available.)
-- **After any change**: run `npm run dev` and confirm it boots; run relevant jest tests. Report actual results — if a test fails, paste the output.
+- **NEVER run the app or dev servers.** Do NOT execute `npm start`, `npm run dev`, `npm run build`, `node server.js`, `cd client && npm start`, or any other command that boots the app/servers. The user runs and verifies changes themselves; you write code, you do not launch it. (If the user explicitly asks you to run a command, still prefer handing it to them via the `! <command>` prompt prefix.)
+- Tests: `npm test` (jest, `--passWithNoTests`) is allowed ONLY if the user asks for tests to be run; otherwise assume the user will run them. Test files go in `tests/` or beside the component, never in root.
+- **Do NOT open or drive the browser.** Do NOT use `chrome-devtools` or `playwright` MCP tools to screenshot, navigate, or verify UI. Visual verification is the user's job. You may *read* existing screenshot files the user has shared for context, but do not launch/click/screenshot the app.
+- After a change: report what you changed and let the user run `npm run dev` to verify. Do not claim "verified" — you didn't run it. State plainly: "not run/false — please verify with npm run dev."
 
 ## 8. Domain Gotchas
 
@@ -177,13 +178,14 @@ Each protocol has a paired `.js`+`.css`. Real libs: `grpc` (`@grpc/grpc-js`+`pro
 ## 9. Self-Audit (before reporting done)
 
 1. Did I touch **only what was asked**? (project rule)
-2. Did I match existing tokens/components/style? (§4, §5)
-3. Did I verify via `npm run dev` + relevant tests + (for UI) screenshot-before/after? (§7)
-4. Any file over 500 lines now? → split or flag.
-5. Any new dependency added? → justify or remove (prefer stdlib/installed).
-6. Any silent failure / swallowed error / missing boundary validation introduced? → fix.
+2. Did I use only the existing **blue** palette tokens? No foreign hue introduced? (§5)
+3. Did I reuse `common/*` primitives + installed libs instead of reinventing? (§4)
+4. Did I **run/launch anything**? If yes and not explicitly told to → STOP, undo the launch, report it. Code is written, never executed here. (§7)
+5. Any file over 500 lines now? → split or flag.
+6. Any new dependency added? → justify or remove (prefer stdlib/installed).
+7. Any silent failure / swallowed error / missing boundary validation introduced? → fix.
 
-Report: what rung of §1, what changed, verify output, anything skipped (name the ceiling + when to add it).
+Report: what rung of §1, what changed, the blue tokens used, and say plainly "not run — please verify with npm run dev" (do not claim verified). Name anything skipped with its ceiling + when to add it.
 
 ## 10. Quick reference
 
@@ -192,7 +194,8 @@ Pigeon = Express + React, multi-protocol API testing tool.
 Priority: security/data-loss > bug > feature > refactor > docs.
 Ask before: multi-file / new feature / UI redesign. Act on: tiny fixes.
 Reuse: common/* primitives + installed libs before new code.
-Tokens: read index.css (--primary #014C75, --radius-lg 16px, Inter/Roboto Mono). Match section's local tokens.
-Verify: npm run dev (NEVER build) + jest + browser screenshot for UI.
-Don't: Co-Authored-By, root test files, new deps for what a few lines do, scaffolding-for-later.
+Palette: BLUE only. Read index.css (--primary #014C75, --accent, --info, --radius-lg 16px, Inter/Roboto Mono). Match section's local tokens. Status colors (green/amber/red) only for status, never as primary accents.
+Do NOT run: no npm start/dev/build, no node server.js, no launching servers. User verifies.
+Do NOT drive: no chrome-devtools/playwright browser actions/screenshots. Visual verify = user's job.
+Don't: claim "verified" (you didn't run), Co-Authored-By, root test files, new deps for what a few lines do, off-palette colors, scaffolding-for-later.
 ```

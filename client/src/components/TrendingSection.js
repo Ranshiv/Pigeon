@@ -1,8 +1,9 @@
-//client/src/components/TrendingSection.js
+// client/src/components/TrendingSection.js
 
 import React from 'react';
 import './TrendingSection.css';
-import { FiTrendingUp, FiArrowUpRight, FiClock, FiUser } from 'react-icons/fi';
+import { FiTrendingUp, FiArrowUpRight, FiClock } from 'react-icons/fi';
+import AppSelect from './common/AppSelect/AppSelect';
 
 const TrendingSection = () => {
     // Mock trending APIs data
@@ -49,6 +50,10 @@ const TrendingSection = () => {
         }
     ];
 
+    // Placeholder state for AppSelect
+    const [timeframe, setTimeframe] = React.useState('this-week');
+    const [category, setCategory] = React.useState('all');
+
     return (
         <div className="trending-section">
             <header className="trending-header">
@@ -58,24 +63,36 @@ const TrendingSection = () => {
 
             <div className="trending-filters">
                 <div className="filter-group">
-                    <span className="filter-label">Timeframe:</span>
-                    <select className="filter-select">
-                        <option>This week</option>
-                        <option>This month</option>
-                        <option>This year</option>
-                    </select>
+                    <span className="filter-label">Timeframe</span>
+                    <div className="filter-select">
+                        <AppSelect
+                            value={timeframe}
+                            onChange={setTimeframe}
+                            options={[
+                                { value: 'this-week', label: 'This week' },
+                                { value: 'this-month', label: 'This month' },
+                                { value: 'this-year', label: 'This year' }
+                            ]}
+                        />
+                    </div>
                 </div>
 
                 <div className="filter-group">
-                    <span className="filter-label">Category:</span>
-                    <select className="filter-select">
-                        <option>All Categories</option>
-                        <option>AI</option>
-                        <option>Data</option>
-                        <option>E-commerce</option>
-                        <option>Finance</option>
-                        <option>Productivity</option>
-                    </select>
+                    <span className="filter-label">Category</span>
+                    <div className="filter-select">
+                        <AppSelect
+                            value={category}
+                            onChange={setCategory}
+                            options={[
+                                { value: 'all', label: 'All Categories' },
+                                { value: 'ai', label: 'AI' },
+                                { value: 'data', label: 'Data' },
+                                { value: 'ecommerce', label: 'E-commerce' },
+                                { value: 'finance', label: 'Finance' },
+                                { value: 'productivity', label: 'Productivity' }
+                            ]}
+                        />
+                    </div>
                 </div>
             </div>
 
@@ -92,29 +109,29 @@ const TrendingSection = () => {
                             </div>
                             <p className="trending-description">{api.description}</p>
                             <div className="trending-meta">
-                                <div className="meta-item">
-                                    <FiClock className="meta-icon" />
+                                <div className="trending-meta-item">
+                                    <FiClock className="trending-meta-icon" />
                                     <span>{api.timeframe}</span>
                                 </div>
                                 <div className="meta-category">
-                                    <span>{api.category}</span>
+                                    {api.category}
                                 </div>
                             </div>
                         </div>
                         <div className="trending-actions">
-                            <button className="view-api-btn">View API</button>
-                            <button className="add-to-collection-btn">Add to collection</button>
+                            <button className="view-api-btn" onClick={() => console.log('View', api.id)}>View API</button>
+                            <button className="add-to-collection-btn" onClick={() => console.log('Add', api.id)}>Add to collection</button>
                         </div>
                     </div>
                 ))}
             </div>
 
             <div className="trending-insights">
-                <h3>API Trends Insights</h3>
                 <div className="insights-content">
+                    <h3>API Trends Insights</h3>
                     <p>AI and Machine Learning APIs continue to dominate the growth charts this month, with a 243% increase in usage across the platform.</p>
-                    <button className="view-insights-btn">View Full Report</button>
                 </div>
+                <button className="view-insights-btn">View Full Report</button>
             </div>
         </div>
     );

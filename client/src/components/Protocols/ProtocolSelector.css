@@ -90,8 +90,14 @@
 }
 
 .protocol-card--selected {
-    border-color: var(--primary-color);
-    background: var(--hover-bg);
+    border-color: var(--protocol-color, var(--primary-color));
+    background: color-mix(in srgb, var(--protocol-color, var(--primary-color)) 10%, var(--selector-bg));
+    box-shadow: 0 0 0 1px var(--protocol-color, var(--primary-color)),
+        0 0 14px color-mix(in srgb, var(--protocol-color, var(--primary-color)) 25%, transparent);
+}
+
+.protocol-card--selected .protocol-card__name {
+    color: var(--protocol-color, var(--primary-color));
 }
 
 .protocol-card--selected .protocol-card__indicator {
@@ -115,7 +121,19 @@
 }
 
 .protocol-card__check {
-    display: none;
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    font-size: 0.6rem;
+    font-weight: bold;
+    color: var(--button-text, #fff);
+    background: var(--protocol-color, var(--primary-color));
+    border-radius: 50%;
 }
 
 .protocol-card__content {

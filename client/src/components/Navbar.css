@@ -535,6 +535,11 @@
     margin: 0;
 }
 
+.workspace-selector-dropdown .create-workspace-btn {
+    width: calc(100% - 24px);
+    margin: 10px 12px 0;
+}
+
 .create-workspace-btn:hover {
     background-color: var(--primary-hover);
 }

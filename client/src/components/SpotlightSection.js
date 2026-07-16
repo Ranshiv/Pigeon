@@ -7,28 +7,36 @@ const SpotlightSection = () => {
     // Mock featured APIs for demonstration
     const featuredApis = [
         {
-            id: 'api-1',
-            name: 'GitHub REST API',
-            description: 'Access GitHub data and functionality',
-            category: 'Development',
-            rating: 4.8,
-            usage: 12450
-        },
-        {
-            id: 'api-2',
-            name: 'Weather API',
-            description: 'Get weather forecasts and historical data',
-            category: 'Weather',
-            rating: 4.7,
-            usage: 8920
-        },
-        {
-            id: 'api-3',
-            name: 'Stripe API',
-            description: 'Process payments and manage subscriptions',
+            id: 'feat-1',
+            name: 'Stripe GraphQL API',
+            description: 'Integrate payments, subscriptions, and financial services into your application.',
             category: 'Finance',
             rating: 4.9,
-            usage: 15300
+            usage: '1.2M req/day'
+        },
+        {
+            id: 'feat-2',
+            name: 'Twilio Voice API',
+            description: 'Make, receive, and monitor phone calls from your web or mobile app.',
+            category: 'Communications',
+            rating: 4.7,
+            usage: '850K req/day'
+        },
+        {
+            id: 'feat-3',
+            name: 'GitHub REST API v3',
+            description: 'Interact with GitHub repositories, issues, users, and workflows programmatically.',
+            category: 'Developer Tools',
+            rating: 4.8,
+            usage: '3.4M req/day'
+        },
+        {
+            id: 'feat-4',
+            name: 'SendGrid SMS API',
+            description: 'Deliver transactional and marketing emails at scale with high deliverability.',
+            category: 'Communications',
+            rating: 4.6,
+            usage: '2.1M req/day'
         }
     ];
 
@@ -36,7 +44,7 @@ const SpotlightSection = () => {
         <div className="spotlight-section">
             <header className="spotlight-header">
                 <h2><FiStar className="header-icon" /> API Spotlight</h2>
-                <p>Discover featured and trending APIs recommended for you</p>
+                <p>Discover featured and trending APIs recommended for your workflow</p>
             </header>
 
             <div className="featured-apis">
@@ -53,14 +61,14 @@ const SpotlightSection = () => {
                                 <div className="api-stats">
                                     <div className="api-rating">
                                         <FiStar className="star-icon" />
-                                        <span>{api.rating.toFixed(1)}</span>
+                                        <span>{api.rating}</span>
                                     </div>
                                     <div className="api-usage">
                                         <FiActivity className="usage-icon" />
-                                        <span>{api.usage.toLocaleString()} users</span>
+                                        <span>{api.usage}</span>
                                     </div>
                                 </div>
-                                <button className="view-api-btn">View details</button>
+                                <button className="view-api-btn">View API</button>
                             </div>
                         </div>
                     ))}
@@ -68,11 +76,11 @@ const SpotlightSection = () => {
             </div>
 
             <div className="spotlight-community">
-                <h3>Community Highlights</h3>
                 <div className="community-content">
-                    <p>This section will show community-created collections and API recommendations.</p>
-                    <button className="explore-community-btn">Explore Community</button>
+                    <h3>Community Favorites</h3>
+                    <p>Explore the most starred and collected APIs by the developer community this month.</p>
                 </div>
+                <button className="explore-community-btn">Explore Community</button>
             </div>
         </div>
     );

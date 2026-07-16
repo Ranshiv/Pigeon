@@ -8,7 +8,7 @@ import RequestForm from './RequestForm';
 import ResponseDisplay from './ResponseDisplay';
 import WorkspaceDetail from './WorkspaceDetail';
 import CollectionsManagement from './CollectionsManagement';
-import { FiGrid, FiPlus, FiUsers, FiGlobe, FiLock, FiStar } from 'react-icons/fi';
+import { FiGrid, FiPlus, FiUsers, FiGlobe, FiLock, FiStar, FiX } from 'react-icons/fi';
 import './WorkspacesSection.css';
 
 const WorkspacesSection = ({ requests, response, onSend, onCreate, onUpdate, onDelete }) => {
@@ -369,9 +369,14 @@ const WorkspacesSection = ({ requests, response, onSend, onCreate, onUpdate, onD
                             {/* Create Workspace Modal */}
                             {showCreateModal && (
                                 <div className="modal-overlay">
-                                    <div className="modal-content workspace-modal">
-                                        <h2>Create New Workspace</h2>
-                                        <form onSubmit={handleCreateWorkspace}>
+                                    <div className="create-workspace-modal">
+                                        <div className="modal-header">
+                                            <h2>Create New Workspace</h2>
+                                            <button className="close-btn" onClick={() => setShowCreateModal(false)}>
+                                                <FiX size={20} />
+                                            </button>
+                                        </div>
+                                        <form className="create-workspace-form" onSubmit={handleCreateWorkspace}>
                                             <div className="form-group">
                                                 <label htmlFor="workspaceName">Name</label>
                                                 <input

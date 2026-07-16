@@ -1,40 +1,42 @@
-/* client/src/components/Protocols/WebSocketTester.css */
-
-/* ============================================
-   WebSocket Tester Container
-   ============================================ */
+/* client/src/components/Protocols/WebSocketTester.css - MQTT-style observability layout */
 
 .websocket-tester {
     --ws-bg: var(--tester-surface, var(--card-bg));
     --ws-border: var(--tester-hairline);
     --ws-text: var(--text-color);
     --ws-text-muted: var(--text-secondary);
-    --ws-primary: var(--primary-color);
-    --ws-success: var(--success-color, #22C55E);
-    --ws-error: var(--danger-color, #EF4444);
-    --ws-warning: var(--warning-color, #F59E0B);
-    --ws-sent-bg: color-mix(in srgb, var(--tester-accent) 8%, var(--tester-inset));
-    --ws-received-bg: color-mix(in srgb, var(--success-color) 8%, var(--tester-inset));
+    --ws-primary: var(--tester-accent, var(--primary-color));
+    --ws-success: var(--success-color, #28a745);
+    --ws-error: var(--danger-color, #dc3545);
+    --ws-sent-bg: color-mix(in srgb, var(--ws-primary) 8%, var(--tester-inset));
+    --ws-received-bg: color-mix(in srgb, var(--ws-success) 8%, var(--tester-inset));
     --ws-system-bg: var(--tester-inset);
-    --ws-error-bg: color-mix(in srgb, var(--danger-color) 8%, var(--tester-inset));
-    --tester-accent: var(--primary-color);
+    --ws-error-bg: color-mix(in srgb, var(--ws-error) 8%, var(--tester-inset));
 
     display: flex;
     flex-direction: column;
+    gap: 16px;
     height: 100%;
-    background: var(--ws-bg);
-    overflow: hidden;
-    border: 1px solid var(--ws-border);
-    border-radius: var(--tester-radius);
-    box-shadow: 0 6px 24px color-mix(in srgb, var(--ws-primary) 6%, transparent);
+    padding: clamp(16px, 2vw, 24px);
+    background: var(--tester-inset);
     animation: tsRise 0.42s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
-/* Section eyebrow (shared header style) */
-.ws-eyebrow {
-    display: inline-flex;
+.ws-panel {
+    padding: 18px;
+    background: var(--ws-bg);
+    border: 1px solid var(--ws-border);
+    border-radius: var(--tester-radius);
+    box-shadow: 0 6px 24px color-mix(in srgb, var(--ws-primary) 6%, transparent);
+}
+
+.ws-panel-title {
+    display: flex;
     align-items: center;
     gap: 8px;
+    margin: 0 0 14px 0;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--tester-hairline);
     font-family: var(--tester-mono);
     font-size: 0.72rem;
     font-weight: 600;
@@ -43,33 +45,35 @@
     color: var(--text-secondary);
 }
 
-.ws-eyebrow svg {
+.ws-panel-title svg {
     color: var(--ws-primary);
+    flex-shrink: 0;
 }
 
-.ws-panel-head {
+/* Connection panel */
+.ws-connection-panel {
+    flex-shrink: 0;
+}
+
+.ws-connection-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 12px;
-    margin-bottom: 12px;
-    padding-bottom: 10px;
-    border-bottom: 1px solid var(--tester-hairline);
 }
 
-/* ============================================
-   Connection Panel
-   ============================================ */
-
-.ws-connection-panel {
-    padding: 16px;
-    background: var(--ws-bg);
-    border-bottom: 1px solid var(--ws-border);
+.ws-connection-header .ws-panel-title {
+    flex: 1;
 }
 
-.ws-url-input-group {
+.ws-connection-header .ts-status {
+    margin-bottom: 14px;
+}
+
+.ws-url-group {
     display: flex;
     align-items: stretch;
+    margin-bottom: 14px;
     border: 1px solid var(--ws-border);
     border-radius: var(--tester-radius-sm);
     background: var(--tester-inset);
@@ -78,7 +82,7 @@
                 box-shadow var(--dur-fast, 120ms) var(--ease-out, ease);
 }
 
-.ws-url-input-group:focus-within {
+.ws-url-group:focus-within {
     border-color: var(--ws-primary);
     box-shadow: 0 0 0 3px color-mix(in srgb, var(--ws-primary) 12%, transparent);
 }
@@ -86,44 +90,42 @@
 .ws-protocol-badge {
     display: flex;
     align-items: center;
+    border-radius: 0;
     padding: 0 16px;
     background: color-mix(in srgb, var(--ws-primary) 12%, var(--tester-inset));
     color: var(--ws-primary);
     border-right: 1px solid var(--ws-border);
-    border-radius: 0;
     font-family: var(--tester-mono);
     font-weight: 700;
     font-size: 0.78rem;
     letter-spacing: 0.08em;
-    white-space: nowrap;
 }
 
-/* extra specificity beats the global input[type="text"] rule in index.css */
-.ws-url-input-group input.ws-url-input {
+.ws-url-group input.ws-url-input {
     flex: 1;
     width: auto;
     min-width: 0;
     padding: 11px 14px;
     border: none;
     border-radius: 0;
-    box-shadow: none;
     font-size: 0.9rem;
     font-family: var(--tester-mono);
     background: transparent;
     color: var(--ws-text);
-    transition: none;
+    box-shadow: none;
 }
 
-.ws-url-input-group input.ws-url-input:hover,
-.ws-url-input-group input.ws-url-input:focus {
-    outline: none;
+.ws-url-group input.ws-url-input:hover,
+.ws-url-group input.ws-url-input:focus {
     border: none;
+    outline: none;
     box-shadow: none;
     background: transparent;
 }
 
-.ws-url-input:disabled {
+.ws-url-input::placeholder {
     color: var(--ws-text-muted);
+    opacity: 0.7;
 }
 
 .ws-btn {
@@ -140,7 +142,6 @@
     font-size: 0.82rem;
     cursor: pointer;
     transition: all var(--dur-fast, 120ms) var(--ease-out, ease);
-    white-space: nowrap;
 }
 
 .ws-btn:focus-visible {
@@ -153,9 +154,9 @@
     cursor: not-allowed;
 }
 
-.ws-url-input-group .ws-btn-connect,
-.ws-url-input-group .ws-btn-disconnect,
-.ws-url-input-group .ws-btn-settings {
+.ws-btn-connect,
+.ws-btn-disconnect,
+.ws-url-group .ws-btn-settings {
     border: none;
     border-left: 1px solid var(--ws-border);
     border-radius: 0;
@@ -194,206 +195,235 @@
     background: color-mix(in srgb, var(--ws-primary) 8%, transparent);
 }
 
-/* KPI strip — 4 tiles in 1 row when wide, 2+2 when narrow */
-.ws-metrics-strip {
-    display: flex;
-    flex-wrap: nowrap;
-    gap: 10px;
-    align-items: center;
-    margin-top: 12px;
-}
-
-@media (max-width: 1100px) {
-    .ws-metrics-strip {
-        flex-wrap: wrap;
-    }
-}
-
-.ws-metrics-strip .ts-kpi {
-    flex: 0 0 auto;
-    width: 100%;
-    max-width: 180px;
-    min-width: 130px;
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: 10px;
-    padding: 9px 14px;
-}
-
-.ws-metrics-strip .ts-kpi::before {
-    height: 2px;
-}
-
-.ws-metrics-strip .ts-kpi-label {
-    margin-bottom: 0;
-}
-
-.ws-metrics-strip .ts-kpi-value {
-    font-size: 1.05rem;
-}
-
-/* Settings group — visually separated from the KPIs */
-.ws-metrics-strip .ws-settings-group {
-    display: flex;
-    flex-wrap: nowrap;
-    gap: 10px;
-    align-items: center;
-    margin-left: 16px;
-    padding: 10px 14px;
+/* Settings */
+.ws-settings {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+    margin-bottom: 14px;
+    padding: 14px;
     background: var(--tester-inset);
     border: 1px solid var(--tester-hairline);
     border-radius: var(--tester-radius-sm);
+    animation: tsFadeIn 0.2s ease both;
 }
 
-@media (max-width: 1100px) {
-    .ws-metrics-strip .ws-settings-group {
-        flex-wrap: wrap;
-        margin-left: 0;
-        flex: 1 1 100%;
-    }
-}
-
-.ws-metrics-strip .ws-setting {
-    flex: 0 0 auto;
+.ws-setting {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 6px;
 }
 
-.ws-metrics-strip .ws-setting-subprotocol {
-    flex: 1 1 260px;
-    min-width: 260px;
-    max-width: 420px;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 10px;
-}
-
-.ws-metrics-strip .ws-setting-subprotocol label {
-    flex: 0 0 auto;
-    font-size: 0.64rem;
+.ws-setting label {
+    font-size: 0.68rem;
+    color: var(--text-secondary);
     font-family: var(--tester-mono);
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.1em;
-    color: var(--text-secondary);
 }
 
-.ws-metrics-strip .ws-setting-subprotocol input {
-    flex: 1 1 auto;
-    min-width: 0;
-    padding: 9px 12px;
-    border: 1px solid var(--tester-hairline);
+.ws-setting input[type="text"] {
+    padding: 9px 11px;
+    border: 1px solid var(--ws-border);
     border-radius: var(--tester-radius-btn);
     font-size: 0.85rem;
-    font-family: var(--tester-mono);
     background: var(--tester-surface);
     color: var(--ws-text);
+    font-family: var(--tester-mono);
     transition: border-color var(--dur-fast, 120ms) var(--ease-out, ease),
                 box-shadow var(--dur-fast, 120ms) var(--ease-out, ease);
 }
 
-.ws-metrics-strip .ws-setting-subprotocol input:focus {
+.ws-setting input[type="text"]:focus {
     outline: none;
     border-color: var(--ws-primary);
     box-shadow: 0 0 0 2px color-mix(in srgb, var(--ws-primary) 15%, transparent);
 }
 
-.ws-metrics-strip .ws-setting-toggle label {
+.ws-setting-row {
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    padding: 6px 10px;
-    border: 1px solid var(--tester-hairline);
-    border-radius: 999px;
-    font-size: 0.76rem;
-    font-weight: 600;
+    font-size: 0.85rem;
     color: var(--ws-text);
-    white-space: nowrap;
     cursor: pointer;
-    background: var(--tester-surface);
-    transition: all var(--dur-fast, 120ms) var(--ease-out, ease);
 }
 
-.ws-metrics-strip .ws-setting-toggle label:hover {
-    border-color: color-mix(in srgb, var(--ws-primary) 45%, var(--tester-hairline));
-}
-
-.ws-metrics-strip .ws-setting-toggle input {
+.ws-setting-row input[type="checkbox"] {
     accent-color: var(--ws-primary);
+    margin: 0;
+    cursor: pointer;
 }
 
-.ws-metrics-strip .ws-setting-toggle:has(input:checked) label {
-    background: color-mix(in srgb, var(--ws-primary) 10%, var(--tester-surface));
-    border-color: color-mix(in srgb, var(--ws-primary) 40%, var(--tester-hairline));
-    color: var(--ws-primary);
+/* KPI strip */
+.ws-kpi-strip {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 12px;
 }
 
-
-/* ============================================
-   Error Display
-   ============================================ */
-
+/* Error */
 .ws-error {
     display: flex;
+    justify-content: space-between;
     align-items: center;
-    gap: 8px;
-    margin-top: 12px;
-    padding: 10px 14px;
+    margin-top: 14px;
+    padding: 12px 16px;
     background: var(--ws-error-bg);
-    border-radius: var(--tester-radius-sm);
     border: 1px solid color-mix(in srgb, var(--ws-error) 30%, transparent);
-}
-
-.ws-error-icon {
-    font-size: 1rem;
+    border-radius: var(--tester-radius-sm);
+    color: var(--ws-error);
+    font-size: 0.88rem;
+    animation: tsSlideUp 0.24s var(--ease-out, ease) both;
 }
 
 .ws-error-text {
-    flex: 1;
-    font-size: 0.85rem;
-    color: var(--ws-error);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
 }
 
-.ws-error-close {
-    padding: 4px 8px;
+.ws-error button {
     background: transparent;
     border: none;
-    cursor: pointer;
     font-size: 1.2rem;
+    line-height: 1;
+    cursor: pointer;
     color: var(--ws-error);
-    opacity: 0.7;
 }
 
-.ws-error-close:hover {
-    opacity: 1;
+/* Main layout */
+.ws-main-content {
+    flex: 1;
+    display: flex;
+    gap: 16px;
+    min-height: 0;
 }
 
-/* ============================================
-   Messages Panel
-   ============================================ */
+.ws-left-column {
+    width: 38%;
+    min-width: 280px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
 
+.ws-right-column {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Send panel */
+.ws-send-panel {
+    flex-shrink: 0;
+}
+
+.ws-type-selector {
+    display: inline-flex;
+    gap: 2px;
+    padding: 3px;
+    margin-bottom: 12px;
+    background: var(--tester-inset);
+    border: 1px solid var(--tester-hairline);
+    border-radius: 999px;
+}
+
+.ws-type-btn {
+    padding: 5px 16px;
+    background: transparent;
+    border: none;
+    border-radius: 999px;
+    font-size: 0.76rem;
+    font-weight: 600;
+    color: var(--ws-text-muted);
+    cursor: pointer;
+    transition: all var(--dur-fast, 120ms) var(--ease-out, ease);
+}
+
+.ws-type-btn:hover {
+    color: var(--ws-text);
+}
+
+.ws-type-btn.active {
+    background: var(--ws-primary);
+    color: var(--button-text, #fff);
+}
+
+.ws-send-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.ws-message-input {
+    width: 100%;
+    min-height: 120px;
+    padding: 12px;
+    border: 1px solid var(--ws-border);
+    border-radius: var(--tester-radius-btn);
+    font-family: var(--tester-mono);
+    font-size: 0.85rem;
+    line-height: 1.5;
+    resize: vertical;
+    background: var(--tester-inset);
+    color: var(--ws-text);
+    transition: border-color var(--dur-fast, 120ms) var(--ease-out, ease),
+                box-shadow var(--dur-fast, 120ms) var(--ease-out, ease);
+}
+
+.ws-message-input:focus {
+    outline: none;
+    border-color: var(--ws-primary);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--ws-primary) 15%, transparent);
+}
+
+.ws-message-input:disabled {
+    background: var(--ws-system-bg);
+    color: var(--ws-text-muted);
+}
+
+.ws-btn-send {
+    align-self: flex-start;
+    background: var(--ws-primary);
+    color: var(--button-text, #fff);
+    border-color: var(--ws-primary);
+}
+
+.ws-btn-send:hover:not(:disabled) {
+    filter: brightness(1.12);
+}
+
+.ws-input-hint {
+    font-size: 0.72rem;
+    color: var(--ws-text-muted);
+    font-family: var(--tester-mono);
+}
+
+/* Messages panel */
 .ws-messages-panel {
     flex: 1;
     display: flex;
     flex-direction: column;
     min-height: 0;
-    overflow: hidden;
 }
 
 .ws-messages-header {
     display: flex;
-    justify-content: space-between;
     align-items: center;
     gap: 12px;
-    padding: 14px 16px;
-    background: var(--ws-bg);
-    border-bottom: 1px solid var(--ws-border);
+    margin-bottom: 12px;
 }
 
-.ws-messages-filter {
+.ws-messages-header .ws-panel-title {
+    margin: 0;
+    padding: 0;
+    border: none;
+}
+
+.ws-message-filters {
     display: inline-flex;
     gap: 2px;
     padding: 3px;
@@ -435,10 +465,8 @@
 }
 
 .ws-btn-clear {
+    margin-left: auto;
     padding: 6px 12px;
-    background: var(--tester-inset);
-    border: 1px solid var(--tester-hairline);
-    border-radius: var(--tester-radius-btn);
     font-size: 0.76rem;
 }
 
@@ -448,20 +476,16 @@
     color: var(--ws-error);
 }
 
-/* ============================================
-   Messages List
-   ============================================ */
-
 .ws-messages-list {
     flex: 1;
     overflow-y: auto;
-    padding: 16px;
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 8px;
 }
 
-.ws-messages-empty {
+/* Empty */
+.ws-empty {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -479,64 +503,54 @@
     border-radius: 50%;
     background: color-mix(in srgb, var(--ws-primary) 8%, var(--tester-inset));
     color: var(--ws-primary);
-    opacity: 0.85;
-}
-
-.ws-messages-empty p {
-    margin: 4px 0;
+    opacity: 0.8;
 }
 
 .ws-empty-title {
+    margin: 0 0 4px;
     font-weight: 600;
     color: var(--ws-text);
 }
 
 .ws-empty-hint {
-    font-size: 0.85rem;
-    opacity: 0.75;
+    margin: 0;
+    font-size: 0.82rem;
+    opacity: 0.8;
 }
 
-/* ============================================
-   Message Item
-   ============================================ */
-
+/* Message rows */
 .ws-message {
     padding: 12px;
     border-radius: var(--tester-radius-sm);
-    border: 1px solid transparent;
+    border: 1px solid var(--ws-border);
+    background: var(--tester-inset);
     animation: tsSlideUp 0.24s var(--ease-out, ease) both;
 }
 
 .ws-message-sent {
-    background: var(--ws-sent-bg);
-    border-color: color-mix(in srgb, var(--tester-accent) 25%, var(--tester-hairline));
-    margin-left: 20px;
+    border-left: 3px solid var(--ws-primary);
 }
 
 .ws-message-received {
-    background: var(--ws-received-bg);
-    border-color: color-mix(in srgb, var(--success-color) 25%, var(--tester-hairline));
-    margin-right: 20px;
+    border-left: 3px solid var(--ws-success);
 }
 
 .ws-message-system {
-    background: var(--ws-system-bg);
-    border-color: var(--ws-border);
-    text-align: center;
+    border-left: 3px solid var(--tester-hairline);
     font-style: italic;
 }
 
 .ws-message-error {
-    background: var(--ws-error-bg);
-    border-color: color-mix(in srgb, var(--ws-error) 30%, transparent);
+    border-left: 3px solid var(--ws-error);
 }
 
 .ws-message-header {
     display: flex;
     align-items: center;
-    gap: 12px;
+    flex-wrap: wrap;
+    gap: 8px;
     margin-bottom: 8px;
-    font-size: 0.75rem;
+    font-size: 0.74rem;
 }
 
 .ws-message-direction {
@@ -547,162 +561,69 @@
     font-family: var(--tester-mono);
     text-transform: uppercase;
     letter-spacing: 0.04em;
-    font-size: 0.68rem;
+    font-size: 0.66rem;
 }
 
 .ws-direction-sent {
-    color: var(--ws-primary, var(--tester-accent));
+    padding: 2px 8px;
+    border-radius: var(--tester-radius-btn);
+    background: color-mix(in srgb, var(--ws-primary) 12%, var(--tester-inset));
+    color: var(--ws-primary);
+    border: 1px solid color-mix(in srgb, var(--ws-primary) 25%, var(--tester-hairline));
 }
 
 .ws-direction-received {
-    color: var(--ws-success, var(--success-color));
+    padding: 2px 8px;
+    border-radius: var(--tester-radius-btn);
+    background: color-mix(in srgb, var(--ws-success) 12%, var(--tester-inset));
+    color: var(--ws-success);
+    border: 1px solid color-mix(in srgb, var(--ws-success) 25%, var(--tester-hairline));
 }
 
 .ws-direction-system {
+    padding: 2px 8px;
+    border-radius: var(--tester-radius-btn);
+    background: var(--tester-inset);
     color: var(--ws-text-muted);
+    border: 1px solid var(--tester-hairline);
 }
 
 .ws-direction-error {
+    padding: 2px 8px;
+    border-radius: var(--tester-radius-btn);
+    background: color-mix(in srgb, var(--ws-error) 12%, var(--tester-inset));
     color: var(--ws-error);
+    border: 1px solid color-mix(in srgb, var(--ws-error) 25%, var(--tester-hairline));
 }
 
 .ws-message-time {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
     color: var(--ws-text-muted);
     font-family: var(--tester-mono);
     font-variant-numeric: tabular-nums;
 }
 
 .ws-message-size {
-    color: var(--ws-text-muted);
     margin-left: auto;
+    color: var(--ws-text-muted);
+    font-family: var(--tester-mono);
+    font-size: 0.72rem;
 }
 
 .ws-message-content {
-    font-family: var(--tester-mono);
-    font-size: 0.85rem;
-    line-height: 1.5;
-    overflow-x: auto;
-    color: var(--ws-text);
-}
-
-.ws-message-content pre {
     margin: 0;
-    white-space: pre-wrap;
-    word-break: break-word;
-}
-
-/* ============================================
-   Input Panel
-   ============================================ */
-
-.ws-input-panel {
-    padding: 16px;
-    background: var(--ws-bg);
-    border-top: 1px solid var(--ws-border);
-}
-
-.ws-input-panel::before {
-    content: 'SEND MESSAGE';
-    display: block;
-    font-family: var(--tester-mono);
-    font-size: 0.72rem;
-    font-weight: 600;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--text-secondary);
-    margin-bottom: 12px;
-    padding-bottom: 8px;
-    border-bottom: 1px solid var(--tester-hairline);
-}
-
-.ws-input-type-selector {
-    display: inline-flex;
-    gap: 2px;
-    padding: 3px;
-    margin-bottom: 10px;
-    background: var(--tester-inset);
-    border: 1px solid var(--tester-hairline);
-    border-radius: 999px;
-}
-
-.ws-type-btn {
-    padding: 5px 16px;
-    background: transparent;
-    border: none;
-    border-radius: 999px;
-    font-size: 0.76rem;
-    font-weight: 600;
-    color: var(--ws-text-muted);
-    cursor: pointer;
-    transition: all var(--dur-fast, 120ms) var(--ease-out, ease);
-}
-
-.ws-type-btn:hover {
-    color: var(--ws-text);
-}
-
-.ws-type-btn.active {
-    background: var(--ws-primary);
-    color: var(--button-text, #fff);
-}
-
-.ws-input-area {
-    display: flex;
-    gap: 8px;
-}
-
-.ws-message-input {
-    flex: 1;
-    padding: 12px;
+    padding: 10px;
+    background: var(--tester-surface);
     border: 1px solid var(--tester-hairline);
     border-radius: var(--tester-radius-btn);
     font-family: var(--tester-mono);
-    background: var(--tester-inset);
+    font-size: 0.8rem;
+    overflow-x: auto;
+    white-space: pre-wrap;
+    word-break: break-word;
     color: var(--ws-text);
-    font-size: 0.9rem;
-    resize: none;
-    min-height: 60px;
-    max-height: 150px;
-    transition: border-color 0.2s ease;
 }
 
-.ws-message-input:focus {
-    outline: none;
-    border-color: var(--ws-primary);
-    box-shadow: 0 0 0 2px color-mix(in srgb, var(--ws-primary) 15%, transparent);
-}
-
-.ws-message-input:disabled {
-    background: var(--ws-system-bg);
-    color: var(--ws-text-muted);
-}
-
-.ws-btn-send {
-    padding: 12px 24px;
-    background: var(--ws-primary);
-    color: var(--button-text, #fff);
-    align-self: flex-end;
-    border-color: var(--ws-primary);
-}
-
-.ws-btn-send:hover:not(:disabled) {
-    filter: brightness(1.1);
-}
-
-.ws-input-hint {
-    margin-top: 6px;
-    font-size: 0.72rem;
-    color: var(--ws-text-muted);
-    font-family: var(--tester-mono);
-}
-
-/* ============================================
-   Scrollbar Styling
-   ============================================ */
-
+/* Scrollbar */
 .ws-messages-list::-webkit-scrollbar {
     width: 8px;
 }
@@ -721,24 +642,34 @@
     background: var(--ws-text-muted);
 }
 
-/* ============================================
-   Responsive Adjustments
-   ============================================ */
-
+/* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
     .websocket-tester,
     .ws-message,
-    .ws-settings-panel {
+    .ws-error,
+    .ws-settings {
         animation: none;
     }
 }
 
-@media (max-width: 768px) {
-    .ws-url-input-group {
+/* Responsive */
+@media (max-width: 900px) {
+    .ws-main-content {
+        flex-direction: column;
+    }
+
+    .ws-left-column {
+        width: 100%;
+        min-width: 0;
+    }
+}
+
+@media (max-width: 600px) {
+    .ws-url-group {
         flex-wrap: wrap;
     }
 
-    .ws-url-input-group input.ws-url-input {
+    .ws-url-group input.ws-url-input {
         order: -1;
         width: 100%;
         border-bottom: 1px solid var(--ws-border);
@@ -749,18 +680,13 @@
         flex: 1;
     }
 
-    .ws-settings-panel {
-        grid-template-columns: 1fr;
-    }
-
     .ws-messages-header {
         flex-direction: column;
-        gap: 8px;
+        align-items: flex-start;
     }
 
-    .ws-message-sent,
-    .ws-message-received {
+    .ws-message-filters,
+    .ws-btn-clear {
         margin-left: 0;
-        margin-right: 0;
     }
 }

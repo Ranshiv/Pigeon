@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useTheme } from '../context/ThemeContext';
 import { useFont, fontSizeOptions } from '../context/FontContext';
+import AppSelect from './common/AppSelect/AppSelect';
 import './SettingsPage.css';
 
 // Define available icons (matches filenames in public/assets/icons)
@@ -214,17 +215,13 @@ const SettingsPage = () => {
                 {/* Font Size Selection */}
                 <div className="form-group">
                     <label htmlFor="fontSizeSelect">Font Size:</label>
-                    <select
+                    <AppSelect
                         id="fontSizeSelect"
                         value={selectedFontSize}
                         onChange={handleFontSizeChange}
-                    >
-                        {Object.entries(fontSizeOptions).map(([label, value]) => (
-                            <option key={value} value={value}>
-                                {label} ({value})
-                            </option>
-                        ))}
-                    </select>
+                        options={Object.entries(fontSizeOptions).map(([label, value]) => ({ label: `${label} (${value})`, value }))}
+                        className="settings-font-select"
+                    />
                 </div>
             </section>
 

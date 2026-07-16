@@ -1,35 +1,37 @@
-/* client/src/components/Protocols/GrpcTester.css */
+/* client/src/components/Protocols/GrpcTester.css - MQTT-style observability layout */
 
 .grpc-tester {
     --grpc-bg: var(--tester-surface, var(--card-bg));
     --grpc-border: var(--tester-hairline);
     --grpc-text: var(--text-color);
     --grpc-text-muted: var(--text-secondary);
-    --grpc-primary: var(--primary-color);
-    --grpc-success: var(--success-color, #22C55E);
-    --grpc-error: var(--danger-color, #EF4444);
-    --tester-accent: var(--primary-color);
+    --grpc-primary: var(--tester-accent, var(--primary-color));
+    --grpc-success: var(--success-color, #28a745);
+    --grpc-error: var(--danger-color, #dc3545);
 
     display: flex;
     flex-direction: column;
     gap: 16px;
-    padding: 16px;
-    background: var(--grpc-bg);
-    border-radius: var(--tester-radius);
-    border: 1px solid var(--grpc-border);
+    height: 100%;
+    padding: clamp(16px, 2vw, 24px);
+    background: var(--tester-inset);
     animation: tsRise 0.42s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
-.grpc-section {
-    padding: 16px;
+.grpc-panel {
+    padding: 18px;
     background: var(--grpc-bg);
     border: 1px solid var(--grpc-border);
-    border-radius: var(--tester-radius-sm);
+    border-radius: var(--tester-radius);
+    box-shadow: 0 6px 24px color-mix(in srgb, var(--grpc-primary) 6%, transparent);
 }
 
-.grpc-section-title {
-    margin: 0 0 12px 0;
-    padding-bottom: 8px;
+.grpc-panel-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 14px 0;
+    padding-bottom: 10px;
     border-bottom: 1px solid var(--tester-hairline);
     font-family: var(--tester-mono);
     font-size: 0.72rem;
@@ -39,16 +41,66 @@
     color: var(--text-secondary);
 }
 
-/* Proto Section */
+.grpc-panel-title svg {
+    color: var(--grpc-primary);
+    flex-shrink: 0;
+}
+
+/* Error */
+.grpc-error {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    background: color-mix(in srgb, var(--grpc-error) 8%, var(--tester-inset));
+    border: 1px solid color-mix(in srgb, var(--grpc-error) 30%, transparent);
+    border-radius: var(--tester-radius-sm);
+    color: var(--grpc-error);
+    font-size: 0.88rem;
+    animation: tsSlideUp 0.24s var(--ease-out, ease) both;
+}
+
+.grpc-error-text {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.grpc-error button {
+    background: transparent;
+    border: none;
+    font-size: 1.2rem;
+    line-height: 1;
+    cursor: pointer;
+    color: var(--grpc-error);
+}
+
+/* Proto + Connection top panel */
+.grpc-config-panel {
+    flex-shrink: 0;
+}
+
+.grpc-config-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+.grpc-config-col {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
 .grpc-proto-upload {
     display: flex;
     align-items: center;
-    gap: 12px;
-    margin-bottom: 12px;
+    gap: 10px;
+    flex-wrap: wrap;
 }
 
 .grpc-proto-filename {
-    font-size: 0.85rem;
+    font-size: 0.78rem;
     color: var(--grpc-text-muted);
     padding: 4px 10px;
     background: var(--tester-inset);
@@ -61,12 +113,15 @@
     min-height: 120px;
     padding: 12px;
     font-family: var(--tester-mono);
-    font-size: 0.85rem;
+    font-size: 0.83rem;
+    line-height: 1.5;
     border: 1px solid var(--grpc-border);
     border-radius: var(--tester-radius-btn);
     resize: vertical;
     background: var(--tester-inset);
     color: var(--grpc-text);
+    transition: border-color var(--dur-fast, 120ms) var(--ease-out, ease),
+                box-shadow var(--dur-fast, 120ms) var(--ease-out, ease);
 }
 
 .grpc-proto-editor:focus {
@@ -75,126 +130,233 @@
     box-shadow: 0 0 0 2px color-mix(in srgb, var(--grpc-primary) 15%, transparent);
 }
 
-/* Connection Section */
 .grpc-url-group {
     display: flex;
-    gap: 8px;
+    align-items: stretch;
     margin-bottom: 12px;
+    border: 1px solid var(--grpc-border);
+    border-radius: var(--tester-radius-sm);
+    background: var(--tester-inset);
+    overflow: hidden;
+    transition: border-color var(--dur-fast, 120ms) var(--ease-out, ease),
+                box-shadow var(--dur-fast, 120ms) var(--ease-out, ease);
+}
+
+.grpc-url-group:focus-within {
+    border-color: var(--grpc-primary);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--grpc-primary) 12%, transparent);
 }
 
 .grpc-protocol-badge {
-    padding: 10px 16px;
-    background: linear-gradient(135deg, var(--grpc-primary), color-mix(in srgb, var(--grpc-primary) 70%, var(--background-color)));
-    color: var(--button-text, #fff);
-    font-weight: 600;
-    font-size: 0.85rem;
-    border-radius: var(--tester-radius-btn) 0 0 var(--tester-radius-btn);
+    display: flex;
+    align-items: center;
+    border-radius: 0;
+    padding: 0 16px;
+    background: color-mix(in srgb, var(--grpc-primary) 12%, var(--tester-inset));
+    color: var(--grpc-primary);
+    border-right: 1px solid var(--grpc-border);
+    font-family: var(--tester-mono);
+    font-weight: 700;
+    font-size: 0.78rem;
+    letter-spacing: 0.08em;
 }
 
-.grpc-url-input {
+.grpc-url-group input.grpc-url-input {
     flex: 1;
-    padding: 10px 14px;
-    border: 1px solid var(--grpc-border);
+    width: auto;
+    min-width: 0;
+    padding: 11px 14px;
+    border: none;
     border-radius: 0;
-    font-size: 0.95rem;
+    font-size: 0.9rem;
     font-family: var(--tester-mono);
+    background: transparent;
+    color: var(--grpc-text);
+    box-shadow: none;
+}
+
+.grpc-url-group input.grpc-url-input:hover,
+.grpc-url-group input.grpc-url-input:focus {
+    border: none;
+    outline: none;
+    box-shadow: none;
+    background: transparent;
+}
+
+.grpc-url-input::placeholder {
+    color: var(--grpc-text-muted);
+    opacity: 0.7;
+}
+
+.grpc-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 10px 18px;
+    border: 1px solid var(--tester-hairline);
+    border-radius: var(--tester-radius-btn);
     background: var(--tester-inset);
     color: var(--grpc-text);
+    font-weight: 600;
+    font-size: 0.82rem;
+    cursor: pointer;
+    transition: all var(--dur-fast, 120ms) var(--ease-out, ease);
 }
 
-.grpc-url-input:focus {
+.grpc-btn:focus-visible {
     outline: none;
-    border-color: var(--grpc-primary);
-    box-shadow: 0 0 0 2px color-mix(in srgb, var(--grpc-primary) 15%, transparent);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--grpc-primary) 25%, transparent);
 }
 
-.grpc-service-method-selector {
-    display: flex;
-    gap: 16px;
+.grpc-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.grpc-btn-connect,
+.grpc-btn-disconnect {
+    border: none;
+    border-left: 1px solid var(--grpc-border);
+    border-radius: 0;
+    align-self: stretch;
+    min-width: 116px;
+}
+
+.grpc-btn-connect {
+    background: var(--grpc-primary);
+    color: var(--button-text, #fff);
+}
+
+.grpc-btn-connect:hover:not(:disabled) {
+    filter: brightness(1.12);
+}
+
+.grpc-btn-disconnect {
+    background: transparent;
+    color: var(--grpc-error);
+}
+
+.grpc-btn-disconnect:hover {
+    background: color-mix(in srgb, var(--grpc-error) 10%, transparent);
+}
+
+.grpc-btn-primary {
+    background: var(--grpc-primary);
+    color: var(--button-text, #fff);
+    border-color: var(--grpc-primary);
+}
+
+.grpc-btn-primary:hover:not(:disabled) {
+    filter: brightness(1.12);
+}
+
+.grpc-btn-small {
+    padding: 6px 12px;
+    font-size: 0.76rem;
+}
+
+/* Service / Method selects */
+.grpc-select-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
     margin-bottom: 12px;
 }
 
 .grpc-select-group {
-    flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 6px;
 }
 
 .grpc-select-group label {
-    font-size: 0.72rem;
+    font-size: 0.68rem;
     color: var(--text-secondary);
     font-family: var(--tester-mono);
+    font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.1em;
 }
 
-.grpc-select-group select {
+.grpc-select-group .app-select {
     width: 100%;
 }
 
-.grpc-status {
+.grpc-select-group .app-select-trigger {
+    background: var(--tester-surface);
+    border-color: var(--grpc-border);
+    font-size: 0.85rem;
+}
+
+.grpc-method-type {
+    font-size: 0.75rem;
+    color: var(--grpc-text-muted);
+    font-family: var(--tester-mono);
+}
+
+/* KPI strip */
+.grpc-kpi-strip {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 12px;
+}
+
+/* Main layout */
+.grpc-main-content {
+    flex: 1;
     display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 6px 12px;
-    border-radius: 999px;
-    font-size: 0.7rem;
-    font-family: var(--tester-mono);
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
+    gap: 16px;
+    min-height: 0;
 }
 
-.grpc-status-connected {
-    background: color-mix(in srgb, var(--grpc-success) 8%, var(--tester-inset));
-    color: var(--grpc-success);
-    border: 1px solid color-mix(in srgb, var(--grpc-success) 35%, var(--tester-hairline));
+.grpc-left-column {
+    width: 42%;
+    min-width: 300px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
 }
 
-.grpc-status-disconnected {
-    background: var(--tester-inset);
-    color: var(--grpc-text-muted);
-    border: 1px solid var(--tester-hairline);
+.grpc-right-column {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
 }
 
-.grpc-status-dot {
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    background: currentColor;
+/* Request panel */
+.grpc-request-panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
 }
 
-.grpc-status-connected .grpc-status-dot {
-    animation: livePulse 1.5s ease-in-out infinite;
-}
-
-.grpc-stats {
-    color: var(--grpc-text-muted);
-    font-size: 0.78rem;
-    font-family: var(--tester-mono);
-}
-
-/* Request Section */
 .grpc-metadata {
-    margin-bottom: 12px;
+    margin-bottom: 14px;
 }
 
 .grpc-metadata-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 8px;
-    font-size: 0.72rem;
+    margin-bottom: 10px;
+}
+
+.grpc-metadata-header span {
+    font-size: 0.68rem;
     color: var(--text-secondary);
     font-family: var(--tester-mono);
+    font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.1em;
 }
 
 .grpc-metadata-row {
     display: flex;
     gap: 8px;
-    margin-bottom: 6px;
+    margin-bottom: 8px;
 }
 
 .grpc-metadata-row input {
@@ -202,13 +364,21 @@
     padding: 8px 10px;
     border: 1px solid var(--grpc-border);
     border-radius: var(--tester-radius-btn);
-    font-size: 0.85rem;
+    font-size: 0.83rem;
     background: var(--tester-surface);
     color: var(--grpc-text);
+    transition: border-color var(--dur-fast, 120ms) var(--ease-out, ease),
+                box-shadow var(--dur-fast, 120ms) var(--ease-out, ease);
+}
+
+.grpc-metadata-row input:focus {
+    outline: none;
+    border-color: var(--grpc-primary);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--grpc-primary) 15%, transparent);
 }
 
 .grpc-btn-remove {
-    padding: 8px 12px;
+    padding: 2px 10px;
     background: transparent;
     border: 1px solid var(--grpc-error);
     color: var(--grpc-error);
@@ -222,17 +392,19 @@
 }
 
 .grpc-message-editor {
-    width: 100%;
-    min-height: 100px;
+    flex: 1;
+    min-height: 140px;
     padding: 12px;
-    font-family: var(--tester-mono);
-    font-size: 0.85rem;
     border: 1px solid var(--grpc-border);
     border-radius: var(--tester-radius-btn);
-    margin-bottom: 12px;
+    font-family: var(--tester-mono);
+    font-size: 0.83rem;
+    line-height: 1.5;
     resize: vertical;
     background: var(--tester-inset);
     color: var(--grpc-text);
+    transition: border-color var(--dur-fast, 120ms) var(--ease-out, ease),
+                box-shadow var(--dur-fast, 120ms) var(--ease-out, ease);
 }
 
 .grpc-message-editor:focus {
@@ -241,104 +413,34 @@
     box-shadow: 0 0 0 2px color-mix(in srgb, var(--grpc-primary) 15%, transparent);
 }
 
-/* Buttons */
-.grpc-btn {
-    padding: 10px 20px;
-    border: 1px solid var(--tester-hairline);
-    border-radius: var(--tester-radius-btn);
-    background: var(--tester-inset);
-    color: var(--grpc-text);
-    font-weight: 600;
-    font-size: 0.85rem;
-    cursor: pointer;
-    transition: all var(--dur-fast, 120ms) var(--ease-out, ease);
-}
-
-.grpc-btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
-
-.grpc-btn-upload,
-.grpc-btn-parse,
-.grpc-btn-sample {
-    background: var(--tester-inset);
-    border: 1px solid var(--grpc-border);
-    color: var(--grpc-text);
-}
-
-.grpc-btn-upload:hover,
-.grpc-btn-parse:hover,
-.grpc-btn-sample:hover {
-    background: color-mix(in srgb, var(--grpc-primary) 8%, var(--tester-inset));
-}
-
-.grpc-btn-sample {
-    background: color-mix(in srgb, var(--grpc-primary) 12%, var(--tester-inset));
-    border-color: var(--grpc-primary);
-    color: var(--grpc-primary);
-}
-
-.grpc-btn-sample:hover {
-    background: color-mix(in srgb, var(--grpc-primary) 20%, var(--tester-inset));
-}
-
-.grpc-btn-connect,
 .grpc-btn-invoke {
-    background: var(--grpc-primary);
-    color: var(--button-text, #fff);
-    border-color: var(--grpc-primary);
-    border-radius: 0 var(--tester-radius-btn) var(--tester-radius-btn) 0;
+    margin-top: 12px;
+    align-self: flex-start;
 }
 
-.grpc-btn-connect:hover:not(:disabled),
-.grpc-btn-invoke:hover:not(:disabled) {
-    filter: brightness(1.1);
+/* Response panel */
+.grpc-response-panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
 }
 
-.grpc-btn-invoke {
-    width: 100%;
-    border-radius: var(--tester-radius-btn);
-}
-
-.grpc-btn-disconnect {
-    background: var(--grpc-error);
-    color: var(--button-text, #fff);
-    border-color: var(--grpc-error);
-    border-radius: 0 var(--tester-radius-btn) var(--tester-radius-btn) 0;
-}
-
-.grpc-btn-disconnect:hover {
-    filter: brightness(1.1);
-}
-
-.grpc-btn-small {
-    padding: 6px 12px;
-    font-size: 0.78rem;
-    background: var(--tester-inset);
-    border: 1px solid var(--grpc-border);
-}
-
-/* Response Section */
 .grpc-response-header {
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    justify-content: space-between;
     margin-bottom: 12px;
 }
 
-.grpc-response-header::before {
-    content: 'RESPONSES';
-    font-family: var(--tester-mono);
-    font-size: 0.72rem;
-    font-weight: 600;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--text-secondary);
+.grpc-response-header .grpc-panel-title {
+    margin: 0;
+    padding: 0;
+    border: none;
 }
 
 .grpc-responses-list {
-    max-height: 400px;
+    flex: 1;
     overflow-y: auto;
     display: flex;
     flex-direction: column;
@@ -346,57 +448,118 @@
 }
 
 .grpc-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: var(--grpc-text-muted);
     text-align: center;
     padding: 40px;
-    color: var(--grpc-text-muted);
-    font-size: 0.9rem;
+}
+
+.grpc-empty-icon {
+    display: inline-flex;
+    padding: 16px;
+    margin-bottom: 14px;
+    border-radius: 50%;
+    background: color-mix(in srgb, var(--grpc-primary) 8%, var(--tester-inset));
+    color: var(--grpc-primary);
+    opacity: 0.8;
+}
+
+.grpc-empty-title {
+    margin: 0 0 4px;
+    font-weight: 600;
+    color: var(--grpc-text);
+}
+
+.grpc-empty-hint {
+    margin: 0;
+    font-size: 0.82rem;
+    opacity: 0.8;
 }
 
 .grpc-response {
     padding: 12px;
     border-radius: var(--tester-radius-sm);
     border: 1px solid var(--grpc-border);
+    background: var(--tester-inset);
+    animation: tsSlideUp 0.24s var(--ease-out, ease) both;
 }
 
 .grpc-response-request {
-    background: color-mix(in srgb, var(--grpc-primary) 8%, var(--tester-inset));
-    border-color: color-mix(in srgb, var(--grpc-primary) 25%, var(--tester-hairline));
+    border-left: 3px solid var(--grpc-primary);
 }
 
 .grpc-response-response {
-    background: color-mix(in srgb, var(--grpc-success) 8%, var(--tester-inset));
-    border-color: color-mix(in srgb, var(--grpc-success) 25%, var(--tester-hairline));
+    border-left: 3px solid var(--grpc-success);
 }
 
 .grpc-response-error {
-    background: color-mix(in srgb, var(--grpc-error) 8%, var(--tester-inset));
-    border-color: color-mix(in srgb, var(--grpc-error) 25%, var(--tester-hairline));
+    border-left: 3px solid var(--grpc-error);
 }
 
 .grpc-response-system {
-    background: var(--tester-inset);
+    border-left: 3px solid var(--tester-hairline);
     font-style: italic;
 }
 
 .grpc-response-header-row {
     display: flex;
     align-items: center;
-    gap: 12px;
+    flex-wrap: wrap;
+    gap: 8px;
     margin-bottom: 8px;
-    font-size: 0.8rem;
+    font-size: 0.75rem;
 }
 
 .grpc-response-type {
-    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 8px;
+    border-radius: var(--tester-radius-btn);
+    font-weight: 700;
+    font-family: var(--tester-mono);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    font-size: 0.66rem;
+    background: color-mix(in srgb, var(--grpc-primary) 12%, var(--tester-inset));
+    color: var(--grpc-primary);
+    border: 1px solid color-mix(in srgb, var(--grpc-primary) 25%, var(--tester-hairline));
+}
+
+.grpc-response-response .grpc-response-type {
+    background: color-mix(in srgb, var(--grpc-success) 12%, var(--tester-inset));
+    color: var(--grpc-success);
+    border-color: color-mix(in srgb, var(--grpc-success) 25%, var(--tester-hairline));
+}
+
+.grpc-response-error .grpc-response-type {
+    background: color-mix(in srgb, var(--grpc-error) 12%, var(--tester-inset));
+    color: var(--grpc-error);
+    border-color: color-mix(in srgb, var(--grpc-error) 25%, var(--tester-hairline));
+}
+
+.grpc-response-system .grpc-response-type {
+    background: var(--tester-inset);
+    color: var(--grpc-text-muted);
+    border-color: var(--tester-hairline);
 }
 
 .grpc-response-method {
-    color: var(--grpc-primary);
     font-family: var(--tester-mono);
+    color: var(--grpc-text);
+    background: color-mix(in srgb, var(--grpc-primary) 8%, transparent);
+    padding: 1px 7px;
+    border-radius: 999px;
 }
 
 .grpc-response-latency,
 .grpc-response-time {
+    font-family: var(--tester-mono);
+    font-size: 0.72rem;
     color: var(--grpc-text-muted);
 }
 
@@ -407,7 +570,8 @@
 .grpc-response-content {
     margin: 0;
     padding: 10px;
-    background: color-mix(in srgb, var(--tester-accent) 4%, var(--tester-inset));
+    background: var(--tester-surface);
+    border: 1px solid var(--tester-hairline);
     border-radius: var(--tester-radius-btn);
     font-family: var(--tester-mono);
     font-size: 0.8rem;
@@ -421,52 +585,51 @@
     margin-top: 8px;
     font-size: 0.75rem;
     color: var(--grpc-error);
+    font-family: var(--tester-mono);
 }
 
-/* Error Display */
-.grpc-error {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 12px 16px;
-    background: color-mix(in srgb, var(--grpc-error) 8%, var(--tester-inset));
-    border: 1px solid color-mix(in srgb, var(--grpc-error) 30%, transparent);
-    border-radius: var(--tester-radius-sm);
-    color: var(--grpc-error);
-    font-size: 0.9rem;
-}
-
-.grpc-error button {
-    background: transparent;
-    border: none;
-    font-size: 1.2rem;
-    cursor: pointer;
-    color: var(--grpc-error);
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+    .grpc-tester,
+    .grpc-error,
+    .grpc-response {
+        animation: none;
+    }
 }
 
 /* Responsive */
-@media (max-width: 768px) {
+@media (max-width: 900px) {
+    .grpc-config-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .grpc-main-content {
+        flex-direction: column;
+    }
+
+    .grpc-left-column {
+        width: 100%;
+        min-width: 0;
+    }
+}
+
+@media (max-width: 600px) {
     .grpc-url-group {
         flex-wrap: wrap;
     }
 
-    .grpc-protocol-badge {
-        border-radius: var(--tester-radius-btn);
-    }
-
-    .grpc-url-input {
-        order: 1;
+    .grpc-url-group input.grpc-url-input {
+        order: -1;
         width: 100%;
-        border-radius: var(--tester-radius-btn);
-        margin-top: 8px;
+        border-bottom: 1px solid var(--grpc-border);
     }
 
     .grpc-btn-connect,
     .grpc-btn-disconnect {
-        border-radius: var(--tester-radius-btn);
+        flex: 1;
     }
 
-    .grpc-service-method-selector {
-        flex-direction: column;
+    .grpc-select-row {
+        grid-template-columns: 1fr;
     }
 }

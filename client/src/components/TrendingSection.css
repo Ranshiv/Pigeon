@@ -1,221 +1,248 @@
-/*client/src/components/TrendingSection.css*/
+/* client/src/components/TrendingSection.css */
 
 .trending-section {
     width: 100%;
-    padding: 1.5rem;
-    background-color: var(--background-color);
-}
-
-.trending-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px;
-    border-bottom: 1px solid var(--border-color);
-    cursor: pointer;
-    color: var(--text-color);
+    padding: clamp(16px, 3vw, 32px);
+    max-width: 1200px;
+    margin: 0 auto;
 }
 
 .trending-header {
-    margin-bottom: 1.75rem;
+    margin-bottom: 32px;
 }
 
 .trending-header h2 {
     display: flex;
     align-items: center;
     margin-top: 0;
-    margin-bottom: 0.5rem;
+    margin-bottom: 8px;
     font-size: 1.5rem;
+    font-weight: 650;
+    letter-spacing: -0.01em;
     color: var(--text-color);
 }
 
 .header-icon {
     color: var(--primary-color);
-    margin-right: 0.5rem;
+    margin-right: 12px;
 }
 
 .trending-header p {
     color: var(--text-secondary);
     margin: 0;
+    font-size: 0.95rem;
+    line-height: 1.5;
 }
 
 .trending-filters {
     display: flex;
-    gap: 1.5rem;
-    margin-bottom: 1.5rem;
+    gap: 24px;
+    margin-bottom: 24px;
+    background: var(--card-bg);
+    padding: 16px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md, 12px);
+    flex-wrap: wrap;
 }
 
 .filter-group {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
+    gap: 12px;
 }
 
 .filter-label {
-    font-size: 0.9rem;
-    color: var(--text-color);
-    font-weight: 500;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
 }
 
 .filter-select {
-    /* Inherit global index.css select styling; only layout overrides */
-    width: auto;
-    min-width: 140px;
+    width: 180px;
 }
 
 .trending-list {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    margin-bottom: 2rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 20px;
+    margin-bottom: 32px;
 }
 
 .trending-card {
     background-color: var(--card-bg);
     border: 1px solid var(--border-color);
-    border-radius: 8px;
-    padding: 1.25rem;
+    border-radius: var(--radius-lg, 16px);
+    padding: 24px;
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    box-shadow: var(--card-shadow);
-    transition: all 0.2s ease;
+    flex-direction: column;
+    box-shadow: 0 4px 12px color-mix(in srgb, var(--primary-color) 4%, transparent);
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .trending-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(1, 76, 117, 0.15);
+    transform: translateY(-3px);
     border-color: var(--primary-color);
+    box-shadow: 0 8px 24px color-mix(in srgb, var(--primary-color) 12%, transparent);
 }
 
 .trending-main {
     flex: 1;
-    margin-right: 1.5rem;
+    display: flex;
+    flex-direction: column;
 }
 
 .trending-title-area {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: space-between;
-    margin-bottom: 0.5rem;
+    margin-bottom: 12px;
+    gap: 16px;
 }
 
 .trending-title-area h3 {
     margin: 0;
-    font-size: 1.1rem;
+    font-size: 1.15rem;
     color: var(--text-color);
-    font-weight: 600;
+    font-weight: 650;
+    letter-spacing: -0.01em;
+    line-height: 1.3;
 }
 
 .growth-tag {
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    background-color: var(--success-bg);
-    color: var(--success-text);
+    background-color: color-mix(in srgb, var(--success-color) 15%, transparent);
+    color: var(--success-color);
+    border: 1px solid color-mix(in srgb, var(--success-color) 30%, transparent);
     font-size: 0.75rem;
-    font-weight: 600;
-    padding: 0.25rem 0.5rem;
-    border-radius: 1rem;
+    font-weight: 700;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    padding: 2px 8px;
+    border-radius: 999px;
+    flex-shrink: 0;
 }
 
 .growth-tag svg {
-    margin-right: 0.25rem;
+    margin-right: 4px;
 }
 
 .trending-description {
     color: var(--text-secondary);
     font-size: 0.9rem;
-    margin-bottom: 0.75rem;
-    line-height: 1.4;
+    margin: 0 0 20px 0;
+    line-height: 1.5;
+    flex: 1;
 }
 
 .trending-meta {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    font-size: 0.85rem;
+    font-size: 0.8rem;
+    margin-bottom: 20px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border-color);
 }
 
-.meta-item {
+.trending-meta-item {
     display: flex;
     align-items: center;
     color: var(--text-secondary);
+    font-weight: 500;
 }
 
-.meta-icon {
-    margin-right: 0.35rem;
+.trending-meta-icon {
+    margin-right: 6px;
     color: var(--primary-color);
 }
 
 .meta-category {
-    background-color: var(--hover-bg);
-    color: var(--text-color);
-    padding: 0.2rem 0.5rem;
-    border-radius: 1rem;
+    background-color: var(--background-color);
+    color: var(--text-secondary);
+    border: 1px solid var(--border-color);
+    padding: 2px 10px;
+    border-radius: 999px;
     font-size: 0.75rem;
-    font-weight: 500;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
 }
 
 .trending-actions {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.view-api-btn, .add-to-collection-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 16px;
+    border-radius: var(--radius-sm, 8px);
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s ease;
 }
 
 .view-api-btn {
     background-color: var(--primary-color);
     color: #ffffff;
-    border: none;
-    border-radius: 6px;
-    padding: 0.5rem 1rem;
-    font-size: 0.85rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s ease;
+    border: 1px solid var(--primary-color);
 }
 
 .view-api-btn:hover {
-    background-color: var(--primary-hover);
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(1, 76, 117, 0.25);
+    filter: brightness(1.1);
 }
 
 .add-to-collection-btn {
-    background-color: var(--hover-bg);
+    background-color: transparent;
     color: var(--text-color);
     border: 1px solid var(--border-color);
-    border-radius: 6px;
-    padding: 0.5rem 1rem;
-    font-size: 0.85rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s ease;
 }
 
 .add-to-collection-btn:hover {
-    background-color: var(--card-bg);
     border-color: var(--primary-color);
+    color: var(--primary-color);
+    background-color: color-mix(in srgb, var(--primary-color) 5%, transparent);
 }
 
 .trending-insights {
-    background-color: var(--primary-light);
-    border-radius: 8px;
-    padding: 1.5rem;
-    border-left: 4px solid var(--primary-color);
+    background-color: color-mix(in srgb, var(--primary-color) 4%, var(--card-bg));
+    border: 1px solid color-mix(in srgb, var(--primary-color) 20%, var(--border-color));
+    border-radius: var(--radius-lg, 16px);
+    padding: 24px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 32px;
+    position: relative;
+    overflow: hidden;
 }
 
-.trending-insights h3 {
-    margin-top: 0;
-    margin-bottom: 1rem;
-    font-size: 1.2rem;
-    color: var(--primary-color);
-    font-weight: 600;
+.trending-insights::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 4px;
+    background: var(--primary-color);
 }
 
 .insights-content {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+    flex: 1;
+}
+
+.trending-insights h3 {
+    margin: 0 0 8px 0;
+    font-size: 1.15rem;
+    color: var(--text-color);
+    font-weight: 650;
+    letter-spacing: -0.01em;
 }
 
 .insights-content p {
@@ -223,73 +250,42 @@
     color: var(--text-secondary);
     font-size: 0.95rem;
     line-height: 1.5;
-    max-width: 70%;
+    max-width: 65ch;
 }
 
 .view-insights-btn {
-    background-color: var(--primary-color);
-    color: #ffffff;
-    border: none;
-    border-radius: 6px;
-    padding: 0.5rem 1rem;
-    font-size: 0.85rem;
-    font-weight: 500;
+    flex-shrink: 0;
+    background-color: transparent;
+    color: var(--primary-color);
+    border: 1px solid var(--primary-color);
+    border-radius: var(--radius-sm, 8px);
+    padding: 10px 20px;
+    font-size: 0.9rem;
+    font-weight: 600;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.15s ease;
+    white-space: nowrap;
 }
 
 .view-insights-btn:hover {
-    background-color: var(--primary-hover);
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(1, 76, 117, 0.25);
+    background-color: color-mix(in srgb, var(--primary-color) 8%, transparent);
 }
 
-/* Dark Theme Overrides */
-body.dark-theme .trending-section {
-    background-color: var(--background-color);
-}
+@media (max-width: 768px) {
+    .trending-insights {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 20px;
+        padding: 24px;
+    }
 
-body.dark-theme .trending-card {
-    background-color: var(--card-bg);
-    border-color: var(--border-color);
-}
+    .trending-filters {
+        flex-direction: column;
+        gap: 16px;
+    }
 
-body.dark-theme .trending-card:hover {
-    box-shadow: 0 8px 20px rgba(1, 76, 117, 0.25);
-}
-
-body.dark-theme .trending-description {
-    color: #B8D4E3;
-}
-
-body.dark-theme .meta-item {
-    color: #7A9BAD;
-}
-
-body.dark-theme .meta-category {
-    background-color: rgba(1, 76, 117, 0.2);
-    color: #B8D4E3;
-}
-
-body.dark-theme .add-to-collection-btn {
-    background-color: rgba(1, 76, 117, 0.1);
-    border-color: var(--border-color);
-}
-
-body.dark-theme .add-to-collection-btn:hover {
-    background-color: rgba(1, 76, 117, 0.2);
-    border-color: var(--primary-color);
-}
-
-body.dark-theme .trending-insights {
-    background-color: rgba(1, 76, 117, 0.15);
-    border-left-color: var(--primary-color);
-}
-
-body.dark-theme .trending-insights h3 {
-    color: #0EA5E9;
-}
-
-body.dark-theme .insights-content p {
-    color: #B8D4E3;
+    .filter-select {
+        width: 100%;
+        flex: 1;
+    }
 }
