@@ -48,8 +48,52 @@
   align-items: center;
   flex-wrap: nowrap;
   min-width: 0;
-  max-width: 70%;
+  max-width: 45%;
   gap: 12px;
+}
+
+/* Tab bar relocated into the header — segmented control matching protocols page */
+.collection-header .tab-navigation {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  margin: 0;
+  background: var(--background-color);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md, 8px);
+  min-height: 0;
+  flex-shrink: 0;
+  overflow: visible;
+}
+
+.collection-header .tab-btn {
+  padding: 8px 12px;
+  min-height: 0;
+  font-size: 12px;
+  font-weight: 500;
+  border: none;
+  border-bottom: none;
+  border-radius: 6px;
+  color: var(--text-secondary);
+}
+
+.collection-header .tab-btn:hover {
+  transform: none;
+  border-bottom-color: transparent;
+  background: var(--primary-light);
+  color: var(--text-color);
+}
+
+.collection-header .tab-btn.active {
+  border-bottom-color: transparent;
+  background: var(--primary-color, #014C75);
+  color: var(--button-text, #fff) !important;
+  box-shadow: none;
+}
+
+.collection-header .tab-btn.active .fi,
+.collection-header .tab-btn.active i {
+  color: var(--button-text, #fff);
 }
 
 .title-icon {
@@ -605,33 +649,40 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 140px;
-  padding: 20px;
+  padding: 28px 20px;
   text-align: center;
   color: var(--text-secondary);
   font-size: 13px;
   margin: 10px;
-  border: 1px dashed rgba(255, 255, 255, 0.1);
-  border-radius: var(--border-radius);
+  gap: 8px;
+  border: 1px dashed var(--border-color);
+  border-radius: var(--radius-lg, 16px);
+  background: var(--card-bg, #002234);
   transition: all 0.3s ease;
 }
 
 .no-requests:hover {
-  border-color: rgba(1, 76, 117, 0.3);
-  background-color: rgba(1, 76, 117, 0.05);
+  border-color: color-mix(in srgb, var(--primary-color) 30%, var(--border-color));
+}
+
+.no-requests p {
+  margin: 0;
+  font-weight: 600;
+  color: var(--text-color);
 }
 
 .no-content-icon {
-  font-size: 32px;
-  margin-bottom: 12px;
-  opacity: 0.6;
-  color: var(--text-secondary);
-  transition: color 0.3s ease;
-}
-
-.no-requests:hover .no-content-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  font-size: 24px;
+  margin-bottom: 4px;
   color: var(--primary-color, #014C75);
-  opacity: 0.8;
+  background: color-mix(in srgb, var(--primary-color) 12%, transparent);
+  transition: all 0.3s ease;
 }
 
 /* Collection info styling - redesigned for better structure */
@@ -658,7 +709,8 @@
 .collection-overview-card {
   background-color: var(--card-bg, #002234);
   border: 1px solid var(--border-color);
-  border-radius: 8px;
+  border-radius: var(--radius-lg, 16px);
+  box-shadow: 0 6px 24px color-mix(in srgb, var(--primary-color) 6%, transparent);
   padding: 24px;
   margin-bottom: 8px;
 }
@@ -676,7 +728,8 @@
 .collection-metadata-section {
   background-color: var(--card-bg, #002234);
   border: 1px solid var(--border-color);
-  border-radius: 8px;
+  border-radius: var(--radius-lg, 16px);
+  box-shadow: 0 6px 24px color-mix(in srgb, var(--primary-color) 6%, transparent);
   padding: 20px;
   overflow: hidden;
 }
@@ -711,9 +764,9 @@
 }
 
 .meta-item {
-  background-color: var(--bg-ccolor);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 8px;
+  background-color: var(--background-color);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md, 12px);
   padding: 16px;
   display: flex;
   flex-direction: column;
@@ -758,10 +811,13 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background-color: var(--primary-color, #014C75);
-  color: white;
+  align-self: flex-start;
+  width: 24px;
   min-width: 24px;
   height: 24px;
+  flex: 0 0 auto;
+  background-color: var(--primary-color, #014C75);
+  color: white;
   border-radius: 50%;
   font-size: 12px;
   font-weight: 600;
@@ -771,7 +827,8 @@
 .real-time-info {
   background-color: var(--card-bg, #002234);
   border: 1px solid var(--border-color);
-  border-radius: 8px;
+  border-radius: var(--radius-lg, 16px);
+  box-shadow: 0 6px 24px color-mix(in srgb, var(--primary-color) 6%, transparent);
   padding: 24px;
   text-align: center;
 }
@@ -1478,8 +1535,9 @@
 /* Designer Tab Styling */
 .designer-tab-content {
   width: 100%;
-  height: calc(100vh - 140px);
-  /* Account for header and tab navigation */
+  flex: 1;
+  min-height: 0;
+  /* Fill the remaining space in .collection-main exactly */
   background: var(--background-color);
   overflow: hidden;
   border: 1px solid var(--border-color);
@@ -1531,4 +1589,220 @@
   100% {
     transform: rotate(360deg);
   }
+}
+/* === 2026 instrument-panel redesign overrides === */
+[data-cd-redesign="v1"] {
+  --ws-accent: var(--primary-color);
+  --ws-hairline: var(--border-color);
+  --ws-surface: var(--card-bg);
+  --ws-inset: var(--background-color);
+  --ws-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  --ws-radius: var(--radius-lg, 16px);
+  --ws-radius-sm: var(--radius-md, 12px);
+  --ws-radius-btn: var(--radius-sm, 8px);
+}
+
+/* Header → matching ws-header / pt-header */
+[data-cd-redesign="v1"] .collection-detail {
+  background: var(--ws-inset);
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+[data-cd-redesign="v1"] .collection-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 16px;
+  padding: 24px clamp(20px, 3vw, 48px);
+  background: var(--ws-surface);
+  border-bottom: 1px solid var(--ws-hairline);
+  flex-wrap: wrap;
+}
+
+[data-cd-redesign="v1"] .collection-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+[data-cd-redesign="v1"] .collection-title h2 {
+  margin: 0;
+  font-size: clamp(22px, 2.5vw, 28px);
+  font-weight: 650;
+  letter-spacing: -0.02em;
+  color: var(--text-color);
+}
+
+[data-cd-redesign="v1"] .collection-content {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+}
+
+/* Tab bar → matching pt-header-tabs segmented control */
+[data-cd-redesign="v1"] .tab-navigation {
+  display: inline-flex;
+  gap: 4px;
+  padding: 4px;
+  margin: 16px clamp(20px, 3vw, 48px) 0;
+  background: var(--ws-surface);
+  border: 1px solid var(--ws-hairline);
+  border-radius: var(--ws-radius-sm);
+  width: fit-content;
+  align-self: flex-start;
+}
+
+[data-cd-redesign="v1"] .tab-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border: none;
+  border-radius: var(--ws-radius-btn);
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.12s var(--ease-out, ease);
+  white-space: nowrap;
+}
+
+[data-cd-redesign="v1"] .tab-btn:hover {
+  background: var(--ws-inset);
+  color: var(--text-color);
+}
+
+[data-cd-redesign="v1"] .tab-btn.active {
+  background: color-mix(in srgb, var(--ws-accent) 12%, transparent);
+  color: var(--ws-accent);
+}
+
+/* Tab content padding */
+[data-cd-redesign="v1"] .collection-main,
+[data-cd-redesign="v1"] .documentation-tab-content,
+[data-cd-redesign="v1"] .sample-data-tab-content,
+[data-cd-redesign="v1"] .variables-tab-content,
+[data-cd-redesign="v1"] .designer-tab-content {
+  padding: 16px clamp(20px, 3vw, 48px);
+  width: 100%;
+}
+
+/* Hide legacy collection-content wrapper overrides that fight new layout */
+[data-cd-redesign="v1"] .collection-content {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Add-request button styled like ws-btn primary */
+[data-cd-redesign="v1"] .add-request-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border: 1px solid var(--ws-accent);
+  border-radius: var(--ws-radius-btn);
+  background: var(--ws-accent);
+  color: var(--button-text, #fff);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: filter 0.12s var(--ease-out, ease);
+}
+
+[data-cd-redesign="v1"] .add-request-btn:hover {
+  filter: brightness(1.1);
+}
+
+/* Empty states → ws-empty pattern */
+[data-cd-redesign="v1"] .no-requests,
+[data-cd-redesign="v1"] .documentation-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 40px 24px;
+  border: 1px dashed var(--ws-hairline);
+  border-radius: var(--ws-radius);
+  background: var(--ws-surface);
+  color: var(--text-secondary);
+  gap: 10px;
+}
+
+[data-cd-redesign="v1"] .no-content-icon,
+[data-cd-redesign="v1"] .placeholder-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--ws-accent) 12%, transparent);
+  color: var(--ws-accent);
+  font-size: 1.4rem;
+  margin-bottom: 4px;
+}
+
+[data-cd-redesign="v1"] .no-requests p,
+[data-cd-redesign="v1"] .documentation-placeholder p {
+  margin: 0;
+  font-size: 0.9rem;
+  max-width: 36ch;
+  line-height: 1.5;
+}
+
+[data-cd-redesign="v1"] .no-requests small,
+[data-cd-redesign="v1"] .documentation-placeholder small {
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+}
+
+[data-cd-redesign="v1"] .create-doc-link,
+[data-cd-redesign="v1"] .preview-swagger-btn,
+[data-cd-redesign="v1"] .primary-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border: 1px solid var(--ws-hairline);
+  border-radius: var(--ws-radius-btn);
+  background: var(--ws-accent);
+  color: var(--button-text, #fff);
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: filter 0.12s var(--ease-out, ease);
+}
+
+[data-cd-redesign="v1"] .create-doc-link:hover,
+[data-cd-redesign="v1"] .preview-swagger-btn:hover,
+[data-cd-redesign="v1"] .primary-button:hover {
+  filter: brightness(1.1);
+}
+
+[data-cd-redesign="v1"] .preview-swagger-btn {
+  background: transparent;
+  color: var(--ws-accent);
+}
+
+[data-cd-redesign="v1"] .documentation-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+[data-cd-redesign="v1"] .ws-page {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  flex: 1;
+  min-height: 0;
 }

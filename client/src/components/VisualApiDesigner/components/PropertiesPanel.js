@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { FiSettings, FiTrash2, FiCheck, FiX, FiInfo, FiPlay, FiLoader } from 'react-icons/fi';
+import AppSelect from '../../common/AppSelect/AppSelect';
 import './PropertiesPanel.css';
 
 /**
@@ -185,18 +186,15 @@ const PropertiesPanel = ({ selectedNode, onNodeUpdate, onDeleteNode, onTestEndpo
 
     // Enhanced select component
     const FormSelect = useCallback(({ value, onChange, options, error, ...props }) => (
-        <select
-            value={value || ''}
-            onChange={(e) => onChange(e.target.value)}
-            className={`form-select ${error ? 'error' : ''}`}
-            {...props}
-        >
-            {options.map(option => (
-                <option key={option.value} value={option.value}>
-                    {option.label}
-                </option>
-            ))}
-        </select>
+        <div className={error ? 'has-error' : ''}>
+            <AppSelect
+                value={value || ''}
+                onChange={onChange}
+                options={options}
+                variant="default"
+                {...props}
+            />
+        </div>
     ), []);
 
     // Enhanced textarea component

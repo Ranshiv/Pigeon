@@ -69,8 +69,7 @@ const ValidationPanel = ({ validationErrors = [], onValidationIssueClick }) => {
                 <div className="validation-status">
                     {/* status chip */}
                     <div className={`status-chip ${getStatusClass()}`}>
-                        <span className="dot" aria-hidden />
-                        <span className="label">{getStatusText()}</span>
+                        {getStatusText()}
                     </div>
                     <span className="status-text">{totalIssues === 0 ? 'Validation' : 'Validation issues'}</span>
                 </div>

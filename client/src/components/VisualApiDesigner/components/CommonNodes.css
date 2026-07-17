@@ -1,19 +1,18 @@
 /* Common Node Styles for Info, Security, Tag, Parameter nodes */
 .enhanced-node {
     position: relative;
-    background: #1a1a1a;
-    background-color: #1a1a1a;
-    border: 1px solid #333;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    background: var(--designer-card);
+    border: 1px solid var(--designer-border);
+    border-radius: var(--designer-radius, 10px);
+    box-shadow: var(--designer-shadow-md);
     cursor: pointer;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
     min-width: 280px;
     max-width: 320px;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-family: inherit;
     overflow: hidden;
     user-select: none;
-    color: #fff;
+    color: var(--designer-text-primary);
     display: flex;
     flex-direction: column;
     height: 100%;
@@ -21,13 +20,13 @@
 }
 
 .enhanced-node:hover {
-    border-color: #014C75;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-    transform: translateY(-2px);
+    border-color: var(--designer-primary);
+    box-shadow: var(--designer-shadow-hover);
 }
 
 .enhanced-node.selected {
-    box-shadow: 0 0 0 2px rgba(1, 76, 117, 0.2);
+    border-color: var(--designer-primary);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--designer-primary) 40%, transparent);
 }
 
 /* Selection outline styling */
@@ -37,7 +36,7 @@
     left: -1px;
     right: -1px;
     bottom: -1px;
-    border: 1px dashed #014C75;
+    border: 1px dashed var(--designer-primary);
     border-radius: 8px;
     pointer-events: none;
     z-index: 10;
@@ -45,21 +44,18 @@
 
 .enhanced-node.dragging {
     opacity: 1.0;
-    transform: rotate(1deg) scale(1.02);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
-    background: #1a1a1a;
+    box-shadow: var(--designer-shadow-hover);
+    background: var(--designer-card);
     z-index: 1000;
-    backdrop-filter: blur(0);
-    -webkit-backdrop-filter: blur(0);
 }
 
-/* Enhanced Node Header - Dark Theme */
+/* Enhanced Node Header */
 .enhanced-node-header {
     display: flex;
     align-items: center;
     padding: 12px;
-    background: #252525;
-    border-bottom: 1px solid #333;
+    background: var(--designer-component-bg);
+    border-bottom: 1px solid var(--designer-border);
 }
 
 .node-icon-container {
@@ -68,18 +64,19 @@
     justify-content: center;
     width: 24px;
     height: 24px;
-    background: #333;
-    border-radius: 4px;
-    color: #014C75;
+    background: color-mix(in srgb, var(--designer-primary) 15%, transparent);
+    border-radius: 6px;
+    color: var(--designer-primary);
     margin-right: 8px;
 }
 
 .node-type-badge {
-    font-size: 11px;
+    font-family: var(--tester-mono, ui-monospace, SFMono-Regular, Menlo, Consolas, monospace);
+    font-size: 0.66rem;
     font-weight: 600;
-    color: #aaa;
+    color: var(--designer-text-secondary);
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.12em;
     margin-right: auto;
 }
 
@@ -102,18 +99,18 @@
     color: white;
 }
 
-/* Enhanced Node Content - Dark Theme */
+/* Enhanced Node Content */
 .enhanced-node-content {
     padding: 12px;
     flex-grow: 1;
-    background: #1a1a1a;
+    background: var(--designer-card);
     display: flex;
     flex-direction: column;
 }
 
 /* Fix for node-card-children - ensure background is solid and no bleed-through */
 .node-card-children {
-    background-color: #1a1a1a !important;
+    background-color: var(--designer-card) !important;
     overflow: hidden;
     position: relative;
     isolation: isolate;
@@ -122,14 +119,12 @@
 
 /* Ensure node-card-content has proper styling */
 .node-card-content {
-    background-color: var(--node-bg);
+    background-color: var(--designer-card);
     position: relative;
     isolation: isolate;
     z-index: 1;
     padding: 12px;
     flex-grow: 1;
-
-
 }
 
 /* Ensure no bleed-through on dragging state */
@@ -138,14 +133,12 @@
 .resource-node-modern.dragging .node-card-children,
 .enhanced-node.dragging .node-card-children {
     opacity: 1.0;
-    background-color: #1a1a1a !important;
+    background-color: var(--designer-card) !important;
 }
-
-/* Ensure node-card-header has proper styling */
 
 /* Ensure node-card-outer has proper styling */
 .node-card-outer {
-    background-color: #1a1a1a !important;
+    background-color: var(--designer-card) !important;
     position: relative;
     isolation: isolate;
     z-index: 1;
@@ -155,13 +148,13 @@
 .enhanced-node .node-title {
     font-size: 14px;
     font-weight: 600;
-    color: #fff;
+    color: var(--designer-text-primary);
     margin-bottom: 6px;
 }
 
 .enhanced-node .node-description {
     font-size: 12px;
-    color: #aaa;
+    color: var(--designer-text-secondary);
     line-height: 1.4;
 }
 
@@ -308,9 +301,9 @@
 
 /* Endpoint Path */
 .endpoint-path {
-    font-family: 'Monaco', 'Menlo', monospace;
+    font-family: var(--tester-mono, 'Monaco', 'Menlo', monospace);
     font-size: 12px;
-    color: #ccc;
+    color: var(--designer-text-secondary);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -352,12 +345,11 @@
     display: flex;
     align-items: center;
     padding: 12px;
-    background-color: var(--node-header);
-    border-bottom: 1px solid #333;
+    background-color: var(--designer-component-bg);
+    border-bottom: 1px solid var(--designer-border);
     isolation: isolate;
     position: relative;
     z-index: 1;
-
 }
 
 .node-card-icon {
@@ -373,28 +365,32 @@
     justify-content: center;
     width: 24px;
     height: 24px;
-    background: #333;
-    border-radius: 4px;
-    color: #014C75;
+    background: color-mix(in srgb, var(--designer-primary) 15%, transparent);
+    border-radius: 6px;
+    color: var(--designer-primary);
 }
 
 .node-card-type-badge {
-    font-size: 11px;
+    font-family: var(--tester-mono, ui-monospace, SFMono-Regular, Menlo, Consolas, monospace);
+    font-size: 0.66rem;
     font-weight: 600;
-    color: #aaa;
+    color: var(--designer-text-secondary);
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.12em;
     margin-right: auto;
 }
 
 .node-card-status {
-    padding: 2px 6px;
-    font-size: 10px;
-    font-weight: 500;
-    border-radius: 4px;
+    padding: 3px 8px;
+    font-family: var(--tester-mono, ui-monospace, SFMono-Regular, Menlo, Consolas, monospace);
+    font-size: 0.62rem;
+    font-weight: 600;
+    border-radius: 999px;
     text-transform: uppercase;
-    background: rgba(1, 76, 117, 0.2);
-    color: #014C75;
+    letter-spacing: 0.06em;
+    background: color-mix(in srgb, var(--designer-primary) 12%, transparent);
+    color: var(--designer-primary);
+    border: 1px solid color-mix(in srgb, var(--designer-primary) 25%, var(--designer-border));
 }
 
 
@@ -402,12 +398,12 @@
     font-size: 14px;
     font-weight: 600;
     margin-bottom: 4px;
-    color: #fff;
+    color: var(--designer-text-primary);
 }
 
 .node-card-desc {
     font-size: 12px;
-    color: #aaa;
+    color: var(--designer-text-secondary);
     line-height: 1.4;
 }
 
@@ -418,7 +414,7 @@
     left: -2px;
     right: -2px;
     bottom: -2px;
-    border: 1px dashed #014C75;
+    border: 1px dashed var(--designer-primary);
     border-radius: 9px;
     pointer-events: none;
     animation: selectionPulse 2s infinite;
@@ -468,7 +464,7 @@
 .endpoint-node-modern .node-card-children,
 .schema-node-modern .node-card-children,
 .resource-node-modern .node-card-children {
-    background-color: #1a1a1a !important;
+    background-color: var(--designer-card) !important;
     overflow: hidden;
 }
 
@@ -477,13 +473,13 @@
 .schema-node-modern,
 .resource-node-modern,
 .enhanced-node {
-    background-color: #1a1a1a !important;
+    background-color: var(--designer-card) !important;
 }
 
 .endpoint-node-modern.dragging,
 .schema-node-modern.dragging,
 .resource-node-modern.dragging,
 .enhanced-node.dragging {
-    background-color: #1a1a1a !important;
+    background-color: var(--designer-card) !important;
     isolation: isolate;
 }
