@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { X, ExternalLink, BookOpen, Code, Play, Copy, Check, Star, TrendingUp, MessageSquare, Book, Activity, Users, ArrowLeft } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import TryItConsole from './TryItConsole';
 import { MarketplaceApi } from './MarketplaceApi';
 import './ApiDetailModal.css';
+
+const TAB_ORDER = ['overview', 'tryit', 'endpoints', 'reviews', 'forums', 'guides', 'health'];
 
 const ApiDetailModal = ({ api, onClose }) => {
     const [activeTab, setActiveTab] = useState('overview');
@@ -17,37 +19,88 @@ const ApiDetailModal = ({ api, onClose }) => {
     const [guides, setGuides] = useState(null);
     const [selectedGuide, setSelectedGuide] = useState(null);
     const [health, setHealth] = useState(null);
-    const [loadingTab, setLoadingTab] = useState(false);
+    const [tabLoading, setTabLoading] = useState({});
+    const [tabError, setTabError] = useState({});
     const [showThreadForm, setShowThreadForm] = useState(false);
     const [reviewRating, setReviewRating] = useState(5);
     const [hoverRating, setHoverRating] = useState(0);
 
+    const modalRef = useRef(null);
+    const closeBtnRef = useRef(null);
+    const lastFocusedRef = useRef(document.activeElement);
+
+    const setLoading = useCallback((tab, loading) => {
+        setTabLoading(prev => ({ ...prev, [tab]: loading }));
+    }, []);
+    const setError = useCallback((tab, err) => {
+        setTabError(prev => ({ ...prev, [tab]: err?.message || String(err) }));
+    }, []);
+
+    // Focus trap helpers
+    const getFocusable = () => {
+        const node = modalRef.current;
+        if (!node) return [];
+        return Array.from(node.querySelectorAll(
+            'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        )).filter(el => el.offsetParent !== null && !el.disabled);
+    };
+
+    const handleKeyDown = useCallback((e) => {
+        if (e.key === 'Escape') {
+            e.preventDefault();
+            onClose();
+            return;
+        }
+        if (e.key === 'Tab' && modalRef.current) {
+            const focusable = getFocusable();
+            if (focusable.length === 0) return;
+            const first = focusable[0];
+            const last = focusable[focusable.length - 1];
+            if (e.shiftKey && document.activeElement === first) {
+                e.preventDefault();
+                last.focus();
+            } else if (!e.shiftKey && document.activeElement === last) {
+                e.preventDefault();
+                first.focus();
+            }
+        }
+    }, [onClose]);
+
+    useEffect(() => {
+        lastFocusedRef.current = document.activeElement;
+        closeBtnRef.current?.focus();
+        document.addEventListener('keydown', handleKeyDown);
+        return () => {
+            document.removeEventListener('keydown', handleKeyDown);
+            lastFocusedRef.current?.focus?.();
+        };
+    }, [handleKeyDown]);
+
     // Fetch data when tab changes
-    React.useEffect(() => {
+    useEffect(() => {
         const fetchData = async () => {
-            if (activeTab === 'reviews' && !reviews) {
-                setLoadingTab(true);
-                try { setReviews(await MarketplaceApi.getReviews(api.id)); } catch (e) { console.error(e); }
-                setLoadingTab(false);
-            }
-            if (activeTab === 'forums' && !threads) {
-                setLoadingTab(true);
-                try { setThreads(await MarketplaceApi.listThreads(api.id)); } catch (e) { console.error(e); }
-                setLoadingTab(false);
-            }
-            if (activeTab === 'guides' && !guides) {
-                setLoadingTab(true);
-                try { setGuides(await MarketplaceApi.getGuides(api.id)); } catch (e) { console.error(e); }
-                setLoadingTab(false);
-            }
-            if (activeTab === 'health' && !health) {
-                setLoadingTab(true);
-                try { setHealth(await MarketplaceApi.getHealth(api.id)); } catch (e) { console.error(e); }
-                setLoadingTab(false);
+            const handlers = {
+                reviews: async () => setReviews(await MarketplaceApi.getReviews(api.id)),
+                forums: async () => setThreads(await MarketplaceApi.listThreads(api.id)),
+                guides: async () => setGuides(await MarketplaceApi.getGuides(api.id)),
+                health: async () => setHealth(await MarketplaceApi.getHealth(api.id))
+            };
+            const fetcher = handlers[activeTab];
+            if (!fetcher) return;
+            setLoading(activeTab, true);
+            setError(activeTab, null);
+            try {
+                await fetcher();
+            } catch (e) {
+                console.error(e);
+                setError(activeTab, e);
+            } finally {
+                setLoading(activeTab, false);
             }
         };
         fetchData();
-    }, [activeTab, api.id, reviews, threads, guides, health]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [activeTab, api.id]);
 
     const copyToClipboard = (text) => {
         navigator.clipboard.writeText(text);
@@ -57,11 +110,9 @@ const ApiDetailModal = ({ api, onClose }) => {
 
     const handleSaveRequest = async (requestData) => {
         try {
-            const response = await fetch('http://localhost:5001/api/requests', {
+            const res = await fetch('/api/requests', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
+                headers: { 'Content-Type': 'application/json' },
                 credentials: 'include',
                 body: JSON.stringify({
                     name: `${api.name} - ${requestData.method} ${requestData.path}`,
@@ -75,20 +126,74 @@ const ApiDetailModal = ({ api, onClose }) => {
                 })
             });
 
-            if (response.ok) {
-                alert('Request saved successfully!');
-            } else {
-                throw new Error('Failed to save request');
+            if (!res.ok) {
+                const data = await res.json().catch(() => ({}));
+                throw new Error(data.message || `Failed to save request (${res.status})`);
             }
+            alert('Request saved successfully!');
         } catch (error) {
             console.error('Save request error:', error);
-            alert('Failed to save request. Please try again.');
+            alert(error.message || 'Failed to save request. Please try again.');
         }
     };
 
+    const titleId = `api-detail-title-${api.id}`;
+
     return (
-        <div className="modal-overlay" onClick={onClose}>
-            <div className="api-detail-modal" onClick={(e) => e.stopPropagation()}>
+        <div className="modal-overlay" onClick={onClose} role="presentation">
+            <div
+                ref={modalRef}
+                className="api-detail-modal"
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby={titleId}
+                onClick={(e) => e.stopPropagation()}
+            >
+                {/* Tab rail — sits left of the form */}
+                <nav className="modal-tabs-vertical" role="tablist" aria-label="API details">
+                    <div className="tabs-wrapper-vertical">
+                        {TAB_ORDER.map(tab => {
+                            const Icon = {
+                                overview: BookOpen,
+                                tryit: Play,
+                                endpoints: Code,
+                                reviews: Star,
+                                forums: Users,
+                                guides: Book,
+                                health: Activity
+                            }[tab];
+                            const label = {
+                                overview: 'Overview',
+                                tryit: 'Try It',
+                                endpoints: 'Endpoints',
+                                reviews: 'Reviews',
+                                forums: 'Forums',
+                                guides: 'Guides',
+                                health: 'Health'
+                            }[tab];
+                            const isActive = activeTab === tab;
+                            return (
+                                <button
+                                    key={tab}
+                                    className={`tab-btn-vertical ${isActive ? 'active' : ''}`}
+                                    role="tab"
+                                    aria-selected={isActive}
+                                    aria-controls={`api-tabpanel-${tab}`}
+                                    id={`api-tab-${tab}`}
+                                    title={label}
+                                    aria-label={label}
+                                    onClick={() => setActiveTab(tab)}
+                                >
+                                    <Icon size={20} />
+                                    {isActive && <span className="tab-label">{label}</span>}
+                                </button>
+                            );
+                        })}
+                    </div>
+                </nav>
+
+                {/* Form column: header + body */}
+                <div className="modal-form">
                 {/* Modal Header */}
                 <div className="modal-header">
                     <div className="header-main-content">
@@ -103,7 +208,7 @@ const ApiDetailModal = ({ api, onClose }) => {
                         </div>
                         <div className="header-details">
                             <div className="title-row">
-                                <h2>{api.name}</h2>
+                                <h2 id={titleId}>{api.name}</h2>
                                 <div className="badges-wrapper">
                                     {api.featured && (
                                         <span className="badge badge-featured">
@@ -130,7 +235,7 @@ const ApiDetailModal = ({ api, onClose }) => {
                                         <span className="stat-sub">({api.ratingCount})</span>
                                     </span>
                                     <span className="stat-pill">
-                                        {api.usageCount.toLocaleString()} uses
+                                        {(api.usageCount ?? 0).toLocaleString()} uses
                                     </span>
                                     <span className="stat-pill category-pill">
                                         {api.category}
@@ -139,64 +244,9 @@ const ApiDetailModal = ({ api, onClose }) => {
                             </div>
                         </div>
                     </div>
-                    <button className="close-btn" onClick={onClose} aria-label="Close modal">
+                    <button ref={closeBtnRef} className="close-btn" onClick={onClose} aria-label="Close modal">
                         <X size={24} />
                     </button>
-                </div>
-
-                {/* Tabs */}
-                <div className="modal-tabs">
-                    <div className="tabs-wrapper">
-                        <button
-                            className={`tab-btn ${activeTab === 'overview' ? 'active' : ''}`}
-                            onClick={() => setActiveTab('overview')}
-                        >
-                            <BookOpen size={18} />
-                            Overview
-                        </button>
-                        <button
-                            className={`tab-btn ${activeTab === 'tryit' ? 'active' : ''}`}
-                            onClick={() => setActiveTab('tryit')}
-                        >
-                            <Play size={18} />
-                            Try It
-                        </button>
-                        <button
-                            className={`tab-btn ${activeTab === 'endpoints' ? 'active' : ''}`}
-                            onClick={() => setActiveTab('endpoints')}
-                        >
-                            <Code size={18} />
-                            Endpoints
-                        </button>
-                        <button
-                            className={`tab-btn ${activeTab === 'reviews' ? 'active' : ''}`}
-                            onClick={() => setActiveTab('reviews')}
-                        >
-                            <Star size={18} />
-                            Reviews
-                        </button>
-                        <button
-                            className={`tab-btn ${activeTab === 'forums' ? 'active' : ''}`}
-                            onClick={() => setActiveTab('forums')}
-                        >
-                            <Users size={18} />
-                            Forums
-                        </button>
-                        <button
-                            className={`tab-btn ${activeTab === 'guides' ? 'active' : ''}`}
-                            onClick={() => setActiveTab('guides')}
-                        >
-                            <Book size={18} />
-                            Guides
-                        </button>
-                        <button
-                            className={`tab-btn ${activeTab === 'health' ? 'active' : ''}`}
-                            onClick={() => setActiveTab('health')}
-                        >
-                            <Activity size={18} />
-                            Health
-                        </button>
-                    </div>
                 </div>
 
                 {/* Modal Body */}
@@ -204,7 +254,12 @@ const ApiDetailModal = ({ api, onClose }) => {
                     {/* Overview Tab */}
                     {/* Overview Tab */}
                     {activeTab === 'overview' && (
-                        <div className="overview-tab">
+                        <div
+                            className="overview-tab"
+                            role="tabpanel"
+                            id="api-tabpanel-overview"
+                            aria-labelledby="api-tab-overview"
+                        >
                             <div className="overview-main">
                                 <section className="overview-card description-card">
                                     <h3>About this API</h3>
@@ -297,8 +352,8 @@ const ApiDetailModal = ({ api, onClose }) => {
                                             <span className="info-label">Rating</span>
                                             <span className="rating-row">
                                                 <Star size={14} style={{ fill: 'var(--warning-color)', color: 'var(--warning-color)' }} />
-                                                <span>{api.ratingAverage}</span>
-                                                <span className="rating-count">({api.ratingCount})</span>
+                                                <span>{api.ratingAverage ?? '—'}</span>
+                                                <span className="rating-count">({api.ratingCount ?? 0})</span>
                                             </span>
                                         </div>
                                     </div>
@@ -318,7 +373,12 @@ const ApiDetailModal = ({ api, onClose }) => {
 
                     {/* Try It Tab */}
                     {activeTab === 'tryit' && (
-                        <div className="tryit-tab">
+                        <div
+                            className="tryit-tab"
+                            role="tabpanel"
+                            id="api-tabpanel-tryit"
+                            aria-labelledby="api-tab-tryit"
+                        >
                             <TryItConsole
                                 api={api}
                                 selectedEndpoint={selectedEndpoint}
@@ -330,7 +390,12 @@ const ApiDetailModal = ({ api, onClose }) => {
 
                     {/* Endpoints Tab */}
                     {activeTab === 'endpoints' && (
-                        <div className="endpoints-tab">
+                        <div
+                            className="endpoints-tab"
+                            role="tabpanel"
+                            id="api-tabpanel-endpoints"
+                            aria-labelledby="api-tab-endpoints"
+                        >
                             <div className="endpoints-header-row">
                                 <h3>Available Endpoints</h3>
                                 <span className="endpoint-count">{api.endpoints.length} endpoints</span>
@@ -408,7 +473,12 @@ const ApiDetailModal = ({ api, onClose }) => {
 
                     {/* Reviews Tab */}
                     {activeTab === 'reviews' && (
-                        <div className="reviews-tab">
+                        <div
+                            className="reviews-tab"
+                            role="tabpanel"
+                            id="api-tabpanel-reviews"
+                            aria-labelledby="api-tab-reviews"
+                        >
                             <div className="write-review-section">
                                 <h3>Write a Review</h3>
                                 <form onSubmit={async (e) => {
@@ -468,17 +538,17 @@ const ApiDetailModal = ({ api, onClose }) => {
                                 </form>
                             </div>
 
-                            {loadingTab ? <div className="loading-state">Loading reviews...</div> : !reviews ? <div className="empty-state">No reviews loaded.</div> : (
+                            {tabLoading.reviews ? <div className="loading-state">Loading reviews...</div> : tabError.reviews ? <div className="empty-state">{tabError.reviews}</div> : !reviews ? <div className="empty-state">No reviews loaded.</div> : (
                                 <div className="reviews-list-container">
 
                                     <div className="reviews-list">
-                                        {reviews.items?.length === 0 ? (
+                                        {(!reviews.items || reviews.items.length === 0) ? (
                                             <div className="empty-reviews-placeholder">
                                                 <MessageSquare size={32} />
                                                 <p>No reviews yet. Be the first to share your experience!</p>
                                             </div>
                                         ) : (
-                                            reviews.items?.map(r => (
+                                            reviews.items.map(r => (
                                                 <div key={r._id} className="review-card-modern">
                                                     <div className="review-header">
                                                         <div className="reviewer-info">
@@ -508,7 +578,12 @@ const ApiDetailModal = ({ api, onClose }) => {
 
                     {/* Forums Tab */}
                     {activeTab === 'forums' && (
-                        <div className="forums-tab">
+                        <div
+                            className="forums-tab"
+                            role="tabpanel"
+                            id="api-tabpanel-forums"
+                            aria-labelledby="api-tab-forums"
+                        >
                             {!showThreadForm ? (
                                 <div className="marketplace-card" style={{ marginBottom: 20 }}>
                                     <button className="btn-primary-compact" onClick={() => setShowThreadForm(true)}>
@@ -548,9 +623,9 @@ const ApiDetailModal = ({ api, onClose }) => {
                                 </div>
                             )}
 
-                            {loadingTab ? <div>Loading...</div> : !threads ? <div>No forums loaded.</div> : (
+                            {tabLoading.forums ? <div>Loading...</div> : tabError.forums ? <div>{tabError.forums}</div> : !threads ? <div>No forums loaded.</div> : (
                                 <div className="threads-list">
-                                    {threads.items?.map(t => (
+                                    {(threads.items || []).map(t => (
                                         <div key={t._id} className="thread-card-modern">
                                             <div className="thread-main">
                                                 <h4>{t.title}</h4>
@@ -562,7 +637,7 @@ const ApiDetailModal = ({ api, onClose }) => {
                                             </div>
                                         </div>
                                     ))}
-                                    {threads.items?.length === 0 && <div className="empty-text">No threads yet.</div>}
+                                    {(threads.items || []).length === 0 && <div className="empty-text">No threads yet.</div>}
                                 </div>
                             )}
                         </div>
@@ -570,8 +645,13 @@ const ApiDetailModal = ({ api, onClose }) => {
 
                     {/* Guides Tab */}
                     {activeTab === 'guides' && (
-                        <div className="guides-tab">
-                            {loadingTab ? <div>Loading...</div> : !guides ? <div>No guides loaded.</div> : (
+                        <div
+                            className="guides-tab"
+                            role="tabpanel"
+                            id="api-tabpanel-guides"
+                            aria-labelledby="api-tab-guides"
+                        >
+                            {tabLoading.guides ? <div>Loading...</div> : tabError.guides ? <div>{tabError.guides}</div> : !guides ? <div>No guides loaded.</div> : (
                                 <>
                                     {!selectedGuide ? (
                                         <div className="guides-list">
@@ -583,15 +663,16 @@ const ApiDetailModal = ({ api, onClose }) => {
                                                         <button
                                                             className="btn-secondary-compact"
                                                             onClick={async () => {
-                                                                setLoadingTab(true);
+                                                                setLoading('guideDetail', true);
+                                                                setError('guideDetail', null);
                                                                 try {
                                                                     const fullGuide = await MarketplaceApi.getGuide(api.id, g.slug);
                                                                     setSelectedGuide(fullGuide);
                                                                 } catch (err) {
                                                                     console.error(err);
-                                                                    alert('Failed to load guide details');
+                                                                    setError('guideDetail', err.message || 'Failed to load guide details');
                                                                 }
-                                                                setLoadingTab(false);
+                                                                setLoading('guideDetail', false);
                                                             }}
                                                         >
                                                             Read Guide
@@ -615,9 +696,11 @@ const ApiDetailModal = ({ api, onClose }) => {
                                                     <span>Last updated: {new Date(selectedGuide.updatedAt || selectedGuide.createdAt).toLocaleDateString()}</span>
                                                 </div>
                                                 <div className="markdown-body">
-                                                    <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                                                        {selectedGuide.contentMarkdown}
-                                                    </ReactMarkdown>
+                                                    {tabError.guideDetail ? <div className="empty-text">{tabError.guideDetail}</div> : (
+                                                        <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                                                            {selectedGuide.contentMarkdown}
+                                                        </ReactMarkdown>
+                                                    )}
                                                 </div>
                                             </div>
                                         </div>
@@ -629,8 +712,13 @@ const ApiDetailModal = ({ api, onClose }) => {
 
                     {/* Health Tab */}
                     {activeTab === 'health' && (
-                        <div className="health-tab">
-                            {loadingTab ? <div>Loading...</div> : !health ? <div>Health data unavailable.</div> : (
+                        <div
+                            className="health-tab"
+                            role="tabpanel"
+                            id="api-tabpanel-health"
+                            aria-labelledby="api-tab-health"
+                        >
+                            {tabLoading.health ? <div>Loading...</div> : tabError.health ? <div>{tabError.health}</div> : !health ? <div>Health data unavailable.</div> : (
                                 <div className="health-dashboard">
                                     <div className="health-score-card">
                                         <div className="score-circle" style={{ borderColor: health.current?.status === 'operational' ? 'var(--success-color)' : 'var(--warning-color)' }}>
@@ -672,7 +760,8 @@ const ApiDetailModal = ({ api, onClose }) => {
                             )}
                         </div>
                     )}
-                </div>
+                    </div>{/* /.modal-body */}
+                </div>{/* /.modal-form */}
             </div>
         </div>
     );

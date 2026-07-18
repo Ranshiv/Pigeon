@@ -30,17 +30,31 @@
 }
 
 .api-detail-modal {
-    background-color: var(--card-bg) !important;
-    border-radius: 16px;
+    background-color: transparent !important;
     width: 100%;
-    max-width: 1100px;
+    max-width: 1160px;
     height: 85vh;
     display: flex;
-    flex-direction: column;
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
-    border: 1px solid var(--border-color) !important;
-    overflow: hidden;
+    flex-direction: row;
+    align-items: stretch;
+    gap: 20px;
+    border: none !important;
+    box-shadow: none !important;
+    overflow: visible;
     animation: slideUp 0.3s ease-out;
+}
+
+/* Form column holds header + body — its own floating card */
+.modal-form {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background-color: var(--card-bg) !important;
+    border: 1px solid var(--border-color) !important;
+    border-radius: 16px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
 }
 
 @keyframes slideUp {
@@ -508,30 +522,38 @@
     transform: rotate(90deg);
 }
 
-.modal-tabs {
+/* === Vertical tab rail (detached floating card, left of the form) === */
+.modal-tabs-vertical {
     display: flex;
-    justify-content: center;
-    /* Center the tabs for better balance */
-    padding: 16px 32px;
+    flex-direction: column;
+    align-self: center;
+    width: 150px; /* fixed so switching tabs never reflows the rail width */
+    flex-shrink: 0;
+    padding: 16px 12px;
     background-color: var(--card-bg) !important;
-    border-bottom: 1px solid var(--border-color) !important;
-}
-
-.tabs-wrapper {
-    display: flex;
-    gap: 4px;
-    background-color: var(--background-color) !important;
-    padding: 6px;
-    border-radius: 14px;
     border: 1px solid var(--border-color) !important;
-    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.03) !important;
+    border-radius: 16px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
 }
 
-.tab-btn {
+.tabs-wrapper-vertical {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    background-color: transparent !important;
+    padding: 0;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+.tab-btn-vertical {
     display: flex;
     align-items: center;
-    gap: 10px;
-    padding: 10px 24px;
+    justify-content: flex-start;
+    gap: 12px;
+    padding: 12px;
+    min-width: 48px;
+    min-height: 48px; /* a11y: 44px+ touch target */
     border: none !important;
     background: transparent !important;
     color: var(--text-secondary) !important;
@@ -541,26 +563,32 @@
     border-radius: 10px;
     transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     white-space: nowrap;
+    line-height: 1;
 }
 
-.tab-btn:hover:not(.active) {
+.tab-btn-vertical:hover:not(.active) {
     color: var(--text-color) !important;
     background-color: var(--hover-bg) !important;
 }
 
-.tab-btn.active {
+.tab-btn-vertical.active {
     background-color: var(--primary-color) !important;
     color: #ffffff !important;
     box-shadow: 0 4px 12px rgba(1, 76, 117, 0.25) !important;
-    transform: scale(1.02);
 }
 
-.tab-btn svg {
+.tab-btn-vertical svg {
     transition: transform 0.2s ease;
+    flex-shrink: 0;
 }
 
-.tab-btn.active svg {
+.tab-btn-vertical.active svg {
     transform: scale(1.1);
+}
+
+.tab-label {
+    font-size: 0.9rem;
+    font-weight: 600;
 }
 
 .modal-body {
@@ -848,6 +876,35 @@
         position: absolute;
         top: 20px;
         right: 20px;
+    }
+
+    /* Narrow rail keeps icon-only sizing but stays compact */
+    .modal-tabs-vertical {
+        padding: 12px 8px;
+    }
+
+    .tab-btn-vertical {
+        min-width: 44px;
+        min-height: 44px;
+        padding: 10px;
+    }
+}
+
+@media (max-width: 600px) {
+    /* Stack: rail collapses to icon-only strip on top, form below */
+    .api-detail-modal {
+        flex-direction: column;
+    }
+
+    .modal-tabs-vertical {
+        flex-direction: row;
+        overflow-x: auto;
+        padding: 8px;
+    }
+
+    .tabs-wrapper-vertical {
+        flex-direction: row;
+        overflow-x: auto;
     }
 }
 
