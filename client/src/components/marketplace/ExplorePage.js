@@ -27,8 +27,9 @@ const ExplorePage = () => {
     const [showFilters, setShowFilters] = useState(true);
     const [selectedApi, setSelectedApi] = useState(null);
     const [showApiModal, setShowApiModal] = useState(false);
+    const [modalInitialTab, setModalInitialTab] = useState('overview');
     const [page, setPage] = useState(1);
-    const [hasMore, setHasMore] = useState(true);
+    const [totalPages, setTotalPages] = useState(1);
     const [error, setError] = useState(null);
     const [favorites, setFavorites] = useState(() => {
         try { return new Set(JSON.parse(localStorage.getItem(FAVORITES_KEY) || '[]')); }
@@ -62,17 +63,12 @@ const ExplorePage = () => {
                 tags: selectedTags.join(','),
                 sort: sortBy,
                 page,
-                limit: 12,
+                limit: 24,
                 signal: controller.signal
             });
 
-            if (page === 1) {
-                setApis(data.results || []);
-            } else {
-                setApis(prev => [...prev, ...(data.results || [])]);
-            }
-
-            setHasMore(Boolean(data.hasMore));
+            setApis(data.results || []);
+            setTotalPages(Math.max(1, data.totalPages || 1));
         } catch (err) {
             if (err.name === 'AbortError') return;
             console.error('Failed to fetch APIs:', err);
@@ -94,6 +90,7 @@ const ExplorePage = () => {
     // Fetch APIs when search params change
     useEffect(() => {
         fetchApis();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     }, [fetchApis]);
 
     const fetchCategories = async () => {
@@ -145,8 +142,9 @@ const ExplorePage = () => {
         setError(null);
     };
 
-    const openApiDetail = (api) => {
+    const openApiDetail = (api, tab = 'overview') => {
         setSelectedApi(api);
+        setModalInitialTab(tab);
         setShowApiModal(true);
     };
 
@@ -322,7 +320,7 @@ const ExplorePage = () => {
                     {/* APIs Grid */}
                     {loading && page === 1 ? (
                         <div className="apis-grid">
-                            {Array.from({ length: 12 }).map((_, i) => (
+                            {Array.from({ length: 24 }).map((_, i) => (
                                 <div className="api-card skeleton-card" key={i} style={{ '--i': i }}>
                                     <div className="sk sk-top">
                                         <div className="sk sk-avatar" />
@@ -356,7 +354,7 @@ const ExplorePage = () => {
                                     <div
                                         key={api.id}
                                         className="api-card"
-                                        style={{ '--i': i % 12 }}
+                                        style={{ '--i': i % 24 }}
                                         onClick={() => openApiDetail(api)}
                                     >
                                         {/* Card Top: Identity + rating chip */}
@@ -423,13 +421,13 @@ const ExplorePage = () => {
                                         <div className="api-card-actions">
                                             <button
                                                 className="card-action card-action-primary"
-                                                onClick={(e) => { e.stopPropagation(); openApiDetail(api); }}
+                                                onClick={(e) => { e.stopPropagation(); openApiDetail(api, 'tryit'); }}
                                             >
                                                 <Play size={14} /> Try It
                                             </button>
                                             <button
                                                 className="card-action"
-                                                onClick={(e) => { e.stopPropagation(); openApiDetail(api); }}
+                                                onClick={(e) => { e.stopPropagation(); openApiDetail(api, 'endpoints'); }}
                                             >
                                                 <BookOpen size={14} /> Docs
                                             </button>
@@ -446,15 +444,41 @@ const ExplorePage = () => {
                                 ))}
                             </div>
 
-                            {/* Load More */}
-                            {hasMore && (
-                                <div className="load-more-section">
+                            {/* Pagination */}
+                            {totalPages > 1 && (
+                                <div className="pagination">
                                     <button
-                                        className="btn-secondary"
-                                        onClick={() => setPage(prev => prev + 1)}
-                                        disabled={loading}
+                                        className="page-btn"
+                                        onClick={() => setPage(p => Math.max(1, p - 1))}
+                                        disabled={page === 1 || loading}
                                     >
-                                        {loading ? 'Loading...' : 'Load More'}
+                                        Prev
+                                    </button>
+                                    {Array.from({ length: totalPages }, (_, i) => i + 1)
+                                        .filter(n => n === 1 || n === totalPages || Math.abs(n - page) <= 1)
+                                        .reduce((acc, n, i, arr) => {
+                                            if (i > 0 && n - arr[i - 1] > 1) acc.push('...' + n);
+                                            acc.push(n);
+                                            return acc;
+                                        }, [])
+                                        .map(n => typeof n === 'string' ? (
+                                            <span key={n} className="page-ellipsis">…</span>
+                                        ) : (
+                                            <button
+                                                key={n}
+                                                className={`page-btn ${n === page ? 'active' : ''}`}
+                                                onClick={() => setPage(n)}
+                                                disabled={loading}
+                                            >
+                                                {n}
+                                            </button>
+                                        ))}
+                                    <button
+                                        className="page-btn"
+                                        onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                                        disabled={page === totalPages || loading}
+                                    >
+                                        Next
                                     </button>
                                 </div>
                             )}
@@ -467,6 +491,7 @@ const ExplorePage = () => {
             {showApiModal && selectedApi && (
                 <ApiDetailModal
                     api={selectedApi}
+                    initialTab={modalInitialTab}
                     onClose={closeApiModal}
                 />
             )}

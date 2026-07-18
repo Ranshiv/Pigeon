@@ -351,7 +351,7 @@
     color: var(--text-muted);
 }
 
-.endpoints-list {
+.documentation-editor .endpoints-list {
     margin-top: 24px;
     background-color: var(--background-color);
     border: 1px solid var(--border-color);
@@ -360,7 +360,7 @@
     box-shadow: none;
 }
 
-.endpoints-list h4 {
+.documentation-editor .endpoints-list h4 {
     margin-top: 0;
     margin-bottom: 14px;
     font-size: 16px;
@@ -637,7 +637,7 @@
     }
 
     .editor-tools,
-    .endpoints-list {
+    .documentation-editor .endpoints-list {
         margin-bottom: 16px;
     }
 }

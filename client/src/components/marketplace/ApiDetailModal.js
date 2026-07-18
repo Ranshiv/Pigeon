@@ -8,8 +8,8 @@ import './ApiDetailModal.css';
 
 const TAB_ORDER = ['overview', 'tryit', 'endpoints', 'reviews', 'forums', 'guides', 'health'];
 
-const ApiDetailModal = ({ api, onClose }) => {
-    const [activeTab, setActiveTab] = useState('overview');
+const ApiDetailModal = ({ api, onClose, initialTab = 'overview' }) => {
+    const [activeTab, setActiveTab] = useState(TAB_ORDER.includes(initialTab) ? initialTab : 'overview');
     const [selectedEndpoint, setSelectedEndpoint] = useState(api.endpoints[0] || null);
     const [copied, setCopied] = useState(false);
 
