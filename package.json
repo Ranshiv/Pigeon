@@ -6,9 +6,9 @@
     "pigeon": "./cli/pigeon-cli.js"
   },
   "scripts": {
-    "test": "jest --passWithNoTests",
-    "test:watch": "jest --watch --passWithNoTests",
-    "test:coverage": "jest --coverage --passWithNoTests",
+    "test": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js --passWithNoTests",
+    "test:watch": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js --watch --passWithNoTests",
+    "test:coverage": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js --coverage --passWithNoTests",
     "cli": "node ./cli/pigeon-cli.js",
     "generate:guide-pdf": "node generate-pdf-guide.js",
     "clean:empty:dry": "node ./scripts/remove-empty-files.js",

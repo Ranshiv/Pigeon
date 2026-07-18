@@ -12,6 +12,7 @@ import AlertsDashboard from './components/alerting/AlertsDashboard';
 import AlertPolicyEditor from './components/alerting/AlertPolicyEditor';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import PageLoader from './components/common/PageLoader/PageLoader';
 import './App.css';
 
 const APP_NAME = 'Pigeon';
@@ -120,25 +121,8 @@ function App() {
   // Show loading spinner while checking authentication
   if (isLoading) {
     return (
-      <div className="App" style={{
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        height: '100vh',
-        background: '#1a1a2e'
-      }}>
-        <div style={{ textAlign: 'center', color: '#fff' }}>
-          <div style={{
-            border: '4px solid #f3f3f3',
-            borderTop: '4px solid #4a9eff',
-            borderRadius: '50%',
-            width: '50px',
-            height: '50px',
-            animation: 'spin 1s linear infinite',
-            margin: '0 auto 20px'
-          }}></div>
-          <p>Loading...</p>
-        </div>
+      <div className="App" style={{ display: 'flex', height: '100vh' }}>
+        <PageLoader size="lg" label="Loading..." />
       </div>
     );
   }

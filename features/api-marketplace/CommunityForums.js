@@ -49,6 +49,17 @@ class CommunityForums {
             tags
         });
         await thread.save();
+        // Seed the opening body as the first post so consumers (and getThread)
+        // see the thread's content as posts[0], consistent with a forum model.
+        const openingPost = new ForumPost({
+            threadId: thread._id,
+            userId,
+            body
+        });
+        await openingPost.save();
+        thread.replyCount = 1;
+        thread.lastReplyAt = new Date();
+        await thread.save();
         return thread;
     }
 

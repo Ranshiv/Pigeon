@@ -35,6 +35,7 @@ const ReviewService = require('../features/api-marketplace/ReviewService');
 const CommunityForums = require('../features/api-marketplace/CommunityForums');
 const GuideService = require('../features/api-marketplace/GuideService');
 const HealthService = require('../features/api-marketplace/HealthService');
+const { ensureAuthenticated } = require('../middleware/auth');
 
 // GET /api/marketplace/search - Search public APIs
 router.get('/search', async (req, res) => {
@@ -273,9 +274,8 @@ router.get('/listings/:id/reviews', async (req, res) => {
     }
 });
 
-router.post('/listings/:id/reviews', async (req, res) => {
+router.post('/listings/:id/reviews', ensureAuthenticated, async (req, res) => {
     try {
-        if (!req.user) return res.status(401).json({ error: 'Unauthorized' });
         const review = await ReviewService.createReview(req.params.id, req.user._id, req.body);
         res.json(review);
     } catch (err) {
@@ -293,9 +293,8 @@ router.get('/listings/:id/forums/threads', async (req, res) => {
     }
 });
 
-router.post('/listings/:id/forums/threads', async (req, res) => {
+router.post('/listings/:id/forums/threads', ensureAuthenticated, async (req, res) => {
     try {
-        if (!req.user) return res.status(401).json({ error: 'Unauthorized' });
         const thread = await CommunityForums.createThread(req.params.id, req.user._id, req.body);
         res.json(thread);
     } catch (err) {
@@ -312,9 +311,8 @@ router.get('/forums/threads/:threadId', async (req, res) => {
     }
 });
 
-router.post('/forums/threads/:threadId/posts', async (req, res) => {
+router.post('/forums/threads/:threadId/posts', ensureAuthenticated, async (req, res) => {
     try {
-        if (!req.user) return res.status(401).json({ error: 'Unauthorized' });
         const post = await CommunityForums.replyToThread(req.params.threadId, req.user._id, req.body);
         res.json(post);
     } catch (err) {
@@ -344,9 +342,8 @@ router.get('/listings/:id/guides/:slug', async (req, res) => {
     }
 });
 
-router.post('/listings/:id/guides', async (req, res) => {
+router.post('/listings/:id/guides', ensureAuthenticated, async (req, res) => {
     try {
-        // In real app, check for admin/creator permissions
         const guide = await GuideService.createGuide(req.params.id, req.body);
         res.json(guide);
     } catch (err) {
