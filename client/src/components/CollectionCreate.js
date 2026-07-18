@@ -4,6 +4,7 @@ import './CollectionsManagement.css'; // Reuse the existing CSS
 
 const CollectionCreate = ({
     workspaceId: workspaceIdProp,
+    workspaceName,
     embedded = false,
     onCancel,
     onCreated
@@ -108,7 +109,7 @@ const CollectionCreate = ({
                 <h1>Create New Collection</h1>
                 <p className="subtitle">
                     {workspaceId
-                        ? `Creating collection in workspace: ${workspaceId}`
+                        ? `Creating collection in workspace: ${workspaceName || workspaceId}`
                         : 'Creating collection in your default workspace'}
                 </p>
             </div>

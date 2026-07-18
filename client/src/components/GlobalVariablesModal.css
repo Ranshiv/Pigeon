@@ -100,9 +100,8 @@
     color: var(--danger-color, #dc3545);
     border: 1px solid color-mix(in srgb, var(--danger-color, #dc3545) 30%, transparent);
     border-radius: var(--tester-radius-sm, 8px);
-    padding: 10px 14px;
-    margin: 0 24px;
-    margin-top: 16px;
+    padding: 12px 16px;
+    margin: 0;
     font-size: 0.85rem;
 }
 

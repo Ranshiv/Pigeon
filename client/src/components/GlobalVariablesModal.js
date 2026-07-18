@@ -83,13 +83,13 @@ const GlobalVariablesModal = ({
                     </button>
                 </div>
 
-                {error && (
-                    <div className="global-variables-error">
-                        {error}
-                    </div>
-                )}
-
                 <div className="global-variables-content">
+                    {error && (
+                        <div className="global-variables-error">
+                            {error}
+                        </div>
+                    )}
+
                     {loading ? (
                         <div className="global-variables-loading">
                             <div className="global-variables-spinner"></div>

@@ -1071,6 +1071,7 @@ const WorkspaceDetail = () => {
                         <CollectionCreate
                             embedded
                             workspaceId={workspace._id}
+                            workspaceName={workspace.name}
                             onCancel={closeCreateCollectionModal}
                             onCreated={async () => {
                                 closeCreateCollectionModal();
