@@ -1,6 +1,8 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Search, Filter, Star, TrendingUp, ChevronDown, X, Play, BookOpen, Bookmark } from 'lucide-react';
 import ApiDetailModal from './ApiDetailModal';
+import { MarketplaceApi } from './MarketplaceApi';
+import { debounce } from '../../utils/debounce';
 import './ExplorePage.css';
 
 // Segmented sort. Backend must accept these `sort` keys; unknown keys fall back to default order.
@@ -27,10 +29,12 @@ const ExplorePage = () => {
     const [showApiModal, setShowApiModal] = useState(false);
     const [page, setPage] = useState(1);
     const [hasMore, setHasMore] = useState(true);
+    const [error, setError] = useState(null);
     const [favorites, setFavorites] = useState(() => {
         try { return new Set(JSON.parse(localStorage.getItem(FAVORITES_KEY) || '[]')); }
         catch { return new Set(); }
     });
+    const abortRef = useRef(null);
 
     const toggleFavorite = (id) => {
         setFavorites(prev => {
@@ -43,29 +47,40 @@ const ExplorePage = () => {
 
     const fetchApis = useCallback(async () => {
         setLoading(true);
+        setError(null);
+        if (abortRef.current) {
+            abortRef.current.abort();
+        }
+        const controller = new AbortController();
+        abortRef.current = controller;
+
         try {
-            const params = new URLSearchParams({
+            const categoryParam = selectedCategory === 'All' ? '' : selectedCategory;
+            const data = await MarketplaceApi.searchListings({
                 query: searchQuery,
-                category: selectedCategory,
+                category: categoryParam,
                 tags: selectedTags.join(','),
                 sort: sortBy,
-                page: page.toString(),
-                limit: '12'
+                page,
+                limit: 12,
+                signal: controller.signal
             });
 
-            const response = await fetch(`http://localhost:5001/api/marketplace/search?${params}`);
-            const data = await response.json();
-
             if (page === 1) {
-                setApis(data.results);
+                setApis(data.results || []);
             } else {
-                setApis(prev => [...prev, ...data.results]);
+                setApis(prev => [...prev, ...(data.results || [])]);
             }
 
-            setHasMore(data.hasMore);
-        } catch (error) {
-            console.error('Failed to fetch APIs:', error);
+            setHasMore(Boolean(data.hasMore));
+        } catch (err) {
+            if (err.name === 'AbortError') return;
+            console.error('Failed to fetch APIs:', err);
+            setError(err.message || 'Failed to load APIs. Please try again.');
         } finally {
+            if (abortRef.current === controller) {
+                abortRef.current = null;
+            }
             setLoading(false);
         }
     }, [searchQuery, selectedCategory, selectedTags, sortBy, page]);
@@ -83,22 +98,31 @@ const ExplorePage = () => {
 
     const fetchCategories = async () => {
         try {
-            const response = await fetch('http://localhost:5001/api/marketplace/categories');
-            const data = await response.json();
-            setCategories([{ name: 'All', count: 0 }, ...data]);
+            const data = await MarketplaceApi.listCategories();
+            const total = data.reduce((sum, c) => sum + (c.count || 0), 0);
+            setCategories([{ name: 'All', count: total }, ...data]);
         } catch (error) {
             console.error('Failed to fetch categories:', error);
+            setError(error.message || 'Failed to load categories.');
         }
     };
 
     const fetchTags = async () => {
         try {
-            const response = await fetch('http://localhost:5001/api/marketplace/tags');
-            const data = await response.json();
+            const data = await MarketplaceApi.listTags();
             setTags(data.slice(0, 20)); // Show top 20 tags
         } catch (error) {
             console.error('Failed to fetch tags:', error);
         }
+    };
+
+    const debouncedSetSearch = useCallback(
+        debounce((value) => setSearchQuery(value), 250),
+        []
+    );
+
+    const retry = () => {
+        fetchApis();
     };
 
     const toggleTag = (tagName) => {
@@ -118,6 +142,7 @@ const ExplorePage = () => {
         setSelectedTags([]);
         setSortBy('popular');
         setPage(1);
+        setError(null);
     };
 
     const openApiDetail = (api) => {
@@ -154,7 +179,7 @@ const ExplorePage = () => {
                             placeholder="Search APIs by name, category, or tag..."
                             value={searchQuery}
                             onChange={(e) => {
-                                setSearchQuery(e.target.value);
+                                debouncedSetSearch(e.target.value);
                                 setPage(1);
                             }}
                             className="search-input"
@@ -287,10 +312,17 @@ const ExplorePage = () => {
                         </div>
                     )}
 
+                    {error && !loading && (
+                        <div className="explore-error" role="alert">
+                            <span>{error}</span>
+                            <button className="empty-btn" onClick={retry}>Retry</button>
+                        </div>
+                    )}
+
                     {/* APIs Grid */}
                     {loading && page === 1 ? (
                         <div className="apis-grid">
-                            {Array.from({ length: 6 }).map((_, i) => (
+                            {Array.from({ length: 12 }).map((_, i) => (
                                 <div className="api-card skeleton-card" key={i} style={{ '--i': i }}>
                                     <div className="sk sk-top">
                                         <div className="sk sk-avatar" />
@@ -327,64 +359,67 @@ const ExplorePage = () => {
                                         style={{ '--i': i % 12 }}
                                         onClick={() => openApiDetail(api)}
                                     >
-                                        {/* Card Top: Identity & Badges */}
-                                        <div className="api-card-top">
-                                            <div className="api-identity">
-                                                <div className="api-icon">
-                                                    {api.logo ? (
-                                                        <img src={api.logo} alt={api.name} />
-                                                    ) : (
-                                                        <div className="api-icon-placeholder">
+                                        {/* Card Top: Identity + rating chip */}
+                                        <div className="api-card-head">
+                                            <div className="api-icon">
+                                                {api.logo ? (
+                                                    <>
+                                                        <img
+                                                            src={api.logo}
+                                                            alt={api.name}
+                                                            onError={(e) => {
+                                                                e.target.style.display = 'none';
+                                                                e.target.nextSibling.style.display = 'flex';
+                                                            }}
+                                                        />
+                                                        <div className="api-icon-placeholder" style={{ display: 'none' }}>
                                                             {api.name.charAt(0)}
                                                         </div>
-                                                    )}
-                                                </div>
-                                                <div className="api-title-block">
-                                                    <h3 className="api-name">{api.name}</h3>
-                                                    <span className="api-provider">by {api.provider}</span>
-                                                </div>
+                                                    </>
+                                                ) : (
+                                                    <div className="api-icon-placeholder">
+                                                        {api.name.charAt(0)}
+                                                    </div>
+                                                )}
                                             </div>
+                                            <div className="api-title-block">
+                                                <h3 className="api-name">{api.name}</h3>
+                                                <span className="api-provider">by {api.provider}</span>
+                                            </div>
+                                            <div className="api-rating" title={`${formatRating(api.ratingAverage)} from ${api.ratingCount} ratings`}>
+                                                <Star size={13} className="star-icon" fill="currentColor" />
+                                                <span className="api-rating-value">{formatRating(api.ratingAverage)}</span>
+                                            </div>
+                                        </div>
 
-                                            {/* Meta row: badges + category pill, inline under title block */}
-                                            <div className="api-meta-row">
-                                                {api.featured && (
-                                                    <span className="badge badge-featured" title="Featured">
-                                                        <Star size={10} fill="currentColor" />
-                                                        <span>Featured</span>
-                                                    </span>
-                                                )}
-                                                {api.trending && (
-                                                    <span className="badge badge-trending" title="Trending">
-                                                        <TrendingUp size={10} />
-                                                        <span>Trending</span>
-                                                    </span>
-                                                )}
-                                                <span className="api-category-pill">{api.category}</span>
-                                            </div>
+                                        {/* Badges + category */}
+                                        <div className="api-meta-row">
+                                            {api.featured && (
+                                                <span className="badge badge-featured" title="Featured">
+                                                    <Star size={10} fill="currentColor" />
+                                                    <span>Featured</span>
+                                                </span>
+                                            )}
+                                            {api.trending && (
+                                                <span className="badge badge-trending" title="Trending">
+                                                    <TrendingUp size={10} />
+                                                    <span>Trending</span>
+                                                </span>
+                                            )}
+                                            <span className="api-category-pill">{api.category}</span>
                                         </div>
 
                                         {/* Description */}
-                                        <div className="api-card-body">
-                                            <p className="api-description">{api.description}</p>
+                                        <p className="api-description">{api.description}</p>
+
+                                        {/* Technical meta chips */}
+                                        <div className="api-tech-row">
+                                            <span className="tech-badge">{api.authType}</span>
+                                            <span className="tech-badge">{api.pricing}</span>
+                                            <span className="api-rating-count">{api.ratingCount?.toLocaleString?.() ?? api.ratingCount} uses</span>
                                         </div>
 
-                                        {/* Footer: Stats & Technical Tags */}
-                                        <div className="api-card-footer">
-                                            <div className="stats-row">
-                                                <div className="stat-item" title="Rating">
-                                                    <Star size={14} className="star-icon" fill="currentColor" />
-                                                    <span className="stat-value">{formatRating(api.ratingAverage)}</span>
-                                                    <span className="stat-sub">({api.ratingCount})</span>
-                                                </div>
-                                            </div>
-
-                                            <div className="tags-row">
-                                                <span className="tech-badge">{api.authType}</span>
-                                                <span className="tech-badge">{api.pricing}</span>
-                                            </div>
-                                        </div>
-
-                                        {/* Hover action row */}
+                                        {/* Action row */}
                                         <div className="api-card-actions">
                                             <button
                                                 className="card-action card-action-primary"
