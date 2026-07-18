@@ -88,12 +88,12 @@ export class TemplateLibraryManager {
                             <div class="date-range">{{dateRange}}</div>
                         </div>
                         
-                        <div class="metrics-row">
+                        <div class="ts-kpi-grid">
                             {{#each overview}}
-                            <div class="metric-card">
-                                <div class="metric-value">{{this.value}}</div>
-                                <div class="metric-label">{{this.label}}</div>
-                                <div class="metric-change {{this.changeType}}">{{this.change}}</div>
+                            <div class="ts-kpi">
+                                <div class="ts-kpi-label">{{this.label}}</div>
+                                <div class="ts-kpi-value">{{this.value}}</div>
+                                <div class="ts-kpi-change {{this.changeType}}">{{this.change}}</div>
                             </div>
                             {{/each}}
                         </div>
@@ -122,7 +122,7 @@ export class TemplateLibraryManager {
                     <div class="api-status-monitor">
                         <div class="status-header">
                             <h3>API Status</h3>
-                            <div class="last-updated">Last updated: {{formatTime timestamp}}</div>
+                            <div class="last-updated">Last updated: {{formatTimestamp timestamp}}</div>
                         </div>
                         
                         <div class="overall-status status-{{overallStatus}}">
@@ -130,20 +130,14 @@ export class TemplateLibraryManager {
                             <span class="status-text">{{overallStatusText}}</span>
                         </div>
                         
-                        <div class="performance-metrics">
-                            <div class="metric">
-                                <span class="metric-label">Response Time</span>
-                                <span class="metric-value">{{responseTime}}ms</span>
-                                <div class="metric-bar">
-                                    <div class="metric-fill" style="width: {{responseTimePercent}}%"></div>
-                                </div>
+                        <div class="ts-kpi-grid">
+                            <div class="ts-kpi">
+                                <div class="ts-kpi-label">Response Time</div>
+                                <div class="ts-kpi-value">{{responseTime}}ms</div>
                             </div>
-                            <div class="metric">
-                                <span class="metric-label">Uptime</span>
-                                <span class="metric-value">{{uptime}}%</span>
-                                <div class="metric-bar">
-                                    <div class="metric-fill" style="width: {{uptime}}%"></div>
-                                </div>
+                            <div class="ts-kpi">
+                                <div class="ts-kpi-label">Uptime</div>
+                                <div class="ts-kpi-value">{{uptime}}%</div>
                             </div>
                         </div>
                         
@@ -201,14 +195,10 @@ export class TemplateLibraryManager {
                     <div class="json-explorer">
                         <div class="json-header">
                             <h3>{{title}}</h3>
-                            <div class="json-controls">
-                                <button class="btn btn-small" onclick="expandAll()">Expand All</button>
-                                <button class="btn btn-small" onclick="collapseAll()">Collapse All</button>
-                            </div>
                         </div>
-                        <div class="json-tree">
-                            {{jsonTree data}}
-                        </div>
+                        <pre class="json-content">
+                            {{json data}}
+                        </pre>
                     </div>
                 `
             }

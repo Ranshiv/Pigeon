@@ -1,0 +1,274 @@
+- generic [ref=f3e3]:
+  - navigation [ref=f3e4]:
+    - generic [ref=f3e5]:
+      - generic [ref=f3e6] [cursor=pointer]: Pigeon
+      - link "Sign In" [ref=f3e9] [cursor=pointer]:
+        - /url: http://localhost:5001/auth/google
+  - generic [ref=f3e10]:
+    - generic [ref=f3e11]:
+      - generic:
+        - generic: Project Management
+        - generic: Team Communication
+        - generic: Document Collaboration
+        - generic: Task Tracking
+      - generic [ref=f3e12]:
+        - generic [ref=f3e13]:
+          - heading "Everything App for your teams" [level=1] [ref=f3e14]
+          - paragraph [ref=f3e15]:
+            - strong [ref=f3e16]: Pigeon
+            - text: is an open-source platform that serves as an all-in-one replacement of
+            - strong [ref=f3e17]: Linear
+            - text: ","
+            - strong [ref=f3e18]: Jira
+            - text: ","
+            - strong [ref=f3e19]: Slack
+            - text: ", and"
+            - strong [ref=f3e20]: Notion
+            - text: . Streamline your workflow with a single unified experience.
+          - generic [ref=f3e21]:
+            - link "TRY IT FREE →" [ref=f3e22] [cursor=pointer]:
+              - /url: "#"
+            - link "Learn More" [ref=f3e23] [cursor=pointer]:
+              - /url: "#features"
+          - generic [ref=f3e24]:
+            - generic [ref=f3e25]: Built with
+            - generic [ref=f3e26]:
+              - img "React" [ref=f3e27]
+              - img "Node.js" [ref=f3e29]
+              - img "Modern JavaScript" [ref=f3e31]
+              - img "High Performance" [ref=f3e33]
+        - generic [ref=f3e35]:
+          - generic [ref=f3e36]:
+            - generic [ref=f3e41]: workspace.js
+            - generic [ref=f3e42]: project.js
+          - generic [ref=f3e44]:
+            - generic [ref=f3e45]: "1"
+            - generic [ref=f3e46]: "2"
+            - generic [ref=f3e47]: "3"
+            - generic [ref=f3e48]: "4"
+            - generic [ref=f3e49]: "5"
+            - generic [ref=f3e50]: "6"
+            - generic [ref=f3e51]: "7"
+            - generic [ref=f3e52]: "8"
+            - generic [ref=f3e53]: "9"
+            - generic [ref=f3e54]: "10"
+            - generic [ref=f3e55]: "11"
+            - generic [ref=f3e56]: "12"
+            - generic [ref=f3e57]: "13"
+            - generic [ref=f3e58]: "14"
+            - generic [ref=f3e59]: "15"
+            - generic [ref=f3e60]: "16"
+            - generic [ref=f3e61]: "17"
+            - generic [ref=f3e62]: "18"
+            - generic [ref=f3e63]: "19"
+            - generic [ref=f3e64]: "20"
+            - generic [ref=f3e65]: "21"
+            - generic [ref=f3e66]: "22"
+            - generic [ref=f3e67]: "23"
+            - generic [ref=f3e68]: "24"
+            - generic [ref=f3e69]: "25"
+            - generic [ref=f3e70]: "26"
+            - generic [ref=f3e71]: "27"
+            - generic [ref=f3e72]: "28"
+            - generic [ref=f3e73]: "29"
+            - generic [ref=f3e74]: "30"
+            - generic [ref=f3e75]: "31"
+            - generic [ref=f3e76]: "32"
+            - generic [ref=f3e77]: "33"
+            - generic [ref=f3e78]: "34"
+            - generic [ref=f3e79]: "35"
+            - generic [ref=f3e80]: "36"
+            - generic [ref=f3e81]: "37"
+            - generic [ref=f3e82]: "38"
+            - generic [ref=f3e83]: "39"
+            - generic [ref=f3e84]: "40"
+            - generic [ref=f3e85]: "41"
+            - generic [ref=f3e86]: "42"
+            - generic [ref=f3e87]: "43"
+            - generic [ref=f3e88]: "44"
+            - generic [ref=f3e89]: "45"
+            - generic [ref=f3e90]: "46"
+            - generic [ref=f3e91]: "47"
+            - generic [ref=f3e92]: "48"
+            - generic [ref=f3e93]: "49"
+            - generic [ref=f3e94]: "50"
+            - generic [ref=f3e95]: "51"
+            - generic [ref=f3e96]: "52"
+    - generic [ref=f3e151]:
+      - generic [ref=f3e152]:
+        - heading "Everything you need for productive team work" [level=2] [ref=f3e153]
+        - paragraph [ref=f3e154]: Team Planner • Project Management • Virtual Office • Chat • Documents • Inbox
+      - generic [ref=f3e155]:
+        - generic [ref=f3e156]:
+          - heading "Keyboard Shortcuts" [level=3] [ref=f3e160]
+          - paragraph [ref=f3e161]: Work efficiently with instant access to common actions.
+        - generic [ref=f3e162]:
+          - heading "Team Planner" [level=3] [ref=f3e166]
+          - paragraph [ref=f3e167]: Keep track of the bigger picture by viewing all API endpoints in one centralized dashboard.
+        - generic [ref=f3e168]:
+          - heading "Notifications" [level=3] [ref=f3e173]
+          - paragraph [ref=f3e174]: Keep up to date with any API changes by receiving instant notifications.
+        - generic [ref=f3e175]:
+          - heading "Advanced Filtering" [level=3] [ref=f3e180]
+          - paragraph [ref=f3e181]: Precise API search with advanced filtering capabilities.
+    - generic [ref=f3e182]:
+      - generic [ref=f3e183]:
+        - heading "Work Together. Like in the Office." [level=2] [ref=f3e184]
+        - paragraph [ref=f3e185]: Create customized virtual workspace for any team working with APIs. Collaborate with remote teams seamlessly through real-time communication within your workspace.
+        - generic [ref=f3e186]:
+          - generic [ref=f3e194]:
+            - heading "Team Collaboration" [level=3] [ref=f3e195]
+            - paragraph [ref=f3e196]: Connect with your team instantly to monitor progress and track API updates.
+          - generic [ref=f3e201]:
+            - heading "Chat with Team" [level=3] [ref=f3e202]
+            - paragraph [ref=f3e203]: Send DMs and create group chats directly within your API workspace.
+          - generic [ref=f3e210]:
+            - heading "Version History" [level=3] [ref=f3e211]
+            - paragraph [ref=f3e212]: Track every edit effortlessly, and never lose a single API change.
+      - img "Team Collaboration" [ref=f3e214]
+    - generic [ref=f3e215]:
+      - img "Knowledge Management" [ref=f3e217]
+      - generic [ref=f3e218]:
+        - heading "Knowledge at Your Fingertips" [level=2] [ref=f3e219]
+        - paragraph [ref=f3e220]: Pigeon offers a wide range of features to create and manage your API documentation. Our suite of collaborative editing tools boosts team efficiency.
+        - generic [ref=f3e221]:
+          - paragraph [ref=f3e226]: Documents in Pigeon can be used for sharing API reference materials, collaborating on plans, and storing implementation details.
+          - paragraph [ref=f3e233]: With real-time collaboration, remote teams can work together on API documentation with features like tagging users and linking to endpoints.
+        - link "Start Documentation" [ref=f3e234] [cursor=pointer]:
+          - /url: http://localhost:5001/auth/google
+    - generic [ref=f3e237]:
+      - heading "Key Features" [level=2] [ref=f3e238]
+      - generic [ref=f3e239]:
+        - generic [ref=f3e240]:
+          - heading "Effortless Requesting" [level=3] [ref=f3e244]
+          - paragraph [ref=f3e245]: Quickly create and send any type of HTTP request with an intuitive UI.
+        - generic [ref=f3e246]:
+          - heading "Detailed Inspection" [level=3] [ref=f3e251]
+          - paragraph [ref=f3e252]: Analyze responses, headers, cookies, and performance metrics with ease.
+        - generic [ref=f3e253]:
+          - heading "Save & Organize" [level=3] [ref=f3e259]
+          - paragraph [ref=f3e260]: Save your requests, organize them into collections, and sync across devices.
+    - generic [ref=f3e261]:
+      - heading "Sync with GitHub. Both Ways." [level=2] [ref=f3e262]
+      - paragraph [ref=f3e263]: Manage your API tasks efficiently with Pigeon's bidirectional GitHub synchronization. Use Pigeon as an advanced front-end for GitHub Issues.
+      - generic [ref=f3e264]:
+        - generic [ref=f3e265]:
+          - heading "Two-way Synchronization" [level=3] [ref=f3e271]
+          - paragraph [ref=f3e272]: Integrate your API tracker with GitHub to sync changes instantly.
+        - generic [ref=f3e273]:
+          - heading "Multiple Repositories" [level=3] [ref=f3e280]
+          - paragraph [ref=f3e281]: Organize multiple projects for more effective planning and collaboration.
+        - generic [ref=f3e282]:
+          - heading "Global Access" [level=3] [ref=f3e287]
+          - paragraph [ref=f3e288]: Work with your team from anywhere in the world with seamless synchronization.
+    - generic [ref=f3e289]:
+      - heading "Why Choose Pigeon?" [level=2] [ref=f3e290]
+      - generic [ref=f3e291]:
+        - generic [ref=f3e293] [cursor=pointer]:
+          - generic [ref=f3e294]:
+            - heading "Intuitive Interface" [level=3] [ref=f3e299]
+            - paragraph [ref=f3e300]: Easy to learn and use, even for beginners
+          - generic [ref=f3e301]:
+            - paragraph [ref=f3e302]: Our clean, modern interface helps you focus on what matters - testing your APIs without distractions.
+            - link "Try it now" [ref=f3e303]:
+              - /url: http://localhost:5001/auth/google
+        - generic [ref=f3e307] [cursor=pointer]:
+          - generic [ref=f3e308]:
+            - heading "Core Functionality" [level=3] [ref=f3e312]
+            - paragraph [ref=f3e313]: Everything you need for effective API testing
+          - generic [ref=f3e314]:
+            - paragraph [ref=f3e315]: We focus on the essential features that developers need daily, without unnecessary complexity.
+            - link "Get started" [ref=f3e316]:
+              - /url: http://localhost:5001/auth/google
+        - generic [ref=f3e320] [cursor=pointer]:
+          - generic [ref=f3e321]:
+            - heading "Streamlined Workflow" [level=3] [ref=f3e327]
+            - paragraph [ref=f3e328]: Save time and reduce errors
+          - generic [ref=f3e329]:
+            - paragraph [ref=f3e330]: Pigeon helps you build a more efficient workflow with saved requests, collections, and quick responses.
+            - link "Explore more" [ref=f3e331]:
+              - /url: http://localhost:5001/auth/google
+        - generic [ref=f3e335] [cursor=pointer]:
+          - generic [ref=f3e336]:
+            - heading "Free to Use" [level=3] [ref=f3e341]
+            - paragraph [ref=f3e342]: Get started without any cost
+          - generic [ref=f3e343]:
+            - paragraph [ref=f3e344]: Pigeon is 100% free to use with all core features available to everyone, no hidden limitations.
+            - link "Sign up free" [ref=f3e345]:
+              - /url: http://localhost:5001/auth/google
+    - generic [ref=f3e348]:
+      - heading "Ready to Transform Your API Development?" [level=2] [ref=f3e349]
+      - paragraph [ref=f3e350]: Join thousands of developers building better APIs with Pigeon.
+      - generic [ref=f3e351]:
+        - link "Try It Free" [ref=f3e352] [cursor=pointer]:
+          - /url: http://localhost:5001/auth/google
+        - generic [ref=f3e353]:
+          - link "GitHub" [ref=f3e354] [cursor=pointer]:
+            - /url: https://github.com
+          - link "Slack" [ref=f3e357] [cursor=pointer]:
+            - /url: https://slack.com
+          - link "Twitter" [ref=f3e360] [cursor=pointer]:
+            - /url: https://twitter.com
+          - link "LinkedIn" [ref=f3e363] [cursor=pointer]:
+            - /url: https://linkedin.com
+      - paragraph [ref=f3e366]: Made with passion by the Pigeon team
+  - region "Notifications Alt+T"
+  - contentinfo [ref=f3e367]:
+    - generic [ref=f3e368]:
+      - generic [ref=f3e369]:
+        - generic [ref=f3e370]:
+          - heading "Pigeon" [level=3] [ref=f3e371]
+          - paragraph [ref=f3e372]: The ultimate API development platform
+          - generic [ref=f3e373]:
+            - link [ref=f3e374] [cursor=pointer]:
+              - /url: https://github.com
+            - link [ref=f3e377] [cursor=pointer]:
+              - /url: https://twitter.com
+            - link [ref=f3e380] [cursor=pointer]:
+              - /url: https://linkedin.com
+        - generic [ref=f3e383]:
+          - heading "Product" [level=4] [ref=f3e384]
+          - list [ref=f3e385]:
+            - listitem [ref=f3e386]:
+              - link "API Network" [ref=f3e387] [cursor=pointer]:
+                - /url: /workspace/api-network
+            - listitem [ref=f3e390]:
+              - link "Collections" [ref=f3e391] [cursor=pointer]:
+                - /url: /workspace/collections
+            - listitem [ref=f3e395]:
+              - link "Documentation" [ref=f3e396] [cursor=pointer]:
+                - /url: /documentation
+            - listitem [ref=f3e400]:
+              - link "History" [ref=f3e401] [cursor=pointer]:
+                - /url: /workspace/history
+        - generic [ref=f3e405]:
+          - heading "Resources" [level=4] [ref=f3e406]
+          - list [ref=f3e407]:
+            - listitem [ref=f3e408]:
+              - link "Help Center" [ref=f3e409] [cursor=pointer]:
+                - /url: "#"
+            - listitem [ref=f3e413]:
+              - link "API Status" [ref=f3e414] [cursor=pointer]:
+                - /url: "#"
+            - listitem [ref=f3e418]:
+              - link "Tutorials" [ref=f3e419] [cursor=pointer]:
+                - /url: "#"
+            - listitem [ref=f3e423]:
+              - link "Blog" [ref=f3e424] [cursor=pointer]:
+                - /url: "#"
+        - generic [ref=f3e429]:
+          - heading "Contact Us" [level=4] [ref=f3e430]
+          - link "support@pigeonapp.io" [ref=f3e431] [cursor=pointer]:
+            - /url: mailto:support@pigeonapp.io
+          - paragraph [ref=f3e435]: Have questions or feedback? We'd love to hear from you!
+      - generic [ref=f3e436]:
+        - generic [ref=f3e437]: © 2026 Pigeon. All rights reserved.
+        - generic [ref=f3e438]:
+          - link "Privacy Policy" [ref=f3e439] [cursor=pointer]:
+            - /url: "#"
+          - link "Terms of Service" [ref=f3e440] [cursor=pointer]:
+            - /url: "#"
+          - link "Cookies" [ref=f3e441] [cursor=pointer]:
+            - /url: "#"
+          - link "System Status" [ref=f3e442] [cursor=pointer]:
+            - /url: /status

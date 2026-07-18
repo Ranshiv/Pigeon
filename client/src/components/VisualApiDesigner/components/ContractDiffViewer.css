@@ -38,9 +38,9 @@
     --text-placeholder: #7A9BAD;
     --border-light: #003956;
     --border-hover: #004A6B;
-    --color-primary: #58a6ff;
-    --color-primary-hover: #409cff;
-    --color-primary-alpha: rgba(88, 166, 255, 0.15);
+    --color-primary: #38bdf8;
+    --color-primary-hover: #7dd3fc;
+    --color-primary-alpha: rgba(56, 189, 248, 0.15);
     --color-success: #3fb950;
     --color-warning: #d29922;
     --color-error: #f85149;
@@ -531,27 +531,31 @@
     max-width: 24rem;
 }
 
-/* Tab Navigation */
+/* Tab Navigation - segmented control (matches ProtocolTestPage) */
 .diff-tabs {
-    display: flex;
-    gap: 0.25rem;
-    border-bottom: 1px solid var(--border-light);
+    display: inline-flex;
+    gap: 4px;
+    padding: 4px;
+    background: var(--bg-primary);
+    border: 1px solid var(--border-light);
+    border-radius: 10px;
     margin-bottom: 1.5rem;
 }
 
 .tab {
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    gap: 0.5rem;
-    padding: 0.75rem 1rem;
+    gap: 6px;
+    padding: 8px 16px;
     border: none;
     background: transparent;
     color: var(--text-secondary);
-    font-size: 0.875rem;
-    font-weight: 500;
+    font-size: 0.8rem;
+    font-weight: 600;
     cursor: pointer;
-    border-bottom: 2px solid transparent;
-    transition: all 0.2s ease;
+    white-space: nowrap;
+    border-radius: 7px;
+    transition: all 0.15s ease;
 }
 
 .tab:disabled {
@@ -561,11 +565,13 @@
 
 .tab:hover:not(:disabled) {
     color: var(--text-primary);
+    background-color: var(--bg-hover);
 }
 
-.tab.active {
+.contract-diff-viewer .tab.active {
     color: var(--color-primary);
-    border-bottom-color: var(--color-primary);
+    background: var(--color-primary-alpha);
+    font-weight: 600;
 }
 
 /* Responsive Design */

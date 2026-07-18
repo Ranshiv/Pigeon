@@ -4,18 +4,19 @@
     flex-direction: column;
     height: 100%;
     background-color: var(--background-color);
-    border-radius: 8px;
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+    border-radius: var(--radius-lg, 16px);
+    box-shadow: 0 6px 24px color-mix(in srgb, var(--primary-color) 6%, transparent);
     overflow: hidden;
 }
 
-.editor-header {
+.doc-editor-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 18px 20px;
+    padding: 18px clamp(20px, 3vw, 32px);
     border-bottom: 1px solid var(--border-color);
     background-color: var(--card-bg);
+    border-radius: 0;
 }
 
 .editor-title-section {
@@ -26,7 +27,17 @@
     width: 50%;
     font-size: 16px;
     font-weight: 500;
+    padding: 10px 12px;
     border-radius: 6px;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+}
+
+.title-input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px var(--primary-light);
 }
 
 .editor-actions {
@@ -35,11 +46,12 @@
     align-items: center;
 }
 
-/* Modern Toggle Button Group */
+/* Segmented toggle — protocols instrument-panel language */
 .view-toggle-group {
     display: flex;
-    background-color: var(--card-bg);
-    border-radius: 8px;
+    gap: 4px;
+    background-color: var(--background-color);
+    border-radius: var(--radius-md, 12px);
     padding: 4px;
     border: 1px solid var(--border-color);
     position: relative;
@@ -53,14 +65,14 @@
     border: none;
     background-color: transparent;
     cursor: pointer;
-    font-size: 14px;
-    font-weight: 500;
-    transition: all 0.2s ease;
+    font-size: 13px;
+    font-weight: 550;
+    transition: all 0.12s ease;
     color: var(--text-secondary);
     position: relative;
     min-width: 80px;
     justify-content: center;
-    border-radius: 6px;
+    border-radius: var(--radius-sm, 8px);
     white-space: nowrap;
 }
 
@@ -71,14 +83,14 @@
 
 .view-toggle-btn.active {
     background-color: var(--primary-color);
-    color: white;
+    color: var(--button-text, #fff);
     font-weight: 600;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: none;
 }
 
 .view-toggle-btn.active:hover {
-    background-color: var(--primary-hover);
-    color: white;
+    filter: brightness(1.1);
+    color: var(--button-text, #fff);
 }
 
 /* Legacy support for old view-toggle class - can be removed if not used elsewhere */
@@ -108,21 +120,20 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    padding: 10px 18px;
+    padding: 8px 14px;
 
     background: var(--primary-color) !important;
-    color: white !important;
-    border: none;
-    border-radius: 6px;
+    color: var(--button-text, #fff) !important;
+    border: 1px solid var(--primary-color);
+    border-radius: var(--radius-sm, 8px);
     cursor: pointer;
-    font-size: 14px;
-    font-weight: 500;
-    transition: all 0.2s ease;
+    font-size: 13px;
+    font-weight: 600;
+    transition: filter 0.12s ease;
 }
 
 .save-button:hover {
-    background-color: var(--primary-hover) !important;
-    transform: translateY(-1px);
+    filter: brightness(1.1);
 }
 
 .save-button:active {
@@ -155,35 +166,27 @@
     justify-content: center;
     gap: 8px;
     width: 100%;
-    padding: 14px 16px;
+    padding: 12px 16px;
     margin-bottom: 20px;
     background-color: var(--primary-color);
-    color: white;
-    border: none;
-    border-radius: 8px;
+    color: var(--button-text, #fff);
+    border: 1px solid var(--primary-color);
+    border-radius: var(--radius-sm, 8px);
     cursor: pointer;
     font-size: 14px;
     font-weight: 600;
-    transition: all 0.2s ease;
-    box-shadow: 0 2px 8px var(--primary-shadow);
+    transition: filter 0.12s ease;
     position: relative;
     overflow: hidden;
 }
 
 .insert-template-btn:hover {
-    background-color: var(--primary-hover);
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px var(--primary-shadow);
-}
-
-.insert-template-btn:active {
-    transform: translateY(0);
-    box-shadow: 0 2px 6px var(--primary-shadow);
+    filter: brightness(1.1);
 }
 
 .insert-template-btn:focus {
     outline: none;
-    box-shadow: 0 0 0 3px var(--primary-light), 0 2px 8px var(--primary-shadow);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary-color) 15%, transparent);
 }
 
 .editor-content {
@@ -201,6 +204,16 @@
     font-family: 'Roboto Mono', 'Courier New', monospace;
     font-size: 15px;
     line-height: 1.6;
+    background-color: var(--background-color);
+    color: var(--text-color);
+}
+
+.documentation-textarea:focus {
+    outline: none;
+}
+
+.documentation-textarea::placeholder {
+    color: var(--text-muted);
 }
 
 .documentation-preview {
@@ -236,18 +249,18 @@
 }
 
 .documentation-preview pre {
-    background-color: var(--code-background, #f5f7f9);
+    background-color: var(--background-color);
     padding: 16px;
     border-radius: 6px;
     overflow-x: auto;
-    border: 1px solid var(--code-border, #e1e4e8);
+    border: 1px solid var(--border-color);
     margin: 16px 0;
 }
 
 .documentation-preview code {
     font-family: 'Roboto Mono', 'Courier New', monospace;
     font-size: 14px;
-    color: var(--code-text, #24292e);
+    color: var(--text-color);
 }
 
 .documentation-preview p {
@@ -287,20 +300,23 @@
 
 .editor-tools {
     margin-bottom: 28px;
-    background-color: var(--card-bg);
-    border-radius: 8px;
+    background-color: var(--background-color);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md, 12px);
     padding: 16px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    box-shadow: none;
 }
 
 .editor-tools h4 {
     margin-top: 0;
     margin-bottom: 14px;
-    font-size: 16px;
-    color: var(--text-color);
+    font-size: 0.72rem;
     font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
     border-bottom: 1px solid var(--border-color);
-    padding-bottom: 8px;
+    padding-bottom: 10px;
 }
 
 .editor-tools button {
@@ -311,12 +327,12 @@
     margin-bottom: 6px;
     background-color: transparent;
     border: 1px solid var(--border-color);
-    border-radius: 6px;
+    border-radius: var(--radius-sm, 8px);
     cursor: pointer;
     font-size: 14px;
     text-align: left;
     color: var(--text-secondary);
-    transition: all 0.2s ease;
+    transition: all 0.12s ease;
 }
 
 .editor-tools button:hover {
@@ -337,10 +353,11 @@
 
 .endpoints-list {
     margin-top: 24px;
-    background-color: var(--tools-bg, #ffffff);
-    border-radius: 8px;
+    background-color: var(--background-color);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md, 12px);
     padding: 16px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    box-shadow: none;
 }
 
 .endpoints-list h4 {
@@ -365,18 +382,17 @@
     display: flex;
     align-items: center;
     padding: 10px 12px;
-    border: 1px solid var(--border-color, #eaeaea);
-    border-radius: 6px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm, 8px);
     margin-bottom: 8px;
     cursor: pointer;
-    background-color: var(--endpoint-bg, #ffffff);
-    transition: all 0.2s ease;
+    background-color: var(--card-bg);
+    transition: all 0.12s ease;
 }
 
 .endpoint-item:hover {
-    background-color: var(--hover-background, #f5f5f5);
-    transform: translateY(-1px);
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    background-color: var(--hover-bg);
+    border-color: color-mix(in srgb, var(--primary-color) 40%, var(--border-color));
 }
 
 .endpoint-item:active {

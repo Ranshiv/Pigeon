@@ -91,27 +91,28 @@
     background-color: color-mix(in srgb, var(--danger-color) 12%, transparent);
 }
 
-/* Method Filters styled as compliance tabs */
+/* Method Filters as individual chips */
 .hst-tabs {
     display: flex;
-    gap: 4px;
-    padding: 4px;
-    background-color: var(--surface-sunken);
-    border-radius: var(--radius-md);
-    border: 1px solid var(--border-color);
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 0;
+    background-color: transparent;
+    border: none;
 }
 
 .hst-tab {
-    flex: 1;
+    flex: 0 0 auto;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 6px 8px;
+    padding: 8px 16px;
     font-size: 0.75rem;
+    letter-spacing: 0.03em;
     font-weight: 700;
-    border-radius: var(--radius-sm);
-    border: 1px solid transparent;
-    background: transparent;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-color);
+    background-color: var(--surface-sunken);
     color: var(--text-secondary);
     cursor: pointer;
     white-space: nowrap;
@@ -119,6 +120,7 @@
     transition: background var(--dur-fast) var(--ease-out),
                 color var(--dur-fast) var(--ease-out),
                 border-color var(--dur-fast) var(--ease-out),
+                transform var(--dur-fast) var(--ease-out),
                 box-shadow var(--dur-fast) var(--ease-out);
 }
 
@@ -129,6 +131,9 @@
 .hst-tab:hover {
     background-color: var(--hover-bg);
     color: var(--text-color);
+    border-color: var(--text-muted);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
 }
 
 .hst-tab:focus-visible {
@@ -142,33 +147,33 @@
 }
 
 .hst-tab--active.hst-tab--method-get {
-    background-color: color-mix(in srgb, var(--method-get) 12%, var(--surface));
+    background-color: color-mix(in srgb, var(--method-get) 18%, var(--surface));
     color: var(--method-get);
-    border-color: color-mix(in srgb, var(--method-get) 25%, transparent);
+    border-color: color-mix(in srgb, var(--method-get) 45%, transparent);
 }
 
 .hst-tab--active.hst-tab--method-post {
-    background-color: color-mix(in srgb, var(--method-post) 12%, var(--surface));
+    background-color: color-mix(in srgb, var(--method-post) 18%, var(--surface));
     color: var(--method-post);
-    border-color: color-mix(in srgb, var(--method-post) 25%, transparent);
+    border-color: color-mix(in srgb, var(--method-post) 45%, transparent);
 }
 
 .hst-tab--active.hst-tab--method-put {
-    background-color: color-mix(in srgb, var(--method-put) 12%, var(--surface));
+    background-color: color-mix(in srgb, var(--method-put) 18%, var(--surface));
     color: var(--method-put);
-    border-color: color-mix(in srgb, var(--method-put) 25%, transparent);
+    border-color: color-mix(in srgb, var(--method-put) 45%, transparent);
 }
 
 .hst-tab--active.hst-tab--method-delete {
-    background-color: color-mix(in srgb, var(--method-delete) 12%, var(--surface));
+    background-color: color-mix(in srgb, var(--method-delete) 18%, var(--surface));
     color: var(--method-delete);
-    border-color: color-mix(in srgb, var(--method-delete) 25%, transparent);
+    border-color: color-mix(in srgb, var(--method-delete) 45%, transparent);
 }
 
 .hst-tab--active.hst-tab--method-patch {
-    background-color: color-mix(in srgb, var(--method-patch) 12%, var(--surface));
+    background-color: color-mix(in srgb, var(--method-patch) 18%, var(--surface));
     color: var(--method-patch);
-    border-color: color-mix(in srgb, var(--method-patch) 25%, transparent);
+    border-color: color-mix(in srgb, var(--method-patch) 45%, transparent);
 }
 
 /* Content Area */

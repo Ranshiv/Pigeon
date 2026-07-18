@@ -228,6 +228,26 @@ body {
   background: var(--danger-color);
 }
 
+.ts-kpi-change {
+  display: inline-block;
+  margin-top: 8px;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-family: var(--tester-mono);
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+.ts-kpi-change.positive {
+  color: var(--success-color);
+  background: color-mix(in srgb, var(--success-color) 10%, var(--tester-inset));
+}
+
+.ts-kpi-change.negative {
+  color: var(--danger-color);
+  background: color-mix(in srgb, var(--danger-color) 10%, var(--tester-inset));
+}
+
 /* Inputs */
 .ts-input,
 .ts-select,

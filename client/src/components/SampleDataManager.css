@@ -1,15 +1,13 @@
 /* Local fallbacks only — scoped to the component, NOT :root,
    so global theme variables from index.css are untouched. */
 .sample-data-manager {
-    --sidebar-bg: #262626;
-    --hover-color: var(--hover-bg, #333333);
-    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.25);
-    --shadow-md: 0 2px 6px rgba(0, 0, 0, 0.35);
+    --hover-color: var(--hover-bg);
 }
 
 .sample-data-manager {
     display: flex;
     flex-direction: column;
+    gap: 16px;
     height: 100%;
     width: 100%;
     min-height: 100vh;
@@ -18,7 +16,8 @@
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     position: relative;
     margin: 0;
-    padding: 0;
+    padding: clamp(16px, 3vw, 24px);
+    box-sizing: border-box;
     border: none;
     border-radius: 0;
     box-shadow: none;
@@ -32,14 +31,17 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 16px 20px;
-    background: var(--background-color);
-    border-bottom: 1px solid var(--border-color);
+    padding: 18px;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg, 16px);
+    box-shadow: 0 6px 24px color-mix(in srgb, var(--primary-color) 6%, transparent);
     position: relative;
     z-index: 1;
     margin: 0;
-    border-radius: 0;
     width: 100%;
+    flex-shrink: 0;
+    box-sizing: border-box;
 }
 
 /* Top Toolbar similar to the request workspace toolbar */
@@ -47,9 +49,12 @@
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    padding: 12px 16px;
-    background: var(--background-color);
-    border-bottom: 1px solid var(--border-color);
+    padding: 12px 18px;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg, 16px);
+    box-shadow: 0 6px 24px color-mix(in srgb, var(--primary-color) 6%, transparent);
+    flex-shrink: 0;
 }
 
 .toolbar-button-group {
@@ -64,22 +69,22 @@
     align-items: center;
     justify-content: center;
     gap: 6px;
-    padding: 6px 12px;
-    border-radius: var(--border-radius-sm, 6px);
+    padding: 8px 14px;
+    border-radius: var(--radius-sm, 8px);
     border: 1px solid var(--border-color);
-    background: var(--card-bg);
+    background: var(--background-color);
     cursor: pointer;
-    font-size: 0.85rem;
+    font-size: 0.82rem;
+    font-weight: 550;
     color: var(--text-color);
-    transition: all var(--transition-speed, 0.2s);
+    transition: all 0.12s ease;
     height: 32px;
-    box-shadow: var(--shadow, 0 1px 3px rgba(1, 76, 117, 0.15));
+    box-shadow: none;
 }
 
 .toolbar-button:hover {
-    background: var(--hover-bg);
-    border-color: var(--primary-color);
-    box-shadow: var(--shadow-hover, 0 2px 8px rgba(1, 76, 117, 0.2));
+    background: color-mix(in srgb, var(--primary-color) 8%, var(--background-color));
+    border-color: color-mix(in srgb, var(--primary-color) 45%, var(--border-color));
 }
 
 .toolbar-button .icon {
@@ -88,10 +93,9 @@
 }
 
 .toolbar-button.validate {
-    color: var(--success-text, #16a34a);
-    border-color: var(--success-color, #28a745);
-    background: var(--success-bg, #dcfce7);
-
+    color: var(--success-color, #28a745);
+    border-color: color-mix(in srgb, var(--success-color, #28a745) 35%, var(--border-color));
+    background: var(--background-color);
 }
 
 .toolbar-button.validate .icon {
@@ -99,9 +103,8 @@
 }
 
 .toolbar-button.validate:hover {
-    background: var(--success-light, #d4edda);
+    background: color-mix(in srgb, var(--success-color, #28a745) 10%, var(--background-color));
     border-color: var(--success-color, #28a745);
-    box-shadow: 0 2px 8px rgba(40, 167, 69, 0.2);
 }
 
 .toolbar-button.save {
@@ -111,9 +114,7 @@
 }
 
 .toolbar-button.save:hover {
-    background: var(--primary-hover);
-    border-color: var(--primary-hover);
-    box-shadow: var(--shadow-hover);
+    filter: brightness(1.1);
 }
 
 .header-left {
@@ -122,7 +123,8 @@
 }
 
 .sample-data-header h2 {
-    font-size: 1.5rem;
+    font-size: 1.3rem;
+    font-weight: 600;
     margin: 0;
     color: var(--text-color);
     display: flex;
@@ -131,19 +133,19 @@
 }
 
 .sample-data-header h2 .icon {
-    color: var(--text-color);
+    color: var(--primary-color);
 }
 
 .header-subtitle {
     color: var(--text-secondary);
-    margin: 5px 0 0;
+    margin: 4px 0 0;
     font-size: 0.85rem;
-    opacity: 0.8;
+    opacity: 1;
 }
 
 .sample-data-actions {
     display: flex;
-    gap: 12px;
+    gap: 10px;
 }
 
 .action-btn {
@@ -151,25 +153,24 @@
     align-items: center;
     justify-content: center;
     gap: 8px;
-    padding: 8px 16px;
-    border-radius: var(--border-radius-sm, 6px);
+    padding: 8px 14px;
+    border-radius: var(--radius-sm, 8px);
     border: 1px solid var(--border-color);
-    background: var(--card-bg);
+    background: var(--background-color);
     cursor: pointer;
-    font-size: 0.9rem;
-    font-weight: 500;
+    font-size: 0.82rem;
+    font-weight: 550;
     color: var(--text-color);
-    transition: all var(--transition-speed, 0.2s);
-    box-shadow: var(--shadow);
+    transition: all 0.12s ease;
+    box-shadow: none;
     height: auto !important;
     width: auto !important;
 }
 
 .action-btn:hover {
-    background: var(--hover-bg);
+    background: color-mix(in srgb, var(--primary-color) 8%, var(--background-color));
     color: var(--text-color);
-    border-color: var(--primary-color);
-    box-shadow: var(--shadow-hover);
+    border-color: color-mix(in srgb, var(--primary-color) 45%, var(--border-color));
 }
 
 .action-btn .icon {
@@ -177,28 +178,22 @@
 }
 
 .action-btn.template-btn {
-    background: #014C75;
-    color: #ffffff;
-    border-color: #014C75;
-    font-weight: 500;
+    background: var(--primary-color);
+    color: var(--button-text, #ffffff);
+    border-color: var(--primary-color);
+    font-weight: 550;
 }
 
 .action-btn.template-btn:hover {
-    background: #013B5B;
-    color: #ffffff;
-    border-color: #013B5B;
-    box-shadow: 0 2px 8px rgba(1, 76, 117, 0.3);
-    transform: translateY(-1px);
+    filter: brightness(1.1);
 }
 
 .action-btn.template-btn:active {
-    background: #012840;
-    border-color: #012840;
-    transform: translateY(0);
+    filter: brightness(0.95);
 }
 
 .action-btn.template-btn .icon {
-    color: var(--text-color);
+    color: var(--button-text, #ffffff);
 }
 
 .error-message {
@@ -236,15 +231,14 @@
 .sample-data-content {
     display: flex;
     flex: 1;
-    height: calc(100% - 64px);
-    /* Adjusted for header height */
-    min-height: calc(100% - 64px);
+    gap: 16px;
     overflow: hidden;
-    background: var(--background-color);
+    background: transparent;
     position: relative;
     z-index: 1;
     margin: 0;
     border: none;
+    min-height: 0;
 }
 
 .datasets-sidebar {
@@ -252,8 +246,10 @@
     min-width: 280px;
     max-width: 350px;
     height: 100%;
-    background: var(--sidebar-bg);
-    border-right: 1px solid var(--border-color);
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg, 16px);
+    box-shadow: 0 6px 24px color-mix(in srgb, var(--primary-color) 6%, transparent);
     display: flex;
     flex-direction: column;
     overflow: hidden;
@@ -272,15 +268,19 @@
 
 .search-input-container input {
     padding: 8px 12px 8px 35px;
-    border-radius: var(--border-radius-sm, 6px);
+    border-radius: var(--radius-sm, 8px);
+    background: var(--background-color);
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
     font-size: 0.9rem;
-    transition: all var(--transition-speed, 0.2s);
-    box-shadow: var(--shadow);
+    transition: all 0.12s ease;
+    box-shadow: none;
 }
 
 .search-input-container input:focus {
-    background-color: var(--hover-bg);
-    box-shadow: var(--shadow-md);
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px var(--primary-light);
 }
 
 .search-input-container input::placeholder {
@@ -301,42 +301,45 @@
     display: flex;
     overflow-x: auto;
     white-space: nowrap;
-    gap: 8px;
+    gap: 6px;
 }
 
 .category-btn {
     padding: 6px 12px;
-    border-radius: 20px;
+    border-radius: var(--radius-sm, 8px);
     border: 1px solid var(--border-color);
-    background: var(--card-bg);
-    font-size: 0.8rem;
+    background: var(--background-color);
+    font-size: 0.78rem;
+    font-weight: 550;
     color: var(--text-secondary);
     cursor: pointer;
-    transition: all var(--transition-speed, 0.2s);
+    transition: all 0.12s ease;
     display: inline-flex;
     align-items: center;
     gap: 5px;
-    box-shadow: var(--shadow);
+    box-shadow: none;
 }
 
 .category-btn .icon {
     font-size: 0.75rem;
-    color: var(--text-color);
+    color: var(--text-secondary);
 }
 
 .category-btn:hover {
-    background: var(--hover-bg);
-    border-color: var(--primary-color);
+    background: color-mix(in srgb, var(--primary-color) 8%, var(--background-color));
+    border-color: color-mix(in srgb, var(--primary-color) 45%, var(--border-color));
     color: var(--text-color);
-    box-shadow: var(--shadow-hover);
 }
 
 .category-btn.active {
-    background: rgba(1, 76, 117, 0.2);
+    background: var(--primary-color);
     border-color: var(--primary-color);
-    color: var(--text-color);
-    font-weight: 500;
-    box-shadow: var(--shadow-hover);
+    color: var(--button-text, #fff);
+    font-weight: 600;
+}
+
+.category-btn.active .icon {
+    color: var(--button-text, #fff);
 }
 
 .datasets-list {
@@ -359,13 +362,13 @@
 }
 
 .dataset-count {
-    background: rgba(1, 76, 117, 0.15);
+    background: color-mix(in srgb, var(--primary-color) 15%, transparent);
     color: var(--text-color);
     padding: 2px 8px;
     border-radius: 12px;
     font-size: 0.75rem;
     font-weight: 500;
-    border: 1px solid rgba(1, 76, 117, 0.3);
+    border: 1px solid color-mix(in srgb, var(--primary-color) 30%, transparent);
 }
 
 .datasets-list ul {
@@ -377,9 +380,9 @@
 .datasets-list li {
     padding: 8px 10px;
     cursor: pointer;
-    transition: all var(--transition-speed, 0.2s);
-    font-size: 0.9rem;
-    border-radius: var(--border-radius-sm, 6px);
+    transition: all 0.12s ease;
+    font-size: 0.88rem;
+    border-radius: var(--radius-sm, 8px);
     margin-bottom: 2px;
     display: flex;
     justify-content: space-between;
@@ -391,13 +394,13 @@
     background: var(--hover-bg);
     border-color: var(--border-color);
     color: var(--text-color);
-    box-shadow: var(--shadow);
+    box-shadow: none;
 }
 
 .datasets-list li.active {
-    background: rgba(1, 76, 117, 0.15);
+    background: color-mix(in srgb, var(--primary-color) 15%, transparent);
     color: var(--text-color);
-    border: 1px solid rgba(1, 76, 117, 0.3);
+    border: 1px solid color-mix(in srgb, var(--primary-color) 30%, transparent);
     border-left: 3px solid var(--primary-color);
     font-weight: 500;
 }
@@ -419,11 +422,11 @@
     color: var(--text-secondary);
     font-size: 0.9rem;
     text-align: center;
-    background: var(--card-bg);
-    border-radius: var(--border-radius, 8px);
+    background: var(--background-color);
+    border-radius: var(--radius-lg, 16px);
     margin: 15px 0;
     border: 1px dashed var(--border-color);
-    box-shadow: var(--shadow);
+    box-shadow: none;
 }
 
 .dataset-editor {
@@ -431,16 +434,20 @@
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    background: var(--background-color);
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg, 16px);
+    box-shadow: 0 6px 24px color-mix(in srgb, var(--primary-color) 6%, transparent);
 }
 
 .editor-toolbar {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 12px 20px;
-    background: rgba(255, 255, 255, 0.05);
+    padding: 14px 20px;
+    background: var(--card-bg);
     border-bottom: 1px solid var(--border-color);
+    border-radius: var(--radius-lg, 16px) var(--radius-lg, 16px) 0 0;
     gap: 15px;
 }
 
@@ -464,9 +471,10 @@
 .view-mode-selector {
     display: flex;
     align-items: center;
-    gap: 2px;
-    border-radius: 6px;
-    overflow: hidden;
+    gap: 4px;
+    background: var(--background-color);
+    border-radius: var(--radius-md, 12px);
+    padding: 4px;
     border: 1px solid var(--border-color);
 }
 
@@ -475,21 +483,22 @@
     align-items: center;
     justify-content: center;
     padding: 5px 12px;
-    background: rgba(255, 255, 255, 0.05);
+    background: transparent;
     border: none;
+    border-radius: var(--radius-sm, 8px);
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.12s ease;
     color: var(--text-secondary);
 }
 
 .view-mode-btn:hover {
-    background: rgba(255, 255, 255, 0.1);
+    background: var(--hover-bg);
     color: var(--text-color);
 }
 
 .view-mode-btn.active {
-    background: rgba(1, 76, 117, 0.2);
-    color: var(--text-color);
+    background: var(--primary-color);
+    color: var(--button-text, #fff);
 }
 
 .editor-actions {
@@ -503,22 +512,22 @@
     align-items: center;
     gap: 5px;
     padding: 6px 12px;
-    border-radius: var(--border-radius-sm, 6px);
+    border-radius: var(--radius-sm, 8px);
     border: 1px solid var(--border-color);
-    background: var(--card-bg);
+    background: var(--background-color);
     cursor: pointer;
-    font-size: 0.85rem;
+    font-size: 0.82rem;
+    font-weight: 550;
     color: var(--text-color);
-    transition: all var(--transition-speed, 0.2s);
+    transition: all 0.12s ease;
     height: 32px;
-    box-shadow: var(--shadow);
+    box-shadow: none;
 }
 
 .editor-btn:hover:not(:disabled) {
-    background: var(--hover-bg);
+    background: color-mix(in srgb, var(--primary-color) 8%, var(--background-color));
     color: var(--text-color);
-    border-color: var(--primary-color);
-    box-shadow: var(--shadow-hover);
+    border-color: color-mix(in srgb, var(--primary-color) 45%, var(--border-color));
 }
 
 .editor-btn .icon {
@@ -531,40 +540,36 @@
 }
 
 .editor-btn.delete-btn {
-    color: var(--danger-text, #dc2626);
-    border-color: var(--danger-border, #fecaca);
-    background: var(--danger-bg, #fef2f2);
+    color: var(--danger-color);
+    border-color: color-mix(in srgb, var(--danger-color) 35%, var(--border-color));
+    background: var(--background-color);
 }
 
 .editor-btn.delete-btn:hover:not(:disabled) {
-    background: var(--danger-bg-hover, #fee2e2);
-    border-color: var(--danger-border-hover, #fca5a5);
-    box-shadow: 0 2px 8px rgba(220, 38, 38, 0.2);
+    background: color-mix(in srgb, var(--danger-color) 10%, var(--background-color));
+    border-color: var(--danger-color);
 }
 
 .editor-btn.refresh-btn {
-    color: var(--success-text, #16a34a);
-    border-color: var(--success-color, #28a745);
-    background: var(--success-bg, #dcfce7);
+    color: var(--success-color, #28a745);
+    border-color: color-mix(in srgb, var(--success-color, #28a745) 35%, var(--border-color));
+    background: var(--background-color);
 }
 
 .editor-btn.refresh-btn:hover:not(:disabled) {
-    background: var(--success-light, #d4edda);
+    background: color-mix(in srgb, var(--success-color, #28a745) 10%, var(--background-color));
     border-color: var(--success-color, #28a745);
-    box-shadow: 0 2px 8px rgba(40, 167, 69, 0.2);
 }
 
 .use-data-btn {
     background: var(--primary-color);
     color: var(--button-text, #ffffff);
     border-color: var(--primary-color);
-    font-weight: 500;
+    font-weight: 550;
 }
 
 .use-data-btn:hover:not(:disabled) {
-    background: var(--primary-hover);
-    border-color: var(--primary-hover);
-    box-shadow: var(--shadow-hover);
+    filter: brightness(1.1);
 }
 
 /* Styles for the Use Data button in the top toolbar */
@@ -573,22 +578,20 @@
     align-items: center;
     justify-content: center;
     padding: 6px 15px;
-    border-radius: var(--border-radius-sm, 6px);
+    border-radius: var(--radius-sm, 8px);
     border: 1px solid var(--primary-color);
     background: var(--primary-color);
     cursor: pointer;
-    font-size: 0.9rem;
-    font-weight: 500;
+    font-size: 0.85rem;
+    font-weight: 550;
     color: var(--button-text, #ffffff);
-    transition: all var(--transition-speed, 0.2s);
+    transition: all 0.12s ease;
     height: 32px;
-    box-shadow: var(--shadow);
+    box-shadow: none;
 }
 
 .use-data-button:hover:not(:disabled) {
-    background: var(--primary-hover);
-    border-color: var(--primary-hover);
-    box-shadow: var(--shadow-hover);
+    filter: brightness(1.1);
 }
 
 .use-data-button:disabled {
@@ -623,7 +626,7 @@
     overflow: hidden;
     display: flex;
     flex-direction: column;
-    background: var(--background-color);
+    background: var(--card-bg);
     border-radius: 0;
 }
 
@@ -654,7 +657,7 @@
 
 .preview-header {
     padding: 10px 15px;
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--card-bg);
     border-bottom: 1px solid var(--border-color);
 }
 
@@ -668,7 +671,7 @@
     flex-grow: 1;
     overflow-y: auto;
     padding: 15px;
-    background: rgba(40, 40, 42, 0.5);
+    background: var(--background-color);
 }
 
 .inline-error-message {
@@ -691,8 +694,8 @@
 .preview-item {
     display: flex;
     padding: 8px 10px;
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 4px;
+    background: var(--card-bg);
+    border-radius: var(--radius-sm, 8px);
     border: 1px solid var(--border-color);
 }
 
@@ -743,12 +746,12 @@
 }
 
 .modal-content {
-    background: var(--background-color);
-    border-radius: 4px;
+    background: var(--card-bg);
+    border-radius: var(--radius-lg, 16px);
     width: 90%;
     max-width: 600px;
     padding: 20px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 6px 24px color-mix(in srgb, var(--primary-color) 10%, transparent);
     max-height: 90vh;
     overflow-y: auto;
     border: 1px solid var(--border-color);
@@ -797,15 +800,16 @@
 .cancel-btn,
 .create-btn {
     padding: 8px 15px;
-    border-radius: var(--border-radius-sm, 6px);
+    border-radius: var(--radius-sm, 8px);
     cursor: pointer;
-    font-size: 0.9rem;
-    transition: all var(--transition-speed, 0.2s);
-    box-shadow: var(--shadow);
+    font-size: 0.85rem;
+    font-weight: 550;
+    transition: all 0.12s ease;
+    box-shadow: none;
 }
 
 .cancel-btn {
-    background: var(--card-bg);
+    background: var(--background-color);
     border: 1px solid var(--border-color);
     color: var(--text-color);
 }
@@ -813,7 +817,6 @@
 .cancel-btn:hover {
     background: var(--hover-bg);
     border-color: var(--text-secondary);
-    box-shadow: var(--shadow-hover);
 }
 
 .create-btn {
@@ -823,9 +826,7 @@
 }
 
 .create-btn:hover:not(:disabled) {
-    background: var(--primary-hover);
-    border-color: var(--primary-hover);
-    box-shadow: var(--shadow-hover);
+    filter: brightness(1.1);
 }
 
 .create-btn:disabled {
@@ -838,7 +839,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: var(--background-color);
+    background: var(--card-bg);
     padding: 20px;
 }
 
@@ -846,10 +847,10 @@
     text-align: center;
     max-width: 400px;
     padding: 30px;
-    background: var(--card-bg);
-    border-radius: var(--border-radius-lg, 12px);
-    box-shadow: var(--shadow-lg);
-    border: 1px solid var(--border-color);
+    background: var(--background-color);
+    border-radius: var(--radius-lg, 16px);
+    box-shadow: none;
+    border: 1px dashed var(--border-color);
 }
 
 .empty-icon {
@@ -911,13 +912,13 @@
 
 .template-item {
     border: 1px solid var(--border-color);
-    border-radius: var(--border-radius, 8px);
+    border-radius: var(--radius-md, 12px);
     padding: 20px;
     text-align: center;
     cursor: pointer;
-    transition: all var(--transition-speed, 0.2s);
-    background: var(--card-bg);
-    box-shadow: var(--shadow);
+    transition: all 0.12s ease;
+    background: var(--background-color);
+    box-shadow: none;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -925,10 +926,8 @@
 }
 
 .template-item:hover {
-    background: var(--hover-bg);
+    background: color-mix(in srgb, var(--primary-color) 8%, var(--background-color));
     border-color: var(--primary-color);
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-lg);
 }
 
 .template-icon {
@@ -946,7 +945,7 @@
 }
 
 .modal-content {
-    background-color: var(--background-color) !important;
+    background-color: var(--card-bg) !important;
 }
 
 .template-name {
@@ -958,13 +957,13 @@
 
 .template-custom {
     border-style: dashed;
-    background: rgba(1, 76, 117, 0.1);
-    border-color: rgba(1, 76, 117, 0.4);
+    background: color-mix(in srgb, var(--primary-color) 10%, var(--background-color));
+    border-color: color-mix(in srgb, var(--primary-color) 40%, var(--border-color));
 }
 
 .template-custom:hover {
     border-style: dashed;
-    background: rgba(1, 76, 117, 0.25);
+    background: color-mix(in srgb, var(--primary-color) 20%, var(--background-color));
     border-color: var(--primary-color);
 }
 
@@ -977,12 +976,12 @@
 }
 
 .login-credentials {
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     color: var(--text-color);
     font-weight: 500;
-    background-color: var(--card-bg);
+    background-color: var(--background-color);
     padding: 6px 12px;
-    border-radius: var(--border-radius-sm, 6px);
+    border-radius: var(--radius-sm, 8px);
     border: 1px solid var(--border-color);
-    box-shadow: var(--shadow);
+    box-shadow: none;
 }

@@ -13,6 +13,7 @@ import {
 import DiffSummaryCard from './DiffSummaryCard';
 import DiffComparisonPanel from './DiffComparisonPanel';
 import ChangesList from './ChangesList';
+import AppSelect from '../../common/AppSelect/AppSelect';
 import './ContractDiffViewer.css';
 import './ContractDiffViewer_Enhanced.css';
 
@@ -270,54 +271,48 @@ const ContractDiffViewer = ({
                 <div className="version-selector">
                     <label htmlFor="compare-from-select">Compare From:</label>
                     <div className="select-wrapper">
-                        <select
+                        <AppSelect
                             id="compare-from-select"
                             value={selectedVersion1?._id || ''}
-                            onChange={(e) => {
-                                const version = e.target.value ? availableVersions.find(v => v._id === e.target.value) : null;
+                            onChange={(val) => {
+                                const version = val ? availableVersions.find(v => v._id === val) : null;
                                 setSelectedVersion1(version);
                                 setComparisonResult(null); // Clear previous results
                                 setError(null); // Clear any errors
                             }}
                             disabled={isLoading}
-
-                        >
-                            <option value="" className="placeholder-option">
-                                Select version...
-                            </option>
-                            {availableVersions.map(version => (
-                                <option key={version._id} value={version._id}>
-                                    {formatVersionName(version)}
-                                </option>
-                            ))}
-                        </select>
+                            options={[
+                                { value: '', label: 'Select version...' },
+                                ...availableVersions.map(version => ({
+                                    value: version._id,
+                                    label: formatVersionName(version)
+                                }))
+                            ]}
+                        />
                     </div>
                 </div>
 
                 <div className="version-selector">
                     <label htmlFor="compare-to-select">Compare To:</label>
                     <div className="select-wrapper">
-                        <select
+                        <AppSelect
                             id="compare-to-select"
                             value={selectedVersion2?._id || ''}
-                            onChange={(e) => {
-                                const version = e.target.value ? availableVersions.find(v => v._id === e.target.value) : null;
+                            onChange={(val) => {
+                                const version = val ? availableVersions.find(v => v._id === val) : null;
                                 setSelectedVersion2(version);
                                 setComparisonResult(null); // Clear previous results
                                 setError(null); // Clear any errors
                             }}
                             disabled={isLoading}
-
-                        >
-                            <option value="" className="placeholder-option">
-                                Select version...
-                            </option>
-                            {availableVersions.map(version => (
-                                <option key={version._id} value={version._id}>
-                                    {formatVersionName(version)}
-                                </option>
-                            ))}
-                        </select>
+                            options={[
+                                { value: '', label: 'Select version...' },
+                                ...availableVersions.map(version => ({
+                                    value: version._id,
+                                    label: formatVersionName(version)
+                                }))
+                            ]}
+                        />
                     </div>
                 </div>
 

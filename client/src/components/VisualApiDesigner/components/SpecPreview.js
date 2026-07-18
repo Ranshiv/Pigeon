@@ -5,6 +5,7 @@ import Editor from '@monaco-editor/react';
 import YAML from 'yaml';
 import { useTheme } from '../../../context/ThemeContext';
 import { registerPigeonThemes, getPigeonMonacoTheme, pigeonEditorOptions } from '../../../themes/monacoThemes';
+import '../../Protocols/tester-shell.css';
 import './SpecPreviewModern.css';
 import {
     FiFileText,
@@ -44,7 +45,7 @@ const SpecPreview = ({
     const [sideBySide, setSideBySide] = useState(false);
     const [localText, setLocalText] = useState('');
     const [validationList, setValidationList] = useState([]);
-    const editorHeight = 720; // Fixed height instead of dynamic resizing
+    const editorHeight = 820; // Fixed height instead of dynamic resizing
 
     const editorRef = useRef(null);
     const monacoRef = useRef(null);
@@ -897,7 +898,7 @@ const SpecPreview = ({
                     <div className="debug-info">
                         <h4>Debug Info</h4>
                         <button
-                            className="debug-btn"
+                            className="debug-btn-text"
                             onClick={debugSpecState}
                             title="Debug spec state"
                             aria-label="Debug specification state"

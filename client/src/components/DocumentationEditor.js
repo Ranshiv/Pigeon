@@ -501,7 +501,7 @@ const DocumentationEditor = ({ documentation, collection, onSave, isSaving }) =>
 
     return (
         <div className="documentation-editor" data-key={`editor-instance-${Date.now()}`}>
-            <div className="editor-header">
+            <div className="doc-editor-header">
                 <div className="editor-title-section">
                     <input
                         type="text"

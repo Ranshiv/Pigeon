@@ -685,7 +685,7 @@ function CollectionDetail() {
                     defaultChecked={!collection.isPublic}
                     style={{ display: 'none' }}
                   />
-                  <div className="visibility-icon">🔒</div>
+                  <div className="visibility-icon private-icon"><FiLock /></div>
                   <div>
                     <strong>Private</strong>
                     <p>Only you and your collaborators can access this collection</p>
@@ -715,7 +715,7 @@ function CollectionDetail() {
                     defaultChecked={collection.isPublic}
                     style={{ display: 'none' }}
                   />
-                  <div className="visibility-icon">🌐</div>
+                  <div className="visibility-icon public-icon"><FiGlobe /></div>
                   <div>
                     <strong>Public</strong>
                     <p>This collection is publicly accessible to anyone with the link</p>
@@ -829,6 +829,38 @@ function CollectionDetail() {
           <ActiveCollaborators collectionId={collectionId} />
         </div>
       </div>
+        <div className="tab-navigation">
+          <button
+            className={`tab-btn ${activeTab === 'requests' ? 'active' : ''}`}
+            onClick={() => setActiveTab('requests')}
+          >
+            <FiPackage /> Requests
+          </button>
+          <button
+            className={`tab-btn ${activeTab === 'documentation' ? 'active' : ''}`}
+            onClick={() => setActiveTab('documentation')}
+          >
+            <FiBook /> Documentation
+          </button>
+          <button
+            className={`tab-btn ${activeTab === 'sampleData' ? 'active' : ''}`}
+            onClick={() => setActiveTab('sampleData')}
+          >
+            <FiDatabase /> Sample Data
+          </button>
+          <button
+            className={`tab-btn ${activeTab === 'variables' ? 'active' : ''}`}
+            onClick={() => setActiveTab('variables')}
+          >
+            <FiSettings /> Variables
+          </button>
+          <button
+            className={`tab-btn ${activeTab === 'designer' ? 'active' : ''}`}
+            onClick={() => setActiveTab('designer')}
+          >
+            <FiGrid /> API Designer
+          </button>
+        </div>
         <div className="collection-actions">
           {pendingChanges && (
             <div className="pending-changes-indicator">Unsaved changes</div>
@@ -924,38 +956,6 @@ function CollectionDetail() {
         </div>
 
         <div className="collection-main">
-          <div className="tab-navigation">
-            <button
-              className={`tab-btn ${activeTab === 'requests' ? 'active' : ''}`}
-              onClick={() => setActiveTab('requests')}
-            >
-              <FiPackage /> Requests
-            </button>
-            <button
-              className={`tab-btn ${activeTab === 'documentation' ? 'active' : ''}`}
-              onClick={() => setActiveTab('documentation')}
-            >
-              <FiBook /> Documentation
-            </button>            <button
-              className={`tab-btn ${activeTab === 'sampleData' ? 'active' : ''}`}
-              onClick={() => setActiveTab('sampleData')}
-            >
-              <FiDatabase /> Sample Data
-            </button>
-            <button
-              className={`tab-btn ${activeTab === 'variables' ? 'active' : ''}`}
-              onClick={() => setActiveTab('variables')}
-            >
-              <FiSettings /> Variables
-            </button>
-            <button
-              className={`tab-btn ${activeTab === 'designer' ? 'active' : ''}`}
-              onClick={() => setActiveTab('designer')}
-            >
-              <FiGrid /> API Designer
-            </button>
-          </div>
-
           {activeTab === 'requests' && (
             <>
               {!selectedRequest && !showRequestForm ? (<div className="collection-info">

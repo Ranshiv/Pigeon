@@ -29,9 +29,10 @@ ChartJS.register(
  * Visualization Engine for API Response Data
  * Provides template-based visualization similar to Postman's Visualizer
  */
+const MAX_CHART_POINTS = 1000;
+
 export class VisualizationEngine {
     static templates = new Map();
-    static chartInstances = new Map();
 
     /**
      * Set visualization using template and data
@@ -50,7 +51,7 @@ export class VisualizationEngine {
 
             // Create visualization object
             const visualization = {
-                id: `viz-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+                id: `viz-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`,
                 template: template,
                 data: data,
                 rendered: rendered,
@@ -78,9 +79,9 @@ export class VisualizationEngine {
      */
     static generateChart(type, data, config = {}) {
         const chartConfig = this.buildChartConfig(type, data, config);
-        const template = this.generateChartTemplate(type, chartConfig);
+        const placeholder = '<div class="chart-visualization"></div>';
 
-        return this.set(template, { chartConfig, rawData: data }, config);
+        return this.set(placeholder, { chartConfig, rawData: data }, { ...config, type: 'chart' });
     }
 
     /**
@@ -213,6 +214,7 @@ export class VisualizationEngine {
 
         } catch (error) {
             console.error('Error generating visualizations:', error);
+            throw new Error(`Failed to generate visualizations: ${error.message}`);
         }
 
         return visualizations;
@@ -300,13 +302,13 @@ export class VisualizationEngine {
      */
     static createMetrics(metrics, options = {}) {
         const template = `
-            <div class="visualization-metrics">
+            <div class="ts-kpi-grid">
                 {{#each metrics}}
-                <div class="metric-card">
-                    <div class="metric-value">{{this.value}}</div>
-                    <div class="metric-label">{{this.label}}</div>
+                <div class="ts-kpi">
+                    <div class="ts-kpi-label">{{this.label}}</div>
+                    <div class="ts-kpi-value">{{this.value}}</div>
                     {{#if this.change}}
-                    <div class="metric-change {{this.changeType}}">
+                    <div class="ts-kpi-change {{this.changeType}}">
                         {{this.change}}
                     </div>
                     {{/if}}
@@ -383,19 +385,21 @@ export class VisualizationEngine {
      */
     static formatChartData(type, data) {
         if (Array.isArray(data)) {
+            const clamped = data.slice(0, MAX_CHART_POINTS);
+
             // Array of objects
-            if (data.length > 0 && typeof data[0] === 'object') {
-                const keys = Object.keys(data[0]);
+            if (clamped.length > 0 && typeof clamped[0] === 'object') {
+                const keys = Object.keys(clamped[0]);
                 const labelKey = keys[0];
                 const valueKey = keys[1] || keys[0];
 
                 return {
-                    labels: data.map(item => item[labelKey]),
+                    labels: clamped.map(item => item[labelKey]),
                     datasets: [{
                         label: valueKey,
-                        data: data.map(item => item[valueKey]),
-                        backgroundColor: this.generateColors(data.length),
-                        borderColor: this.generateColors(data.length, 0.8),
+                        data: clamped.map(item => item[valueKey]),
+                        backgroundColor: this.generateColors(clamped.length),
+                        borderColor: this.generateColors(clamped.length, 0.8),
                         borderWidth: 1
                     }]
                 };
@@ -403,20 +407,20 @@ export class VisualizationEngine {
 
             // Array of primitives
             return {
-                labels: data.map((_, index) => `Item ${index + 1}`),
+                labels: clamped.map((_, index) => `Item ${index + 1}`),
                 datasets: [{
                     label: 'Values',
-                    data: data,
-                    backgroundColor: this.generateColors(data.length),
-                    borderColor: this.generateColors(data.length, 0.8),
+                    data: clamped,
+                    backgroundColor: this.generateColors(clamped.length),
+                    borderColor: this.generateColors(clamped.length, 0.8),
                     borderWidth: 1
                 }]
             };
         }
 
         // Object with key-value pairs
-        if (typeof data === 'object') {
-            const entries = Object.entries(data);
+        if (typeof data === 'object' && data !== null) {
+            const entries = Object.entries(data).slice(0, MAX_CHART_POINTS);
             return {
                 labels: entries.map(([key]) => key),
                 datasets: [{
@@ -433,31 +437,6 @@ export class VisualizationEngine {
     }
 
     /**
-     * Generate chart template
-     * @param {string} type - Chart type
-     * @param {Object} config - Chart configuration
-     * @returns {string} HTML template
-     */
-    static generateChartTemplate(type, config) {
-        return `
-            <div class="visualization-chart">
-                <canvas id="chart-{{timestamp}}" width="400" height="200"></canvas>
-                <script>
-                    (function() {
-                        const ctx = document.getElementById('chart-{{timestamp}}').getContext('2d');
-                        const chart = new Chart(ctx, {{{json chartConfig}}});
-                        
-                        // Store chart instance for later cleanup
-                        if (window.visualizationCharts) {
-                            window.visualizationCharts.set('chart-{{timestamp}}', chart);
-                        }
-                    })();
-                </script>
-            </div>
-        `;
-    }
-
-    /**
      * Generate colors for charts
      * @param {number} count - Number of colors needed
      * @param {number} alpha - Alpha transparency
@@ -466,7 +445,7 @@ export class VisualizationEngine {
     static generateColors(count, alpha = 0.6) {
         const colors = [
             '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF',
-            '#FF9F40', '#FF6384', '#C9CBCF', '#4BC0C0', '#FF6384'
+            '#FF9F40', '#C9CBCF', '#22C55E', '#F59E0B', '#EF4444'
         ];
 
         return Array.from({ length: count }, (_, i) => {
@@ -490,7 +469,7 @@ export class VisualizationEngine {
     static detectVisualizationType(template) {
         if (template.includes('<canvas')) return 'chart';
         if (template.includes('<table')) return 'table';
-        if (template.includes('metric-card')) return 'metrics';
+        if (template.includes('ts-kpi')) return 'metrics';
         if (template.includes('{{#each')) return 'list';
         return 'custom';
     }
@@ -507,15 +486,7 @@ export class VisualizationEngine {
      * Clear all visualizations
      */
     static clearAll() {
-        // Clean up chart instances
-        this.chartInstances.forEach(chart => {
-            if (chart && typeof chart.destroy === 'function') {
-                chart.destroy();
-            }
-        });
-
         this.templates.clear();
-        this.chartInstances.clear();
     }
 
     /**
@@ -523,14 +494,6 @@ export class VisualizationEngine {
      * @param {string} id - Visualization ID
      */
     static remove(id) {
-        if (this.chartInstances.has(id)) {
-            const chart = this.chartInstances.get(id);
-            if (chart && typeof chart.destroy === 'function') {
-                chart.destroy();
-            }
-            this.chartInstances.delete(id);
-        }
-
         this.templates.delete(id);
     }
 
@@ -574,20 +537,18 @@ export class VisualizationEngine {
                 name: 'API Status Metrics',
                 description: 'Show response status, time, and size metrics',
                 template: `
-                    <div class="status-metrics">
-                        <div class="metric-grid">
-                            <div class="metric-item status-{{statusClass}}">
-                                <div class="metric-value">{{status}}</div>
-                                <div class="metric-label">Status</div>
-                            </div>
-                            <div class="metric-item">
-                                <div class="metric-value">{{responseTime}}ms</div>
-                                <div class="metric-label">Response Time</div>
-                            </div>
-                            <div class="metric-item">
-                                <div class="metric-value">{{size}}</div>
-                                <div class="metric-label">Size</div>
-                            </div>
+                    <div class="ts-kpi-grid">
+                        <div class="ts-kpi status-{{statusClass status}}">
+                            <div class="ts-kpi-label">Status</div>
+                            <div class="ts-kpi-value">{{status}}</div>
+                        </div>
+                        <div class="ts-kpi">
+                            <div class="ts-kpi-label">Response Time</div>
+                            <div class="ts-kpi-value">{{responseTime}}ms</div>
+                        </div>
+                        <div class="ts-kpi">
+                            <div class="ts-kpi-label">Size</div>
+                            <div class="ts-kpi-value">{{size}}</div>
                         </div>
                     </div>
                 `
@@ -611,7 +572,7 @@ Handlebars.registerHelper('json', function (context) {
 });
 
 Handlebars.registerHelper('formatBytes', function (bytes) {
-    if (bytes === 0) return '0 Bytes';
+    if (!Number.isFinite(bytes) || bytes <= 0) return '0 Bytes';
     const k = 1024;
     const sizes = ['Bytes', 'KB', 'MB', 'GB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));

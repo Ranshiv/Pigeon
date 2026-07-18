@@ -51,10 +51,10 @@ body.dark-theme .endpoint-editor {
     align-items: center;
     justify-content: space-between;
     margin-bottom: 20px;
-    padding: 16px 20px;
-    background: var(--editor-bg-primary);
-    border: 1px solid var(--editor-border-primary);
-    border-radius: 10px;
+    padding: 18px clamp(20px, 3vw, 32px);
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg, 16px);
 }
 
 .header-info {

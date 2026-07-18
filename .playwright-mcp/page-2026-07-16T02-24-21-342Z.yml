@@ -1,0 +1,66 @@
+- generic [ref=e3]:
+  - navigation [ref=e4]:
+    - generic [ref=e5]:
+      - generic [ref=e6] [cursor=pointer]: Pigeon
+      - link "Sign In" [ref=e9] [cursor=pointer]:
+        - /url: http://localhost:5001/auth/google
+  - region "Notifications Alt+T"
+  - contentinfo [ref=e10]:
+    - generic [ref=e11]:
+      - generic [ref=e12]:
+        - generic [ref=e13]:
+          - heading "Pigeon" [level=3] [ref=e14]
+          - paragraph [ref=e15]: The ultimate API development platform
+          - generic [ref=e16]:
+            - link [ref=e17] [cursor=pointer]:
+              - /url: https://github.com
+            - link [ref=e20] [cursor=pointer]:
+              - /url: https://twitter.com
+            - link [ref=e23] [cursor=pointer]:
+              - /url: https://linkedin.com
+        - generic [ref=e26]:
+          - heading "Product" [level=4] [ref=e27]
+          - list [ref=e28]:
+            - listitem [ref=e29]:
+              - link "API Network" [ref=e30] [cursor=pointer]:
+                - /url: /workspace/api-network
+            - listitem [ref=e33]:
+              - link "Collections" [ref=e34] [cursor=pointer]:
+                - /url: /workspace/collections
+            - listitem [ref=e38]:
+              - link "Documentation" [ref=e39] [cursor=pointer]:
+                - /url: /documentation
+            - listitem [ref=e43]:
+              - link "History" [ref=e44] [cursor=pointer]:
+                - /url: /workspace/history
+        - generic [ref=e48]:
+          - heading "Resources" [level=4] [ref=e49]
+          - list [ref=e50]:
+            - listitem [ref=e51]:
+              - link "Help Center" [ref=e52] [cursor=pointer]:
+                - /url: "#"
+            - listitem [ref=e56]:
+              - link "API Status" [ref=e57] [cursor=pointer]:
+                - /url: "#"
+            - listitem [ref=e61]:
+              - link "Tutorials" [ref=e62] [cursor=pointer]:
+                - /url: "#"
+            - listitem [ref=e66]:
+              - link "Blog" [ref=e67] [cursor=pointer]:
+                - /url: "#"
+        - generic [ref=e72]:
+          - heading "Contact Us" [level=4] [ref=e73]
+          - link "support@pigeonapp.io" [ref=e74] [cursor=pointer]:
+            - /url: mailto:support@pigeonapp.io
+          - paragraph [ref=e78]: Have questions or feedback? We'd love to hear from you!
+      - generic [ref=e79]:
+        - generic [ref=e80]: © 2026 Pigeon. All rights reserved.
+        - generic [ref=e81]:
+          - link "Privacy Policy" [ref=e82] [cursor=pointer]:
+            - /url: "#"
+          - link "Terms of Service" [ref=e83] [cursor=pointer]:
+            - /url: "#"
+          - link "Cookies" [ref=e84] [cursor=pointer]:
+            - /url: "#"
+          - link "System Status" [ref=e85] [cursor=pointer]:
+            - /url: /status

@@ -1,29 +1,52 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo, useId } from 'react';
+import { FiPlus, FiRefreshCw, FiBarChart2, FiX, FiAlertTriangle } from 'react-icons/fi';
 import { VisualizationEngine } from '../services/VisualizationEngine';
 import TemplateLibraryManager from '../services/TemplateLibraryManager';
 import ChartRenderer from './ChartRenderer';
 import NetworkFlowRenderer from './NetworkFlowRenderer';
+import TemplateEditorModal from './TemplateEditorModal';
+import '../../Protocols/tester-shell.css';
+import DOMPurify from 'dompurify';
 import './VisualizationTab.css';
+import './VisualizationTabContent.css';
+
+const SANITIZE_CONFIG = { FORBID_ATTR: ['style'], FORBID_TAGS: ['style'] };
+
+const sanitizeHtml = (html) => DOMPurify.sanitize(html, SANITIZE_CONFIG);
+
+const NOOP = () => {};
 
 const VisualizationTab = ({
     apiResponse = null,
     nodes = [],
-    onVisualizationUpdate = () => { },
+    onVisualizationUpdate = NOOP,
     visualizationContext = null
 }) => {
+    const panelId = useId();
     const [visualizations, setVisualizations] = useState([]);
     const [activeVisualization, setActiveVisualization] = useState(null);
     const [customTemplate, setCustomTemplate] = useState('');
     const [selectedTemplate, setSelectedTemplate] = useState('');
     const [isTemplateEditorOpen, setIsTemplateEditorOpen] = useState(false);
     const [error, setError] = useState(null);
-    const [previewData, setPreviewData] = useState(null);
     const [templateLibrary, setTemplateLibrary] = useState([]);
     const [suggestedCharts, setSuggestedCharts] = useState([]);
-    const visualizationContainerRef = useRef(null);
+    const tabRefs = useRef([]);
+
+    // Notify parent whenever visualizations change
+    useEffect(() => {
+        onVisualizationUpdate(visualizations);
+    }, [visualizations, onVisualizationUpdate]);
+
+    // Keep active visualization in sync if it was deleted
+    useEffect(() => {
+        if (activeVisualization && !visualizations.some(v => v.id === activeVisualization.id)) {
+            setActiveVisualization(visualizations[0] || null);
+        }
+    }, [visualizations, activeVisualization]);
 
     // Sample data for testing when no API response is available
-    const sampleData = React.useMemo(() => ({
+    const sampleData = useMemo(() => ({
         users: [
             { name: 'John Doe', email: 'john@example.com', age: 30, status: 'active', score: 85 },
             { name: 'Jane Smith', email: 'jane@example.com', age: 25, status: 'active', score: 92 },
@@ -49,6 +72,14 @@ const VisualizationTab = ({
         size: 2048,
         timestamp: new Date().toISOString()
     }), []);
+
+    const previewData = useMemo(() => {
+        if (visualizationContext && visualizationContext.responseData) {
+            return visualizationContext.responseData.data || visualizationContext.responseData;
+        }
+        if (apiResponse) return apiResponse;
+        return sampleData;
+    }, [visualizationContext, apiResponse, sampleData]);
 
     const loadTemplateLibrary = useCallback(() => {
         const templates = TemplateLibraryManager.getAllTemplates();
@@ -140,7 +171,6 @@ const VisualizationTab = ({
             }
 
             setVisualizations(newVisualizations);
-            onVisualizationUpdate(newVisualizations);
 
             // Set first visualization as active
             if (newVisualizations.length > 0) {
@@ -149,43 +179,23 @@ const VisualizationTab = ({
 
         } catch (err) {
             setError(`Failed to generate visualizations: ${err.message}`);
+            // Clear stale generated visualizations on failure
+            setVisualizations([]);
+            setActiveVisualization(null);
         }
-    }, [onVisualizationUpdate]);
+    }, []);
 
-    // Enhanced data handling with proper synchronization
+    // Load template library once on mount
     useEffect(() => {
-        let dataToUse;
-        let isFromContext = false;
+        loadTemplateLibrary();
+    }, [loadTemplateLibrary]);
 
-        // Priority 1: Use visualization context data if available
-        if (visualizationContext && visualizationContext.responseData) {
-            const contextData = visualizationContext.responseData.data || visualizationContext.responseData;
-            dataToUse = contextData;
-            isFromContext = true;
-        }
-        // Priority 2: Use API response data
-        else if (apiResponse) {
-            dataToUse = apiResponse;
-        }
-        // Priority 3: Fall back to sample data
-        else {
-            dataToUse = sampleData;
-        }
-
-        // Only update if data has actually changed
-        if (JSON.stringify(dataToUse) !== JSON.stringify(previewData)) {
-            setPreviewData(dataToUse);
-
-            // Load template library only once
-            if (!isFromContext) {
-                loadTemplateLibrary();
-            }
-
-            // Auto-generate visualizations and suggestions
-            generateDefaultVisualizations(dataToUse);
-            generateChartSuggestions(dataToUse);
-        }
-    }, [visualizationContext, apiResponse, sampleData, previewData, loadTemplateLibrary, generateDefaultVisualizations, generateChartSuggestions]);
+    // Regenerate when previewData changes
+    useEffect(() => {
+        if (!previewData) return;
+        generateDefaultVisualizations(previewData);
+        generateChartSuggestions(previewData);
+    }, [previewData, generateDefaultVisualizations, generateChartSuggestions]);
 
     const handleTemplateSelect = (templateId) => {
         setSelectedTemplate(templateId);
@@ -208,27 +218,49 @@ const VisualizationTab = ({
             const newVisualization = {
                 ...customViz,
                 name: 'Custom Visualization',
-                type: 'custom'
+                type: 'custom',
+                rendered: sanitizeHtml(customViz.rendered)
             };
 
             setVisualizations(prev => [...prev, newVisualization]);
             setActiveVisualization(newVisualization);
             setIsTemplateEditorOpen(false);
-
-            onVisualizationUpdate(newVisualization);
         } catch (err) {
             setError(`Template error: ${err.message}`);
         }
     };
 
     const handleDeleteVisualization = (vizId) => {
-        setVisualizations(prev => prev.filter(viz => viz.id !== vizId));
+        setVisualizations(prev => {
+            tabRefs.current = tabRefs.current.slice(0, prev.length - 1);
+            return prev.filter(viz => viz.id !== vizId);
+        });
         VisualizationEngine.remove(vizId);
+    };
 
-        if (activeVisualization && activeVisualization.id === vizId) {
-            const remaining = visualizations.filter(viz => viz.id !== vizId);
-            setActiveVisualization(remaining.length > 0 ? remaining[0] : null);
+    const handleTabKeyDown = (e, index) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            setActiveVisualization(visualizations[index]);
+            return;
         }
+
+        let nextIndex = index;
+        if (e.key === 'ArrowRight') {
+            nextIndex = (index + 1) % visualizations.length;
+        } else if (e.key === 'ArrowLeft') {
+            nextIndex = (index - 1 + visualizations.length) % visualizations.length;
+        } else if (e.key === 'Home') {
+            nextIndex = 0;
+        } else if (e.key === 'End') {
+            nextIndex = visualizations.length - 1;
+        } else {
+            return;
+        }
+
+        e.preventDefault();
+        tabRefs.current[nextIndex]?.focus();
+        setActiveVisualization(visualizations[nextIndex]);
     };
 
     const renderVisualizationContent = (visualization) => {
@@ -238,27 +270,25 @@ const VisualizationTab = ({
         if (visualization.type === 'chart' && visualization.data && visualization.data.chartConfig) {
             const chartConfig = visualization.data.chartConfig;
             return (
-                <div className="chart-visualization">
+                <div className="ts-panel visualization-card">
                     <ChartRenderer
                         type={chartConfig.type}
                         data={chartConfig.data}
                         options={chartConfig.options}
-                        width={600}
-                        height={400}
                     />
                 </div>
             );
         }
 
+        const safeHtml = sanitizeHtml(visualization.rendered);
+
         // If it's a network flow visualization, render using NetworkFlowRenderer
         if (visualization.type === 'network' && visualization.data) {
             return (
-                <div className="network-visualization">
+                <div className="ts-panel visualization-card">
                     <NetworkFlowRenderer
                         data={visualization.data}
                         options={visualization.options}
-                        width={600}
-                        height={400}
                     />
                 </div>
             );
@@ -266,8 +296,8 @@ const VisualizationTab = ({
 
         return (
             <div
-                className="visualization-content"
-                dangerouslySetInnerHTML={{ __html: visualization.rendered }}
+                className="ts-panel visualization-card visualization-content"
+                dangerouslySetInnerHTML={{ __html: safeHtml }}
             />
         );
     };
@@ -276,31 +306,29 @@ const VisualizationTab = ({
         <div className="visualization-tab">
             <div className="visualization-header">
                 <div className="header-left">
-                    <h3>Data Visualizations</h3>
-                    <span className="visualization-count">
-                        {visualizations.length} visualization{visualizations.length !== 1 ? 's' : ''}
-                    </span>
+                    <div className="ts-eyebrow">Data Visualizations</div>
+                    <span className="ts-badge">{visualizations.length}</span>
                 </div>
                 <div className="header-actions">
                     <button
-                        className="btn btn-secondary"
+                        className="ts-btn primary"
                         onClick={() => setIsTemplateEditorOpen(true)}
                     >
-                        + Create Custom
+                        <FiPlus size={14} /> Create Custom
                     </button>
                     <button
-                        className="btn btn-secondary"
+                        className="ts-btn"
                         onClick={() => generateDefaultVisualizations(previewData)}
                     >
-                        🔄 Refresh
+                        <FiRefreshCw size={14} /> Refresh
                     </button>
                     {suggestedCharts.length > 0 && (
                         <div className="chart-suggestions">
-                            <label>Suggested: </label>
-                            {suggestedCharts.slice(0, 3).map((suggestion, index) => (
+                            <span className="ts-muted">Suggested:</span>
+                            {suggestedCharts.slice(0, 3).map((suggestion) => (
                                 <button
-                                    key={index}
-                                    className="btn btn-small btn-suggestion"
+                                    key={suggestion.type}
+                                    className="ts-btn ts-btn-suggestion"
                                     onClick={() => {
                                         const chartViz = VisualizationEngine.generateChart(
                                             suggestion.type,
@@ -315,7 +343,7 @@ const VisualizationTab = ({
                                     }}
                                     title={suggestion.reason}
                                 >
-                                    📊 {suggestion.type}
+                                    <FiBarChart2 size={14} /> {suggestion.type}
                                 </button>
                             ))}
                         </div>
@@ -324,14 +352,15 @@ const VisualizationTab = ({
             </div>
 
             {error && (
-                <div className="error-banner">
-                    <span className="error-icon">⚠️</span>
-                    {error}
+                <div className="error-banner" role="alert">
+                    <FiAlertTriangle size={16} />
+                    <span className="error-message">{error}</span>
                     <button
                         className="error-close"
                         onClick={() => setError(null)}
+                        aria-label="Dismiss error"
                     >
-                        ×
+                        <FiX size={14} />
                     </button>
                 </div>
             )}
@@ -339,23 +368,35 @@ const VisualizationTab = ({
             <div className="visualization-workspace">
                 {/* Visualization Tabs */}
                 {visualizations.length > 0 && (
-                    <div className="visualization-tabs">
-                        {visualizations.map(viz => (
+                    <div className="visualization-tabs" role="tablist">
+                        {visualizations.map((viz, index) => (
                             <div
                                 key={viz.id}
+                                ref={(el) => (tabRefs.current[index] = el)}
                                 className={`viz-tab ${activeVisualization?.id === viz.id ? 'active' : ''}`}
-                                onClick={() => setActiveVisualization(viz)}
                             >
-                                <span className="tab-name">{viz.name}</span>
-                                <span className="tab-type">{viz.type}</span>
                                 <button
-                                    className="tab-close"
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        handleDeleteVisualization(viz.id);
-                                    }}
+                                    type="button"
+                                    className="viz-tab-trigger"
+                                    onClick={() => setActiveVisualization(viz)}
+                                    role="tab"
+                                    aria-selected={activeVisualization?.id === viz.id}
+                                    aria-controls={panelId}
+                                    id={`${panelId}-tab-${viz.id}`}
+                                    tabIndex={activeVisualization?.id === viz.id ? 0 : -1}
+                                    onKeyDown={(e) => handleTabKeyDown(e, index)}
                                 >
-                                    ×
+                                    <span className="tab-name">{viz.name}</span>
+                                    <span className="ts-badge">{viz.type}</span>
+                                </button>
+                                <button
+                                    type="button"
+                                    className="tab-close"
+                                    onClick={() => handleDeleteVisualization(viz.id)}
+                                    aria-label={`Close ${viz.name}`}
+                                    tabIndex={-1}
+                                >
+                                    <FiX size={12} />
                                 </button>
                             </div>
                         ))}
@@ -364,21 +405,23 @@ const VisualizationTab = ({
 
                 {/* Visualization Content */}
                 <div
-                    className="visualization-container"
-                    ref={visualizationContainerRef}
+                    id={panelId}
+                    className="visualization-container ts-inset"
+                    role="tabpanel"
+                    aria-labelledby={activeVisualization ? `${panelId}-tab-${activeVisualization.id}` : undefined}
                 >
                     {activeVisualization ? (
                         renderVisualizationContent(activeVisualization)
                     ) : (
                         <div className="no-visualization">
-                            <div className="no-viz-icon">📊</div>
+                            <div className="no-viz-icon" aria-hidden="true">📊</div>
                             <h4>No Visualizations</h4>
                             <p>Create a custom visualization or use API response data to auto-generate charts and tables.</p>
                             <button
-                                className="btn btn-primary"
+                                className="ts-btn primary"
                                 onClick={() => setIsTemplateEditorOpen(true)}
                             >
-                                Create Visualization
+                                <FiPlus size={14} /> Create Visualization
                             </button>
                         </div>
                     )}
@@ -387,71 +430,16 @@ const VisualizationTab = ({
 
             {/* Template Editor Modal */}
             {isTemplateEditorOpen && (
-                <div className="template-editor-modal">
-                    <div className="modal-overlay" onClick={() => setIsTemplateEditorOpen(false)} />
-                    <div className="modal-content">
-                        <div className="modal-header">
-                            <h3>Create Custom Visualization</h3>
-                            <button
-                                className="modal-close"
-                                onClick={() => setIsTemplateEditorOpen(false)}
-                            >
-                                ×
-                            </button>
-                        </div>
-
-                        <div className="modal-body">
-                            <div className="template-section">
-                                <label>Use Prebuilt Template:</label>
-                                <select
-                                    value={selectedTemplate}
-                                    onChange={(e) => handleTemplateSelect(e.target.value)}
-                                    className="template-select"
-                                >
-                                    <option value="">Custom Template</option>
-                                    {templateLibrary.map((template) => (
-                                        <option key={template.id} value={template.id}>
-                                            {template.name} - {template.description}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-
-                            <div className="template-section">
-                                <label>Template (Handlebars syntax):</label>
-                                <textarea
-                                    value={customTemplate}
-                                    onChange={(e) => setCustomTemplate(e.target.value)}
-                                    placeholder="Enter your Handlebars template here..."
-                                    className="template-textarea"
-                                    rows={10}
-                                />
-                            </div>
-
-                            <div className="template-section">
-                                <label>Available Data:</label>
-                                <pre className="data-preview">
-                                    {JSON.stringify(previewData, null, 2)}
-                                </pre>
-                            </div>
-                        </div>
-
-                        <div className="modal-footer">
-                            <button
-                                className="btn btn-secondary"
-                                onClick={() => setIsTemplateEditorOpen(false)}
-                            >
-                                Cancel
-                            </button>
-                            <button
-                                className="btn btn-primary"
-                                onClick={handleCustomVisualization}
-                            >
-                                Create Visualization
-                            </button>
-                        </div>
-                    </div>
-                </div>
+                <TemplateEditorModal
+                    selectedTemplate={selectedTemplate}
+                    templateLibrary={templateLibrary}
+                    customTemplate={customTemplate}
+                    previewData={previewData}
+                    onClose={() => setIsTemplateEditorOpen(false)}
+                    onSelectTemplate={handleTemplateSelect}
+                    onTemplateChange={setCustomTemplate}
+                    onCreate={handleCustomVisualization}
+                />
             )}
         </div>
     );

@@ -430,15 +430,14 @@ const Navbar = ({ isAuthenticated }) => {
                                             <div className="dropdown-item" onClick={() => handleNavigation('/workspace/performance-tests')}>
                                                 <FiBarChart2 size={16} style={{ marginRight: '10px' }} /> Performance Tests
                                             </div>
+                                            <div className="dropdown-item" onClick={() => handleNavigation('/workspace/history')}>
+                                                <FiClock size={16} style={{ marginRight: '10px' }} /> History
+                                            </div>
                                             <div className="dropdown-item" onClick={() => handleNavigation('/workspace/api-network/requests/new')}>
                                                 <FiPlus size={16} style={{ marginRight: '10px' }} /> Add Request
                                             </div>
                                         </div>
                                     )}
-                                </div>                                <div className="navbar-item" onClick={() => handleNavigation('/workspace/history')}>
-                                    <span className={isActive('/workspace/history') ? 'active' : ''}>
-                                        <FiClock size={18} /> History
-                                    </span>
                                 </div>                                {/* Monitoring Dashboard link */}
                                 <div className="navbar-item" onClick={() => handleNavigation('/workspace/monitoring')}>
                                     <span className={isActive('/workspace/monitoring') ? 'active' : ''}>

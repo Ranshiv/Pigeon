@@ -304,7 +304,7 @@ const UnifiedVariableViewer = ({
     return (
         <div className={`unified-variable-viewer ${compact ? 'compact' : ''}`}>
             <div className="viewer-header">
-                <div className="header-info">
+                <div className="uvv-header-info">
                     <h3>Variable Overview</h3>
                     <p className="header-description">
                         Variables are resolved in priority order. Higher priority levels override lower ones.

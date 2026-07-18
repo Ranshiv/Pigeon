@@ -75,28 +75,40 @@ const GlobalVariablesModal = ({
                 <div className="global-variables-modal-header">
                     <h2>
                         <FiGlobe />
+                        <span className="ts-eyebrow">Global</span>
                         Global Variables
                     </h2>
-                    <button className="close-button" onClick={onClose}>
+                    <button className="gv-close-btn" onClick={onClose} aria-label="Close">
                         <FiX />
                     </button>
                 </div>
 
                 {error && (
-                    <div className="error-message">
+                    <div className="global-variables-error">
                         {error}
                     </div>
                 )}
 
                 <div className="global-variables-content">
                     {loading ? (
-                        <div className="loading-state">
-                            <div className="loading-spinner"></div>
-                            <p>Loading global variables...</p>
+                        <div className="global-variables-loading">
+                            <div className="global-variables-spinner"></div>
+                            <p>Loading global variables…</p>
+                        </div>
+                    ) : variables.length === 0 ? (
+                        <div className="global-variables-empty">
+                            <div className="global-variables-empty-icon">
+                                <FiGlobe />
+                            </div>
+                            <h3 className="global-variables-empty-title">No global variables yet</h3>
+                            <p className="global-variables-empty-subtext">
+                                Global variables are available across all collections and environments in this workspace.
+                                Create your first to share values like API base URLs, tokens, or feature flags.
+                            </p>
                         </div>
                     ) : (
-                        <div className="variables-container">
-                            <div className="variables-description">
+                        <>
+                            <div className="global-variables-banner">
                                 <p>
                                     Global variables are available across all collections and environments in this workspace.
                                     They have the lowest precedence in variable resolution.
@@ -106,16 +118,17 @@ const GlobalVariablesModal = ({
                                 scope="global"
                                 variables={variables}
                                 onVariablesChange={setVariables}
-                                helpText="Define variables that will be available throughout your entire workspace."
+                                editable={true}
+                                hideHeader
                             />
-                        </div>
+                        </>
                     )}
                 </div>
 
-                <div className="global-variables-modal-actions">
+                <div className="global-variables-footer">
                     <button
                         type="button"
-                        className="cancel-button"
+                        className="gv-cancel-btn"
                         onClick={onClose}
                         disabled={saving}
                     >
@@ -123,12 +136,12 @@ const GlobalVariablesModal = ({
                     </button>
                     <button
                         type="button"
-                        className="save-button"
+                        className="gv-save-btn"
                         onClick={handleSave}
                         disabled={saving || loading}
                     >
                         <FiSave />
-                        {saving ? 'Saving...' : 'Save Changes'}
+                        {saving ? 'Saving…' : 'Save Changes'}
                     </button>
                 </div>
             </div>

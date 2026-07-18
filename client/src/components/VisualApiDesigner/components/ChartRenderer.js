@@ -30,8 +30,6 @@ const ChartRenderer = ({
     type,
     data,
     options = {},
-    width = 400,
-    height = 300,
     className = ''
 }) => {
     const chartRef = useRef(null);
@@ -74,9 +72,7 @@ const ChartRenderer = ({
     const chartProps = {
         ref: chartRef,
         data: data,
-        options: defaultOptions,
-        width: width,
-        height: height
+        options: defaultOptions
     };
 
     const renderChart = () => {
@@ -99,7 +95,7 @@ const ChartRenderer = ({
     };
 
     return (
-        <div className={`chart-container ${className}`} style={{ width, height }}>
+        <div className={`chart-container ${className}`}>
             {renderChart()}
         </div>
     );
