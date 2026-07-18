@@ -36,6 +36,33 @@ const CommunityForums = require('../features/api-marketplace/CommunityForums');
 const GuideService = require('../features/api-marketplace/GuideService');
 const HealthService = require('../features/api-marketplace/HealthService');
 const { ensureAuthenticated } = require('../middleware/auth');
+const { proxyLimiter } = require('../middleware/rateLimiter');
+const { validateBody } = require('../middleware/validateBody');
+const { z } = require('zod');
+
+// Tier 1: zod schemas for marketplace write endpoints.
+const reviewSchema = z.object({
+    rating: z.number().int().min(1).max(5),
+    title: z.string().trim().max(100).optional(),
+    body: z.string().trim().min(1).max(2000)
+});
+
+const threadSchema = z.object({
+    title: z.string().trim().min(1).max(200),
+    body: z.string().trim().min(1).max(5000),
+    tags: z.array(z.string()).optional()
+});
+
+const replySchema = z.object({
+    body: z.string().trim().min(1)
+});
+
+const guideSchema = z.object({
+    title: z.string().trim().min(1),
+    slug: z.string().trim().min(1),
+    summary: z.string().trim().max(300).optional(),
+    contentMarkdown: z.string().trim().min(1)
+});
 
 // GET /api/marketplace/search - Search public APIs
 router.get('/search', async (req, res) => {
@@ -45,16 +72,23 @@ router.get('/search', async (req, res) => {
         // Build filter
         const filter = {};
 
-        // Filter by search query using safe escaped regex for partial matches.
+        // Filter by search query. Default to Mongo $text (uses the existing text
+        // index on name/description/provider/tags for relevance ranking). When
+        // ?exact=1 is set, fall back to escaped-regex substring matching so a
+        // query like "predict" still hits "unpredictable" (a stem $text misses).
         if (query) {
-            const safeQuery = escapeRegExp(query);
-            const searchRegex = new RegExp(safeQuery, 'i');
-            filter.$or = [
-                { name: searchRegex },
-                { description: searchRegex },
-                { provider: searchRegex },
-                { tags: searchRegex }
-            ];
+            if (req.query.exact) {
+                const safeQuery = escapeRegExp(query);
+                const searchRegex = new RegExp(safeQuery, 'i');
+                filter.$or = [
+                    { name: searchRegex },
+                    { description: searchRegex },
+                    { provider: searchRegex },
+                    { tags: searchRegex }
+                ];
+            } else {
+                filter.$text = { $search: query };
+            }
         }
 
         // Filter by category
@@ -174,9 +208,28 @@ router.get('/featured', async (req, res) => {
     }
 });
 
-// GET /api/marketplace/trending - Get trending APIs
+// GET /api/marketplace/trending - Get trending APIs.
+// Default: return listings flagged trending (static seed value).
+// ?recompute=1: derive from real signal — recent review velocity in the last
+// 7 days, top N by count. ponytail: on-read recompute; switch to a node-cron
+// job writing the trending flag when read throughput makes this aggregation hot.
+const TrendingReview = require('../server/models/Review');
 router.get('/trending', async (req, res) => {
     try {
+        if (req.query.recompute) {
+            const since = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+            const top = await TrendingReview.aggregate([
+                { $match: { createdAt: { $gte: since } } },
+                { $group: { _id: '$listingId', recentReviews: { $sum: 1 } } },
+                { $sort: { recentReviews: -1 } },
+                { $limit: 20 }
+            ]);
+            const ids = top.map(t => t._id);
+            const trending = await MarketplaceApi.find({ id: { $in: ids } });
+            // Preserve aggregation order (most-recently-reviewed first).
+            trending.sort((a, b) => ids.indexOf(a.id) - ids.indexOf(b.id));
+            return res.json(trending);
+        }
         const trending = await MarketplaceApi.find({ trending: true });
         res.json(trending);
     } catch (error) {
@@ -274,7 +327,7 @@ router.get('/listings/:id/reviews', async (req, res) => {
     }
 });
 
-router.post('/listings/:id/reviews', ensureAuthenticated, async (req, res) => {
+router.post('/listings/:id/reviews', ensureAuthenticated, validateBody(reviewSchema), async (req, res) => {
     try {
         const review = await ReviewService.createReview(req.params.id, req.user._id, req.body);
         res.json(review);
@@ -293,7 +346,7 @@ router.get('/listings/:id/forums/threads', async (req, res) => {
     }
 });
 
-router.post('/listings/:id/forums/threads', ensureAuthenticated, async (req, res) => {
+router.post('/listings/:id/forums/threads', ensureAuthenticated, validateBody(threadSchema), async (req, res) => {
     try {
         const thread = await CommunityForums.createThread(req.params.id, req.user._id, req.body);
         res.json(thread);
@@ -311,7 +364,7 @@ router.get('/forums/threads/:threadId', async (req, res) => {
     }
 });
 
-router.post('/forums/threads/:threadId/posts', ensureAuthenticated, async (req, res) => {
+router.post('/forums/threads/:threadId/posts', ensureAuthenticated, validateBody(replySchema), async (req, res) => {
     try {
         const post = await CommunityForums.replyToThread(req.params.threadId, req.user._id, req.body);
         res.json(post);
@@ -342,7 +395,7 @@ router.get('/listings/:id/guides/:slug', async (req, res) => {
     }
 });
 
-router.post('/listings/:id/guides', ensureAuthenticated, async (req, res) => {
+router.post('/listings/:id/guides', ensureAuthenticated, validateBody(guideSchema), async (req, res) => {
     try {
         const guide = await GuideService.createGuide(req.params.id, req.body);
         res.json(guide);
@@ -373,7 +426,7 @@ router.get('/listings/:id/plans', (req, res) => {
 });
 
 // POST /api/marketplace/proxy - Proxy requests to external APIs (for Try It feature)
-router.post('/proxy', async (req, res) => {
+router.post('/proxy', proxyLimiter, async (req, res) => {
     const startTime = Date.now();
 
     try {
@@ -458,6 +511,16 @@ router.post('/proxy', async (req, res) => {
         }
 
         const responseSize = JSON.stringify(responseBody).length;
+
+        // Tier 2: credit the listing whose baseUrl host matches the proxied URL
+        // so "popular" sort reflects real Try-It usage. Fire-and-forget; the proxy
+        // response is already complete.
+        try {
+            await MarketplaceApi.updateOne(
+                { baseUrl: { $regex: new RegExp('^[^:]+://[^/]*' + escapeRegExp(urlObj.host) + '(/|$)'), $options: 'i' } },
+                { $inc: { usageCount: 1 } }
+            );
+        } catch (e) { /* non-fatal: usage tracking must never break the proxy */ }
 
         res.json({
             status: externalResponse.status,

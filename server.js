@@ -11,6 +11,7 @@ const path = require('path');
 const mongoose = require('mongoose');
 const axios = require('axios'); // Add axios import for proxy functionality
 const https = require('https'); // Add https to handle SSL issues
+const { mountSecurityMiddleware, globalErrorHandler } = require('./middleware/securityMiddleware');
 const { initializeConnections } = require('./config/db');
 const User = require('./models/User');
 const MarketplaceApi = require('./models/MarketplaceApi');
@@ -41,6 +42,7 @@ app.use(cors({
     origin: process.env.FRONTEND_URL || 'http://localhost:3000',
     credentials: true
 }));
+mountSecurityMiddleware(app);
 app.use(express.json());
 app.use(cookieParser());
 app.use(session({
@@ -189,6 +191,9 @@ app.get('/api/health', (req, res) => {
         }
     });
 });
+
+// --- GLOBAL ERROR HANDLER (must be last) ---
+app.use(globalErrorHandler);
 
 
 // --- GOOGLE AUTH ROUTES ---

@@ -24,6 +24,7 @@ jest.unstable_mockModule('node-fetch', async () => ({
 }));
 
 const router = require('../routes/apiMarketplace');
+const { resetProxyLimiter } = require('../middleware/rateLimiter');
 
 const MarketplaceApi = require('../models/MarketplaceApi');
 const User = require('../models/User');
@@ -99,6 +100,8 @@ afterAll(async () => {
 }, 60000);
 
 beforeEach(async () => {
+    // Reset the in-memory rate-limit window so the 9 proxy tests don't trip 429.
+    resetProxyLimiter();
     await Promise.all([
         MarketplaceApi.deleteMany({}),
         Review.deleteMany({}),
@@ -157,6 +160,21 @@ describe('GET /api/marketplace/search', () => {
         expect(res.body.page).toBe(1);
         expect(res.body.results.length).toBeLessThanOrEqual(100);
     });
+
+    test('$text search ranks results by relevance (more mentions rank higher)', async () => {
+        await seedListing({ id: 'low', name: 'Weather', description: 'a thing' });
+        await seedListing({ id: 'high', name: 'Weather Pro', description: 'weather weather weather forecasts' });
+        const res = await request(app).get('/api/marketplace/search?query=weather');
+        expect(res.body.total).toBe(2);
+        expect(res.body.results[0].id).toBe('high');
+    });
+
+    test('?exact=1 falls back to substring regex matching', async () => {
+        await seedListing({ id: 'ex1', name: 'unpredictable' });
+        const res = await request(app).get('/api/marketplace/search?query=predict&exact=1');
+        expect(res.body.total).toBe(1);
+        expect(res.body.results[0].id).toBe('ex1');
+    });
 });
 
 describe('GET /api/marketplace/categories', () => {
@@ -195,12 +213,27 @@ describe('GET /api/marketplace/featured and /trending', () => {
         expect(res.body[0].id).toBe('f1');
     });
 
-    test('trending returns only trending listings', async () => {
+    test('trending returns only listings flagged trending', async () => {
         await seedListing({ id: 'tr1', trending: true });
         await seedListing({ id: 'tr2', trending: false });
         const res = await request(app).get('/api/marketplace/trending');
         expect(res.body).toHaveLength(1);
         expect(res.body[0].id).toBe('tr1');
+    });
+
+    test('trending is recomputed from recent review velocity (high-activity listing ranks in)', async () => {
+        const Review = require('../server/models/Review');
+        await seedListing({ id: 'hot', trending: false });
+        await seedListing({ id: 'cold', trending: true });
+        // Hot listing has 3 recent reviews; cold has none.
+        await Review.create([
+            { listingId: 'hot', userId: userId, rating: 5, body: 'a' },
+            { listingId: 'hot', userId: new mongoose.Types.ObjectId(), rating: 4, body: 'b' },
+            { listingId: 'hot', userId: new mongoose.Types.ObjectId(), rating: 4, body: 'c' }
+        ]);
+        const res = await request(app).get('/api/marketplace/trending?recompute=1');
+        const ids = res.body.map(a => a.id);
+        expect(ids).toContain('hot');
     });
 });
 
@@ -276,6 +309,24 @@ describe('Reviews', () => {
         const list = await request(app).get('/api/marketplace/listings/rev-3/reviews');
         expect(list.body.total).toBe(1);
     });
+
+    test('POST review with out-of-range rating returns 400', async () => {
+        await seedListing({ id: 'rev-4' });
+        const res = await request(app)
+            .post('/api/marketplace/listings/rev-4/reviews')
+            .set(authHeader)
+            .send({ rating: 9, body: 'Bad rating' });
+        expect(res.status).toBe(400);
+    });
+
+    test('POST review missing body field returns 400', async () => {
+        await seedListing({ id: 'rev-5' });
+        const res = await request(app)
+            .post('/api/marketplace/listings/rev-5/reviews')
+            .set(authHeader)
+            .send({ rating: 5 });
+        expect(res.status).toBe(400);
+    });
 });
 
 describe('Community forums', () => {
@@ -292,6 +343,15 @@ describe('Community forums', () => {
             .post('/api/marketplace/listings/forum-2/forums/threads')
             .send({ title: 'Hello', body: 'World' });
         expect(res.status).toBe(401);
+    });
+
+    test('POST thread missing title returns 400 even when authed', async () => {
+        await seedListing({ id: 'forum-2b' });
+        const res = await request(app)
+            .post('/api/marketplace/listings/forum-2b/forums/threads')
+            .set(authHeader)
+            .send({ body: 'no title here' });
+        expect(res.status).toBe(400);
     });
 
     test('POST thread with token seeds an opening post, GET thread returns it with posts[0]', async () => {
@@ -385,6 +445,15 @@ describe('Guides', () => {
         expect(res.status).toBe(200);
         expect(res.body.slug).toBe('custom');
     });
+
+    test('POST guide missing contentMarkdown returns 400 even when authed', async () => {
+        await seedListing({ id: 'guide-3b' });
+        const res = await request(app)
+            .post('/api/marketplace/listings/guide-3b/guides')
+            .set(authHeader)
+            .send({ title: 'No body', slug: 'no-body' });
+        expect(res.status).toBe(400);
+    });
 });
 
 describe('Health and plans', () => {
@@ -472,6 +541,21 @@ describe('POST /api/marketplace/proxy (Try It)', () => {
         expect(opts.method).toBe('POST');
         expect(opts.body).toBe(JSON.stringify({ x: 1 }));
         expect(opts.headers['Content-Type']).toBe('application/json');
+    });
+
+    test('increments listing usageCount after a successful proxy call', async () => {
+        await seedListing({ id: 'usage-1', usageCount: 5, baseUrl: 'https://api.public.test' });
+        fetchMock.mockResolvedValueOnce({
+            ok: true, status: 200, statusText: 'OK',
+            headers: new Map([['content-type', 'application/json']]),
+            json: async () => ({}), text: async () => '', arrayBuffer: async () => new ArrayBuffer(0)
+        });
+        const res = await request(app)
+            .post('/api/marketplace/proxy')
+            .send({ url: 'https://api.public.test/v1' });
+        expect(res.status).toBe(200);
+        const after = await MarketplaceApi.findOne({ id: 'usage-1' }).lean();
+        expect(after.usageCount).toBe(6);
     });
 });
 
