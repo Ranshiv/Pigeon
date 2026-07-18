@@ -12,6 +12,7 @@ const EndpointSchema = new mongoose.Schema({
     method: { type: String, enum: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD', 'OPTIONS'], required: true },
     description: String,
     parameters: [ParameterSchema],
+    sample: { type: mongoose.Schema.Types.Mixed, default: null }, // curl-verified example values per Try It
     body: mongoose.Schema.Types.Mixed // Flexible structure for body schema definition
 });
 

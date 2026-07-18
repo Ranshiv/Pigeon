@@ -3,7 +3,32 @@ const express = require('express');
 const router = express.Router();
 const MarketplaceApi = require('../models/MarketplaceApi');
 const https = require('https'); // Add https to handle SSL issues
+const dns = require('dns').promises;
 const fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args));
+
+function escapeRegExp(string) {
+    return String(string).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+async function isPrivateHost(hostname) {
+    if (!hostname) return true;
+    const host = hostname.toLowerCase();
+    if (host === 'localhost' || host.endsWith('.localhost')) return true;
+    if (host === 'metadata.google.internal') return true;
+    if (host.startsWith('169.254.') || host.startsWith('fe80:')) return true;
+    try {
+        const lookup = await dns.lookup(host, { all: true });
+        return lookup.some(({ address }) => {
+            return address === '127.0.0.1' || address === '::1' ||
+                   address.startsWith('10.') || address.startsWith('192.168.') ||
+                   /^172\.(1[6-9]|2\d|3[01])\./.test(address) ||
+                   address.startsWith('169.254.') || address.startsWith('fc') ||
+                   address.startsWith('fe80:') || address === '0.0.0.0';
+        });
+    } catch {
+        return false;
+    }
+}
 
 // Feature Services
 const ReviewService = require('../features/api-marketplace/ReviewService');
@@ -19,10 +44,10 @@ router.get('/search', async (req, res) => {
         // Build filter
         const filter = {};
 
-        // Filter by search query using text index or regex
+        // Filter by search query using safe escaped regex for partial matches.
         if (query) {
-            // Using regex for partial matches on name/description if text index search is too strict or not set up
-            const searchRegex = new RegExp(query, 'i');
+            const safeQuery = escapeRegExp(query);
+            const searchRegex = new RegExp(safeQuery, 'i');
             filter.$or = [
                 { name: searchRegex },
                 { description: searchRegex },
@@ -36,11 +61,14 @@ router.get('/search', async (req, res) => {
             filter.category = category;
         }
 
-        // Filter by tags
+        // Filter by tags (exact case-insensitive match for each tag)
         if (tags) {
-            const tagArray = tags.split(',').map(t => t.trim());
-            // Match any of the tags provided
-            filter.tags = { $in: tagArray.map(t => new RegExp(`^${t}$`, 'i')) };
+            const tagArray = tags.split(',').map(t => t.trim()).filter(Boolean);
+            if (tagArray.length > 0) {
+                filter.tags = {
+                    $in: tagArray.map(t => new RegExp(`^${escapeRegExp(t)}$`, 'i'))
+                };
+            }
         }
 
         // Sort options
@@ -49,11 +77,17 @@ router.get('/search', async (req, res) => {
             case 'popular':
                 sortOption = { usageCount: -1 };
                 break;
+            case 'trending':
+                sortOption = { trending: -1, usageCount: -1 };
+                break;
             case 'rating':
                 sortOption = { ratingAverage: -1 };
                 break;
             case 'name':
                 sortOption = { name: 1 };
+                break;
+            case 'newest':
+                sortOption = { createdAt: -1 };
                 break;
             default:
                 sortOption = { usageCount: -1 }; // Default to popular
@@ -61,8 +95,8 @@ router.get('/search', async (req, res) => {
         }
 
         // Pagination
-        const pageNum = parseInt(page);
-        const limitNum = parseInt(limit);
+        const pageNum = Math.max(1, parseInt(page) || 1);
+        const limitNum = Math.min(100, Math.max(1, parseInt(limit) || 12));
         const skip = (pageNum - 1) * limitNum;
 
         // Execute query
@@ -352,18 +386,36 @@ router.post('/proxy', async (req, res) => {
             return res.status(400).json({ error: 'URL is required' });
         }
 
+        let urlObj;
+        try {
+            urlObj = new URL(url);
+        } catch {
+            return res.status(400).json({ error: 'Invalid URL' });
+        }
+
+        // Block non-public hosts to prevent SSRF / metadata access.
+        if (await isPrivateHost(urlObj.hostname)) {
+            return res.status(403).json({ error: 'Proxy to private/internal hosts is not allowed' });
+        }
+
+        // Only allow http(s) schemes.
+        if (!['http:', 'https:'].includes(urlObj.protocol)) {
+            return res.status(400).json({ error: 'Only http and https URLs are allowed' });
+        }
+
         // Build URL with query parameters
-        const urlObj = new URL(url);
         Object.entries(queryParams).forEach(([key, value]) => {
             if (value) {
                 urlObj.searchParams.append(key, value);
             }
         });
 
-        // Create an agent to allow insecure connections if needed
-        const agent = new https.Agent({
-            rejectUnauthorized: req.body.rejectUnauthorized !== undefined ? req.body.rejectUnauthorized : false // Default to false for marketplace trial to be more user-friendly
-        });
+        // Default to verifying TLS. The user can opt-in to insecure mode for
+        // testing broken certs, but never default to unsafe.
+        const rejectUnauthorized = req.body.rejectUnauthorized !== undefined
+            ? Boolean(req.body.rejectUnauthorized)
+            : true;
+        const agent = new https.Agent({ rejectUnauthorized });
 
         // Prepare fetch options
         const fetchOptions = {

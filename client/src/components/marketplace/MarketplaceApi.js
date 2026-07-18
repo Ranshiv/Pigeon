@@ -22,6 +22,17 @@ export const MarketplaceApi = {
         const res = await fetch(`/api/marketplace/tags?query=${encodeURIComponent(query)}`, { credentials: 'include' });
         return jsonOrThrow(res);
     },
+    async searchListings({ query = '', category = '', tags = '', sort = 'popular', page = 1, limit = 12, signal } = {}) {
+        const url = new URL('/api/marketplace/search', window.location.origin);
+        if (query) url.searchParams.set('query', query);
+        if (category) url.searchParams.set('category', category);
+        if (tags) url.searchParams.set('tags', tags);
+        if (sort) url.searchParams.set('sort', sort);
+        url.searchParams.set('page', String(page));
+        url.searchParams.set('limit', String(limit));
+        const res = await fetch(url.toString(), { credentials: 'include', signal });
+        return jsonOrThrow(res);
+    },
     async browseListings({ query = '', category = '', tag = '', showcased = false, page = 1, limit = 20 } = {}) {
         const url = new URL('/api/marketplace/listings', window.location.origin);
         if (query) url.searchParams.set('query', query);

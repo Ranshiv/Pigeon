@@ -13,6 +13,7 @@
     "generate:guide-pdf": "node generate-pdf-guide.js",
     "clean:empty:dry": "node ./scripts/remove-empty-files.js",
     "clean:empty": "node ./scripts/remove-empty-files.js --apply",
+    "verify:apis": "node ./scripts/verifyApis.js",
     "contract:diff": "node ./cli/pigeon-cli.js diff --base test-api-v1.json --head test-api-v2.json --format html --output diff-report.html"
   },
   "keywords": [
