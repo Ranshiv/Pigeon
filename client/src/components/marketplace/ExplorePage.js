@@ -17,6 +17,7 @@ const FAVORITES_KEY = 'exploreFavorites';
 
 const ExplorePage = () => {
     const [searchQuery, setSearchQuery] = useState('');
+    const [searchInput, setSearchInput] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('All');
     const [selectedTags, setSelectedTags] = useState([]);
     const [sortBy, setSortBy] = useState('popular');
@@ -135,6 +136,7 @@ const ExplorePage = () => {
 
     const clearFilters = () => {
         setSearchQuery('');
+        setSearchInput('');
         setSelectedCategory('All');
         setSelectedTags([]);
         setSortBy('popular');
@@ -175,17 +177,20 @@ const ExplorePage = () => {
                         <input
                             type="text"
                             placeholder="Search APIs by name, category, or tag..."
-                            value={searchQuery}
+                            value={searchInput}
                             onChange={(e) => {
-                                debouncedSetSearch(e.target.value);
+                                const value = e.target.value;
+                                setSearchInput(value);
+                                debouncedSetSearch(value);
                                 setPage(1);
                             }}
                             className="search-input"
                         />
-                        {searchQuery && (
+                        {searchInput && (
                             <button
                                 className="clear-search"
                                 onClick={() => {
+                                    setSearchInput('');
                                     setSearchQuery('');
                                     setPage(1);
                                 }}
@@ -286,7 +291,7 @@ const ExplorePage = () => {
                             {searchQuery && (
                                 <span className="filter-chip">
                                     Search: "{searchQuery}"
-                                    <button onClick={() => { setSearchQuery(''); setPage(1); }}>
+                                    <button onClick={() => { setSearchQuery(''); setSearchInput(''); setPage(1); }}>
                                         <X size={14} />
                                     </button>
                                 </span>

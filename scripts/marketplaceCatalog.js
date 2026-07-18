@@ -2279,30 +2279,6 @@ const publicApiCatalog = [
         trending: false
     },
     {
-        id: 'dog-facts-3',
-        name: 'Dog Facts',
-        provider: 'Dog Facts',
-        description: 'Random facts of Dogs',
-        category: 'Animals',
-        tags: ['animals', 'public-api', 'dog'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.7,
-        ratingCount: 8007,
-        usageCount: 31501,
-        baseUrl: 'https://kinduff.github.io',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://kinduff.github.io/dog-api/',
-        featured: false,
-        trending: false
-    },
-    {
         id: 'dogs',
         name: 'Dogs',
         provider: 'Dogs',
@@ -2879,30 +2855,6 @@ const publicApiCatalog = [
         trending: false
     },
     {
-        id: 'art-institute-of-chicago',
-        name: 'Art Institute of Chicago',
-        provider: 'Art Institute of Chicago',
-        description: 'Art',
-        category: 'Art & Design',
-        tags: ['art-design', 'public-api', 'art'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.9,
-        ratingCount: 1309,
-        usageCount: 55401,
-        baseUrl: 'https://api.artic.edu',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://api.artic.edu/docs/',
-        featured: false,
-        trending: false
-    },
-    {
         id: 'emojihub',
         name: 'EmojiHub',
         provider: 'EmojiHub',
@@ -3263,30 +3215,6 @@ const publicApiCatalog = [
         trending: false
     },
     {
-        id: 'bhagavad-gita-2',
-        name: 'Bhagavad Gita',
-        provider: 'Bhagavad Gita',
-        description: 'Bhagavad Gita text',
-        category: 'Books',
-        tags: ['books', 'public-api', 'bhagavad'],
-        authType: 'OAuth 2.0',
-        pricing: 'Free',
-        ratingAverage: 4.6,
-        ratingCount: 3296,
-        usageCount: 88970,
-        baseUrl: 'https://bhagavadgita.io',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://bhagavadgita.io/api',
-        featured: false,
-        trending: false
-    },
-    {
         id: 'bhagavad-gita-telugu',
         name: 'Bhagavad Gita telugu',
         provider: 'Bhagavad Gita telugu',
@@ -3307,30 +3235,6 @@ const publicApiCatalog = [
             }
         ],
         documentation: 'https://gita-api.vercel.app',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'bible-api',
-        name: 'Bible-api',
-        provider: 'Bible-api',
-        description: 'Free Bible API with multiple languages',
-        category: 'Books',
-        tags: ['books', 'public-api', 'bible'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4,
-        ratingCount: 6540,
-        usageCount: 55005,
-        baseUrl: 'https://bible-api.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://bible-api.com/',
         featured: false,
         trending: false
     },
@@ -4319,30 +4223,6 @@ const publicApiCatalog = [
         trending: false
     },
     {
-        id: 'frankfurter-2',
-        name: 'Frankfurter',
-        provider: 'Frankfurter',
-        description: 'Exchange rates, currency conversion and time series',
-        category: 'Currency Exchange',
-        tags: ['currency-exchange', 'public-api', 'frankfurter'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.8,
-        ratingCount: 7288,
-        usageCount: 65398,
-        baseUrl: 'https://www.frankfurter.app',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://www.frankfurter.app/docs',
-        featured: false,
-        trending: false
-    },
-    {
         id: 'national-bank-of-poland',
         name: 'National Bank of Poland',
         provider: 'National Bank of Poland',
@@ -4507,30 +4387,6 @@ const publicApiCatalog = [
             }
         ],
         documentation: 'https://24pullrequests.com/api',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'agify-io',
-        name: 'Agify.io',
-        provider: 'Agify.io',
-        description: 'Estimates the age from a first name',
-        category: 'Development',
-        tags: ['development', 'public-api', 'agify'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4,
-        ratingCount: 5100,
-        usageCount: 48371,
-        baseUrl: 'https://agify.io',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://agify.io',
         featured: false,
         trending: false
     },
@@ -4871,30 +4727,6 @@ const publicApiCatalog = [
         trending: false
     },
     {
-        id: 'genderize-io',
-        name: 'Genderize.io',
-        provider: 'Genderize.io',
-        description: 'Estimates a gender from a first name',
-        category: 'Development',
-        tags: ['development', 'public-api', 'genderize'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.3,
-        ratingCount: 7493,
-        usageCount: 23141,
-        baseUrl: 'https://genderize.io',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://genderize.io',
-        featured: false,
-        trending: false
-    },
-    {
         id: 'ghost',
         name: 'Ghost',
         provider: 'Ghost',
@@ -5059,30 +4891,6 @@ const publicApiCatalog = [
             }
         ],
         documentation: 'https://host.io',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'httpbin-2',
-        name: 'Httpbin',
-        provider: 'Httpbin',
-        description: 'A Simple HTTP Request & Response Service',
-        category: 'Development',
-        tags: ['development', 'public-api', 'httpbin'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.7,
-        ratingCount: 8597,
-        usageCount: 88585,
-        baseUrl: 'https://httpbin.org',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://httpbin.org/',
         featured: false,
         trending: false
     },
@@ -5279,54 +5087,6 @@ const publicApiCatalog = [
         trending: false
     },
     {
-        id: 'jsonbin-io',
-        name: 'JSONbin.io',
-        provider: 'JSONbin.io',
-        description: 'Free JSON storage service. Ideal for small scale Web apps, Websites and Mobile apps',
-        category: 'Development',
-        tags: ['development', 'public-api', 'jsonbin'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.1,
-        ratingCount: 1291,
-        usageCount: 5684,
-        baseUrl: 'https://jsonbin.io',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://jsonbin.io',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'jsonplaceholder-2',
-        name: 'JSONPlaceholder',
-        provider: 'JSONPlaceholder',
-        description: 'Fake REST API for testing and prototyping',
-        category: 'Development',
-        tags: ['development', 'public-api', 'jsonplaceholder'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.3,
-        ratingCount: 1573,
-        usageCount: 29867,
-        baseUrl: 'https://jsonplaceholder.typicode.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://jsonplaceholder.typicode.com',
-        featured: false,
-        trending: false
-    },
-    {
         id: 'kroki',
         name: 'Kroki',
         provider: 'Kroki',
@@ -5419,30 +5179,6 @@ const publicApiCatalog = [
             }
         ],
         documentation: 'https://designer.mocky.io/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'nationalize-io',
-        name: 'Nationalize.io',
-        provider: 'Nationalize.io',
-        description: 'Estimate the nationality of a first name',
-        category: 'Development',
-        tags: ['development', 'public-api', 'nationalize'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.6,
-        ratingCount: 7586,
-        usageCount: 57012,
-        baseUrl: 'https://nationalize.io',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://nationalize.io',
         featured: false,
         trending: false
     },
@@ -7343,54 +7079,6 @@ const publicApiCatalog = [
         trending: false
     },
     {
-        id: 'thecocktaildb',
-        name: 'TheCocktailDB',
-        provider: 'TheCocktailDB',
-        description: 'Cocktail Recipes',
-        category: 'Food & Drink',
-        tags: ['food-drink', 'public-api', 'thecocktaildb'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.4,
-        ratingCount: 4104,
-        usageCount: 15372,
-        baseUrl: 'https://www.thecocktaildb.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://www.thecocktaildb.com/api.php',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'themealdb',
-        name: 'TheMealDB',
-        provider: 'TheMealDB',
-        description: 'Meal Recipes',
-        category: 'Food & Drink',
-        tags: ['food-drink', 'public-api', 'themealdb'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.5,
-        ratingCount: 7045,
-        usageCount: 67649,
-        baseUrl: 'https://www.themealdb.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://www.themealdb.com/api.php',
-        featured: false,
-        trending: false
-    },
-    {
         id: 'zestful',
         name: 'Zestful',
         provider: 'Zestful',
@@ -7891,30 +7579,6 @@ const publicApiCatalog = [
             }
         ],
         documentation: 'https://github.com/favware/graphql-pokemon',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'jokeapi-2',
-        name: 'JokeAPI',
-        provider: 'JokeAPI',
-        description: 'Programming, Miscellaneous and Dark Jokes',
-        category: 'Games & Comics',
-        tags: ['games-comics', 'public-api', 'jokeapi'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.5,
-        ratingCount: 5255,
-        usageCount: 27250,
-        baseUrl: 'https://sv443.net',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://sv443.net/jokeapi/v2/',
         featured: false,
         trending: false
     },
@@ -8879,30 +8543,6 @@ const publicApiCatalog = [
         trending: false
     },
     {
-        id: 'rest-countries',
-        name: 'REST Countries',
-        provider: 'REST Countries',
-        description: 'Get information about countries via a RESTful API',
-        category: 'Geocoding',
-        tags: ['geocoding', 'public-api', 'rest'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.4,
-        ratingCount: 3804,
-        usageCount: 94900,
-        baseUrl: 'https://restcountries.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://restcountries.com',
-        featured: false,
-        trending: false
-    },
-    {
         id: 'slf',
         name: 'SLF',
         provider: 'SLF',
@@ -9379,30 +9019,6 @@ const publicApiCatalog = [
             }
         ],
         documentation: 'https://covid19api.com/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'covid-19-2',
-        name: 'Covid-19',
-        provider: 'Covid-19',
-        description: 'Covid 19 cases, deaths and recovery per country',
-        category: 'Health',
-        tags: ['health', 'public-api', 'covid'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.6,
-        ratingCount: 4516,
-        usageCount: 21859,
-        baseUrl: 'https://github.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://github.com/M-Media-Group/Covid-19-API',
         featured: false,
         trending: false
     },
@@ -10823,30 +10439,6 @@ const publicApiCatalog = [
         trending: false
     },
     {
-        id: 'evil-insult-generator',
-        name: 'Evil Insult Generator',
-        provider: 'Evil Insult Generator',
-        description: 'Evil Insults',
-        category: 'Open Source Projects',
-        tags: ['open-source-projects', 'public-api', 'evil'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.1,
-        ratingCount: 9021,
-        usageCount: 22931,
-        baseUrl: 'https://evilinsult.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://evilinsult.com/api',
-        featured: false,
-        trending: false
-    },
-    {
         id: 'github-contribution-chart-generator',
         name: 'GitHub Contribution Chart Generator',
         provider: 'GitHub Contribution Chart Generator',
@@ -11083,30 +10675,6 @@ const publicApiCatalog = [
             }
         ],
         documentation: 'https://zenquotes.io/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'cloudmersive-validate-2',
-        name: 'Cloudmersive Validate',
-        provider: 'Cloudmersive Validate',
-        description: 'Validate international phone numbers',
-        category: 'Phone',
-        tags: ['phone', 'public-api', 'cloudmersive'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.5,
-        ratingCount: 4515,
-        usageCount: 7145,
-        baseUrl: 'https://cloudmersive.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://cloudmersive.com/phone-number-validation-API',
         featured: false,
         trending: false
     },
@@ -12211,30 +11779,6 @@ const publicApiCatalog = [
             }
         ],
         documentation: 'https://openf1.org/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'openligadb',
-        name: 'OpenLigaDB',
-        provider: 'OpenLigaDB',
-        description: 'Crowd sourced sports league results',
-        category: 'Sports & Fitness',
-        tags: ['sports-fitness', 'public-api', 'openligadb'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.2,
-        ratingCount: 2732,
-        usageCount: 27890,
-        baseUrl: 'https://www.openligadb.de',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://www.openligadb.de',
         featured: false,
         trending: false
     },
@@ -13583,30 +13127,6 @@ const publicApiCatalog = [
         trending: false
     },
     {
-        id: 'swapi-3',
-        name: 'SWAPI',
-        provider: 'SWAPI',
-        description: 'All things Star Wars',
-        category: 'Video',
-        tags: ['video', 'public-api', 'swapi'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.3,
-        ratingCount: 9333,
-        usageCount: 32833,
-        baseUrl: 'https://www.swapi.tech',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://www.swapi.tech',
-        featured: false,
-        trending: false
-    },
-    {
         id: 'the-vampire-diaries',
         name: 'The Vampire Diaries',
         provider: 'The Vampire Diaries',
@@ -14011,30 +13531,6 @@ const publicApiCatalog = [
             }
         ],
         documentation: 'https://theaxolotlapi.netlify.app/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'cat-facts-3',
-        name: 'Cat Facts',
-        provider: 'Cat Facts',
-        description: 'Daily cat facts',
-        category: 'Animals',
-        tags: ['animals', 'public-api', 'cat'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.3,
-        ratingCount: 9013,
-        usageCount: 15359,
-        baseUrl: 'https://alexwohlbruck.github.io',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://alexwohlbruck.github.io/cat-facts/',
         featured: false,
         trending: false
     },
@@ -14578,12390 +14074,6 @@ const publicApiCatalog = [
         ratingAverage: 4.3,
         ratingCount: 1483,
         usageCount: 28426,
-        baseUrl: 'https://bazaar.abuse.ch',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://bazaar.abuse.ch/api/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'adoptapet-2',
-        name: 'AdoptAPet',
-        provider: 'AdoptAPet',
-        description: 'Resource to help get pets adopted',
-        category: 'Animals',
-        tags: ['animals', 'public-api', 'adoptapet'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.4,
-        ratingCount: 5114,
-        usageCount: 59659,
-        baseUrl: 'https://www.adoptapet.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://www.adoptapet.com/public/apis/pet_list.html',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'cat-facts-4',
-        name: 'Cat Facts',
-        provider: 'Cat Facts',
-        description: 'Random cat facts',
-        category: 'Animals',
-        tags: ['animals', 'public-api', 'cat'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.2,
-        ratingCount: 1632,
-        usageCount: 37161,
-        baseUrl: 'https://catfact.ninja',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://catfact.ninja/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'dog-facts-4',
-        name: 'Dog Facts',
-        provider: 'Dog Facts',
-        description: 'Random dog facts',
-        category: 'Animals',
-        tags: ['animals', 'public-api', 'dog'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.2,
-        ratingCount: 7102,
-        usageCount: 45514,
-        baseUrl: 'https://dukengn.github.io',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://dukengn.github.io/Dog-facts-API/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'dog-facts-5',
-        name: 'Dog Facts',
-        provider: 'Dog Facts',
-        description: 'Random facts of Dogs',
-        category: 'Animals',
-        tags: ['animals', 'public-api', 'dog'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.1,
-        ratingCount: 8721,
-        usageCount: 67317,
-        baseUrl: 'https://kinduff.github.io',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://kinduff.github.io/dog-api/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'dogs-2',
-        name: 'Dogs',
-        provider: 'Dogs',
-        description: 'Based on the Stanford Dogs Dataset',
-        category: 'Animals',
-        tags: ['animals', 'public-api', 'dogs'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.1,
-        ratingCount: 4971,
-        usageCount: 54638,
-        baseUrl: 'https://dog.ceo',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://dog.ceo/dog-api/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'fishwatch-2',
-        name: 'FishWatch',
-        provider: 'FishWatch',
-        description: 'Information and pictures about individual fish species',
-        category: 'Animals',
-        tags: ['animals', 'public-api', 'fishwatch'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.1,
-        ratingCount: 9311,
-        usageCount: 88115,
-        baseUrl: 'https://www.fishwatch.gov',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://www.fishwatch.gov/developers',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'http-cat-2',
-        name: 'HTTP Cat',
-        provider: 'HTTP Cat',
-        description: 'Cat for every HTTP Status',
-        category: 'Animals',
-        tags: ['animals', 'public-api', 'http'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.5,
-        ratingCount: 2185,
-        usageCount: 83526,
-        baseUrl: 'https://http.cat',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://http.cat/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'http-dog-2',
-        name: 'HTTP Dog',
-        provider: 'HTTP Dog',
-        description: 'Dogs for every HTTP response status code',
-        category: 'Animals',
-        tags: ['animals', 'public-api', 'http'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.7,
-        ratingCount: 9017,
-        usageCount: 43502,
-        baseUrl: 'https://http.dog',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://http.dog/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'movebank-2',
-        name: 'Movebank',
-        provider: 'Movebank',
-        description: 'Movement and Migration data of animals',
-        category: 'Animals',
-        tags: ['animals', 'public-api', 'movebank'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.7,
-        ratingCount: 687,
-        usageCount: 24312,
-        baseUrl: 'https://github.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://github.com/movebank/movebank-api-doc',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'petfinder-2',
-        name: 'Petfinder',
-        provider: 'Petfinder',
-        description: 'Petfinder is dedicated to helping pets find homes, another resource to get pets adopted',
-        category: 'Animals',
-        tags: ['animals', 'public-api', 'petfinder'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.7,
-        ratingCount: 7937,
-        usageCount: 30205,
-        baseUrl: 'https://www.petfinder.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://www.petfinder.com/developers/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'placebear-2',
-        name: 'PlaceBear',
-        provider: 'PlaceBear',
-        description: 'Placeholder bear pictures',
-        category: 'Animals',
-        tags: ['animals', 'public-api', 'placebear'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.5,
-        ratingCount: 2295,
-        usageCount: 10256,
-        baseUrl: 'https://placebear.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://placebear.com/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'placedog-2',
-        name: 'PlaceDog',
-        provider: 'PlaceDog',
-        description: 'Placeholder Dog pictures',
-        category: 'Animals',
-        tags: ['animals', 'public-api', 'placedog'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.9,
-        ratingCount: 2789,
-        usageCount: 2041,
-        baseUrl: 'https://place.dog',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://place.dog',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'randomdog-2',
-        name: 'RandomDog',
-        provider: 'RandomDog',
-        description: 'Random pictures of dogs',
-        category: 'Animals',
-        tags: ['animals', 'public-api', 'randomdog'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.1,
-        ratingCount: 5291,
-        usageCount: 30398,
-        baseUrl: 'https://random.dog',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://random.dog/woof.json',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'shibe-online-2',
-        name: 'Shibe.Online',
-        provider: 'Shibe.Online',
-        description: 'Random pictures of Shiba Inu, cats or birds',
-        category: 'Animals',
-        tags: ['animals', 'public-api', 'shibe'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.7,
-        ratingCount: 1677,
-        usageCount: 23453,
-        baseUrl: 'https://shibe.online',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'http://shibe.online/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'aniapi-2',
-        name: 'AniAPI',
-        provider: 'AniAPI',
-        description: 'Anime discovery, streaming & syncing with trackers',
-        category: 'Anime',
-        tags: ['anime', 'public-api', 'aniapi'],
-        authType: 'OAuth 2.0',
-        pricing: 'Free',
-        ratingAverage: 4.6,
-        ratingCount: 4976,
-        usageCount: 8068,
-        baseUrl: 'https://aniapi.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://aniapi.com/docs/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'animefacts-2',
-        name: 'AnimeFacts',
-        provider: 'AnimeFacts',
-        description: 'Anime Facts (over 100+)',
-        category: 'Anime',
-        tags: ['anime', 'public-api', 'animefacts'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.5,
-        ratingCount: 4405,
-        usageCount: 46843,
-        baseUrl: 'https://chandan-02.github.io',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://chandan-02.github.io/anime-facts-rest-api/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'animenewsnetwork-2',
-        name: 'AnimeNewsNetwork',
-        provider: 'AnimeNewsNetwork',
-        description: 'Anime industry news',
-        category: 'Anime',
-        tags: ['anime', 'public-api', 'animenewsnetwork'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.3,
-        ratingCount: 553,
-        usageCount: 24864,
-        baseUrl: 'https://www.animenewsnetwork.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://www.animenewsnetwork.com/encyclopedia/api.php',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'catboy-2',
-        name: 'Catboy',
-        provider: 'Catboy',
-        description: 'Neko images, funny GIFs & more',
-        category: 'Anime',
-        tags: ['anime', 'public-api', 'catboy'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.4,
-        ratingCount: 6204,
-        usageCount: 19814,
-        baseUrl: 'https://catboys.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://catboys.com/api',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'danbooru-anime-2',
-        name: 'Danbooru Anime',
-        provider: 'Danbooru Anime',
-        description: 'Thousands of anime artist database to find good anime art',
-        category: 'Anime',
-        tags: ['anime', 'public-api', 'danbooru'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.7,
-        ratingCount: 6117,
-        usageCount: 84231,
-        baseUrl: 'https://danbooru.donmai.us',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://danbooru.donmai.us/wiki_pages/help:api',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'jikan-3',
-        name: 'Jikan',
-        provider: 'Jikan',
-        description: 'Unofficial MyAnimeList API',
-        category: 'Anime',
-        tags: ['anime', 'public-api', 'jikan'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.8,
-        ratingCount: 5718,
-        usageCount: 84316,
-        baseUrl: 'https://jikan.moe',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://jikan.moe',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'kitsu-2',
-        name: 'Kitsu',
-        provider: 'Kitsu',
-        description: 'Anime discovery platform',
-        category: 'Anime',
-        tags: ['anime', 'public-api', 'kitsu'],
-        authType: 'OAuth 2.0',
-        pricing: 'Free',
-        ratingAverage: 4.4,
-        ratingCount: 3844,
-        usageCount: 13620,
-        baseUrl: 'https://kitsu.docs.apiary.io',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://kitsu.docs.apiary.io/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'nekosbest-2',
-        name: 'NekosBest',
-        provider: 'NekosBest',
-        description: 'Neko Images & Anime roleplaying GIFs',
-        category: 'Anime',
-        tags: ['anime', 'public-api', 'nekosbest'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.4,
-        ratingCount: 1514,
-        usageCount: 76716,
-        baseUrl: 'https://docs.nekos.best',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://docs.nekos.best',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'studio-ghibli-2',
-        name: 'Studio Ghibli',
-        provider: 'Studio Ghibli',
-        description: 'Resources from Studio Ghibli films',
-        category: 'Anime',
-        tags: ['anime', 'public-api', 'studio'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.4,
-        ratingCount: 814,
-        usageCount: 45759,
-        baseUrl: 'https://ghibliapi.herokuapp.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://ghibliapi.herokuapp.com',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'trace-moe-2',
-        name: 'Trace Moe',
-        provider: 'Trace Moe',
-        description: 'A useful tool to get the exact scene of an anime from a screenshot',
-        category: 'Anime',
-        tags: ['anime', 'public-api', 'trace'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.7,
-        ratingCount: 8767,
-        usageCount: 61323,
-        baseUrl: 'https://soruly.github.io',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://soruly.github.io/trace.moe-api/#/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'waifu-im-2',
-        name: 'Waifu.im',
-        provider: 'Waifu.im',
-        description: 'Get waifu pictures from an archive of over 4000 images and multiple tags',
-        category: 'Anime',
-        tags: ['anime', 'public-api', 'waifu'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.5,
-        ratingCount: 715,
-        usageCount: 74602,
-        baseUrl: 'https://waifu.im',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://waifu.im/docs',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'nophishy-2',
-        name: 'NoPhishy',
-        provider: 'NoPhishy',
-        description: 'Check links to see if they\'re known phishing attempts',
-        category: 'Anti-Malware',
-        tags: ['anti-malware', 'public-api', 'nophishy'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.8,
-        ratingCount: 4418,
-        usageCount: 25988,
-        baseUrl: 'https://rapidapi.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://rapidapi.com/Amiichu/api/exerra-phishing-check/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'scanii-2',
-        name: 'Scanii',
-        provider: 'Scanii',
-        description: 'Simple REST API that can scan submitted documents/files for the presence of threats',
-        category: 'Anti-Malware',
-        tags: ['anti-malware', 'public-api', 'scanii'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.3,
-        ratingCount: 9453,
-        usageCount: 51564,
-        baseUrl: 'https://docs.scanii.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://docs.scanii.com/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'urlhaus-2',
-        name: 'URLhaus',
-        provider: 'URLhaus',
-        description: 'Bulk queries and Download Malware Samples',
-        category: 'Anti-Malware',
-        tags: ['anti-malware', 'public-api', 'urlhaus'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.4,
-        ratingCount: 6334,
-        usageCount: 75833,
-        baseUrl: 'https://urlhaus-api.abuse.ch',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://urlhaus-api.abuse.ch/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'art-institute-of-chicago-2',
-        name: 'Art Institute of Chicago',
-        provider: 'Art Institute of Chicago',
-        description: 'Art',
-        category: 'Art & Design',
-        tags: ['art-design', 'public-api', 'art'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.4,
-        ratingCount: 7424,
-        usageCount: 43560,
-        baseUrl: 'https://api.artic.edu',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://api.artic.edu/docs/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'emojihub-2',
-        name: 'EmojiHub',
-        provider: 'EmojiHub',
-        description: 'Get emojis by categories and groups',
-        category: 'Art & Design',
-        tags: ['art-design', 'public-api', 'emojihub'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.9,
-        ratingCount: 5039,
-        usageCount: 15219,
-        baseUrl: 'https://github.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://github.com/cheatsnake/emojihub',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'icon-horse-2',
-        name: 'Icon Horse',
-        provider: 'Icon Horse',
-        description: 'Favicons for any website, with fallbacks',
-        category: 'Art & Design',
-        tags: ['art-design', 'public-api', 'icon'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.1,
-        ratingCount: 9051,
-        usageCount: 9221,
-        baseUrl: 'https://icon.horse',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://icon.horse',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'lordicon-2',
-        name: 'Lordicon',
-        provider: 'Lordicon',
-        description: 'Icons with predone Animations',
-        category: 'Art & Design',
-        tags: ['art-design', 'public-api', 'lordicon'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.6,
-        ratingCount: 3536,
-        usageCount: 9005,
-        baseUrl: 'https://lordicon.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://lordicon.com/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'php-noise-2',
-        name: 'PHP-Noise',
-        provider: 'PHP-Noise',
-        description: 'Noise Background Image Generator',
-        category: 'Art & Design',
-        tags: ['art-design', 'public-api', 'php'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.7,
-        ratingCount: 8067,
-        usageCount: 22366,
-        baseUrl: 'https://php-noise.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://php-noise.com/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'upres-2',
-        name: 'UpRes',
-        provider: 'UpRes',
-        description: 'AI image upscaling to 8K with 18 models (Real-ESRGAN, SeedVR2, AuraSR)',
-        category: 'Art & Design',
-        tags: ['art-design', 'public-api', 'upres'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.5,
-        ratingCount: 5235,
-        usageCount: 46819,
-        baseUrl: 'https://upres.ai',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://upres.ai/docs/api',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'xcolors-2',
-        name: 'xColors',
-        provider: 'xColors',
-        description: 'Generate & convert colors',
-        category: 'Art & Design',
-        tags: ['art-design', 'public-api', 'xcolors'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.4,
-        ratingCount: 6344,
-        usageCount: 38977,
-        baseUrl: 'https://x-colors.herokuapp.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://x-colors.herokuapp.com/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'auth0-2',
-        name: 'Auth0',
-        provider: 'Auth0',
-        description: 'Easy to implement, adaptable authentication and authorization platform',
-        category: 'Authentication & Authorization',
-        tags: ['authentication-authorization', 'public-api', 'auth0'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.8,
-        ratingCount: 5278,
-        usageCount: 6968,
-        baseUrl: 'https://auth0.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://auth0.com',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'mojoauth-2',
-        name: 'MojoAuth',
-        provider: 'MojoAuth',
-        description: 'Secure and modern passwordless authentication platform',
-        category: 'Authentication & Authorization',
-        tags: ['authentication-authorization', 'public-api', 'mojoauth'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.5,
-        ratingCount: 2825,
-        usageCount: 37475,
-        baseUrl: 'https://mojoauth.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://mojoauth.com',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'sawo-labs-2',
-        name: 'SAWO Labs',
-        provider: 'SAWO Labs',
-        description: 'Simplify login and improve user experience by integrating passwordless authentication in your app',
-        category: 'Authentication & Authorization',
-        tags: ['authentication-authorization', 'public-api', 'sawo'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.3,
-        ratingCount: 3833,
-        usageCount: 8761,
-        baseUrl: 'https://sawolabs.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://sawolabs.com',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'warrant-2',
-        name: 'Warrant',
-        provider: 'Warrant',
-        description: 'APIs for authorization and access control',
-        category: 'Authentication & Authorization',
-        tags: ['authentication-authorization', 'public-api', 'warrant'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.5,
-        ratingCount: 5635,
-        usageCount: 47876,
-        baseUrl: 'https://warrant.dev',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://warrant.dev/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'bitquery-2',
-        name: 'Bitquery',
-        provider: 'Bitquery',
-        description: 'Onchain GraphQL APIs & DEX APIs',
-        category: 'Blockchain',
-        tags: ['blockchain', 'public-api', 'bitquery'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.3,
-        ratingCount: 993,
-        usageCount: 43070,
-        baseUrl: 'https://graphql.bitquery.io',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://graphql.bitquery.io/ide',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'etherscan-2',
-        name: 'Etherscan',
-        provider: 'Etherscan',
-        description: 'Ethereum explorer API',
-        category: 'Blockchain',
-        tags: ['blockchain', 'public-api', 'etherscan'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.3,
-        ratingCount: 593,
-        usageCount: 69584,
-        baseUrl: 'https://etherscan.io',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://etherscan.io/apis',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'twzrd-agent-intel-2',
-        name: 'TWZRD Agent Intel',
-        provider: 'TWZRD Agent Intel',
-        description: 'Solana on-chain agent trust scoring via MCP; 4 free tools to score, resolve and verify AI agent wallets',
-        category: 'Blockchain',
-        tags: ['blockchain', 'public-api', 'twzrd'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4,
-        ratingCount: 8150,
-        usageCount: 29950,
-        baseUrl: 'https://intel.twzrd.xyz',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://intel.twzrd.xyz',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'amanah-sunnah-2',
-        name: 'Amanah Sunnah',
-        provider: 'Amanah Sunnah',
-        description: 'Semantic search across Quran, Hadith, Tafsir & 18K+ Rijal narrators',
-        category: 'Books',
-        tags: ['books', 'public-api', 'amanah'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.4,
-        ratingCount: 2494,
-        usageCount: 63856,
-        baseUrl: 'https://sunnah.amanahagent.cloud',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://sunnah.amanahagent.cloud/developers',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'bhagavad-gita-3',
-        name: 'Bhagavad Gita',
-        provider: 'Bhagavad Gita',
-        description: 'Open Source Shrimad Bhagavad Gita API including 21+ authors translation in Sanskrit/English/Hindi',
-        category: 'Books',
-        tags: ['books', 'public-api', 'bhagavad'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.5,
-        ratingCount: 4915,
-        usageCount: 15773,
-        baseUrl: 'https://docs.bhagavadgitaapi.in',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://docs.bhagavadgitaapi.in',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'bhagavad-gita-4',
-        name: 'Bhagavad Gita',
-        provider: 'Bhagavad Gita',
-        description: 'Bhagavad Gita text',
-        category: 'Books',
-        tags: ['books', 'public-api', 'bhagavad'],
-        authType: 'OAuth 2.0',
-        pricing: 'Free',
-        ratingAverage: 4.8,
-        ratingCount: 9058,
-        usageCount: 45365,
-        baseUrl: 'https://bhagavadgita.io',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://bhagavadgita.io/api',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'bhagavad-gita-telugu-2',
-        name: 'Bhagavad Gita telugu',
-        provider: 'Bhagavad Gita telugu',
-        description: 'Bhagavad Gita API in telugu and odia languages',
-        category: 'Books',
-        tags: ['books', 'public-api', 'bhagavad'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.7,
-        ratingCount: 1897,
-        usageCount: 83628,
-        baseUrl: 'https://gita-api.vercel.app',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://gita-api.vercel.app',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'bible-api-2',
-        name: 'Bible-api',
-        provider: 'Bible-api',
-        description: 'Free Bible API with multiple languages',
-        category: 'Books',
-        tags: ['books', 'public-api', 'bible'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.5,
-        ratingCount: 6925,
-        usageCount: 90060,
-        baseUrl: 'https://bible-api.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://bible-api.com/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'ganjoor-2',
-        name: 'Ganjoor',
-        provider: 'Ganjoor',
-        description: 'Classic Persian poetry works including access to related manuscripts, recitations and music tracks',
-        category: 'Books',
-        tags: ['books', 'public-api', 'ganjoor'],
-        authType: 'OAuth 2.0',
-        pricing: 'Free',
-        ratingAverage: 4.6,
-        ratingCount: 4416,
-        usageCount: 42273,
-        baseUrl: 'https://api.ganjoor.net',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://api.ganjoor.net',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'kdp-intelligence-2',
-        name: 'KDP Intelligence',
-        provider: 'KDP Intelligence',
-        description: 'KDP niche demand scores, competition analysis and revenue estimates',
-        category: 'Books',
-        tags: ['books', 'public-api', 'kdp'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.7,
-        ratingCount: 2907,
-        usageCount: 10058,
-        baseUrl: 'https://kdp-intelligence-api.vercel.app',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://kdp-intelligence-api.vercel.app/docs',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'penguin-publishing-2',
-        name: 'Penguin Publishing',
-        provider: 'Penguin Publishing',
-        description: 'Books, book covers and related data',
-        category: 'Books',
-        tags: ['books', 'public-api', 'penguin'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.8,
-        ratingCount: 548,
-        usageCount: 67721,
-        baseUrl: 'https://www.penguinrandomhouse.biz',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'http://www.penguinrandomhouse.biz/webservices/rest/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'poetrydb-2',
-        name: 'PoetryDB',
-        provider: 'PoetryDB',
-        description: 'Enables you to get instant data from our vast poetry collection',
-        category: 'Books',
-        tags: ['books', 'public-api', 'poetrydb'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.9,
-        ratingCount: 5929,
-        usageCount: 84489,
-        baseUrl: 'https://github.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://github.com/thundercomb/poetrydb#readme',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'quran-2',
-        name: 'Quran',
-        provider: 'Quran',
-        description: 'RESTful Quran API with multiple languages',
-        category: 'Books',
-        tags: ['books', 'public-api', 'quran'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.9,
-        ratingCount: 3659,
-        usageCount: 52022,
-        baseUrl: 'https://quran.api-docs.io',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://quran.api-docs.io/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'quran-cloud-2',
-        name: 'Quran Cloud',
-        provider: 'Quran Cloud',
-        description: 'A RESTful Quran API to retrieve an Ayah, Surah, Juz or the entire Holy Quran',
-        category: 'Books',
-        tags: ['books', 'public-api', 'quran'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.5,
-        ratingCount: 1255,
-        usageCount: 62393,
-        baseUrl: 'https://alquran.cloud',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://alquran.cloud/api',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'quran-api-2',
-        name: 'Quran-api',
-        provider: 'Quran-api',
-        description: 'Free Quran API Service with 90+ different languages and 400+ translations',
-        category: 'Books',
-        tags: ['books', 'public-api', 'quran'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4,
-        ratingCount: 2230,
-        usageCount: 42961,
-        baseUrl: 'https://github.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://github.com/fawazahmed0/quran-api#readme',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'runyankole-bible-2',
-        name: 'Runyankole Bible',
-        provider: 'Runyankole Bible',
-        description: 'Free REST API for the Runyankore-Rukiga Bible — 66 books, 31106 verses',
-        category: 'Books',
-        tags: ['books', 'public-api', 'runyankole'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.3,
-        ratingCount: 5143,
-        usageCount: 28949,
-        baseUrl: 'https://runyankole-bible-api.vercel.app',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://runyankole-bible-api.vercel.app',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'thirukkural-2',
-        name: 'Thirukkural',
-        provider: 'Thirukkural',
-        description: '1330 Thirukkural poems and explanation in Tamil and English',
-        category: 'Books',
-        tags: ['books', 'public-api', 'thirukkural'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4,
-        ratingCount: 7650,
-        usageCount: 79307,
-        baseUrl: 'https://api-thirukkural.web.app',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://api-thirukkural.web.app/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'urantia-papers-2',
-        name: 'Urantia Papers',
-        provider: 'Urantia Papers',
-        description: 'Full-text + semantic search across the Urantia Papers, with audio narration, entities, translations',
-        category: 'Books',
-        tags: ['books', 'public-api', 'urantia'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.6,
-        ratingCount: 9176,
-        usageCount: 90096,
-        baseUrl: 'https://urantia.dev',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://urantia.dev',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'wizard-world-2',
-        name: 'Wizard World',
-        provider: 'Wizard World',
-        description: 'Get information from the Harry Potter universe',
-        category: 'Books',
-        tags: ['books', 'public-api', 'wizard'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.8,
-        ratingCount: 2268,
-        usageCount: 8824,
-        baseUrl: 'https://wizard-world-api.herokuapp.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://wizard-world-api.herokuapp.com/swagger/index.html',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'apache-superset-2',
-        name: 'Apache Superset',
-        provider: 'Apache Superset',
-        description: 'API to manage your BI dashboards and data sources on Superset',
-        category: 'Business',
-        tags: ['business', 'public-api', 'apache'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.6,
-        ratingCount: 2536,
-        usageCount: 35719,
-        baseUrl: 'https://superset.apache.org',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://superset.apache.org/docs/api',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'meirra-2',
-        name: 'Meirra',
-        provider: 'Meirra',
-        description: 'SEO monitoring, email verification, lead generation, and marketing analytics',
-        category: 'Business',
-        tags: ['business', 'public-api', 'meirra'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.4,
-        ratingCount: 2014,
-        usageCount: 59787,
-        baseUrl: 'https://meirra.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://meirra.com/api',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'pick-an-agency-2',
-        name: 'Pick an Agency',
-        provider: 'Pick an Agency',
-        description: 'Search 47,000+ marketing agencies by service, location and rating',
-        category: 'Business',
-        tags: ['business', 'public-api', 'pick'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.7,
-        ratingCount: 3647,
-        usageCount: 3306,
-        baseUrl: 'https://www.pickanagency.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://www.pickanagency.com/developers',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'redash-2',
-        name: 'Redash',
-        provider: 'Redash',
-        description: 'Access your queries and dashboards on Redash',
-        category: 'Business',
-        tags: ['business', 'public-api', 'redash'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.3,
-        ratingCount: 553,
-        usageCount: 62579,
-        baseUrl: 'https://redash.io',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://redash.io/help/user-guide/integrations-and-api/api',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'tomba-email-finder-2',
-        name: 'Tomba email finder',
-        provider: 'Tomba email finder',
-        description: 'Email Finder for B2B sales and email marketing and email verifier',
-        category: 'Business',
-        tags: ['business', 'public-api', 'tomba'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.3,
-        ratingCount: 7003,
-        usageCount: 76500,
-        baseUrl: 'https://tomba.io',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://tomba.io/api',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'caldays-2',
-        name: 'caldays',
-        provider: 'caldays',
-        description: 'Public holidays for 195+ countries',
-        category: 'Calendar',
-        tags: ['calendar', 'public-api', 'caldays'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.3,
-        ratingCount: 3693,
-        usageCount: 92599,
-        baseUrl: 'https://caldays.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://caldays.com/api',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'festivo-public-holidays-2',
-        name: 'Festivo Public Holidays',
-        provider: 'Festivo Public Holidays',
-        description: 'Fastest and most advanced public holiday and observance service on the market',
-        category: 'Calendar',
-        tags: ['calendar', 'public-api', 'festivo'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.8,
-        ratingCount: 3598,
-        usageCount: 66014,
-        baseUrl: 'https://docs.getfestivo.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://docs.getfestivo.com/docs/products/public-holidays-api/intro',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'namedays-calendar-2',
-        name: 'Namedays Calendar',
-        provider: 'Namedays Calendar',
-        description: 'Provides namedays for multiple countries',
-        category: 'Calendar',
-        tags: ['calendar', 'public-api', 'namedays'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.1,
-        ratingCount: 821,
-        usageCount: 95188,
-        baseUrl: 'https://nameday.abalin.net',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://nameday.abalin.net',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'non-working-days-2',
-        name: 'Non-Working Days',
-        provider: 'Non-Working Days',
-        description: 'Simple REST API for checking working, non-working or short days for Russia, CIS, USA and other',
-        category: 'Calendar',
-        tags: ['calendar', 'public-api', 'non'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.3,
-        ratingCount: 5193,
-        usageCount: 16956,
-        baseUrl: 'https://isdayoff.ru',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://isdayoff.ru',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'public-holidays-2',
-        name: 'Public Holidays',
-        provider: 'Public Holidays',
-        description: 'Data on national, regional, and religious holidays via API',
-        category: 'Calendar',
-        tags: ['calendar', 'public-api', 'public'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.7,
-        ratingCount: 5817,
-        usageCount: 77616,
-        baseUrl: 'https://www.abstractapi.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://www.abstractapi.com/holidays-api',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'the-calendar-2',
-        name: 'The Calendar',
-        provider: 'The Calendar',
-        description: 'Public holidays for US states and 30 countries plus sports and finance calendars as static JSON',
-        category: 'Calendar',
-        tags: ['calendar', 'public-api', 'the'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.2,
-        ratingCount: 1602,
-        usageCount: 54443,
-        baseUrl: 'https://the-calendar.net',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://the-calendar.net/api/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'pantry-2',
-        name: 'Pantry',
-        provider: 'Pantry',
-        description: 'Free JSON storage for small projects',
-        category: 'Cloud Storage & File Sharing',
-        tags: ['cloud-storage-file-sharing', 'public-api', 'pantry'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.2,
-        ratingCount: 3702,
-        usageCount: 30743,
-        baseUrl: 'https://getpantry.cloud',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://getpantry.cloud/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'quip-2',
-        name: 'Quip',
-        provider: 'Quip',
-        description: 'File Sharing and Storage for groups',
-        category: 'Cloud Storage & File Sharing',
-        tags: ['cloud-storage-file-sharing', 'public-api', 'quip'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.3,
-        ratingCount: 2473,
-        usageCount: 38710,
-        baseUrl: 'https://quip.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://quip.com/dev/automation/documentation',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'web3-storage-2',
-        name: 'Web3 Storage',
-        provider: 'Web3 Storage',
-        description: 'File Sharing and Storage for Free with 1TB Space',
-        category: 'Cloud Storage & File Sharing',
-        tags: ['cloud-storage-file-sharing', 'public-api', 'web3'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.7,
-        ratingCount: 6977,
-        usageCount: 36496,
-        baseUrl: 'https://web3.storage',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://web3.storage/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: '0x-2',
-        name: '0x',
-        provider: '0x',
-        description: 'API for querying token and pool stats across various liquidity pools',
-        category: 'Cryptocurrency',
-        tags: ['cryptocurrency', 'public-api', '0x'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.8,
-        ratingCount: 9418,
-        usageCount: 86559,
-        baseUrl: 'https://0x.org',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://0x.org/api',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'alchemy-ethereum-2',
-        name: 'Alchemy Ethereum',
-        provider: 'Alchemy Ethereum',
-        description: 'Ethereum Node-as-a-Service Provider',
-        category: 'Cryptocurrency',
-        tags: ['cryptocurrency', 'public-api', 'alchemy'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.1,
-        ratingCount: 1481,
-        usageCount: 61140,
-        baseUrl: 'https://docs.alchemy.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://docs.alchemy.com/alchemy/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'alpha-mossland-2',
-        name: 'Alpha (Mossland)',
-        provider: 'Alpha (Mossland)',
-        description: 'Korean crypto channel stance + RAG Q&A + canonical entity/topic/event store',
-        category: 'Cryptocurrency',
-        tags: ['cryptocurrency', 'public-api', 'alpha'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.4,
-        ratingCount: 734,
-        usageCount: 85747,
-        baseUrl: 'https://alpha.moss.land',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://alpha.moss.land/developers',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'block-lottos-2',
-        name: 'Block Lottos',
-        provider: 'Block Lottos',
-        description: 'On-chain lottery, draw history, jackpot and advertising endpoints',
-        category: 'Cryptocurrency',
-        tags: ['cryptocurrency', 'public-api', 'block'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.1,
-        ratingCount: 6181,
-        usageCount: 7240,
-        baseUrl: 'https://blocklottos.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://blocklottos.com/openapi.json',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'btcturk-2',
-        name: 'BtcTurk',
-        provider: 'BtcTurk',
-        description: 'Real-time cryptocurrency data, graphs and API that allows buy&sell',
-        category: 'Cryptocurrency',
-        tags: ['cryptocurrency', 'public-api', 'btcturk'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.9,
-        ratingCount: 6949,
-        usageCount: 27778,
-        baseUrl: 'https://docs.btcturk.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://docs.btcturk.com/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'coingecko-3',
-        name: 'CoinGecko',
-        provider: 'CoinGecko',
-        description: 'Cryptocurrency Price, Market, and Developer/Social Data',
-        category: 'Cryptocurrency',
-        tags: ['cryptocurrency', 'public-api', 'coingecko'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.1,
-        ratingCount: 5891,
-        usageCount: 39913,
-        baseUrl: 'https://www.coingecko.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'http://www.coingecko.com/api',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'coinpaprika-2',
-        name: 'Coinpaprika',
-        provider: 'Coinpaprika',
-        description: 'Cryptocurrencies prices, volume and more',
-        category: 'Cryptocurrency',
-        tags: ['cryptocurrency', 'public-api', 'coinpaprika'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.5,
-        ratingCount: 8665,
-        usageCount: 73595,
-        baseUrl: 'https://api.coinpaprika.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://api.coinpaprika.com',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'cryptomarket-2',
-        name: 'CryptoMarket',
-        provider: 'CryptoMarket',
-        description: 'Cryptocurrencies Trading platform',
-        category: 'Cryptocurrency',
-        tags: ['cryptocurrency', 'public-api', 'cryptomarket'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.9,
-        ratingCount: 5629,
-        usageCount: 52875,
-        baseUrl: 'https://api.exchange.cryptomkt.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://api.exchange.cryptomkt.com/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'hyperliquid-market-data-2',
-        name: 'Hyperliquid Market Data',
-        provider: 'Hyperliquid Market Data',
-        description: 'Hyperliquid open interest, funding and cross-venue predicted rates per coin',
-        category: 'Cryptocurrency',
-        tags: ['cryptocurrency', 'public-api', 'hyperliquid'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.4,
-        ratingCount: 6124,
-        usageCount: 75803,
-        baseUrl: 'https://rapidapi.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://rapidapi.com/theliminalguy/api/hyperliquid-market-data-oi-funding-open-interest',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'infura-ethereum-2',
-        name: 'INFURA Ethereum',
-        provider: 'INFURA Ethereum',
-        description: 'Interaction with the Ethereum mainnet and several testnets',
-        category: 'Cryptocurrency',
-        tags: ['cryptocurrency', 'public-api', 'infura'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.7,
-        ratingCount: 867,
-        usageCount: 64052,
-        baseUrl: 'https://infura.io',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://infura.io/product/ethereum',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'nomics-2',
-        name: 'Nomics',
-        provider: 'Nomics',
-        description: 'Historical and realtime cryptocurrency prices and market data',
-        category: 'Cryptocurrency',
-        tags: ['cryptocurrency', 'public-api', 'nomics'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.1,
-        ratingCount: 4071,
-        usageCount: 48510,
-        baseUrl: 'https://nomics.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://nomics.com/docs/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'exchangeratesapi-io-2',
-        name: 'Exchangeratesapi.io',
-        provider: 'Exchangeratesapi.io',
-        description: 'Exchange rates with currency conversion',
-        category: 'Currency Exchange',
-        tags: ['currency-exchange', 'public-api', 'exchangeratesapi'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.5,
-        ratingCount: 6605,
-        usageCount: 21443,
-        baseUrl: 'https://exchangeratesapi.io',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://exchangeratesapi.io?utm_source=Github&utm_medium=Referral&utm_campaign=Public-apis-repo-Best-sellers',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'currency-api-2',
-        name: 'Currency-api',
-        provider: 'Currency-api',
-        description: 'Free Currency Exchange Rates API with 150+ Currencies & No Rate Limits',
-        category: 'Currency Exchange',
-        tags: ['currency-exchange', 'public-api', 'currency'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.4,
-        ratingCount: 6324,
-        usageCount: 63689,
-        baseUrl: 'https://github.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://github.com/fawazahmed0/currency-api#readme',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'currencyfreaks-2',
-        name: 'CurrencyFreaks',
-        provider: 'CurrencyFreaks',
-        description: 'Provides current and historical currency exchange rates with free plan 1K requests/month',
-        category: 'Currency Exchange',
-        tags: ['currency-exchange', 'public-api', 'currencyfreaks'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.5,
-        ratingCount: 5795,
-        usageCount: 69899,
-        baseUrl: 'https://currencyfreaks.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://currencyfreaks.com/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'currencyscoop-2',
-        name: 'CurrencyScoop',
-        provider: 'CurrencyScoop',
-        description: 'Real-time and historical currency rates JSON API',
-        category: 'Currency Exchange',
-        tags: ['currency-exchange', 'public-api', 'currencyscoop'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.5,
-        ratingCount: 7835,
-        usageCount: 1619,
-        baseUrl: 'https://currencyscoop.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://currencyscoop.com/api-documentation',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'exchangerate-api-2',
-        name: 'ExchangeRate-API',
-        provider: 'ExchangeRate-API',
-        description: 'Free currency conversion',
-        category: 'Currency Exchange',
-        tags: ['currency-exchange', 'public-api', 'exchangerate'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4,
-        ratingCount: 8800,
-        usageCount: 90900,
-        baseUrl: 'https://www.exchangerate-api.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://www.exchangerate-api.com',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'frankfurter-3',
-        name: 'Frankfurter',
-        provider: 'Frankfurter',
-        description: 'Exchange rates, currency conversion and time series',
-        category: 'Currency Exchange',
-        tags: ['currency-exchange', 'public-api', 'frankfurter'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.7,
-        ratingCount: 8907,
-        usageCount: 87201,
-        baseUrl: 'https://www.frankfurter.app',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://www.frankfurter.app/docs',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'national-bank-of-poland-2',
-        name: 'National Bank of Poland',
-        provider: 'National Bank of Poland',
-        description: 'A collection of currency exchange rates (data in XML and JSON)',
-        category: 'Currency Exchange',
-        tags: ['currency-exchange', 'public-api', 'national'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.8,
-        ratingCount: 5118,
-        usageCount: 35516,
-        baseUrl: 'https://api.nbp.pl',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'http://api.nbp.pl/en.html',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'paralelo-bo-2',
-        name: 'paralelo.bo',
-        provider: 'paralelo.bo',
-        description: 'Bolivia parallel-market USD/BOB exchange rate, aggregated from P2P sources every 60s',
-        category: 'Currency Exchange',
-        tags: ['currency-exchange', 'public-api', 'paralelo'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4,
-        ratingCount: 4040,
-        usageCount: 80648,
-        baseUrl: 'https://paralelo.bo',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://paralelo.bo/api',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'vatcomply-com-2',
-        name: 'VATComply.com',
-        provider: 'VATComply.com',
-        description: 'Exchange rates, geolocation and VAT number validation',
-        category: 'Currency Exchange',
-        tags: ['currency-exchange', 'public-api', 'vatcomply'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.3,
-        ratingCount: 3163,
-        usageCount: 13951,
-        baseUrl: 'https://www.vatcomply.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://www.vatcomply.com/documentation',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'us-autocomplete-2',
-        name: 'US Autocomplete',
-        provider: 'US Autocomplete',
-        description: 'Enter address data quickly with real-time address suggestions',
-        category: 'Data Validation',
-        tags: ['data-validation', 'public-api', 'us'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.9,
-        ratingCount: 2939,
-        usageCount: 8205,
-        baseUrl: 'https://www.smarty.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://www.smarty.com/docs/cloud/us-autocomplete-pro-api',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'us-extract-2',
-        name: 'US Extract',
-        provider: 'US Extract',
-        description: 'Extract postal addresses from any text including emails',
-        category: 'Data Validation',
-        tags: ['data-validation', 'public-api', 'us'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.6,
-        ratingCount: 5686,
-        usageCount: 34312,
-        baseUrl: 'https://www.smarty.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://www.smarty.com/products/apis/us-extract-api',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'us-street-address-2',
-        name: 'US Street Address',
-        provider: 'US Street Address',
-        description: 'Validate and append data for any US postal address',
-        category: 'Data Validation',
-        tags: ['data-validation', 'public-api', 'us'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.5,
-        ratingCount: 2505,
-        usageCount: 81857,
-        baseUrl: 'https://www.smarty.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://www.smarty.com/docs/cloud/us-street-api',
-        featured: false,
-        trending: false
-    },
-    {
-        id: '24-pull-requests-2',
-        name: '24 Pull Requests',
-        provider: '24 Pull Requests',
-        description: 'Project to promote open source collaboration during December',
-        category: 'Development',
-        tags: ['development', 'public-api', '24'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.3,
-        ratingCount: 8543,
-        usageCount: 53577,
-        baseUrl: 'https://24pullrequests.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://24pullrequests.com/api',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'agify-io-2',
-        name: 'Agify.io',
-        provider: 'Agify.io',
-        description: 'Estimates the age from a first name',
-        category: 'Development',
-        tags: ['development', 'public-api', 'agify'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.1,
-        ratingCount: 4861,
-        usageCount: 62908,
-        baseUrl: 'https://agify.io',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://agify.io',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'apicagent-2',
-        name: 'ApicAgent',
-        provider: 'ApicAgent',
-        description: 'Extract device details from user-agent string',
-        category: 'Development',
-        tags: ['development', 'public-api', 'apicagent'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.2,
-        ratingCount: 2462,
-        usageCount: 91280,
-        baseUrl: 'https://www.apicagent.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://www.apicagent.com',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'base-2',
-        name: 'Base',
-        provider: 'Base',
-        description: 'Building quick backends',
-        category: 'Development',
-        tags: ['development', 'public-api', 'base'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.3,
-        ratingCount: 4493,
-        usageCount: 30570,
-        baseUrl: 'https://www.base-api.io',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://www.base-api.io/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'beeceptor-2',
-        name: 'Beeceptor',
-        provider: 'Beeceptor',
-        description: 'Build a mock Rest API endpoint in seconds',
-        category: 'Development',
-        tags: ['development', 'public-api', 'beeceptor'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.5,
-        ratingCount: 9365,
-        usageCount: 53552,
-        baseUrl: 'https://beeceptor.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://beeceptor.com/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'blague-xyz-2',
-        name: 'Blague.xyz',
-        provider: 'Blague.xyz',
-        description: 'La plus grande API de Blagues FR/The biggest FR jokes API',
-        category: 'Development',
-        tags: ['development', 'public-api', 'blague'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.4,
-        ratingCount: 3404,
-        usageCount: 59129,
-        baseUrl: 'https://blague.xyz',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://blague.xyz/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'brainshop-ai-2',
-        name: 'Brainshop.ai',
-        provider: 'Brainshop.ai',
-        description: 'Make A Free A.I Brain',
-        category: 'Development',
-        tags: ['development', 'public-api', 'brainshop'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.3,
-        ratingCount: 1313,
-        usageCount: 33687,
-        baseUrl: 'https://brainshop.ai',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://brainshop.ai/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'browshot-2',
-        name: 'Browshot',
-        provider: 'Browshot',
-        description: 'Easily make screenshots of web pages in any screen size, as any device',
-        category: 'Development',
-        tags: ['development', 'public-api', 'browshot'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.8,
-        ratingCount: 4228,
-        usageCount: 86818,
-        baseUrl: 'https://browshot.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://browshot.com/api/documentation',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'cloudflare-trace-2',
-        name: 'Cloudflare Trace',
-        provider: 'Cloudflare Trace',
-        description: 'Get IP Address, Timestamp, User Agent, Country Code, IATA, HTTP Version, TLS/SSL Version & More',
-        category: 'Development',
-        tags: ['development', 'public-api', 'cloudflare'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.1,
-        ratingCount: 6111,
-        usageCount: 50087,
-        baseUrl: 'https://github.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://github.com/fawazahmed0/cloudflare-trace-api',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'contentful-images-2',
-        name: 'Contentful Images',
-        provider: 'Contentful Images',
-        description: 'Used to retrieve and apply transformations to images',
-        category: 'Development',
-        tags: ['development', 'public-api', 'contentful'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.3,
-        ratingCount: 5303,
-        usageCount: 54829,
-        baseUrl: 'https://www.contentful.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://www.contentful.com/developers/docs/references/images-api/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'cors-proxy-2',
-        name: 'CORS Proxy',
-        provider: 'CORS Proxy',
-        description: 'Get around the dreaded CORS error by using this proxy as a middle man',
-        category: 'Development',
-        tags: ['development', 'public-api', 'cors'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.8,
-        ratingCount: 2978,
-        usageCount: 21925,
-        baseUrl: 'https://github.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://github.com/burhanuday/cors-proxy',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'countapi-2',
-        name: 'CountAPI',
-        provider: 'CountAPI',
-        description: 'Free and simple counting service. You can use it to track page hits and specific events',
-        category: 'Development',
-        tags: ['development', 'public-api', 'countapi'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.9,
-        ratingCount: 5169,
-        usageCount: 83809,
-        baseUrl: 'https://countapi.xyz',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://countapi.xyz',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'databricks-2',
-        name: 'Databricks',
-        provider: 'Databricks',
-        description: 'Service to manage your databricks account,clusters, notebooks, jobs and workspaces',
-        category: 'Development',
-        tags: ['development', 'public-api', 'databricks'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.4,
-        ratingCount: 2324,
-        usageCount: 1974,
-        baseUrl: 'https://docs.databricks.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://docs.databricks.com/dev-tools/api/latest/index.html',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'docker-hub-2',
-        name: 'Docker Hub',
-        provider: 'Docker Hub',
-        description: 'Interact with Docker Hub',
-        category: 'Development',
-        tags: ['development', 'public-api', 'docker'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.8,
-        ratingCount: 3208,
-        usageCount: 49529,
-        baseUrl: 'https://docs.docker.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://docs.docker.com/docker-hub/api/latest/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'downstatus-2',
-        name: 'DownStatus',
-        provider: 'DownStatus',
-        description: 'Real-time status for GitHub, AWS, Discord and 90+ services',
-        category: 'Development',
-        tags: ['development', 'public-api', 'downstatus'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.2,
-        ratingCount: 2872,
-        usageCount: 64338,
-        baseUrl: 'https://isitdownstatus.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://isitdownstatus.com',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'extendsclass-json-storage-2',
-        name: 'ExtendsClass JSON Storage',
-        provider: 'ExtendsClass JSON Storage',
-        description: 'A simple JSON store API',
-        category: 'Development',
-        tags: ['development', 'public-api', 'extendsclass'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4,
-        ratingCount: 4340,
-        usageCount: 52977,
-        baseUrl: 'https://extendsclass.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://extendsclass.com/json-storage.html',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'genderize-io-2',
-        name: 'Genderize.io',
-        provider: 'Genderize.io',
-        description: 'Estimates a gender from a first name',
-        category: 'Development',
-        tags: ['development', 'public-api', 'genderize'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4,
-        ratingCount: 5970,
-        usageCount: 76495,
-        baseUrl: 'https://genderize.io',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://genderize.io',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'ghost-2',
-        name: 'Ghost',
-        provider: 'Ghost',
-        description: 'Get Published content into your Website, App or other embedded media',
-        category: 'Development',
-        tags: ['development', 'public-api', 'ghost'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.3,
-        ratingCount: 8693,
-        usageCount: 39599,
-        baseUrl: 'https://ghost.org',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://ghost.org/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'github-3',
-        name: 'GitHub',
-        provider: 'GitHub',
-        description: 'Make use of GitHub repositories, code and user info programmatically',
-        category: 'Development',
-        tags: ['development', 'public-api', 'github'],
-        authType: 'OAuth 2.0',
-        pricing: 'Free',
-        ratingAverage: 4.2,
-        ratingCount: 3302,
-        usageCount: 11400,
-        baseUrl: 'https://docs.github.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://docs.github.com/en/free-pro-team@latest/rest',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'glitterly-2',
-        name: 'Glitterly',
-        provider: 'Glitterly',
-        description: 'Image generation API',
-        category: 'Development',
-        tags: ['development', 'public-api', 'glitterly'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.8,
-        ratingCount: 3978,
-        usageCount: 20639,
-        baseUrl: 'https://developers.glitterly.app',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://developers.glitterly.app',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'google-firebase-2',
-        name: 'Google Firebase',
-        provider: 'Google Firebase',
-        description: 'Google\'s mobile application development platform that helps build, improve, and grow app',
-        category: 'Development',
-        tags: ['development', 'public-api', 'google'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.5,
-        ratingCount: 4805,
-        usageCount: 50472,
-        baseUrl: 'https://firebase.google.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://firebase.google.com/docs',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'hasura-2',
-        name: 'Hasura',
-        provider: 'Hasura',
-        description: 'GraphQL and REST API Engine with built in Authorization',
-        category: 'Development',
-        tags: ['development', 'public-api', 'hasura'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.4,
-        ratingCount: 7604,
-        usageCount: 13300,
-        baseUrl: 'https://hasura.io',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://hasura.io/opensource/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'heroku-2',
-        name: 'Heroku',
-        provider: 'Heroku',
-        description: 'REST API to programmatically create apps, provision add-ons and perform other task on Heroku',
-        category: 'Development',
-        tags: ['development', 'public-api', 'heroku'],
-        authType: 'OAuth 2.0',
-        pricing: 'Free',
-        ratingAverage: 4.2,
-        ratingCount: 7782,
-        usageCount: 43326,
-        baseUrl: 'https://devcenter.heroku.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://devcenter.heroku.com/articles/platform-api-reference/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'host-io-2',
-        name: 'Host.io',
-        provider: 'Host.io',
-        description: 'Domains Data API for Developers',
-        category: 'Development',
-        tags: ['development', 'public-api', 'host'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.5,
-        ratingCount: 6365,
-        usageCount: 7409,
-        baseUrl: 'https://host.io',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://host.io',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'httpbin-3',
-        name: 'Httpbin',
-        provider: 'Httpbin',
-        description: 'A Simple HTTP Request & Response Service',
-        category: 'Development',
-        tags: ['development', 'public-api', 'httpbin'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.8,
-        ratingCount: 6978,
-        usageCount: 66782,
-        baseUrl: 'https://httpbin.org',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://httpbin.org/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'httpbin-cloudflare-2',
-        name: 'Httpbin Cloudflare',
-        provider: 'Httpbin Cloudflare',
-        description: 'A Simple HTTP Request & Response Service with HTTP/3 Support by Cloudflare',
-        category: 'Development',
-        tags: ['development', 'public-api', 'httpbin'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.9,
-        ratingCount: 4569,
-        usageCount: 67295,
-        baseUrl: 'https://cloudflare-quic.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://cloudflare-quic.com/b/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'ibm-text-to-speech-2',
-        name: 'IBM Text to Speech',
-        provider: 'IBM Text to Speech',
-        description: 'Convert text to speech',
-        category: 'Development',
-        tags: ['development', 'public-api', 'ibm'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.1,
-        ratingCount: 7371,
-        usageCount: 24553,
-        baseUrl: 'https://cloud.ibm.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://cloud.ibm.com/docs/text-to-speech/getting-started.html',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'icanhazepoch-2',
-        name: 'Icanhazepoch',
-        provider: 'Icanhazepoch',
-        description: 'Get Epoch time',
-        category: 'Development',
-        tags: ['development', 'public-api', 'icanhazepoch'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.3,
-        ratingCount: 583,
-        usageCount: 94583,
-        baseUrl: 'https://icanhazepoch.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://icanhazepoch.com',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'icanhazip-2',
-        name: 'Icanhazip',
-        provider: 'Icanhazip',
-        description: 'IP Address API',
-        category: 'Development',
-        tags: ['development', 'public-api', 'icanhazip'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.1,
-        ratingCount: 6101,
-        usageCount: 5228,
-        baseUrl: 'https://major.io',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://major.io/icanhazip-com-faq/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'image-charts-2',
-        name: 'Image-Charts',
-        provider: 'Image-Charts',
-        description: 'Generate charts, QR codes and graph images',
-        category: 'Development',
-        tags: ['development', 'public-api', 'image'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.5,
-        ratingCount: 7245,
-        usageCount: 18106,
-        baseUrl: 'https://documentation.image-charts.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://documentation.image-charts.com/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'ip-fast-com-2',
-        name: 'ip-fast.com',
-        provider: 'ip-fast.com',
-        description: 'IP address, country and city',
-        category: 'Development',
-        tags: ['development', 'public-api', 'ip'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.8,
-        ratingCount: 8198,
-        usageCount: 21956,
-        baseUrl: 'https://ip-fast.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://ip-fast.com/docs/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'ipfind-io-2',
-        name: 'ipfind.io',
-        provider: 'ipfind.io',
-        description: 'Geographic location of an IP address or any domain name along with some other useful information',
-        category: 'Development',
-        tags: ['development', 'public-api', 'ipfind'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.1,
-        ratingCount: 5261,
-        usageCount: 51394,
-        baseUrl: 'https://ipfind.io',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://ipfind.io',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'jsdelivr-2',
-        name: 'jsDelivr',
-        provider: 'jsDelivr',
-        description: 'Package info and download stats on jsDelivr CDN',
-        category: 'Development',
-        tags: ['development', 'public-api', 'jsdelivr'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.3,
-        ratingCount: 6053,
-        usageCount: 67221,
-        baseUrl: 'https://github.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://github.com/jsdelivr/data.jsdelivr.com',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'jsonbin-io-2',
-        name: 'JSONbin.io',
-        provider: 'JSONbin.io',
-        description: 'Free JSON storage service. Ideal for small scale Web apps, Websites and Mobile apps',
-        category: 'Development',
-        tags: ['development', 'public-api', 'jsonbin'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.4,
-        ratingCount: 5944,
-        usageCount: 79492,
-        baseUrl: 'https://jsonbin.io',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://jsonbin.io',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'jsonplaceholder-3',
-        name: 'JSONPlaceholder',
-        provider: 'JSONPlaceholder',
-        description: 'Fake REST API for testing and prototyping',
-        category: 'Development',
-        tags: ['development', 'public-api', 'jsonplaceholder'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.2,
-        ratingCount: 3192,
-        usageCount: 51670,
-        baseUrl: 'https://jsonplaceholder.typicode.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://jsonplaceholder.typicode.com',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'kroki-2',
-        name: 'Kroki',
-        provider: 'Kroki',
-        description: 'Creates diagrams from textual descriptions',
-        category: 'Development',
-        tags: ['development', 'public-api', 'kroki'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.8,
-        ratingCount: 7598,
-        usageCount: 50014,
-        baseUrl: 'https://kroki.io',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://kroki.io',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'lua-decompiler-2',
-        name: 'Lua Decompiler',
-        provider: 'Lua Decompiler',
-        description: 'Online Lua 5.1 Decompiler',
-        category: 'Development',
-        tags: ['development', 'public-api', 'lua'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.9,
-        ratingCount: 8879,
-        usageCount: 85197,
-        baseUrl: 'https://lua-decompiler.ferib.dev',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://lua-decompiler.ferib.dev/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'mac-address-vendor-lookup-2',
-        name: 'MAC address vendor lookup',
-        provider: 'MAC address vendor lookup',
-        description: 'Retrieve vendor details and other information regarding a given MAC address or an OUI',
-        category: 'Development',
-        tags: ['development', 'public-api', 'mac'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4,
-        ratingCount: 4800,
-        usageCount: 14042,
-        baseUrl: 'https://macaddress.io',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://macaddress.io/api',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'mocky-2',
-        name: 'Mocky',
-        provider: 'Mocky',
-        description: 'Mock user defined test JSON for REST API endpoints',
-        category: 'Development',
-        tags: ['development', 'public-api', 'mocky'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.1,
-        ratingCount: 9411,
-        usageCount: 37844,
-        baseUrl: 'https://designer.mocky.io',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://designer.mocky.io/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'nationalize-io-2',
-        name: 'Nationalize.io',
-        provider: 'Nationalize.io',
-        description: 'Estimate the nationality of a first name',
-        category: 'Development',
-        tags: ['development', 'public-api', 'nationalize'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.3,
-        ratingCount: 7693,
-        usageCount: 61170,
-        baseUrl: 'https://nationalize.io',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://nationalize.io',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'networkcalc-2',
-        name: 'NetworkCalc',
-        provider: 'NetworkCalc',
-        description: 'Network calculators, including subnets, DNS, binary, and security tools',
-        category: 'Development',
-        tags: ['development', 'public-api', 'networkcalc'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.1,
-        ratingCount: 3391,
-        usageCount: 49555,
-        baseUrl: 'https://networkcalc.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://networkcalc.com/api/docs',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'openqr-2',
-        name: 'OpenQR',
-        provider: 'OpenQR',
-        description: 'Generate QR codes and manage dynamic (editable) QR codes with scan analytics',
-        category: 'Development',
-        tags: ['development', 'public-api', 'openqr'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.3,
-        ratingCount: 813,
-        usageCount: 15473,
-        baseUrl: 'https://openqr.uk',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://openqr.uk/api',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'oyyi-2',
-        name: 'oyyi',
-        provider: 'oyyi',
-        description: 'API for Fake Data, image/video conversion, optimization, pdf optimization and thumbnail generation',
-        category: 'Development',
-        tags: ['development', 'public-api', 'oyyi'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.2,
-        ratingCount: 4752,
-        usageCount: 90321,
-        baseUrl: 'https://oyyi.xyz',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://oyyi.xyz/docs/1.0',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'pagecdn-2',
-        name: 'PageCDN',
-        provider: 'PageCDN',
-        description: 'Public API for javascript, css and font libraries on PageCDN',
-        category: 'Development',
-        tags: ['development', 'public-api', 'pagecdn'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.6,
-        ratingCount: 2566,
-        usageCount: 9438,
-        baseUrl: 'https://pagecdn.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://pagecdn.com/docs/public-api',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'proxykingdom-2',
-        name: 'ProxyKingdom',
-        provider: 'ProxyKingdom',
-        description: 'Rotating Proxy API that produces a working proxy on every request',
-        category: 'Development',
-        tags: ['development', 'public-api', 'proxykingdom'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.5,
-        ratingCount: 2135,
-        usageCount: 22376,
-        baseUrl: 'https://proxykingdom.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://proxykingdom.com',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'qr-barcode-2',
-        name: 'QR & Barcode',
-        provider: 'QR & Barcode',
-        description: 'QR codes and barcodes (Code 128, EAN-13, Data Matrix, PDF417 + more). SVG or PNG output',
-        category: 'Development',
-        tags: ['development', 'public-api', 'qr'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.4,
-        ratingCount: 5584,
-        usageCount: 54583,
-        baseUrl: 'https://solsigs.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://solsigs.com/qrapi/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'qr-code-2',
-        name: 'QR code',
-        provider: 'QR code',
-        description: 'Create an easy to read QR code and URL shortener',
-        category: 'Development',
-        tags: ['development', 'public-api', 'qr'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.9,
-        ratingCount: 7599,
-        usageCount: 95442,
-        baseUrl: 'https://www.qrtag.net',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://www.qrtag.net/api/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'quickchart-2',
-        name: 'QuickChart',
-        provider: 'QuickChart',
-        description: 'Generate chart and graph images',
-        category: 'Development',
-        tags: ['development', 'public-api', 'quickchart'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.7,
-        ratingCount: 8777,
-        usageCount: 15039,
-        baseUrl: 'https://quickchart.io',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://quickchart.io/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'random-stuff-2',
-        name: 'Random Stuff',
-        provider: 'Random Stuff',
-        description: 'Can be used to get AI Response, jokes, memes, and much more at lightning-fast speed',
-        category: 'Development',
-        tags: ['development', 'public-api', 'random'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4,
-        ratingCount: 8750,
-        usageCount: 63178,
-        baseUrl: 'https://api-docs.pgamerx.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://api-docs.pgamerx.com/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'rss-feed-to-json-2',
-        name: 'RSS feed to JSON',
-        provider: 'RSS feed to JSON',
-        description: 'Returns RSS feed in JSON format using feed URL',
-        category: 'Development',
-        tags: ['development', 'public-api', 'rss'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4,
-        ratingCount: 6830,
-        usageCount: 11904,
-        baseUrl: 'https://rss-to-json-serverless-api.vercel.app',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://rss-to-json-serverless-api.vercel.app',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'savepage-io-2',
-        name: 'SavePage.io',
-        provider: 'SavePage.io',
-        description: 'A free, RESTful API used to screenshot any desktop, or mobile website',
-        category: 'Development',
-        tags: ['development', 'public-api', 'savepage'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.5,
-        ratingCount: 2505,
-        usageCount: 50000,
-        baseUrl: 'https://www.savepage.io',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://www.savepage.io',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'scraperbox-2',
-        name: 'scraperBox',
-        provider: 'scraperBox',
-        description: 'Undetectable web scraping API',
-        category: 'Development',
-        tags: ['development', 'public-api', 'scraperbox'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.1,
-        ratingCount: 6201,
-        usageCount: 21814,
-        baseUrl: 'https://scraperbox.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://scraperbox.com/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'screenshot-2',
-        name: 'Screenshot',
-        provider: 'Screenshot',
-        description: 'Take programmatic screenshots of web pages from any website',
-        category: 'Development',
-        tags: ['development', 'public-api', 'screenshot'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.8,
-        ratingCount: 2778,
-        usageCount: 57754,
-        baseUrl: 'https://www.abstractapi.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://www.abstractapi.com/website-screenshot-api',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'screenshotapi-net-2',
-        name: 'ScreenshotAPI.net',
-        provider: 'ScreenshotAPI.net',
-        description: 'Create pixel-perfect website screenshots',
-        category: 'Development',
-        tags: ['development', 'public-api', 'screenshotapi'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.6,
-        ratingCount: 866,
-        usageCount: 16909,
-        baseUrl: 'https://screenshotapi.net',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://screenshotapi.net/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'serpstack-2',
-        name: 'serpstack',
-        provider: 'serpstack',
-        description: 'Real-Time & Accurate Google Search Results API',
-        category: 'Development',
-        tags: ['development', 'public-api', 'serpstack'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.2,
-        ratingCount: 4362,
-        usageCount: 7123,
-        baseUrl: 'https://serpstack.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://serpstack.com/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'sonar-2',
-        name: 'Sonar',
-        provider: 'Sonar',
-        description: 'Project Sonar DNS Enumeration API',
-        category: 'Development',
-        tags: ['development', 'public-api', 'sonar'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.5,
-        ratingCount: 3215,
-        usageCount: 72673,
-        baseUrl: 'https://github.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://github.com/Cgboal/SonarSearch',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'statically-2',
-        name: 'Statically',
-        provider: 'Statically',
-        description: 'A free CDN for developers',
-        category: 'Development',
-        tags: ['development', 'public-api', 'statically'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.2,
-        ratingCount: 742,
-        usageCount: 56606,
-        baseUrl: 'https://statically.io',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://statically.io/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'supportivekoala-2',
-        name: 'Supportivekoala',
-        provider: 'Supportivekoala',
-        description: 'Autogenerate images with template',
-        category: 'Development',
-        tags: ['development', 'public-api', 'supportivekoala'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.3,
-        ratingCount: 3153,
-        usageCount: 86807,
-        baseUrl: 'https://developers.supportivekoala.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://developers.supportivekoala.com/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'suprsonic-2',
-        name: 'Suprsonic',
-        provider: 'Suprsonic',
-        description: 'Unified agent API: search, scrape, enrich, image gen, TTS, STT, messaging. One key, 20+ capabilities',
-        category: 'Development',
-        tags: ['development', 'public-api', 'suprsonic'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.2,
-        ratingCount: 6282,
-        usageCount: 95683,
-        baseUrl: 'https://suprsonic.ai',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://suprsonic.ai',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'thunder-client-2',
-        name: 'Thunder Client',
-        provider: 'Thunder Client',
-        description: 'API testing tool',
-        category: 'Development',
-        tags: ['development', 'public-api', 'thunder'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.8,
-        ratingCount: 1628,
-        usageCount: 11161,
-        baseUrl: 'https://www.thunderclient.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://www.thunderclient.com/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'tyk-2',
-        name: 'Tyk',
-        provider: 'Tyk',
-        description: 'Api and service management platform',
-        category: 'Development',
-        tags: ['development', 'public-api', 'tyk'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.8,
-        ratingCount: 648,
-        usageCount: 37735,
-        baseUrl: 'https://tyk.io',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://tyk.io/open-source/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'webclaw-2',
-        name: 'Webclaw',
-        provider: 'Webclaw',
-        description: 'Web content extraction for LLMs with scrape, crawl, search, and summarize',
-        category: 'Development',
-        tags: ['development', 'public-api', 'webclaw'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.5,
-        ratingCount: 4435,
-        usageCount: 22847,
-        baseUrl: 'https://webclaw.io',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://webclaw.io/docs/api',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'webscraping-ai-2',
-        name: 'WebScraping.AI',
-        provider: 'WebScraping.AI',
-        description: 'Web Scraping API with built-in proxies and JS rendering',
-        category: 'Development',
-        tags: ['development', 'public-api', 'webscraping'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.2,
-        ratingCount: 7512,
-        usageCount: 63858,
-        baseUrl: 'https://webscraping.ai',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://webscraping.ai/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'lingua-robot-2',
-        name: 'Lingua Robot',
-        provider: 'Lingua Robot',
-        description: 'Word definitions, pronunciations, synonyms, antonyms and others',
-        category: 'Dictionaries',
-        tags: ['dictionaries', 'public-api', 'lingua'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.7,
-        ratingCount: 7917,
-        usageCount: 73059,
-        baseUrl: 'https://www.linguarobot.io',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://www.linguarobot.io',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'owlbot-2',
-        name: 'OwlBot',
-        provider: 'OwlBot',
-        description: 'Definitions with example sentence and photo if available',
-        category: 'Dictionaries',
-        tags: ['dictionaries', 'public-api', 'owlbot'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.5,
-        ratingCount: 7875,
-        usageCount: 18482,
-        baseUrl: 'https://owlbot.info',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://owlbot.info/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'wiktionary-2',
-        name: 'Wiktionary',
-        provider: 'Wiktionary',
-        description: 'Collaborative dictionary data',
-        category: 'Dictionaries',
-        tags: ['dictionaries', 'public-api', 'wiktionary'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.5,
-        ratingCount: 7385,
-        usageCount: 56412,
-        baseUrl: 'https://en.wiktionary.org',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://en.wiktionary.org/w/api.php',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'asana-2',
-        name: 'Asana',
-        provider: 'Asana',
-        description: 'Programmatic access to all data in your asana system',
-        category: 'Documents & Productivity',
-        tags: ['documents-productivity', 'public-api', 'asana'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.8,
-        ratingCount: 7958,
-        usageCount: 70065,
-        baseUrl: 'https://developers.asana.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://developers.asana.com/docs',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'buildpdf-2',
-        name: 'BuildPDF',
-        provider: 'BuildPDF',
-        description: 'Convert HTML, images, and text to PDF',
-        category: 'Documents & Productivity',
-        tags: ['documents-productivity', 'public-api', 'buildpdf'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.6,
-        ratingCount: 4516,
-        usageCount: 37573,
-        baseUrl: 'https://buildpdf.co',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://buildpdf.co/api/docs',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'cloudmersive-document-and-data-conversion-2',
-        name: 'Cloudmersive Document and Data Conversion',
-        provider: 'Cloudmersive Document and Data Conversion',
-        description: 'HTML/URL to PDF/PNG, Office documents to PDF, image conversion',
-        category: 'Documents & Productivity',
-        tags: ['documents-productivity', 'public-api', 'cloudmersive'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.6,
-        ratingCount: 7426,
-        usageCount: 89560,
-        baseUrl: 'https://cloudmersive.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://cloudmersive.com/convert-api',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'ilovepdf-2',
-        name: 'iLovePDF',
-        provider: 'iLovePDF',
-        description: 'Convert, merge, split, extract text and add page numbers for PDFs. Free for 250 documents/month',
-        category: 'Documents & Productivity',
-        tags: ['documents-productivity', 'public-api', 'ilovepdf'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.5,
-        ratingCount: 3935,
-        usageCount: 95633,
-        baseUrl: 'https://developer.ilovepdf.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://developer.ilovepdf.com/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'pdffleet-2',
-        name: 'PDFFleet',
-        provider: 'PDFFleet',
-        description: 'HTML and URL to PDF API with templates and a free tier',
-        category: 'Documents & Productivity',
-        tags: ['documents-productivity', 'public-api', 'pdffleet'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.8,
-        ratingCount: 9208,
-        usageCount: 18958,
-        baseUrl: 'https://pdffleet.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://pdffleet.com',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'renderly-2',
-        name: 'Renderly',
-        provider: 'Renderly',
-        description: 'HTML to PDF conversion API built on Chromium',
-        category: 'Documents & Productivity',
-        tags: ['documents-productivity', 'public-api', 'renderly'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.5,
-        ratingCount: 9235,
-        usageCount: 70390,
-        baseUrl: 'https://renderlyapi.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://renderlyapi.com',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'staffsign-2',
-        name: 'staffSign',
-        provider: 'staffSign',
-        description: 'Digital employment contract API with QES/eIDAS support for HR and staffing',
-        category: 'Documents & Productivity',
-        tags: ['documents-productivity', 'public-api', 'staffsign'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.1,
-        ratingCount: 7491,
-        usageCount: 61427,
-        baseUrl: 'https://staffsign.de',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://staffsign.de/docs',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'cloudmersive-validate-3',
-        name: 'Cloudmersive Validate',
-        provider: 'Cloudmersive Validate',
-        description: 'Validate email addresses, phone numbers, VAT numbers and domain names',
-        category: 'Email',
-        tags: ['email', 'public-api', 'cloudmersive'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.6,
-        ratingCount: 2896,
-        usageCount: 80342,
-        baseUrl: 'https://cloudmersive.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://cloudmersive.com/validate-api',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'disify-2',
-        name: 'Disify',
-        provider: 'Disify',
-        description: 'Validate and detect disposable and temporary email addresses',
-        category: 'Email',
-        tags: ['email', 'public-api', 'disify'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4,
-        ratingCount: 1240,
-        usageCount: 5820,
-        baseUrl: 'https://www.disify.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://www.disify.com/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'emailjs-2',
-        name: 'EmailJS',
-        provider: 'EmailJS',
-        description: 'Send emails directly from client-side JavaScript without a backend server',
-        category: 'Email',
-        tags: ['email', 'public-api', 'emailjs'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.7,
-        ratingCount: 567,
-        usageCount: 44009,
-        baseUrl: 'https://www.emailjs.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://www.emailjs.com/docs/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'email-validation-2',
-        name: 'Email Validation',
-        provider: 'Email Validation',
-        description: 'Validate email addresses for deliverability and spam',
-        category: 'Email',
-        tags: ['email', 'public-api'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.6,
-        ratingCount: 3766,
-        usageCount: 22323,
-        baseUrl: 'https://www.abstractapi.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://www.abstractapi.com/email-verification-validation-api',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'eva-2',
-        name: 'EVA',
-        provider: 'EVA',
-        description: 'Validate email addresses',
-        category: 'Email',
-        tags: ['email', 'public-api', 'eva'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.6,
-        ratingCount: 9166,
-        usageCount: 88809,
-        baseUrl: 'https://eva.pingutil.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://eva.pingutil.com/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'kickbox-2',
-        name: 'Kickbox',
-        provider: 'Kickbox',
-        description: 'Email verification API',
-        category: 'Email',
-        tags: ['email', 'public-api', 'kickbox'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.9,
-        ratingCount: 8939,
-        usageCount: 16919,
-        baseUrl: 'https://open.kickbox.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://open.kickbox.com/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'kiprio-email-validate-2',
-        name: 'Kiprio Email Validate',
-        provider: 'Kiprio Email Validate',
-        description: 'Free email validation: MX check, disposable detection, syntax',
-        category: 'Email',
-        tags: ['email', 'public-api', 'kiprio'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.8,
-        ratingCount: 1088,
-        usageCount: 50655,
-        baseUrl: 'https://kiprio.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://kiprio.com/v1/email-validate',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'mail-gw-2',
-        name: 'mail.gw',
-        provider: 'mail.gw',
-        description: '10 Minute Mail',
-        category: 'Email',
-        tags: ['email', 'public-api', 'mail'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.8,
-        ratingCount: 7248,
-        usageCount: 68535,
-        baseUrl: 'https://docs.mail.gw',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://docs.mail.gw',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'mail-tm-2',
-        name: 'mail.tm',
-        provider: 'mail.tm',
-        description: 'Temporary Email Service',
-        category: 'Email',
-        tags: ['email', 'public-api', 'mail'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.9,
-        ratingCount: 1939,
-        usageCount: 53205,
-        baseUrl: 'https://docs.mail.tm',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://docs.mail.tm',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'verifier-2',
-        name: 'Verifier',
-        provider: 'Verifier',
-        description: 'Verifies that a given email is real',
-        category: 'Email',
-        tags: ['email', 'public-api', 'verifier'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.2,
-        ratingCount: 9212,
-        usageCount: 74958,
-        baseUrl: 'https://verifier.meetchopra.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://verifier.meetchopra.com/docs#/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'anycrap-2',
-        name: 'Anycrap',
-        provider: 'Anycrap',
-        description: '35,000+ absurdist AI-generated product concepts with names, descriptions, and images',
-        category: 'Entertainment',
-        tags: ['entertainment', 'public-api', 'anycrap'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.4,
-        ratingCount: 8854,
-        usageCount: 39193,
-        baseUrl: 'https://anycrap.shop',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://anycrap.shop/developers',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'corporate-buzz-words-2',
-        name: 'Corporate Buzz Words',
-        provider: 'Corporate Buzz Words',
-        description: 'REST API for Corporate Buzz Words',
-        category: 'Entertainment',
-        tags: ['entertainment', 'public-api', 'corporate'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.3,
-        ratingCount: 6683,
-        usageCount: 54597,
-        baseUrl: 'https://github.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://github.com/sameerkumar18/corporate-bs-generator-api',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'fun-fact-2',
-        name: 'Fun Fact',
-        provider: 'Fun Fact',
-        description: 'A simple HTTPS api that can randomly select and return a fact from the FFA database',
-        category: 'Entertainment',
-        tags: ['entertainment', 'public-api', 'fun'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.4,
-        ratingCount: 4284,
-        usageCount: 16112,
-        baseUrl: 'https://api.aakhilv.me',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://api.aakhilv.me',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'jokeapi-3',
-        name: 'JokeAPI',
-        provider: 'JokeAPI',
-        description: 'Programmable jokes in multiple languages with filtering options',
-        category: 'Entertainment',
-        tags: ['entertainment', 'public-api', 'jokeapi'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.4,
-        ratingCount: 6874,
-        usageCount: 49053,
-        baseUrl: 'https://v2.jokeapi.dev',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://v2.jokeapi.dev/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'justmeme-wtf-2',
-        name: 'justmeme.wtf',
-        provider: 'justmeme.wtf',
-        description: 'Free meme API with 2400+ templates, search, trending, and AI generation',
-        category: 'Entertainment',
-        tags: ['entertainment', 'public-api', 'justmeme'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.4,
-        ratingCount: 2334,
-        usageCount: 94690,
-        baseUrl: 'https://justmeme.wtf',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://justmeme.wtf/api-docs',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'potterdb-2',
-        name: 'PotterDB',
-        provider: 'PotterDB',
-        description: 'Harry Potter universe database with characters, spells, potions and more',
-        category: 'Entertainment',
-        tags: ['entertainment', 'public-api', 'potterdb'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.8,
-        ratingCount: 4118,
-        usageCount: 14945,
-        baseUrl: 'https://docs.potterdb.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://docs.potterdb.com/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'carbon-interface-2',
-        name: 'Carbon Interface',
-        provider: 'Carbon Interface',
-        description: 'API to calculate carbon (C02) emissions estimates for common C02 emitting activities',
-        category: 'Environment',
-        tags: ['environment', 'public-api', 'carbon'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.5,
-        ratingCount: 2735,
-        usageCount: 43462,
-        baseUrl: 'https://docs.carboninterface.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://docs.carboninterface.com/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'climatiq-2',
-        name: 'Climatiq',
-        provider: 'Climatiq',
-        description: 'Calculate the environmental footprint created by a broad range of emission-generating activities',
-        category: 'Environment',
-        tags: ['environment', 'public-api', 'climatiq'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4,
-        ratingCount: 2860,
-        usageCount: 18480,
-        baseUrl: 'https://docs.climatiq.io',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://docs.climatiq.io',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'sustainmetrics-2',
-        name: 'SustainMetrics',
-        provider: 'SustainMetrics',
-        description: '18,000+ GHG emission factors from DEFRA, EPA, ADEME, Ember',
-        category: 'Environment',
-        tags: ['environment', 'public-api', 'sustainmetrics'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.4,
-        ratingCount: 7344,
-        usageCount: 47977,
-        baseUrl: 'https://www.sustainmetrics.net',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://www.sustainmetrics.net/api',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'aletheia-2',
-        name: 'Aletheia',
-        provider: 'Aletheia',
-        description: 'Insider trading data, earnings call analysis, financial statements, and more',
-        category: 'Finance',
-        tags: ['finance', 'public-api', 'aletheia'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.5,
-        ratingCount: 2805,
-        usageCount: 54757,
-        baseUrl: 'https://aletheiaapi.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://aletheiaapi.com/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'alpaca-2',
-        name: 'Alpaca',
-        provider: 'Alpaca',
-        description: 'Realtime and historical market data on all US equities and ETFs',
-        category: 'Finance',
-        tags: ['finance', 'public-api', 'alpaca'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.4,
-        ratingCount: 1604,
-        usageCount: 95443,
-        baseUrl: 'https://alpaca.markets',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://alpaca.markets/docs/api-documentation/api-v2/market-data/alpaca-data-api-v2/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'banco-do-brasil-2',
-        name: 'Banco do Brasil',
-        provider: 'Banco do Brasil',
-        description: 'All Banco do Brasil financial transaction APIs',
-        category: 'Finance',
-        tags: ['finance', 'public-api', 'banco'],
-        authType: 'OAuth 2.0',
-        pricing: 'Free',
-        ratingAverage: 4.9,
-        ratingCount: 7549,
-        usageCount: 24149,
-        baseUrl: 'https://developers.bb.com.br',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://developers.bb.com.br/home',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'brieftape-2',
-        name: 'BriefTape',
-        provider: 'BriefTape',
-        description: 'Real-time AI-summarized SEC filings, Fed, FDA and BLS data, ticker-tagged',
-        category: 'Finance',
-        tags: ['finance', 'public-api', 'brieftape'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.2,
-        ratingCount: 6512,
-        usageCount: 30287,
-        baseUrl: 'https://brieftape.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://brieftape.com',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'congressinvests-2',
-        name: 'CongressInvests',
-        provider: 'CongressInvests',
-        description: 'Real-time U.S. congressional stock trade disclosures from Senate EFD and House Clerk',
-        category: 'Finance',
-        tags: ['finance', 'public-api', 'congressinvests'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.8,
-        ratingCount: 6908,
-        usageCount: 12915,
-        baseUrl: 'https://congressinvests.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://congressinvests.com',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'econdb-2',
-        name: 'Econdb',
-        provider: 'Econdb',
-        description: 'Global macroeconomic data',
-        category: 'Finance',
-        tags: ['finance', 'public-api', 'econdb'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.9,
-        ratingCount: 4709,
-        usageCount: 70744,
-        baseUrl: 'https://www.econdb.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://www.econdb.com/api/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'econpulse-2',
-        name: 'EconPulse',
-        provider: 'EconPulse',
-        description: 'Live economic data — CPI, PPI, energy, treasury rates, BTC premium',
-        category: 'Finance',
-        tags: ['finance', 'public-api', 'econpulse'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.8,
-        ratingCount: 7018,
-        usageCount: 52502,
-        baseUrl: 'https://econpulse.io',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://econpulse.io',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'fred-2',
-        name: 'FRED',
-        provider: 'FRED',
-        description: 'Economic data from the Federal Reserve Bank of St. Louis',
-        category: 'Finance',
-        tags: ['finance', 'public-api', 'fred'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.3,
-        ratingCount: 2363,
-        usageCount: 72694,
-        baseUrl: 'https://fred.stlouisfed.org',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://fred.stlouisfed.org/docs/api/fred/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'front-accounting-apis-2',
-        name: 'Front Accounting APIs',
-        provider: 'Front Accounting APIs',
-        description: 'Front accounting is multilingual and multicurrency software for small businesses',
-        category: 'Finance',
-        tags: ['finance', 'public-api', 'front'],
-        authType: 'OAuth 2.0',
-        pricing: 'Free',
-        ratingAverage: 4.7,
-        ratingCount: 3107,
-        usageCount: 26658,
-        baseUrl: 'https://frontaccounting.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://frontaccounting.com/fawiki/index.php?n=Devel.SimpleAPIModule',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'helium-2',
-        name: 'Helium',
-        provider: 'Helium',
-        description: 'News with media bias scoring, balanced news synthesis, live market data, AI options pricing',
-        category: 'Finance',
-        tags: ['finance', 'public-api', 'helium'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.4,
-        ratingCount: 2224,
-        usageCount: 16246,
-        baseUrl: 'https://heliumtrades.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://heliumtrades.com/mcp-page/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'hotstoks-2',
-        name: 'Hotstoks',
-        provider: 'Hotstoks',
-        description: 'Stock market data powered by SQL',
-        category: 'Finance',
-        tags: ['finance', 'public-api', 'hotstoks'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.5,
-        ratingCount: 8015,
-        usageCount: 32216,
-        baseUrl: 'https://hotstoks.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://hotstoks.com?utm_source=public-apis',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'ibanforge-2',
-        name: 'IBANforge',
-        provider: 'IBANforge',
-        description: 'IBAN validation and BIC/SWIFT lookup for 75+ countries with 121K+ bank entries',
-        category: 'Finance',
-        tags: ['finance', 'public-api', 'ibanforge'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.9,
-        ratingCount: 7349,
-        usageCount: 62264,
-        baseUrl: 'https://api.ibanforge.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://api.ibanforge.com',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'iex-cloud-2',
-        name: 'IEX Cloud',
-        provider: 'IEX Cloud',
-        description: 'Realtime & Historical Stock and Market Data',
-        category: 'Finance',
-        tags: ['finance', 'public-api', 'iex'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.4,
-        ratingCount: 2894,
-        usageCount: 47770,
-        baseUrl: 'https://iexcloud.io',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://iexcloud.io/docs/api/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'openfigi-2',
-        name: 'OpenFIGI',
-        provider: 'OpenFIGI',
-        description: 'Equity, index, futures, options symbology from Bloomberg LP',
-        category: 'Finance',
-        tags: ['finance', 'public-api', 'openfigi'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.3,
-        ratingCount: 2693,
-        usageCount: 46170,
-        baseUrl: 'https://www.openfigi.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://www.openfigi.com/api',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'portfolio-optimizer-2',
-        name: 'Portfolio Optimizer',
-        provider: 'Portfolio Optimizer',
-        description: 'Portfolio analysis and optimization',
-        category: 'Finance',
-        tags: ['finance', 'public-api', 'portfolio'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.8,
-        ratingCount: 6618,
-        usageCount: 17731,
-        baseUrl: 'https://portfoliooptimizer.io',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://portfoliooptimizer.io/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'sec-edgar-data-2',
-        name: 'SEC EDGAR Data',
-        provider: 'SEC EDGAR Data',
-        description: 'API to access annual reports of public US companies',
-        category: 'Finance',
-        tags: ['finance', 'public-api', 'sec'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4,
-        ratingCount: 3990,
-        usageCount: 37070,
-        baseUrl: 'https://www.sec.gov',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://www.sec.gov/edgar/sec-api-documentation',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'stockdata-2',
-        name: 'StockData',
-        provider: 'StockData',
-        description: 'Real-Time, Intraday & Historical Market Data, News and Sentiment API',
-        category: 'Finance',
-        tags: ['finance', 'public-api', 'stockdata'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4,
-        ratingCount: 8630,
-        usageCount: 31447,
-        baseUrl: 'https://www.stockdata.org',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://www.StockData.org',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'stockfit-2',
-        name: 'StockFit',
-        provider: 'StockFit',
-        description: 'SEC filings, financial statements, earnings, ETF holdings and ownership data',
-        category: 'Finance',
-        tags: ['finance', 'public-api', 'stockfit'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.1,
-        ratingCount: 3561,
-        usageCount: 86865,
-        baseUrl: 'https://api.stockfit.io',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://api.stockfit.io/docs',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'sugra-2',
-        name: 'Sugra',
-        provider: 'Sugra',
-        description: 'One API for market data, economics, commodities, climate, and global news. LLM-ready JSON',
-        category: 'Finance',
-        tags: ['finance', 'public-api', 'sugra'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.2,
-        ratingCount: 4552,
-        usageCount: 34578,
-        baseUrl: 'https://sugra.ai',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://sugra.ai',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'tradier-2',
-        name: 'Tradier',
-        provider: 'Tradier',
-        description: 'US equity/option market data (delayed, intraday, historical)',
-        category: 'Finance',
-        tags: ['finance', 'public-api', 'tradier'],
-        authType: 'OAuth 2.0',
-        pricing: 'Free',
-        ratingAverage: 4.9,
-        ratingCount: 5539,
-        usageCount: 51719,
-        baseUrl: 'https://developer.tradier.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://developer.tradier.com',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'vat-validation-2',
-        name: 'VAT Validation',
-        provider: 'VAT Validation',
-        description: 'Validate VAT numbers and calculate VAT rates',
-        category: 'Finance',
-        tags: ['finance', 'public-api', 'vat'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.7,
-        ratingCount: 5167,
-        usageCount: 10523,
-        baseUrl: 'https://www.abstractapi.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://www.abstractapi.com/vat-validation-rates-api',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'yahoo-finance-2',
-        name: 'Yahoo Finance',
-        provider: 'Yahoo Finance',
-        description: 'Real time low latency Yahoo Finance API for stock market, crypto currencies, and currency exchange',
-        category: 'Finance',
-        tags: ['finance', 'public-api', 'yahoo'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.1,
-        ratingCount: 3751,
-        usageCount: 20321,
-        baseUrl: 'https://www.yahoofinanceapi.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://www.yahoofinanceapi.com/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'ynab-2',
-        name: 'YNAB',
-        provider: 'YNAB',
-        description: 'Budgeting & Planning',
-        category: 'Finance',
-        tags: ['finance', 'public-api', 'ynab'],
-        authType: 'OAuth 2.0',
-        pricing: 'Free',
-        ratingAverage: 4.6,
-        ratingCount: 6486,
-        usageCount: 31426,
-        baseUrl: 'https://api.youneedabudget.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://api.youneedabudget.com/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'baconmockup-2',
-        name: 'BaconMockup',
-        provider: 'BaconMockup',
-        description: 'Resizable bacon placeholder images',
-        category: 'Food & Drink',
-        tags: ['food-drink', 'public-api', 'baconmockup'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.8,
-        ratingCount: 8028,
-        usageCount: 69932,
-        baseUrl: 'https://baconmockup.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://baconmockup.com/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'foodish-2',
-        name: 'Foodish',
-        provider: 'Foodish',
-        description: 'Random pictures of food dishes',
-        category: 'Food & Drink',
-        tags: ['food-drink', 'public-api', 'foodish'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4,
-        ratingCount: 2500,
-        usageCount: 26857,
-        baseUrl: 'https://github.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://github.com/surhud004/Foodish#readme',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'open-brewery-db-2',
-        name: 'Open Brewery DB',
-        provider: 'Open Brewery DB',
-        description: 'Breweries, Cideries and Craft Beer Bottle Shops',
-        category: 'Food & Drink',
-        tags: ['food-drink', 'public-api', 'open'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.4,
-        ratingCount: 7524,
-        usageCount: 54574,
-        baseUrl: 'https://www.openbrewerydb.org',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://www.openbrewerydb.org',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'recipeapi-2',
-        name: 'RecipeAPI',
-        provider: 'RecipeAPI',
-        description: 'Recipes, ingredients, nutrition data and cooking instructions',
-        category: 'Food & Drink',
-        tags: ['food-drink', 'public-api', 'recipeapi'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.8,
-        ratingCount: 6498,
-        usageCount: 63856,
-        baseUrl: 'https://recipeapi.io',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://recipeapi.io',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'thecocktaildb-2',
-        name: 'TheCocktailDB',
-        provider: 'TheCocktailDB',
-        description: 'Cocktail Recipes',
-        category: 'Food & Drink',
-        tags: ['food-drink', 'public-api', 'thecocktaildb'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.3,
-        ratingCount: 2153,
-        usageCount: 57093,
-        baseUrl: 'https://www.thecocktaildb.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://www.thecocktaildb.com/api.php',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'themealdb-2',
-        name: 'TheMealDB',
-        provider: 'TheMealDB',
-        description: 'Meal Recipes',
-        category: 'Food & Drink',
-        tags: ['food-drink', 'public-api', 'themealdb'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.8,
-        ratingCount: 5198,
-        usageCount: 42099,
-        baseUrl: 'https://www.themealdb.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://www.themealdb.com/api.php',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'zestful-2',
-        name: 'Zestful',
-        provider: 'Zestful',
-        description: 'Parse recipe ingredients',
-        category: 'Food & Drink',
-        tags: ['food-drink', 'public-api', 'zestful'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.9,
-        ratingCount: 4489,
-        usageCount: 83998,
-        baseUrl: 'https://zestfuldata.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://zestfuldata.com/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'amiiboapi-2',
-        name: 'AmiiboAPI',
-        provider: 'AmiiboAPI',
-        description: 'Nintendo Amiibo Information',
-        category: 'Games & Comics',
-        tags: ['games-comics', 'public-api', 'amiiboapi'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.7,
-        ratingCount: 847,
-        usageCount: 74049,
-        baseUrl: 'https://amiiboapi.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://amiiboapi.com/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'astroworld-2',
-        name: 'Astroworld',
-        provider: 'Astroworld',
-        description: 'Free Minecraft data: mobs, biomes, items, enchantments, structures, commands, versions, achievements, trades',
-        category: 'Games & Comics',
-        tags: ['games-comics', 'public-api', 'astroworld'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.9,
-        ratingCount: 6469,
-        usageCount: 87852,
-        baseUrl: 'https://api.astroworldmc.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://api.astroworldmc.com',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'autochess-vng-2',
-        name: 'Autochess VNG',
-        provider: 'Autochess VNG',
-        description: 'Rest Api for Autochess VNG',
-        category: 'Games & Comics',
-        tags: ['games-comics', 'public-api', 'autochess'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.7,
-        ratingCount: 4647,
-        usageCount: 74449,
-        baseUrl: 'https://github.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://github.com/didadadida93/autochess-vng-api',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'barter-vg-2',
-        name: 'Barter.VG',
-        provider: 'Barter.VG',
-        description: 'Provides information about Game, DLC, Bundles, Giveaways, Trading',
-        category: 'Games & Comics',
-        tags: ['games-comics', 'public-api', 'barter'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.8,
-        ratingCount: 6568,
-        usageCount: 68009,
-        baseUrl: 'https://github.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://github.com/bartervg/barter.vg/wiki',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'battle-net-2',
-        name: 'Battle.net',
-        provider: 'Battle.net',
-        description: 'Diablo III, Hearthstone, StarCraft II and World of Warcraft game data APIs',
-        category: 'Games & Comics',
-        tags: ['games-comics', 'public-api', 'battle'],
-        authType: 'OAuth 2.0',
-        pricing: 'Free',
-        ratingAverage: 4.2,
-        ratingCount: 7182,
-        usageCount: 43668,
-        baseUrl: 'https://develop.battle.net',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://develop.battle.net/documentation/guides/getting-started',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'bugsnax-2',
-        name: 'Bugsnax',
-        provider: 'Bugsnax',
-        description: 'Get information about Bugsnax',
-        category: 'Games & Comics',
-        tags: ['games-comics', 'public-api', 'bugsnax'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4,
-        ratingCount: 7910,
-        usageCount: 95344,
-        baseUrl: 'https://www.bugsnaxapi.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://www.bugsnaxapi.com/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'cheapshark-2',
-        name: 'CheapShark',
-        provider: 'CheapShark',
-        description: 'Steam/PC Game Prices and Deals',
-        category: 'Games & Comics',
-        tags: ['games-comics', 'public-api', 'cheapshark'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.6,
-        ratingCount: 2106,
-        usageCount: 69800,
-        baseUrl: 'https://www.cheapshark.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://www.cheapshark.com/api',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'crafatar-2',
-        name: 'Crafatar',
-        provider: 'Crafatar',
-        description: 'API for Minecraft skins and faces',
-        category: 'Games & Comics',
-        tags: ['games-comics', 'public-api', 'crafatar'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4,
-        ratingCount: 6950,
-        usageCount: 86207,
-        baseUrl: 'https://crafatar.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://crafatar.com',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'cross-universe-2',
-        name: 'Cross Universe',
-        provider: 'Cross Universe',
-        description: 'Cross Universe Card Data',
-        category: 'Games & Comics',
-        tags: ['games-comics', 'public-api', 'cross'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4,
-        ratingCount: 8130,
-        usageCount: 82090,
-        baseUrl: 'https://crossuniverse.psychpsyo.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://crossuniverse.psychpsyo.com/apiDocs.html',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'disney-2',
-        name: 'Disney',
-        provider: 'Disney',
-        description: 'Information of Disney characters',
-        category: 'Games & Comics',
-        tags: ['games-comics', 'public-api', 'disney'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.2,
-        ratingCount: 7862,
-        usageCount: 6051,
-        baseUrl: 'https://disneyapi.dev',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://disneyapi.dev',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'dungeons-and-dragons-alternate-2',
-        name: 'Dungeons and Dragons (Alternate)',
-        provider: 'Dungeons and Dragons (Alternate)',
-        description: 'Includes all monsters and spells from the SRD (System Reference Document) as well as a search API',
-        category: 'Games & Comics',
-        tags: ['games-comics', 'public-api', 'dungeons'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.3,
-        ratingCount: 2423,
-        usageCount: 79131,
-        baseUrl: 'https://open5e.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://open5e.com/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'ffxiv-collect-2',
-        name: 'FFXIV Collect',
-        provider: 'FFXIV Collect',
-        description: 'Final Fantasy XIV data on collectables',
-        category: 'Games & Comics',
-        tags: ['games-comics', 'public-api', 'ffxiv'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.4,
-        ratingCount: 6944,
-        usageCount: 39492,
-        baseUrl: 'https://ffxivcollect.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://ffxivcollect.com/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'final-fantasy-xiv-2',
-        name: 'Final Fantasy XIV',
-        provider: 'Final Fantasy XIV',
-        description: 'Final Fantasy XIV Game data API',
-        category: 'Games & Comics',
-        tags: ['games-comics', 'public-api', 'final'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.1,
-        ratingCount: 5341,
-        usageCount: 58834,
-        baseUrl: 'https://xivapi.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://xivapi.com/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'freetogame-3',
-        name: 'FreeToGame',
-        provider: 'FreeToGame',
-        description: 'Free-To-Play Games Database',
-        category: 'Games & Comics',
-        tags: ['games-comics', 'public-api', 'freetogame'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.8,
-        ratingCount: 2228,
-        usageCount: 63104,
-        baseUrl: 'https://www.freetogame.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://www.freetogame.com/api-doc',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'fun-facts-2',
-        name: 'Fun Facts',
-        provider: 'Fun Facts',
-        description: 'Random Fun Facts',
-        category: 'Games & Comics',
-        tags: ['games-comics', 'public-api', 'fun'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.3,
-        ratingCount: 8773,
-        usageCount: 79324,
-        baseUrl: 'https://asli-fun-fact-api.herokuapp.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://asli-fun-fact-api.herokuapp.com/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'funtranslations-2',
-        name: 'FunTranslations',
-        provider: 'FunTranslations',
-        description: 'Translate Text into funny languages',
-        category: 'Games & Comics',
-        tags: ['games-comics', 'public-api', 'funtranslations'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.7,
-        ratingCount: 2717,
-        usageCount: 40316,
-        baseUrl: 'https://api.funtranslations.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://api.funtranslations.com/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'gamerpower-2',
-        name: 'GamerPower',
-        provider: 'GamerPower',
-        description: 'Game Giveaways Tracker',
-        category: 'Games & Comics',
-        tags: ['games-comics', 'public-api', 'gamerpower'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.1,
-        ratingCount: 5411,
-        usageCount: 87558,
-        baseUrl: 'https://www.gamerpower.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://www.gamerpower.com/api-read',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'geek-jokes-2',
-        name: 'Geek-Jokes',
-        provider: 'Geek-Jokes',
-        description: 'Fetch a random geeky/programming related joke for use in all sorts of applications',
-        category: 'Games & Comics',
-        tags: ['games-comics', 'public-api', 'geek'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.5,
-        ratingCount: 6465,
-        usageCount: 23137,
-        baseUrl: 'https://github.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://github.com/sameerkumar18/geek-joke-api',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'genshin-impact-3',
-        name: 'Genshin Impact',
-        provider: 'Genshin Impact',
-        description: 'Genshin Impact game data',
-        category: 'Games & Comics',
-        tags: ['games-comics', 'public-api', 'genshin'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.6,
-        ratingCount: 6946,
-        usageCount: 22492,
-        baseUrl: 'https://genshin.dev',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://genshin.dev',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'graphql-pokemon-2',
-        name: 'GraphQL Pokemon',
-        provider: 'GraphQL Pokemon',
-        description: 'GraphQL powered Pokemon API. Supports generations 1 through 8',
-        category: 'Games & Comics',
-        tags: ['games-comics', 'public-api', 'graphql'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.7,
-        ratingCount: 6757,
-        usageCount: 5893,
-        baseUrl: 'https://github.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://github.com/favware/graphql-pokemon',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'jokeapi-4',
-        name: 'JokeAPI',
-        provider: 'JokeAPI',
-        description: 'Programming, Miscellaneous and Dark Jokes',
-        category: 'Games & Comics',
-        tags: ['games-comics', 'public-api', 'jokeapi'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.9,
-        ratingCount: 5969,
-        usageCount: 63067,
-        baseUrl: 'https://sv443.net',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://sv443.net/jokeapi/v2/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'jokes-one-2',
-        name: 'Jokes One',
-        provider: 'Jokes One',
-        description: 'Joke of the day and large category of jokes accessible via REST API',
-        category: 'Games & Comics',
-        tags: ['games-comics', 'public-api', 'jokes'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.3,
-        ratingCount: 3963,
-        usageCount: 11780,
-        baseUrl: 'https://jokes.one',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://jokes.one/api/joke/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'monster-hunter-world-2',
-        name: 'Monster Hunter World',
-        provider: 'Monster Hunter World',
-        description: 'Monster Hunter World data',
-        category: 'Games & Comics',
-        tags: ['games-comics', 'public-api', 'monster'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.4,
-        ratingCount: 6404,
-        usageCount: 71700,
-        baseUrl: 'https://docs.mhw-db.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://docs.mhw-db.com/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'pok-api-graphql-2',
-        name: 'PokéAPI (GraphQL)',
-        provider: 'PokéAPI (GraphQL)',
-        description: 'The Unofficial GraphQL for PokeAPI',
-        category: 'Games & Comics',
-        tags: ['games-comics', 'public-api', 'pok'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.7,
-        ratingCount: 4767,
-        usageCount: 23038,
-        baseUrl: 'https://github.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://github.com/mazipan/graphql-pokeapi',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'psychonauts-2',
-        name: 'Psychonauts',
-        provider: 'Psychonauts',
-        description: 'Psychonauts World Characters Information and PSI Powers',
-        category: 'Games & Comics',
-        tags: ['games-comics', 'public-api', 'psychonauts'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.9,
-        ratingCount: 6249,
-        usageCount: 64249,
-        baseUrl: 'https://psychonauts-api.netlify.app',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://psychonauts-api.netlify.app/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'pubg-2',
-        name: 'PUBG',
-        provider: 'PUBG',
-        description: 'Access in-game PUBG data',
-        category: 'Games & Comics',
-        tags: ['games-comics', 'public-api', 'pubg'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.2,
-        ratingCount: 9342,
-        usageCount: 9977,
-        baseUrl: 'https://developer.pubg.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://developer.pubg.com/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'puyo-nexus-2',
-        name: 'Puyo Nexus',
-        provider: 'Puyo Nexus',
-        description: 'Puyo Puyo information from Puyo Nexus Wiki',
-        category: 'Games & Comics',
-        tags: ['games-comics', 'public-api', 'puyo'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.1,
-        ratingCount: 5201,
-        usageCount: 77243,
-        baseUrl: 'https://github.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://github.com/deltadex7/puyodb-api-deno',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'quizapi-io-2',
-        name: 'quizapi.io',
-        provider: 'quizapi.io',
-        description: 'Access to various kind of quiz questions',
-        category: 'Games & Comics',
-        tags: ['games-comics', 'public-api', 'quizapi'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.6,
-        ratingCount: 4916,
-        usageCount: 15059,
-        baseUrl: 'https://quizapi.io',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://quizapi.io/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'rick-and-morty-2',
-        name: 'Rick and Morty',
-        provider: 'Rick and Morty',
-        description: 'All the Rick and Morty information, including images',
-        category: 'Games & Comics',
-        tags: ['games-comics', 'public-api', 'rick'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.1,
-        ratingCount: 1281,
-        usageCount: 62968,
-        baseUrl: 'https://rickandmortyapi.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://rickandmortyapi.com',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'rps-101-2',
-        name: 'RPS 101',
-        provider: 'RPS 101',
-        description: 'Rock, Paper, Scissors with 101 objects',
-        category: 'Games & Comics',
-        tags: ['games-comics', 'public-api', 'rps'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.6,
-        ratingCount: 3466,
-        usageCount: 36709,
-        baseUrl: 'https://rps101.pythonanywhere.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://rps101.pythonanywhere.com/api',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'scryfall-3',
-        name: 'Scryfall',
-        provider: 'Scryfall',
-        description: 'Magic: The Gathering database',
-        category: 'Games & Comics',
-        tags: ['games-comics', 'public-api', 'scryfall'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.1,
-        ratingCount: 9081,
-        usageCount: 78368,
-        baseUrl: 'https://scryfall.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://scryfall.com/docs/api',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'spacetradersapi-2',
-        name: 'SpaceTradersAPI',
-        provider: 'SpaceTradersAPI',
-        description: 'A playable inter-galactic space trading MMOAPI',
-        category: 'Games & Comics',
-        tags: ['games-comics', 'public-api', 'spacetradersapi'],
-        authType: 'OAuth 2.0',
-        pricing: 'Free',
-        ratingAverage: 4.1,
-        ratingCount: 7751,
-        usageCount: 1464,
-        baseUrl: 'https://spacetraders.io',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://spacetraders.io?rel=pub-apis',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'tcgdex-2',
-        name: 'TCGdex',
-        provider: 'TCGdex',
-        description: 'Multi languages Pokémon TCG Information',
-        category: 'Games & Comics',
-        tags: ['games-comics', 'public-api', 'tcgdex'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.7,
-        ratingCount: 7717,
-        usageCount: 9031,
-        baseUrl: 'https://www.tcgdex.net',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://www.tcgdex.net/docs',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'universalis-2',
-        name: 'Universalis',
-        provider: 'Universalis',
-        description: 'Final Fantasy XIV market board data',
-        category: 'Games & Comics',
-        tags: ['games-comics', 'public-api', 'universalis'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.1,
-        ratingCount: 2341,
-        usageCount: 33405,
-        baseUrl: 'https://universalis.app',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://universalis.app/docs/index.html',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'administrative-divisons-db-2',
-        name: 'administrative-divisons-db',
-        provider: 'administrative-divisons-db',
-        description: 'Get all administrative divisions of a country',
-        category: 'Geocoding',
-        tags: ['geocoding', 'public-api', 'administrative'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.1,
-        ratingCount: 4351,
-        usageCount: 3550,
-        baseUrl: 'https://github.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://github.com/kamikazechaser/administrative-divisions-db',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'apogeoapi-2',
-        name: 'ApogeoAPI',
-        provider: 'ApogeoAPI',
-        description: 'Bundled API for countries, states, cities, IP geolocation, and live exchange rates',
-        category: 'Geocoding',
-        tags: ['geocoding', 'public-api', 'apogeoapi'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.9,
-        ratingCount: 6169,
-        usageCount: 33238,
-        baseUrl: 'https://apogeoapi.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://apogeoapi.com',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'apiip-2',
-        name: 'Apiip',
-        provider: 'Apiip',
-        description: 'Get location information by IP address',
-        category: 'Geocoding',
-        tags: ['geocoding', 'public-api', 'apiip'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.7,
-        ratingCount: 5067,
-        usageCount: 80366,
-        baseUrl: 'https://apiip.net',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://apiip.net/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'bng2latlong-2',
-        name: 'bng2latlong',
-        provider: 'bng2latlong',
-        description: 'Convert British OSGB36 easting and northing (British National Grid) to WGS84 latitude and longitude',
-        category: 'Geocoding',
-        tags: ['geocoding', 'public-api', 'bng2latlong'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.4,
-        ratingCount: 1864,
-        usageCount: 7623,
-        baseUrl: 'https://www.getthedata.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://www.getthedata.com/bng2latlong',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'country-2',
-        name: 'Country',
-        provider: 'Country',
-        description: 'Get your visitor\'s country from their IP',
-        category: 'Geocoding',
-        tags: ['geocoding', 'public-api', 'country'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4,
-        ratingCount: 8630,
-        usageCount: 12732,
-        baseUrl: 'https://country.is',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'http://country.is/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'countrystatecity-2',
-        name: 'CountryStateCity',
-        provider: 'CountryStateCity',
-        description: 'World countries, states, regions, provinces, cities & towns in JSON, SQL, XML, YAML, & CSV format',
-        category: 'Geocoding',
-        tags: ['geocoding', 'public-api', 'countrystatecity'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.6,
-        ratingCount: 866,
-        usageCount: 93338,
-        baseUrl: 'https://countrystatecity.in',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://countrystatecity.in/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'geoapify-2',
-        name: 'Geoapify',
-        provider: 'Geoapify',
-        description: 'Forward and reverse geocoding, address autocomplete',
-        category: 'Geocoding',
-        tags: ['geocoding', 'public-api', 'geoapify'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4,
-        ratingCount: 9260,
-        usageCount: 22965,
-        baseUrl: 'https://www.geoapify.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://www.geoapify.com/api/geocoding-api/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'geocodify-com-2',
-        name: 'Geocodify.com',
-        provider: 'Geocodify.com',
-        description: 'Worldwide geocoding, geoparsing and autocomplete for addresses',
-        category: 'Geocoding',
-        tags: ['geocoding', 'public-api', 'geocodify'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.5,
-        ratingCount: 2125,
-        usageCount: 49517,
-        baseUrl: 'https://geocodify.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://geocodify.com/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'geographql-2',
-        name: 'GeographQL',
-        provider: 'GeographQL',
-        description: 'A Country, State, and City GraphQL API',
-        category: 'Geocoding',
-        tags: ['geocoding', 'public-api', 'geographql'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.2,
-        ratingCount: 9472,
-        usageCount: 16138,
-        baseUrl: 'https://geographql.netlify.app',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://geographql.netlify.app',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'geojs-2',
-        name: 'GeoJS',
-        provider: 'GeoJS',
-        description: 'IP geolocation with ChatOps integration',
-        category: 'Geocoding',
-        tags: ['geocoding', 'public-api', 'geojs'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4,
-        ratingCount: 9130,
-        usageCount: 61518,
-        baseUrl: 'https://www.geojs.io',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://www.geojs.io/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'geokeo-2',
-        name: 'Geokeo',
-        provider: 'Geokeo',
-        description: 'Geokeo geocoding service- with 2500 free api requests daily',
-        category: 'Geocoding',
-        tags: ['geocoding', 'public-api', 'geokeo'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.6,
-        ratingCount: 1736,
-        usageCount: 71033,
-        baseUrl: 'https://geokeo.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://geokeo.com',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'geoplugin-2',
-        name: 'geoPlugin',
-        provider: 'geoPlugin',
-        description: 'IP geolocation and currency conversion',
-        category: 'Geocoding',
-        tags: ['geocoding', 'public-api', 'geoplugin'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.2,
-        ratingCount: 822,
-        usageCount: 75046,
-        baseUrl: 'https://www.geoplugin.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://www.geoplugin.com',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'hackmyip-2',
-        name: 'HackMyIP',
-        provider: 'HackMyIP',
-        description: 'IP geolocation, ISP and privacy/VPN scoring, email breach checks, DNS and WHOIS lookups',
-        category: 'Geocoding',
-        tags: ['geocoding', 'public-api', 'hackmyip'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.4,
-        ratingCount: 6644,
-        usageCount: 48163,
-        baseUrl: 'https://hackmyip.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://hackmyip.com/api',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'ip-api-io-2',
-        name: 'IP-API.io',
-        provider: 'IP-API.io',
-        description: 'IP geolocation with VPN/proxy/Tor detection, reputation and risk score',
-        category: 'Geocoding',
-        tags: ['geocoding', 'public-api', 'ip'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.9,
-        ratingCount: 5789,
-        usageCount: 49327,
-        baseUrl: 'https://ip-api.io',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://ip-api.io',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'ip-geolocation-2',
-        name: 'IP Geolocation',
-        provider: 'IP Geolocation',
-        description: 'Geolocate website visitors from their IPs',
-        category: 'Geocoding',
-        tags: ['geocoding', 'public-api', 'ip'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.4,
-        ratingCount: 4924,
-        usageCount: 44489,
-        baseUrl: 'https://www.abstractapi.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://www.abstractapi.com/ip-geolocation-api',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'ip2geo-dev-2',
-        name: 'ip2geo.dev',
-        provider: 'ip2geo.dev',
-        description: 'Programmatically convert IP addresses into geolocation data',
-        category: 'Geocoding',
-        tags: ['geocoding', 'public-api', 'ip2geo'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.4,
-        ratingCount: 6974,
-        usageCount: 91639,
-        baseUrl: 'https://ip2geo.dev',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://ip2geo.dev',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'ipapi-co-2',
-        name: 'ipapi.co',
-        provider: 'ipapi.co',
-        description: 'Find IP address location information',
-        category: 'Geocoding',
-        tags: ['geocoding', 'public-api', 'ipapi'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4,
-        ratingCount: 3250,
-        usageCount: 39250,
-        baseUrl: 'https://ipapi.co',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://ipapi.co/api/#introduction',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'ipgeolocation-2',
-        name: 'ipgeolocation',
-        provider: 'ipgeolocation',
-        description: 'IP Geolocation AP with free plan 30k requests per month',
-        category: 'Geocoding',
-        tags: ['geocoding', 'public-api', 'ipgeolocation'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.9,
-        ratingCount: 5969,
-        usageCount: 16067,
-        baseUrl: 'https://ipgeolocation.io',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://ipgeolocation.io/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'kiprio-uk-postcode-2',
-        name: 'Kiprio UK Postcode',
-        provider: 'Kiprio UK Postcode',
-        description: 'UK postcode lookup with lat/lon, district, ward, constituency',
-        category: 'Geocoding',
-        tags: ['geocoding', 'public-api', 'kiprio'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.1,
-        ratingCount: 2341,
-        usageCount: 2691,
-        baseUrl: 'https://kiprio.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://kiprio.com/v1/postcode',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'latlng-2',
-        name: 'LatLng',
-        provider: 'LatLng',
-        description: 'Geocoding, reverse geocoding, places, and static maps',
-        category: 'Geocoding',
-        tags: ['geocoding', 'public-api', 'latlng'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.2,
-        ratingCount: 9362,
-        usageCount: 67980,
-        baseUrl: 'https://www.latlng.work',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://www.latlng.work/docs',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'locationiq-2',
-        name: 'LocationIQ',
-        provider: 'LocationIQ',
-        description: 'Provides forward/reverse geocoding and batch geocoding',
-        category: 'Geocoding',
-        tags: ['geocoding', 'public-api', 'locationiq'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.9,
-        ratingCount: 7169,
-        usageCount: 16238,
-        baseUrl: 'https://locationiq.org',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://locationiq.org/docs/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'longdo-map-2',
-        name: 'Longdo Map',
-        provider: 'Longdo Map',
-        description: 'Interactive map with detailed places and information portal in Thailand',
-        category: 'Geocoding',
-        tags: ['geocoding', 'public-api', 'longdo'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.4,
-        ratingCount: 8974,
-        usageCount: 11782,
-        baseUrl: 'https://map.longdo.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://map.longdo.com/docs/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'nominatim-2',
-        name: 'Nominatim',
-        provider: 'Nominatim',
-        description: 'Provides worldwide forward / reverse geocoding',
-        category: 'Geocoding',
-        tags: ['geocoding', 'public-api', 'nominatim'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.8,
-        ratingCount: 5758,
-        usageCount: 26036,
-        baseUrl: 'https://nominatim.org',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://nominatim.org/release-docs/latest/api/Overview/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'opencage-2',
-        name: 'OpenCage',
-        provider: 'OpenCage',
-        description: 'Forward and reverse geocoding using open data',
-        category: 'Geocoding',
-        tags: ['geocoding', 'public-api', 'opencage'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4,
-        ratingCount: 1150,
-        usageCount: 19664,
-        baseUrl: 'https://opencagedata.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://opencagedata.com',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'pinball-map-2',
-        name: 'Pinball Map',
-        provider: 'Pinball Map',
-        description: 'A crowdsourced map of public pinball machines',
-        category: 'Geocoding',
-        tags: ['geocoding', 'public-api', 'pinball'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.1,
-        ratingCount: 3361,
-        usageCount: 37123,
-        baseUrl: 'https://pinballmap.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://pinballmap.com/api/v1/docs',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'postali-2',
-        name: 'Postali',
-        provider: 'Postali',
-        description: 'Mexico Zip Codes API',
-        category: 'Geocoding',
-        tags: ['geocoding', 'public-api', 'postali'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.6,
-        ratingCount: 5026,
-        usageCount: 49075,
-        baseUrl: 'https://postali.app',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://postali.app/api',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'postcodes-io-2',
-        name: 'Postcodes.io',
-        provider: 'Postcodes.io',
-        description: 'Postcode lookup & Geolocation for the UK',
-        category: 'Geocoding',
-        tags: ['geocoding', 'public-api', 'postcodes'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.9,
-        ratingCount: 2709,
-        usageCount: 73458,
-        baseUrl: 'https://postcodes.io',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://postcodes.io',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'rest-countries-2',
-        name: 'REST Countries',
-        provider: 'REST Countries',
-        description: 'Get information about countries via a RESTful API',
-        category: 'Geocoding',
-        tags: ['geocoding', 'public-api', 'rest'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.3,
-        ratingCount: 5093,
-        usageCount: 29513,
-        baseUrl: 'https://restcountries.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://restcountries.com',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'slf-2',
-        name: 'SLF',
-        provider: 'SLF',
-        description: 'German city, country, river, database',
-        category: 'Geocoding',
-        tags: ['geocoding', 'public-api', 'slf'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.3,
-        ratingCount: 2703,
-        usageCount: 37886,
-        baseUrl: 'https://github.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://github.com/slftool/slftool.github.io/blob/master/API.md',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'telize-2',
-        name: 'Telize',
-        provider: 'Telize',
-        description: 'Telize offers location information from any IP address',
-        category: 'Geocoding',
-        tags: ['geocoding', 'public-api', 'telize'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.3,
-        ratingCount: 1153,
-        usageCount: 40664,
-        baseUrl: 'https://rapidapi.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://rapidapi.com/fcambus/api/telize/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'tomtom-2',
-        name: 'TomTom',
-        provider: 'TomTom',
-        description: 'Maps, Directions, Places and Traffic APIs',
-        category: 'Geocoding',
-        tags: ['geocoding', 'public-api', 'tomtom'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.6,
-        ratingCount: 2686,
-        usageCount: 17312,
-        baseUrl: 'https://developer.tomtom.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://developer.tomtom.com/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'us-zipcode-2',
-        name: 'US ZipCode',
-        provider: 'US ZipCode',
-        description: 'Validate and append data for any US ZipCode',
-        category: 'Geocoding',
-        tags: ['geocoding', 'public-api', 'us'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.3,
-        ratingCount: 583,
-        usageCount: 43869,
-        baseUrl: 'https://www.smarty.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://www.smarty.com/docs/cloud/us-zipcode-api',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'brazil-2',
-        name: 'Brazil',
-        provider: 'Brazil',
-        description: 'Community driven API for Brazil Public Data',
-        category: 'Government',
-        tags: ['government', 'public-api', 'brazil'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4,
-        ratingCount: 3000,
-        usageCount: 8214,
-        baseUrl: 'https://brasilapi.com.br',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://brasilapi.com.br/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'cpfhub-2',
-        name: 'CPFHub',
-        provider: 'CPFHub',
-        description: 'Brazilian CPF lookup — returns full name, birth date, and gender for any CPF',
-        category: 'Government',
-        tags: ['government', 'public-api', 'cpfhub'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.8,
-        ratingCount: 1488,
-        usageCount: 5569,
-        baseUrl: 'https://cpfhub.io',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://cpfhub.io',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'city-toronto-open-data-2',
-        name: 'City, Toronto Open Data',
-        provider: 'City, Toronto Open Data',
-        description: 'Toronto (CA) City Open Data',
-        category: 'Government',
-        tags: ['government', 'public-api', 'city'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.9,
-        ratingCount: 789,
-        usageCount: 79327,
-        baseUrl: 'https://open.toronto.ca',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://open.toronto.ca/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'ecourtsindia-2',
-        name: 'eCourtsIndia',
-        provider: 'eCourtsIndia',
-        description: 'Indian court case status, judgments, and hearing schedule API',
-        category: 'Government',
-        tags: ['government', 'public-api', 'ecourtsindia'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4,
-        ratingCount: 900,
-        usageCount: 4914,
-        baseUrl: 'https://ecourtsindia.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://ecourtsindia.com/api',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'fastdol-2',
-        name: 'FastDOL',
-        provider: 'FastDOL',
-        description: 'Federal enforcement records for US employers: OSHA, WHD, MSHA, EPA, NLRB, and more',
-        category: 'Government',
-        tags: ['government', 'public-api', 'fastdol'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.7,
-        ratingCount: 5777,
-        usageCount: 31896,
-        baseUrl: 'https://www.fastdol.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://www.fastdol.com/docs',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'indian-pincode-2',
-        name: 'Indian Pincode',
-        provider: 'Indian Pincode',
-        description: 'Free India PIN code lookup with GPS coordinates, 165k+ post offices, state & district data',
-        category: 'Government',
-        tags: ['government', 'public-api', 'indian'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.2,
-        ratingCount: 2702,
-        usageCount: 4743,
-        baseUrl: 'https://indianpincode.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://indianpincode.com/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'localgov-jp-2',
-        name: 'LocalGov.jp',
-        provider: 'LocalGov.jp',
-        description: 'Japan grants and subsidies (central J-Grants + 1,916 municipalities)',
-        category: 'Government',
-        tags: ['government', 'public-api', 'localgov'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.6,
-        ratingCount: 5426,
-        usageCount: 13132,
-        baseUrl: 'https://localgov.jp',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://localgov.jp/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'national-park-service-us-2',
-        name: 'National Park Service, US',
-        provider: 'National Park Service, US',
-        description: 'Data from the US National Park Service',
-        category: 'Government',
-        tags: ['government', 'public-api', 'national'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.4,
-        ratingCount: 8544,
-        usageCount: 25149,
-        baseUrl: 'https://www.nps.gov',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://www.nps.gov/subjects/developer/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'open-government-norway-2',
-        name: 'Open Government, Norway',
-        provider: 'Open Government, Norway',
-        description: 'Norwegian Government Open Data',
-        category: 'Government',
-        tags: ['government', 'public-api', 'open'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.7,
-        ratingCount: 5027,
-        usageCount: 24361,
-        baseUrl: 'https://data.norge.no',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://data.norge.no/dataservices',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'open-government-poland-2',
-        name: 'Open Government, Poland',
-        provider: 'Open Government, Poland',
-        description: 'Poland Government Open Data',
-        category: 'Government',
-        tags: ['government', 'public-api', 'open'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.7,
-        ratingCount: 5797,
-        usageCount: 57185,
-        baseUrl: 'https://dane.gov.pl',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://dane.gov.pl/en',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'open-government-portugal-2',
-        name: 'Open Government, Portugal',
-        provider: 'Open Government, Portugal',
-        description: 'Portugal Government Open Data',
-        category: 'Government',
-        tags: ['government', 'public-api', 'open'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.7,
-        ratingCount: 4677,
-        usageCount: 93882,
-        baseUrl: 'https://dados.gov.pt',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://dados.gov.pt/en/docapi/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'openmercantil-2',
-        name: 'OpenMercantil',
-        provider: 'OpenMercantil',
-        description: 'Spanish company public data and BORME event timelines',
-        category: 'Government',
-        tags: ['government', 'public-api', 'openmercantil'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.5,
-        ratingCount: 7985,
-        usageCount: 46069,
-        baseUrl: 'https://openmercantil.es',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://openmercantil.es/api/documentacion',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'prc-exam-schedule-2',
-        name: 'PRC Exam Schedule',
-        provider: 'PRC Exam Schedule',
-        description: 'Unofficial Philippine Professional Regulation Commission\'s examination schedule',
-        category: 'Government',
-        tags: ['government', 'public-api', 'prc'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.5,
-        ratingCount: 3565,
-        usageCount: 13152,
-        baseUrl: 'https://api.whenisthenextboardexam.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://api.whenisthenextboardexam.com/docs/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'us-federal-contracts-grants-2',
-        name: 'US Federal Contracts & Grants',
-        provider: 'US Federal Contracts & Grants',
-        description: 'US federal contracts, grants, and agency spending data updated daily',
-        category: 'Government',
-        tags: ['government', 'public-api', 'us'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.2,
-        ratingCount: 7162,
-        usageCount: 30951,
-        baseUrl: 'https://government-data-api.onrender.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://government-data-api.onrender.com/docs',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'clinical-trials-directory-2',
-        name: 'Clinical Trials Directory',
-        provider: 'Clinical Trials Directory',
-        description: 'Every clinical trial registered with ClinicalTrials.gov, indexed by condition and sponsor',
-        category: 'Health',
-        tags: ['health', 'public-api', 'clinical'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.9,
-        ratingCount: 5779,
-        usageCount: 32039,
-        baseUrl: 'https://trials.starfile.org',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://trials.starfile.org/api',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'covid-19-3',
-        name: 'Covid-19',
-        provider: 'Covid-19',
-        description: 'Covid 19 spread, infection and recovery',
-        category: 'Health',
-        tags: ['health', 'public-api', 'covid'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.7,
-        ratingCount: 2897,
-        usageCount: 95056,
-        baseUrl: 'https://covid19api.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://covid19api.com/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'covid-19-4',
-        name: 'Covid-19',
-        provider: 'Covid-19',
-        description: 'Covid 19 cases, deaths and recovery per country',
-        category: 'Health',
-        tags: ['health', 'public-api', 'covid'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.2,
-        ratingCount: 3802,
-        usageCount: 81043,
-        baseUrl: 'https://github.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://github.com/M-Media-Group/Covid-19-API',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'covid-19-government-response-2',
-        name: 'Covid-19 Government Response',
-        provider: 'Covid-19 Government Response',
-        description: 'Government measures tracker to fight against the Covid-19 pandemic',
-        category: 'Health',
-        tags: ['health', 'public-api', 'covid'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4,
-        ratingCount: 1620,
-        usageCount: 27874,
-        baseUrl: 'https://covidtracker.bsg.ox.ac.uk',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://covidtracker.bsg.ox.ac.uk',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'covid-19-jhu-csse-2',
-        name: 'Covid-19 JHU CSSE',
-        provider: 'Covid-19 JHU CSSE',
-        description: 'Open-source API for exploring Covid19 cases based on JHU CSSE',
-        category: 'Health',
-        tags: ['health', 'public-api', 'covid'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.7,
-        ratingCount: 4837,
-        usageCount: 86905,
-        baseUrl: 'https://nuttaphat.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://nuttaphat.com/covid19-api/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'covid-19-live-data-2',
-        name: 'Covid-19 Live Data',
-        provider: 'Covid-19 Live Data',
-        description: 'Global and countrywise data of Covid 19 daily Summary, confirmed cases, recovered and deaths',
-        category: 'Health',
-        tags: ['health', 'public-api', 'covid'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.2,
-        ratingCount: 4552,
-        usageCount: 61293,
-        baseUrl: 'https://github.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://github.com/mathdroid/covid-19-api',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'covid-19-philippines-2',
-        name: 'Covid-19 Philippines',
-        provider: 'Covid-19 Philippines',
-        description: 'Unofficial Covid-19 Web API for Philippines from data collected by DOH',
-        category: 'Health',
-        tags: ['health', 'public-api', 'covid'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.4,
-        ratingCount: 2954,
-        usageCount: 41207,
-        baseUrl: 'https://github.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://github.com/Simperfy/Covid-19-API-Philippines-DOH',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'covid-id-2',
-        name: 'COVID-ID',
-        provider: 'COVID-ID',
-        description: 'Indonesian government Covid data per province',
-        category: 'Health',
-        tags: ['health', 'public-api', 'covid'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.7,
-        ratingCount: 6087,
-        usageCount: 40941,
-        baseUrl: 'https://data.covid19.go.id',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://data.covid19.go.id/public/api/prov.json',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'infermedica-2',
-        name: 'Infermedica',
-        provider: 'Infermedica',
-        description: 'NLP based symptom checker and patient triage API for health diagnosis from text',
-        category: 'Health',
-        tags: ['health', 'public-api', 'infermedica'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.7,
-        ratingCount: 1317,
-        usageCount: 52831,
-        baseUrl: 'https://developer.infermedica.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://developer.infermedica.com/docs/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'lapis-2',
-        name: 'LAPIS',
-        provider: 'LAPIS',
-        description: 'SARS-CoV-2 genomic sequences from public sources',
-        category: 'Health',
-        tags: ['health', 'public-api', 'lapis'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.9,
-        ratingCount: 6789,
-        usageCount: 50755,
-        baseUrl: 'https://cov-spectrum.ethz.ch',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://cov-spectrum.ethz.ch/public',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'longevity-world-cup-2',
-        name: 'Longevity World Cup',
-        provider: 'Longevity World Cup',
-        description: 'Public biological age competition data with biomarkers and rankings',
-        category: 'Health',
-        tags: ['health', 'public-api', 'longevity'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.7,
-        ratingCount: 3457,
-        usageCount: 73279,
-        baseUrl: 'https://longevityworldcup.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://longevityworldcup.com/api/data/athletes',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'open-disease-2',
-        name: 'Open Disease',
-        provider: 'Open Disease',
-        description: 'API for Current cases and more stuff about COVID-19 and Influenza',
-        category: 'Health',
-        tags: ['health', 'public-api', 'open'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.1,
-        ratingCount: 7121,
-        usageCount: 43660,
-        baseUrl: 'https://disease.sh',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://disease.sh/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'quarantine-2',
-        name: 'Quarantine',
-        provider: 'Quarantine',
-        description: 'Coronavirus API with free COVID-19 live updates',
-        category: 'Health',
-        tags: ['health', 'public-api', 'quarantine'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4,
-        ratingCount: 1410,
-        usageCount: 8558,
-        baseUrl: 'https://quarantine.country',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://quarantine.country/coronavirus/api/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'ai-dev-jobs-2',
-        name: 'AI Dev Jobs',
-        provider: 'AI Dev Jobs',
-        description: 'AI/ML engineering job aggregator with REST, RSS, and MCP endpoints',
-        category: 'Jobs',
-        tags: ['jobs', 'public-api', 'ai'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.9,
-        ratingCount: 3709,
-        usageCount: 39315,
-        baseUrl: 'https://aidevboard.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://aidevboard.com/openapi.yaml',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'arbeitnow-2',
-        name: 'Arbeitnow',
-        provider: 'Arbeitnow',
-        description: 'API for Job board aggregator in Europe / Remote',
-        category: 'Jobs',
-        tags: ['jobs', 'public-api', 'arbeitnow'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.7,
-        ratingCount: 2617,
-        usageCount: 33445,
-        baseUrl: 'https://documenter.getpostman.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://documenter.getpostman.com/view/18545278/UVJbJdKh',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'devitjobs-uk-2',
-        name: 'DevITjobs UK',
-        provider: 'DevITjobs UK',
-        description: 'Jobs with GraphQL',
-        category: 'Jobs',
-        tags: ['jobs', 'public-api', 'devitjobs'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.1,
-        ratingCount: 8651,
-        usageCount: 92735,
-        baseUrl: 'https://devitjobs.uk',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://devitjobs.uk/job_feed.xml',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'graphql-jobs-2',
-        name: 'GraphQL Jobs',
-        provider: 'GraphQL Jobs',
-        description: 'Jobs with GraphQL',
-        category: 'Jobs',
-        tags: ['jobs', 'public-api', 'graphql'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.2,
-        ratingCount: 1402,
-        usageCount: 30557,
-        baseUrl: 'https://graphql.jobs',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://graphql.jobs/docs/api/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'herohunt-people-search-2',
-        name: 'HeroHunt People Search',
-        provider: 'HeroHunt People Search',
-        description: 'Search 1 billion people profiles across LinkedIn and GitHub for talent sourcing',
-        category: 'Jobs',
-        tags: ['jobs', 'public-api', 'herohunt'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.8,
-        ratingCount: 8428,
-        usageCount: 78846,
-        baseUrl: 'https://www.herohunt.ai',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://www.herohunt.ai/people-search-api',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'jobdatalake-2',
-        name: 'JobDataLake',
-        provider: 'JobDataLake',
-        description: '1M+ enriched job listings from 20,000+ companies with salary, skills, seniority',
-        category: 'Jobs',
-        tags: ['jobs', 'public-api', 'jobdatalake'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4,
-        ratingCount: 8200,
-        usageCount: 82671,
-        baseUrl: 'https://www.jobdatalake.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://www.jobdatalake.com/docs',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'ai-for-thai-2',
-        name: 'AI For Thai',
-        provider: 'AI For Thai',
-        description: 'Free Various Thai AI API',
-        category: 'Machine Learning',
-        tags: ['machine-learning', 'public-api', 'ai'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.5,
-        ratingCount: 2935,
-        usageCount: 47633,
-        baseUrl: 'https://aiforthai.in.th',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://aiforthai.in.th/index.php',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'cloudmersive-2',
-        name: 'Cloudmersive',
-        provider: 'Cloudmersive',
-        description: 'Image captioning, face recognition, NSFW classification',
-        category: 'Machine Learning',
-        tags: ['machine-learning', 'public-api', 'cloudmersive'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.4,
-        ratingCount: 1904,
-        usageCount: 59914,
-        baseUrl: 'https://www.cloudmersive.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://www.cloudmersive.com/image-recognition-and-processing-api',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'deepai-2',
-        name: 'DeepAI',
-        provider: 'DeepAI',
-        description: 'Provides AI-powered APIs for text generation, image processing, and more',
-        category: 'Machine Learning',
-        tags: ['machine-learning', 'public-api', 'deepai'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4,
-        ratingCount: 8070,
-        usageCount: 41938,
-        baseUrl: 'https://deepai.org',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://deepai.org/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'exude-api-2',
-        name: 'EXUDE-API',
-        provider: 'EXUDE-API',
-        description: 'Used for the primary ways for filtering the stopping, stemming words from the text data',
-        category: 'Machine Learning',
-        tags: ['machine-learning', 'public-api', 'exude'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.8,
-        ratingCount: 7658,
-        usageCount: 24451,
-        baseUrl: 'https://uttesh.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'http://uttesh.com/exude-api/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'groq-2',
-        name: 'Groq',
-        provider: 'Groq',
-        description: 'Fast AI inference API with free tier, supports Llama, Mixtral, Gemma models',
-        category: 'Machine Learning',
-        tags: ['machine-learning', 'public-api', 'groq'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.3,
-        ratingCount: 2173,
-        usageCount: 47096,
-        baseUrl: 'https://console.groq.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://console.groq.com/docs/quickstart',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'hugging-face-2',
-        name: 'Hugging Face',
-        provider: 'Hugging Face',
-        description: 'AI model hub with inference API for NLP, computer vision, and audio',
-        category: 'Machine Learning',
-        tags: ['machine-learning', 'public-api', 'hugging'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.5,
-        ratingCount: 1815,
-        usageCount: 45330,
-        baseUrl: 'https://huggingface.co',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://huggingface.co',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'irisnet-2',
-        name: 'Irisnet',
-        provider: 'Irisnet',
-        description: 'Realtime content moderation API that blocks or blurs unwanted images in real-time',
-        category: 'Machine Learning',
-        tags: ['machine-learning', 'public-api', 'irisnet'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.8,
-        ratingCount: 8778,
-        usageCount: 32896,
-        baseUrl: 'https://irisnet.de',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://irisnet.de/api/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'jina-ai-2',
-        name: 'Jina AI',
-        provider: 'Jina AI',
-        description: 'Free AI API for embeddings, reranking, and text processing',
-        category: 'Machine Learning',
-        tags: ['machine-learning', 'public-api', 'jina'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.3,
-        ratingCount: 8883,
-        usageCount: 21054,
-        baseUrl: 'https://jina.ai',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://jina.ai',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'machinetutors-2',
-        name: 'Machinetutors',
-        provider: 'Machinetutors',
-        description: 'AI Solutions: Video/Image Classification & Tagging, NSFW, Icon/Image/Audio Search, NLP',
-        category: 'Machine Learning',
-        tags: ['machine-learning', 'public-api', 'machinetutors'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.2,
-        ratingCount: 3352,
-        usageCount: 33978,
-        baseUrl: 'https://www.machinetutors.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://www.machinetutors.com/portfolio/MT_api.html',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'mediacraft-ai-2',
-        name: 'MediaCraft AI',
-        provider: 'MediaCraft AI',
-        description: 'Chinese content compliance review (17 platforms), EN↔CN translation, and SEO optimization. Pay-per-call via x402 (Solana USDC).',
-        category: 'Machine Learning',
-        tags: ['machine-learning', 'public-api', 'mediacraft'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.7,
-        ratingCount: 2687,
-        usageCount: 14455,
-        baseUrl: 'https://mediacraft-x402-api.onrender.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://mediacraft-x402-api.onrender.com',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'messengerx-io-2',
-        name: 'MessengerX.io',
-        provider: 'MessengerX.io',
-        description: 'A FREE API for developers to build and monetize personalized ML based chat apps',
-        category: 'Machine Learning',
-        tags: ['machine-learning', 'public-api', 'messengerx'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.8,
-        ratingCount: 5748,
-        usageCount: 44892,
-        baseUrl: 'https://messengerx.rtfd.io',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://messengerx.rtfd.io',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'not-human-search-2',
-        name: 'Not Human Search',
-        provider: 'Not Human Search',
-        description: 'AI tool discovery with agentic scoring for 8,600+ tools and MCP servers',
-        category: 'Machine Learning',
-        tags: ['machine-learning', 'public-api', 'not'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.2,
-        ratingCount: 8822,
-        usageCount: 28617,
-        baseUrl: 'https://nothumansearch.ai',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://nothumansearch.ai/openapi.yaml',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'openvisionapi-2',
-        name: 'OpenVisionAPI',
-        provider: 'OpenVisionAPI',
-        description: 'Open source computer vision API based on open source models',
-        category: 'Machine Learning',
-        tags: ['machine-learning', 'public-api', 'openvisionapi'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4,
-        ratingCount: 8400,
-        usageCount: 15271,
-        baseUrl: 'https://openvisionapi.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://openvisionapi.com',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'roboflow-universe-2',
-        name: 'Roboflow Universe',
-        provider: 'Roboflow Universe',
-        description: 'Pre-trained computer vision models',
-        category: 'Machine Learning',
-        tags: ['machine-learning', 'public-api', 'roboflow'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.4,
-        ratingCount: 6824,
-        usageCount: 84189,
-        baseUrl: 'https://universe.roboflow.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://universe.roboflow.com',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'tensorfeed-2',
-        name: 'TensorFeed',
-        provider: 'TensorFeed',
-        description: 'Real-time AI news, model pricing, service status, and agent activity feeds',
-        category: 'Machine Learning',
-        tags: ['machine-learning', 'public-api', 'tensorfeed'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.3,
-        ratingCount: 8163,
-        usageCount: 61094,
-        baseUrl: 'https://tensorfeed.ai',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://tensorfeed.ai/developers',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'time-door-2',
-        name: 'Time Door',
-        provider: 'Time Door',
-        description: 'A time series analysis API',
-        category: 'Machine Learning',
-        tags: ['machine-learning', 'public-api', 'time'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.4,
-        ratingCount: 1284,
-        usageCount: 61112,
-        baseUrl: 'https://timedoor.io',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://timedoor.io',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'ai-mastering-2',
-        name: 'AI Mastering',
-        provider: 'AI Mastering',
-        description: 'Automated Music Mastering',
-        category: 'Music',
-        tags: ['music', 'public-api', 'ai'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.9,
-        ratingCount: 8959,
-        usageCount: 57922,
-        baseUrl: 'https://aimastering.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://aimastering.com/api_docs/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'mixcloud-2',
-        name: 'Mixcloud',
-        provider: 'Mixcloud',
-        description: 'Music',
-        category: 'Music',
-        tags: ['music', 'public-api', 'mixcloud'],
-        authType: 'OAuth 2.0',
-        pricing: 'Free',
-        ratingAverage: 4.9,
-        ratingCount: 3209,
-        usageCount: 54387,
-        baseUrl: 'https://www.mixcloud.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://www.mixcloud.com/developers/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'napster-2',
-        name: 'Napster',
-        provider: 'Napster',
-        description: 'Music',
-        category: 'Music',
-        tags: ['music', 'public-api', 'napster'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.9,
-        ratingCount: 5849,
-        usageCount: 47478,
-        baseUrl: 'https://developer.napster.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://developer.napster.com/api/v2.2',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'radio-browser-2',
-        name: 'Radio Browser',
-        provider: 'Radio Browser',
-        description: 'List of internet radio stations',
-        category: 'Music',
-        tags: ['music', 'public-api', 'radio'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4,
-        ratingCount: 1350,
-        usageCount: 43692,
-        baseUrl: 'https://api.radio-browser.info',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://api.radio-browser.info/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'songlink-odesli-2',
-        name: 'Songlink / Odesli',
-        provider: 'Songlink / Odesli',
-        description: 'Get all the services on which a song is available',
-        category: 'Music',
-        tags: ['music', 'public-api', 'songlink'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.8,
-        ratingCount: 2188,
-        usageCount: 68669,
-        baseUrl: 'https://www.notion.so',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://www.notion.so/API-d0ebe08a5e304a55928405eb682f6741',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'currents-2',
-        name: 'Currents',
-        provider: 'Currents',
-        description: 'Real-time and historical global news with multilingual support',
-        category: 'News',
-        tags: ['news', 'public-api', 'currents'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.8,
-        ratingCount: 9068,
-        usageCount: 44938,
-        baseUrl: 'https://currentsapi.services',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://currentsapi.services/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'florida-man-2',
-        name: 'Florida Man',
-        provider: 'Florida Man',
-        description: 'Static JSON dataset of 10,000+ Florida Man headlines by date',
-        category: 'News',
-        tags: ['news', 'public-api', 'florida'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.2,
-        ratingCount: 5812,
-        usageCount: 46044,
-        baseUrl: 'https://github.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://github.com/juliayxhuang/florida-man-api#readme',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'gnews-2',
-        name: 'GNews',
-        provider: 'GNews',
-        description: 'Search for news from various sources',
-        category: 'News',
-        tags: ['news', 'public-api', 'gnews'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.4,
-        ratingCount: 1994,
-        usageCount: 21499,
-        baseUrl: 'https://gnews.io',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://gnews.io/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'graphs-for-coronavirus-2',
-        name: 'Graphs for Coronavirus',
-        provider: 'Graphs for Coronavirus',
-        description: 'Each Country separately and Worldwide Graphs for Coronavirus. Daily updates',
-        category: 'News',
-        tags: ['news', 'public-api', 'graphs'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.1,
-        ratingCount: 4821,
-        usageCount: 85760,
-        baseUrl: 'https://corona.dnsforfamily.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://corona.dnsforfamily.com/api.txt',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'marketaux-2',
-        name: 'MarketAux',
-        provider: 'MarketAux',
-        description: 'Live stock market news with tagged tickers + sentiment and stats JSON API',
-        category: 'News',
-        tags: ['news', 'public-api', 'marketaux'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.8,
-        ratingCount: 7238,
-        usageCount: 79391,
-        baseUrl: 'https://www.marketaux.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://www.marketaux.com/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'noozra-2',
-        name: 'Noozra',
-        provider: 'Noozra',
-        description: 'Free news headlines from 200+ curated RSS sources',
-        category: 'News',
-        tags: ['news', 'public-api', 'noozra'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.9,
-        ratingCount: 519,
-        usageCount: 64002,
-        baseUrl: 'https://noozra.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://noozra.com/api',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'spaceflight-news-2',
-        name: 'Spaceflight News',
-        provider: 'Spaceflight News',
-        description: 'Spaceflight related news 🚀',
-        category: 'News',
-        tags: ['news', 'public-api', 'spaceflight'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.2,
-        ratingCount: 4862,
-        usageCount: 74623,
-        baseUrl: 'https://spaceflightnewsapi.net',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://spaceflightnewsapi.net',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'thenews-2',
-        name: 'TheNews',
-        provider: 'TheNews',
-        description: 'Aggregated headlines, top story and live news JSON API',
-        category: 'News',
-        tags: ['news', 'public-api', 'thenews'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4,
-        ratingCount: 9100,
-        usageCount: 27800,
-        baseUrl: 'https://www.thenewsapi.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://www.thenewsapi.com/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'api-setu-2',
-        name: 'API Setu',
-        provider: 'API Setu',
-        description: 'An Indian Government platform that provides a lot of APIS for KYC, business, education & employment',
-        category: 'Open Data',
-        tags: ['open-data', 'public-api', 'api'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.4,
-        ratingCount: 1094,
-        usageCount: 69656,
-        baseUrl: 'https://www.apisetu.gov.in',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://www.apisetu.gov.in/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'black-history-facts-2',
-        name: 'Black History Facts',
-        provider: 'Black History Facts',
-        description: 'Contribute or search one of the largest black history fact databases on the web',
-        category: 'Open Data',
-        tags: ['open-data', 'public-api', 'black'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4,
-        ratingCount: 2080,
-        usageCount: 6082,
-        baseUrl: 'https://www.blackhistoryapi.io',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://www.blackhistoryapi.io/docs',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'enigma-public-2',
-        name: 'Enigma Public',
-        provider: 'Enigma Public',
-        description: 'Broadest collection of public data',
-        category: 'Open Data',
-        tags: ['open-data', 'public-api', 'enigma'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.3,
-        ratingCount: 4733,
-        usageCount: 89319,
-        baseUrl: 'https://developers.enigma.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://developers.enigma.com/docs',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'linkpreview-2',
-        name: 'LinkPreview',
-        provider: 'LinkPreview',
-        description: 'Get JSON formatted summary with title, description and preview image for any requested URL',
-        category: 'Open Data',
-        tags: ['open-data', 'public-api', 'linkpreview'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.6,
-        ratingCount: 4796,
-        usageCount: 31185,
-        baseUrl: 'https://www.linkpreview.net',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://www.linkpreview.net',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'microlink-io-2',
-        name: 'Microlink.io',
-        provider: 'Microlink.io',
-        description: 'Extract structured data from any website',
-        category: 'Open Data',
-        tags: ['open-data', 'public-api', 'microlink'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.3,
-        ratingCount: 3213,
-        usageCount: 73244,
-        baseUrl: 'https://microlink.io',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://microlink.io',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'modelpartfinder-error-codes-2',
-        name: 'ModelPartFinder Error Codes',
-        provider: 'ModelPartFinder Error Codes',
-        description: 'Lookup appliance and equipment error codes by brand and code, with recommended replacement parts',
-        category: 'Open Data',
-        tags: ['open-data', 'public-api', 'modelpartfinder'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.8,
-        ratingCount: 4648,
-        usageCount: 57306,
-        baseUrl: 'https://modelpartfinder.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://modelpartfinder.com/docs/api',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'nobel-prize-2',
-        name: 'Nobel Prize',
-        provider: 'Nobel Prize',
-        description: 'Open data about nobel prizes and events',
-        category: 'Open Data',
-        tags: ['open-data', 'public-api', 'nobel'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.5,
-        ratingCount: 2135,
-        usageCount: 71376,
-        baseUrl: 'https://www.nobelprize.org',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://www.nobelprize.org/about/developer-zone-2/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'open-scholarships-2',
-        name: 'Open Scholarships',
-        provider: 'Open Scholarships',
-        description: 'Free, openly-licensed directory of US scholarships and student aid from official sources',
-        category: 'Open Data',
-        tags: ['open-data', 'public-api', 'open'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4,
-        ratingCount: 2490,
-        usageCount: 65855,
-        baseUrl: 'https://scholarships.grudged.io',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://scholarships.grudged.io',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'opensanctions-2',
-        name: 'OpenSanctions',
-        provider: 'OpenSanctions',
-        description: 'Data on international sanctions, crime and politically exposed persons',
-        category: 'Open Data',
-        tags: ['open-data', 'public-api', 'opensanctions'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.8,
-        ratingCount: 2598,
-        usageCount: 61014,
-        baseUrl: 'https://www.opensanctions.org',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://www.opensanctions.org/docs/api/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'socrata-2',
-        name: 'Socrata',
-        provider: 'Socrata',
-        description: 'Access to Open Data from Governments, Non-profits and NGOs around the world',
-        category: 'Open Data',
-        tags: ['open-data', 'public-api', 'socrata'],
-        authType: 'OAuth 2.0',
-        pricing: 'Free',
-        ratingAverage: 4.5,
-        ratingCount: 1775,
-        usageCount: 25182,
-        baseUrl: 'https://dev.socrata.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://dev.socrata.com/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'statistics-of-the-world-2',
-        name: 'Statistics of the World',
-        provider: 'Statistics of the World',
-        description: 'Economic data for 218 countries — GDP, population, inflation, and 440+ indicators from IMF and World Bank',
-        category: 'Open Data',
-        tags: ['open-data', 'public-api', 'statistics'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.6,
-        ratingCount: 5196,
-        usageCount: 23099,
-        baseUrl: 'https://statisticsoftheworld.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://statisticsoftheworld.com/api-docs',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'ume-open-data-2',
-        name: 'Umeå Open Data',
-        provider: 'Umeå Open Data',
-        description: 'Open data of the city Umeå in northen Sweden',
-        category: 'Open Data',
-        tags: ['open-data', 'public-api', 'ume'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.1,
-        ratingCount: 2581,
-        usageCount: 13725,
-        baseUrl: 'https://opendata.umea.se',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://opendata.umea.se/api/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'warnely-2',
-        name: 'Warnely',
-        provider: 'Warnely',
-        description: 'Composite travel-safety scores for 180 countries (FCDO + US State + GPI + WGI + live incident wire), OpenAPI 3.1 spec, CC BY 4.0',
-        category: 'Open Data',
-        tags: ['open-data', 'public-api', 'warnely'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.4,
-        ratingCount: 3284,
-        usageCount: 48254,
-        baseUrl: 'https://warnely.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://warnely.com/developers',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'creative-commons-catalog-2',
-        name: 'Creative Commons Catalog',
-        provider: 'Creative Commons Catalog',
-        description: 'Search among openly licensed and public domain works',
-        category: 'Open Source Projects',
-        tags: ['open-source-projects', 'public-api', 'creative'],
-        authType: 'OAuth 2.0',
-        pricing: 'Free',
-        ratingAverage: 4,
-        ratingCount: 3070,
-        usageCount: 71224,
-        baseUrl: 'https://api.creativecommons.engineering',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://api.creativecommons.engineering/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'evil-insult-generator-2',
-        name: 'Evil Insult Generator',
-        provider: 'Evil Insult Generator',
-        description: 'Evil Insults',
-        category: 'Open Source Projects',
-        tags: ['open-source-projects', 'public-api', 'evil'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4,
-        ratingCount: 1750,
-        usageCount: 59035,
-        baseUrl: 'https://evilinsult.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://evilinsult.com/api',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'github-contribution-chart-generator-2',
-        name: 'GitHub Contribution Chart Generator',
-        provider: 'GitHub Contribution Chart Generator',
-        description: 'Create an image of your GitHub contributions',
-        category: 'Open Source Projects',
-        tags: ['open-source-projects', 'public-api', 'github'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.3,
-        ratingCount: 8273,
-        usageCount: 24539,
-        baseUrl: 'https://github-contributions.vercel.app',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://github-contributions.vercel.app',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'github-readme-stats-2',
-        name: 'GitHub ReadMe Stats',
-        provider: 'GitHub ReadMe Stats',
-        description: 'Add dynamically generated statistics to your GitHub profile ReadMe',
-        category: 'Open Source Projects',
-        tags: ['open-source-projects', 'public-api', 'github'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.8,
-        ratingCount: 7618,
-        usageCount: 84445,
-        baseUrl: 'https://github.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://github.com/anuraghazra/github-readme-stats',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'metabase-2',
-        name: 'Metabase',
-        provider: 'Metabase',
-        description: 'An open source Business Intelligence server to share data and analytics inside your company',
-        category: 'Open Source Projects',
-        tags: ['open-source-projects', 'public-api', 'metabase'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.2,
-        ratingCount: 8422,
-        usageCount: 23417,
-        baseUrl: 'https://www.metabase.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://www.metabase.com/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'astroway-2',
-        name: 'AstroWay',
-        provider: 'AstroWay',
-        description: 'Astrology, natal charts, Human Design, Vedic and horoscopes on the Swiss Ephemeris',
-        category: 'Personality',
-        tags: ['personality', 'public-api', 'astroway'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.6,
-        ratingCount: 7676,
-        usageCount: 67168,
-        baseUrl: 'https://api.astroway.info',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://api.astroway.info/docs/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'inspiration-2',
-        name: 'Inspiration',
-        provider: 'Inspiration',
-        description: 'Motivational and Inspirational quotes',
-        category: 'Personality',
-        tags: ['personality', 'public-api', 'inspiration'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.6,
-        ratingCount: 4836,
-        usageCount: 82762,
-        baseUrl: 'https://inspiration.goprogram.ai',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://inspiration.goprogram.ai/docs/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'kanye-rest-3',
-        name: 'kanye.rest',
-        provider: 'kanye.rest',
-        description: 'REST API for random Kanye West quotes',
-        category: 'Personality',
-        tags: ['personality', 'public-api', 'kanye'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4,
-        ratingCount: 8680,
-        usageCount: 38025,
-        baseUrl: 'https://kanye.rest',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://kanye.rest',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'kimiquotes-2',
-        name: 'kimiquotes',
-        provider: 'kimiquotes',
-        description: 'Team radio and interview quotes by Finnish F1 legend Kimi Räikkönen',
-        category: 'Personality',
-        tags: ['personality', 'public-api', 'kimiquotes'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.9,
-        ratingCount: 5179,
-        usageCount: 77097,
-        baseUrl: 'https://kimiquotes.herokuapp.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://kimiquotes.herokuapp.com/doc',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'personality-fyi-2',
-        name: 'Personality.fyi',
-        provider: 'Personality.fyi',
-        description: 'Free MBTI personality types and OEJTS test scoring',
-        category: 'Personality',
-        tags: ['personality', 'public-api'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.9,
-        ratingCount: 3319,
-        usageCount: 78545,
-        baseUrl: 'https://personality.fyi',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://personality.fyi/api',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'quoteclear-2',
-        name: 'quoteclear',
-        provider: 'quoteclear',
-        description: 'Ever-growing list of James Clear quotes from the 3-2-1 Newsletter',
-        category: 'Personality',
-        tags: ['personality', 'public-api', 'quoteclear'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.7,
-        ratingCount: 6587,
-        usageCount: 66155,
-        baseUrl: 'https://quoteclear.web.app',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://quoteclear.web.app/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'zen-quotes-2',
-        name: 'Zen Quotes',
-        provider: 'Zen Quotes',
-        description: 'Large collection of Zen quotes for inspiration',
-        category: 'Personality',
-        tags: ['personality', 'public-api', 'zen'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.7,
-        ratingCount: 6857,
-        usageCount: 35336,
-        baseUrl: 'https://zenquotes.io',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://zenquotes.io/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'cloudmersive-validate-4',
-        name: 'Cloudmersive Validate',
-        provider: 'Cloudmersive Validate',
-        description: 'Validate international phone numbers',
-        category: 'Phone',
-        tags: ['phone', 'public-api', 'cloudmersive'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.7,
-        ratingCount: 1277,
-        usageCount: 58539,
-        baseUrl: 'https://cloudmersive.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://cloudmersive.com/phone-number-validation-API',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'phone-specification-2',
-        name: 'Phone Specification',
-        provider: 'Phone Specification',
-        description: 'Rest Api for Phone specifications',
-        category: 'Phone',
-        tags: ['phone', 'public-api'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.8,
-        ratingCount: 5968,
-        usageCount: 4066,
-        baseUrl: 'https://github.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://github.com/azharimm/phone-specs-api',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'phone-validation-2',
-        name: 'Phone Validation',
-        provider: 'Phone Validation',
-        description: 'Validate phone numbers globally',
-        category: 'Phone',
-        tags: ['phone', 'public-api'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.8,
-        ratingCount: 8378,
-        usageCount: 31411,
-        baseUrl: 'https://www.abstractapi.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://www.abstractapi.com/phone-validation-api',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'veriphone-2',
-        name: 'Veriphone',
-        provider: 'Veriphone',
-        description: 'Phone number validation & carrier lookup',
-        category: 'Phone',
-        tags: ['phone', 'public-api', 'veriphone'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.8,
-        ratingCount: 1948,
-        usageCount: 15206,
-        baseUrl: 'https://veriphone.io',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://veriphone.io',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'apitemplate-io-2',
-        name: 'APITemplate.io',
-        provider: 'APITemplate.io',
-        description: 'Dynamically generate images and PDFs from templates with a simple API',
-        category: 'Photography',
-        tags: ['photography', 'public-api', 'apitemplate'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.5,
-        ratingCount: 2535,
-        usageCount: 17147,
-        baseUrl: 'https://apitemplate.io',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://apitemplate.io',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'bruzu-2',
-        name: 'Bruzu',
-        provider: 'Bruzu',
-        description: 'Image generation with query string',
-        category: 'Photography',
-        tags: ['photography', 'public-api', 'bruzu'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.8,
-        ratingCount: 1978,
-        usageCount: 15496,
-        baseUrl: 'https://docs.bruzu.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://docs.bruzu.com',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'duply-2',
-        name: 'Duply',
-        provider: 'Duply',
-        description: 'Generate, Edit, Scale and Manage Images and Videos Smarter & Faster',
-        category: 'Photography',
-        tags: ['photography', 'public-api', 'duply'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.4,
-        ratingCount: 5134,
-        usageCount: 17804,
-        baseUrl: 'https://duply.co',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://duply.co/docs#getting-started-api',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'dynapictures-2',
-        name: 'DynaPictures',
-        provider: 'DynaPictures',
-        description: 'Generate Hundreds of Personalized Images in Minutes',
-        category: 'Photography',
-        tags: ['photography', 'public-api', 'dynapictures'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.1,
-        ratingCount: 4171,
-        usageCount: 17524,
-        baseUrl: 'https://dynapictures.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://dynapictures.com/docs/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'objectcut-2',
-        name: 'ObjectCut',
-        provider: 'ObjectCut',
-        description: 'Image Background removal',
-        category: 'Photography',
-        tags: ['photography', 'public-api', 'objectcut'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.7,
-        ratingCount: 7247,
-        usageCount: 43821,
-        baseUrl: 'https://objectcut.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://objectcut.com/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'pexels-2',
-        name: 'Pexels',
-        provider: 'Pexels',
-        description: 'Free Stock Photos and Videos',
-        category: 'Photography',
-        tags: ['photography', 'public-api', 'pexels'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.5,
-        ratingCount: 7605,
-        usageCount: 50443,
-        baseUrl: 'https://www.pexels.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://www.pexels.com/api/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'mintlify-2',
-        name: 'Mintlify',
-        provider: 'Mintlify',
-        description: 'For programmatically generating documentation for code',
-        category: 'Programming',
-        tags: ['programming', 'public-api', 'mintlify'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.2,
-        ratingCount: 6112,
-        usageCount: 25373,
-        baseUrl: 'https://docs.mintlify.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://docs.mintlify.com',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'gbif-2',
-        name: 'GBIF',
-        provider: 'GBIF',
-        description: 'Global Biodiversity Information Facility',
-        category: 'Science & Math',
-        tags: ['science-math', 'public-api', 'gbif'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.6,
-        ratingCount: 5156,
-        usageCount: 36236,
-        baseUrl: 'https://www.gbif.org',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://www.gbif.org/developer/summary',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'launch-library-2-2',
-        name: 'Launch Library 2',
-        provider: 'Launch Library 2',
-        description: 'Spaceflight launches and events database',
-        category: 'Science & Math',
-        tags: ['science-math', 'public-api', 'launch'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.8,
-        ratingCount: 2028,
-        usageCount: 39646,
-        baseUrl: 'https://thespacedevs.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://thespacedevs.com/llapi',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'nasa-ads-2',
-        name: 'NASA ADS',
-        provider: 'NASA ADS',
-        description: 'NASA Astrophysics Data System',
-        category: 'Science & Math',
-        tags: ['science-math', 'public-api', 'nasa'],
-        authType: 'OAuth 2.0',
-        pricing: 'Free',
-        ratingAverage: 4,
-        ratingCount: 2900,
-        usageCount: 53485,
-        baseUrl: 'https://ui.adsabs.harvard.edu',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://ui.adsabs.harvard.edu/help/api/api-docs.html',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'openalex-2',
-        name: 'OpenAlex',
-        provider: 'OpenAlex',
-        description: 'Open catalog of scholarly works, authors, institutions, sources, and concepts',
-        category: 'Science & Math',
-        tags: ['science-math', 'public-api', 'openalex'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.8,
-        ratingCount: 6078,
-        usageCount: 31654,
-        baseUrl: 'https://docs.openalex.org',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://docs.openalex.org/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'remote-calc-2',
-        name: 'Remote Calc',
-        provider: 'Remote Calc',
-        description: 'Decodes base64 encoding and parses it to return a solution to the calculation in JSON',
-        category: 'Science & Math',
-        tags: ['science-math', 'public-api', 'remote'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.4,
-        ratingCount: 6784,
-        usageCount: 24612,
-        baseUrl: 'https://github.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://github.com/elizabethadegbaju/remotecalc',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'xmath-2',
-        name: 'xMath',
-        provider: 'xMath',
-        description: 'Random mathematical expressions',
-        category: 'Science & Math',
-        tags: ['science-math', 'public-api', 'xmath'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.4,
-        ratingCount: 5934,
-        usageCount: 68347,
-        baseUrl: 'https://x-math.herokuapp.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://x-math.herokuapp.com/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'application-environment-verification-2',
-        name: 'Application Environment Verification',
-        provider: 'Application Environment Verification',
-        description: 'Android library and API to verify the safety of user devices, detect rooted devices and other risks',
-        category: 'Security',
-        tags: ['security', 'public-api', 'application'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.8,
-        ratingCount: 5728,
-        usageCount: 34889,
-        baseUrl: 'https://github.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://github.com/fingerprintjs/aev',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'binaryedge-2',
-        name: 'BinaryEdge',
-        provider: 'BinaryEdge',
-        description: 'Provide access to BinaryEdge 40fy scanning platform',
-        category: 'Security',
-        tags: ['security', 'public-api', 'binaryedge'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.4,
-        ratingCount: 6214,
-        usageCount: 58244,
-        baseUrl: 'https://docs.binaryedge.io',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://docs.binaryedge.io/api-v2.html',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'botd-2',
-        name: 'Botd',
-        provider: 'Botd',
-        description: 'Botd is a browser library for JavaScript bot detection',
-        category: 'Security',
-        tags: ['security', 'public-api', 'botd'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.5,
-        ratingCount: 1245,
-        usageCount: 23535,
-        baseUrl: 'https://github.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://github.com/fingerprintjs/botd',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'classify-2',
-        name: 'Classify',
-        provider: 'Classify',
-        description: 'Encrypting & decrypting text messages',
-        category: 'Security',
-        tags: ['security', 'public-api', 'classify'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.2,
-        ratingCount: 8472,
-        usageCount: 20853,
-        baseUrl: 'https://classify-web.herokuapp.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://classify-web.herokuapp.com/#/api',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'complete-criminal-checks-2',
-        name: 'Complete Criminal Checks',
-        provider: 'Complete Criminal Checks',
-        description: 'Provides data of offenders from all U.S. States and Pureto Rico',
-        category: 'Security',
-        tags: ['security', 'public-api', 'complete'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.1,
-        ratingCount: 1851,
-        usageCount: 91193,
-        baseUrl: 'https://completecriminalchecks.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://completecriminalchecks.com/Developers',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'dead-drop-2',
-        name: 'dead-drop',
-        provider: 'dead-drop',
-        description: 'Ephemeral zero-knowledge encrypted data sharing',
-        category: 'Security',
-        tags: ['security', 'public-api', 'dead'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.4,
-        ratingCount: 4724,
-        usageCount: 55603,
-        baseUrl: 'https://api.dead-drop.xyz',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://api.dead-drop.xyz/api/v1/docs',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'fingerprintjs-pro-2',
-        name: 'FingerprintJS Pro',
-        provider: 'FingerprintJS Pro',
-        description: 'Fraud detection API offering highly accurate browser fingerprinting',
-        category: 'Security',
-        tags: ['security', 'public-api', 'fingerprintjs'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.7,
-        ratingCount: 3917,
-        usageCount: 48345,
-        baseUrl: 'https://dev.fingerprintjs.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://dev.fingerprintjs.com/docs',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'hashable-2',
-        name: 'Hashable',
-        provider: 'Hashable',
-        description: 'A REST API to access high level cryptographic functions and methods',
-        category: 'Security',
-        tags: ['security', 'public-api', 'hashable'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.8,
-        ratingCount: 8138,
-        usageCount: 76948,
-        baseUrl: 'https://hashable.space',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://hashable.space/pages/api/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'iplogs-2',
-        name: 'IPLogs',
-        provider: 'IPLogs',
-        description: 'Free VPN, proxy, Tor and datacenter IP detection. 13 sources, active probing',
-        category: 'Security',
-        tags: ['security', 'public-api', 'iplogs'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4,
-        ratingCount: 4000,
-        usageCount: 42071,
-        baseUrl: 'https://iplogs.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://iplogs.com/docs',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'loginradius-2',
-        name: 'LoginRadius',
-        provider: 'LoginRadius',
-        description: 'Managed User Authentication Service',
-        category: 'Security',
-        tags: ['security', 'public-api', 'loginradius'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.7,
-        ratingCount: 3477,
-        usageCount: 40425,
-        baseUrl: 'https://www.loginradius.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://www.loginradius.com/docs/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'passwordinator-2',
-        name: 'Passwordinator',
-        provider: 'Passwordinator',
-        description: 'Generate random passwords of varying complexities',
-        category: 'Security',
-        tags: ['security', 'public-api', 'passwordinator'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.4,
-        ratingCount: 3904,
-        usageCount: 66057,
-        baseUrl: 'https://github.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://github.com/fawazsullia/password-generator/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'virushee-2',
-        name: 'Virushee',
-        provider: 'Virushee',
-        description: 'Virushee file/data scanning',
-        category: 'Security',
-        tags: ['security', 'public-api', 'virushee'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.1,
-        ratingCount: 4821,
-        usageCount: 43617,
-        baseUrl: 'https://api.virushee.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://api.virushee.com/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'dummy-products-2',
-        name: 'Dummy Products',
-        provider: 'Dummy Products',
-        description: 'An api to fetch dummy e-commerce products JSON data with placeholder images',
-        category: 'Shopping',
-        tags: ['shopping', 'public-api', 'dummy'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.9,
-        ratingCount: 9339,
-        usageCount: 9119,
-        baseUrl: 'https://dummyproducts-api.herokuapp.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://dummyproducts-api.herokuapp.com/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'flipkart-marketplace-2',
-        name: 'Flipkart Marketplace',
-        provider: 'Flipkart Marketplace',
-        description: 'Product listing management, Order Fulfilment in the Flipkart Marketplace',
-        category: 'Shopping',
-        tags: ['shopping', 'public-api', 'flipkart'],
-        authType: 'OAuth 2.0',
-        pricing: 'Free',
-        ratingAverage: 4.3,
-        ratingCount: 1973,
-        usageCount: 93924,
-        baseUrl: 'https://seller.flipkart.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://seller.flipkart.com/api-docs/FMSAPI.html',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'woocommerce-2',
-        name: 'WooCommerce',
-        provider: 'WooCommerce',
-        description: 'WooCommerce REST APIS to create, read, update, and delete data on wordpress website in JSON format',
-        category: 'Shopping',
-        tags: ['shopping', 'public-api', 'woocommerce'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4,
-        ratingCount: 4480,
-        usageCount: 52854,
-        baseUrl: 'https://woocommerce.github.io',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://woocommerce.github.io/woocommerce-rest-api-docs/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: '4chan-2',
-        name: '4chan',
-        provider: '4chan',
-        description: 'Simple image-based bulletin board dedicated to a variety of topics',
-        category: 'Social',
-        tags: ['social', 'public-api', '4chan'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.4,
-        ratingCount: 2424,
-        usageCount: 9560,
-        baseUrl: 'https://github.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://github.com/4chan/4chan-API',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'ayrshare-2',
-        name: 'Ayrshare',
-        provider: 'Ayrshare',
-        description: 'Social media APIs to post, get analytics, and manage multiple users social media accounts',
-        category: 'Social',
-        tags: ['social', 'public-api', 'ayrshare'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.9,
-        ratingCount: 3259,
-        usageCount: 52822,
-        baseUrl: 'https://www.ayrshare.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://www.ayrshare.com',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'bluesky-2',
-        name: 'Bluesky',
-        provider: 'Bluesky',
-        description: 'Decentralized social networking via the AT protocol',
-        category: 'Social',
-        tags: ['social', 'public-api', 'bluesky'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.9,
-        ratingCount: 6579,
-        usageCount: 51011,
-        baseUrl: 'https://docs.bsky.app',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://docs.bsky.app/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'doge-meme-2',
-        name: 'Doge-Meme',
-        provider: 'Doge-Meme',
-        description: 'Top meme posts from r/dogecoin which include \'Meme\' flair',
-        category: 'Social',
-        tags: ['social', 'public-api', 'doge'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.8,
-        ratingCount: 8208,
-        usageCount: 78529,
-        baseUrl: 'https://api.doge-meme.lol',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://api.doge-meme.lol/docs',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'lanyard-2',
-        name: 'Lanyard',
-        provider: 'Lanyard',
-        description: 'Retrieve your presence on Discord through an HTTP REST API or WebSocket',
-        category: 'Social',
-        tags: ['social', 'public-api', 'lanyard'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.7,
-        ratingCount: 3907,
-        usageCount: 22486,
-        baseUrl: 'https://github.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://github.com/Phineas/lanyard',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'trash-nothing-2',
-        name: 'Trash Nothing',
-        provider: 'Trash Nothing',
-        description: 'A freecycling community with thousands of free items posted every day',
-        category: 'Social',
-        tags: ['social', 'public-api', 'trash'],
-        authType: 'OAuth 2.0',
-        pricing: 'Free',
-        ratingAverage: 4.8,
-        ratingCount: 6518,
-        usageCount: 84431,
-        baseUrl: 'https://trashnothing.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://trashnothing.com/developer',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'xfetch-2',
-        name: 'xfetch',
-        provider: 'xfetch',
-        description: 'Read API for X/Twitter search, profiles, tweets, and social graph',
-        category: 'Social',
-        tags: ['social', 'public-api', 'xfetch'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.4,
-        ratingCount: 5094,
-        usageCount: 41084,
-        baseUrl: 'https://xfetch.io',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://xfetch.io',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'api-football-2',
-        name: 'API-FOOTBALL',
-        provider: 'API-FOOTBALL',
-        description: 'Get information about Football Leagues & Cups',
-        category: 'Sports & Fitness',
-        tags: ['sports-fitness', 'public-api', 'api'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.6,
-        ratingCount: 3336,
-        usageCount: 52976,
-        baseUrl: 'https://www.api-football.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://www.api-football.com/documentation-v3',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'balldontlie-2',
-        name: 'balldontlie',
-        provider: 'balldontlie',
-        description: 'Balldontlie provides access to stats data from the NBA',
-        category: 'Sports & Fitness',
-        tags: ['sports-fitness', 'public-api', 'balldontlie'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.4,
-        ratingCount: 4864,
-        usageCount: 69909,
-        baseUrl: 'https://www.balldontlie.io',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://www.balldontlie.io',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'cloudbet-2',
-        name: 'Cloudbet',
-        provider: 'Cloudbet',
-        description: 'Official Cloudbet API provides real-time sports odds and betting API to place bets programmatically',
-        category: 'Sports & Fitness',
-        tags: ['sports-fitness', 'public-api', 'cloudbet'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.8,
-        ratingCount: 4398,
-        usageCount: 36128,
-        baseUrl: 'https://www.cloudbet.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://www.cloudbet.com/api/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'discgolf-2',
-        name: 'DiscGolf',
-        provider: 'DiscGolf',
-        description: 'Structured disc golf course data',
-        category: 'Sports & Fitness',
-        tags: ['sports-fitness', 'public-api', 'discgolf'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.7,
-        ratingCount: 1937,
-        usageCount: 17491,
-        baseUrl: 'https://discgolfapi.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://discgolfapi.com/docs/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'football-soccer-videos-2',
-        name: 'Football (Soccer) Videos',
-        provider: 'Football (Soccer) Videos',
-        description: 'Embed codes for goals and highlights from Premier League, Bundesliga, Serie A and many more',
-        category: 'Sports & Fitness',
-        tags: ['sports-fitness', 'public-api', 'football'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.2,
-        ratingCount: 9192,
-        usageCount: 38527,
-        baseUrl: 'https://www.scorebat.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://www.scorebat.com/video-api/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'football-standings-2',
-        name: 'Football Standings',
-        provider: 'Football Standings',
-        description: 'Display football standings e.g epl, la liga, serie a etc. The data is based on espn site',
-        category: 'Sports & Fitness',
-        tags: ['sports-fitness', 'public-api', 'football'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.5,
-        ratingCount: 2775,
-        usageCount: 66182,
-        baseUrl: 'https://github.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://github.com/azharimm/football-standings-api',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'oddsmagnet-2',
-        name: 'Oddsmagnet',
-        provider: 'Oddsmagnet',
-        description: 'Odds history from multiple UK bookmakers',
-        category: 'Sports & Fitness',
-        tags: ['sports-fitness', 'public-api', 'oddsmagnet'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.2,
-        ratingCount: 8662,
-        usageCount: 16451,
-        baseUrl: 'https://data.oddsmagnet.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://data.oddsmagnet.com',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'openf1-2',
-        name: 'OpenF1',
-        provider: 'OpenF1',
-        description: 'Real-time and historical Formula 1 data including laps, car telemetry and positions',
-        category: 'Sports & Fitness',
-        tags: ['sports-fitness', 'public-api', 'openf1'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.9,
-        ratingCount: 2489,
-        usageCount: 81427,
-        baseUrl: 'https://openf1.org',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://openf1.org/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'openligadb-2',
-        name: 'OpenLigaDB',
-        provider: 'OpenLigaDB',
-        description: 'Crowd sourced sports league results',
-        category: 'Sports & Fitness',
-        tags: ['sports-fitness', 'public-api', 'openligadb'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.5,
-        ratingCount: 8845,
-        usageCount: 43049,
-        baseUrl: 'https://www.openligadb.de',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://www.openligadb.de',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'padel-snipe-2',
-        name: 'Padel Snipe',
-        provider: 'Padel Snipe',
-        description: '4,000+ mapped padel clubs across 9 European countries with GPS and courts',
-        category: 'Sports & Fitness',
-        tags: ['sports-fitness', 'public-api', 'padel'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.4,
-        ratingCount: 7134,
-        usageCount: 91662,
-        baseUrl: 'https://padelsnipe.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://padelsnipe.com/fr/world/api',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'sport-list-data-2',
-        name: 'Sport List & Data',
-        provider: 'Sport List & Data',
-        description: 'List of and resources related to sports',
-        category: 'Sports & Fitness',
-        tags: ['sports-fitness', 'public-api', 'sport'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.6,
-        ratingCount: 8456,
-        usageCount: 76993,
-        baseUrl: 'https://developers.decathlon.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://developers.decathlon.com/products/sports',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'sport-vision-2',
-        name: 'Sport Vision',
-        provider: 'Sport Vision',
-        description: 'Identify sport, brands and gear in an image. Also does image sports captioning',
-        category: 'Sports & Fitness',
-        tags: ['sports-fitness', 'public-api', 'sport'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.5,
-        ratingCount: 1125,
-        usageCount: 77232,
-        baseUrl: 'https://developers.decathlon.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://developers.decathlon.com/products/sport-vision',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'sportscore-2',
-        name: 'SportScore',
-        provider: 'SportScore',
-        description: 'Live scores, fixtures, standings and stats for football, basketball, cricket and tennis',
-        category: 'Sports & Fitness',
-        tags: ['sports-fitness', 'public-api', 'sportscore'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.6,
-        ratingCount: 2086,
-        usageCount: 7655,
-        baseUrl: 'https://sportscore.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://sportscore.com/developers/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'squiggle-2',
-        name: 'Squiggle',
-        provider: 'Squiggle',
-        description: 'Fixtures, results and predictions for Australian Football League matches',
-        category: 'Sports & Fitness',
-        tags: ['sports-fitness', 'public-api', 'squiggle'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.5,
-        ratingCount: 5415,
-        usageCount: 89130,
-        baseUrl: 'https://api.squiggle.com.au',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://api.squiggle.com.au',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'therundown-2',
-        name: 'TheRundown',
-        provider: 'TheRundown',
-        description: 'Real-time sports data: odds, scores, stats & prediction markets, 30+ leagues, 18+ sportsbooks',
-        category: 'Sports & Fitness',
-        tags: ['sports-fitness', 'public-api', 'therundown'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.2,
-        ratingCount: 1302,
-        usageCount: 83971,
-        baseUrl: 'https://therundown.io',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://therundown.io/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'thesportsdb-2',
-        name: 'TheSportsDB',
-        provider: 'TheSportsDB',
-        description: 'Crowd-Sourced Sports Data and Artwork',
-        category: 'Sports & Fitness',
-        tags: ['sports-fitness', 'public-api', 'thesportsdb'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.8,
-        ratingCount: 3538,
-        usageCount: 91434,
-        baseUrl: 'https://www.thesportsdb.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://www.thesportsdb.com/api.php',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'dummyjson-2',
-        name: 'DummyJSON',
-        provider: 'DummyJSON',
-        description: 'Fake REST API with products, users, posts, comments, todos and more',
-        category: 'Test Data',
-        tags: ['test-data', 'public-api', 'dummyjson'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.2,
-        ratingCount: 2702,
-        usageCount: 86314,
-        baseUrl: 'https://dummyjson.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://dummyjson.com/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'fakejson-2',
-        name: 'FakeJSON',
-        provider: 'FakeJSON',
-        description: 'Service to generate test and fake data',
-        category: 'Test Data',
-        tags: ['test-data', 'public-api', 'fakejson'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.7,
-        ratingCount: 9227,
-        usageCount: 11961,
-        baseUrl: 'https://fakejson.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://fakejson.com',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'fakerapi-2',
-        name: 'FakerAPI',
-        provider: 'FakerAPI',
-        description: 'APIs collection to get fake data',
-        category: 'Test Data',
-        tags: ['test-data', 'public-api', 'fakerapi'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.7,
-        ratingCount: 797,
-        usageCount: 32185,
-        baseUrl: 'https://fakerapi.it',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://fakerapi.it/en',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'quickmocker-2',
-        name: 'QuickMocker',
-        provider: 'QuickMocker',
-        description: 'API mocking tool to generate contextual, fake or random data',
-        category: 'Test Data',
-        tags: ['test-data', 'public-api', 'quickmocker'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4,
-        ratingCount: 1010,
-        usageCount: 15501,
-        baseUrl: 'https://quickmocker.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://quickmocker.com',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'randommer-2',
-        name: 'Randommer',
-        provider: 'Randommer',
-        description: 'Random data generator',
-        category: 'Test Data',
-        tags: ['test-data', 'public-api', 'randommer'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.9,
-        ratingCount: 5029,
-        usageCount: 62647,
-        baseUrl: 'https://randommer.io',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://randommer.io/randommer-api',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'totalshiftleft-sandbox-2',
-        name: 'TotalShiftLeft Sandbox',
-        provider: 'TotalShiftLeft Sandbox',
-        description: 'Free multi-protocol sandbox: REST, GraphQL & SOAP with OAuth2/JWT auth and OpenAPI 3.0 spec',
-        category: 'Test Data',
-        tags: ['test-data', 'public-api', 'totalshiftleft'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.3,
-        ratingCount: 5523,
-        usageCount: 79860,
-        baseUrl: 'https://demo.totalshiftleft.ai',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://demo.totalshiftleft.ai/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'audexum-2',
-        name: 'Audexum',
-        provider: 'Audexum',
-        description: 'Text-to-speech REST API with 43 voices and 33 languages',
-        category: 'Text Analysis',
-        tags: ['text-analysis', 'public-api', 'audexum'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.7,
-        ratingCount: 3147,
-        usageCount: 6235,
-        baseUrl: 'https://audexum.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://audexum.com/docs',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'cloudmersive-natural-language-processing-2',
-        name: 'Cloudmersive Natural Language Processing',
-        provider: 'Cloudmersive Natural Language Processing',
-        description: 'Natural language processing and text analysis',
-        category: 'Text Analysis',
-        tags: ['text-analysis', 'public-api', 'cloudmersive'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.5,
-        ratingCount: 4585,
-        usageCount: 74583,
-        baseUrl: 'https://www.cloudmersive.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://www.cloudmersive.com/nlp-api',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'geoscore-2',
-        name: 'GeoScore',
-        provider: 'GeoScore',
-        description: 'Score content for AI search citation readiness with a 0-100 GEO score and 8 structural metrics',
-        category: 'Text Analysis',
-        tags: ['text-analysis', 'public-api', 'geoscore'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.1,
-        ratingCount: 6021,
-        usageCount: 71217,
-        baseUrl: 'https://geoscoreapi.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://geoscoreapi.com',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'kiprio-translate-2',
-        name: 'Kiprio Translate',
-        provider: 'Kiprio Translate',
-        description: 'Free text translation with language detection, supports 50+ languages',
-        category: 'Text Analysis',
-        tags: ['text-analysis', 'public-api', 'kiprio'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.9,
-        ratingCount: 5979,
-        usageCount: 20354,
-        baseUrl: 'https://kiprio.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://kiprio.com/v1/translate',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'lecto-translation-2',
-        name: 'Lecto Translation',
-        provider: 'Lecto Translation',
-        description: 'Translation API with free tier and reasonable prices',
-        category: 'Text Analysis',
-        tags: ['text-analysis', 'public-api', 'lecto'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.5,
-        ratingCount: 955,
-        usageCount: 38636,
-        baseUrl: 'https://rapidapi.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://rapidapi.com/lecto-lecto-default/api/lecto-translation/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'sentiment-analysis-2',
-        name: 'Sentiment Analysis',
-        provider: 'Sentiment Analysis',
-        description: 'Multilingual sentiment analysis of texts from different sources',
-        category: 'Text Analysis',
-        tags: ['text-analysis', 'public-api', 'sentiment'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.2,
-        ratingCount: 7932,
-        usageCount: 59633,
-        baseUrl: 'https://www.meaningcloud.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://www.meaningcloud.com/developer/sentiment-analysis',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'tisane-2',
-        name: 'Tisane',
-        provider: 'Tisane',
-        description: 'Text Analytics with focus on detection of abusive content and law enforcement applications',
-        category: 'Text Analysis',
-        tags: ['text-analysis', 'public-api', 'tisane'],
-        authType: 'OAuth 2.0',
-        pricing: 'Free',
-        ratingAverage: 4.2,
-        ratingCount: 7892,
-        usageCount: 79341,
-        baseUrl: 'https://tisane.ai',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://tisane.ai/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'aftership-2',
-        name: 'Aftership',
-        provider: 'Aftership',
-        description: 'API to update, manage and track shipment efficiently',
-        category: 'Tracking',
-        tags: ['tracking', 'public-api', 'aftership'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.4,
-        ratingCount: 3004,
-        usageCount: 25357,
-        baseUrl: 'https://developers.aftership.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://developers.aftership.com/reference/quick-start',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'pixela-2',
-        name: 'Pixela',
-        provider: 'Pixela',
-        description: 'API for recording and tracking habits or effort, routines',
-        category: 'Tracking',
-        tags: ['tracking', 'public-api', 'pixela'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.7,
-        ratingCount: 4447,
-        usageCount: 90563,
-        baseUrl: 'https://pixe.la',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://pixe.la',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'wecantrack-2',
-        name: 'WeCanTrack',
-        provider: 'WeCanTrack',
-        description: 'Automatically place subids in affiliate links to attribute affiliate conversions to click data',
-        category: 'Tracking',
-        tags: ['tracking', 'public-api', 'wecantrack'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.1,
-        ratingCount: 7341,
-        usageCount: 9548,
-        baseUrl: 'https://docs.wecantrack.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://docs.wecantrack.com',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'whereparcel-2',
-        name: 'WhereParcel',
-        provider: 'WhereParcel',
-        description: 'Unified parcel tracking API across 60+ carriers worldwide (USPS, FedEx, UPS, DHL, etc.)',
-        category: 'Tracking',
-        tags: ['tracking', 'public-api', 'whereparcel'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.6,
-        ratingCount: 5846,
-        usageCount: 54478,
-        baseUrl: 'https://whereparcel.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://whereparcel.com/docs',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'apimetro-2',
-        name: 'Apimetro',
-        provider: 'Apimetro',
-        description: 'Geospatial data for Mexico City public transport system (Metro, Metrobús, Cablebús, RTP, etc.)',
-        category: 'Transportation',
-        tags: ['transportation', 'public-api', 'apimetro'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.5,
-        ratingCount: 8675,
-        usageCount: 41310,
-        baseUrl: 'https://apimetro.dev',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://apimetro.dev/swagger/index.html',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'bc-ferries-2',
-        name: 'BC Ferries',
-        provider: 'BC Ferries',
-        description: 'Sailing times and capacities for BC Ferries',
-        category: 'Transportation',
-        tags: ['transportation', 'public-api', 'bc'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.6,
-        ratingCount: 5916,
-        usageCount: 50202,
-        baseUrl: 'https://www.bcferriesapi.ca',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://www.bcferriesapi.ca',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'cts-2',
-        name: 'CTS',
-        provider: 'CTS',
-        description: 'CTS Realtime API',
-        category: 'Transportation',
-        tags: ['transportation', 'public-api', 'cts'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4,
-        ratingCount: 2100,
-        usageCount: 43942,
-        baseUrl: 'https://api.cts-strasbourg.eu',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://api.cts-strasbourg.eu/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'faa-n-number-registry-2',
-        name: 'FAA N-Number Registry',
-        provider: 'FAA N-Number Registry',
-        description: 'Every FAA-registered civil aircraft in the United States, lookup by N-number or Mode S hex code',
-        category: 'Transportation',
-        tags: ['transportation', 'public-api', 'faa'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.1,
-        ratingCount: 5341,
-        usageCount: 53548,
-        baseUrl: 'https://n-number.starfile.org',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://n-number.starfile.org/api',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'open-charge-map-2',
-        name: 'Open Charge Map',
-        provider: 'Open Charge Map',
-        description: 'Global public registry of electric vehicle charging locations',
-        category: 'Transportation',
-        tags: ['transportation', 'public-api', 'open'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.2,
-        ratingCount: 4472,
-        usageCount: 79567,
-        baseUrl: 'https://openchargemap.org',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://openchargemap.org/site/develop/api',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'orizn-visa-2',
-        name: 'Orizn Visa',
-        provider: 'Orizn Visa',
-        description: 'Visa requirements for 199 countries, 39K+ passport-destination pairs in 15 languages',
-        category: 'Transportation',
-        tags: ['transportation', 'public-api', 'orizn'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.8,
-        ratingCount: 7928,
-        usageCount: 3632,
-        baseUrl: 'https://visa.orizn.app',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://visa.orizn.app',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'openvan-2',
-        name: 'OpenVan',
-        provider: 'OpenVan',
-        description: 'Fuel prices for 121 countries, food cost index & vanlife weather scores for RV travel',
-        category: 'Transportation',
-        tags: ['transportation', 'public-api', 'openvan'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.5,
-        ratingCount: 8565,
-        usageCount: 75437,
-        baseUrl: 'https://openvan.camp',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://openvan.camp/docs',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'tankerkoenig-2',
-        name: 'Tankerkoenig',
-        provider: 'Tankerkoenig',
-        description: 'German realtime gas/diesel prices',
-        category: 'Transportation',
-        tags: ['transportation', 'public-api', 'tankerkoenig'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.8,
-        ratingCount: 6648,
-        usageCount: 80878,
-        baseUrl: 'https://creativecommons.tankerkoenig.de',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://creativecommons.tankerkoenig.de/swagger/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'transport-for-belgium-2',
-        name: 'Transport for Belgium',
-        provider: 'Transport for Belgium',
-        description: 'The iRail API is a third-party API for Belgian public transport by train',
-        category: 'Transportation',
-        tags: ['transportation', 'public-api', 'transport'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.5,
-        ratingCount: 5945,
-        usageCount: 83063,
-        baseUrl: 'https://docs.irail.be',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://docs.irail.be/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'transport-rest-2',
-        name: 'transport.rest',
-        provider: 'transport.rest',
-        description: 'Community maintained, developer-friendly public transport API',
-        category: 'Transportation',
-        tags: ['transportation', 'public-api', 'transport'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.4,
-        ratingCount: 7824,
-        usageCount: 6332,
-        baseUrl: 'https://transport.rest',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://transport.rest',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'uber-2',
-        name: 'Uber',
-        provider: 'Uber',
-        description: 'Uber ride requests and price estimation',
-        category: 'Transportation',
-        tags: ['transportation', 'public-api', 'uber'],
-        authType: 'OAuth 2.0',
-        pricing: 'Free',
-        ratingAverage: 4.8,
-        ratingCount: 798,
-        usageCount: 63328,
-        baseUrl: 'https://developer.uber.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://developer.uber.com/products',
-        featured: false,
-        trending: false
-    },
-    {
-        id: '1pt-2',
-        name: '1pt',
-        provider: '1pt',
-        description: 'A simple URL shortener',
-        category: 'URL Shorteners',
-        tags: ['url-shorteners', 'public-api', '1pt'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.9,
-        ratingCount: 4979,
-        usageCount: 12211,
-        baseUrl: 'https://github.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://github.com/1pt-co/api/blob/main/README.md',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'cleanuri-2',
-        name: 'CleanURI',
-        provider: 'CleanURI',
-        description: 'URL shortener service',
-        category: 'URL Shorteners',
-        tags: ['url-shorteners', 'public-api', 'cleanuri'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.9,
-        ratingCount: 5339,
-        usageCount: 19834,
-        baseUrl: 'https://cleanuri.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://cleanuri.com/docs',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'gotiny-2',
-        name: 'GoTiny',
-        provider: 'GoTiny',
-        description: 'A lightweight URL shortener, focused on ease-of-use for the developer and end-user',
-        category: 'URL Shorteners',
-        tags: ['url-shorteners', 'public-api', 'gotiny'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.8,
-        ratingCount: 7498,
-        usageCount: 64428,
-        baseUrl: 'https://github.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://github.com/robvanbakel/gotiny-api',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'kutt-2',
-        name: 'Kutt',
-        provider: 'Kutt',
-        description: 'Free Modern URL Shortener',
-        category: 'URL Shorteners',
-        tags: ['url-shorteners', 'public-api', 'kutt'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4,
-        ratingCount: 8430,
-        usageCount: 18704,
-        baseUrl: 'https://docs.kutt.it',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://docs.kutt.it/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'redirhub-2',
-        name: 'RedirHub',
-        provider: 'RedirHub',
-        description: 'URL redirect management with custom domains, HTTPS, analytics, and REST API',
-        category: 'URL Shorteners',
-        tags: ['url-shorteners', 'public-api', 'redirhub'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.3,
-        ratingCount: 5493,
-        usageCount: 33427,
-        baseUrl: 'https://redirhub.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://redirhub.com',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'shrtcode-2',
-        name: 'Shrtcode',
-        provider: 'Shrtcode',
-        description: 'URl Shortener with multiple Domains',
-        category: 'URL Shorteners',
-        tags: ['url-shorteners', 'public-api', 'shrtcode'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4,
-        ratingCount: 1790,
-        usageCount: 9041,
-        baseUrl: 'https://shrtco.de',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://shrtco.de/docs',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'shrtlnk-2',
-        name: 'Shrtlnk',
-        provider: 'Shrtlnk',
-        description: 'Simple and efficient short link creation',
-        category: 'URL Shorteners',
-        tags: ['url-shorteners', 'public-api', 'shrtlnk'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4,
-        ratingCount: 1480,
-        usageCount: 28568,
-        baseUrl: 'https://shrtlnk.dev',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://shrtlnk.dev/developer',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'urlbae-2',
-        name: 'UrlBae',
-        provider: 'UrlBae',
-        description: 'Simple and efficient short link creation',
-        category: 'URL Shorteners',
-        tags: ['url-shorteners', 'public-api', 'urlbae'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.7,
-        ratingCount: 7427,
-        usageCount: 17418,
-        baseUrl: 'https://urlbae.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://urlbae.com/developers',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'carvector-2',
-        name: 'CarVector',
-        provider: 'CarVector',
-        description: 'Vehicle specs, images, recalls, and DTC codes across 1925-2029',
-        category: 'Vehicle',
-        tags: ['vehicle', 'public-api', 'carvector'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.7,
-        ratingCount: 5477,
-        usageCount: 35282,
-        baseUrl: 'https://carvector.io',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://carvector.io/docs',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'problemsbyvin-2',
-        name: 'ProblemsByVin',
-        provider: 'ProblemsByVin',
-        description: 'Owner complaints, recalls and failure-mileage statistics by vehicle make, model and year',
-        category: 'Vehicle',
-        tags: ['vehicle', 'public-api', 'problemsbyvin'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.4,
-        ratingCount: 1674,
-        usageCount: 85882,
-        baseUrl: 'https://problemsbyvin.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://problemsbyvin.com/data/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'revcardata-2',
-        name: 'RevCarData',
-        provider: 'RevCarData',
-        description: '86,000+ global vehicle specifications and EV metrics',
-        category: 'Vehicle',
-        tags: ['vehicle', 'public-api', 'revcardata'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.3,
-        ratingCount: 2983,
-        usageCount: 55640,
-        baseUrl: 'https://revcardata.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://revcardata.com',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'smartcar-2',
-        name: 'Smartcar',
-        provider: 'Smartcar',
-        description: 'Lock and unlock vehicles and get data like odometer reading and location. Works on most new cars',
-        category: 'Vehicle',
-        tags: ['vehicle', 'public-api', 'smartcar'],
-        authType: 'OAuth 2.0',
-        pricing: 'Free',
-        ratingAverage: 4.7,
-        ratingCount: 5687,
-        usageCount: 94883,
-        baseUrl: 'https://smartcar.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://smartcar.com/docs/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'bob-s-burgers-2',
-        name: 'Bob\'s Burgers',
-        provider: 'Bob\'s Burgers',
-        description: 'Bob\'s Burgers API',
-        category: 'Video',
-        tags: ['video', 'public-api', 'bob'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.4,
-        ratingCount: 9124,
-        usageCount: 85946,
-        baseUrl: 'https://bobs-burgers-api-ui.herokuapp.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://bobs-burgers-api-ui.herokuapp.com',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'dune-2',
-        name: 'Dune',
-        provider: 'Dune',
-        description: 'A simple API which provides you with book, character, movie and quotes JSON data',
-        category: 'Video',
-        tags: ['video', 'public-api', 'dune'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.4,
-        ratingCount: 5764,
-        usageCount: 86180,
-        baseUrl: 'https://github.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://github.com/ywalia01/dune-api',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'final-space-2',
-        name: 'Final Space',
-        provider: 'Final Space',
-        description: 'Final Space API',
-        category: 'Video',
-        tags: ['video', 'public-api', 'final'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.1,
-        ratingCount: 2581,
-        usageCount: 51011,
-        baseUrl: 'https://finalspaceapi.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://finalspaceapi.com/docs/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'hyperserve-2',
-        name: 'Hyperserve',
-        provider: 'Hyperserve',
-        description: 'Video backend API: upload any format, transcode to MP4, deliver via CDN',
-        category: 'Video',
-        tags: ['video', 'public-api', 'hyperserve'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.3,
-        ratingCount: 7283,
-        usageCount: 55397,
-        baseUrl: 'https://hyperserve.io',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://hyperserve.io/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'imdbot-2',
-        name: 'IMDbOT',
-        provider: 'IMDbOT',
-        description: 'Unofficial IMDb Movie / Series Information',
-        category: 'Video',
-        tags: ['video', 'public-api', 'imdbot'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.5,
-        ratingCount: 5395,
-        usageCount: 47842,
-        baseUrl: 'https://github.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://github.com/SpEcHiDe/IMDbOT',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'mcu-countdown-2',
-        name: 'MCU Countdown',
-        provider: 'MCU Countdown',
-        description: 'A Countdown to the next MCU Film',
-        category: 'Video',
-        tags: ['video', 'public-api', 'mcu'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.9,
-        ratingCount: 5769,
-        usageCount: 11895,
-        baseUrl: 'https://github.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://github.com/DiljotSG/MCU-Countdown',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'movie-quote-2',
-        name: 'Movie Quote',
-        provider: 'Movie Quote',
-        description: 'Random Movie and Series Quotes',
-        category: 'Video',
-        tags: ['video', 'public-api', 'movie'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.5,
-        ratingCount: 7265,
-        usageCount: 75680,
-        baseUrl: 'https://github.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://github.com/F4R4N/movie-quote/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'owen-wilson-wow-2',
-        name: 'Owen Wilson Wow',
-        provider: 'Owen Wilson Wow',
-        description: 'API for actor Owen Wilson\'s "wow" exclamations in movies',
-        category: 'Video',
-        tags: ['video', 'public-api', 'owen'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.6,
-        ratingCount: 6666,
-        usageCount: 78452,
-        baseUrl: 'https://owen-wilson-wow-api.herokuapp.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://owen-wilson-wow-api.herokuapp.com',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'swapi-4',
-        name: 'SWAPI',
-        provider: 'SWAPI',
-        description: 'All the Star Wars data you\'ve ever wanted',
-        category: 'Video',
-        tags: ['video', 'public-api', 'swapi'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.2,
-        ratingCount: 1952,
-        usageCount: 54636,
-        baseUrl: 'https://swapi.dev',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://swapi.dev/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'swapi-5',
-        name: 'SWAPI',
-        provider: 'SWAPI',
-        description: 'All things Star Wars',
-        category: 'Video',
-        tags: ['video', 'public-api', 'swapi'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.1,
-        ratingCount: 3571,
-        usageCount: 76438,
-        baseUrl: 'https://www.swapi.tech',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://www.swapi.tech',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'the-vampire-diaries-2',
-        name: 'The Vampire Diaries',
-        provider: 'The Vampire Diaries',
-        description: 'TV Show Data',
-        category: 'Video',
-        tags: ['video', 'public-api', 'the'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4,
-        ratingCount: 3730,
-        usageCount: 9175,
-        baseUrl: 'https://vampire-diaries-api.netlify.app',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://vampire-diaries-api.netlify.app/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'trakt-2',
-        name: 'Trakt',
-        provider: 'Trakt',
-        description: 'Movie and TV Data',
-        category: 'Video',
-        tags: ['video', 'public-api', 'trakt'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.6,
-        ratingCount: 7846,
-        usageCount: 35763,
-        baseUrl: 'https://trakt.docs.apiary.io',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://trakt.docs.apiary.io/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'unogs-2',
-        name: 'uNoGS',
-        provider: 'uNoGS',
-        description: 'Unofficial Netflix Online Global Search, Search all netflix regions in one place',
-        category: 'Video',
-        tags: ['video', 'public-api', 'unogs'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.6,
-        ratingCount: 5606,
-        usageCount: 58015,
-        baseUrl: 'https://rapidapi.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://rapidapi.com/unogs/api/unogsng',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'web-series-quotes-generator-2',
-        name: 'Web Series Quotes Generator',
-        provider: 'Web Series Quotes Generator',
-        description: 'API generates various Web Series Quote Images',
-        category: 'Video',
-        tags: ['video', 'public-api', 'web'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.6,
-        ratingCount: 7666,
-        usageCount: 26738,
-        baseUrl: 'https://github.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://github.com/yogeshwaran01/web-series-quotes',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'colorfulclouds-2',
-        name: 'ColorfulClouds',
-        provider: 'ColorfulClouds',
-        description: 'Weather',
-        category: 'Weather',
-        tags: ['weather', 'public-api', 'colorfulclouds'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4,
-        ratingCount: 6810,
-        usageCount: 65330,
-        baseUrl: 'https://open.caiyunapp.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://open.caiyunapp.com/ColorfulClouds_Weather_API',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'hg-weather-2',
-        name: 'HG Weather',
-        provider: 'HG Weather',
-        description: 'Provides weather forecast data for cities in Brazil',
-        category: 'Weather',
-        tags: ['weather', 'public-api', 'hg'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.8,
-        ratingCount: 1338,
-        usageCount: 52262,
-        baseUrl: 'https://hgbrasil.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://hgbrasil.com/status/weather',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'oikolab-2',
-        name: 'Oikolab',
-        provider: 'Oikolab',
-        description: '70+ years of global, hourly historical and forecast weather data from NOAA and ECMWF',
-        category: 'Weather',
-        tags: ['weather', 'public-api', 'oikolab'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.9,
-        ratingCount: 2979,
-        usageCount: 68782,
-        baseUrl: 'https://docs.oikolab.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://docs.oikolab.com',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'open-meteo-2',
-        name: 'Open-Meteo',
-        provider: 'Open-Meteo',
-        description: 'Global weather forecast API for non-commercial use',
-        category: 'Weather',
-        tags: ['weather', 'public-api', 'open'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.3,
-        ratingCount: 5323,
-        usageCount: 23260,
-        baseUrl: 'https://open-meteo.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://open-meteo.com/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'opensensemap-2',
-        name: 'openSenseMap',
-        provider: 'openSenseMap',
-        description: 'Data from Personal Weather Stations called senseBoxes',
-        category: 'Weather',
-        tags: ['weather', 'public-api', 'opensensemap'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4,
-        ratingCount: 2430,
-        usageCount: 61132,
-        baseUrl: 'https://api.opensensemap.org',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://api.opensensemap.org/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'pirate-weather-2',
-        name: 'Pirate Weather',
-        provider: 'Pirate Weather',
-        description: 'Free weather API with forecast data similar to Dark Sky',
-        category: 'Weather',
-        tags: ['weather', 'public-api', 'pirate'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.6,
-        ratingCount: 2226,
-        usageCount: 59675,
-        baseUrl: 'https://pirateweather.net',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://pirateweather.net/en/latest/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'qweather-2',
-        name: 'QWeather',
-        provider: 'QWeather',
-        description: 'Location-based weather data',
-        category: 'Weather',
-        tags: ['weather', 'public-api', 'qweather'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.1,
-        ratingCount: 5131,
-        usageCount: 53661,
-        baseUrl: 'https://dev.qweather.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://dev.qweather.com/en/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'storm-glass-2',
-        name: 'Storm Glass',
-        provider: 'Storm Glass',
-        description: 'Global marine weather from multiple sources',
-        category: 'Weather',
-        tags: ['weather', 'public-api', 'storm'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.8,
-        ratingCount: 3488,
-        usageCount: 73855,
-        baseUrl: 'https://stormglass.io',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://stormglass.io/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'us-weather-2',
-        name: 'US Weather',
-        provider: 'US Weather',
-        description: 'US National Weather Service',
-        category: 'Weather',
-        tags: ['weather', 'public-api', 'us'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.1,
-        ratingCount: 1531,
-        usageCount: 17575,
-        baseUrl: 'https://www.weather.gov',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://www.weather.gov/documentation/services-web-api',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'visual-crossing-2',
-        name: 'Visual Crossing',
-        provider: 'Visual Crossing',
-        description: 'Global historical and weather forecast data',
-        category: 'Weather',
-        tags: ['weather', 'public-api', 'visual'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.3,
-        ratingCount: 6833,
-        usageCount: 11476,
-        baseUrl: 'https://www.visualcrossing.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://www.visualcrossing.com/weather-api',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'weatherapi-2',
-        name: 'WeatherAPI',
-        provider: 'WeatherAPI',
-        description: 'Weather API with other stuff like Astronomy and Geolocation API',
-        category: 'Weather',
-        tags: ['weather', 'public-api', 'weatherapi'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.2,
-        ratingCount: 582,
-        usageCount: 57440,
-        baseUrl: 'https://www.weatherapi.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://www.weatherapi.com/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'wttr-in-2',
-        name: 'wttr.in',
-        provider: 'wttr.in',
-        description: 'Weather in your terminal, supports JSON output',
-        category: 'Weather',
-        tags: ['weather', 'public-api', 'wttr'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.3,
-        ratingCount: 3253,
-        usageCount: 35679,
-        baseUrl: 'https://wttr.in',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://wttr.in/:help',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'axolotl-2',
-        name: 'Axolotl',
-        provider: 'Axolotl',
-        description: 'Collection of axolotl pictures and facts',
-        category: 'Animals',
-        tags: ['animals', 'public-api', 'axolotl'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.9,
-        ratingCount: 9069,
-        usageCount: 6938,
-        baseUrl: 'https://theaxolotlapi.netlify.app',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://theaxolotlapi.netlify.app/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'cat-facts-5',
-        name: 'Cat Facts',
-        provider: 'Cat Facts',
-        description: 'Daily cat facts',
-        category: 'Animals',
-        tags: ['animals', 'public-api', 'cat'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.1,
-        ratingCount: 3251,
-        usageCount: 58964,
-        baseUrl: 'https://alexwohlbruck.github.io',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://alexwohlbruck.github.io/cat-facts/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'cataas-2',
-        name: 'Cataas',
-        provider: 'Cataas',
-        description: 'Cat as a service (cats pictures and gifs)',
-        category: 'Animals',
-        tags: ['animals', 'public-api', 'cataas'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.9,
-        ratingCount: 5619,
-        usageCount: 36874,
-        baseUrl: 'https://cataas.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://cataas.com/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'cats-2',
-        name: 'Cats',
-        provider: 'Cats',
-        description: 'Pictures of cats from Tumblr',
-        category: 'Animals',
-        tags: ['animals', 'public-api', 'cats'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.1,
-        ratingCount: 9471,
-        usageCount: 70853,
-        baseUrl: 'https://docs.thecatapi.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://docs.thecatapi.com/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'ebird-2',
-        name: 'eBird',
-        provider: 'eBird',
-        description: 'Retrieve recent or notable birding observations within a region',
-        category: 'Animals',
-        tags: ['animals', 'public-api', 'ebird'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.2,
-        ratingCount: 4412,
-        usageCount: 24987,
-        baseUrl: 'https://documenter.getpostman.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://documenter.getpostman.com/view/664302/S1ENwy59',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'meowfacts-2',
-        name: 'MeowFacts',
-        provider: 'MeowFacts',
-        description: 'Get random cat facts',
-        category: 'Animals',
-        tags: ['animals', 'public-api', 'meowfacts'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.3,
-        ratingCount: 3663,
-        usageCount: 26309,
-        baseUrl: 'https://github.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://github.com/wh-iterabb-it/meowfacts',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'randomduck-2',
-        name: 'RandomDuck',
-        provider: 'RandomDuck',
-        description: 'Random pictures of ducks',
-        category: 'Animals',
-        tags: ['animals', 'public-api', 'randomduck'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.4,
-        ratingCount: 1764,
-        usageCount: 92323,
-        baseUrl: 'https://random-d.uk',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://random-d.uk/api',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'randomfox-2',
-        name: 'RandomFox',
-        provider: 'RandomFox',
-        description: 'Random pictures of foxes',
-        category: 'Animals',
-        tags: ['animals', 'public-api', 'randomfox'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4,
-        ratingCount: 3260,
-        usageCount: 38394,
-        baseUrl: 'https://randomfox.ca',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://randomfox.ca/floof/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'rescuegroups-2',
-        name: 'RescueGroups',
-        provider: 'RescueGroups',
-        description: 'Adoption',
-        category: 'Animals',
-        tags: ['animals', 'public-api', 'rescuegroups'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.9,
-        ratingCount: 2039,
-        usageCount: 42791,
-        baseUrl: 'https://userguide.rescuegroups.org',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://userguide.rescuegroups.org/display/APIDG/API+Developers+Guide+Home',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'the-dog-2',
-        name: 'The Dog',
-        provider: 'The Dog',
-        description: 'A public service all about Dogs, free to use when making your fancy new App, Website or Service',
-        category: 'Animals',
-        tags: ['animals', 'public-api', 'the'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.6,
-        ratingCount: 8876,
-        usageCount: 75910,
-        baseUrl: 'https://thedogapi.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://thedogapi.com/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'xeno-canto-2',
-        name: 'xeno-canto',
-        provider: 'xeno-canto',
-        description: 'Bird recordings',
-        category: 'Animals',
-        tags: ['animals', 'public-api', 'xeno'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.6,
-        ratingCount: 9096,
-        usageCount: 78513,
-        baseUrl: 'https://xeno-canto.org',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://xeno-canto.org/explore/api',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'anilist-2',
-        name: 'AniList',
-        provider: 'AniList',
-        description: 'Anime discovery & tracking',
-        category: 'Anime',
-        tags: ['anime', 'public-api', 'anilist'],
-        authType: 'OAuth 2.0',
-        pricing: 'Free',
-        ratingAverage: 4.4,
-        ratingCount: 5074,
-        usageCount: 5653,
-        baseUrl: 'https://github.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://github.com/AniList/ApiV2-GraphQL-Docs',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'animechan-2',
-        name: 'AnimeChan',
-        provider: 'AnimeChan',
-        description: 'Anime quotes (over 10k+)',
-        category: 'Anime',
-        tags: ['anime', 'public-api', 'animechan'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.8,
-        ratingCount: 8028,
-        usageCount: 26646,
-        baseUrl: 'https://github.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://github.com/RocktimSaikia/anime-chan',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'mangadex-2',
-        name: 'MangaDex',
-        provider: 'MangaDex',
-        description: 'Manga Database and Community',
-        category: 'Anime',
-        tags: ['anime', 'public-api', 'mangadex'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.3,
-        ratingCount: 3853,
-        usageCount: 52050,
-        baseUrl: 'https://api.mangadex.org',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://api.mangadex.org/docs.html',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'mangapi-2',
-        name: 'Mangapi',
-        provider: 'Mangapi',
-        description: 'Translate manga pages from one language to another',
-        category: 'Anime',
-        tags: ['anime', 'public-api', 'mangapi'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.5,
-        ratingCount: 2435,
-        usageCount: 47705,
-        baseUrl: 'https://rapidapi.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://rapidapi.com/pierre.carcellermeunier/api/mangapi3/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'myanimelist-2',
-        name: 'MyAnimeList',
-        provider: 'MyAnimeList',
-        description: 'Anime and Manga Database and Community',
-        category: 'Anime',
-        tags: ['anime', 'public-api', 'myanimelist'],
-        authType: 'OAuth 2.0',
-        pricing: 'Free',
-        ratingAverage: 4,
-        ratingCount: 2390,
-        usageCount: 74984,
-        baseUrl: 'https://myanimelist.net',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://myanimelist.net/clubs.php?cid=13727',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'shikimori-2',
-        name: 'Shikimori',
-        provider: 'Shikimori',
-        description: 'Anime discovery, tracking, forum, rates',
-        category: 'Anime',
-        tags: ['anime', 'public-api', 'shikimori'],
-        authType: 'OAuth 2.0',
-        pricing: 'Free',
-        ratingAverage: 4.1,
-        ratingCount: 1571,
-        usageCount: 43010,
-        baseUrl: 'https://shikimori.one',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://shikimori.one/api/doc',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'waifu-pics-2',
-        name: 'Waifu.pics',
-        provider: 'Waifu.pics',
-        description: 'Image sharing platform for anime images',
-        category: 'Anime',
-        tags: ['anime', 'public-api', 'waifu'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.4,
-        ratingCount: 5294,
-        usageCount: 19542,
-        baseUrl: 'https://waifu.pics',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://waifu.pics/docs',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'abuseipdb-2',
-        name: 'AbuseIPDB',
-        provider: 'AbuseIPDB',
-        description: 'IP/domain/URL reputation',
-        category: 'Anti-Malware',
-        tags: ['anti-malware', 'public-api', 'abuseipdb'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.1,
-        ratingCount: 821,
-        usageCount: 52617,
-        baseUrl: 'https://docs.abuseipdb.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://docs.abuseipdb.com/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'alienvault-open-threat-exchange-otx-2',
-        name: 'AlienVault Open Threat Exchange (OTX)',
-        provider: 'AlienVault Open Threat Exchange (OTX)',
-        description: 'IP/domain/URL reputation',
-        category: 'Anti-Malware',
-        tags: ['anti-malware', 'public-api', 'alienvault'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.3,
-        ratingCount: 1213,
-        usageCount: 43959,
-        baseUrl: 'https://otx.alienvault.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://otx.alienvault.com/api',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'capesandbox-2',
-        name: 'CAPEsandbox',
-        provider: 'CAPEsandbox',
-        description: 'Malware execution and analysis',
-        category: 'Anti-Malware',
-        tags: ['anti-malware', 'public-api', 'capesandbox'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.6,
-        ratingCount: 2066,
-        usageCount: 42509,
-        baseUrl: 'https://capev2.readthedocs.io',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://capev2.readthedocs.io/en/latest/usage/api.html',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'google-safe-browsing-2',
-        name: 'Google Safe Browsing',
-        provider: 'Google Safe Browsing',
-        description: 'Google Link/Domain Flagging',
-        category: 'Anti-Malware',
-        tags: ['anti-malware', 'public-api', 'google'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.9,
-        ratingCount: 3689,
-        usageCount: 30169,
-        baseUrl: 'https://developers.google.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://developers.google.com/safe-browsing/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'maldatabase-2',
-        name: 'MalDatabase',
-        provider: 'MalDatabase',
-        description: 'Provide malware datasets and threat intelligence feeds',
-        category: 'Anti-Malware',
-        tags: ['anti-malware', 'public-api', 'maldatabase'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.1,
-        ratingCount: 2611,
-        usageCount: 54015,
-        baseUrl: 'https://maldatabase.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://maldatabase.com/api-doc.html',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'malshare-2',
-        name: 'MalShare',
-        provider: 'MalShare',
-        description: 'Malware Archive / file sourcing',
-        category: 'Anti-Malware',
-        tags: ['anti-malware', 'public-api', 'malshare'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.9,
-        ratingCount: 3509,
-        usageCount: 55715,
-        baseUrl: 'https://malshare.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://malshare.com/doc.php',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'malwarebazaar-2',
-        name: 'MalwareBazaar',
-        provider: 'MalwareBazaar',
-        description: 'Collect and share malware samples',
-        category: 'Anti-Malware',
-        tags: ['anti-malware', 'public-api', 'malwarebazaar'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.6,
-        ratingCount: 9456,
-        usageCount: 2993,
         baseUrl: 'https://bazaar.abuse.ch',
         endpoints: [
             {
@@ -27523,30 +14635,6 @@ const publicApiCatalog = [
             }
         ],
         documentation: 'https://www.covalenthq.com/docs/api/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'helium-3',
-        name: 'Helium',
-        provider: 'Helium',
-        description: 'Helium is a global, distributed network of Hotspots that create public, long-range wireless coverage',
-        category: 'Blockchain',
-        tags: ['blockchain', 'public-api', 'helium'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.3,
-        ratingCount: 3843,
-        usageCount: 38049,
-        baseUrl: 'https://docs.helium.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://docs.helium.com/api/blockchain/introduction/',
         featured: false,
         trending: false
     },
@@ -28459,54 +15547,6 @@ const publicApiCatalog = [
             }
         ],
         documentation: 'https://holidayapi.com/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'nager-date-2',
-        name: 'Nager.Date',
-        provider: 'Nager.Date',
-        description: 'Public holidays for more than 90 countries',
-        category: 'Calendar',
-        tags: ['calendar', 'public-api', 'nager'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4,
-        ratingCount: 2850,
-        usageCount: 57192,
-        baseUrl: 'https://date.nager.at',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://date.nager.at',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'non-working-days-3',
-        name: 'Non-Working Days',
-        provider: 'Non-Working Days',
-        description: 'Database of ICS files for non working days',
-        category: 'Calendar',
-        tags: ['calendar', 'public-api', 'non'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.4,
-        ratingCount: 3574,
-        usageCount: 90153,
-        baseUrl: 'https://github.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://github.com/gadael/icsdb',
         featured: false,
         trending: false
     },
@@ -29779,30 +16819,6 @@ const publicApiCatalog = [
             }
         ],
         documentation: 'https://www.cryptingup.com/apidoc/#introduction',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'cryptocompare-2',
-        name: 'CryptoCompare',
-        provider: 'CryptoCompare',
-        description: 'Cryptocurrencies Comparison',
-        category: 'Cryptocurrency',
-        tags: ['cryptocurrency', 'public-api', 'cryptocompare'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.8,
-        ratingCount: 9488,
-        usageCount: 23569,
-        baseUrl: 'https://www.cryptocompare.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://www.cryptocompare.com/api#',
         featured: false,
         trending: false
     },
@@ -31535,30 +18551,6 @@ const publicApiCatalog = [
         trending: false
     },
     {
-        id: 'ipify-2',
-        name: 'IPify',
-        provider: 'IPify',
-        description: 'A simple IP Address API',
-        category: 'Development',
-        tags: ['development', 'public-api', 'ipify'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4.3,
-        ratingCount: 7923,
-        usageCount: 4203,
-        baseUrl: 'https://www.ipify.org',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://www.ipify.org/',
-        featured: false,
-        trending: false
-    },
-    {
         id: 'ipinfo',
         name: 'IPinfo',
         provider: 'IPinfo',
@@ -31991,30 +18983,6 @@ const publicApiCatalog = [
         trending: false
     },
     {
-        id: 'qr-code-3',
-        name: 'QR code',
-        provider: 'QR code',
-        description: 'Generate and decode / read QR code graphics',
-        category: 'Development',
-        tags: ['development', 'public-api', 'qr'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4,
-        ratingCount: 5980,
-        usageCount: 73640,
-        baseUrl: 'https://goqr.me',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'http://goqr.me/api/',
-        featured: false,
-        trending: false
-    },
-    {
         id: 'qrcode-monkey',
         name: 'Qrcode Monkey',
         provider: 'Qrcode Monkey',
@@ -32059,30 +19027,6 @@ const publicApiCatalog = [
             }
         ],
         documentation: 'https://rejax.io/',
-        featured: false,
-        trending: false
-    },
-    {
-        id: 'reqres-2',
-        name: 'ReqRes',
-        provider: 'ReqRes',
-        description: 'A hosted REST-API ready to respond to your AJAX requests',
-        category: 'Development',
-        tags: ['development', 'public-api', 'reqres'],
-        authType: 'None',
-        pricing: 'Free',
-        ratingAverage: 4,
-        ratingCount: 1660,
-        usageCount: 27308,
-        baseUrl: 'https://reqres.in',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://reqres.in/',
         featured: false,
         trending: false
     },
@@ -34223,30 +21167,6 @@ const publicApiCatalog = [
         trending: false
     },
     {
-        id: 'marketstack-2',
-        name: 'Marketstack',
-        provider: 'Marketstack',
-        description: 'Real-Time, Intraday & Historical Market Data API',
-        category: 'Finance',
-        tags: ['finance', 'public-api', 'marketstack'],
-        authType: 'API Key',
-        pricing: 'Free',
-        ratingAverage: 4.2,
-        ratingCount: 9212,
-        usageCount: 69816,
-        baseUrl: 'https://marketstack.com',
-        endpoints: [
-            {
-                path: '/',
-                method: 'GET',
-                description: 'Root endpoint — see documentation for real paths'
-            }
-        ],
-        documentation: 'https://marketstack.com/?utm_source=Github&utm_medium=Referral&utm_campaign=Public-apis-repo-Best-sellers',
-        featured: false,
-        trending: false
-    },
-    {
         id: 'alpha-vantage',
         name: 'Alpha Vantage',
         provider: 'Alpha Vantage',
@@ -36187,6 +23107,13086 @@ const publicApiCatalog = [
             }
         ],
         documentation: 'https://opentdb.com/api_config.php',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'pandascore',
+        name: 'PandaScore',
+        provider: 'PandaScore',
+        description: 'E-sports games and results',
+        category: 'Games & Comics',
+        tags: ['games-comics', 'public-api', 'pandascore'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.7,
+        ratingCount: 8477,
+        usageCount: 64711,
+        baseUrl: 'https://developers.pandascore.co',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://developers.pandascore.co/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'path-of-exile',
+        name: 'Path of Exile',
+        provider: 'Path of Exile',
+        description: 'Path of Exile Game Information',
+        category: 'Games & Comics',
+        tags: ['games-comics', 'public-api', 'path'],
+        authType: 'OAuth 2.0',
+        pricing: 'Free',
+        ratingAverage: 4.2,
+        ratingCount: 3502,
+        usageCount: 93714,
+        baseUrl: 'https://www.pathofexile.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://www.pathofexile.com/developer/docs',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'playerdb',
+        name: 'PlayerDB',
+        provider: 'PlayerDB',
+        description: 'Query Minecraft, Steam and XBox Accounts',
+        category: 'Games & Comics',
+        tags: ['games-comics', 'public-api', 'playerdb'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.8,
+        ratingCount: 9058,
+        usageCount: 87794,
+        baseUrl: 'https://playerdb.co',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://playerdb.co/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'pok-api',
+        name: 'Pokéapi',
+        provider: 'Pokéapi',
+        description: 'Pokémon Information',
+        category: 'Games & Comics',
+        tags: ['games-comics', 'public-api', 'pok'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.2,
+        ratingCount: 9152,
+        usageCount: 8807,
+        baseUrl: 'https://pokeapi.co',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://pokeapi.co',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'pok-mon-tcg',
+        name: 'Pokémon TCG',
+        provider: 'Pokémon TCG',
+        description: 'Pokémon TCG Information',
+        category: 'Games & Comics',
+        tags: ['games-comics', 'public-api', 'pok'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.1,
+        ratingCount: 7381,
+        usageCount: 92554,
+        baseUrl: 'https://pokemontcg.io',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://pokemontcg.io',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'raider',
+        name: 'Raider',
+        provider: 'Raider',
+        description: 'Provides detailed character and guild rankings for Raiding and Mythic+ content in World of Warcraft',
+        category: 'Games & Comics',
+        tags: ['games-comics', 'public-api', 'raider'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.2,
+        ratingCount: 7922,
+        usageCount: 74060,
+        baseUrl: 'https://raider.io',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://raider.io/api',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'rawg-io',
+        name: 'RAWG.io',
+        provider: 'RAWG.io',
+        description: '500,000+ games for 50 platforms including mobiles',
+        category: 'Games & Comics',
+        tags: ['games-comics', 'public-api', 'rawg'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.7,
+        ratingCount: 8907,
+        usageCount: 78201,
+        baseUrl: 'https://rawg.io',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://rawg.io/apidocs',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'riot-games',
+        name: 'Riot Games',
+        provider: 'Riot Games',
+        description: 'League of Legends Game Information',
+        category: 'Games & Comics',
+        tags: ['games-comics', 'public-api', 'riot'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.5,
+        ratingCount: 785,
+        usageCount: 72897,
+        baseUrl: 'https://developer.riotgames.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://developer.riotgames.com/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'runescape',
+        name: 'RuneScape',
+        provider: 'RuneScape',
+        description: 'RuneScape and OSRS RPGs information',
+        category: 'Games & Comics',
+        tags: ['games-comics', 'public-api', 'runescape'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.7,
+        ratingCount: 3577,
+        usageCount: 39582,
+        baseUrl: 'https://runescape.wiki',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://runescape.wiki/w/Application_programming_interface',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'sakura-cardcaptor',
+        name: 'Sakura CardCaptor',
+        provider: 'Sakura CardCaptor',
+        description: 'Sakura CardCaptor Cards Information',
+        category: 'Games & Comics',
+        tags: ['games-comics', 'public-api', 'sakura'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4,
+        ratingCount: 9180,
+        usageCount: 43240,
+        baseUrl: 'https://github.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://github.com/JessVel/sakura-card-captor-api',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'steam',
+        name: 'Steam',
+        provider: 'Steam',
+        description: 'Steam Web API documentation',
+        category: 'Games & Comics',
+        tags: ['games-comics', 'public-api', 'steam'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.7,
+        ratingCount: 3087,
+        usageCount: 24941,
+        baseUrl: 'https://steamapi.xpaw.me',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://steamapi.xpaw.me/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'superheroes',
+        name: 'SuperHeroes',
+        provider: 'SuperHeroes',
+        description: 'All SuperHeroes and Villains data from all universes under a single API',
+        category: 'Games & Comics',
+        tags: ['games-comics', 'public-api', 'superheroes'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.6,
+        ratingCount: 6076,
+        usageCount: 45653,
+        baseUrl: 'https://superheroapi.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://superheroapi.com',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'tebex',
+        name: 'Tebex',
+        provider: 'Tebex',
+        description: 'Tebex API for information about game purchases',
+        category: 'Games & Comics',
+        tags: ['games-comics', 'public-api', 'tebex'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.9,
+        ratingCount: 3159,
+        usageCount: 88951,
+        baseUrl: 'https://docs.tebex.io',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://docs.tebex.io/plugin/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'tetr-io',
+        name: 'TETR.IO',
+        provider: 'TETR.IO',
+        description: 'TETR.IO Tetra Channel API',
+        category: 'Games & Comics',
+        tags: ['games-comics', 'public-api', 'tetr'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.3,
+        ratingCount: 3733,
+        usageCount: 83319,
+        baseUrl: 'https://tetr.io',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://tetr.io/about/api/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'tronald-dump',
+        name: 'Tronald Dump',
+        provider: 'Tronald Dump',
+        description: 'The dumbest things Donald Trump has ever said',
+        category: 'Games & Comics',
+        tags: ['games-comics', 'public-api', 'tronald'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.8,
+        ratingCount: 678,
+        usageCount: 73739,
+        baseUrl: 'https://www.tronalddump.io',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://www.tronalddump.io/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'valorant-non-official',
+        name: 'Valorant (non-official)',
+        provider: 'Valorant (non-official)',
+        description: 'An extensive API containing data of most Valorant in-game items, assets and more',
+        category: 'Games & Comics',
+        tags: ['games-comics', 'public-api', 'valorant'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.6,
+        ratingCount: 4586,
+        usageCount: 1155,
+        baseUrl: 'https://valorant-api.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://valorant-api.com',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'warface-non-official',
+        name: 'Warface (non-official)',
+        provider: 'Warface (non-official)',
+        description: 'Official API proxy with better data structure and more features',
+        category: 'Games & Comics',
+        tags: ['games-comics', 'public-api', 'warface'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.4,
+        ratingCount: 964,
+        usageCount: 75352,
+        baseUrl: 'https://api.wfstats.cf',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://api.wfstats.cf',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'wargaming-net',
+        name: 'Wargaming.net',
+        provider: 'Wargaming.net',
+        description: 'Wargaming.net info and stats',
+        category: 'Games & Comics',
+        tags: ['games-comics', 'public-api', 'wargaming'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4,
+        ratingCount: 870,
+        usageCount: 62481,
+        baseUrl: 'https://developers.wargaming.net',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://developers.wargaming.net/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'when-is-next-mcu-film',
+        name: 'When is next MCU film',
+        provider: 'When is next MCU film',
+        description: 'Upcoming MCU film information',
+        category: 'Games & Comics',
+        tags: ['games-comics', 'public-api', 'when'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.7,
+        ratingCount: 4847,
+        usageCount: 33335,
+        baseUrl: 'https://github.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://github.com/DiljotSG/MCU-Countdown/blob/develop/docs/API.md',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'xkcd',
+        name: 'xkcd',
+        provider: 'xkcd',
+        description: 'Retrieve xkcd comics as JSON',
+        category: 'Games & Comics',
+        tags: ['games-comics', 'public-api', 'xkcd'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.7,
+        ratingCount: 9367,
+        usageCount: 78838,
+        baseUrl: 'https://xkcd.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://xkcd.com/json.html',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'yu-gi-oh',
+        name: 'Yu-Gi-Oh!',
+        provider: 'Yu-Gi-Oh!',
+        description: 'Yu-Gi-Oh! TCG Information',
+        category: 'Games & Comics',
+        tags: ['games-comics', 'public-api', 'yu'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.8,
+        ratingCount: 3718,
+        usageCount: 20316,
+        baseUrl: 'https://db.ygoprodeck.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://db.ygoprodeck.com/api-guide/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'ipapi-com',
+        name: 'ipapi.com',
+        provider: 'ipapi.com',
+        description: 'Real-time Geolocation & Reverse IP Lookup REST API',
+        category: 'Geocoding',
+        tags: ['geocoding', 'public-api', 'ipapi'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.4,
+        ratingCount: 9324,
+        usageCount: 18403,
+        baseUrl: 'https://ipapi.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://ipapi.com/?utm_source=Github&utm_medium=Referral&utm_campaign=Public-apis-repo-Best-sellers',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'actinia-grass-gis',
+        name: 'Actinia Grass GIS',
+        provider: 'Actinia Grass GIS',
+        description: 'Actinia is an open source REST API for geographical data that uses GRASS GIS',
+        category: 'Geocoding',
+        tags: ['geocoding', 'public-api', 'actinia'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.3,
+        ratingCount: 4173,
+        usageCount: 71239,
+        baseUrl: 'https://actinia.mundialis.de',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://actinia.mundialis.de/api_docs/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'adresse-data-gouv-fr',
+        name: 'adresse.data.gouv.fr',
+        provider: 'adresse.data.gouv.fr',
+        description: 'Address database of France, geocoding and reverse',
+        category: 'Geocoding',
+        tags: ['geocoding', 'public-api', 'adresse'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.4,
+        ratingCount: 5904,
+        usageCount: 83343,
+        baseUrl: 'https://adresse.data.gouv.fr',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://adresse.data.gouv.fr',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'airtel-ip',
+        name: 'Airtel IP',
+        provider: 'Airtel IP',
+        description: 'IP Geolocation API. Collecting data from multiple sources',
+        category: 'Geocoding',
+        tags: ['geocoding', 'public-api', 'airtel'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.6,
+        ratingCount: 8586,
+        usageCount: 78440,
+        baseUrl: 'https://sys.airtel.lv',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://sys.airtel.lv/ip2country/1.1.1.1/?full=true',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'bdapis',
+        name: 'BdAPIs',
+        provider: 'BdAPIs',
+        description: 'Get divisions, districts, and upazzilas of Bangladesh',
+        category: 'Geocoding',
+        tags: ['geocoding', 'public-api', 'bdapis'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.6,
+        ratingCount: 5946,
+        usageCount: 38778,
+        baseUrl: 'https://bdapis.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://bdapis.com/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'bigdatacloud',
+        name: 'BigDataCloud',
+        provider: 'BigDataCloud',
+        description: 'Provides fast and accurate IP geolocation APIs along with security checks and confidence area',
+        category: 'Geocoding',
+        tags: ['geocoding', 'public-api', 'bigdatacloud'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.2,
+        ratingCount: 1682,
+        usageCount: 28883,
+        baseUrl: 'https://www.bigdatacloud.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://www.bigdatacloud.com/ip-geolocation-apis',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'bing-maps',
+        name: 'Bing Maps',
+        provider: 'Bing Maps',
+        description: 'Create/customize digital maps based on Bing Maps data',
+        category: 'Geocoding',
+        tags: ['geocoding', 'public-api', 'bing'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.7,
+        ratingCount: 3767,
+        usageCount: 84895,
+        baseUrl: 'https://www.microsoft.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://www.microsoft.com/maps/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'cartes-io',
+        name: 'Cartes.io',
+        provider: 'Cartes.io',
+        description: 'Create maps and markers for anything',
+        category: 'Geocoding',
+        tags: ['geocoding', 'public-api', 'cartes'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.6,
+        ratingCount: 6146,
+        usageCount: 3520,
+        baseUrl: 'https://github.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://github.com/M-Media-Group/Cartes.io/wiki/API',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'citysdk',
+        name: 'CitySDK',
+        provider: 'CitySDK',
+        description: 'Open APIs for select European cities',
+        category: 'Geocoding',
+        tags: ['geocoding', 'public-api', 'citysdk'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.6,
+        ratingCount: 8706,
+        usageCount: 6458,
+        baseUrl: 'https://www.citysdk.eu',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'http://www.citysdk.eu/citysdk-toolkit/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'ducks-unlimited',
+        name: 'Ducks Unlimited',
+        provider: 'Ducks Unlimited',
+        description: 'API explorer that gives a query URL with a JSON response of locations and cities',
+        category: 'Geocoding',
+        tags: ['geocoding', 'public-api', 'ducks'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.7,
+        ratingCount: 9257,
+        usageCount: 11536,
+        baseUrl: 'https://gis.ducks.org',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://gis.ducks.org/datasets/du-university-chapters/api',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'geoapi',
+        name: 'GeoApi',
+        provider: 'GeoApi',
+        description: 'French geographical data',
+        category: 'Geocoding',
+        tags: ['geocoding', 'public-api', 'geoapi'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.2,
+        ratingCount: 6942,
+        usageCount: 89634,
+        baseUrl: 'https://api.gouv.fr',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://api.gouv.fr/api/geoapi.html',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'geocod-io',
+        name: 'Geocod.io',
+        provider: 'Geocod.io',
+        description: 'Address geocoding / reverse geocoding in bulk',
+        category: 'Geocoding',
+        tags: ['geocoding', 'public-api', 'geocod'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.7,
+        ratingCount: 2507,
+        usageCount: 2572,
+        baseUrl: 'https://www.geocod.io',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://www.geocod.io/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'geocode-xyz',
+        name: 'Geocode.xyz',
+        provider: 'Geocode.xyz',
+        description: 'Provides worldwide forward/reverse geocoding, batch geocoding and geoparsing',
+        category: 'Geocoding',
+        tags: ['geocoding', 'public-api', 'geocode'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.3,
+        ratingCount: 1853,
+        usageCount: 71479,
+        baseUrl: 'https://geocode.xyz',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://geocode.xyz/api',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'geodata-gov-gr',
+        name: 'Geodata.gov.gr',
+        provider: 'Geodata.gov.gr',
+        description: 'Open geospatial data and API service for Greece',
+        category: 'Geocoding',
+        tags: ['geocoding', 'public-api', 'geodata'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.7,
+        ratingCount: 3297,
+        usageCount: 88971,
+        baseUrl: 'https://geodata.gov.gr',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://geodata.gov.gr/en/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'geodatasource',
+        name: 'GeoDataSource',
+        provider: 'GeoDataSource',
+        description: 'Geocoding of city name by using latitude and longitude coordinates',
+        category: 'Geocoding',
+        tags: ['geocoding', 'public-api', 'geodatasource'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.5,
+        ratingCount: 5445,
+        usageCount: 3706,
+        baseUrl: 'https://www.geodatasource.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://www.geodatasource.com/web-service',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'geodb-cities',
+        name: 'GeoDB Cities',
+        provider: 'GeoDB Cities',
+        description: 'Get global city, region, and country data',
+        category: 'Geocoding',
+        tags: ['geocoding', 'public-api', 'geodb'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.8,
+        ratingCount: 9408,
+        usageCount: 91558,
+        baseUrl: 'https://geodb-cities-api.wirefreethought.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'http://geodb-cities-api.wirefreethought.com/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'google-earth-engine',
+        name: 'Google Earth Engine',
+        provider: 'Google Earth Engine',
+        description: 'A cloud-based platform for planetary-scale environmental data analysis',
+        category: 'Geocoding',
+        tags: ['geocoding', 'public-api', 'google'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.2,
+        ratingCount: 6332,
+        usageCount: 95261,
+        baseUrl: 'https://developers.google.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://developers.google.com/earth-engine/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'google-maps',
+        name: 'Google Maps',
+        provider: 'Google Maps',
+        description: 'Create/customize digital maps based on Google Maps data',
+        category: 'Geocoding',
+        tags: ['geocoding', 'public-api', 'google'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.4,
+        ratingCount: 2894,
+        usageCount: 32484,
+        baseUrl: 'https://developers.google.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://developers.google.com/maps/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'graph-countries',
+        name: 'Graph Countries',
+        provider: 'Graph Countries',
+        description: 'Country-related data like currencies, languages, flags, regions+subregions and bordering countries',
+        category: 'Geocoding',
+        tags: ['geocoding', 'public-api', 'graph'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.6,
+        ratingCount: 8356,
+        usageCount: 70122,
+        baseUrl: 'https://github.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://github.com/lennertVanSever/graphcountries',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'hellosalut',
+        name: 'HelloSalut',
+        provider: 'HelloSalut',
+        description: 'Get hello translation following user language',
+        category: 'Geocoding',
+        tags: ['geocoding', 'public-api', 'hellosalut'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.4,
+        ratingCount: 6304,
+        usageCount: 23829,
+        baseUrl: 'https://fourtonfish.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://fourtonfish.com/project/hellosalut-api/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'here-maps',
+        name: 'HERE Maps',
+        provider: 'HERE Maps',
+        description: 'Create/customize digital maps based on HERE Maps data',
+        category: 'Geocoding',
+        tags: ['geocoding', 'public-api', 'here'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.1,
+        ratingCount: 8241,
+        usageCount: 54820,
+        baseUrl: 'https://developer.here.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://developer.here.com',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'hirak-ip-to-country',
+        name: 'Hirak IP to Country',
+        provider: 'Hirak IP to Country',
+        description: 'Ip to location with country code, currency code & currency name, fast response, unlimited requests',
+        category: 'Geocoding',
+        tags: ['geocoding', 'public-api', 'hirak'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.5,
+        ratingCount: 2805,
+        usageCount: 5615,
+        baseUrl: 'https://iplocation.hirak.site',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://iplocation.hirak.site/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'hong-kong-geodata-store',
+        name: 'Hong Kong GeoData Store',
+        provider: 'Hong Kong GeoData Store',
+        description: 'API for accessing geo-data of Hong Kong',
+        category: 'Geocoding',
+        tags: ['geocoding', 'public-api', 'hong'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.3,
+        ratingCount: 3373,
+        usageCount: 53410,
+        baseUrl: 'https://geodata.gov.hk',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://geodata.gov.hk/gs/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'ibge',
+        name: 'IBGE',
+        provider: 'IBGE',
+        description: 'Aggregate services of IBGE (Brazilian Institute of Geography and Statistics)',
+        category: 'Geocoding',
+        tags: ['geocoding', 'public-api', 'ibge'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.8,
+        ratingCount: 8458,
+        usageCount: 73994,
+        baseUrl: 'https://servicodados.ibge.gov.br',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://servicodados.ibge.gov.br/api/docs/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'ip-2-country',
+        name: 'IP 2 Country',
+        provider: 'IP 2 Country',
+        description: 'Map an IP to a country',
+        category: 'Geocoding',
+        tags: ['geocoding', 'public-api', 'ip'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.6,
+        ratingCount: 7156,
+        usageCount: 36379,
+        baseUrl: 'https://ip2country.info',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://ip2country.info',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'ip-address-details',
+        name: 'IP Address Details',
+        provider: 'IP Address Details',
+        description: 'Find geolocation with ip address',
+        category: 'Geocoding',
+        tags: ['geocoding', 'public-api', 'ip'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4,
+        ratingCount: 4510,
+        usageCount: 14001,
+        baseUrl: 'https://ipinfo.io',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://ipinfo.io/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'ip-vigilante',
+        name: 'IP Vigilante',
+        provider: 'IP Vigilante',
+        description: 'Free IP Geolocation API',
+        category: 'Geocoding',
+        tags: ['geocoding', 'public-api', 'ip'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.8,
+        ratingCount: 1438,
+        usageCount: 75419,
+        baseUrl: 'https://www.ipvigilante.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://www.ipvigilante.com/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'ip2location',
+        name: 'IP2Location',
+        provider: 'IP2Location',
+        description: 'IP geolocation web service to get more than 55 parameters',
+        category: 'Geocoding',
+        tags: ['geocoding', 'public-api', 'ip2location'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.1,
+        ratingCount: 3661,
+        usageCount: 79023,
+        baseUrl: 'https://www.ip2location.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://www.ip2location.com/web-service/ip2location',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'ip2proxy',
+        name: 'IP2Proxy',
+        provider: 'IP2Proxy',
+        description: 'Detect proxy and VPN using IP address',
+        category: 'Geocoding',
+        tags: ['geocoding', 'public-api', 'ip2proxy'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.8,
+        ratingCount: 1678,
+        usageCount: 58025,
+        baseUrl: 'https://www.ip2location.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://www.ip2location.com/web-service/ip2proxy',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'ipgeo',
+        name: 'IPGEO',
+        provider: 'IPGEO',
+        description: 'Unlimited free IP Address API with useful information',
+        category: 'Geocoding',
+        tags: ['geocoding', 'public-api', 'ipgeo'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.9,
+        ratingCount: 4469,
+        usageCount: 94995,
+        baseUrl: 'https://api.techniknews.net',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://api.techniknews.net/ipgeo/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'ipinfodb',
+        name: 'IPInfoDB',
+        provider: 'IPInfoDB',
+        description: 'Free Geolocation tools and APIs for country, region, city and time zone lookup by IP address',
+        category: 'Geocoding',
+        tags: ['geocoding', 'public-api', 'ipinfodb'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.6,
+        ratingCount: 7646,
+        usageCount: 55878,
+        baseUrl: 'https://www.ipinfodb.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://www.ipinfodb.com/api',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'kakao-maps',
+        name: 'Kakao Maps',
+        provider: 'Kakao Maps',
+        description: 'Kakao Maps provide multiple APIs for Korean maps',
+        category: 'Geocoding',
+        tags: ['geocoding', 'public-api', 'kakao'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.8,
+        ratingCount: 8278,
+        usageCount: 35968,
+        baseUrl: 'https://apis.map.kakao.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://apis.map.kakao.com',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'keycdn-ip-location-finder',
+        name: 'keycdn IP Location Finder',
+        provider: 'keycdn IP Location Finder',
+        description: 'Get the IP geolocation data through the simple REST API. All the responses are JSON encoded',
+        category: 'Geocoding',
+        tags: ['geocoding', 'public-api', 'keycdn'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.4,
+        ratingCount: 5684,
+        usageCount: 82740,
+        baseUrl: 'https://tools.keycdn.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://tools.keycdn.com/geo',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'mapbox',
+        name: 'Mapbox',
+        provider: 'Mapbox',
+        description: 'Create/customize beautiful digital maps',
+        category: 'Geocoding',
+        tags: ['geocoding', 'public-api', 'mapbox'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.4,
+        ratingCount: 9034,
+        usageCount: 23933,
+        baseUrl: 'https://docs.mapbox.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://docs.mapbox.com/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'mapquest',
+        name: 'MapQuest',
+        provider: 'MapQuest',
+        description: 'To access tools and resources to map the world',
+        category: 'Geocoding',
+        tags: ['geocoding', 'public-api', 'mapquest'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.5,
+        ratingCount: 1085,
+        usageCount: 35226,
+        baseUrl: 'https://developer.mapquest.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://developer.mapquest.com/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'mexico',
+        name: 'Mexico',
+        provider: 'Mexico',
+        description: 'Mexico RESTful zip codes API',
+        category: 'Geocoding',
+        tags: ['geocoding', 'public-api', 'mexico'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.6,
+        ratingCount: 4146,
+        usageCount: 4663,
+        baseUrl: 'https://github.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://github.com/IcaliaLabs/sepomex',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'one-map-singapore',
+        name: 'One Map, Singapore',
+        provider: 'One Map, Singapore',
+        description: 'Singapore Land Authority REST API services for Singapore addresses',
+        category: 'Geocoding',
+        tags: ['geocoding', 'public-api', 'one'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.3,
+        ratingCount: 3393,
+        usageCount: 57556,
+        baseUrl: 'https://www.onemap.gov.sg',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://www.onemap.gov.sg/docs/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'onwater',
+        name: 'OnWater',
+        provider: 'OnWater',
+        description: 'Determine if a lat/lon is on water or land',
+        category: 'Geocoding',
+        tags: ['geocoding', 'public-api', 'onwater'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.5,
+        ratingCount: 6645,
+        usageCount: 8877,
+        baseUrl: 'https://onwater.io',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://onwater.io/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'open-topo-data',
+        name: 'Open Topo Data',
+        provider: 'Open Topo Data',
+        description: 'Elevation and ocean depth for a latitude and longitude',
+        category: 'Geocoding',
+        tags: ['geocoding', 'public-api', 'open'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.1,
+        ratingCount: 8021,
+        usageCount: 94788,
+        baseUrl: 'https://www.opentopodata.org',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://www.opentopodata.org',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'openrouteservice-org',
+        name: 'openrouteservice.org',
+        provider: 'openrouteservice.org',
+        description: 'Directions, POIs, isochrones, geocoding (+reverse), elevation, and more',
+        category: 'Geocoding',
+        tags: ['geocoding', 'public-api', 'openrouteservice'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.2,
+        ratingCount: 3622,
+        usageCount: 1017,
+        baseUrl: 'https://openrouteservice.org',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://openrouteservice.org/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'positionstack',
+        name: 'positionstack',
+        provider: 'positionstack',
+        description: 'Forward & Reverse Batch Geocoding REST API',
+        category: 'Geocoding',
+        tags: ['geocoding', 'public-api', 'positionstack'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.2,
+        ratingCount: 7162,
+        usageCount: 64380,
+        baseUrl: 'https://positionstack.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://positionstack.com/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'postalcodes',
+        name: 'PostalCodes',
+        provider: 'PostalCodes',
+        description: 'Postal code search, country exports, and address validation data',
+        category: 'Geocoding',
+        tags: ['geocoding', 'public-api', 'postalcodes'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4,
+        ratingCount: 2960,
+        usageCount: 76780,
+        baseUrl: 'https://postalcodes.info',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://postalcodes.info/api',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'queimadas-inpe',
+        name: 'Queimadas INPE',
+        provider: 'Queimadas INPE',
+        description: 'Access to heat focus data (probable wildfire)',
+        category: 'Geocoding',
+        tags: ['geocoding', 'public-api', 'queimadas'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.8,
+        ratingCount: 5928,
+        usageCount: 74061,
+        baseUrl: 'https://queimadas.dgi.inpe.br',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://queimadas.dgi.inpe.br/queimadas/dados-abertos/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'roadgoat-cities',
+        name: 'RoadGoat Cities',
+        provider: 'RoadGoat Cities',
+        description: 'Cities content & photos API',
+        category: 'Geocoding',
+        tags: ['geocoding', 'public-api', 'roadgoat'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.8,
+        ratingCount: 5708,
+        usageCount: 89601,
+        baseUrl: 'https://www.roadgoat.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://www.roadgoat.com/business/cities-api',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'rwanda-locations',
+        name: 'Rwanda Locations',
+        provider: 'Rwanda Locations',
+        description: 'Rwanda Provences, Districts, Cities, Capital City, Sector, cells, villages and streets',
+        category: 'Geocoding',
+        tags: ['geocoding', 'public-api', 'rwanda'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.3,
+        ratingCount: 8283,
+        usageCount: 82111,
+        baseUrl: 'https://rapidapi.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://rapidapi.com/victorkarangwa4/api/rwanda',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'spotsense',
+        name: 'SpotSense',
+        provider: 'SpotSense',
+        description: 'Add location based interactions to your mobile app',
+        category: 'Geocoding',
+        tags: ['geocoding', 'public-api', 'spotsense'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.3,
+        ratingCount: 2333,
+        usageCount: 45119,
+        baseUrl: 'https://spotsense.io',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://spotsense.io/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'uebermaps',
+        name: 'Uebermaps',
+        provider: 'Uebermaps',
+        description: 'Discover and share maps with friends',
+        category: 'Geocoding',
+        tags: ['geocoding', 'public-api', 'uebermaps'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.5,
+        ratingCount: 2225,
+        usageCount: 64532,
+        baseUrl: 'https://uebermaps.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://uebermaps.com/api/v2',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'utah-agrc',
+        name: 'Utah AGRC',
+        provider: 'Utah AGRC',
+        description: 'Utah Web API for geocoding Utah addresses',
+        category: 'Geocoding',
+        tags: ['geocoding', 'public-api', 'utah'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.1,
+        ratingCount: 6551,
+        usageCount: 38721,
+        baseUrl: 'https://api.mapserv.utah.gov',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://api.mapserv.utah.gov',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'viacep',
+        name: 'ViaCep',
+        provider: 'ViaCep',
+        description: 'Brazil RESTful zip codes API',
+        category: 'Geocoding',
+        tags: ['geocoding', 'public-api', 'viacep'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.5,
+        ratingCount: 5705,
+        usageCount: 67600,
+        baseUrl: 'https://viacep.com.br',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://viacep.com.br',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'what3words',
+        name: 'What3Words',
+        provider: 'What3Words',
+        description: 'Three words as rememberable and unique coordinates worldwide',
+        category: 'Geocoding',
+        tags: ['geocoding', 'public-api', 'what3words'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.7,
+        ratingCount: 5927,
+        usageCount: 2918,
+        baseUrl: 'https://what3words.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://what3words.com',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'yandex-maps-geocoder',
+        name: 'Yandex.Maps Geocoder',
+        provider: 'Yandex.Maps Geocoder',
+        description: 'Use geocoding to get an object\'s coordinates from its address',
+        category: 'Geocoding',
+        tags: ['geocoding', 'public-api', 'yandex'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.7,
+        ratingCount: 8597,
+        usageCount: 49442,
+        baseUrl: 'https://yandex.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://yandex.com/dev/maps/geocoder',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'zipcodeapi',
+        name: 'ZipCodeAPI',
+        provider: 'ZipCodeAPI',
+        description: 'US zip code distance, radius and location API',
+        category: 'Geocoding',
+        tags: ['geocoding', 'public-api', 'zipcodeapi'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.1,
+        ratingCount: 8191,
+        usageCount: 82670,
+        baseUrl: 'https://www.zipcodeapi.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://www.zipcodeapi.com',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'ziptastic',
+        name: 'Ziptastic',
+        provider: 'Ziptastic',
+        description: 'Get the country, state, and city of any US zip-code',
+        category: 'Geocoding',
+        tags: ['geocoding', 'public-api', 'ziptastic'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4,
+        ratingCount: 4440,
+        usageCount: 61562,
+        baseUrl: 'https://ziptasticapi.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://ziptasticapi.com/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'bank-negara-malaysia-open-data',
+        name: 'Bank Negara Malaysia Open Data',
+        provider: 'Bank Negara Malaysia Open Data',
+        description: 'Malaysia Central Bank Open Data',
+        category: 'Government',
+        tags: ['government', 'public-api', 'bank'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.2,
+        ratingCount: 4732,
+        usageCount: 91033,
+        baseUrl: 'https://apikijangportal.bnm.gov.my',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://apikijangportal.bnm.gov.my/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'brazil-central-bank-open-data',
+        name: 'Brazil Central Bank Open Data',
+        provider: 'Brazil Central Bank Open Data',
+        description: 'Brazil Central Bank Open Data',
+        category: 'Government',
+        tags: ['government', 'public-api', 'brazil'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.2,
+        ratingCount: 5822,
+        usageCount: 7331,
+        baseUrl: 'https://dadosabertos.bcb.gov.br',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://dadosabertos.bcb.gov.br/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'brazil-receita-ws',
+        name: 'Brazil Receita WS',
+        provider: 'Brazil Receita WS',
+        description: 'Consult companies by CNPJ for Brazilian companies',
+        category: 'Government',
+        tags: ['government', 'public-api', 'brazil'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.4,
+        ratingCount: 5634,
+        usageCount: 28447,
+        baseUrl: 'https://www.receitaws.com.br',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://www.receitaws.com.br/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'brazilian-chamber-of-deputies-open-data',
+        name: 'Brazilian Chamber of Deputies Open Data',
+        provider: 'Brazilian Chamber of Deputies Open Data',
+        description: 'Provides legislative information in Apis XML and JSON, as well as files in various formats',
+        category: 'Government',
+        tags: ['government', 'public-api', 'brazilian'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.2,
+        ratingCount: 3482,
+        usageCount: 54711,
+        baseUrl: 'https://dadosabertos.camara.leg.br',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://dadosabertos.camara.leg.br/swagger/api.html',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'census-gov',
+        name: 'Census.gov',
+        provider: 'Census.gov',
+        description: 'The US Census Bureau provides various APIs and data sets on demographics and businesses',
+        category: 'Government',
+        tags: ['government', 'public-api', 'census'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.9,
+        ratingCount: 9329,
+        usageCount: 88118,
+        baseUrl: 'https://www.census.gov',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://www.census.gov/data/developers/data-sets.html',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'city-berlin',
+        name: 'City, Berlin',
+        provider: 'City, Berlin',
+        description: 'Berlin(DE) City Open Data',
+        category: 'Government',
+        tags: ['government', 'public-api', 'city'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.5,
+        ratingCount: 2845,
+        usageCount: 41620,
+        baseUrl: 'https://daten.berlin.de',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://daten.berlin.de/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'city-gda-sk',
+        name: 'City, Gdańsk',
+        provider: 'City, Gdańsk',
+        description: 'Gdańsk (PL) City Open Data',
+        category: 'Government',
+        tags: ['government', 'public-api', 'city'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.4,
+        ratingCount: 2254,
+        usageCount: 19250,
+        baseUrl: 'https://ckan.multimediagdansk.pl',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://ckan.multimediagdansk.pl/en',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'city-helsinki',
+        name: 'City, Helsinki',
+        provider: 'City, Helsinki',
+        description: 'Helsinki(FI) City Open Data',
+        category: 'Government',
+        tags: ['government', 'public-api', 'city'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.2,
+        ratingCount: 7872,
+        usageCount: 71624,
+        baseUrl: 'https://hri.fi',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://hri.fi/en_gb/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'city-lviv',
+        name: 'City, Lviv',
+        provider: 'City, Lviv',
+        description: 'Lviv(UA) City Open Data',
+        category: 'Government',
+        tags: ['government', 'public-api', 'city'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4,
+        ratingCount: 3560,
+        usageCount: 28722,
+        baseUrl: 'https://opendata.city-adm.lviv.ua',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://opendata.city-adm.lviv.ua/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'city-nantes-open-data',
+        name: 'City, Nantes Open Data',
+        provider: 'City, Nantes Open Data',
+        description: 'Nantes(FR) City Open Data',
+        category: 'Government',
+        tags: ['government', 'public-api', 'city'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.8,
+        ratingCount: 3448,
+        usageCount: 41992,
+        baseUrl: 'https://data.nantesmetropole.fr',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://data.nantesmetropole.fr/pages/home/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'city-new-york-open-data',
+        name: 'City, New York Open Data',
+        provider: 'City, New York Open Data',
+        description: 'New York (US) City Open Data',
+        category: 'Government',
+        tags: ['government', 'public-api', 'city'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.7,
+        ratingCount: 2277,
+        usageCount: 86682,
+        baseUrl: 'https://opendata.cityofnewyork.us',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://opendata.cityofnewyork.us/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'code-gov',
+        name: 'Code.gov',
+        provider: 'Code.gov',
+        description: 'The primary platform for Open Source and code sharing for the U.S. Federal Government',
+        category: 'Government',
+        tags: ['government', 'public-api', 'code'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.7,
+        ratingCount: 9207,
+        usageCount: 77101,
+        baseUrl: 'https://code.gov',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://code.gov',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'colorado-information-marketplace',
+        name: 'Colorado Information Marketplace',
+        provider: 'Colorado Information Marketplace',
+        description: 'Colorado State Government Open Data',
+        category: 'Government',
+        tags: ['government', 'public-api', 'colorado'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.9,
+        ratingCount: 819,
+        usageCount: 22331,
+        baseUrl: 'https://data.colorado.gov',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://data.colorado.gov/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'conversor-iae-cnae',
+        name: 'Conversor IAE CNAE',
+        provider: 'Conversor IAE CNAE',
+        description: 'Spanish IAE/CNAE tax activity codes, 2009→2025 crosswalk and AEAT obligations',
+        category: 'Government',
+        tags: ['government', 'public-api', 'conversor'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.8,
+        ratingCount: 9188,
+        usageCount: 18098,
+        baseUrl: 'https://www.conversoriaecnae.es',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://www.conversoriaecnae.es/api/v1/docs',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'data-usa',
+        name: 'Data USA',
+        provider: 'Data USA',
+        description: 'US Public Data',
+        category: 'Government',
+        tags: ['government', 'public-api', 'data'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.3,
+        ratingCount: 7043,
+        usageCount: 95506,
+        baseUrl: 'https://datausa.io',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://datausa.io/about/api/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'data-gov',
+        name: 'Data.gov',
+        provider: 'Data.gov',
+        description: 'US Government Data',
+        category: 'Government',
+        tags: ['government', 'public-api', 'data'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.2,
+        ratingCount: 5892,
+        usageCount: 11484,
+        baseUrl: 'https://api.data.gov',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://api.data.gov/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'deutscher-bundestag-dip',
+        name: 'Deutscher Bundestag DIP',
+        provider: 'Deutscher Bundestag DIP',
+        description: 'This API provides read access to DIP entities (e.g. activities, persons, printed material)',
+        category: 'Government',
+        tags: ['government', 'public-api', 'deutscher'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.6,
+        ratingCount: 3036,
+        usageCount: 88505,
+        baseUrl: 'https://dip.bundestag.de',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://dip.bundestag.de/documents/informationsblatt_zur_dip_api_v01.pdf',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'district-of-columbia-open-data',
+        name: 'District of Columbia Open Data',
+        provider: 'District of Columbia Open Data',
+        description: 'Contains D.C. government public datasets, including crime, GIS, financial data, and so on',
+        category: 'Government',
+        tags: ['government', 'public-api', 'district'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.2,
+        ratingCount: 7972,
+        usageCount: 18924,
+        baseUrl: 'https://opendata.dc.gov',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'http://opendata.dc.gov/pages/using-apis',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'epa',
+        name: 'EPA',
+        provider: 'EPA',
+        description: 'Web services and data sets from the US Environmental Protection Agency',
+        category: 'Government',
+        tags: ['government', 'public-api', 'epa'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.1,
+        ratingCount: 9391,
+        usageCount: 77984,
+        baseUrl: 'https://www.epa.gov',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://www.epa.gov/developers/data-data-products#apis',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'fbi-wanted',
+        name: 'FBI Wanted',
+        provider: 'FBI Wanted',
+        description: 'Access information on the FBI Wanted program',
+        category: 'Government',
+        tags: ['government', 'public-api', 'fbi'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.6,
+        ratingCount: 8796,
+        usageCount: 25185,
+        baseUrl: 'https://www.fbi.gov',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://www.fbi.gov/wanted/api',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'fec',
+        name: 'FEC',
+        provider: 'FEC',
+        description: 'Information on campaign donations in federal elections',
+        category: 'Government',
+        tags: ['government', 'public-api', 'fec'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.3,
+        ratingCount: 1503,
+        usageCount: 1857,
+        baseUrl: 'https://api.open.fec.gov',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://api.open.fec.gov/developers/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'federal-register',
+        name: 'Federal Register',
+        provider: 'Federal Register',
+        description: 'The Daily Journal of the United States Government',
+        category: 'Government',
+        tags: ['government', 'public-api', 'federal'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.8,
+        ratingCount: 6428,
+        usageCount: 91989,
+        baseUrl: 'https://www.federalregister.gov',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://www.federalregister.gov/reader-aids/developer-resources/rest-api',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'gazette-data-uk',
+        name: 'Gazette Data, UK',
+        provider: 'Gazette Data, UK',
+        description: 'UK official public record API',
+        category: 'Government',
+        tags: ['government', 'public-api', 'gazette'],
+        authType: 'OAuth 2.0',
+        pricing: 'Free',
+        ratingAverage: 4.7,
+        ratingCount: 2487,
+        usageCount: 15141,
+        baseUrl: 'https://www.thegazette.co.uk',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://www.thegazette.co.uk/data',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'gun-policy',
+        name: 'Gun Policy',
+        provider: 'Gun Policy',
+        description: 'International firearm injury prevention and policy',
+        category: 'Government',
+        tags: ['government', 'public-api', 'gun'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.4,
+        ratingCount: 1994,
+        usageCount: 81070,
+        baseUrl: 'https://www.gunpolicy.org',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://www.gunpolicy.org/api',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'interpol-red-notices',
+        name: 'Interpol Red Notices',
+        provider: 'Interpol Red Notices',
+        description: 'Access and search Interpol Red Notices',
+        category: 'Government',
+        tags: ['government', 'public-api', 'interpol'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.8,
+        ratingCount: 4418,
+        usageCount: 76416,
+        baseUrl: 'https://interpol.api.bund.dev',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://interpol.api.bund.dev/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'istanbul-i-bb-open-data',
+        name: 'Istanbul (İBB) Open Data',
+        provider: 'Istanbul (İBB) Open Data',
+        description: 'Data sets from the İstanbul Metropolitan Municipality (İBB)',
+        category: 'Government',
+        tags: ['government', 'public-api', 'istanbul'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.8,
+        ratingCount: 4518,
+        usageCount: 69145,
+        baseUrl: 'https://data.ibb.gov.tr',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://data.ibb.gov.tr',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'neotimo-dgfip-mirror',
+        name: 'Neotimo DGFiP Mirror',
+        provider: 'Neotimo DGFiP Mirror',
+        description: 'French DGFiP registry of certified e-invoicing platforms (Plateformes Agréées), searchable by SIRET',
+        category: 'Government',
+        tags: ['government', 'public-api', 'neotimo'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.9,
+        ratingCount: 5409,
+        usageCount: 16272,
+        baseUrl: 'https://neotimo.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://neotimo.com/annuaire-dgfip',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'open-government-act',
+        name: 'Open Government, ACT',
+        provider: 'Open Government, ACT',
+        description: 'Australian Capital Territory Open Data',
+        category: 'Government',
+        tags: ['government', 'public-api', 'open'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.4,
+        ratingCount: 574,
+        usageCount: 12582,
+        baseUrl: 'https://www.data.act.gov.au',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://www.data.act.gov.au/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'open-government-argentina',
+        name: 'Open Government, Argentina',
+        provider: 'Open Government, Argentina',
+        description: 'Argentina Government Open Data',
+        category: 'Government',
+        tags: ['government', 'public-api', 'open'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.5,
+        ratingCount: 8845,
+        usageCount: 58477,
+        baseUrl: 'https://datos.gob.ar',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://datos.gob.ar/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'open-government-australia',
+        name: 'Open Government, Australia',
+        provider: 'Open Government, Australia',
+        description: 'Australian Government Open Data',
+        category: 'Government',
+        tags: ['government', 'public-api', 'open'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4,
+        ratingCount: 4160,
+        usageCount: 30808,
+        baseUrl: 'https://www.data.gov.au',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://www.data.gov.au/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'open-government-austria',
+        name: 'Open Government, Austria',
+        provider: 'Open Government, Austria',
+        description: 'Austria Government Open Data',
+        category: 'Government',
+        tags: ['government', 'public-api', 'open'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.9,
+        ratingCount: 9209,
+        usageCount: 36387,
+        baseUrl: 'https://www.data.gv.at',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://www.data.gv.at/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'open-government-belgium',
+        name: 'Open Government, Belgium',
+        provider: 'Open Government, Belgium',
+        description: 'Belgium Government Open Data',
+        category: 'Government',
+        tags: ['government', 'public-api', 'open'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.1,
+        ratingCount: 5921,
+        usageCount: 69345,
+        baseUrl: 'https://data.gov.be',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://data.gov.be/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'open-government-cyprus',
+        name: 'Open Government, Cyprus',
+        provider: 'Open Government, Cyprus',
+        description: 'Cyprus Government Open Data',
+        category: 'Government',
+        tags: ['government', 'public-api', 'open'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.4,
+        ratingCount: 1024,
+        usageCount: 51503,
+        baseUrl: 'https://data.gov.cy',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://data.gov.cy/?language=en',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'open-government-czech-republic',
+        name: 'Open Government, Czech Republic',
+        provider: 'Open Government, Czech Republic',
+        description: 'Czech Republic Government Open Data',
+        category: 'Government',
+        tags: ['government', 'public-api', 'open'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4,
+        ratingCount: 2260,
+        usageCount: 80822,
+        baseUrl: 'https://data.gov.cz',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://data.gov.cz/english/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'open-government-denmark',
+        name: 'Open Government, Denmark',
+        provider: 'Open Government, Denmark',
+        description: 'Denmark Government Open Data',
+        category: 'Government',
+        tags: ['government', 'public-api', 'open'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.6,
+        ratingCount: 1136,
+        usageCount: 55662,
+        baseUrl: 'https://www.opendata.dk',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://www.opendata.dk/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'open-government-estonia',
+        name: 'Open Government, Estonia',
+        provider: 'Open Government, Estonia',
+        description: 'Estonia Government Open Data',
+        category: 'Government',
+        tags: ['government', 'public-api', 'open'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.5,
+        ratingCount: 7695,
+        usageCount: 19456,
+        baseUrl: 'https://avaandmed.eesti.ee',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://avaandmed.eesti.ee/instructions/opendata-dataset-api',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'open-government-finland',
+        name: 'Open Government, Finland',
+        provider: 'Open Government, Finland',
+        description: 'Finland Government Open Data',
+        category: 'Government',
+        tags: ['government', 'public-api', 'open'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.4,
+        ratingCount: 7334,
+        usageCount: 50262,
+        baseUrl: 'https://www.avoindata.fi',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://www.avoindata.fi/en',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'open-government-france',
+        name: 'Open Government, France',
+        provider: 'Open Government, France',
+        description: 'French Government Open Data',
+        category: 'Government',
+        tags: ['government', 'public-api', 'open'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.3,
+        ratingCount: 7263,
+        usageCount: 88394,
+        baseUrl: 'https://www.data.gouv.fr',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://www.data.gouv.fr/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'open-government-germany',
+        name: 'Open Government, Germany',
+        provider: 'Open Government, Germany',
+        description: 'Germany Government Open Data',
+        category: 'Government',
+        tags: ['government', 'public-api', 'open'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.5,
+        ratingCount: 9305,
+        usageCount: 11115,
+        baseUrl: 'https://www.govdata.de',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://www.govdata.de/daten/-/details/govdata-metadatenkatalog',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'open-government-greece',
+        name: 'Open Government, Greece',
+        provider: 'Open Government, Greece',
+        description: 'Greece Government Open Data',
+        category: 'Government',
+        tags: ['government', 'public-api', 'open'],
+        authType: 'OAuth 2.0',
+        pricing: 'Free',
+        ratingAverage: 4.7,
+        ratingCount: 4157,
+        usageCount: 84236,
+        baseUrl: 'https://data.gov.gr',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://data.gov.gr/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'open-government-india',
+        name: 'Open Government, India',
+        provider: 'Open Government, India',
+        description: 'Indian Government Open Data',
+        category: 'Government',
+        tags: ['government', 'public-api', 'open'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.9,
+        ratingCount: 2889,
+        usageCount: 8341,
+        baseUrl: 'https://data.gov.in',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://data.gov.in/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'open-government-indonesia',
+        name: 'Open Government, Indonesia',
+        provider: 'Open Government, Indonesia',
+        description: 'Indonesian Government Open Data',
+        category: 'Government',
+        tags: ['government', 'public-api', 'open'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.4,
+        ratingCount: 2824,
+        usageCount: 47617,
+        baseUrl: 'https://data.go.id',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://data.go.id/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'open-government-ireland',
+        name: 'Open Government, Ireland',
+        provider: 'Open Government, Ireland',
+        description: 'Ireland Government Open Data',
+        category: 'Government',
+        tags: ['government', 'public-api', 'open'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.1,
+        ratingCount: 5221,
+        usageCount: 93674,
+        baseUrl: 'https://data.gov.ie',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://data.gov.ie/pages/developers',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'open-government-italy',
+        name: 'Open Government, Italy',
+        provider: 'Open Government, Italy',
+        description: 'Italy Government Open Data',
+        category: 'Government',
+        tags: ['government', 'public-api', 'open'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.9,
+        ratingCount: 5299,
+        usageCount: 34257,
+        baseUrl: 'https://www.dati.gov.it',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://www.dati.gov.it/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'open-government-korea',
+        name: 'Open Government, Korea',
+        provider: 'Open Government, Korea',
+        description: 'Korea Government Open Data',
+        category: 'Government',
+        tags: ['government', 'public-api', 'open'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.4,
+        ratingCount: 7544,
+        usageCount: 87006,
+        baseUrl: 'https://www.data.go.kr',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://www.data.go.kr/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'open-government-lithuania',
+        name: 'Open Government, Lithuania',
+        provider: 'Open Government, Lithuania',
+        description: 'Lithuania Government Open Data',
+        category: 'Government',
+        tags: ['government', 'public-api', 'open'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.3,
+        ratingCount: 2523,
+        usageCount: 10146,
+        baseUrl: 'https://data.gov.lt',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://data.gov.lt/public/api/1',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'open-government-luxembourg',
+        name: 'Open Government, Luxembourg',
+        provider: 'Open Government, Luxembourg',
+        description: 'Luxembourgish Government Open Data',
+        category: 'Government',
+        tags: ['government', 'public-api', 'open'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4,
+        ratingCount: 8330,
+        usageCount: 52404,
+        baseUrl: 'https://data.public.lu',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://data.public.lu',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'open-government-mexico',
+        name: 'Open Government, Mexico',
+        provider: 'Open Government, Mexico',
+        description: 'Mexican Statistical Government Open Data',
+        category: 'Government',
+        tags: ['government', 'public-api', 'open'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.9,
+        ratingCount: 8519,
+        usageCount: 25717,
+        baseUrl: 'https://www.inegi.org.mx',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://www.inegi.org.mx/datos/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'open-government-netherlands',
+        name: 'Open Government, Netherlands',
+        provider: 'Open Government, Netherlands',
+        description: 'Netherlands Government Open Data',
+        category: 'Government',
+        tags: ['government', 'public-api', 'open'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4,
+        ratingCount: 3910,
+        usageCount: 36201,
+        baseUrl: 'https://data.overheid.nl',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://data.overheid.nl/en/ondersteuning/data-publiceren/api',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'open-government-new-south-wales',
+        name: 'Open Government, New South Wales',
+        provider: 'Open Government, New South Wales',
+        description: 'New South Wales Government Open Data',
+        category: 'Government',
+        tags: ['government', 'public-api', 'open'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.3,
+        ratingCount: 5473,
+        usageCount: 20567,
+        baseUrl: 'https://api.nsw.gov.au',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://api.nsw.gov.au/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'open-government-new-zealand',
+        name: 'Open Government, New Zealand',
+        provider: 'Open Government, New Zealand',
+        description: 'New Zealand Government Open Data',
+        category: 'Government',
+        tags: ['government', 'public-api', 'open'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.8,
+        ratingCount: 5188,
+        usageCount: 49241,
+        baseUrl: 'https://www.data.govt.nz',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://www.data.govt.nz/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'open-government-peru',
+        name: 'Open Government, Peru',
+        provider: 'Open Government, Peru',
+        description: 'Peru Government Open Data',
+        category: 'Government',
+        tags: ['government', 'public-api', 'open'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4,
+        ratingCount: 840,
+        usageCount: 81762,
+        baseUrl: 'https://www.datosabiertos.gob.pe',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://www.datosabiertos.gob.pe/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'open-government-queensland-government',
+        name: 'Open Government, Queensland Government',
+        provider: 'Open Government, Queensland Government',
+        description: 'Queensland Government Open Data',
+        category: 'Government',
+        tags: ['government', 'public-api', 'open'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.2,
+        ratingCount: 832,
+        usageCount: 68047,
+        baseUrl: 'https://www.data.qld.gov.au',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://www.data.qld.gov.au/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'open-government-saudi-arabia',
+        name: 'Open Government, Saudi Arabia',
+        provider: 'Open Government, Saudi Arabia',
+        description: 'Saudi Arabia Government Open Data',
+        category: 'Government',
+        tags: ['government', 'public-api', 'open'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.5,
+        ratingCount: 3015,
+        usageCount: 1216,
+        baseUrl: 'https://data.gov.sa',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://data.gov.sa',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'open-government-singapore',
+        name: 'Open Government, Singapore',
+        provider: 'Open Government, Singapore',
+        description: 'Singapore Government Open Data',
+        category: 'Government',
+        tags: ['government', 'public-api', 'open'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.2,
+        ratingCount: 592,
+        usageCount: 70298,
+        baseUrl: 'https://data.gov.sg',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://data.gov.sg/developer',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'open-government-slovakia',
+        name: 'Open Government, Slovakia',
+        provider: 'Open Government, Slovakia',
+        description: 'Slovakia Government Open Data',
+        category: 'Government',
+        tags: ['government', 'public-api', 'open'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.8,
+        ratingCount: 6798,
+        usageCount: 22899,
+        baseUrl: 'https://data.gov.sk',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://data.gov.sk/en/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'open-government-slovenia',
+        name: 'Open Government, Slovenia',
+        provider: 'Open Government, Slovenia',
+        description: 'Slovenia Government Open Data',
+        category: 'Government',
+        tags: ['government', 'public-api', 'open'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.7,
+        ratingCount: 3737,
+        usageCount: 65176,
+        baseUrl: 'https://podatki.gov.si',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://podatki.gov.si/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'open-government-south-australian-government',
+        name: 'Open Government, South Australian Government',
+        provider: 'Open Government, South Australian Government',
+        description: 'South Australian Government Open Data',
+        category: 'Government',
+        tags: ['government', 'public-api', 'open'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.2,
+        ratingCount: 8122,
+        usageCount: 81517,
+        baseUrl: 'https://data.sa.gov.au',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://data.sa.gov.au/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'open-government-spain',
+        name: 'Open Government, Spain',
+        provider: 'Open Government, Spain',
+        description: 'Spain Government Open Data',
+        category: 'Government',
+        tags: ['government', 'public-api', 'open'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.5,
+        ratingCount: 5685,
+        usageCount: 75740,
+        baseUrl: 'https://datos.gob.es',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://datos.gob.es/en',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'open-government-sweden',
+        name: 'Open Government, Sweden',
+        provider: 'Open Government, Sweden',
+        description: 'Sweden Government Open Data',
+        category: 'Government',
+        tags: ['government', 'public-api', 'open'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.2,
+        ratingCount: 4282,
+        usageCount: 46254,
+        baseUrl: 'https://www.dataportal.se',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://www.dataportal.se/en/dataservice/91_29789/api-for-the-statistical-database',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'open-government-switzerland',
+        name: 'Open Government, Switzerland',
+        provider: 'Open Government, Switzerland',
+        description: 'Switzerland Government Open Data',
+        category: 'Government',
+        tags: ['government', 'public-api', 'open'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.5,
+        ratingCount: 2865,
+        usageCount: 20766,
+        baseUrl: 'https://handbook.opendata.swiss',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://handbook.opendata.swiss/de/content/nutzen/api-nutzen.html',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'open-government-taiwan',
+        name: 'Open Government, Taiwan',
+        provider: 'Open Government, Taiwan',
+        description: 'Taiwan Government Open Data',
+        category: 'Government',
+        tags: ['government', 'public-api', 'open'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.4,
+        ratingCount: 3054,
+        usageCount: 35079,
+        baseUrl: 'https://data.gov.tw',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://data.gov.tw/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'open-government-thailand',
+        name: 'Open Government, Thailand',
+        provider: 'Open Government, Thailand',
+        description: 'Thailand Government Open Data',
+        category: 'Government',
+        tags: ['government', 'public-api', 'open'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.9,
+        ratingCount: 1939,
+        usageCount: 43777,
+        baseUrl: 'https://data.go.th',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://data.go.th/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'open-government-uk',
+        name: 'Open Government, UK',
+        provider: 'Open Government, UK',
+        description: 'UK Government Open Data',
+        category: 'Government',
+        tags: ['government', 'public-api', 'open'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.4,
+        ratingCount: 7634,
+        usageCount: 25447,
+        baseUrl: 'https://data.gov.uk',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://data.gov.uk/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'open-government-usa',
+        name: 'Open Government, USA',
+        provider: 'Open Government, USA',
+        description: 'United States Government Open Data',
+        category: 'Government',
+        tags: ['government', 'public-api', 'open'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.7,
+        ratingCount: 6597,
+        usageCount: 22442,
+        baseUrl: 'https://www.data.gov',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://www.data.gov/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'open-government-victoria-state-government',
+        name: 'Open Government, Victoria State Government',
+        provider: 'Open Government, Victoria State Government',
+        description: 'Victoria State Government Open Data',
+        category: 'Government',
+        tags: ['government', 'public-api', 'open'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.3,
+        ratingCount: 5533,
+        usageCount: 46004,
+        baseUrl: 'https://www.data.vic.gov.au',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://www.data.vic.gov.au/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'open-government-west-australia',
+        name: 'Open Government, West Australia',
+        provider: 'Open Government, West Australia',
+        description: 'West Australia Open Data',
+        category: 'Government',
+        tags: ['government', 'public-api', 'open'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.2,
+        ratingCount: 3202,
+        usageCount: 86814,
+        baseUrl: 'https://data.wa.gov.au',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://data.wa.gov.au/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'openregistry',
+        name: 'OpenRegistry',
+        provider: 'OpenRegistry',
+        description: 'Real-time queries to 27 national company registries (UK, FR, DE, IT, ES, KR + 21 more)',
+        category: 'Government',
+        tags: ['government', 'public-api', 'openregistry'],
+        authType: 'OAuth 2.0',
+        pricing: 'Free',
+        ratingAverage: 4,
+        ratingCount: 2250,
+        usageCount: 72821,
+        baseUrl: 'https://openregistry.sophymarine.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://openregistry.sophymarine.com',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'represent-by-open-north',
+        name: 'Represent by Open North',
+        provider: 'Represent by Open North',
+        description: 'Find Canadian Government Representatives',
+        category: 'Government',
+        tags: ['government', 'public-api', 'represent'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.6,
+        ratingCount: 9016,
+        usageCount: 74930,
+        baseUrl: 'https://represent.opennorth.ca',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://represent.opennorth.ca/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'uk-companies-house',
+        name: 'UK Companies House',
+        provider: 'UK Companies House',
+        description: 'UK Companies House Data from the UK government',
+        category: 'Government',
+        tags: ['government', 'public-api', 'uk'],
+        authType: 'OAuth 2.0',
+        pricing: 'Free',
+        ratingAverage: 4.8,
+        ratingCount: 6938,
+        usageCount: 13062,
+        baseUrl: 'https://developer.company-information.service.gov.uk',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://developer.company-information.service.gov.uk/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'us-presidential-election-data-by-togatech',
+        name: 'US Presidential Election Data by TogaTech',
+        provider: 'US Presidential Election Data by TogaTech',
+        description: 'Basic candidate data and live electoral vote counts for top two parties in US presidential election',
+        category: 'Government',
+        tags: ['government', 'public-api', 'us'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.7,
+        ratingCount: 1247,
+        usageCount: 53249,
+        baseUrl: 'https://uselection.togatech.org',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://uselection.togatech.org/api/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'usa-gov',
+        name: 'USA.gov',
+        provider: 'USA.gov',
+        description: 'Authoritative information on U.S. programs, events, services and more',
+        category: 'Government',
+        tags: ['government', 'public-api', 'usa'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.7,
+        ratingCount: 2707,
+        usageCount: 64029,
+        baseUrl: 'https://www.usa.gov',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://www.usa.gov/developer',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'usaspending-gov',
+        name: 'USAspending.gov',
+        provider: 'USAspending.gov',
+        description: 'US federal spending data',
+        category: 'Government',
+        tags: ['government', 'public-api', 'usaspending'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.5,
+        ratingCount: 4445,
+        usageCount: 74135,
+        baseUrl: 'https://api.usaspending.gov',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://api.usaspending.gov/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'cms-gov',
+        name: 'CMS.gov',
+        provider: 'CMS.gov',
+        description: 'Access to the data from the CMS - medicare.gov',
+        category: 'Health',
+        tags: ['health', 'public-api', 'cms'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.1,
+        ratingCount: 5131,
+        usageCount: 36518,
+        baseUrl: 'https://data.cms.gov',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://data.cms.gov/provider-data/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'coronavirus',
+        name: 'Coronavirus',
+        provider: 'Coronavirus',
+        description: 'HTTP API for Latest Covid-19 Data',
+        category: 'Health',
+        tags: ['health', 'public-api', 'coronavirus'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.2,
+        ratingCount: 2022,
+        usageCount: 58217,
+        baseUrl: 'https://pipedream.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://pipedream.com/@pravin/http-api-for-latest-wuhan-coronavirus-data-2019-ncov-p_G6CLVM/readme',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'coronavirus-in-the-uk',
+        name: 'Coronavirus in the UK',
+        provider: 'Coronavirus in the UK',
+        description: 'UK Government coronavirus data, including deaths and cases by region',
+        category: 'Health',
+        tags: ['health', 'public-api', 'coronavirus'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.9,
+        ratingCount: 6779,
+        usageCount: 62468,
+        baseUrl: 'https://coronavirus.data.gov.uk',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://coronavirus.data.gov.uk/details/developers-guide',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'covid-tracking-project',
+        name: 'Covid Tracking Project',
+        provider: 'Covid Tracking Project',
+        description: 'Covid-19 data for the US',
+        category: 'Health',
+        tags: ['health', 'public-api', 'covid'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.4,
+        ratingCount: 2384,
+        usageCount: 28697,
+        baseUrl: 'https://covidtracking.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://covidtracking.com/data/api/version-2',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'covid-19-datenhub',
+        name: 'Covid-19 Datenhub',
+        provider: 'Covid-19 Datenhub',
+        description: 'Maps, datasets, applications and more in the context of COVID-19',
+        category: 'Health',
+        tags: ['health', 'public-api', 'covid'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.9,
+        ratingCount: 7459,
+        usageCount: 90279,
+        baseUrl: 'https://npgeo-corona-npgeo-de.hub.arcgis.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://npgeo-corona-npgeo-de.hub.arcgis.com',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'covid-19-india',
+        name: 'Covid-19 India',
+        provider: 'Covid-19 India',
+        description: 'Covid 19 statistics state and district wise about cases, vaccinations, recovery within India',
+        category: 'Health',
+        tags: ['health', 'public-api', 'covid'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.5,
+        ratingCount: 5895,
+        usageCount: 79056,
+        baseUrl: 'https://data.covid19india.org',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://data.covid19india.org/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'covid-19-tracker-canada',
+        name: 'COVID-19 Tracker Canada',
+        provider: 'COVID-19 Tracker Canada',
+        description: 'Details on Covid-19 cases across Canada',
+        category: 'Health',
+        tags: ['health', 'public-api', 'covid'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.3,
+        ratingCount: 3663,
+        usageCount: 54451,
+        baseUrl: 'https://api.covid19tracker.ca',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://api.covid19tracker.ca/docs/1.0/overview',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'covid-19-tracker-sri-lanka',
+        name: 'COVID-19 Tracker Sri Lanka',
+        provider: 'COVID-19 Tracker Sri Lanka',
+        description: 'Provides situation of the COVID-19 patients reported in Sri Lanka',
+        category: 'Health',
+        tags: ['health', 'public-api', 'covid'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.7,
+        ratingCount: 1877,
+        usageCount: 38625,
+        baseUrl: 'https://www.hpb.health.gov.lk',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://www.hpb.health.gov.lk/en/api-documentation',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'cure-cancer-with-ai',
+        name: 'Cure Cancer With AI',
+        provider: 'Cure Cancer With AI',
+        description: 'Oncology research, clinical trials, FDA approvals, news, and MAMMAL predictions',
+        category: 'Health',
+        tags: ['health', 'public-api', 'cure'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.7,
+        ratingCount: 7307,
+        usageCount: 56543,
+        baseUrl: 'https://www.curecancerwithai.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://www.curecancerwithai.com/developers',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'dataflow-kit-covid-19',
+        name: 'Dataflow Kit COVID-19',
+        provider: 'Dataflow Kit COVID-19',
+        description: 'COVID-19 live statistics into sites per hour',
+        category: 'Health',
+        tags: ['health', 'public-api', 'dataflow'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.1,
+        ratingCount: 6911,
+        usageCount: 66058,
+        baseUrl: 'https://covid-19.dataflowkit.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://covid-19.dataflowkit.com',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'edamam',
+        name: 'Edamam',
+        provider: 'Edamam',
+        description: 'Food and nutrition data API with recipe search',
+        category: 'Health',
+        tags: ['health', 'public-api', 'edamam'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.2,
+        ratingCount: 2212,
+        usageCount: 93958,
+        baseUrl: 'https://developer.edamam.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://developer.edamam.com/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'fooddata-central',
+        name: 'FoodData Central',
+        provider: 'FoodData Central',
+        description: 'National Nutrient Database for Standard Reference',
+        category: 'Health',
+        tags: ['health', 'public-api', 'fooddata'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.9,
+        ratingCount: 2089,
+        usageCount: 29512,
+        baseUrl: 'https://fdc.nal.usda.gov',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://fdc.nal.usda.gov/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'healthcare-gov',
+        name: 'Healthcare.gov',
+        provider: 'Healthcare.gov',
+        description: 'Educational content about the US Health Insurance Marketplace',
+        category: 'Health',
+        tags: ['health', 'public-api', 'healthcare'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.1,
+        ratingCount: 3201,
+        usageCount: 50100,
+        baseUrl: 'https://www.healthcare.gov',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://www.healthcare.gov/developers/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'humanitarian-data-exchange',
+        name: 'Humanitarian Data Exchange',
+        provider: 'Humanitarian Data Exchange',
+        description: 'Humanitarian Data Exchange (HDX) is open platform for sharing data across crises and organisations',
+        category: 'Health',
+        tags: ['health', 'public-api', 'humanitarian'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.9,
+        ratingCount: 6229,
+        usageCount: 84104,
+        baseUrl: 'https://data.humdata.org',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://data.humdata.org/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'lexigram',
+        name: 'Lexigram',
+        provider: 'Lexigram',
+        description: 'NLP that extracts mentions of clinical concepts from text, gives access to clinical ontology',
+        category: 'Health',
+        tags: ['health', 'public-api', 'lexigram'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.6,
+        ratingCount: 1406,
+        usageCount: 74986,
+        baseUrl: 'https://docs.lexigram.io',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://docs.lexigram.io/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'medlineplus-genetics',
+        name: 'MedlinePlus Genetics',
+        provider: 'MedlinePlus Genetics',
+        description: 'Genetic conditions, genes, chromosomes and mtDNA data',
+        category: 'Health',
+        tags: ['health', 'public-api', 'medlineplus'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.8,
+        ratingCount: 7658,
+        usageCount: 69022,
+        baseUrl: 'https://medlineplus.gov',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://medlineplus.gov/about/developers/geneticsdatafilesapi/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'myvaccination',
+        name: 'MyVaccination',
+        provider: 'MyVaccination',
+        description: 'Vaccination data for Malaysia',
+        category: 'Health',
+        tags: ['health', 'public-api', 'myvaccination'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.6,
+        ratingCount: 1736,
+        usageCount: 51748,
+        baseUrl: 'https://documenter.getpostman.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://documenter.getpostman.com/view/16605343/Tzm8GG7u',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'nppes',
+        name: 'NPPES',
+        provider: 'NPPES',
+        description: 'National Plan & Provider Enumeration System, info on healthcare providers registered in US',
+        category: 'Health',
+        tags: ['health', 'public-api', 'nppes'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.7,
+        ratingCount: 6567,
+        usageCount: 14152,
+        baseUrl: 'https://npiregistry.cms.hhs.gov',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://npiregistry.cms.hhs.gov/registry/help-api',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'nutritionix',
+        name: 'Nutritionix',
+        provider: 'Nutritionix',
+        description: 'Worlds largest verified nutrition database',
+        category: 'Health',
+        tags: ['health', 'public-api', 'nutritionix'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.6,
+        ratingCount: 1066,
+        usageCount: 60652,
+        baseUrl: 'https://developer.nutritionix.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://developer.nutritionix.com/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'open-data-nhs-scotland',
+        name: 'Open Data NHS Scotland',
+        provider: 'Open Data NHS Scotland',
+        description: 'Medical reference data and statistics by Public Health Scotland',
+        category: 'Health',
+        tags: ['health', 'public-api', 'open'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.7,
+        ratingCount: 6207,
+        usageCount: 73243,
+        baseUrl: 'https://www.opendata.nhs.scot',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://www.opendata.nhs.scot',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'openfda',
+        name: 'openFDA',
+        provider: 'openFDA',
+        description: 'Public FDA data about drugs, devices and foods',
+        category: 'Health',
+        tags: ['health', 'public-api', 'openfda'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.6,
+        ratingCount: 5946,
+        usageCount: 40778,
+        baseUrl: 'https://open.fda.gov',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://open.fda.gov',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'orion-health',
+        name: 'Orion Health',
+        provider: 'Orion Health',
+        description: 'Medical platform which allows the development of applications for different healthcare scenarios',
+        category: 'Health',
+        tags: ['health', 'public-api', 'orion'],
+        authType: 'OAuth 2.0',
+        pricing: 'Free',
+        ratingAverage: 4.3,
+        ratingCount: 1253,
+        usageCount: 32679,
+        baseUrl: 'https://developer.orionhealth.io',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://developer.orionhealth.io/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'adzuna',
+        name: 'Adzuna',
+        provider: 'Adzuna',
+        description: 'Job board aggregator',
+        category: 'Jobs',
+        tags: ['jobs', 'public-api', 'adzuna'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.2,
+        ratingCount: 1152,
+        usageCount: 53378,
+        baseUrl: 'https://developer.adzuna.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://developer.adzuna.com/overview',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'arbeitsamt',
+        name: 'Arbeitsamt',
+        provider: 'Arbeitsamt',
+        description: 'API for the "Arbeitsamt", which is a german Job board aggregator',
+        category: 'Jobs',
+        tags: ['jobs', 'public-api', 'arbeitsamt'],
+        authType: 'OAuth 2.0',
+        pricing: 'Free',
+        ratingAverage: 4.9,
+        ratingCount: 8499,
+        usageCount: 71571,
+        baseUrl: 'https://jobsuche.api.bund.dev',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://jobsuche.api.bund.dev/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'findwork',
+        name: 'Findwork',
+        provider: 'Findwork',
+        description: 'Job board',
+        category: 'Jobs',
+        tags: ['jobs', 'public-api', 'findwork'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.3,
+        ratingCount: 2173,
+        usageCount: 63381,
+        baseUrl: 'https://findwork.dev',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://findwork.dev/developers/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'jobs2careers',
+        name: 'Jobs2Careers',
+        provider: 'Jobs2Careers',
+        description: 'Job aggregator',
+        category: 'Jobs',
+        tags: ['jobs', 'public-api', 'jobs2careers'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.2,
+        ratingCount: 5612,
+        usageCount: 18873,
+        baseUrl: 'https://api.jobs2careers.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'http://api.jobs2careers.com/api/spec.pdf',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'jooble',
+        name: 'Jooble',
+        provider: 'Jooble',
+        description: 'Job search engine',
+        category: 'Jobs',
+        tags: ['jobs', 'public-api', 'jooble'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4,
+        ratingCount: 2980,
+        usageCount: 85925,
+        baseUrl: 'https://jooble.org',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://jooble.org/api/about',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'reed',
+        name: 'Reed',
+        provider: 'Reed',
+        description: 'Job board aggregator',
+        category: 'Jobs',
+        tags: ['jobs', 'public-api', 'reed'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.3,
+        ratingCount: 563,
+        usageCount: 81580,
+        baseUrl: 'https://www.reed.co.uk',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://www.reed.co.uk/developers',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'the-muse',
+        name: 'The Muse',
+        provider: 'The Muse',
+        description: 'Job board and company profiles',
+        category: 'Jobs',
+        tags: ['jobs', 'public-api', 'the'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.9,
+        ratingCount: 7759,
+        usageCount: 89037,
+        baseUrl: 'https://www.themuse.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://www.themuse.com/developers/api/v2',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'upwork',
+        name: 'Upwork',
+        provider: 'Upwork',
+        description: 'Freelance job board and management system',
+        category: 'Jobs',
+        tags: ['jobs', 'public-api', 'upwork'],
+        authType: 'OAuth 2.0',
+        pricing: 'Free',
+        ratingAverage: 4.7,
+        ratingCount: 6647,
+        usageCount: 84163,
+        baseUrl: 'https://developers.upwork.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://developers.upwork.com/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'usajobs',
+        name: 'USAJOBS',
+        provider: 'USAJOBS',
+        description: 'US government job board',
+        category: 'Jobs',
+        tags: ['jobs', 'public-api', 'usajobs'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.6,
+        ratingCount: 5676,
+        usageCount: 41453,
+        baseUrl: 'https://developer.usajobs.gov',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://developer.usajobs.gov/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'whatjobs',
+        name: 'WhatJobs',
+        provider: 'WhatJobs',
+        description: 'Job search engine',
+        category: 'Jobs',
+        tags: ['jobs', 'public-api', 'whatjobs'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.9,
+        ratingCount: 3229,
+        usageCount: 95104,
+        baseUrl: 'https://www.whatjobs.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://www.whatjobs.com/affiliates',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'ziprecruiter',
+        name: 'ZipRecruiter',
+        provider: 'ZipRecruiter',
+        description: 'Job search app and website',
+        category: 'Jobs',
+        tags: ['jobs', 'public-api', 'ziprecruiter'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.3,
+        ratingCount: 8183,
+        usageCount: 95240,
+        baseUrl: 'https://www.ziprecruiter.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://www.ziprecruiter.com/publishers',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'clarifai',
+        name: 'Clarifai',
+        provider: 'Clarifai',
+        description: 'Computer Vision',
+        category: 'Machine Learning',
+        tags: ['machine-learning', 'public-api', 'clarifai'],
+        authType: 'OAuth 2.0',
+        pricing: 'Free',
+        ratingAverage: 4.4,
+        ratingCount: 5764,
+        usageCount: 26037,
+        baseUrl: 'https://docs.clarifai.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://docs.clarifai.com/api-guide/api-overview',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'deepcode',
+        name: 'Deepcode',
+        provider: 'Deepcode',
+        description: 'AI for code review',
+        category: 'Machine Learning',
+        tags: ['machine-learning', 'public-api', 'deepcode'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.6,
+        ratingCount: 8506,
+        usageCount: 55858,
+        baseUrl: 'https://www.deepcode.ai',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://www.deepcode.ai',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'dialogflow',
+        name: 'Dialogflow',
+        provider: 'Dialogflow',
+        description: 'Natural Language Processing',
+        category: 'Machine Learning',
+        tags: ['machine-learning', 'public-api', 'dialogflow'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.3,
+        ratingCount: 4123,
+        usageCount: 63517,
+        baseUrl: 'https://cloud.google.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://cloud.google.com/dialogflow/docs/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'goldbean',
+        name: 'GoldBean',
+        provider: 'GoldBean',
+        description: 'OCR, Translation, NLP & ERNIE LLM via Baidu AI (free tier available)',
+        category: 'Machine Learning',
+        tags: ['machine-learning', 'public-api', 'goldbean'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.5,
+        ratingCount: 4145,
+        usageCount: 19663,
+        baseUrl: 'https://goldbean-api.xyz',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://goldbean-api.xyz/docs',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'hirak-faceapi',
+        name: 'Hirak FaceAPI',
+        provider: 'Hirak FaceAPI',
+        description: 'Face detection, face recognition with age estimation/gender estimation, accurate, no quota limits',
+        category: 'Machine Learning',
+        tags: ['machine-learning', 'public-api', 'hirak'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.6,
+        ratingCount: 6066,
+        usageCount: 22080,
+        baseUrl: 'https://faceapi.hirak.site',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://faceapi.hirak.site/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'imagga',
+        name: 'Imagga',
+        provider: 'Imagga',
+        description: 'Image Recognition Solutions like Tagging, Visual Search, NSFW moderation',
+        category: 'Machine Learning',
+        tags: ['machine-learning', 'public-api', 'imagga'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.7,
+        ratingCount: 3797,
+        usageCount: 58756,
+        baseUrl: 'https://imagga.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://imagga.com/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'inferdo',
+        name: 'Inferdo',
+        provider: 'Inferdo',
+        description: 'Computer Vision services like Facial detection, Image labeling, NSFW classification',
+        category: 'Machine Learning',
+        tags: ['machine-learning', 'public-api', 'inferdo'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.8,
+        ratingCount: 8638,
+        usageCount: 82305,
+        baseUrl: 'https://rapidapi.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://rapidapi.com/user/inferdo',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'ips-online',
+        name: 'IPS Online',
+        provider: 'IPS Online',
+        description: 'Face and License Plate Anonymization',
+        category: 'Machine Learning',
+        tags: ['machine-learning', 'public-api', 'ips'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.5,
+        ratingCount: 3415,
+        usageCount: 42702,
+        baseUrl: 'https://docs.identity.ps',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://docs.identity.ps/docs',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'keen-io',
+        name: 'Keen IO',
+        provider: 'Keen IO',
+        description: 'Data Analytics',
+        category: 'Machine Learning',
+        tags: ['machine-learning', 'public-api', 'keen'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.5,
+        ratingCount: 6645,
+        usageCount: 52735,
+        baseUrl: 'https://keen.io',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://keen.io/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'nlp-cloud',
+        name: 'NLP Cloud',
+        provider: 'NLP Cloud',
+        description: 'NLP API using spaCy and transformers for NER, sentiments, classification, summarization, and more',
+        category: 'Machine Learning',
+        tags: ['machine-learning', 'public-api', 'nlp'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.9,
+        ratingCount: 7419,
+        usageCount: 72988,
+        baseUrl: 'https://nlpcloud.io',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://nlpcloud.io',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'perspective',
+        name: 'Perspective',
+        provider: 'Perspective',
+        description: 'NLP API to return probability that if text is toxic, obscene, insulting or threatening',
+        category: 'Machine Learning',
+        tags: ['machine-learning', 'public-api', 'perspective'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.1,
+        ratingCount: 1431,
+        usageCount: 51418,
+        baseUrl: 'https://perspectiveapi.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://perspectiveapi.com',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'skybiometry',
+        name: 'SkyBiometry',
+        provider: 'SkyBiometry',
+        description: 'Face Detection, Face Recognition and Face Grouping',
+        category: 'Machine Learning',
+        tags: ['machine-learning', 'public-api', 'skybiometry'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.9,
+        ratingCount: 4989,
+        usageCount: 52784,
+        baseUrl: 'https://skybiometry.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://skybiometry.com/documentation/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'unplugg',
+        name: 'Unplugg',
+        provider: 'Unplugg',
+        description: 'Forecasting API for timeseries data',
+        category: 'Machine Learning',
+        tags: ['machine-learning', 'public-api', 'unplugg'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.5,
+        ratingCount: 6835,
+        usageCount: 33762,
+        baseUrl: 'https://unplu.gg',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://unplu.gg/test_api.html',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'wolframalpha',
+        name: 'WolframAlpha',
+        provider: 'WolframAlpha',
+        description: 'Provides specific answers to questions using data and algorithms',
+        category: 'Machine Learning',
+        tags: ['machine-learning', 'public-api', 'wolframalpha'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.3,
+        ratingCount: 4053,
+        usageCount: 68650,
+        baseUrl: 'https://products.wolframalpha.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://products.wolframalpha.com/api/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: '7digital',
+        name: '7digital',
+        provider: '7digital',
+        description: 'Api of Music store 7digital',
+        category: 'Music',
+        tags: ['music', 'public-api', '7digital'],
+        authType: 'OAuth 2.0',
+        pricing: 'Free',
+        ratingAverage: 4.8,
+        ratingCount: 958,
+        usageCount: 72351,
+        baseUrl: 'https://docs.7digital.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://docs.7digital.com/reference',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'audiomack',
+        name: 'Audiomack',
+        provider: 'Audiomack',
+        description: 'Api of the streaming music hub Audiomack',
+        category: 'Music',
+        tags: ['music', 'public-api', 'audiomack'],
+        authType: 'OAuth 2.0',
+        pricing: 'Free',
+        ratingAverage: 4.7,
+        ratingCount: 1487,
+        usageCount: 57283,
+        baseUrl: 'https://www.audiomack.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://www.audiomack.com/data-api/docs',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'bandcamp',
+        name: 'Bandcamp',
+        provider: 'Bandcamp',
+        description: 'API of Music store Bandcamp',
+        category: 'Music',
+        tags: ['music', 'public-api', 'bandcamp'],
+        authType: 'OAuth 2.0',
+        pricing: 'Free',
+        ratingAverage: 4.3,
+        ratingCount: 6483,
+        usageCount: 9997,
+        baseUrl: 'https://bandcamp.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://bandcamp.com/developer',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'bandsintown',
+        name: 'Bandsintown',
+        provider: 'Bandsintown',
+        description: 'Music Events',
+        category: 'Music',
+        tags: ['music', 'public-api', 'bandsintown'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.2,
+        ratingCount: 7812,
+        usageCount: 39044,
+        baseUrl: 'https://app.swaggerhub.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://app.swaggerhub.com/apis/Bandsintown/PublicAPI/3.0.0',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'deezer',
+        name: 'Deezer',
+        provider: 'Deezer',
+        description: 'Music',
+        category: 'Music',
+        tags: ['music', 'public-api', 'deezer'],
+        authType: 'OAuth 2.0',
+        pricing: 'Free',
+        ratingAverage: 4,
+        ratingCount: 5130,
+        usageCount: 29947,
+        baseUrl: 'https://developers.deezer.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://developers.deezer.com/api',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'discogs',
+        name: 'Discogs',
+        provider: 'Discogs',
+        description: 'Music',
+        category: 'Music',
+        tags: ['music', 'public-api', 'discogs'],
+        authType: 'OAuth 2.0',
+        pricing: 'Free',
+        ratingAverage: 4.5,
+        ratingCount: 1025,
+        usageCount: 39503,
+        baseUrl: 'https://www.discogs.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://www.discogs.com/developers/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'freesound',
+        name: 'Freesound',
+        provider: 'Freesound',
+        description: 'Music Samples',
+        category: 'Music',
+        tags: ['music', 'public-api', 'freesound'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.2,
+        ratingCount: 8682,
+        usageCount: 65597,
+        baseUrl: 'https://freesound.org',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://freesound.org/docs/api/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'gaana',
+        name: 'Gaana',
+        provider: 'Gaana',
+        description: 'API to retrieve song information from Gaana',
+        category: 'Music',
+        tags: ['music', 'public-api', 'gaana'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.3,
+        ratingCount: 1433,
+        usageCount: 35133,
+        baseUrl: 'https://github.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://github.com/cyberboysumanjay/GaanaAPI',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'genius',
+        name: 'Genius',
+        provider: 'Genius',
+        description: 'Crowdsourced lyrics and music knowledge',
+        category: 'Music',
+        tags: ['music', 'public-api', 'genius'],
+        authType: 'OAuth 2.0',
+        pricing: 'Free',
+        ratingAverage: 4.8,
+        ratingCount: 2748,
+        usageCount: 13892,
+        baseUrl: 'https://docs.genius.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://docs.genius.com/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'genrenator',
+        name: 'Genrenator',
+        provider: 'Genrenator',
+        description: 'Music genre generator',
+        category: 'Music',
+        tags: ['music', 'public-api', 'genrenator'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.6,
+        ratingCount: 4006,
+        usageCount: 69358,
+        baseUrl: 'https://binaryjazz.us',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://binaryjazz.us/genrenator-api/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'itunes-search',
+        name: 'iTunes Search',
+        provider: 'iTunes Search',
+        description: 'Software products',
+        category: 'Music',
+        tags: ['music', 'public-api', 'itunes'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.2,
+        ratingCount: 6742,
+        usageCount: 63748,
+        baseUrl: 'https://affiliate.itunes.apple.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://affiliate.itunes.apple.com/resources/documentation/itunes-store-web-service-search-api/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'jamendo',
+        name: 'Jamendo',
+        provider: 'Jamendo',
+        description: 'Music',
+        category: 'Music',
+        tags: ['music', 'public-api', 'jamendo'],
+        authType: 'OAuth 2.0',
+        pricing: 'Free',
+        ratingAverage: 4.3,
+        ratingCount: 4023,
+        usageCount: 75789,
+        baseUrl: 'https://developer.jamendo.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://developer.jamendo.com/v3.0/docs',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'jiosaavn',
+        name: 'JioSaavn',
+        provider: 'JioSaavn',
+        description: 'API to retrieve song information, album meta data and many more from JioSaavn',
+        category: 'Music',
+        tags: ['music', 'public-api', 'jiosaavn'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.2,
+        ratingCount: 7612,
+        usageCount: 64587,
+        baseUrl: 'https://github.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://github.com/cyberboysumanjay/JioSaavnAPI',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'kkbox',
+        name: 'KKBOX',
+        provider: 'KKBOX',
+        description: 'Get music libraries, playlists, charts, and perform out of KKBOX\'s platform',
+        category: 'Music',
+        tags: ['music', 'public-api', 'kkbox'],
+        authType: 'OAuth 2.0',
+        pricing: 'Free',
+        ratingAverage: 4.6,
+        ratingCount: 6776,
+        usageCount: 50039,
+        baseUrl: 'https://developer.kkbox.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://developer.kkbox.com',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'ksoft-si-lyrics',
+        name: 'KSoft.Si Lyrics',
+        provider: 'KSoft.Si Lyrics',
+        description: 'API to get lyrics for songs',
+        category: 'Music',
+        tags: ['music', 'public-api', 'ksoft'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.2,
+        ratingCount: 9172,
+        usageCount: 36953,
+        baseUrl: 'https://docs.ksoft.si',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://docs.ksoft.si/api/lyrics-api',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'lastfm',
+        name: 'LastFm',
+        provider: 'LastFm',
+        description: 'Music',
+        category: 'Music',
+        tags: ['music', 'public-api', 'lastfm'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.2,
+        ratingCount: 1052,
+        usageCount: 83507,
+        baseUrl: 'https://www.last.fm',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://www.last.fm/api',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'lyrics-ovh',
+        name: 'Lyrics.ovh',
+        provider: 'Lyrics.ovh',
+        description: 'Simple API to retrieve the lyrics of a song',
+        category: 'Music',
+        tags: ['music', 'public-api', 'lyrics'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.1,
+        ratingCount: 6961,
+        usageCount: 21208,
+        baseUrl: 'https://lyricsovh.docs.apiary.io',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://lyricsovh.docs.apiary.io',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'musicbrainz',
+        name: 'MusicBrainz',
+        provider: 'MusicBrainz',
+        description: 'Music',
+        category: 'Music',
+        tags: ['music', 'public-api', 'musicbrainz'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4,
+        ratingCount: 9430,
+        usageCount: 84847,
+        baseUrl: 'https://musicbrainz.org',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://musicbrainz.org/doc/Development/XML_Web_Service/Version_2',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'musixmatch',
+        name: 'Musixmatch',
+        provider: 'Musixmatch',
+        description: 'Music',
+        category: 'Music',
+        tags: ['music', 'public-api', 'musixmatch'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.6,
+        ratingCount: 3046,
+        usageCount: 94078,
+        baseUrl: 'https://developer.musixmatch.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://developer.musixmatch.com/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'openwhyd',
+        name: 'Openwhyd',
+        provider: 'Openwhyd',
+        description: 'Download curated playlists of streaming tracks (YouTube, SoundCloud, etc...)',
+        category: 'Music',
+        tags: ['music', 'public-api', 'openwhyd'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.9,
+        ratingCount: 2079,
+        usageCount: 73225,
+        baseUrl: 'https://openwhyd.github.io',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://openwhyd.github.io/openwhyd/API',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'phishin',
+        name: 'Phishin',
+        provider: 'Phishin',
+        description: 'A web-based archive of legal live audio recordings of the improvisational rock band Phish',
+        category: 'Music',
+        tags: ['music', 'public-api', 'phishin'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4,
+        ratingCount: 8960,
+        usageCount: 65922,
+        baseUrl: 'https://phish.in',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://phish.in/api-docs',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'songkick',
+        name: 'Songkick',
+        provider: 'Songkick',
+        description: 'Music Events',
+        category: 'Music',
+        tags: ['music', 'public-api', 'songkick'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.6,
+        ratingCount: 7566,
+        usageCount: 79152,
+        baseUrl: 'https://www.songkick.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://www.songkick.com/developer/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'songsterr',
+        name: 'Songsterr',
+        provider: 'Songsterr',
+        description: 'Provides guitar, bass and drums tabs and chords',
+        category: 'Music',
+        tags: ['music', 'public-api', 'songsterr'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.2,
+        ratingCount: 9002,
+        usageCount: 70786,
+        baseUrl: 'https://www.songsterr.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://www.songsterr.com/a/wa/api/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'soundcloud',
+        name: 'SoundCloud',
+        provider: 'SoundCloud',
+        description: 'With SoundCloud API you can build applications that will give more power to control your content',
+        category: 'Music',
+        tags: ['music', 'public-api', 'soundcloud'],
+        authType: 'OAuth 2.0',
+        pricing: 'Free',
+        ratingAverage: 4.7,
+        ratingCount: 8687,
+        usageCount: 52883,
+        baseUrl: 'https://developers.soundcloud.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://developers.soundcloud.com/docs/api/guide',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'spotify',
+        name: 'Spotify',
+        provider: 'Spotify',
+        description: 'View Spotify music catalog, manage users\' libraries, get recommendations and more',
+        category: 'Music',
+        tags: ['music', 'public-api', 'spotify'],
+        authType: 'OAuth 2.0',
+        pricing: 'Free',
+        ratingAverage: 4.5,
+        ratingCount: 5025,
+        usageCount: 10503,
+        baseUrl: 'https://beta.developer.spotify.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://beta.developer.spotify.com/documentation/web-api/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'sunor',
+        name: 'Sunor',
+        provider: 'Sunor',
+        description: 'AI music generation API via Suno, with pay-as-you-go credits',
+        category: 'Music',
+        tags: ['music', 'public-api', 'sunor'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.4,
+        ratingCount: 8124,
+        usageCount: 35660,
+        baseUrl: 'https://docs.sunor.cc',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://docs.sunor.cc',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'theaudiodb',
+        name: 'TheAudioDB',
+        provider: 'TheAudioDB',
+        description: 'Music',
+        category: 'Music',
+        tags: ['music', 'public-api', 'theaudiodb'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4,
+        ratingCount: 2880,
+        usageCount: 15054,
+        baseUrl: 'https://www.theaudiodb.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://www.theaudiodb.com/api_guide.php',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'vagalume',
+        name: 'Vagalume',
+        provider: 'Vagalume',
+        description: 'Crowdsourced lyrics and music knowledge',
+        category: 'Music',
+        tags: ['music', 'public-api', 'vagalume'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.7,
+        ratingCount: 6037,
+        usageCount: 50219,
+        baseUrl: 'https://api.vagalume.com.br',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://api.vagalume.com.br/docs/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'verome',
+        name: 'Verome',
+        provider: 'Verome',
+        description: 'Music API for searching, streaming and exploring music data from YouTube Music, YouTube, and Last.fm',
+        category: 'Music',
+        tags: ['music', 'public-api', 'verome'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.9,
+        ratingCount: 5099,
+        usageCount: 39657,
+        baseUrl: 'https://github.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://github.com/Kirazul/Verome-API',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'mediastack',
+        name: 'Mediastack',
+        provider: 'Mediastack',
+        description: 'Free, Simple REST API for Live News & Blog Articles',
+        category: 'News',
+        tags: ['news', 'public-api', 'mediastack'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.7,
+        ratingCount: 8297,
+        usageCount: 11828,
+        baseUrl: 'https://mediastack.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://mediastack.com?utm_source=Github&utm_medium=Referral&utm_campaign=Public-apis-repo-Best-sellers',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'associated-press',
+        name: 'Associated Press',
+        provider: 'Associated Press',
+        description: 'Search for news and metadata from Associated Press',
+        category: 'News',
+        tags: ['news', 'public-api', 'associated'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.5,
+        ratingCount: 8475,
+        usageCount: 94425,
+        baseUrl: 'https://developer.ap.org',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://developer.ap.org/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'feedbin',
+        name: 'Feedbin',
+        provider: 'Feedbin',
+        description: 'RSS reader',
+        category: 'News',
+        tags: ['news', 'public-api', 'feedbin'],
+        authType: 'OAuth 2.0',
+        pricing: 'Free',
+        ratingAverage: 4.6,
+        ratingCount: 7566,
+        usageCount: 90866,
+        baseUrl: 'https://github.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://github.com/feedbin/feedbin-api',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'inshorts-news',
+        name: 'Inshorts News',
+        provider: 'Inshorts News',
+        description: 'Provides news from inshorts',
+        category: 'News',
+        tags: ['news', 'public-api', 'inshorts'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.5,
+        ratingCount: 5385,
+        usageCount: 27697,
+        baseUrl: 'https://github.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://github.com/cyberboysumanjay/Inshorts-News-API',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'new-york-times',
+        name: 'New York Times',
+        provider: 'New York Times',
+        description: 'The New York Times Developer Network',
+        category: 'News',
+        tags: ['news', 'public-api', 'new'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.8,
+        ratingCount: 7448,
+        usageCount: 72421,
+        baseUrl: 'https://developer.nytimes.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://developer.nytimes.com/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'news',
+        name: 'News',
+        provider: 'News',
+        description: 'Headlines currently published on a range of news sources and blogs',
+        category: 'News',
+        tags: ['news', 'public-api'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.2,
+        ratingCount: 5562,
+        usageCount: 81866,
+        baseUrl: 'https://newsapi.org',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://newsapi.org/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'newsdata',
+        name: 'NewsData',
+        provider: 'NewsData',
+        description: 'News data API for live-breaking news and headlines from reputed news sources',
+        category: 'News',
+        tags: ['news', 'public-api', 'newsdata'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4,
+        ratingCount: 2750,
+        usageCount: 59607,
+        baseUrl: 'https://newsdata.io',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://newsdata.io/docs',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'newsx',
+        name: 'NewsX',
+        provider: 'NewsX',
+        description: 'Get or Search Latest Breaking News with ML Powered Summaries 🤖',
+        category: 'News',
+        tags: ['news', 'public-api', 'newsx'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.6,
+        ratingCount: 8866,
+        usageCount: 45052,
+        baseUrl: 'https://rapidapi.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://rapidapi.com/machaao-inc-machaao-inc-default/api/newsx/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'npr-one',
+        name: 'NPR One',
+        provider: 'NPR One',
+        description: 'Personalized news listening experience from NPR',
+        category: 'News',
+        tags: ['news', 'public-api', 'npr'],
+        authType: 'OAuth 2.0',
+        pricing: 'Free',
+        ratingAverage: 4.6,
+        ratingCount: 2226,
+        usageCount: 24818,
+        baseUrl: 'https://dev.npr.org',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'http://dev.npr.org/api/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'the-guardian',
+        name: 'The Guardian',
+        provider: 'The Guardian',
+        description: 'Access all the content the Guardian creates, categorised by tags and section',
+        category: 'News',
+        tags: ['news', 'public-api', 'the'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4,
+        ratingCount: 2780,
+        usageCount: 16325,
+        baseUrl: 'https://open-platform.theguardian.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'http://open-platform.theguardian.com/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'the-old-reader',
+        name: 'The Old Reader',
+        provider: 'The Old Reader',
+        description: 'RSS reader',
+        category: 'News',
+        tags: ['news', 'public-api', 'the'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.2,
+        ratingCount: 4712,
+        usageCount: 79887,
+        baseUrl: 'https://github.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://github.com/theoldreader/api',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'trove',
+        name: 'Trove',
+        provider: 'Trove',
+        description: 'Search through the National Library of Australia collection of 1000s of digitised newspapers',
+        category: 'News',
+        tags: ['news', 'public-api', 'trove'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.1,
+        ratingCount: 2971,
+        usageCount: 63067,
+        baseUrl: 'https://trove.nla.gov.au',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://trove.nla.gov.au/about/create-something/using-api',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'acrelens',
+        name: 'AcreLens',
+        provider: 'AcreLens',
+        description: 'Land suitability scoring API for any US property: off-grid, rural, recreational, investment',
+        category: 'Open Data',
+        tags: ['open-data', 'public-api', 'acrelens'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.8,
+        ratingCount: 6528,
+        usageCount: 93718,
+        baseUrl: 'https://www.acrelens.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://www.acrelens.com',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'archive-org',
+        name: 'Archive.org',
+        provider: 'Archive.org',
+        description: 'The Internet Archive',
+        category: 'Open Data',
+        tags: ['open-data', 'public-api', 'archive'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4,
+        ratingCount: 8330,
+        usageCount: 20118,
+        baseUrl: 'https://archive.readme.io',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://archive.readme.io/docs',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'botsarchive',
+        name: 'BotsArchive',
+        provider: 'BotsArchive',
+        description: 'JSON formatted details about Telegram Bots available in database',
+        category: 'Open Data',
+        tags: ['open-data', 'public-api', 'botsarchive'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.9,
+        ratingCount: 5419,
+        usageCount: 7845,
+        baseUrl: 'https://botsarchive.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://botsarchive.com/docs.html',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'callook-info',
+        name: 'Callook.info',
+        provider: 'Callook.info',
+        description: 'United States ham radio callsigns',
+        category: 'Open Data',
+        tags: ['open-data', 'public-api', 'callook'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.3,
+        ratingCount: 4493,
+        usageCount: 32141,
+        baseUrl: 'https://callook.info',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://callook.info',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'carto',
+        name: 'CARTO',
+        provider: 'CARTO',
+        description: 'Location Information Prediction',
+        category: 'Open Data',
+        tags: ['open-data', 'public-api', 'carto'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.6,
+        ratingCount: 8876,
+        usageCount: 85910,
+        baseUrl: 'https://carto.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://carto.com/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'collegescorecard-ed-gov',
+        name: 'CollegeScoreCard.ed.gov',
+        provider: 'CollegeScoreCard.ed.gov',
+        description: 'Data on higher education institutions in the United States',
+        category: 'Open Data',
+        tags: ['open-data', 'public-api', 'collegescorecard'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.1,
+        ratingCount: 4821,
+        usageCount: 48045,
+        baseUrl: 'https://collegescorecard.ed.gov',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://collegescorecard.ed.gov/data/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'french-address-search',
+        name: 'French Address Search',
+        provider: 'French Address Search',
+        description: 'Address search via the French Government',
+        category: 'Open Data',
+        tags: ['open-data', 'public-api', 'french'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.7,
+        ratingCount: 4427,
+        usageCount: 59989,
+        baseUrl: 'https://geo.api.gouv.fr',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://geo.api.gouv.fr/adresse',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'genesis',
+        name: 'GENESIS',
+        provider: 'GENESIS',
+        description: 'Federal Statistical Office Germany',
+        category: 'Open Data',
+        tags: ['open-data', 'public-api', 'genesis'],
+        authType: 'OAuth 2.0',
+        pricing: 'Free',
+        ratingAverage: 4.1,
+        ratingCount: 5451,
+        usageCount: 1278,
+        baseUrl: 'https://www.destatis.de',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://www.destatis.de/EN/Service/OpenData/api-webservice.html',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'infranode',
+        name: 'InfraNode',
+        provider: 'InfraNode',
+        description: 'Unified German city open data: weather, air quality, EV chargers, transit, demographics',
+        category: 'Open Data',
+        tags: ['open-data', 'public-api', 'infranode'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.3,
+        ratingCount: 6703,
+        usageCount: 40029,
+        baseUrl: 'https://infranode.dev',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://infranode.dev',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'joshua-project',
+        name: 'Joshua Project',
+        provider: 'Joshua Project',
+        description: 'People groups of the world with the fewest followers of Christ',
+        category: 'Open Data',
+        tags: ['open-data', 'public-api', 'joshua'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.9,
+        ratingCount: 2959,
+        usageCount: 45351,
+        baseUrl: 'https://api.joshuaproject.net',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://api.joshuaproject.net/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'k-data-gate',
+        name: 'K-Data Gate',
+        provider: 'K-Data Gate',
+        description: 'Korean market data: K-beauty/K-food products, Naver trends, stocks, real estate, weather',
+        category: 'Open Data',
+        tags: ['open-data', 'public-api', 'k'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.3,
+        ratingCount: 1053,
+        usageCount: 51079,
+        baseUrl: 'https://kdata-gate.vercel.app',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://kdata-gate.vercel.app/docs',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'kaggle',
+        name: 'Kaggle',
+        provider: 'Kaggle',
+        description: 'Create and interact with Datasets, Notebooks, and connect with Kaggle',
+        category: 'Open Data',
+        tags: ['open-data', 'public-api', 'kaggle'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.6,
+        ratingCount: 4856,
+        usageCount: 79336,
+        baseUrl: 'https://www.kaggle.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://www.kaggle.com/docs/api',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'lowy-asia-power-index',
+        name: 'Lowy Asia Power Index',
+        provider: 'Lowy Asia Power Index',
+        description: 'Get measure resources and influence to rank the relative power of states in Asia',
+        category: 'Open Data',
+        tags: ['open-data', 'public-api', 'lowy'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.4,
+        ratingCount: 6804,
+        usageCount: 33329,
+        baseUrl: 'https://github.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://github.com/0x0is1/lowy-index-api-docs',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'nasdaq-data-link',
+        name: 'Nasdaq Data Link',
+        provider: 'Nasdaq Data Link',
+        description: 'Stock market data',
+        category: 'Open Data',
+        tags: ['open-data', 'public-api', 'nasdaq'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.1,
+        ratingCount: 4291,
+        usageCount: 82684,
+        baseUrl: 'https://docs.data.nasdaq.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://docs.data.nasdaq.com/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'onyx-bazaar',
+        name: 'Onyx Bazaar',
+        provider: 'Onyx Bazaar',
+        description: 'Free public leaderboard of x402 paid HTTP services indexed from Coinbase CDP discovery API',
+        category: 'Open Data',
+        tags: ['open-data', 'public-api', 'onyx'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.5,
+        ratingCount: 5655,
+        usageCount: 67736,
+        baseUrl: 'https://onyx-actions.onrender.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://onyx-actions.onrender.com/bazaar',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'open-data-minneapolis',
+        name: 'Open Data Minneapolis',
+        provider: 'Open Data Minneapolis',
+        description: 'Spatial (GIS) and non-spatial city data for Minneapolis',
+        category: 'Open Data',
+        tags: ['open-data', 'public-api', 'open'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.8,
+        ratingCount: 2558,
+        usageCount: 14294,
+        baseUrl: 'https://opendata.minneapolismn.gov',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://opendata.minneapolismn.gov/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'openafrica',
+        name: 'openAFRICA',
+        provider: 'openAFRICA',
+        description: 'Large datasets repository of African open data',
+        category: 'Open Data',
+        tags: ['open-data', 'public-api', 'openafrica'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.3,
+        ratingCount: 5993,
+        usageCount: 88927,
+        baseUrl: 'https://africaopendata.org',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://africaopendata.org/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'opencorporates',
+        name: 'OpenCorporates',
+        provider: 'OpenCorporates',
+        description: 'Data on corporate entities and directors in many countries',
+        category: 'Open Data',
+        tags: ['open-data', 'public-api', 'opencorporates'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.3,
+        ratingCount: 8843,
+        usageCount: 67906,
+        baseUrl: 'https://api.opencorporates.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'http://api.opencorporates.com/documentation/API-Reference',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'pan-africa-data',
+        name: 'Pan Africa Data',
+        provider: 'Pan Africa Data',
+        description: 'Macroeconomic and subnational income distribution data for all 54 African countries',
+        category: 'Open Data',
+        tags: ['open-data', 'public-api', 'pan'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.6,
+        ratingCount: 7456,
+        usageCount: 67993,
+        baseUrl: 'https://panafricadata.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://panafricadata.com',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'peakmetrics',
+        name: 'PeakMetrics',
+        provider: 'PeakMetrics',
+        description: 'News articles and public datasets',
+        category: 'Open Data',
+        tags: ['open-data', 'public-api', 'peakmetrics'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.3,
+        ratingCount: 2523,
+        usageCount: 58860,
+        baseUrl: 'https://rapidapi.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://rapidapi.com/peakmetrics-peakmetrics-default/api/peakmetrics-news',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'recreation-information-database',
+        name: 'Recreation Information Database',
+        provider: 'Recreation Information Database',
+        description: 'Recreational areas, federal lands, historic sites, museums, and other attractions/resources(US)',
+        category: 'Open Data',
+        tags: ['open-data', 'public-api', 'recreation'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.8,
+        ratingCount: 2508,
+        usageCount: 14572,
+        baseUrl: 'https://ridb.recreation.gov',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://ridb.recreation.gov/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'universities-list',
+        name: 'Universities List',
+        provider: 'Universities List',
+        description: 'University names, countries and domains',
+        category: 'Open Data',
+        tags: ['open-data', 'public-api', 'universities'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4,
+        ratingCount: 6500,
+        usageCount: 85714,
+        baseUrl: 'https://github.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://github.com/Hipo/university-domains-list',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'university-of-oslo',
+        name: 'University of Oslo',
+        provider: 'University of Oslo',
+        description: 'Courses, lecture videos, detailed information for courses etc. for the University of Oslo (Norway)',
+        category: 'Open Data',
+        tags: ['open-data', 'public-api', 'university'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.9,
+        ratingCount: 8069,
+        usageCount: 53652,
+        baseUrl: 'https://data.uio.no',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://data.uio.no/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'upc-database',
+        name: 'UPC database',
+        provider: 'UPC database',
+        description: 'More than 1.5 million barcode numbers from all around the world',
+        category: 'Open Data',
+        tags: ['open-data', 'public-api', 'upc'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.9,
+        ratingCount: 8619,
+        usageCount: 80874,
+        baseUrl: 'https://upcdatabase.org',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://upcdatabase.org/api',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'voidly',
+        name: 'Voidly',
+        provider: 'Voidly',
+        description: 'Internet censorship measurements, incidents, and ISP-level blocking data across 126 countries',
+        category: 'Open Data',
+        tags: ['open-data', 'public-api', 'voidly'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4,
+        ratingCount: 4900,
+        usageCount: 4200,
+        baseUrl: 'https://voidly.ai',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://voidly.ai/api-docs',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'wikidata',
+        name: 'Wikidata',
+        provider: 'Wikidata',
+        description: 'Collaboratively edited knowledge base operated by the Wikimedia Foundation',
+        category: 'Open Data',
+        tags: ['open-data', 'public-api', 'wikidata'],
+        authType: 'OAuth 2.0',
+        pricing: 'Free',
+        ratingAverage: 4.9,
+        ratingCount: 8589,
+        usageCount: 68441,
+        baseUrl: 'https://www.wikidata.org',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://www.wikidata.org/w/api.php?action=help',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'wikipedia-2',
+        name: 'Wikipedia',
+        provider: 'Wikipedia',
+        description: 'Mediawiki Encyclopedia',
+        category: 'Open Data',
+        tags: ['open-data', 'public-api', 'wikipedia'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.3,
+        ratingCount: 8203,
+        usageCount: 29671,
+        baseUrl: 'https://www.mediawiki.org',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://www.mediawiki.org/wiki/API:Main_page',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'yelp',
+        name: 'Yelp',
+        provider: 'Yelp',
+        description: 'Find Local Business',
+        category: 'Open Data',
+        tags: ['open-data', 'public-api', 'yelp'],
+        authType: 'OAuth 2.0',
+        pricing: 'Free',
+        ratingAverage: 4.3,
+        ratingCount: 3093,
+        usageCount: 50513,
+        baseUrl: 'https://www.yelp.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://www.yelp.com/developers/documentation/v3',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'datamuse',
+        name: 'Datamuse',
+        provider: 'Datamuse',
+        description: 'Word-finding query engine',
+        category: 'Open Source Projects',
+        tags: ['open-source-projects', 'public-api', 'datamuse'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.1,
+        ratingCount: 2191,
+        usageCount: 11098,
+        baseUrl: 'https://www.datamuse.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://www.datamuse.com/api/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'drupal-org',
+        name: 'Drupal.org',
+        provider: 'Drupal.org',
+        description: 'Drupal.org',
+        category: 'Open Source Projects',
+        tags: ['open-source-projects', 'public-api', 'drupal'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.8,
+        ratingCount: 4388,
+        usageCount: 35412,
+        baseUrl: 'https://www.drupal.org',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://www.drupal.org/drupalorg/docs/api',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'shields',
+        name: 'Shields',
+        provider: 'Shields',
+        description: 'Concise, consistent, and legible badges in SVG and raster format',
+        category: 'Open Source Projects',
+        tags: ['open-source-projects', 'public-api', 'shields'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.3,
+        ratingCount: 5483,
+        usageCount: 10997,
+        baseUrl: 'https://shields.io',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://shields.io/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'epo',
+        name: 'EPO',
+        provider: 'EPO',
+        description: 'European patent search system api',
+        category: 'Patent',
+        tags: ['patent', 'public-api', 'epo'],
+        authType: 'OAuth 2.0',
+        pricing: 'Free',
+        ratingAverage: 4.9,
+        ratingCount: 1239,
+        usageCount: 55534,
+        baseUrl: 'https://developers.epo.org',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://developers.epo.org/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'patentsview',
+        name: 'PatentsView',
+        provider: 'PatentsView',
+        description: 'API is intended to explore and visualize trends/patterns across the US innovation landscape',
+        category: 'Patent',
+        tags: ['patent', 'public-api', 'patentsview'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.5,
+        ratingCount: 4305,
+        usageCount: 50972,
+        baseUrl: 'https://patentsview.org',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://patentsview.org/apis/purpose',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'tipo',
+        name: 'TIPO',
+        provider: 'TIPO',
+        description: 'Taiwan patent search system api',
+        category: 'Patent',
+        tags: ['patent', 'public-api', 'tipo'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.7,
+        ratingCount: 1467,
+        usageCount: 74852,
+        baseUrl: 'https://tiponet.tipo.gov.tw',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://tiponet.tipo.gov.tw/Gazette/OpenData/OD/OD05.aspx?QryDS=API00',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'uspto',
+        name: 'USPTO',
+        provider: 'USPTO',
+        description: 'USA patent api services',
+        category: 'Patent',
+        tags: ['patent', 'public-api', 'uspto'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.2,
+        ratingCount: 4442,
+        usageCount: 20277,
+        baseUrl: 'https://www.uspto.gov',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://www.uspto.gov/learning-and-resources/open-data-and-mobility',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'biriyani-as-a-service',
+        name: 'Biriyani As A Service',
+        provider: 'Biriyani As A Service',
+        description: 'Biriyani images placeholder',
+        category: 'Personality',
+        tags: ['personality', 'public-api', 'biriyani'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.7,
+        ratingCount: 7587,
+        usageCount: 4869,
+        baseUrl: 'https://biriyani.anoram.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://biriyani.anoram.com/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'dev-to',
+        name: 'Dev.to',
+        provider: 'Dev.to',
+        description: 'Access Forem articles, users and other resources via API',
+        category: 'Personality',
+        tags: ['personality', 'public-api', 'dev'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4,
+        ratingCount: 3010,
+        usageCount: 67501,
+        baseUrl: 'https://developers.forem.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://developers.forem.com/api',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'dictum',
+        name: 'Dictum',
+        provider: 'Dictum',
+        description: 'API to get access to the collection of the most inspiring expressions of mankind',
+        category: 'Personality',
+        tags: ['personality', 'public-api', 'dictum'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.5,
+        ratingCount: 3305,
+        usageCount: 56972,
+        baseUrl: 'https://github.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://github.com/fisenkodv/dictum',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'favqs-com',
+        name: 'FavQs.com',
+        provider: 'FavQs.com',
+        description: 'FavQs allows you to collect, discover and share your favorite quotes',
+        category: 'Personality',
+        tags: ['personality', 'public-api', 'favqs'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.6,
+        ratingCount: 1566,
+        usageCount: 52723,
+        baseUrl: 'https://favqs.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://favqs.com/api',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'icanhazdadjoke',
+        name: 'icanhazdadjoke',
+        provider: 'icanhazdadjoke',
+        description: 'The largest selection of dad jokes on the internet',
+        category: 'Personality',
+        tags: ['personality', 'public-api', 'icanhazdadjoke'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.7,
+        ratingCount: 6927,
+        usageCount: 43061,
+        baseUrl: 'https://icanhazdadjoke.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://icanhazdadjoke.com/api',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'medium',
+        name: 'Medium',
+        provider: 'Medium',
+        description: 'Community of readers and writers offering unique perspectives on ideas',
+        category: 'Personality',
+        tags: ['personality', 'public-api', 'medium'],
+        authType: 'OAuth 2.0',
+        pricing: 'Free',
+        ratingAverage: 4.6,
+        ratingCount: 5906,
+        usageCount: 44772,
+        baseUrl: 'https://github.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://github.com/Medium/medium-api-docs',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'programming-quotes',
+        name: 'Programming Quotes',
+        provider: 'Programming Quotes',
+        description: 'Programming Quotes API for open source projects',
+        category: 'Personality',
+        tags: ['personality', 'public-api', 'programming'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.8,
+        ratingCount: 7748,
+        usageCount: 65464,
+        baseUrl: 'https://github.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://github.com/skolakoda/programming-quotes-api',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'quotable-quotes',
+        name: 'Quotable Quotes',
+        provider: 'Quotable Quotes',
+        description: 'Quotable is a free, open source quotations API',
+        category: 'Personality',
+        tags: ['personality', 'public-api', 'quotable'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.8,
+        ratingCount: 2278,
+        usageCount: 40682,
+        baseUrl: 'https://github.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://github.com/lukePeavey/quotable',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'quote-garden',
+        name: 'Quote Garden',
+        provider: 'Quote Garden',
+        description: 'REST API for more than 5000 famous quotes',
+        category: 'Personality',
+        tags: ['personality', 'public-api', 'quote'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.1,
+        ratingCount: 5191,
+        usageCount: 9813,
+        baseUrl: 'https://pprathameshmore.github.io',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://pprathameshmore.github.io/QuoteGarden/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'quotes-on-design',
+        name: 'Quotes on Design',
+        provider: 'Quotes on Design',
+        description: 'Inspirational Quotes',
+        category: 'Personality',
+        tags: ['personality', 'public-api', 'quotes'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.3,
+        ratingCount: 7943,
+        usageCount: 16491,
+        baseUrl: 'https://quotesondesign.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://quotesondesign.com/api/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'stoicism-quote',
+        name: 'Stoicism Quote',
+        provider: 'Stoicism Quote',
+        description: 'Quotes about Stoicism',
+        category: 'Personality',
+        tags: ['personality', 'public-api', 'stoicism'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.3,
+        ratingCount: 593,
+        usageCount: 44156,
+        baseUrl: 'https://github.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://github.com/tlcheah2/stoic-quote-lambda-public-api',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'they-said-so-quotes',
+        name: 'They Said So Quotes',
+        provider: 'They Said So Quotes',
+        description: 'Quotes Trusted by many fortune brands around the world',
+        category: 'Personality',
+        tags: ['personality', 'public-api', 'they'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.8,
+        ratingCount: 2798,
+        usageCount: 40614,
+        baseUrl: 'https://theysaidso.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://theysaidso.com/api/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'traitify',
+        name: 'Traitify',
+        provider: 'Traitify',
+        description: 'Assess, collect and analyze Personality',
+        category: 'Personality',
+        tags: ['personality', 'public-api', 'traitify'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.1,
+        ratingCount: 3081,
+        usageCount: 39083,
+        baseUrl: 'https://app.traitify.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://app.traitify.com/developer',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'udemy-instructor',
+        name: 'Udemy(instructor)',
+        provider: 'Udemy(instructor)',
+        description: 'API for instructors on Udemy',
+        category: 'Personality',
+        tags: ['personality', 'public-api', 'udemy'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.1,
+        ratingCount: 9101,
+        usageCount: 59800,
+        baseUrl: 'https://www.udemy.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://www.udemy.com/developers/instructor/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'vadivelu-http-codes',
+        name: 'Vadivelu HTTP Codes',
+        provider: 'Vadivelu HTTP Codes',
+        description: 'On demand HTTP Codes with images',
+        category: 'Personality',
+        tags: ['personality', 'public-api', 'vadivelu'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.1,
+        ratingCount: 4851,
+        usageCount: 87764,
+        baseUrl: 'https://vadivelu.anoram.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://vadivelu.anoram.com/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'numlookup',
+        name: 'Numlookup',
+        provider: 'Numlookup',
+        description: 'Phone number validation and carrier lookup API with global coverage',
+        category: 'Phone',
+        tags: ['phone', 'public-api', 'numlookup'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.5,
+        ratingCount: 3705,
+        usageCount: 20600,
+        baseUrl: 'https://numlookupapi.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://numlookupapi.com',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'numverify',
+        name: 'Numverify',
+        provider: 'Numverify',
+        description: 'Phone number validation',
+        category: 'Phone',
+        tags: ['phone', 'public-api', 'numverify'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.8,
+        ratingCount: 7818,
+        usageCount: 80616,
+        baseUrl: 'https://numverify.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://numverify.com?utm_source=Github&utm_medium=Referral&utm_campaign=Public-apis-repo-Best-sellers',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'veriroute-intel',
+        name: 'VeriRoute Intel',
+        provider: 'VeriRoute Intel',
+        description: 'CNAM caller ID, carrier/LRN lookup and spam scoring for North American phone numbers',
+        category: 'Phone',
+        tags: ['phone', 'public-api', 'veriroute'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.1,
+        ratingCount: 6101,
+        usageCount: 70371,
+        baseUrl: 'https://verirouteintel.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://verirouteintel.com',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'screenshotlayer',
+        name: 'Screenshotlayer',
+        provider: 'Screenshotlayer',
+        description: 'URL to screenshot',
+        category: 'Photography',
+        tags: ['photography', 'public-api', 'screenshotlayer'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.2,
+        ratingCount: 4802,
+        usageCount: 2471,
+        baseUrl: 'https://screenshotlayer.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://screenshotlayer.com?utm_source=Github&utm_medium=Referral&utm_campaign=Public-apis-repo-Best-sellers',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'cheetaho',
+        name: 'CheetahO',
+        provider: 'CheetahO',
+        description: 'Photo optimization and resize',
+        category: 'Photography',
+        tags: ['photography', 'public-api', 'cheetaho'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.8,
+        ratingCount: 3758,
+        usageCount: 23179,
+        baseUrl: 'https://cheetaho.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://cheetaho.com/docs/getting-started/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'dagpi',
+        name: 'Dagpi',
+        provider: 'Dagpi',
+        description: 'Image manipulation and processing',
+        category: 'Photography',
+        tags: ['photography', 'public-api', 'dagpi'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.6,
+        ratingCount: 3596,
+        usageCount: 41728,
+        baseUrl: 'https://dagpi.xyz',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://dagpi.xyz',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'flickr',
+        name: 'Flickr',
+        provider: 'Flickr',
+        description: 'Flickr Services',
+        category: 'Photography',
+        tags: ['photography', 'public-api', 'flickr'],
+        authType: 'OAuth 2.0',
+        pricing: 'Free',
+        ratingAverage: 4.2,
+        ratingCount: 2482,
+        usageCount: 70568,
+        baseUrl: 'https://www.flickr.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://www.flickr.com/services/api/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'getty-images',
+        name: 'Getty Images',
+        provider: 'Getty Images',
+        description: 'Build applications using the world\'s most powerful imagery',
+        category: 'Photography',
+        tags: ['photography', 'public-api', 'getty'],
+        authType: 'OAuth 2.0',
+        pricing: 'Free',
+        ratingAverage: 4.1,
+        ratingCount: 2241,
+        usageCount: 61105,
+        baseUrl: 'https://developers.gettyimages.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'http://developers.gettyimages.com/en/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'gfycat',
+        name: 'Gfycat',
+        provider: 'Gfycat',
+        description: 'Jiffier GIFs',
+        category: 'Photography',
+        tags: ['photography', 'public-api', 'gfycat'],
+        authType: 'OAuth 2.0',
+        pricing: 'Free',
+        ratingAverage: 4.1,
+        ratingCount: 8991,
+        usageCount: 57355,
+        baseUrl: 'https://developers.gfycat.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://developers.gfycat.com/api/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'giphy-2',
+        name: 'Giphy',
+        provider: 'Giphy',
+        description: 'Get all your gifs',
+        category: 'Photography',
+        tags: ['photography', 'public-api', 'giphy'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.1,
+        ratingCount: 1241,
+        usageCount: 29677,
+        baseUrl: 'https://developers.giphy.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://developers.giphy.com/docs/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'google-photos',
+        name: 'Google Photos',
+        provider: 'Google Photos',
+        description: 'Integrate Google Photos with your apps or devices',
+        category: 'Photography',
+        tags: ['photography', 'public-api', 'google'],
+        authType: 'OAuth 2.0',
+        pricing: 'Free',
+        ratingAverage: 4.6,
+        ratingCount: 1616,
+        usageCount: 44873,
+        baseUrl: 'https://developers.google.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://developers.google.com/photos',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'image-upload',
+        name: 'Image Upload',
+        provider: 'Image Upload',
+        description: 'Image Optimization',
+        category: 'Photography',
+        tags: ['photography', 'public-api', 'image'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.8,
+        ratingCount: 1488,
+        usageCount: 37141,
+        baseUrl: 'https://apilayer.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://apilayer.com/marketplace/image_upload-api',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'imgur',
+        name: 'Imgur',
+        provider: 'Imgur',
+        description: 'Images',
+        category: 'Photography',
+        tags: ['photography', 'public-api', 'imgur'],
+        authType: 'OAuth 2.0',
+        pricing: 'Free',
+        ratingAverage: 4.7,
+        ratingCount: 3687,
+        usageCount: 39741,
+        baseUrl: 'https://apidocs.imgur.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://apidocs.imgur.com/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'imsea',
+        name: 'Imsea',
+        provider: 'Imsea',
+        description: 'Free image search',
+        category: 'Photography',
+        tags: ['photography', 'public-api', 'imsea'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4,
+        ratingCount: 5450,
+        usageCount: 79992,
+        baseUrl: 'https://imsea.herokuapp.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://imsea.herokuapp.com/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'photoroom',
+        name: 'PhotoRoom',
+        provider: 'PhotoRoom',
+        description: 'Remove background from images',
+        category: 'Photography',
+        tags: ['photography', 'public-api', 'photoroom'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.2,
+        ratingCount: 7192,
+        usageCount: 78527,
+        baseUrl: 'https://www.photoroom.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://www.photoroom.com/api/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'pixabay',
+        name: 'Pixabay',
+        provider: 'Pixabay',
+        description: 'Photography',
+        category: 'Photography',
+        tags: ['photography', 'public-api', 'pixabay'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.5,
+        ratingCount: 3925,
+        usageCount: 21346,
+        baseUrl: 'https://pixabay.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://pixabay.com/sk/service/about/api/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'placekeanu',
+        name: 'PlaceKeanu',
+        provider: 'PlaceKeanu',
+        description: 'Resizable Keanu Reeves placeholder images with grayscale and young Keanu options',
+        category: 'Photography',
+        tags: ['photography', 'public-api', 'placekeanu'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.6,
+        ratingCount: 2826,
+        usageCount: 2046,
+        baseUrl: 'https://placekeanu.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://placekeanu.com/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'readme-typing-svg',
+        name: 'Readme typing SVG',
+        provider: 'Readme typing SVG',
+        description: 'Customizable typing and deleting text SVG',
+        category: 'Photography',
+        tags: ['photography', 'public-api', 'readme'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.2,
+        ratingCount: 1502,
+        usageCount: 90714,
+        baseUrl: 'https://github.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://github.com/DenverCoder1/readme-typing-svg',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'remove-bg',
+        name: 'Remove.bg',
+        provider: 'Remove.bg',
+        description: 'Image Background removal',
+        category: 'Photography',
+        tags: ['photography', 'public-api', 'remove'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.3,
+        ratingCount: 4903,
+        usageCount: 48771,
+        baseUrl: 'https://www.remove.bg',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://www.remove.bg/api',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'shutterstock',
+        name: 'shutterstock',
+        provider: 'shutterstock',
+        description: 'Stock Photos and Videos',
+        category: 'Photography',
+        tags: ['photography', 'public-api', 'shutterstock'],
+        authType: 'OAuth 2.0',
+        pricing: 'Free',
+        ratingAverage: 4.6,
+        ratingCount: 4216,
+        usageCount: 21959,
+        baseUrl: 'https://api-reference.shutterstock.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://api-reference.shutterstock.com/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'sirv',
+        name: 'Sirv',
+        provider: 'Sirv',
+        description: 'Image management solutions like optimization, manipulation, hosting',
+        category: 'Photography',
+        tags: ['photography', 'public-api', 'sirv'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.3,
+        ratingCount: 3393,
+        usageCount: 60556,
+        baseUrl: 'https://apidocs.sirv.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://apidocs.sirv.com/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'unsplash-2',
+        name: 'Unsplash',
+        provider: 'Unsplash',
+        description: 'Photography',
+        category: 'Photography',
+        tags: ['photography', 'public-api', 'unsplash'],
+        authType: 'OAuth 2.0',
+        pricing: 'Free',
+        ratingAverage: 4.8,
+        ratingCount: 5578,
+        usageCount: 93296,
+        baseUrl: 'https://unsplash.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://unsplash.com/developers',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'wallhaven',
+        name: 'Wallhaven',
+        provider: 'Wallhaven',
+        description: 'Wallpapers',
+        category: 'Photography',
+        tags: ['photography', 'public-api', 'wallhaven'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.1,
+        ratingCount: 5331,
+        usageCount: 88261,
+        baseUrl: 'https://wallhaven.cc',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://wallhaven.cc/help/api',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'webdam',
+        name: 'Webdam',
+        provider: 'Webdam',
+        description: 'Images',
+        category: 'Photography',
+        tags: ['photography', 'public-api', 'webdam'],
+        authType: 'OAuth 2.0',
+        pricing: 'Free',
+        ratingAverage: 4.7,
+        ratingCount: 4817,
+        usageCount: 9188,
+        baseUrl: 'https://www.damsuccess.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://www.damsuccess.com/hc/en-us/articles/202134055-REST-API',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'codeforces',
+        name: 'Codeforces',
+        provider: 'Codeforces',
+        description: 'Get access to Codeforces data',
+        category: 'Programming',
+        tags: ['programming', 'public-api', 'codeforces'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4,
+        ratingCount: 6880,
+        usageCount: 72340,
+        baseUrl: 'https://codeforces.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://codeforces.com/apiHelp',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'hackerearth',
+        name: 'Hackerearth',
+        provider: 'Hackerearth',
+        description: 'For compiling and running code in several languages',
+        category: 'Programming',
+        tags: ['programming', 'public-api', 'hackerearth'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.1,
+        ratingCount: 1331,
+        usageCount: 2690,
+        baseUrl: 'https://www.hackerearth.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://www.hackerearth.com/docs/wiki/developers/v4/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'judge0-ce',
+        name: 'Judge0 CE',
+        provider: 'Judge0 CE',
+        description: 'Online code execution system',
+        category: 'Programming',
+        tags: ['programming', 'public-api', 'judge0'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.3,
+        ratingCount: 5243,
+        usageCount: 34106,
+        baseUrl: 'https://ce.judge0.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://ce.judge0.com/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'kontests',
+        name: 'KONTESTS',
+        provider: 'KONTESTS',
+        description: 'For upcoming and ongoing competitive coding contests',
+        category: 'Programming',
+        tags: ['programming', 'public-api', 'kontests'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4,
+        ratingCount: 2560,
+        usageCount: 95008,
+        baseUrl: 'https://kontests.net',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://kontests.net/api',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'arcsecond-io',
+        name: 'arcsecond.io',
+        provider: 'arcsecond.io',
+        description: 'Multiple astronomy data sources',
+        category: 'Science & Math',
+        tags: ['science-math', 'public-api', 'arcsecond'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4,
+        ratingCount: 8530,
+        usageCount: 65004,
+        baseUrl: 'https://api.arcsecond.io',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://api.arcsecond.io/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'arxiv',
+        name: 'arXiv',
+        provider: 'arXiv',
+        description: 'Curated research-sharing platform: physics, mathematics, quantitative finance, and economics',
+        category: 'Science & Math',
+        tags: ['science-math', 'public-api', 'arxiv'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.7,
+        ratingCount: 6437,
+        usageCount: 64419,
+        baseUrl: 'https://arxiv.org',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://arxiv.org/help/api/user-manual',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'codecogs',
+        name: 'CodeCogs',
+        provider: 'CodeCogs',
+        description: 'Render LaTeX equations in PNG, GIF, SVG, EMF, PDF, JSON, or download formats with styling options',
+        category: 'Science & Math',
+        tags: ['science-math', 'public-api', 'codecogs'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.6,
+        ratingCount: 8596,
+        usageCount: 81299,
+        baseUrl: 'https://editor.codecogs.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://editor.codecogs.com/docs/4-LaTeX_rendering.php',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'core',
+        name: 'CORE',
+        provider: 'CORE',
+        description: 'Access the world\'s Open Access research papers',
+        category: 'Science & Math',
+        tags: ['science-math', 'public-api', 'core'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.4,
+        ratingCount: 4974,
+        usageCount: 68496,
+        baseUrl: 'https://core.ac.uk',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://core.ac.uk/services#api',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'idigbio',
+        name: 'iDigBio',
+        provider: 'iDigBio',
+        description: 'Access millions of museum specimens from organizations around the world',
+        category: 'Science & Math',
+        tags: ['science-math', 'public-api', 'idigbio'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.8,
+        ratingCount: 2838,
+        usageCount: 42762,
+        baseUrl: 'https://github.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://github.com/idigbio/idigbio-search-api/wiki',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'inspirehep-net',
+        name: 'inspirehep.net',
+        provider: 'inspirehep.net',
+        description: 'High Energy Physics info. system',
+        category: 'Science & Math',
+        tags: ['science-math', 'public-api', 'inspirehep'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4,
+        ratingCount: 3980,
+        usageCount: 52354,
+        baseUrl: 'https://github.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://github.com/inspirehep/rest-api-doc',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'iseven-humor',
+        name: 'isEven (humor)',
+        provider: 'isEven (humor)',
+        description: 'Check if a number is even',
+        category: 'Science & Math',
+        tags: ['science-math', 'public-api', 'iseven'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.9,
+        ratingCount: 8459,
+        usageCount: 90422,
+        baseUrl: 'https://isevenapi.xyz',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://isevenapi.xyz/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'isro',
+        name: 'ISRO',
+        provider: 'ISRO',
+        description: 'ISRO Space Crafts Information',
+        category: 'Science & Math',
+        tags: ['science-math', 'public-api', 'isro'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.8,
+        ratingCount: 4438,
+        usageCount: 34134,
+        baseUrl: 'https://isro.vercel.app',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://isro.vercel.app',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'itis',
+        name: 'ITIS',
+        provider: 'ITIS',
+        description: 'Integrated Taxonomic Information System',
+        category: 'Science & Math',
+        tags: ['science-math', 'public-api', 'itis'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.8,
+        ratingCount: 2628,
+        usageCount: 62589,
+        baseUrl: 'https://www.itis.gov',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://www.itis.gov/ws_description.html',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'materials-platform-for-data-science',
+        name: 'Materials Platform for Data Science',
+        provider: 'Materials Platform for Data Science',
+        description: 'Curated experimental data for materials science',
+        category: 'Science & Math',
+        tags: ['science-math', 'public-api', 'materials'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.7,
+        ratingCount: 7737,
+        usageCount: 77319,
+        baseUrl: 'https://mpds.io',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://mpds.io',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'nasa-2',
+        name: 'NASA',
+        provider: 'NASA',
+        description: 'NASA data, including imagery',
+        category: 'Science & Math',
+        tags: ['science-math', 'public-api', 'nasa'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.5,
+        ratingCount: 3435,
+        usageCount: 22276,
+        baseUrl: 'https://api.nasa.gov',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://api.nasa.gov',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'newton',
+        name: 'Newton',
+        provider: 'Newton',
+        description: 'Symbolic and Arithmetic Math Calculator',
+        category: 'Science & Math',
+        tags: ['science-math', 'public-api', 'newton'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.8,
+        ratingCount: 4898,
+        usageCount: 82056,
+        baseUrl: 'https://newton.vercel.app',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://newton.vercel.app',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'noctua',
+        name: 'Noctua',
+        provider: 'Noctua',
+        description: 'REST API used to access NoctuaSky features',
+        category: 'Science & Math',
+        tags: ['science-math', 'public-api', 'noctua'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.3,
+        ratingCount: 7143,
+        usageCount: 15234,
+        baseUrl: 'https://api.noctuasky.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://api.noctuasky.com/api/v1/swaggerdoc/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'numbers',
+        name: 'Numbers',
+        provider: 'Numbers',
+        description: 'Number of the day, random number, number facts and anything else you want to do with numbers',
+        category: 'Science & Math',
+        tags: ['science-math', 'public-api', 'numbers'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.7,
+        ratingCount: 4387,
+        usageCount: 27841,
+        baseUrl: 'https://math.tools',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://math.tools/api/numbers/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'ocean-facts',
+        name: 'Ocean Facts',
+        provider: 'Ocean Facts',
+        description: 'Facts pertaining to the physical science of Oceanography',
+        category: 'Science & Math',
+        tags: ['science-math', 'public-api', 'ocean'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.9,
+        ratingCount: 7449,
+        usageCount: 72849,
+        baseUrl: 'https://oceanfacts.herokuapp.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://oceanfacts.herokuapp.com/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'open-science-framework',
+        name: 'Open Science Framework',
+        provider: 'Open Science Framework',
+        description: 'Repository and archive for study designs, research materials, data, manuscripts, etc',
+        category: 'Science & Math',
+        tags: ['science-math', 'public-api', 'open'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.1,
+        ratingCount: 5811,
+        usageCount: 12187,
+        baseUrl: 'https://developer.osf.io',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://developer.osf.io',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'purple-air',
+        name: 'Purple Air',
+        provider: 'Purple Air',
+        description: 'Real Time Air Quality Monitoring',
+        category: 'Science & Math',
+        tags: ['science-math', 'public-api', 'purple'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4,
+        ratingCount: 5790,
+        usageCount: 17470,
+        baseUrl: 'https://www2.purpleair.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://www2.purpleair.com/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'share',
+        name: 'SHARE',
+        provider: 'SHARE',
+        description: 'A free, open, dataset about research and scholarly activities',
+        category: 'Science & Math',
+        tags: ['science-math', 'public-api', 'share'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.8,
+        ratingCount: 8988,
+        usageCount: 1784,
+        baseUrl: 'https://share.osf.io',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://share.osf.io/api/v2/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'spacex',
+        name: 'SpaceX',
+        provider: 'SpaceX',
+        description: 'Company, vehicle, launchpad and launch data',
+        category: 'Science & Math',
+        tags: ['science-math', 'public-api', 'spacex'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.7,
+        ratingCount: 7877,
+        usageCount: 24768,
+        baseUrl: 'https://github.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://github.com/r-spacex/SpaceX-API',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'sunrise-and-sunset',
+        name: 'Sunrise and Sunset',
+        provider: 'Sunrise and Sunset',
+        description: 'Sunset and sunrise times for a given latitude and longitude',
+        category: 'Science & Math',
+        tags: ['science-math', 'public-api', 'sunrise'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.9,
+        ratingCount: 7819,
+        usageCount: 53759,
+        baseUrl: 'https://sunrise-sunset.org',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://sunrise-sunset.org/api',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'times-adder',
+        name: 'Times Adder',
+        provider: 'Times Adder',
+        description: 'With this API you can add each of the times introduced in the array sended',
+        category: 'Science & Math',
+        tags: ['science-math', 'public-api', 'times'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.8,
+        ratingCount: 508,
+        usageCount: 11715,
+        baseUrl: 'https://github.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://github.com/FranP-code/API-Times-Adder',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'tle',
+        name: 'TLE',
+        provider: 'TLE',
+        description: 'Satellite information',
+        category: 'Science & Math',
+        tags: ['science-math', 'public-api', 'tle'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.2,
+        ratingCount: 532,
+        usageCount: 38147,
+        baseUrl: 'https://tle.ivanstanojevic.me',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://tle.ivanstanojevic.me/#/docs',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'usgs-earthquake-hazards-program',
+        name: 'USGS Earthquake Hazards Program',
+        provider: 'USGS Earthquake Hazards Program',
+        description: 'Earthquakes data real-time',
+        category: 'Science & Math',
+        tags: ['science-math', 'public-api', 'usgs'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4,
+        ratingCount: 2030,
+        usageCount: 68504,
+        baseUrl: 'https://earthquake.usgs.gov',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://earthquake.usgs.gov/fdsnws/event/1/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'usgs-water-services',
+        name: 'USGS Water Services',
+        provider: 'USGS Water Services',
+        description: 'Water quality and level info for rivers and lakes',
+        category: 'Science & Math',
+        tags: ['science-math', 'public-api', 'usgs'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.4,
+        ratingCount: 8564,
+        usageCount: 12580,
+        baseUrl: 'https://waterservices.usgs.gov',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://waterservices.usgs.gov/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'world-bank',
+        name: 'World Bank',
+        provider: 'World Bank',
+        description: 'World Data',
+        category: 'Science & Math',
+        tags: ['science-math', 'public-api', 'world'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4,
+        ratingCount: 1800,
+        usageCount: 29185,
+        baseUrl: 'https://datahelpdesk.worldbank.org',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://datahelpdesk.worldbank.org/knowledgebase/topics/125589',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'bitwarden',
+        name: 'BitWarden',
+        provider: 'BitWarden',
+        description: 'Best open-source password manager',
+        category: 'Security',
+        tags: ['security', 'public-api', 'bitwarden'],
+        authType: 'OAuth 2.0',
+        pricing: 'Free',
+        ratingAverage: 4.3,
+        ratingCount: 4643,
+        usageCount: 79020,
+        baseUrl: 'https://bitwarden.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://bitwarden.com/help/api/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'bugcrowd',
+        name: 'Bugcrowd',
+        provider: 'Bugcrowd',
+        description: 'Bugcrowd API for interacting and tracking the reported issues programmatically',
+        category: 'Security',
+        tags: ['security', 'public-api', 'bugcrowd'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.6,
+        ratingCount: 9466,
+        usageCount: 12566,
+        baseUrl: 'https://docs.bugcrowd.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://docs.bugcrowd.com/api/getting-started/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'censys',
+        name: 'Censys',
+        provider: 'Censys',
+        description: 'Search engine for Internet connected host and devices',
+        category: 'Security',
+        tags: ['security', 'public-api', 'censys'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.8,
+        ratingCount: 6898,
+        usageCount: 80771,
+        baseUrl: 'https://search.censys.io',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://search.censys.io/api',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'crxcavator',
+        name: 'CRXcavator',
+        provider: 'CRXcavator',
+        description: 'Chrome extension risk scoring',
+        category: 'Security',
+        tags: ['security', 'public-api', 'crxcavator'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.4,
+        ratingCount: 1154,
+        usageCount: 13379,
+        baseUrl: 'https://crxcavator.io',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://crxcavator.io/apidocs',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'dehash-lt',
+        name: 'Dehash.lt',
+        provider: 'Dehash.lt',
+        description: 'Hash decryption MD5, SHA1, SHA3, SHA256, SHA384, SHA512',
+        category: 'Security',
+        tags: ['security', 'public-api', 'dehash'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.1,
+        ratingCount: 3541,
+        usageCount: 58148,
+        baseUrl: 'https://github.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://github.com/Dehash-lt/api',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'domain-intelligence',
+        name: 'Domain Intelligence',
+        provider: 'Domain Intelligence',
+        description: 'DNS, WHOIS/RDAP, SSL, subdomain enumeration, and email security in one parallel call',
+        category: 'Security',
+        tags: ['security', 'public-api', 'domain'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.5,
+        ratingCount: 8735,
+        usageCount: 86176,
+        baseUrl: 'https://oti-labs.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://oti-labs.com/domain-intelligence-api',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'emailrep',
+        name: 'EmailRep',
+        provider: 'EmailRep',
+        description: 'Email address threat and risk prediction',
+        category: 'Security',
+        tags: ['security', 'public-api', 'emailrep'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.6,
+        ratingCount: 8326,
+        usageCount: 86260,
+        baseUrl: 'https://docs.emailrep.io',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://docs.emailrep.io/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'escape',
+        name: 'Escape',
+        provider: 'Escape',
+        description: 'An API for escaping different kind of queries',
+        category: 'Security',
+        tags: ['security', 'public-api', 'escape'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.8,
+        ratingCount: 8758,
+        usageCount: 16751,
+        baseUrl: 'https://github.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://github.com/polarspetroll/EscapeAPI',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'filterlists',
+        name: 'FilterLists',
+        provider: 'FilterLists',
+        description: 'Lists of filters for adblockers and firewalls',
+        category: 'Security',
+        tags: ['security', 'public-api', 'filterlists'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.8,
+        ratingCount: 9128,
+        usageCount: 58946,
+        baseUrl: 'https://filterlists.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://filterlists.com',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'fraudlabs-pro',
+        name: 'FraudLabs Pro',
+        provider: 'FraudLabs Pro',
+        description: 'Screen order information using AI to detect frauds',
+        category: 'Security',
+        tags: ['security', 'public-api', 'fraudlabs'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.1,
+        ratingCount: 7141,
+        usageCount: 10805,
+        baseUrl: 'https://www.fraudlabspro.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://www.fraudlabspro.com/developer/api/screen-order',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'fullhunt',
+        name: 'FullHunt',
+        provider: 'FullHunt',
+        description: 'Searchable attack surface database of the entire internet',
+        category: 'Security',
+        tags: ['security', 'public-api', 'fullhunt'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.9,
+        ratingCount: 4499,
+        usageCount: 31714,
+        baseUrl: 'https://api-docs.fullhunt.io',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://api-docs.fullhunt.io/#introduction',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'gitguardian',
+        name: 'GitGuardian',
+        provider: 'GitGuardian',
+        description: 'Scan files for secrets (API Keys, database credentials)',
+        category: 'Security',
+        tags: ['security', 'public-api', 'gitguardian'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.4,
+        ratingCount: 1524,
+        usageCount: 81289,
+        baseUrl: 'https://api.gitguardian.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://api.gitguardian.com/doc',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'greynoise',
+        name: 'GreyNoise',
+        provider: 'GreyNoise',
+        description: 'Query IPs in the GreyNoise dataset and retrieve a subset of the full IP context data',
+        category: 'Security',
+        tags: ['security', 'public-api', 'greynoise'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4,
+        ratingCount: 6820,
+        usageCount: 3474,
+        baseUrl: 'https://docs.greynoise.io',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://docs.greynoise.io/reference/get_v3-community-ip',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'hackerone',
+        name: 'HackerOne',
+        provider: 'HackerOne',
+        description: 'The industry’s first hacker API that helps increase productivity towards creative bug bounty hunting',
+        category: 'Security',
+        tags: ['security', 'public-api', 'hackerone'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.9,
+        ratingCount: 1769,
+        usageCount: 22324,
+        baseUrl: 'https://api.hackerone.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://api.hackerone.com/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'haveibeenpwned',
+        name: 'HaveIBeenPwned',
+        provider: 'HaveIBeenPwned',
+        description: 'Passwords which have previously been exposed in data breaches',
+        category: 'Security',
+        tags: ['security', 'public-api', 'haveibeenpwned'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.6,
+        ratingCount: 8016,
+        usageCount: 76788,
+        baseUrl: 'https://haveibeenpwned.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://haveibeenpwned.com/API/v3',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'intelligence-x',
+        name: 'Intelligence X',
+        provider: 'Intelligence X',
+        description: 'Perform OSINT via Intelligence X',
+        category: 'Security',
+        tags: ['security', 'public-api', 'intelligence'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.3,
+        ratingCount: 8173,
+        usageCount: 60810,
+        baseUrl: 'https://github.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://github.com/IntelligenceX/SDK/blob/master/Intelligence%20X%20API.pdf',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'microsoft-security-response-center-msrc',
+        name: 'Microsoft Security Response Center (MSRC)',
+        provider: 'Microsoft Security Response Center (MSRC)',
+        description: 'Programmatic interfaces to engage with the Microsoft Security Response Center (MSRC)',
+        category: 'Security',
+        tags: ['security', 'public-api', 'microsoft'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.8,
+        ratingCount: 4318,
+        usageCount: 64402,
+        baseUrl: 'https://msrc.microsoft.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://msrc.microsoft.com/report/developer',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'mozilla-http-scanner',
+        name: 'Mozilla http scanner',
+        provider: 'Mozilla http scanner',
+        description: 'Mozilla observatory http scanner',
+        category: 'Security',
+        tags: ['security', 'public-api', 'mozilla'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.1,
+        ratingCount: 9221,
+        usageCount: 14960,
+        baseUrl: 'https://github.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://github.com/mozilla/http-observatory/blob/master/httpobs/docs/api.md',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'mozilla-tls-scanner',
+        name: 'Mozilla tls scanner',
+        provider: 'Mozilla tls scanner',
+        description: 'Mozilla observatory tls scanner',
+        category: 'Security',
+        tags: ['security', 'public-api', 'mozilla'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.8,
+        ratingCount: 7808,
+        usageCount: 21329,
+        baseUrl: 'https://github.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://github.com/mozilla/tls-observatory#api-endpoints',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'national-vulnerability-database',
+        name: 'National Vulnerability Database',
+        provider: 'National Vulnerability Database',
+        description: 'U.S. National Vulnerability Database',
+        category: 'Security',
+        tags: ['security', 'public-api', 'national'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.8,
+        ratingCount: 3838,
+        usageCount: 3334,
+        baseUrl: 'https://nvd.nist.gov',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://nvd.nist.gov/vuln/Data-Feeds/JSON-feed-changelog',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'phishstats',
+        name: 'PhishStats',
+        provider: 'PhishStats',
+        description: 'Phishing database',
+        category: 'Security',
+        tags: ['security', 'public-api', 'phishstats'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.6,
+        ratingCount: 3686,
+        usageCount: 62169,
+        baseUrl: 'https://phishstats.info',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://phishstats.info/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'privacy-com',
+        name: 'Privacy.com',
+        provider: 'Privacy.com',
+        description: 'Generate merchant-specific and one-time use credit card numbers that link back to your bank',
+        category: 'Security',
+        tags: ['security', 'public-api', 'privacy'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.3,
+        ratingCount: 3173,
+        usageCount: 19953,
+        baseUrl: 'https://privacy.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://privacy.com/developer/docs',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'pulsedive',
+        name: 'Pulsedive',
+        provider: 'Pulsedive',
+        description: 'Scan, search and collect threat intelligence data in real-time',
+        category: 'Security',
+        tags: ['security', 'public-api', 'pulsedive'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.8,
+        ratingCount: 1088,
+        usageCount: 55226,
+        baseUrl: 'https://pulsedive.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://pulsedive.com/api/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'securitytrails',
+        name: 'SecurityTrails',
+        provider: 'SecurityTrails',
+        description: 'Domain and IP related information such as current and historical WHOIS and DNS records',
+        category: 'Security',
+        tags: ['security', 'public-api', 'securitytrails'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.8,
+        ratingCount: 2338,
+        usageCount: 68976,
+        baseUrl: 'https://securitytrails.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://securitytrails.com/corp/apidocs',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'shodan',
+        name: 'Shodan',
+        provider: 'Shodan',
+        description: 'Search engine for Internet connected devices',
+        category: 'Security',
+        tags: ['security', 'public-api', 'shodan'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.4,
+        ratingCount: 4874,
+        usageCount: 9767,
+        baseUrl: 'https://developer.shodan.io',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://developer.shodan.io/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'spyse',
+        name: 'Spyse',
+        provider: 'Spyse',
+        description: 'Access data on all Internet assets and build powerful attack surface management applications',
+        category: 'Security',
+        tags: ['security', 'public-api', 'spyse'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.1,
+        ratingCount: 2071,
+        usageCount: 95795,
+        baseUrl: 'https://spyse-dev.readme.io',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://spyse-dev.readme.io/reference/quick-start',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'threat-jammer',
+        name: 'Threat Jammer',
+        provider: 'Threat Jammer',
+        description: 'Risk scoring service from curated threat intelligence data',
+        category: 'Security',
+        tags: ['security', 'public-api', 'threat'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.4,
+        ratingCount: 4484,
+        usageCount: 20712,
+        baseUrl: 'https://threatjammer.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://threatjammer.com/docs/index',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'uk-police',
+        name: 'UK Police',
+        provider: 'UK Police',
+        description: 'UK Police data',
+        category: 'Security',
+        tags: ['security', 'public-api', 'uk'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4,
+        ratingCount: 1850,
+        usageCount: 33050,
+        baseUrl: 'https://data.police.uk',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://data.police.uk/docs/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'vuldb',
+        name: 'VulDB',
+        provider: 'VulDB',
+        description: 'VulDB API allows to initiate queries for one or more items along with transactional bots',
+        category: 'Security',
+        tags: ['security', 'public-api', 'vuldb'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.4,
+        ratingCount: 3334,
+        usageCount: 79690,
+        baseUrl: 'https://vuldb.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://vuldb.com/?doc.api',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'best-buy',
+        name: 'Best Buy',
+        provider: 'Best Buy',
+        description: 'Products, Buying Options, Categories, Recommendations, Stores and Commerce',
+        category: 'Shopping',
+        tags: ['shopping', 'public-api', 'best'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.6,
+        ratingCount: 6466,
+        usageCount: 87138,
+        baseUrl: 'https://bestbuyapis.github.io',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://bestbuyapis.github.io/api-documentation/#overview',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'buywhere',
+        name: 'BuyWhere',
+        provider: 'BuyWhere',
+        description: 'Real-time product catalog API for AI agents across merchants in 7 countries (SG, MY, TH, VN, PH, ID, US)',
+        category: 'Shopping',
+        tags: ['shopping', 'public-api', 'buywhere'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.6,
+        ratingCount: 7746,
+        usageCount: 30749,
+        baseUrl: 'https://buywhere.ai',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://buywhere.ai',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'digi-key',
+        name: 'Digi-Key',
+        provider: 'Digi-Key',
+        description: 'Retrieve price and inventory of electronic components as well as place orders',
+        category: 'Shopping',
+        tags: ['shopping', 'public-api', 'digi'],
+        authType: 'OAuth 2.0',
+        pricing: 'Free',
+        ratingAverage: 4.2,
+        ratingCount: 5012,
+        usageCount: 70216,
+        baseUrl: 'https://www.digikey.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://www.digikey.com/en/resources/api-solutions',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'descripio-amazon-reviews',
+        name: 'Descripio Amazon Reviews',
+        provider: 'Descripio Amazon Reviews',
+        description: 'Amazon product reviews for 12 marketplaces',
+        category: 'Shopping',
+        tags: ['shopping', 'public-api', 'descripio'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.4,
+        ratingCount: 8314,
+        usageCount: 34687,
+        baseUrl: 'https://docs.descripio.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://docs.descripio.com',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'ebay',
+        name: 'eBay',
+        provider: 'eBay',
+        description: 'Sell and Buy on eBay',
+        category: 'Shopping',
+        tags: ['shopping', 'public-api', 'ebay'],
+        authType: 'OAuth 2.0',
+        pricing: 'Free',
+        ratingAverage: 4.8,
+        ratingCount: 1968,
+        usageCount: 83924,
+        baseUrl: 'https://developer.ebay.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://developer.ebay.com/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'etsy',
+        name: 'Etsy',
+        provider: 'Etsy',
+        description: 'Manage shop and interact with listings',
+        category: 'Shopping',
+        tags: ['shopping', 'public-api', 'etsy'],
+        authType: 'OAuth 2.0',
+        pricing: 'Free',
+        ratingAverage: 4.8,
+        ratingCount: 5888,
+        usageCount: 65341,
+        baseUrl: 'https://www.etsy.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://www.etsy.com/developers/documentation/getting_started/api_basics',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'lazada',
+        name: 'Lazada',
+        provider: 'Lazada',
+        description: 'Retrieve product ratings and seller performance metrics',
+        category: 'Shopping',
+        tags: ['shopping', 'public-api', 'lazada'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.2,
+        ratingCount: 9332,
+        usageCount: 11547,
+        baseUrl: 'https://open.lazada.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://open.lazada.com/doc/doc.htm',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'mercadolibre',
+        name: 'Mercadolibre',
+        provider: 'Mercadolibre',
+        description: 'Manage sales, ads, products, services and Shops',
+        category: 'Shopping',
+        tags: ['shopping', 'public-api', 'mercadolibre'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.8,
+        ratingCount: 3448,
+        usageCount: 92992,
+        baseUrl: 'https://developers.mercadolibre.cl',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://developers.mercadolibre.cl/es_ar/api-docs-es',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'octopart',
+        name: 'Octopart',
+        provider: 'Octopart',
+        description: 'Electronic part data for manufacturing, design, and sourcing',
+        category: 'Shopping',
+        tags: ['shopping', 'public-api', 'octopart'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.3,
+        ratingCount: 6233,
+        usageCount: 13247,
+        baseUrl: 'https://octopart.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://octopart.com/api/v4/reference',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'olx-poland',
+        name: 'OLX Poland',
+        provider: 'OLX Poland',
+        description: 'Integrate with local sites by posting, managing adverts and communicating with OLX users',
+        category: 'Shopping',
+        tags: ['shopping', 'public-api', 'olx'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.1,
+        ratingCount: 6561,
+        usageCount: 89008,
+        baseUrl: 'https://developer.olx.pl',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://developer.olx.pl/api/doc#section/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'rappi',
+        name: 'Rappi',
+        provider: 'Rappi',
+        description: 'Manage orders from Rappi\'s app',
+        category: 'Shopping',
+        tags: ['shopping', 'public-api', 'rappi'],
+        authType: 'OAuth 2.0',
+        pricing: 'Free',
+        ratingAverage: 4.3,
+        ratingCount: 8733,
+        usageCount: 94461,
+        baseUrl: 'https://dev-portal.rappi.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://dev-portal.rappi.com/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'shopee',
+        name: 'Shopee',
+        provider: 'Shopee',
+        description: 'Shopee\'s official API for integration of various services from Shopee',
+        category: 'Shopping',
+        tags: ['shopping', 'public-api', 'shopee'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.7,
+        ratingCount: 7167,
+        usageCount: 13666,
+        baseUrl: 'https://open.shopee.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://open.shopee.com/documents?version=1',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'tokopedia',
+        name: 'Tokopedia',
+        provider: 'Tokopedia',
+        description: 'Tokopedia\'s Official API for integration of various services from Tokopedia',
+        category: 'Shopping',
+        tags: ['shopping', 'public-api', 'tokopedia'],
+        authType: 'OAuth 2.0',
+        pricing: 'Free',
+        ratingAverage: 4.7,
+        ratingCount: 1207,
+        usageCount: 78815,
+        baseUrl: 'https://developer.tokopedia.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://developer.tokopedia.com/openapi/guide/#/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'aztro',
+        name: 'aztro',
+        provider: 'aztro',
+        description: 'Daily horoscope info for yesterday, today, and tomorrow',
+        category: 'Social',
+        tags: ['social', 'public-api', 'aztro'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.9,
+        ratingCount: 7279,
+        usageCount: 66968,
+        baseUrl: 'https://aztro.sameerkumar.website',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://aztro.sameerkumar.website/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'blogger',
+        name: 'Blogger',
+        provider: 'Blogger',
+        description: 'The Blogger APIs allows client applications to view and update Blogger content',
+        category: 'Social',
+        tags: ['social', 'public-api', 'blogger'],
+        authType: 'OAuth 2.0',
+        pricing: 'Free',
+        ratingAverage: 4.3,
+        ratingCount: 7473,
+        usageCount: 41281,
+        baseUrl: 'https://developers.google.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://developers.google.com/blogger/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'cisco-spark',
+        name: 'Cisco Spark',
+        provider: 'Cisco Spark',
+        description: 'Team Collaboration Software',
+        category: 'Social',
+        tags: ['social', 'public-api', 'cisco'],
+        authType: 'OAuth 2.0',
+        pricing: 'Free',
+        ratingAverage: 4.4,
+        ratingCount: 7624,
+        usageCount: 24303,
+        baseUrl: 'https://developer.ciscospark.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://developer.ciscospark.com',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'dangerous-discord-database',
+        name: 'Dangerous Discord Database',
+        provider: 'Dangerous Discord Database',
+        description: 'Database of malicious Discord accounts',
+        category: 'Social',
+        tags: ['social', 'public-api', 'dangerous'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.4,
+        ratingCount: 2184,
+        usageCount: 39097,
+        baseUrl: 'https://discord.riverside.rocks',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://discord.riverside.rocks/docs/index.php',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'discord',
+        name: 'Discord',
+        provider: 'Discord',
+        description: 'Make bots for Discord, integrate Discord onto an external platform',
+        category: 'Social',
+        tags: ['social', 'public-api', 'discord'],
+        authType: 'OAuth 2.0',
+        pricing: 'Free',
+        ratingAverage: 4.7,
+        ratingCount: 4477,
+        usageCount: 37568,
+        baseUrl: 'https://discord.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://discord.com/developers/docs/intro',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'disqus',
+        name: 'Disqus',
+        provider: 'Disqus',
+        description: 'Communicate with Disqus data',
+        category: 'Social',
+        tags: ['social', 'public-api', 'disqus'],
+        authType: 'OAuth 2.0',
+        pricing: 'Free',
+        ratingAverage: 4.2,
+        ratingCount: 4642,
+        usageCount: 38020,
+        baseUrl: 'https://disqus.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://disqus.com/api/docs/auth/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'facebook',
+        name: 'Facebook',
+        provider: 'Facebook',
+        description: 'Facebook Login, Share on FB, Social Plugins, Analytics and more',
+        category: 'Social',
+        tags: ['social', 'public-api', 'facebook'],
+        authType: 'OAuth 2.0',
+        pricing: 'Free',
+        ratingAverage: 4.9,
+        ratingCount: 6309,
+        usageCount: 90544,
+        baseUrl: 'https://developers.facebook.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://developers.facebook.com/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'foursquare',
+        name: 'Foursquare',
+        provider: 'Foursquare',
+        description: 'Interact with Foursquare users and places (geolocation-based checkins, photos, tips, events, etc)',
+        category: 'Social',
+        tags: ['social', 'public-api', 'foursquare'],
+        authType: 'OAuth 2.0',
+        pricing: 'Free',
+        ratingAverage: 4,
+        ratingCount: 8710,
+        usageCount: 88887,
+        baseUrl: 'https://developer.foursquare.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://developer.foursquare.com/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'fuck-off-as-a-service',
+        name: 'Fuck Off as a Service',
+        provider: 'Fuck Off as a Service',
+        description: 'Asks someone to fuck off',
+        category: 'Social',
+        tags: ['social', 'public-api', 'fuck'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.3,
+        ratingCount: 4933,
+        usageCount: 6633,
+        baseUrl: 'https://www.foaas.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://www.foaas.com',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'full-contact',
+        name: 'Full Contact',
+        provider: 'Full Contact',
+        description: 'Get Social Media profiles and contact Information',
+        category: 'Social',
+        tags: ['social', 'public-api', 'full'],
+        authType: 'OAuth 2.0',
+        pricing: 'Free',
+        ratingAverage: 4.5,
+        ratingCount: 945,
+        usageCount: 77349,
+        baseUrl: 'https://docs.fullcontact.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://docs.fullcontact.com/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'getxapi',
+        name: 'GetXAPI',
+        provider: 'GetXAPI',
+        description: 'Read Twitter / X data and post tweets, likes, retweets, follows, DMs via REST',
+        category: 'Social',
+        tags: ['social', 'public-api', 'getxapi'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.5,
+        ratingCount: 6405,
+        usageCount: 59129,
+        baseUrl: 'https://www.getxapi.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://www.getxapi.com/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'hackernews-2',
+        name: 'HackerNews',
+        provider: 'HackerNews',
+        description: 'Social news for CS and entrepreneurship',
+        category: 'Social',
+        tags: ['social', 'public-api', 'hackernews'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.1,
+        ratingCount: 7431,
+        usageCount: 90704,
+        baseUrl: 'https://github.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://github.com/HackerNews/API',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'hashnode',
+        name: 'Hashnode',
+        provider: 'Hashnode',
+        description: 'A blogging platform built for developers',
+        category: 'Social',
+        tags: ['social', 'public-api', 'hashnode'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.1,
+        ratingCount: 3621,
+        usageCount: 40017,
+        baseUrl: 'https://hashnode.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://hashnode.com',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'instagram',
+        name: 'Instagram',
+        provider: 'Instagram',
+        description: 'Instagram Login, Share on Instagram, Social Plugins and more',
+        category: 'Social',
+        tags: ['social', 'public-api', 'instagram'],
+        authType: 'OAuth 2.0',
+        pricing: 'Free',
+        ratingAverage: 4.3,
+        ratingCount: 4673,
+        usageCount: 51310,
+        baseUrl: 'https://www.instagram.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://www.instagram.com/developer/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'kakao',
+        name: 'Kakao',
+        provider: 'Kakao',
+        description: 'Kakao Login, Share on KakaoTalk, Social Plugins and more',
+        category: 'Social',
+        tags: ['social', 'public-api', 'kakao'],
+        authType: 'OAuth 2.0',
+        pricing: 'Free',
+        ratingAverage: 4.2,
+        ratingCount: 2722,
+        usageCount: 21460,
+        baseUrl: 'https://developers.kakao.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://developers.kakao.com/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'line',
+        name: 'Line',
+        provider: 'Line',
+        description: 'Line Login, Share on Line, Social Plugins and more',
+        category: 'Social',
+        tags: ['social', 'public-api', 'line'],
+        authType: 'OAuth 2.0',
+        pricing: 'Free',
+        ratingAverage: 4.3,
+        ratingCount: 4523,
+        usageCount: 82289,
+        baseUrl: 'https://developers.line.biz',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://developers.line.biz/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'linkedin',
+        name: 'LinkedIn',
+        provider: 'LinkedIn',
+        description: 'The foundation of all digital integrations with LinkedIn',
+        category: 'Social',
+        tags: ['social', 'public-api', 'linkedin'],
+        authType: 'OAuth 2.0',
+        pricing: 'Free',
+        ratingAverage: 4.1,
+        ratingCount: 2131,
+        usageCount: 94661,
+        baseUrl: 'https://docs.microsoft.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://docs.microsoft.com/en-us/linkedin/?context=linkedin/context',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'meetup-com',
+        name: 'Meetup.com',
+        provider: 'Meetup.com',
+        description: 'Data about Meetups from Meetup.com',
+        category: 'Social',
+        tags: ['social', 'public-api', 'meetup'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.9,
+        ratingCount: 8799,
+        usageCount: 2757,
+        baseUrl: 'https://www.meetup.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://www.meetup.com/api/guide',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'microsoft-graph',
+        name: 'Microsoft Graph',
+        provider: 'Microsoft Graph',
+        description: 'Access the data and intelligence in Microsoft 365, Windows 10, and Enterprise Mobility',
+        category: 'Social',
+        tags: ['social', 'public-api', 'microsoft'],
+        authType: 'OAuth 2.0',
+        pricing: 'Free',
+        ratingAverage: 4,
+        ratingCount: 1990,
+        usageCount: 17641,
+        baseUrl: 'https://docs.microsoft.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://docs.microsoft.com/en-us/graph/api/overview',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'naver',
+        name: 'NAVER',
+        provider: 'NAVER',
+        description: 'NAVER Login, Share on NAVER, Social Plugins and more',
+        category: 'Social',
+        tags: ['social', 'public-api', 'naver'],
+        authType: 'OAuth 2.0',
+        pricing: 'Free',
+        ratingAverage: 4.9,
+        ratingCount: 7849,
+        usageCount: 58764,
+        baseUrl: 'https://developers.naver.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://developers.naver.com/main/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'open-collective',
+        name: 'Open Collective',
+        provider: 'Open Collective',
+        description: 'Get Open Collective data',
+        category: 'Social',
+        tags: ['social', 'public-api', 'open'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.8,
+        ratingCount: 2728,
+        usageCount: 45032,
+        baseUrl: 'https://docs.opencollective.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://docs.opencollective.com/help/developers/api',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'pinterest',
+        name: 'Pinterest',
+        provider: 'Pinterest',
+        description: 'The world\'s catalog of ideas',
+        category: 'Social',
+        tags: ['social', 'public-api', 'pinterest'],
+        authType: 'OAuth 2.0',
+        pricing: 'Free',
+        ratingAverage: 4.7,
+        ratingCount: 5107,
+        usageCount: 74943,
+        baseUrl: 'https://developers.pinterest.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://developers.pinterest.com/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'product-hunt',
+        name: 'Product Hunt',
+        provider: 'Product Hunt',
+        description: 'The best new products in tech',
+        category: 'Social',
+        tags: ['social', 'public-api', 'product'],
+        authType: 'OAuth 2.0',
+        pricing: 'Free',
+        ratingAverage: 4.4,
+        ratingCount: 3754,
+        usageCount: 47750,
+        baseUrl: 'https://api.producthunt.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://api.producthunt.com/v2/docs',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'reddit',
+        name: 'Reddit',
+        provider: 'Reddit',
+        description: 'Homepage of the internet',
+        category: 'Social',
+        tags: ['social', 'public-api', 'reddit'],
+        authType: 'OAuth 2.0',
+        pricing: 'Free',
+        ratingAverage: 4.3,
+        ratingCount: 1943,
+        usageCount: 58063,
+        baseUrl: 'https://www.reddit.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://www.reddit.com/dev/api',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'revolt',
+        name: 'Revolt',
+        provider: 'Revolt',
+        description: 'Revolt open source Discord alternative',
+        category: 'Social',
+        tags: ['social', 'public-api', 'revolt'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.5,
+        ratingCount: 7805,
+        usageCount: 10043,
+        baseUrl: 'https://developers.revolt.chat',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://developers.revolt.chat/api/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'saidit',
+        name: 'Saidit',
+        provider: 'Saidit',
+        description: 'Open Source Reddit Clone',
+        category: 'Social',
+        tags: ['social', 'public-api', 'saidit'],
+        authType: 'OAuth 2.0',
+        pricing: 'Free',
+        ratingAverage: 4.9,
+        ratingCount: 2739,
+        usageCount: 71605,
+        baseUrl: 'https://www.saidit.net',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://www.saidit.net/dev/api',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'slack',
+        name: 'Slack',
+        provider: 'Slack',
+        description: 'Team Instant Messaging',
+        category: 'Social',
+        tags: ['social', 'public-api', 'slack'],
+        authType: 'OAuth 2.0',
+        pricing: 'Free',
+        ratingAverage: 4.7,
+        ratingCount: 1637,
+        usageCount: 71733,
+        baseUrl: 'https://api.slack.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://api.slack.com/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'tamtam',
+        name: 'TamTam',
+        provider: 'TamTam',
+        description: 'Bot API to interact with TamTam',
+        category: 'Social',
+        tags: ['social', 'public-api', 'tamtam'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.5,
+        ratingCount: 8585,
+        usageCount: 51440,
+        baseUrl: 'https://dev.tamtam.chat',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://dev.tamtam.chat/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'telegram-bot',
+        name: 'Telegram Bot',
+        provider: 'Telegram Bot',
+        description: 'Simplified HTTP version of the MTProto API for bots',
+        category: 'Social',
+        tags: ['social', 'public-api', 'telegram'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.8,
+        ratingCount: 6958,
+        usageCount: 61351,
+        baseUrl: 'https://core.telegram.org',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://core.telegram.org/bots/api',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'telegram-mtproto',
+        name: 'Telegram MTProto',
+        provider: 'Telegram MTProto',
+        description: 'Read and write Telegram data',
+        category: 'Social',
+        tags: ['social', 'public-api', 'telegram'],
+        authType: 'OAuth 2.0',
+        pricing: 'Free',
+        ratingAverage: 4.4,
+        ratingCount: 9174,
+        usageCount: 18667,
+        baseUrl: 'https://core.telegram.org',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://core.telegram.org/api#getting-started',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'telegraph',
+        name: 'Telegraph',
+        provider: 'Telegraph',
+        description: 'Create attractive blogs easily, to share',
+        category: 'Social',
+        tags: ['social', 'public-api', 'telegraph'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.1,
+        ratingCount: 1021,
+        usageCount: 95217,
+        baseUrl: 'https://telegra.ph',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://telegra.ph/api',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'tiktok',
+        name: 'TikTok',
+        provider: 'TikTok',
+        description: 'Fetches user info and user\'s video posts on TikTok platform',
+        category: 'Social',
+        tags: ['social', 'public-api', 'tiktok'],
+        authType: 'OAuth 2.0',
+        pricing: 'Free',
+        ratingAverage: 4.3,
+        ratingCount: 6433,
+        usageCount: 8847,
+        baseUrl: 'https://developers.tiktok.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://developers.tiktok.com/doc/login-kit-web',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'tumblr',
+        name: 'Tumblr',
+        provider: 'Tumblr',
+        description: 'Read and write Tumblr Data',
+        category: 'Social',
+        tags: ['social', 'public-api', 'tumblr'],
+        authType: 'OAuth 2.0',
+        pricing: 'Free',
+        ratingAverage: 4.1,
+        ratingCount: 8791,
+        usageCount: 61470,
+        baseUrl: 'https://www.tumblr.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://www.tumblr.com/docs/en/api/v2',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'twitch',
+        name: 'Twitch',
+        provider: 'Twitch',
+        description: 'Game Streaming API',
+        category: 'Social',
+        tags: ['social', 'public-api', 'twitch'],
+        authType: 'OAuth 2.0',
+        pricing: 'Free',
+        ratingAverage: 4.2,
+        ratingCount: 2102,
+        usageCount: 72657,
+        baseUrl: 'https://dev.twitch.tv',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://dev.twitch.tv/docs',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'twitter',
+        name: 'Twitter',
+        provider: 'Twitter',
+        description: 'Read and write Twitter data',
+        category: 'Social',
+        tags: ['social', 'public-api', 'twitter'],
+        authType: 'OAuth 2.0',
+        pricing: 'Free',
+        ratingAverage: 4.2,
+        ratingCount: 952,
+        usageCount: 36207,
+        baseUrl: 'https://developer.twitter.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://developer.twitter.com/en/docs',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'vk',
+        name: 'vk',
+        provider: 'vk',
+        description: 'Read and write vk data',
+        category: 'Social',
+        tags: ['social', 'public-api', 'vk'],
+        authType: 'OAuth 2.0',
+        pricing: 'Free',
+        ratingAverage: 4.2,
+        ratingCount: 3922,
+        usageCount: 44631,
+        baseUrl: 'https://vk.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://vk.com/dev/sites',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'apimedic',
+        name: 'ApiMedic',
+        provider: 'ApiMedic',
+        description: 'ApiMedic offers a medical symptom checker API primarily for patients',
+        category: 'Sports & Fitness',
+        tags: ['sports-fitness', 'public-api', 'apimedic'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.5,
+        ratingCount: 1385,
+        usageCount: 67555,
+        baseUrl: 'https://apimedic.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://apimedic.com/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'canadian-football-league-cfl',
+        name: 'Canadian Football League (CFL)',
+        provider: 'Canadian Football League (CFL)',
+        description: 'Official JSON API providing real-time league, team and player statistics about the CFL',
+        category: 'Sports & Fitness',
+        tags: ['sports-fitness', 'public-api', 'canadian'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4,
+        ratingCount: 7110,
+        usageCount: 15087,
+        baseUrl: 'https://api.cfl.ca',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'http://api.cfl.ca/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'city-bikes',
+        name: 'City Bikes',
+        provider: 'City Bikes',
+        description: 'City Bikes around the world',
+        category: 'Sports & Fitness',
+        tags: ['sports-fitness', 'public-api', 'city'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.1,
+        ratingCount: 731,
+        usageCount: 68604,
+        baseUrl: 'https://api.citybik.es',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://api.citybik.es/v2/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'collegefootballdata-com',
+        name: 'CollegeFootballData.com',
+        provider: 'CollegeFootballData.com',
+        description: 'Unofficial detailed American college football statistics, records, and results API',
+        category: 'Sports & Fitness',
+        tags: ['sports-fitness', 'public-api', 'collegefootballdata'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.9,
+        ratingCount: 6529,
+        usageCount: 11575,
+        baseUrl: 'https://collegefootballdata.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://collegefootballdata.com',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'ergast-f1',
+        name: 'Ergast F1',
+        provider: 'Ergast F1',
+        description: 'F1 data from the beginning of the world championships in 1950',
+        category: 'Sports & Fitness',
+        tags: ['sports-fitness', 'public-api', 'ergast'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.7,
+        ratingCount: 4657,
+        usageCount: 73736,
+        baseUrl: 'https://ergast.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'http://ergast.com/mrd/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'fitbit',
+        name: 'Fitbit',
+        provider: 'Fitbit',
+        description: 'Fitbit Information',
+        category: 'Sports & Fitness',
+        tags: ['sports-fitness', 'public-api', 'fitbit'],
+        authType: 'OAuth 2.0',
+        pricing: 'Free',
+        ratingAverage: 4.3,
+        ratingCount: 6483,
+        usageCount: 25283,
+        baseUrl: 'https://dev.fitbit.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://dev.fitbit.com/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'football',
+        name: 'Football',
+        provider: 'Football',
+        description: 'A simple Open Source Football API to get squads’ stats, best scorers and more',
+        category: 'Sports & Fitness',
+        tags: ['sports-fitness', 'public-api', 'football'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.2,
+        ratingCount: 972,
+        usageCount: 45781,
+        baseUrl: 'https://rapidapi.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://rapidapi.com/GiulianoCrescimbeni/api/football98/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'football-data',
+        name: 'Football-Data',
+        provider: 'Football-Data',
+        description: 'Football data with matches info, players, teams, and competitions',
+        category: 'Sports & Fitness',
+        tags: ['sports-fitness', 'public-api', 'football'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.5,
+        ratingCount: 1275,
+        usageCount: 18110,
+        baseUrl: 'https://www.football-data.org',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://www.football-data.org',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'jcdecaux-bike',
+        name: 'JCDecaux Bike',
+        provider: 'JCDecaux Bike',
+        description: 'JCDecaux\'s self-service bicycles',
+        category: 'Sports & Fitness',
+        tags: ['sports-fitness', 'public-api', 'jcdecaux'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.2,
+        ratingCount: 2242,
+        usageCount: 91963,
+        baseUrl: 'https://developer.jcdecaux.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://developer.jcdecaux.com/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'nba-data',
+        name: 'NBA Data',
+        provider: 'NBA Data',
+        description: 'All NBA Stats DATA, Games, Livescore, Standings, Statistics',
+        category: 'Sports & Fitness',
+        tags: ['sports-fitness', 'public-api', 'nba'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.5,
+        ratingCount: 4755,
+        usageCount: 90036,
+        baseUrl: 'https://rapidapi.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://rapidapi.com/api-sports/api/api-nba/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'nba-stats',
+        name: 'NBA Stats',
+        provider: 'NBA Stats',
+        description: 'Current and historical NBA Statistics',
+        category: 'Sports & Fitness',
+        tags: ['sports-fitness', 'public-api', 'nba'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.8,
+        ratingCount: 5318,
+        usageCount: 17259,
+        baseUrl: 'https://any-api.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://any-api.com/nba_com/nba_com/docs/API_Description',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'nhl-records-and-stats',
+        name: 'NHL Records and Stats',
+        provider: 'NHL Records and Stats',
+        description: 'NHL historical data and statistics',
+        category: 'Sports & Fitness',
+        tags: ['sports-fitness', 'public-api', 'nhl'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.4,
+        ratingCount: 2444,
+        usageCount: 22277,
+        baseUrl: 'https://gitlab.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://gitlab.com/dword4/nhlapi',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'premier-league-standings',
+        name: 'Premier League Standings',
+        provider: 'Premier League Standings',
+        description: 'All Current Premier League Standings and Statistics',
+        category: 'Sports & Fitness',
+        tags: ['sports-fitness', 'public-api', 'premier'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.3,
+        ratingCount: 653,
+        usageCount: 34450,
+        baseUrl: 'https://rapidapi.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://rapidapi.com/heisenbug/api/premier-league-live-scores/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'propline',
+        name: 'PropLine',
+        provider: 'PropLine',
+        description: 'Real-time player-props betting odds with graded prop resolution across 13 books',
+        category: 'Sports & Fitness',
+        tags: ['sports-fitness', 'public-api', 'propline'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.6,
+        ratingCount: 8186,
+        usageCount: 89669,
+        baseUrl: 'https://prop-line.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://prop-line.com',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'racinghub',
+        name: 'RacingHub',
+        provider: 'RacingHub',
+        description: 'Formula 1 historical data and statistics',
+        category: 'Sports & Fitness',
+        tags: ['sports-fitness', 'public-api', 'racinghub'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4,
+        ratingCount: 4830,
+        usageCount: 88475,
+        baseUrl: 'https://racinghub.net',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://racinghub.net/api/v1/docs#/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'sport-data',
+        name: 'Sport Data',
+        provider: 'Sport Data',
+        description: 'Get sports data from all over the world',
+        category: 'Sports & Fitness',
+        tags: ['sports-fitness', 'public-api', 'sport'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4,
+        ratingCount: 4860,
+        usageCount: 59194,
+        baseUrl: 'https://sportdataapi.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://sportdataapi.com',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'sport-places',
+        name: 'Sport Places',
+        provider: 'Sport Places',
+        description: 'Crowd-source sports places around the world',
+        category: 'Sports & Fitness',
+        tags: ['sports-fitness', 'public-api', 'sport'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.2,
+        ratingCount: 4732,
+        usageCount: 61318,
+        baseUrl: 'https://developers.decathlon.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://developers.decathlon.com/products/sport-places',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'sportmonks-cricket',
+        name: 'Sportmonks Cricket',
+        provider: 'Sportmonks Cricket',
+        description: 'Live cricket score, player statistics and fantasy API',
+        category: 'Sports & Fitness',
+        tags: ['sports-fitness', 'public-api', 'sportmonks'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.1,
+        ratingCount: 2291,
+        usageCount: 13398,
+        baseUrl: 'https://docs.sportmonks.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://docs.sportmonks.com/cricket/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'sportmonks-football',
+        name: 'Sportmonks Football',
+        provider: 'Sportmonks Football',
+        description: 'Football score/schedule, news api, tv channels, stats, history, display standing e.g. epl, la liga',
+        category: 'Sports & Fitness',
+        tags: ['sports-fitness', 'public-api', 'sportmonks'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.9,
+        ratingCount: 819,
+        usageCount: 43617,
+        baseUrl: 'https://docs.sportmonks.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://docs.sportmonks.com/football/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'strava',
+        name: 'Strava',
+        provider: 'Strava',
+        description: 'Connect with athletes, activities and more',
+        category: 'Sports & Fitness',
+        tags: ['sports-fitness', 'public-api', 'strava'],
+        authType: 'OAuth 2.0',
+        pricing: 'Free',
+        ratingAverage: 4,
+        ratingCount: 6810,
+        usageCount: 29187,
+        baseUrl: 'https://strava.github.io',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://strava.github.io/api/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'tourneyradar',
+        name: 'TourneyRadar',
+        provider: 'TourneyRadar',
+        description: 'Upcoming chess tournaments from 140+ national federations worldwide',
+        category: 'Sports & Fitness',
+        tags: ['sports-fitness', 'public-api', 'tourneyradar'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.9,
+        ratingCount: 3729,
+        usageCount: 9032,
+        baseUrl: 'https://tourneyradar-api.vercel.app',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://tourneyradar-api.vercel.app',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'tredict',
+        name: 'Tredict',
+        provider: 'Tredict',
+        description: 'Get and set activities, health data and more',
+        category: 'Sports & Fitness',
+        tags: ['sports-fitness', 'public-api', 'tredict'],
+        authType: 'OAuth 2.0',
+        pricing: 'Free',
+        ratingAverage: 4.8,
+        ratingCount: 8358,
+        usageCount: 95836,
+        baseUrl: 'https://www.tredict.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://www.tredict.com/blog/oauth_docs/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'wger',
+        name: 'Wger',
+        provider: 'Wger',
+        description: 'Workout manager data as exercises, muscles or equipment',
+        category: 'Sports & Fitness',
+        tags: ['sports-fitness', 'public-api', 'wger'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4,
+        ratingCount: 7820,
+        usageCount: 16617,
+        baseUrl: 'https://wger.de',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://wger.de/en/software/api',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'bacon-ipsum',
+        name: 'Bacon Ipsum',
+        provider: 'Bacon Ipsum',
+        description: 'A Meatier Lorem Ipsum Generator',
+        category: 'Test Data',
+        tags: ['test-data', 'public-api', 'bacon'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.9,
+        ratingCount: 5829,
+        usageCount: 94047,
+        baseUrl: 'https://baconipsum.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://baconipsum.com/json-api/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'dicebear-avatars',
+        name: 'Dicebear Avatars',
+        provider: 'Dicebear Avatars',
+        description: 'Generate random pixel-art avatars',
+        category: 'Test Data',
+        tags: ['test-data', 'public-api', 'dicebear'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.3,
+        ratingCount: 3223,
+        usageCount: 69103,
+        baseUrl: 'https://avatars.dicebear.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://avatars.dicebear.com/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'english-random-words',
+        name: 'English Random Words',
+        provider: 'English Random Words',
+        description: 'Generate English Random Words with Pronunciation',
+        category: 'Test Data',
+        tags: ['test-data', 'public-api', 'english'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.1,
+        ratingCount: 7891,
+        usageCount: 25913,
+        baseUrl: 'https://random-words-api.vercel.app',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://random-words-api.vercel.app/word',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'fakestoreapi',
+        name: 'FakeStoreAPI',
+        provider: 'FakeStoreAPI',
+        description: 'Fake store rest API for your e-commerce or shopping website prototype',
+        category: 'Test Data',
+        tags: ['test-data', 'public-api', 'fakestoreapi'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.5,
+        ratingCount: 3845,
+        usageCount: 86620,
+        baseUrl: 'https://fakestoreapi.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://fakestoreapi.com/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'generadordni',
+        name: 'GeneradorDNI',
+        provider: 'GeneradorDNI',
+        description: 'Data generator API. Profiles, vehicles, banks and cards, etc',
+        category: 'Test Data',
+        tags: ['test-data', 'public-api', 'generadordni'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.3,
+        ratingCount: 6763,
+        usageCount: 77894,
+        baseUrl: 'https://api.generadordni.es',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://api.generadordni.es',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'itsthisforthat',
+        name: 'ItsThisForThat',
+        provider: 'ItsThisForThat',
+        description: 'Generate Random startup ideas',
+        category: 'Test Data',
+        tags: ['test-data', 'public-api', 'itsthisforthat'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.7,
+        ratingCount: 4917,
+        usageCount: 8345,
+        baseUrl: 'https://itsthisforthat.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://itsthisforthat.com/api.php',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'mailsac',
+        name: 'Mailsac',
+        provider: 'Mailsac',
+        description: 'Disposable Email',
+        category: 'Test Data',
+        tags: ['test-data', 'public-api', 'mailsac'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.9,
+        ratingCount: 2359,
+        usageCount: 23837,
+        baseUrl: 'https://mailsac.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://mailsac.com/docs/api',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'mockaroo',
+        name: 'Mockaroo',
+        provider: 'Mockaroo',
+        description: 'Generate fake data to JSON, CSV, TXT, SQL and XML',
+        category: 'Test Data',
+        tags: ['test-data', 'public-api', 'mockaroo'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.2,
+        ratingCount: 7122,
+        usageCount: 7088,
+        baseUrl: 'https://www.mockaroo.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://www.mockaroo.com/docs',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'random-data',
+        name: 'Random Data',
+        provider: 'Random Data',
+        description: 'Random data generator',
+        category: 'Test Data',
+        tags: ['test-data', 'public-api', 'random'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.9,
+        ratingCount: 3569,
+        usageCount: 22581,
+        baseUrl: 'https://random-data-api.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://random-data-api.com',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'randomuser-2',
+        name: 'RandomUser',
+        provider: 'RandomUser',
+        description: 'Generates and list user data',
+        category: 'Test Data',
+        tags: ['test-data', 'public-api', 'randomuser'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.2,
+        ratingCount: 4462,
+        usageCount: 71566,
+        baseUrl: 'https://randomuser.me',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://randomuser.me',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'robohash',
+        name: 'RoboHash',
+        provider: 'RoboHash',
+        description: 'Generate random robot/alien avatars',
+        category: 'Test Data',
+        tags: ['test-data', 'public-api', 'robohash'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.1,
+        ratingCount: 9361,
+        usageCount: 91551,
+        baseUrl: 'https://robohash.org',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://robohash.org/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'spanish-random-names',
+        name: 'Spanish random names',
+        provider: 'Spanish random names',
+        description: 'Generate spanish names (with gender) randomly',
+        category: 'Test Data',
+        tags: ['test-data', 'public-api', 'spanish'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.8,
+        ratingCount: 2908,
+        usageCount: 43915,
+        baseUrl: 'https://random-names-api.herokuapp.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://random-names-api.herokuapp.com/public',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'spanish-random-words',
+        name: 'Spanish random words',
+        provider: 'Spanish random words',
+        description: 'Generate spanish words randomly',
+        category: 'Test Data',
+        tags: ['test-data', 'public-api', 'spanish'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.3,
+        ratingCount: 733,
+        usageCount: 68747,
+        baseUrl: 'https://palabras-aleatorias-public-api.herokuapp.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://palabras-aleatorias-public-api.herokuapp.com',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'this-person-does-not-exist',
+        name: 'This Person Does not Exist',
+        provider: 'This Person Does not Exist',
+        description: 'Generates real-life faces of people who do not exist',
+        category: 'Test Data',
+        tags: ['test-data', 'public-api', 'this'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.9,
+        ratingCount: 2649,
+        usageCount: 18021,
+        baseUrl: 'https://thispersondoesnotexist.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://thispersondoesnotexist.com',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'toolcarton',
+        name: 'Toolcarton',
+        provider: 'Toolcarton',
+        description: 'Generate random testimonial data',
+        category: 'Test Data',
+        tags: ['test-data', 'public-api', 'toolcarton'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.8,
+        ratingCount: 608,
+        usageCount: 87586,
+        baseUrl: 'https://testimonialapi.toolcarton.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://testimonialapi.toolcarton.com/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'uuid-generator',
+        name: 'UUID Generator',
+        provider: 'UUID Generator',
+        description: 'Generate UUIDs',
+        category: 'Test Data',
+        tags: ['test-data', 'public-api', 'uuid'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.6,
+        ratingCount: 2086,
+        usageCount: 44369,
+        baseUrl: 'https://www.uuidtools.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://www.uuidtools.com/docs',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'yes-no',
+        name: 'Yes No',
+        provider: 'Yes No',
+        description: 'Generate yes or no randomly',
+        category: 'Test Data',
+        tags: ['test-data', 'public-api', 'yes'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.6,
+        ratingCount: 1536,
+        usageCount: 91576,
+        baseUrl: 'https://yesno.wtf',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://yesno.wtf/api',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'code-detection',
+        name: 'Code Detection',
+        provider: 'Code Detection',
+        description: 'Detect, label, format and enrich the code in your app or in your data pipeline',
+        category: 'Text Analysis',
+        tags: ['text-analysis', 'public-api', 'code'],
+        authType: 'OAuth 2.0',
+        pricing: 'Free',
+        ratingAverage: 4.4,
+        ratingCount: 3194,
+        usageCount: 23384,
+        baseUrl: 'https://codedetectionapi.runtime.dev',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://codedetectionapi.runtime.dev',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'apilayer-languagelayer',
+        name: 'apilayer languagelayer',
+        provider: 'apilayer languagelayer',
+        description: 'Language Detection JSON API supporting 173 languages',
+        category: 'Text Analysis',
+        tags: ['text-analysis', 'public-api', 'apilayer'],
+        authType: 'OAuth 2.0',
+        pricing: 'Free',
+        ratingAverage: 4.4,
+        ratingCount: 6534,
+        usageCount: 20862,
+        baseUrl: 'https://languagelayer.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://languagelayer.com/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'aylien-text-analysis',
+        name: 'Aylien Text Analysis',
+        provider: 'Aylien Text Analysis',
+        description: 'A collection of information retrieval and natural language APIs',
+        category: 'Text Analysis',
+        tags: ['text-analysis', 'public-api', 'aylien'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.8,
+        ratingCount: 598,
+        usageCount: 13871,
+        baseUrl: 'https://docs.aylien.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://docs.aylien.com/textapi/#getting-started',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'detect-language',
+        name: 'Detect Language',
+        provider: 'Detect Language',
+        description: 'Detects text language',
+        category: 'Text Analysis',
+        tags: ['text-analysis', 'public-api', 'detect'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.3,
+        ratingCount: 1433,
+        usageCount: 89133,
+        baseUrl: 'https://detectlanguage.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://detectlanguage.com/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'eli',
+        name: 'ELI',
+        provider: 'ELI',
+        description: 'Natural Language Processing Tools for Thai Language',
+        category: 'Text Analysis',
+        tags: ['text-analysis', 'public-api', 'eli'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.9,
+        ratingCount: 2939,
+        usageCount: 10348,
+        baseUrl: 'https://nlp.insightera.co.th',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://nlp.insightera.co.th/docs/v1.0',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'google-cloud-natural',
+        name: 'Google Cloud Natural',
+        provider: 'Google Cloud Natural',
+        description: 'Natural language understanding technology, including sentiment, entity and syntax analysis',
+        category: 'Text Analysis',
+        tags: ['text-analysis', 'public-api', 'google'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.6,
+        ratingCount: 746,
+        usageCount: 17892,
+        baseUrl: 'https://cloud.google.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://cloud.google.com/natural-language/docs/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'hirak-ocr',
+        name: 'Hirak OCR',
+        provider: 'Hirak OCR',
+        description: 'Image to text -text recognition- from image more than 100 language, accurate, unlimited requests',
+        category: 'Text Analysis',
+        tags: ['text-analysis', 'public-api', 'hirak'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.3,
+        ratingCount: 7683,
+        usageCount: 39169,
+        baseUrl: 'https://ocr.hirak.site',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://ocr.hirak.site/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'hirak-translation',
+        name: 'Hirak Translation',
+        provider: 'Hirak Translation',
+        description: 'Translate between 21 of most used languages, accurate, unlimited requests',
+        category: 'Text Analysis',
+        tags: ['text-analysis', 'public-api', 'hirak'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.4,
+        ratingCount: 5514,
+        usageCount: 23287,
+        baseUrl: 'https://translate.hirak.site',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://translate.hirak.site/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'libretranslate',
+        name: 'LibreTranslate',
+        provider: 'LibreTranslate',
+        description: 'Translation tool with 17 available languages',
+        category: 'Text Analysis',
+        tags: ['text-analysis', 'public-api', 'libretranslate'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.1,
+        ratingCount: 551,
+        usageCount: 73721,
+        baseUrl: 'https://libretranslate.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://libretranslate.com/docs',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'semantria',
+        name: 'Semantria',
+        provider: 'Semantria',
+        description: 'Text Analytics with sentiment analysis, categorization & named entity extraction',
+        category: 'Text Analysis',
+        tags: ['text-analysis', 'public-api', 'semantria'],
+        authType: 'OAuth 2.0',
+        pricing: 'Free',
+        ratingAverage: 4.3,
+        ratingCount: 1273,
+        usageCount: 63824,
+        baseUrl: 'https://semantria.readme.io',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://semantria.readme.io/docs',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'watson-natural-language-understanding',
+        name: 'Watson Natural Language Understanding',
+        provider: 'Watson Natural Language Understanding',
+        description: 'Natural language processing for advanced text analysis',
+        category: 'Text Analysis',
+        tags: ['text-analysis', 'public-api', 'watson'],
+        authType: 'OAuth 2.0',
+        pricing: 'Free',
+        ratingAverage: 4.9,
+        ratingCount: 9049,
+        usageCount: 92221,
+        baseUrl: 'https://cloud.ibm.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://cloud.ibm.com/apidocs/natural-language-understanding/natural-language-understanding',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'correios',
+        name: 'Correios',
+        provider: 'Correios',
+        description: 'Integration to provide information and prepare shipments using Correio\'s services',
+        category: 'Tracking',
+        tags: ['tracking', 'public-api', 'correios'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.7,
+        ratingCount: 8027,
+        usageCount: 45789,
+        baseUrl: 'https://cws.correios.com.br',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://cws.correios.com.br/ajuda',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'postalpincode',
+        name: 'PostalPinCode',
+        provider: 'PostalPinCode',
+        description: 'API for getting Pincode details in India',
+        category: 'Tracking',
+        tags: ['tracking', 'public-api', 'postalpincode'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.4,
+        ratingCount: 5764,
+        usageCount: 89466,
+        baseUrl: 'https://www.postalpincode.in',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'http://www.postalpincode.in/Api-Details',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'ups',
+        name: 'UPS',
+        provider: 'UPS',
+        description: 'Shipment and Address information',
+        category: 'Tracking',
+        tags: ['tracking', 'public-api', 'ups'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.1,
+        ratingCount: 1101,
+        usageCount: 78228,
+        baseUrl: 'https://www.ups.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://www.ups.com/upsdeveloperkit',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'whatpulse',
+        name: 'WhatPulse',
+        provider: 'WhatPulse',
+        description: 'Small application that measures your keyboard/mouse usage',
+        category: 'Tracking',
+        tags: ['tracking', 'public-api', 'whatpulse'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.2,
+        ratingCount: 4012,
+        usageCount: 95787,
+        baseUrl: 'https://developer.whatpulse.org',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://developer.whatpulse.org/#web-api',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'ads-b-exchange',
+        name: 'ADS-B Exchange',
+        provider: 'ADS-B Exchange',
+        description: 'Access real-time and historical data of any and all airborne aircraft',
+        category: 'Transportation',
+        tags: ['transportation', 'public-api', 'ads'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.8,
+        ratingCount: 7068,
+        usageCount: 22652,
+        baseUrl: 'https://www.adsbexchange.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://www.adsbexchange.com/data/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'airportsapi',
+        name: 'airportsapi',
+        provider: 'airportsapi',
+        description: 'Get name and website-URL for airports by ICAO code',
+        category: 'Transportation',
+        tags: ['transportation', 'public-api', 'airportsapi'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.3,
+        ratingCount: 7193,
+        usageCount: 19956,
+        baseUrl: 'https://airport-web.appspot.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://airport-web.appspot.com/api/docs/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'amadeus-for-developers',
+        name: 'Amadeus for Developers',
+        provider: 'Amadeus for Developers',
+        description: 'Travel Search - Limited usage',
+        category: 'Transportation',
+        tags: ['transportation', 'public-api', 'amadeus'],
+        authType: 'OAuth 2.0',
+        pricing: 'Free',
+        ratingAverage: 4.1,
+        ratingCount: 8061,
+        usageCount: 91223,
+        baseUrl: 'https://developers.amadeus.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://developers.amadeus.com/self-service',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'apilayer-aviationstack',
+        name: 'apilayer aviationstack',
+        provider: 'apilayer aviationstack',
+        description: 'Real-time Flight Status & Global Aviation Data API',
+        category: 'Transportation',
+        tags: ['transportation', 'public-api', 'apilayer'],
+        authType: 'OAuth 2.0',
+        pricing: 'Free',
+        ratingAverage: 4,
+        ratingCount: 2800,
+        usageCount: 18471,
+        baseUrl: 'https://aviationstack.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://aviationstack.com/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'aviationapi',
+        name: 'AviationAPI',
+        provider: 'AviationAPI',
+        description: 'FAA Aeronautical Charts and Publications, Airport Information, and Airport Weather',
+        category: 'Transportation',
+        tags: ['transportation', 'public-api', 'aviationapi'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.8,
+        ratingCount: 3998,
+        usageCount: 17928,
+        baseUrl: 'https://docs.aviationapi.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://docs.aviationapi.com',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'az511',
+        name: 'AZ511',
+        provider: 'AZ511',
+        description: 'Access traffic data from the ADOT API',
+        category: 'Transportation',
+        tags: ['transportation', 'public-api', 'az511'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.9,
+        ratingCount: 9099,
+        usageCount: 67085,
+        baseUrl: 'https://www.az511.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://www.az511.com/developers/doc',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'bic-boxtech',
+        name: 'BIC-Boxtech',
+        provider: 'BIC-Boxtech',
+        description: 'Container technical detail for the global container fleet',
+        category: 'Transportation',
+        tags: ['transportation', 'public-api', 'bic'],
+        authType: 'OAuth 2.0',
+        pricing: 'Free',
+        ratingAverage: 4.7,
+        ratingCount: 2097,
+        usageCount: 72228,
+        baseUrl: 'https://docs.bic-boxtech.org',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://docs.bic-boxtech.org/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'blablacar',
+        name: 'BlaBlaCar',
+        provider: 'BlaBlaCar',
+        description: 'Search car sharing trips',
+        category: 'Transportation',
+        tags: ['transportation', 'public-api', 'blablacar'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.3,
+        ratingCount: 2663,
+        usageCount: 79594,
+        baseUrl: 'https://dev.blablacar.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://dev.blablacar.com',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'boston-mbta-transit',
+        name: 'Boston MBTA Transit',
+        provider: 'Boston MBTA Transit',
+        description: 'Stations and predicted arrivals for MBTA',
+        category: 'Transportation',
+        tags: ['transportation', 'public-api', 'boston'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.9,
+        ratingCount: 6879,
+        usageCount: 31625,
+        baseUrl: 'https://www.mbta.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://www.mbta.com/developers/v3-api',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'community-transit',
+        name: 'Community Transit',
+        provider: 'Community Transit',
+        description: 'Transitland API',
+        category: 'Transportation',
+        tags: ['transportation', 'public-api', 'community'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.4,
+        ratingCount: 6964,
+        usageCount: 51637,
+        baseUrl: 'https://github.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://github.com/transitland/transitland-datastore/blob/master/README.md#api-endpoints',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'compare-flight-prices',
+        name: 'Compare Flight Prices',
+        provider: 'Compare Flight Prices',
+        description: 'API for comparing flight prices across platforms',
+        category: 'Transportation',
+        tags: ['transportation', 'public-api', 'compare'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.2,
+        ratingCount: 4782,
+        usageCount: 6326,
+        baseUrl: 'https://rapidapi.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://rapidapi.com/obryan-software-obryan-software-default/api/compare-flight-prices/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'grab',
+        name: 'Grab',
+        provider: 'Grab',
+        description: 'Track deliveries, ride fares, payments and loyalty points',
+        category: 'Transportation',
+        tags: ['transportation', 'public-api', 'grab'],
+        authType: 'OAuth 2.0',
+        pricing: 'Free',
+        ratingAverage: 4.3,
+        ratingCount: 4573,
+        usageCount: 49867,
+        baseUrl: 'https://developer.grab.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://developer.grab.com/docs/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'graphhopper',
+        name: 'GraphHopper',
+        provider: 'GraphHopper',
+        description: 'A-to-B routing with turn-by-turn instructions',
+        category: 'Transportation',
+        tags: ['transportation', 'public-api', 'graphhopper'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.9,
+        ratingCount: 8979,
+        usageCount: 60354,
+        baseUrl: 'https://docs.graphhopper.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://docs.graphhopper.com/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'icelandic-apis',
+        name: 'Icelandic APIs',
+        provider: 'Icelandic APIs',
+        description: 'Open APIs that deliver services in or regarding Iceland',
+        category: 'Transportation',
+        tags: ['transportation', 'public-api', 'icelandic'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.1,
+        ratingCount: 4261,
+        usageCount: 62537,
+        baseUrl: 'https://docs.apis.is',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'http://docs.apis.is/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'impala-hotel-bookings',
+        name: 'Impala Hotel Bookings',
+        provider: 'Impala Hotel Bookings',
+        description: 'Hotel content, rates and room bookings',
+        category: 'Transportation',
+        tags: ['transportation', 'public-api', 'impala'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.3,
+        ratingCount: 4803,
+        usageCount: 12471,
+        baseUrl: 'https://docs.impala.travel',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://docs.impala.travel/docs/booking-api/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'izi',
+        name: 'Izi',
+        provider: 'Izi',
+        description: 'Audio guide for travellers',
+        category: 'Transportation',
+        tags: ['transportation', 'public-api', 'izi'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.5,
+        ratingCount: 875,
+        usageCount: 43196,
+        baseUrl: 'https://api-docs.izi.travel',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'http://api-docs.izi.travel/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'navitia',
+        name: 'Navitia',
+        provider: 'Navitia',
+        description: 'The open API for building cool stuff with transport data',
+        category: 'Transportation',
+        tags: ['transportation', 'public-api', 'navitia'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.5,
+        ratingCount: 8565,
+        usageCount: 61295,
+        baseUrl: 'https://doc.navitia.io',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://doc.navitia.io/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'opensky-network',
+        name: 'OpenSky Network',
+        provider: 'OpenSky Network',
+        description: 'Free real-time ADS-B aviation data',
+        category: 'Transportation',
+        tags: ['transportation', 'public-api', 'opensky'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.5,
+        ratingCount: 7145,
+        usageCount: 1092,
+        baseUrl: 'https://opensky-network.org',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://opensky-network.org/apidoc/index.html',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'railway-transport-for-france',
+        name: 'Railway Transport for France',
+        provider: 'Railway Transport for France',
+        description: 'SNCF public API',
+        category: 'Transportation',
+        tags: ['transportation', 'public-api', 'railway'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.8,
+        ratingCount: 4178,
+        usageCount: 53668,
+        baseUrl: 'https://www.digital.sncf.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://www.digital.sncf.com/startup/api',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'refuge-restrooms',
+        name: 'REFUGE Restrooms',
+        provider: 'REFUGE Restrooms',
+        description: 'Provides safe restroom access for transgender, intersex and gender nonconforming individuals',
+        category: 'Transportation',
+        tags: ['transportation', 'public-api', 'refuge'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.6,
+        ratingCount: 2306,
+        usageCount: 71115,
+        baseUrl: 'https://www.refugerestrooms.org',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://www.refugerestrooms.org/api/docs/#!/restrooms',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'road511',
+        name: 'Road511',
+        provider: 'Road511',
+        description: 'Unified traffic data from 65 US/CA jurisdictions: events, cameras, signs, bridges, truck routes',
+        category: 'Transportation',
+        tags: ['transportation', 'public-api', 'road511'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.8,
+        ratingCount: 1628,
+        usageCount: 10446,
+        baseUrl: 'https://road511.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://road511.com/docs.html',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'sabre-for-developers',
+        name: 'Sabre for Developers',
+        provider: 'Sabre for Developers',
+        description: 'Travel Search - Limited usage',
+        category: 'Transportation',
+        tags: ['transportation', 'public-api', 'sabre'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4,
+        ratingCount: 7710,
+        usageCount: 44030,
+        baseUrl: 'https://developer.sabre.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://developer.sabre.com/guides/travel-agency/quickstart/getting-started-in-travel',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'schiphol-airport',
+        name: 'Schiphol Airport',
+        provider: 'Schiphol Airport',
+        description: 'Schiphol',
+        category: 'Transportation',
+        tags: ['transportation', 'public-api', 'schiphol'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.9,
+        ratingCount: 7659,
+        usageCount: 69451,
+        baseUrl: 'https://developer.schiphol.nl',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://developer.schiphol.nl/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'transitland',
+        name: 'TransitLand',
+        provider: 'TransitLand',
+        description: 'Transit Aggregation',
+        category: 'Transportation',
+        tags: ['transportation', 'public-api', 'transitland'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.7,
+        ratingCount: 3597,
+        usageCount: 85156,
+        baseUrl: 'https://www.transit.land',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://www.transit.land/documentation/datastore/api-endpoints.html',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'transport-for-auckland-new-zealand',
+        name: 'Transport for Auckland, New Zealand',
+        provider: 'Transport for Auckland, New Zealand',
+        description: 'Auckland Transport',
+        category: 'Transportation',
+        tags: ['transportation', 'public-api', 'transport'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.7,
+        ratingCount: 777,
+        usageCount: 33611,
+        baseUrl: 'https://dev-portal.at.govt.nz',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://dev-portal.at.govt.nz/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'transport-for-berlin-germany',
+        name: 'Transport for Berlin, Germany',
+        provider: 'Transport for Berlin, Germany',
+        description: 'Third-party VBB API',
+        category: 'Transportation',
+        tags: ['transportation', 'public-api', 'transport'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.9,
+        ratingCount: 5259,
+        usageCount: 25965,
+        baseUrl: 'https://github.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://github.com/derhuerst/vbb-rest/blob/3/docs/index.md',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'transport-for-bordeaux-france',
+        name: 'Transport for Bordeaux, France',
+        provider: 'Transport for Bordeaux, France',
+        description: 'Bordeaux Métropole public transport and more (France)',
+        category: 'Transportation',
+        tags: ['transportation', 'public-api', 'transport'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.3,
+        ratingCount: 8913,
+        usageCount: 46201,
+        baseUrl: 'https://opendata.bordeaux-metropole.fr',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://opendata.bordeaux-metropole.fr/explore/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'transport-for-budapest-hungary',
+        name: 'Transport for Budapest, Hungary',
+        provider: 'Transport for Budapest, Hungary',
+        description: 'Budapest public transport API',
+        category: 'Transportation',
+        tags: ['transportation', 'public-api', 'transport'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.6,
+        ratingCount: 506,
+        usageCount: 17572,
+        baseUrl: 'https://bkkfutar.docs.apiary.io',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://bkkfutar.docs.apiary.io',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'transport-for-czech-republic',
+        name: 'Transport for Czech Republic',
+        provider: 'Transport for Czech Republic',
+        description: 'Czech transport API',
+        category: 'Transportation',
+        tags: ['transportation', 'public-api', 'transport'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.1,
+        ratingCount: 6801,
+        usageCount: 69043,
+        baseUrl: 'https://www.chaps.cz',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://www.chaps.cz/eng/products/idos-internet',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'transport-for-finland',
+        name: 'Transport for Finland',
+        provider: 'Transport for Finland',
+        description: 'Finnish transport API',
+        category: 'Transportation',
+        tags: ['transportation', 'public-api', 'transport'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.1,
+        ratingCount: 6071,
+        usageCount: 6224,
+        baseUrl: 'https://digitransit.fi',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://digitransit.fi/en/developers/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'transport-for-hessen-germany',
+        name: 'Transport for Hessen, Germany',
+        provider: 'Transport for Hessen, Germany',
+        description: 'RMV API (Public Transport in Hessen)',
+        category: 'Transportation',
+        tags: ['transportation', 'public-api', 'transport'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.1,
+        ratingCount: 2501,
+        usageCount: 39714,
+        baseUrl: 'https://opendata.rmv.de',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://opendata.rmv.de/site/start.html',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'transport-for-lisbon-portugal',
+        name: 'Transport for Lisbon, Portugal',
+        provider: 'Transport for Lisbon, Portugal',
+        description: 'Data about buses routes, parking and traffic',
+        category: 'Transportation',
+        tags: ['transportation', 'public-api', 'transport'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.7,
+        ratingCount: 4717,
+        usageCount: 44316,
+        baseUrl: 'https://emel.city-platform.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://emel.city-platform.com/opendata/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'transport-for-london-england',
+        name: 'Transport for London, England',
+        provider: 'Transport for London, England',
+        description: 'TfL API',
+        category: 'Transportation',
+        tags: ['transportation', 'public-api', 'transport'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.1,
+        ratingCount: 5671,
+        usageCount: 42881,
+        baseUrl: 'https://api.tfl.gov.uk',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://api.tfl.gov.uk',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'transport-for-los-angeles-us',
+        name: 'Transport for Los Angeles, US',
+        provider: 'Transport for Los Angeles, US',
+        description: 'Data about positions of Metro vehicles in real time and travel their routes',
+        category: 'Transportation',
+        tags: ['transportation', 'public-api', 'transport'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.4,
+        ratingCount: 1134,
+        usageCount: 9947,
+        baseUrl: 'https://developer.metro.net',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://developer.metro.net/api/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'transport-for-manchester-england',
+        name: 'Transport for Manchester, England',
+        provider: 'Transport for Manchester, England',
+        description: 'TfGM transport network data',
+        category: 'Transportation',
+        tags: ['transportation', 'public-api', 'transport'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.9,
+        ratingCount: 989,
+        usageCount: 21355,
+        baseUrl: 'https://developer.tfgm.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://developer.tfgm.com/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'transport-for-norway',
+        name: 'Transport for Norway',
+        provider: 'Transport for Norway',
+        description: 'Transport APIs and dataset for Norway',
+        category: 'Transportation',
+        tags: ['transportation', 'public-api', 'transport'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.3,
+        ratingCount: 1653,
+        usageCount: 18021,
+        baseUrl: 'https://developer.entur.org',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://developer.entur.org/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'transport-for-ottawa-canada',
+        name: 'Transport for Ottawa, Canada',
+        provider: 'Transport for Ottawa, Canada',
+        description: 'OC Transpo API',
+        category: 'Transportation',
+        tags: ['transportation', 'public-api', 'transport'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.4,
+        ratingCount: 924,
+        usageCount: 45060,
+        baseUrl: 'https://www.octranspo.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://www.octranspo.com/en/plan-your-trip/travel-tools/developers',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'transport-for-spain',
+        name: 'Transport for Spain',
+        provider: 'Transport for Spain',
+        description: 'Public trains of Spain',
+        category: 'Transportation',
+        tags: ['transportation', 'public-api', 'transport'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4,
+        ratingCount: 5600,
+        usageCount: 6300,
+        baseUrl: 'https://data.renfe.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://data.renfe.com/api/1/util/snippet/api_info.html?resource_id=a2368cff-1562-4dde-8466-9635ea3a572a',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'transport-for-sweden',
+        name: 'Transport for Sweden',
+        provider: 'Transport for Sweden',
+        description: 'Public Transport consumer',
+        category: 'Transportation',
+        tags: ['transportation', 'public-api', 'transport'],
+        authType: 'OAuth 2.0',
+        pricing: 'Free',
+        ratingAverage: 4.9,
+        ratingCount: 6769,
+        usageCount: 15467,
+        baseUrl: 'https://www.trafiklab.se',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://www.trafiklab.se/api',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'transport-for-switzerland',
+        name: 'Transport for Switzerland',
+        provider: 'Transport for Switzerland',
+        description: 'Official Swiss Public Transport Open Data',
+        category: 'Transportation',
+        tags: ['transportation', 'public-api', 'transport'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.2,
+        ratingCount: 5232,
+        usageCount: 62533,
+        baseUrl: 'https://opentransportdata.swiss',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://opentransportdata.swiss/en/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'transport-for-the-netherlands',
+        name: 'Transport for The Netherlands',
+        provider: 'Transport for The Netherlands',
+        description: 'OVAPI, country-wide public transport',
+        category: 'Transportation',
+        tags: ['transportation', 'public-api', 'transport'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.1,
+        ratingCount: 1081,
+        usageCount: 45940,
+        baseUrl: 'https://github.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://github.com/skywave/KV78Turbo-OVAPI/wiki',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'transport-for-toronto-canada',
+        name: 'Transport for Toronto, Canada',
+        provider: 'Transport for Toronto, Canada',
+        description: 'TTC',
+        category: 'Transportation',
+        tags: ['transportation', 'public-api', 'transport'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.5,
+        ratingCount: 1545,
+        usageCount: 6006,
+        baseUrl: 'https://myttc.ca',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://myttc.ca/developers',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'transport-for-uk',
+        name: 'Transport for UK',
+        provider: 'Transport for UK',
+        description: 'Transport API and dataset for UK',
+        category: 'Transportation',
+        tags: ['transportation', 'public-api', 'transport'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.7,
+        ratingCount: 4037,
+        usageCount: 54076,
+        baseUrl: 'https://developer.transportapi.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://developer.transportapi.com',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'transport-for-vancouver-canada',
+        name: 'Transport for Vancouver, Canada',
+        provider: 'Transport for Vancouver, Canada',
+        description: 'TransLink',
+        category: 'Transportation',
+        tags: ['transportation', 'public-api', 'transport'],
+        authType: 'OAuth 2.0',
+        pricing: 'Free',
+        ratingAverage: 4.3,
+        ratingCount: 673,
+        usageCount: 48739,
+        baseUrl: 'https://developer.translink.ca',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://developer.translink.ca/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'transport-for-washington-us',
+        name: 'Transport for Washington, US',
+        provider: 'Transport for Washington, US',
+        description: 'Washington Metro transport API',
+        category: 'Transportation',
+        tags: ['transportation', 'public-api', 'transport'],
+        authType: 'OAuth 2.0',
+        pricing: 'Free',
+        ratingAverage: 4.4,
+        ratingCount: 6944,
+        usageCount: 42634,
+        baseUrl: 'https://developer.wmata.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://developer.wmata.com/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'tripadvisor',
+        name: 'Tripadvisor',
+        provider: 'Tripadvisor',
+        description: 'Rating content for a hotel, restaurant, attraction or destination',
+        category: 'Transportation',
+        tags: ['transportation', 'public-api', 'tripadvisor'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.6,
+        ratingCount: 7946,
+        usageCount: 23063,
+        baseUrl: 'https://developer-tripadvisor.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://developer-tripadvisor.com/home/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'velib-metropolis-paris-france',
+        name: 'Velib metropolis, Paris, France',
+        provider: 'Velib metropolis, Paris, France',
+        description: 'Velib Open Data API',
+        category: 'Transportation',
+        tags: ['transportation', 'public-api', 'velib'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.2,
+        ratingCount: 3792,
+        usageCount: 92327,
+        baseUrl: 'https://www.velib-metropole.fr',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://www.velib-metropole.fr/donnees-open-data-gbfs-du-service-velib-metropole',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'bitly',
+        name: 'Bitly',
+        provider: 'Bitly',
+        description: 'URL shortener and link management',
+        category: 'URL Shorteners',
+        tags: ['url-shorteners', 'public-api', 'bitly'],
+        authType: 'OAuth 2.0',
+        pricing: 'Free',
+        ratingAverage: 4.1,
+        ratingCount: 5821,
+        usageCount: 76760,
+        baseUrl: 'https://dev.bitly.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'http://dev.bitly.com/get_started.html',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'clickmeter',
+        name: 'ClickMeter',
+        provider: 'ClickMeter',
+        description: 'Monitor, compare and optimize your marketing links',
+        category: 'URL Shorteners',
+        tags: ['url-shorteners', 'public-api', 'clickmeter'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.4,
+        ratingCount: 8624,
+        usageCount: 88303,
+        baseUrl: 'https://support.clickmeter.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://support.clickmeter.com/hc/en-us/categories/201474986',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'clico',
+        name: 'Clico',
+        provider: 'Clico',
+        description: 'URL shortener service',
+        category: 'URL Shorteners',
+        tags: ['url-shorteners', 'public-api', 'clico'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.1,
+        ratingCount: 551,
+        usageCount: 60150,
+        baseUrl: 'https://cli.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://cli.com/swagger-ui/index.html?configUrl=/v3/api-docs/swagger-config',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'cutt-ly',
+        name: 'Cutt.ly',
+        provider: 'Cutt.ly',
+        description: 'URL shortener service',
+        category: 'URL Shorteners',
+        tags: ['url-shorteners', 'public-api', 'cutt'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.1,
+        ratingCount: 621,
+        usageCount: 93588,
+        baseUrl: 'https://cutt.ly',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://cutt.ly/api-documentation/cuttly-links-api',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'drivet-url-shortener',
+        name: 'Drivet URL Shortener',
+        provider: 'Drivet URL Shortener',
+        description: 'Shorten a long URL easily and fast',
+        category: 'URL Shorteners',
+        tags: ['url-shorteners', 'public-api', 'drivet'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.8,
+        ratingCount: 3278,
+        usageCount: 90396,
+        baseUrl: 'https://wiki.drivet.xyz',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://wiki.drivet.xyz/en/url-shortener/add-links',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'free-url-shortener',
+        name: 'Free Url Shortener',
+        provider: 'Free Url Shortener',
+        description: 'Free URL Shortener offers a powerful API to interact with other sites',
+        category: 'URL Shorteners',
+        tags: ['url-shorteners', 'public-api', 'free'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.6,
+        ratingCount: 8136,
+        usageCount: 81376,
+        baseUrl: 'https://ulvis.net',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://ulvis.net/developer.html',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'git-io',
+        name: 'Git.io',
+        provider: 'Git.io',
+        description: 'Git.io URL shortener',
+        category: 'URL Shorteners',
+        tags: ['url-shorteners', 'public-api', 'git'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.6,
+        ratingCount: 2106,
+        usageCount: 72372,
+        baseUrl: 'https://github.blog',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://github.blog/2011-11-10-git-io-github-url-shortener/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'mgnet-me',
+        name: 'Mgnet.me',
+        provider: 'Mgnet.me',
+        description: 'Torrent URL shorten API',
+        category: 'URL Shorteners',
+        tags: ['url-shorteners', 'public-api', 'mgnet'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.7,
+        ratingCount: 9467,
+        usageCount: 51995,
+        baseUrl: 'https://mgnet.me',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'http://mgnet.me/api.html',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'owo',
+        name: 'owo',
+        provider: 'owo',
+        description: 'A simple link obfuscator/shortener',
+        category: 'URL Shorteners',
+        tags: ['url-shorteners', 'public-api', 'owo'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.8,
+        ratingCount: 5528,
+        usageCount: 88575,
+        baseUrl: 'https://owo.vc',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://owo.vc/api',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'rebrandly',
+        name: 'Rebrandly',
+        provider: 'Rebrandly',
+        description: 'Custom URL shortener for sharing branded links',
+        category: 'URL Shorteners',
+        tags: ['url-shorteners', 'public-api', 'rebrandly'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.2,
+        ratingCount: 1342,
+        usageCount: 91263,
+        baseUrl: 'https://developers.rebrandly.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://developers.rebrandly.com/v1/docs',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'short-link',
+        name: 'Short Link',
+        provider: 'Short Link',
+        description: 'Short URLs support so many domains',
+        category: 'URL Shorteners',
+        tags: ['url-shorteners', 'public-api', 'short'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.2,
+        ratingCount: 9332,
+        usageCount: 82976,
+        baseUrl: 'https://github.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://github.com/FayasNoushad/Short-Link-API',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'tinyurl',
+        name: 'TinyURL',
+        provider: 'TinyURL',
+        description: 'Shorten long URLs',
+        category: 'URL Shorteners',
+        tags: ['url-shorteners', 'public-api', 'tinyurl'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.4,
+        ratingCount: 3224,
+        usageCount: 32817,
+        baseUrl: 'https://tinyurl.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://tinyurl.com/app/dev',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'auto-body-shop-directory',
+        name: 'Auto Body Shop Directory',
+        provider: 'Auto Body Shop Directory',
+        description: 'Find auto body shops by ZIP code, city, location, or profile',
+        category: 'Vehicle',
+        tags: ['vehicle', 'public-api', 'auto'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.4,
+        ratingCount: 9194,
+        usageCount: 46242,
+        baseUrl: 'https://autobodyshopnear.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://autobodyshopnear.com/developers/body-shop-api',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'brazilian-vehicles-and-prices',
+        name: 'Brazilian Vehicles and Prices',
+        provider: 'Brazilian Vehicles and Prices',
+        description: 'Vehicles information from Fundação Instituto de Pesquisas Econômicas - Fipe',
+        category: 'Vehicle',
+        tags: ['vehicle', 'public-api', 'brazilian'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.8,
+        ratingCount: 8738,
+        usageCount: 51176,
+        baseUrl: 'https://deividfortuna.github.io',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://deividfortuna.github.io/fipe/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'helipaddy-sites',
+        name: 'Helipaddy sites',
+        provider: 'Helipaddy sites',
+        description: 'Helicopter and passenger drone landing site directory, Helipaddy data and much more',
+        category: 'Vehicle',
+        tags: ['vehicle', 'public-api', 'helipaddy'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4,
+        ratingCount: 960,
+        usageCount: 55351,
+        baseUrl: 'https://helipaddy.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://helipaddy.com/api/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'kelley-blue-book',
+        name: 'Kelley Blue Book',
+        provider: 'Kelley Blue Book',
+        description: 'Vehicle info, pricing, configuration, plus much more',
+        category: 'Vehicle',
+        tags: ['vehicle', 'public-api', 'kelley'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4,
+        ratingCount: 8780,
+        usageCount: 72182,
+        baseUrl: 'https://developer.kbb.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'http://developer.kbb.com/#!/data/1-Default',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'mercedes-benz',
+        name: 'Mercedes-Benz',
+        provider: 'Mercedes-Benz',
+        description: 'Telematics data, remotely access vehicle functions, car configurator, locate service dealers',
+        category: 'Vehicle',
+        tags: ['vehicle', 'public-api', 'mercedes'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4.5,
+        ratingCount: 8835,
+        usageCount: 48047,
+        baseUrl: 'https://developer.mercedes-benz.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://developer.mercedes-benz.com/apis',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'nhtsa',
+        name: 'NHTSA',
+        provider: 'NHTSA',
+        description: 'NHTSA Product Information Catalog and Vehicle Listing',
+        category: 'Vehicle',
+        tags: ['vehicle', 'public-api', 'nhtsa'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.5,
+        ratingCount: 4485,
+        usageCount: 49283,
+        baseUrl: 'https://vpic.nhtsa.dot.gov',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://vpic.nhtsa.dot.gov/api/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'an-api-of-ice-and-fire',
+        name: 'An API of Ice And Fire',
+        provider: 'An API of Ice And Fire',
+        description: 'Game Of Thrones API',
+        category: 'Video',
+        tags: ['video', 'public-api', 'an'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4,
+        ratingCount: 7240,
+        usageCount: 94962,
+        baseUrl: 'https://anapioficeandfire.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://anapioficeandfire.com/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'breaking-bad',
+        name: 'Breaking Bad',
+        provider: 'Breaking Bad',
+        description: 'Breaking Bad API',
+        category: 'Video',
+        tags: ['video', 'public-api', 'breaking'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.4,
+        ratingCount: 5614,
+        usageCount: 49730,
+        baseUrl: 'https://breakingbadapi.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://breakingbadapi.com/documentation',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'breaking-bad-quotes',
+        name: 'Breaking Bad Quotes',
+        provider: 'Breaking Bad Quotes',
+        description: 'Some Breaking Bad quotes',
+        category: 'Video',
+        tags: ['video', 'public-api', 'breaking'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.4,
+        ratingCount: 4144,
+        usageCount: 59806,
+        baseUrl: 'https://github.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://github.com/shevabam/breaking-bad-quotes',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'catalogopolis',
+        name: 'Catalogopolis',
+        provider: 'Catalogopolis',
+        description: 'Doctor Who API',
+        category: 'Video',
+        tags: ['video', 'public-api', 'catalogopolis'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.8,
+        ratingCount: 2928,
+        usageCount: 73346,
+        baseUrl: 'https://api.catalogopolis.xyz',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://api.catalogopolis.xyz/docs/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'catch-the-show',
+        name: 'Catch The Show',
+        provider: 'Catch The Show',
+        description: 'REST API for next-episode.net',
+        category: 'Video',
+        tags: ['video', 'public-api', 'catch'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.8,
+        ratingCount: 1228,
+        usageCount: 32104,
+        baseUrl: 'https://catchtheshow.herokuapp.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://catchtheshow.herokuapp.com/api/documentation',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'dailymotion',
+        name: 'Dailymotion',
+        provider: 'Dailymotion',
+        description: 'Dailymotion Developer API',
+        category: 'Video',
+        tags: ['video', 'public-api', 'dailymotion'],
+        authType: 'OAuth 2.0',
+        pricing: 'Free',
+        ratingAverage: 4,
+        ratingCount: 3800,
+        usageCount: 19614,
+        baseUrl: 'https://developer.dailymotion.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://developer.dailymotion.com/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'game-of-thrones-quotes',
+        name: 'Game of Thrones Quotes',
+        provider: 'Game of Thrones Quotes',
+        description: 'Some Game of Thrones quotes',
+        category: 'Video',
+        tags: ['video', 'public-api', 'game'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.9,
+        ratingCount: 729,
+        usageCount: 34175,
+        baseUrl: 'https://gameofthronesquotes.xyz',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://gameofthronesquotes.xyz/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'harry-potter-charactes',
+        name: 'Harry Potter Charactes',
+        provider: 'Harry Potter Charactes',
+        description: 'Harry Potter Characters Data with with imagery',
+        category: 'Video',
+        tags: ['video', 'public-api', 'harry'],
+        authType: 'None',
+        pricing: 'Free',
+        ratingAverage: 4.5,
+        ratingCount: 5085,
+        usageCount: 30083,
+        baseUrl: 'https://hp-api.herokuapp.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://hp-api.herokuapp.com/',
+        featured: false,
+        trending: false
+    },
+    {
+        id: 'imdb-api',
+        name: 'IMDb-API',
+        provider: 'IMDb-API',
+        description: 'API for receiving movie, serial and cast information',
+        category: 'Video',
+        tags: ['video', 'public-api', 'imdb'],
+        authType: 'API Key',
+        pricing: 'Free',
+        ratingAverage: 4,
+        ratingCount: 8980,
+        usageCount: 84782,
+        baseUrl: 'https://imdb-api.com',
+        endpoints: [
+            {
+                path: '/',
+                method: 'GET',
+                description: 'Root endpoint — see documentation for real paths'
+            }
+        ],
+        documentation: 'https://imdb-api.com/',
         featured: false,
         trending: false
     }

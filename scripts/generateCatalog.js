@@ -187,12 +187,22 @@ async function main() {
 
     const addId = dedupIds(existing);
     const byId = new Map(existing.map(e => [e.id, e]));
-    const merged = [...existing];
+    // Dedup curated entries by name too — keep first occurrence (real endpoints win).
+    const byName = new Map();
+    const merged = [];
+    for (const e of existing) {
+        const key = e.name.toLowerCase();
+        if (byName.has(key)) continue;
+        byName.set(key, e);
+        merged.push(e);
+    }
     for (const row of rows) {
         if (merged.length >= TARGET) break;
         const e = buildEntry(row, addId);
         if (byId.has(e.id)) continue; // shouldn't happen (dedup guarantees), guard anyway
+        if (byName.has(e.name.toLowerCase())) continue; // skip same-named API already in catalog
         byId.set(e.id, e);
+        byName.set(e.name.toLowerCase(), e);
         merged.push(e);
     }
 

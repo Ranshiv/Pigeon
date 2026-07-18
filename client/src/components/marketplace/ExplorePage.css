@@ -41,10 +41,9 @@
     max-width: 600px;
 }
 
-/* Single sticky unit wrapping toolbar + chips */
+/* Single unit wrapping toolbar + chips — scrolls with page */
 .explore-sticky {
-    position: sticky;
-    top: 0;
+    position: relative;
     z-index: 30;
     padding: 16px 0 16px;
     margin: 0 -32px 20px;
@@ -272,8 +271,8 @@
     padding: 22px 18px;
     align-self: start;
     box-sizing: border-box;
-    position: sticky;
-    top: 140px;
+    position: relative;
+    top: 0;
 }
 
 .filter-section {
