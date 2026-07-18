@@ -287,14 +287,6 @@
     line-height: 1.5 !important;
 }
 
-.monaco-editor-wrapper .line-numbers {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    line-height: 1.5 !important;
-    margin-top: -13px;
-}
-
 /* Headers Editor */
 .headers-editor {
     padding: 16px;

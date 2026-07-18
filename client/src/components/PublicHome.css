@@ -1983,8 +1983,9 @@
     background-color: #777;
 }
 
-/* Line numbers */
-.line-numbers {
+/* Line numbers — scoped to the homepage code demo so they do NOT leak into
+   Monaco editors elsewhere (Monaco's gutter also uses .line-numbers). */
+.code-editor-body .line-numbers {
     position: absolute;
     left: 0;
     top: 15px;
@@ -1998,7 +1999,7 @@
     user-select: none;
 }
 
-.line-numbers div {
+.code-editor-body .line-numbers div {
     padding: 0 5px;
     height: 20px;
     line-height: 20px;
@@ -2006,7 +2007,7 @@
 }
 
 /* Code content with enhanced styling */
-.code-content {
+.code-editor-body .code-content {
     margin-left: 60px;
     /* Increased margin to account for wider line numbers */
     font-size: 0.85em;
@@ -2017,8 +2018,9 @@
     padding-right: 20px;
 }
 
-/* Line numbers */
-.line-numbers {
+/* Line numbers — scoped to the homepage code demo so they do NOT leak into
+   Monaco editors elsewhere (Monaco's gutter also uses .line-numbers). */
+.code-editor-body .line-numbers {
     position: absolute;
     left: 0;
     top: 15px;
@@ -2032,7 +2034,7 @@
     user-select: none;
 }
 
-.line-numbers div {
+.code-editor-body .line-numbers div {
     padding: 0 5px;
     height: 20px;
     line-height: 20px;
@@ -2040,7 +2042,7 @@
 }
 
 /* Code content with enhanced styling */
-.code-content {
+.code-editor-body .code-content {
     margin-left: 60px;
     /* Increased margin to account for wider line numbers */
     font-size: 0.85em;
