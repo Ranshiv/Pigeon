@@ -9,6 +9,9 @@ const userSchema = new mongoose.Schema({
     fontSize: { type: String, default: '16px' },
     // Add profileIcon field
     profileIcon: { type: String, default: null }, // Store the filename, default to null
+    // Authorization role for moderation/admin actions. 'user' is the default;
+    // 'admin' can approve/reject marketplace submissions.
+    role: { type: String, enum: ['user', 'admin'], default: 'user' },
     // OAuth2 tokens for email sending (from Google OAuth)
     accessToken: { type: String, select: false }, // Don't include by default for security
     refreshToken: { type: String, select: false }, // Don't include by default for security

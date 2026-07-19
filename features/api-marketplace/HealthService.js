@@ -17,6 +17,10 @@ class HealthService {
         const avgResponseTimeMs = Math.floor(1000 - (baseScore * 8)); // Lower score = higher latency
 
         return {
+            // Honest marker: these figures are derived from the listing id, not
+            // a real uptime monitor. Wire MonitoringService into getHealth() and
+            // drop `synthetic` before claiming live data.
+            synthetic: true,
             current: {
                 score: baseScore,
                 computedAt: new Date(),

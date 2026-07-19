@@ -35,7 +35,11 @@ const ReviewService = require('../features/api-marketplace/ReviewService');
 const CommunityForums = require('../features/api-marketplace/CommunityForums');
 const GuideService = require('../features/api-marketplace/GuideService');
 const HealthService = require('../features/api-marketplace/HealthService');
+const MarketplaceCollection = require('../server/models/MarketplaceCollection');
+const MarketplacePlan = require('../server/models/MarketplacePlan');
+const { incProxyCall, incReviewSubmission } = require('../middleware/metrics');
 const { ensureAuthenticated } = require('../middleware/auth');
+const { ensureAdmin } = require('../middleware/auth');
 const { proxyLimiter } = require('../middleware/rateLimiter');
 const { validateBody } = require('../middleware/validateBody');
 const { z } = require('zod');
@@ -64,13 +68,30 @@ const guideSchema = z.object({
     contentMarkdown: z.string().trim().min(1)
 });
 
+// Tier 4: schema for a new marketplace API submission.
+const submissionSchema = z.object({
+    name: z.string().trim().min(1).max(120),
+    provider: z.string().trim().min(1),
+    description: z.string().trim().min(1).max(2000),
+    category: z.string().trim().min(1),
+    tags: z.array(z.string()).max(20).optional(),
+    authType: z.string().optional(),
+    pricing: z.string().optional(),
+    baseUrl: z.string().url()
+});
+
+const moderateSchema = z.object({
+    action: z.enum(['approve', 'reject'])
+});
+
 // GET /api/marketplace/search - Search public APIs
 router.get('/search', async (req, res) => {
     try {
         const { query = '', category = '', tags = '', page = 1, limit = 12, sort = 'popular' } = req.query;
 
-        // Build filter
-        const filter = {};
+        // Build filter. Tier 4: only active listings are publicly searchable;
+        // pending/rejected are hidden until moderated.
+        const filter = { status: 'active' };
 
         // Filter by search query. Default to Mongo $text (uses the existing text
         // index on name/description/provider/tags for relevance ranking). When
@@ -238,34 +259,12 @@ router.get('/trending', async (req, res) => {
     }
 });
 
-// GET /api/marketplace/recommended-collections - Get recommended collections
+// GET /api/marketplace/recommended-collections - curated collections from the DB.
 router.get('/recommended-collections', async (req, res) => {
     try {
-        // For now, return some featured ones or a random selection
-        // In a real app, this would be based on user preferences
-        const collections = [
-            {
-                _id: 'rec-1',
-                name: 'Essential Web APIs',
-                description: 'A collection of the most useful APIs for web development',
-                author: { displayName: 'Pigeon Curator' },
-                stars: 450
-            },
-            {
-                _id: 'rec-2',
-                name: 'Data Science Toolkit',
-                description: 'APIs for data processing, ML, and visualization',
-                author: { displayName: 'DataMaster' },
-                stars: 320
-            },
-            {
-                _id: 'rec-3',
-                name: 'Entertainment & Fun',
-                description: 'Most popular joke, image, and trivia APIs',
-                author: { displayName: 'FunBot' },
-                stars: 280
-            }
-        ];
+        const collections = await MarketplaceCollection.find()
+            .sort({ stars: -1 })
+            .limit(20);
         res.json(collections);
     } catch (error) {
         console.error('Recommended collections error:', error);
@@ -330,6 +329,7 @@ router.get('/listings/:id/reviews', async (req, res) => {
 router.post('/listings/:id/reviews', ensureAuthenticated, validateBody(reviewSchema), async (req, res) => {
     try {
         const review = await ReviewService.createReview(req.params.id, req.user._id, req.body);
+        incReviewSubmission();
         res.json(review);
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -414,15 +414,14 @@ router.get('/listings/:id/health', async (req, res) => {
     }
 });
 
-// 5. Plans (Mock for now)
-router.get('/listings/:id/plans', (req, res) => {
-    res.json({
-        enabled: true,
-        plans: [
-            { _id: 'p1', name: 'Developer', description: 'For hobbyists', isFree: true, pricePerMonth: 0, currency: 'USD' },
-            { _id: 'p2', name: 'Pro', description: 'High rate limits', isFree: false, pricePerMonth: 29, currency: 'USD' }
-        ]
-    });
+// 5. Plans — DB-backed pricing plans for a listing.
+router.get('/listings/:id/plans', async (req, res) => {
+    try {
+        const plans = await MarketplacePlan.find({ listingId: req.params.id }).sort({ pricePerMonth: 1 });
+        res.json({ enabled: true, plans });
+    } catch (error) {
+        res.status(500).json({ error: 'Failed to get plans', message: error.message });
+    }
 });
 
 // POST /api/marketplace/proxy - Proxy requests to external APIs (for Try It feature)
@@ -522,6 +521,7 @@ router.post('/proxy', proxyLimiter, async (req, res) => {
             );
         } catch (e) { /* non-fatal: usage tracking must never break the proxy */ }
 
+        incProxyCall();
         res.json({
             status: externalResponse.status,
             statusText: externalResponse.statusText,
@@ -542,6 +542,38 @@ router.post('/proxy', proxyLimiter, async (req, res) => {
             duration,
             success: false
         });
+    }
+});
+
+// --- Tier 4: Submission + Moderation ---
+
+// POST /api/marketplace/listings — submit a new API for moderation.
+// Any authenticated user may submit; the doc is created with status:'pending'.
+router.post('/listings', ensureAuthenticated, validateBody(submissionSchema), async (req, res) => {
+    try {
+        const id = `api-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`;
+        const doc = await MarketplaceApi.create({
+            id,
+            submittedBy: req.user._id,
+            status: 'pending',
+            ...req.body
+        });
+        res.status(201).json(doc);
+    } catch (err) {
+        res.status(500).json({ error: 'Failed to submit listing', message: err.message });
+    }
+});
+
+// POST /api/marketplace/listings/:id/moderate — admin approve/reject a submission.
+router.post('/listings/:id/moderate', ensureAuthenticated, ensureAdmin, validateBody(moderateSchema), async (req, res) => {
+    try {
+        const doc = await MarketplaceApi.findOne({ id: req.params.id });
+        if (!doc) return res.status(404).json({ error: 'Listing not found' });
+        doc.status = req.body.action === 'approve' ? 'active' : 'rejected';
+        await doc.save();
+        res.json(doc);
+    } catch (err) {
+        res.status(500).json({ error: 'Moderation failed', message: err.message });
     }
 });
 

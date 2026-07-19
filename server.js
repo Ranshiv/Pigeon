@@ -12,6 +12,7 @@ const mongoose = require('mongoose');
 const axios = require('axios'); // Add axios import for proxy functionality
 const https = require('https'); // Add https to handle SSL issues
 const { mountSecurityMiddleware, globalErrorHandler } = require('./middleware/securityMiddleware');
+const { metricsHandler } = require('./middleware/metrics');
 const { initializeConnections } = require('./config/db');
 const User = require('./models/User');
 const MarketplaceApi = require('./models/MarketplaceApi');
@@ -45,10 +46,24 @@ app.use(cors({
 mountSecurityMiddleware(app);
 app.use(express.json());
 app.use(cookieParser());
+
+// Tier 4: Redis-backed sessions when REDIS_URL is set (multi-node deployments).
+// ponytail: on a single node, fall back to MemoryStore — do not pay Redis
+// latency until horizontal scale needs shared sessions.
+let sessionStore;
+if (process.env.REDIS_URL) {
+    const redis = require('redis');
+    const RedisStore = require('connect-redis')(session);
+    const redisClient = redis.createClient({ url: process.env.REDIS_URL });
+    redisClient.connect().catch(err => console.error('Redis session store connect failed:', err.message));
+    sessionStore = new RedisStore({ client: redisClient });
+}
+
 app.use(session({
     secret: process.env.SESSION_SECRET || 'keyboard cat',
     resave: false,
     saveUninitialized: false,
+    ...(sessionStore ? { store: sessionStore } : {}),
     cookie: {
         secure: process.env.NODE_ENV === 'production',
         httpOnly: true,
@@ -172,6 +187,9 @@ passport.deserializeUser(async (id, done) => {
 
 // --- Use the central routes with /api prefix ---
 app.use('/api', ensureDatabaseReady, routes);
+
+// --- PROMETHEUS METRICS ---
+app.get('/metrics', metricsHandler);
 
 // --- HEALTH CHECK ENDPOINT ---
 app.get('/api/health', (req, res) => {

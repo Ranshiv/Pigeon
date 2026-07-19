@@ -71,7 +71,20 @@ const authenticateJWT = (req, res, next) => {
     return next();
 };
 
+// Ensure the caller is authenticated AND has the 'admin' role.
+// Requires a passport-attached req.user with a populated role (default 'user').
+const ensureAdmin = (req, res, next) => {
+    const isProd = process.env.NODE_ENV === 'production';
+    const hasUser = (typeof req.isAuthenticated === 'function' && req.isAuthenticated()) || (req.user && req.user.id);
+    if (!hasUser) return res.status(401).json({ message: 'Authentication required' });
+    // Dev stub user is never an admin; production reads req.user.role.
+    const role = (req.user && req.user.role) || 'user';
+    if (role !== 'admin') return res.status(403).json({ message: 'Admin role required' });
+    return next();
+};
+
 module.exports = {
     ensureAuthenticated,
-    authenticateJWT
+    authenticateJWT,
+    ensureAdmin
 };

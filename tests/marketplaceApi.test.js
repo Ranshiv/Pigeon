@@ -37,6 +37,8 @@ let mongo;
 let app;
 let userId;
 let authHeader;
+let adminUserId;
+let adminHeader;
 
 // Minimal auth middleware: honor `Authorization: Bearer <userId>` the way the
 // explore page expects a real token to carry an identity. Mirrors what passport
@@ -47,6 +49,17 @@ function tokenAuth(req, res, next) {
     if (m && mongoose.Types.ObjectId.isValid(m[1])) {
         req.user = { _id: new mongoose.Types.ObjectId(m[1]), id: m[1], displayName: 'Tester' };
         req.isAuthenticated = () => true;
+    }
+    return next();
+}
+
+// Async variant that also loads the user's role from the DB so ensureAdmin can
+// authorize the moderation routes the way passport would in production.
+async function tokenAuthWithRole(req, res, next) {
+    await new Promise(resolve => tokenAuth(req, res, () => resolve()));
+    if (req.user && req.user._id) {
+        const u = await User.findById(req.user._id).lean();
+        if (u) req.user.role = u.role;
     }
     return next();
 }
@@ -80,7 +93,7 @@ beforeAll(async () => {
 
     app = express();
     app.use(express.json());
-    app.use(tokenAuth);
+    app.use(tokenAuthWithRole);
     app.use('/api/marketplace', router);
     // 404 fallthrough — mirrors Express default for unknown routes.
     app.use((req, res) => res.status(404).json({ error: 'Not found' }));
@@ -92,6 +105,15 @@ beforeAll(async () => {
     });
     userId = u._id.toString();
     authHeader = { Authorization: `Bearer ${userId}` };
+
+    const admin = await User.create({
+        googleId: `g-admin-${Math.random().toString(36).slice(2, 10)}`,
+        displayName: 'Admin',
+        email: `admin-${Math.random().toString(36).slice(2, 8)}@pigeon.test`,
+        role: 'admin'
+    });
+    adminUserId = admin._id.toString();
+    adminHeader = { Authorization: `Bearer ${adminUserId}` };
 }, 60000);
 
 afterAll(async () => {
@@ -238,12 +260,19 @@ describe('GET /api/marketplace/featured and /trending', () => {
 });
 
 describe('GET /api/marketplace/recommended-collections', () => {
-    test('returns the static curated collection list', async () => {
+    test('returns curated collections from the DB', async () => {
+        const MarketplaceCollection = require('../server/models/MarketplaceCollection');
+        await MarketplaceCollection.create({
+            slug: 'web-essentials',
+            name: 'Essential Web APIs',
+            description: 'Useful APIs for web dev',
+            listingIds: ['active-1']
+        });
         const res = await request(app).get('/api/marketplace/recommended-collections');
         expect(res.status).toBe(200);
         expect(Array.isArray(res.body)).toBe(true);
         expect(res.body.length).toBeGreaterThanOrEqual(1);
-        expect(res.body[0]).toHaveProperty('name');
+        expect(res.body[0]).toHaveProperty('name', 'Essential Web APIs');
     });
 });
 
@@ -465,12 +494,24 @@ describe('Health and plans', () => {
         expect(res.body.current).toHaveProperty('status');
     });
 
-    test('GET plans returns the static mock plans', async () => {
+    test('GET health flags its synthetic score so clients know it is not real monitoring', async () => {
+        await seedListing({ id: 'health-2' });
+        const res = await request(app).get('/api/marketplace/listings/health-2/health');
+        expect(res.body.synthetic).toBe(true);
+    });
+
+    test('GET plans returns plans from the DB for the listing', async () => {
+        const MarketplacePlan = require('../server/models/MarketplacePlan');
         await seedListing({ id: 'plans-1' });
+        await MarketplacePlan.create([
+            { listingId: 'plans-1', name: 'Developer', isFree: true, pricePerMonth: 0, currency: 'USD' },
+            { listingId: 'plans-1', name: 'Pro', isFree: false, pricePerMonth: 29, currency: 'USD' }
+        ]);
         const res = await request(app).get('/api/marketplace/listings/plans-1/plans');
         expect(res.status).toBe(200);
         expect(res.body.enabled).toBe(true);
         expect(res.body.plans.length).toBeGreaterThanOrEqual(2);
+        expect(res.body.plans[0]).toHaveProperty('name');
     });
 });
 
@@ -570,5 +611,63 @@ describe('Ghost endpoints (defined on client, not on router)', () => {
         await seedListing({ id: 'ghost-2' });
         const res = await request(app).post('/api/marketplace/listings/ghost-2/publish');
         expect(res.status).toBe(404);
+    });
+});
+
+describe('Tier 4: API submission + moderation', () => {
+    const subBody = {
+        name: 'Submitted API', provider: 'SubmitCo',
+        description: 'A new submission', category: 'Weather',
+        tags: ['rest'], authType: 'None', pricing: 'Free', baseUrl: 'https://sub.test'
+    };
+
+    test('POST /listings without auth returns 401', async () => {
+        const res = await request(app).post('/api/marketplace/listings').send(subBody);
+        expect(res.status).toBe(401);
+    });
+
+    test('POST /listings with valid auth creates a pending submission', async () => {
+        const res = await request(app).post('/api/marketplace/listings')
+            .set(authHeader).send(subBody);
+        expect(res.status).toBe(201);
+        expect(res.body.status).toBe('pending');
+        expect(res.body.submittedBy).toBe(userId);
+    });
+
+    test('pending submissions are excluded from /search (only active listed)', async () => {
+        await seedListing({ id: 'active-1' });
+        await request(app).post('/api/marketplace/listings').set(authHeader).send(subBody);
+        const res = await request(app).get('/api/marketplace/search');
+        const ids = res.body.results.map(a => a.id);
+        expect(ids).toContain('active-1');
+        expect(ids).not.toContain(res.body.results.find(a => a.name === 'Submitted API')?.id);
+        expect(res.body.total).toBe(1);
+    });
+
+    test('admin POST /listings/:id/moderate approve flips status to active', async () => {
+        const created = await request(app).post('/api/marketplace/listings')
+            .set(authHeader).send(subBody);
+        const newId = created.body.id;
+        const res = await request(app).post(`/api/marketplace/listings/${newId}/moderate`)
+            .set(adminHeader).send({ action: 'approve' });
+        expect(res.status).toBe(200);
+        expect(res.body.status).toBe('active');
+    });
+
+    test('non-admin POST /listings/:id/moderate returns 403', async () => {
+        const created = await request(app).post('/api/marketplace/listings')
+            .set(authHeader).send(subBody);
+        const res = await request(app).post(`/api/marketplace/listings/${created.body.id}/moderate`)
+            .set(authHeader).send({ action: 'approve' });
+        expect(res.status).toBe(403);
+    });
+
+    test('admin reject flips status to rejected', async () => {
+        const created = await request(app).post('/api/marketplace/listings')
+            .set(authHeader).send(subBody);
+        const res = await request(app).post(`/api/marketplace/listings/${created.body.id}/moderate`)
+            .set(adminHeader).send({ action: 'reject' });
+        expect(res.status).toBe(200);
+        expect(res.body.status).toBe('rejected');
     });
 });

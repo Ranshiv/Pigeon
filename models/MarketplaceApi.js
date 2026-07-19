@@ -34,6 +34,12 @@ const MarketplaceApiSchema = new mongoose.Schema({
     documentation: String,
     featured: { type: Boolean, default: false },
     trending: { type: Boolean, default: false },
+    // Tier 4: submission/moderation lifecycle.
+    // pending  = submitted by a user, awaiting admin review
+    // active   = approved and visible in the marketplace
+    // rejected = admin declined; not listed
+    status: { type: String, enum: ['pending', 'active', 'rejected'], default: 'active' },
+    submittedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now }
 });
