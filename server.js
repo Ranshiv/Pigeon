@@ -53,7 +53,7 @@ app.use(cookieParser());
 let sessionStore;
 if (process.env.REDIS_URL) {
     const redis = require('redis');
-    const RedisStore = require('connect-redis')(session);
+    const { RedisStore } = require('connect-redis');
     const redisClient = redis.createClient({ url: process.env.REDIS_URL });
     redisClient.connect().catch(err => console.error('Redis session store connect failed:', err.message));
     sessionStore = new RedisStore({ client: redisClient });

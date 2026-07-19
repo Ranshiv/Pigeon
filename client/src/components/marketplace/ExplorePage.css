@@ -10,6 +10,17 @@
 /* Header */
 .explore-header {
     margin-bottom: 24px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.explore-header-actions {
+    display: flex;
+    gap: 10px;
+    flex-shrink: 0;
 }
 
 .header-content {

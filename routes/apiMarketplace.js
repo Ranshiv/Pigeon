@@ -90,8 +90,9 @@ router.get('/search', async (req, res) => {
         const { query = '', category = '', tags = '', page = 1, limit = 12, sort = 'popular' } = req.query;
 
         // Build filter. Tier 4: only active listings are publicly searchable;
-        // pending/rejected are hidden until moderated.
-        const filter = { status: 'active' };
+        // pending/rejected are hidden until moderated. Back-compat: existing seed
+        // docs may not have a status field yet, so also include missing status.
+        const filter = { $or: [{ status: 'active' }, { status: { $exists: false } }] };
 
         // Filter by search query. Default to Mongo $text (uses the existing text
         // index on name/description/provider/tags for relevance ranking). When
@@ -546,6 +547,18 @@ router.post('/proxy', proxyLimiter, async (req, res) => {
 });
 
 // --- Tier 4: Submission + Moderation ---
+
+// GET /api/marketplace/listings/pending — admin moderation queue.
+router.get('/listings/pending', ensureAuthenticated, ensureAdmin, async (req, res) => {
+    try {
+        const pending = await MarketplaceApi.find({ status: 'pending' })
+            .sort({ createdAt: -1 })
+            .limit(100);
+        res.json(pending);
+    } catch (err) {
+        res.status(500).json({ error: 'Failed to get pending listings', message: err.message });
+    }
+});
 
 // POST /api/marketplace/listings — submit a new API for moderation.
 // Any authenticated user may submit; the doc is created with status:'pending'.

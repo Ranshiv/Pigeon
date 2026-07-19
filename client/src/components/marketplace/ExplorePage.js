@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { Search, Filter, Star, TrendingUp, ChevronDown, X, Play, BookOpen, Bookmark } from 'lucide-react';
+import { Search, Filter, Star, TrendingUp, ChevronDown, X, Play, BookOpen, Bookmark, Plus, ShieldCheck } from 'lucide-react';
 import ApiDetailModal from './ApiDetailModal';
 import { MarketplaceApi } from './MarketplaceApi';
 import { debounce } from '../../utils/debounce';
@@ -32,6 +32,7 @@ const ExplorePage = () => {
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     const [error, setError] = useState(null);
+    const [user, setUser] = useState(null);
     const [favorites, setFavorites] = useState(() => {
         try { return new Set(JSON.parse(localStorage.getItem(FAVORITES_KEY) || '[]')); }
         catch { return new Set(); }
@@ -82,10 +83,11 @@ const ExplorePage = () => {
         }
     }, [searchQuery, selectedCategory, selectedTags, sortBy, page]);
 
-    // Fetch categories and tags on mount
+    // Fetch categories, tags, and current user on mount
     useEffect(() => {
         fetchCategories();
         fetchTags();
+        fetchUser();
     }, []);
 
     // Fetch APIs when search params change
@@ -111,6 +113,16 @@ const ExplorePage = () => {
             setTags(data.slice(0, 20)); // Show top 20 tags
         } catch (error) {
             console.error('Failed to fetch tags:', error);
+        }
+    };
+
+    const fetchUser = async () => {
+        try {
+            const res = await fetch('/api/auth/check', { credentials: 'include' });
+            const data = await res.json();
+            if (data.isAuthenticated) setUser(data.user);
+        } catch (error) {
+            console.error('Failed to fetch user:', error);
         }
     };
 
@@ -165,6 +177,18 @@ const ExplorePage = () => {
                     <span className="eyebrow">MARKETPLACE</span>
                     <h1>Explore APIs</h1>
                     <p>Discover, test, and integrate thousands of public APIs directly in your workspace</p>
+                </div>
+                <div className="explore-header-actions">
+                    {user && (
+                        <button className="btn-link" onClick={() => window.location.href = '/workspace/api-network/explore/submit'}>
+                            <Plus size={16} /> Submit API
+                        </button>
+                    )}
+                    {user?.role === 'admin' && (
+                        <button className="btn-link" onClick={() => window.location.href = '/workspace/api-network/explore/moderate'}>
+                            <ShieldCheck size={16} /> Moderate
+                        </button>
+                    )}
                 </div>
             </div>
 

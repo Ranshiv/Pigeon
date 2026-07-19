@@ -500,6 +500,28 @@ describe('Health and plans', () => {
         expect(res.body.synthetic).toBe(true);
     });
 
+    test('GET health returns real monitor data when a matching Monitor exists', async () => {
+        const Monitor = require('../models/Monitor');
+        await seedListing({ id: 'health-3', baseUrl: 'https://realmon.test' });
+        await Monitor.create({
+            userId: new mongoose.Types.ObjectId(),
+            name: 'Real',
+            url: 'https://realmon.test/uptime',
+            method: 'GET',
+            interval: 1,
+            currentStatus: 'up',
+            averageResponseTime: 123,
+            uptimePercentage: 99.9,
+            totalChecks: 100,
+            totalFailures: 1
+        });
+        const res = await request(app).get('/api/marketplace/listings/health-3/health');
+        expect(res.body.synthetic).toBe(false);
+        expect(res.body.current.status).toBe('operational');
+        expect(res.body.current.factors.avgResponseTimeMs).toBe(123);
+        expect(res.body.current.factors.uptimePercent).toBe(99);
+    });
+
     test('GET plans returns plans from the DB for the listing', async () => {
         const MarketplacePlan = require('../server/models/MarketplacePlan');
         await seedListing({ id: 'plans-1' });

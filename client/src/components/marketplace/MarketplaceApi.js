@@ -116,10 +116,16 @@ export const MarketplaceApi = {
         });
         return jsonOrThrow(res);
     },
-    async publishListing(listingId) {
-        const res = await fetch(`/api/marketplace/listings/${listingId}/publish`, {
+    async listPendingListings() {
+        const res = await fetch('/api/marketplace/listings/pending', { credentials: 'include' });
+        return jsonOrThrow(res);
+    },
+    async moderateListing(listingId, action) {
+        const res = await fetch(`/api/marketplace/listings/${listingId}/moderate`, {
             method: 'POST',
-            credentials: 'include'
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({ action })
         });
         return jsonOrThrow(res);
     }

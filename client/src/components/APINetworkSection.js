@@ -8,6 +8,8 @@ import RequestForm from './RequestForm';
 import ResponseDisplay from './ResponseDisplay';
 import HistorySection from './HistorySection';
 import ExplorePage from './marketplace/ExplorePage';
+import MarketplaceSubmitListing from './marketplace/MarketplaceSubmitListing';
+import MarketplaceModerationQueue from './marketplace/MarketplaceModerationQueue';
 import { toast } from 'react-toastify';
 import { FiPlus, FiFileText, FiSearch, FiChevronRight, FiGrid, FiClock, FiSidebar, FiChevronsLeft } from 'react-icons/fi';
 import MainShell from './common/MainShell/MainShell';
@@ -340,6 +342,16 @@ const APINetworkSection = () => {
                     <Route path="explore" element={
                         <MainShell>
                             <ExplorePage />
+                        </MainShell>
+                    } />
+                    <Route path="explore/submit" element={
+                        <MainShell>
+                            <MarketplaceSubmitListing />
+                        </MainShell>
+                    } />
+                    <Route path="explore/moderate" element={
+                        <MainShell>
+                            <MarketplaceModerationQueue />
                         </MainShell>
                     } />
                     <Route path="history" element={<Navigate to="/workspace/history" replace />} />
