@@ -3,6 +3,7 @@ const router = express.Router();
 const ReviewRequest = require('../models/ReviewRequest');
 const ActivityLog = require('../models/ActivityLog');
 const Collection = require('../models/Collection');
+const { broadcastActivity } = require('../utils/socket/socket-server');
 
 // Middleware to check authentication (simplified)
 const ensureAuthenticated = (req, res, next) => {
@@ -34,7 +35,7 @@ router.post('/', ensureAuthenticated, async (req, res) => {
         await review.save();
 
         // Log activity
-        await ActivityLog.create({
+        const activity = await ActivityLog.create({
             workspaceId: req.session.workspaceId || 'default', // Ideally from context
             user: req.user._id,
             actionType: 'review_request',
@@ -47,7 +48,10 @@ router.post('/', ensureAuthenticated, async (req, res) => {
             }
         });
 
-        // Emit socket event (handled via socket service in a real app, or client triggers)
+        // Broadcast populated activity to all connected clients
+        const populatedActivity = await ActivityLog.findById(activity._id)
+            .populate('user', 'displayName');
+        broadcastActivity(populatedActivity);
 
         res.status(201).json(review);
     } catch (err) {
@@ -68,13 +72,12 @@ router.patch('/:id/status', ensureAuthenticated, async (req, res) => {
         // Find the reviewer entry for this user
         const reviewerIndex = review.reviewers.findIndex(r => r.user.toString() === req.user._id.toString());
 
-        if (reviewerIndex >= 0) {
-            review.reviewers[reviewerIndex].status = status;
-            review.reviewers[reviewerIndex].reviewedAt = new Date();
-        } else {
-            // Allow ad-hoc reviews? or error?
-            // For now, let's treat it as a general status update if it's the owner or admin
+        if (reviewerIndex < 0) {
+            return res.status(403).json({ error: 'Only assigned reviewers can approve or reject this review' });
         }
+
+        review.reviewers[reviewerIndex].status = status;
+        review.reviewers[reviewerIndex].reviewedAt = new Date();
 
         // If all reviewers approved, mark main status as approved
         const allApproved = review.reviewers.length > 0 && review.reviewers.every(r => r.status === 'approved');
@@ -87,7 +90,7 @@ router.patch('/:id/status', ensureAuthenticated, async (req, res) => {
         await review.save();
 
         // Log activity
-        await ActivityLog.create({
+        const activity = await ActivityLog.create({
             workspaceId: 'default',
             user: req.user._id,
             actionType: status === 'approved' ? 'review_approve' : 'review_reject',
@@ -96,6 +99,10 @@ router.patch('/:id/status', ensureAuthenticated, async (req, res) => {
             resourceName: review.title,
             details: { comment }
         });
+
+        const populatedActivity = await ActivityLog.findById(activity._id)
+            .populate('user', 'displayName');
+        broadcastActivity(populatedActivity);
 
         res.json(review);
     } catch (err) {

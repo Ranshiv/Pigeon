@@ -1,0 +1,209 @@
+.rrm-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    animation: rrm-fade-in 0.2s ease;
+}
+
+@keyframes rrm-fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.rrm-modal {
+    position: relative;
+    width: 100%;
+    max-width: 480px;
+    max-height: 90vh;
+    overflow: hidden;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border-color);
+    background: var(--card-bg);
+    box-shadow: var(--shadow-lg);
+    animation: rrm-zoom-in 0.2s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+@keyframes rrm-zoom-in {
+    from { transform: scale(0.96); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+.rrm-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.rrm-title {
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--text-color);
+    margin: 0;
+}
+
+.rrm-subtitle {
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin: 4px 0 0;
+}
+
+.rrm-body {
+    padding: 24px;
+    overflow-y: auto;
+}
+
+.rrm-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.rrm-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.rrm-label {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-color);
+}
+
+.rrm-input,
+.rrm-textarea,
+.rrm-select {
+    width: 100%;
+    padding: 9px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    background: var(--background-color);
+    color: var(--text-color);
+    font-family: inherit;
+    font-size: 13px;
+    outline: none;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.rrm-input:focus,
+.rrm-textarea:focus,
+.rrm-select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary-color) 15%, transparent);
+}
+
+.rrm-input::placeholder,
+.rrm-textarea::placeholder {
+    color: var(--text-muted);
+}
+
+.rrm-textarea {
+    min-height: 80px;
+    resize: vertical;
+}
+
+.rrm-reviewer-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    max-height: 160px;
+    overflow-y: auto;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    background: var(--background-color);
+    padding: 6px;
+}
+
+.rrm-reviewer-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-color);
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+.rrm-reviewer-row:hover {
+    background: var(--hover-bg);
+}
+
+.rrm-reviewer-row input[type="checkbox"] {
+    flex-shrink: 0;
+}
+
+.rrm-hint {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin: 0;
+}
+
+.rrm-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding-top: 8px;
+}
+
+.rrm-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 9px 16px;
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    font-weight: 500;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.rrm-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.rrm-btn--secondary {
+    background: var(--card-bg);
+    color: var(--text-secondary);
+    border-color: var(--border-color);
+}
+
+.rrm-btn--secondary:hover:not(:disabled) {
+    background: var(--hover-bg);
+    color: var(--text-color);
+}
+
+.rrm-btn--primary {
+    background: var(--primary-color);
+    color: #fff;
+    border-color: var(--primary-color);
+}
+
+.rrm-btn--primary:hover:not(:disabled) {
+    background: var(--primary-hover);
+    border-color: var(--primary-hover);
+}
+
+.rrm-spinner {
+    width: 14px;
+    height: 14px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: rrm-spin 0.8s linear infinite;
+}
+
+@keyframes rrm-spin {
+    to { transform: rotate(360deg); }
+}

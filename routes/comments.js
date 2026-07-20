@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Comment = require('../models/Comment');
 const ActivityLog = require('../models/ActivityLog');
+const { broadcastActivity } = require('../utils/socket/socket-server');
 
 const ensureAuthenticated = (req, res, next) => {
     if (req.isAuthenticated && req.isAuthenticated()) {
@@ -31,7 +32,7 @@ router.post('/', ensureAuthenticated, async (req, res) => {
         await comment.populate('author', 'displayName email profilePicture');
 
         // Log activity
-        await ActivityLog.create({
+        const activity = await ActivityLog.create({
             workspaceId: 'default', // Should ideally come from request context
             user: req.user._id,
             actionType: 'comment',
@@ -43,6 +44,10 @@ router.post('/', ensureAuthenticated, async (req, res) => {
                 snippet: content.substring(0, 50)
             }
         });
+
+        const populatedActivity = await ActivityLog.findById(activity._id)
+            .populate('user', 'displayName');
+        broadcastActivity(populatedActivity);
 
         res.status(201).json(comment);
     } catch (err) {

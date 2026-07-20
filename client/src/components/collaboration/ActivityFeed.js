@@ -1,30 +1,18 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Link } from 'react-router-dom';
 import { useCollaboration } from '../../context/CollaborationContext';
 import { formatDistanceToNow } from 'date-fns';
-import { FiMessageSquare, FiCheckCircle, FiXCircle, FiFileText, FiActivity } from 'react-icons/fi';
+import { FiMessageSquare, FiCheckCircle, FiXCircle, FiFileText, FiActivity, FiRefreshCw, FiSend } from 'react-icons/fi';
 
 const ActivityFeed = ({ isOpen, onToggle }) => {
     const { socket } = useCollaboration();
     const [activities, setActivities] = useState([]);
+    const [refreshing, setRefreshing] = useState(false);
+    const [scope, setScope] = useState('team'); // 'me' | 'team'
 
-    useEffect(() => {
-        fetchActivities();
-
-        const handleNewActivity = (activity) => {
-            setActivities(prev => [activity, ...prev]);
-        };
-
-        if (socket) {
-            socket.on('activityLog', handleNewActivity);
-        }
-        return () => {
-            if (socket) socket.off('activityLog', handleNewActivity);
-        };
-    }, [socket]);
-
-    const fetchActivities = async () => {
+    const fetchActivities = useCallback(async () => {
         try {
-            const res = await fetch('http://localhost:5001/api/activities', { credentials: 'include' });
+            const res = await fetch(`/api/activities?scope=${scope}`, { credentials: 'include' });
             if (res.ok) {
                 const data = await res.json();
                 setActivities(data);
@@ -32,6 +20,29 @@ const ActivityFeed = ({ isOpen, onToggle }) => {
         } catch (err) {
             console.error(err);
         }
+    }, [scope]);
+
+    useEffect(() => {
+        fetchActivities();
+    }, [fetchActivities, scope]);
+
+    useEffect(() => {
+        if (!socket) return;
+
+        const handleNewActivity = (activity) => {
+            setActivities(prev => [activity, ...prev]);
+        };
+
+        socket.on('activityLog', handleNewActivity);
+        return () => {
+            socket.off('activityLog', handleNewActivity);
+        };
+    }, [socket]);
+
+    const handleRefresh = async () => {
+        setRefreshing(true);
+        await fetchActivities();
+        setTimeout(() => setRefreshing(false), 300);
     };
 
     const timeAgo = (date) => {
@@ -42,12 +53,25 @@ const ActivityFeed = ({ isOpen, onToggle }) => {
         }
     };
 
+    const getActivityLink = (act) => {
+        if (!act) return null;
+        if (act.resourceType === 'review') return '/workspace/reviews';
+        if (act.resourceType === 'collection' && act.resourceId) {
+            return `/workspace/collections/${act.resourceId}`;
+        }
+        if (act.resourceType === 'request' && act.resourceId) {
+            return `/workspace/api-network/requests/${act.resourceId}`;
+        }
+        return null;
+    };
+
     const getActivityIcon = (type) => {
         const actionType = type?.toLowerCase() || '';
         if (actionType.includes('approve')) return { icon: <FiCheckCircle size={12} />, bg: 'bg-emerald-500/10', color: 'text-emerald-500' };
         if (actionType.includes('reject')) return { icon: <FiXCircle size={12} />, bg: 'bg-rose-500/10', color: 'text-rose-500' };
         if (actionType.includes('comment')) return { icon: <FiMessageSquare size={12} />, bg: 'bg-amber-500/10', color: 'text-amber-500' };
         if (actionType.includes('request')) return { icon: <FiFileText size={12} />, bg: 'bg-[var(--primary-color)]/10', color: 'text-[var(--primary-color)]' };
+        if (actionType.includes('api_test') || actionType.includes('test')) return { icon: <FiSend size={12} />, bg: 'bg-blue-500/10', color: 'text-blue-500' };
         return { icon: <FiActivity size={12} />, bg: 'bg-slate-500/10', color: 'text-slate-500' };
     };
 
@@ -78,10 +102,37 @@ const ActivityFeed = ({ isOpen, onToggle }) => {
                     ${isOpen ? 'translate-x-0' : 'translate-x-full'}
                 `}
             >
-                <div className="flex items-center justify-between p-5 pb-3">
-                    <h3 className="text-[13px] font-bold uppercase tracking-wider text-[var(--text-color)] opacity-90">Team Activity</h3>
-                    <div className="flex h-5 items-center justify-center rounded bg-[var(--primary-color)] px-1.5 text-[11px] font-bold text-white shadow-sm opacity-90">
-                        {activities.length}
+                <div className="p-5 pb-3">
+                    <div className="mb-3 flex items-center justify-between">
+                        <h3 className="text-[13px] font-bold uppercase tracking-wider text-[var(--text-color)] opacity-90">{scope === 'me' ? 'My Activity' : 'Team Activity'}</h3>
+                        <div className="flex items-center gap-2">
+                            <button
+                                onClick={handleRefresh}
+                                title="Refresh activity"
+                                className={`flex items-center justify-center rounded p-1 text-[var(--text-muted)] transition-colors hover:bg-[var(--hover-bg)] hover:text-[var(--text-color)] ${refreshing ? 'animate-spin' : ''}`}
+                            >
+                                <FiRefreshCw size={14} />
+                            </button>
+                            <div className="flex h-5 items-center justify-center rounded bg-[var(--primary-color)] px-1.5 text-[11px] font-bold text-white shadow-sm opacity-90">
+                                {activities.length}
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Scope selector */}
+                    <div className="flex rounded-md border border-[var(--border-color)] bg-[var(--card-bg)] p-0.5">
+                        <button
+                            onClick={() => setScope('me')}
+                            className={`flex-1 rounded px-2 py-1 text-[11px] font-medium transition-colors ${scope === 'me' ? 'bg-[var(--primary-color)] text-white shadow-sm' : 'text-[var(--text-secondary)] hover:text-[var(--text-color)]'}`}
+                        >
+                            My Activity
+                        </button>
+                        <button
+                            onClick={() => setScope('team')}
+                            className={`flex-1 rounded px-2 py-1 text-[11px] font-medium transition-colors ${scope === 'team' ? 'bg-[var(--primary-color)] text-white shadow-sm' : 'text-[var(--text-secondary)] hover:text-[var(--text-color)]'}`}
+                        >
+                            Team
+                        </button>
                     </div>
                 </div>
 
@@ -100,9 +151,9 @@ const ActivityFeed = ({ isOpen, onToggle }) => {
                         {activities.map((act, idx) => {
                             const iconConfig = getActivityIcon(act.actionType);
                             const isLast = idx === activities.length - 1;
-
-                            return (
-                                <div key={act._id} className={`group relative flex gap-4 py-3 ${!isLast ? '' : ''}`}>
+                            const link = getActivityLink(act);
+                            const content = (
+                                <>
                                     {/* Icon container with solid background to break the line */}
                                     <div className="relative z-10 flex h-7 w-7 flex-none items-center justify-center rounded-full bg-[var(--sidebar-bg)]">
                                         <div className={`flex h-[22px] w-[22px] items-center justify-center rounded-full ${iconConfig.bg} ${iconConfig.color}`}>
@@ -120,7 +171,7 @@ const ActivityFeed = ({ isOpen, onToggle }) => {
                                                 {act.actionType?.toLowerCase().replace(/_/g, ' ')}
                                             </span>
                                             {' '}
-                                            <span className="font-semibold text-[var(--text-color)]">
+                                            <span className={`font-semibold text-[var(--text-color)] ${link ? 'group-hover:underline group-hover:text-[var(--primary-color)]' : ''}`}>
                                                 {act.resourceName}
                                             </span>
                                         </p>
@@ -128,6 +179,21 @@ const ActivityFeed = ({ isOpen, onToggle }) => {
                                             {timeAgo(act.createdAt)}
                                         </span>
                                     </div>
+                                </>
+                            );
+
+                            return link ? (
+                                <Link
+                                    key={act._id}
+                                    to={link}
+                                    className="group relative flex gap-4 py-3 cursor-pointer"
+                                    title="Open related resource"
+                                >
+                                    {content}
+                                </Link>
+                            ) : (
+                                <div key={act._id} className="group relative flex gap-4 py-3">
+                                    {content}
                                 </div>
                             );
                         })}

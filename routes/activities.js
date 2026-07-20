@@ -12,11 +12,15 @@ const ensureAuthenticated = (req, res, next) => {
 // Get activity logs
 router.get('/', ensureAuthenticated, async (req, res) => {
     try {
-        const { limit = 20 } = req.query;
-        // Fetch logs for user's workspace(s)
-        // For now, getting all logs where user is involved or default view
+        const { limit = 20, scope = 'team' } = req.query;
+        const workspaceId = req.session.workspaceId || 'default';
+        const query = { workspaceId };
 
-        const logs = await ActivityLog.find()
+        if (scope === 'me') {
+            query.user = req.user._id;
+        }
+
+        const logs = await ActivityLog.find(query)
             .populate('user', 'displayName')
             .sort({ createdAt: -1 })
             .limit(parseInt(limit));

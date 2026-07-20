@@ -22,7 +22,8 @@ import {
     FiBarChart2,
     FiShield,
     FiBook,  // Add FiBook icon for documentation
-    FiLink   // Add FiLink icon for protocols
+    FiLink,  // Add FiLink icon for protocols
+    FiFileText
 } from 'react-icons/fi';
 import { TbVectorTriangle } from 'react-icons/tb'; // Mesh network icon for GraphQL
 import Notifications from './Notifications'; // Import the Notifications component
@@ -432,6 +433,9 @@ const Navbar = ({ isAuthenticated }) => {
                                             </div>
                                             <div className="dropdown-item" onClick={() => handleNavigation('/workspace/api-network/requests/new')}>
                                                 <FiPlus size={16} style={{ marginRight: '10px' }} /> Add Request
+                                            </div>
+                                            <div className="dropdown-item" onClick={() => handleNavigation('/workspace/reviews')}>
+                                                <FiFileText size={16} style={{ marginRight: '10px' }} /> Reviews
                                             </div>
                                         </div>
                                     )}

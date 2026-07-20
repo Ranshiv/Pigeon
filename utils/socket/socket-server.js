@@ -18,6 +18,15 @@ const protocolSessions = {
  * @param {Object} server - HTTP server instance
  * @return {Object} - Socket.io instance
  */
+function broadcastActivity(activity) {
+    if (!ioInstance) {
+        console.warn('broadcastActivity called before socket server initialized');
+        return;
+    }
+    const room = `workspace:${activity?.workspaceId || 'default'}`;
+    ioInstance.to(room).emit('activityLog', activity);
+}
+
 function initializeSocketServer(server) {
     const io = socketIo(server, {
         cors: {
@@ -796,6 +805,7 @@ function cleanupProtocolSessions(socketId) {
 
 module.exports = {
     initializeSocketServer,
+    broadcastActivity,
     getUserSockets: () => userSockets,
     getIO: () => ioInstance,
     getProtocolSessions: () => protocolSessions,

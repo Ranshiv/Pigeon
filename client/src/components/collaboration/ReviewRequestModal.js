@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useCollaboration } from '../../context/CollaborationContext';
+import './ReviewRequestModal.css';
 
 const ReviewRequestModal = ({ isOpen, onClose, resourceId, resourceType, resourceName }) => {
     const [title, setTitle] = useState('');
@@ -11,7 +12,8 @@ const ReviewRequestModal = ({ isOpen, onClose, resourceId, resourceType, resourc
     useEffect(() => {
         if (isOpen) {
             setTitle(`Review for ${resourceName || resourceType}`);
-            // Fetch potential reviewers (team members)
+            setDescription('');
+            setSelectedReviewers([]);
             fetchTeamMembers();
         }
     }, [isOpen, resourceName, resourceType]);
@@ -28,19 +30,14 @@ const ReviewRequestModal = ({ isOpen, onClose, resourceId, resourceType, resourc
 
             let members = [];
 
-            // Fetch ALL users for easier collaboration
             const res = await fetch('/api/auth/users/list', { credentials: 'include' });
             if (res.ok) {
                 const users = await res.json();
-                console.log('Fetched users:', users);
                 members = users;
             } else {
-                console.warn('Failed to fetch all users, falling back to teams');
-                // Use existing teams endpoint
                 const teamRes = await fetch('/api/teams', { credentials: 'include' });
                 if (teamRes.ok) {
                     const teams = await teamRes.json();
-                    // Flatten all members from all teams
                     const allMembers = new Map();
                     teams.forEach(t => {
                         t.members.forEach(m => {
@@ -52,7 +49,6 @@ const ReviewRequestModal = ({ isOpen, onClose, resourceId, resourceType, resourc
                 }
             }
 
-            // Ensure current user is in the list (for testing/self-review)
             if (currentUser && currentUser.id) {
                 const alreadyExists = members.some(m => m._id === currentUser.id);
                 if (!alreadyExists) {
@@ -62,7 +58,6 @@ const ReviewRequestModal = ({ isOpen, onClose, resourceId, resourceType, resourc
                         email: currentUser.email
                     });
                 } else {
-                    // Update display name for clarity
                     members = members.map(m => m._id === currentUser.id ? { ...m, displayName: `${m.displayName} (Self)` } : m);
                 }
             }
@@ -77,7 +72,7 @@ const ReviewRequestModal = ({ isOpen, onClose, resourceId, resourceType, resourc
         e.preventDefault();
         setLoading(true);
         try {
-            const res = await fetch('http://localhost:5001/api/reviews', {
+            const res = await fetch('/api/reviews', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 credentials: 'include',
@@ -92,10 +87,9 @@ const ReviewRequestModal = ({ isOpen, onClose, resourceId, resourceType, resourc
 
             if (res.ok) {
                 onClose();
-                // Maybe trigger a toast or context refresh
-                alert('Review request sent!');
             } else {
-                alert('Failed to send review request');
+                const errData = await res.json().catch(() => ({}));
+                alert(errData.error || 'Failed to send review request');
             }
         } catch (err) {
             console.error(err);
@@ -108,93 +102,80 @@ const ReviewRequestModal = ({ isOpen, onClose, resourceId, resourceType, resourc
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
-            <div className="relative w-full max-w-lg overflow-hidden rounded-xl border border-slate-800 bg-slate-950 shadow-2xl animate-in zoom-in-95 duration-200 p-0">
-
-                {/* Header */}
-                <div className="flex flex-col space-y-1.5 p-6 border-b border-slate-800 bg-slate-950">
-                    <h3 className="font-semibold leading-none tracking-tight text-white text-lg">Request Review</h3>
-                    <p className="text-sm text-slate-400">Invite team members to review this resource.</p>
+        <div className="rrm-overlay" onClick={onClose}>
+            <div className="rrm-modal" onClick={(e) => e.stopPropagation()}>
+                <div className="rrm-header">
+                    <h3 className="rrm-title">Request Review</h3>
+                    <p className="rrm-subtitle">Invite team members to review this resource.</p>
                 </div>
 
-                {/* Content */}
-                <div className="p-6 pt-6">
-                    <form onSubmit={handleSubmit} className="space-y-4">
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-slate-200">
-                                Title
-                            </label>
+                <div className="rrm-body">
+                    <form onSubmit={handleSubmit} className="rrm-form">
+                        <div className="rrm-field">
+                            <label className="rrm-label">Title</label>
                             <input
-                                className="flex h-10 w-full rounded-md border border-slate-800 bg-slate-900 px-3 py-2 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2 focus:ring-offset-slate-950 disabled:cursor-not-allowed disabled:opacity-50"
+                                className="rrm-input"
                                 value={title}
-                                onChange={e => setTitle(e.target.value)}
+                                onChange={(e) => setTitle(e.target.value)}
                                 required
-                                placeholder="Review Title"
+                                placeholder="Review title"
                             />
                         </div>
 
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-slate-200">
-                                Description
-                            </label>
+                        <div className="rrm-field">
+                            <label className="rrm-label">Description</label>
                             <textarea
-                                className="flex min-h-[80px] w-full rounded-md border border-slate-800 bg-slate-900 px-3 py-2 text-sm text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2 focus:ring-offset-slate-950 disabled:cursor-not-allowed disabled:opacity-50"
+                                className="rrm-textarea"
                                 value={description}
-                                onChange={e => setDescription(e.target.value)}
+                                onChange={(e) => setDescription(e.target.value)}
                                 placeholder="Describe what needs to be reviewed..."
                             />
                         </div>
 
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-slate-200">
-                                Reviewers
-                            </label>
-                            <select
-                                className="flex h-24 w-full rounded-md border border-slate-800 bg-slate-900 px-3 py-2 text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2 focus:ring-offset-slate-950"
-                                multiple
-                                value={selectedReviewers}
-                                onChange={e => {
-                                    const options = [...e.target.selectedOptions];
-                                    const values = options.map(option => option.value);
-                                    setSelectedReviewers(values);
-                                }}
-                            >
-                                {teamMembers.map(user => (
-                                    <option
-                                        key={user._id}
-                                        value={user._id}
-                                        className="py-1 px-2 checked:bg-blue-900 checked:text-white hover:bg-slate-800"
-                                    >
-                                        {user.displayName || user.email}
-                                    </option>
-                                ))}
-                            </select>
-                            <p className="text-[0.8rem] text-slate-500">
-                                Hold Ctrl/Cmd to select multiple reviewers.
-                            </p>
+                        <div className="rrm-field">
+                            <label className="rrm-label">Reviewers</label>
+                            <div className="rrm-reviewer-list">
+                                {teamMembers.map((user) => {
+                                    const checked = selectedReviewers.includes(user._id);
+                                    return (
+                                        <label key={user._id} className="rrm-reviewer-row">
+                                            <input
+                                                type="checkbox"
+                                                checked={checked}
+                                                onChange={(e) => {
+                                                    setSelectedReviewers((prev) =>
+                                                        e.target.checked
+                                                            ? [...prev, user._id]
+                                                            : prev.filter((id) => id !== user._id)
+                                                    );
+                                                }}
+                                            />
+                                            {user.displayName || user.email}
+                                        </label>
+                                    );
+                                })}
+                            </div>
+                            <p className="rrm-hint">Select one or more reviewers.</p>
                         </div>
 
-                        {/* Footer */}
-                        <div className="flex items-center justify-end space-x-2 pt-4">
+                        <div className="rrm-footer">
                             <button
                                 type="button"
+                                className="rrm-btn rrm-btn--secondary"
                                 onClick={onClose}
-                                className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background border border-slate-800 hover:bg-slate-800 hover:text-white h-10 py-2 px-4 bg-transparent text-slate-300"
+                                disabled={loading}
                             >
                                 Cancel
                             </button>
                             <button
                                 type="submit"
-                                disabled={loading}
-                                className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background bg-blue-600 text-white hover:bg-blue-700 h-10 py-2 px-4 shadow-sm"
+                                className="rrm-btn rrm-btn--primary"
+                                disabled={loading || selectedReviewers.length === 0}
                             >
                                 {loading ? (
                                     <>
-                                        <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                        </svg>
-                                        Sending...
+                                        <span className="rrm-spinner"></span>
+                                        Sending…
                                     </>
                                 ) : 'Send Request'}
                             </button>

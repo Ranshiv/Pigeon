@@ -1,12 +1,17 @@
 import React, { useState, useEffect } from 'react';
+import { formatDistanceToNow } from 'date-fns';
+import { FiCheckCircle, FiXCircle, FiEdit2, FiEye, FiPlus, FiClock, FiUser, FiCheckSquare } from 'react-icons/fi';
+import ReviewRequestModal from './ReviewRequestModal';
+import './ReviewDashboard.css';
 
 const ReviewDashboard = () => {
     const [reviews, setReviews] = useState([]);
-    const [filter, setFilter] = useState('assigned'); // 'assigned' or 'created'
+    const [filter, setFilter] = useState('assigned');
     const [loading, setLoading] = useState(true);
     const [editingReview, setEditingReview] = useState(null);
     const [editTitle, setEditTitle] = useState('');
     const [editDescription, setEditDescription] = useState('');
+    const [showCreateModal, setShowCreateModal] = useState(false);
 
     useEffect(() => {
         fetchReviews();
@@ -15,9 +20,7 @@ const ReviewDashboard = () => {
     const fetchReviews = async () => {
         setLoading(true);
         try {
-            const res = await fetch(`/api/reviews?type=${filter}`, {
-                credentials: 'include'
-            });
+            const res = await fetch(`/api/reviews?type=${filter}`, { credentials: 'include' });
             if (res.ok) {
                 const data = await res.json();
                 setReviews(data);
@@ -37,9 +40,7 @@ const ReviewDashboard = () => {
                 credentials: 'include',
                 body: JSON.stringify({ status })
             });
-            if (res.ok) {
-                fetchReviews(); // Refresh list
-            }
+            if (res.ok) fetchReviews();
         } catch (err) {
             console.error('Failed to update status', err);
         }
@@ -63,207 +64,200 @@ const ReviewDashboard = () => {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
                 credentials: 'include',
-                body: JSON.stringify({
-                    title: editTitle,
-                    description: editDescription
-                })
+                body: JSON.stringify({ title: editTitle, description: editDescription })
             });
             if (res.ok) {
                 setEditingReview(null);
                 setEditTitle('');
                 setEditDescription('');
-                fetchReviews(); // Refresh list
-            } else {
-                alert('Failed to update review');
+                fetchReviews();
             }
         } catch (err) {
             console.error('Failed to update review', err);
-            alert('Error updating review');
         }
     };
 
-    // Helper for status badge styles
-    const getStatusStyle = (status) => {
-        switch (status) {
-            case 'approved':
-                return 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20';
-            case 'rejected':
-                return 'bg-red-500/10 text-red-400 border-red-500/20';
-            default:
-                return 'bg-blue-500/10 text-blue-400 border-blue-500/20';
-        }
+    const statusConfig = {
+        approved: { label: 'Approved', icon: FiCheckCircle, class: 'status--approved' },
+        rejected: { label: 'Rejected', icon: FiXCircle, class: 'status--rejected' },
+        open: { label: 'Open', icon: FiClock, class: 'status--open' }
+    };
+
+    const stats = {
+        total: reviews.length,
+        open: reviews.filter(r => r.status === 'open').length,
+        approved: reviews.filter(r => r.status === 'approved').length,
+        rejected: reviews.filter(r => r.status === 'rejected').length
     };
 
     return (
-        <div className="min-h-full bg-slate-950 p-6 md:p-10 font-sans text-slate-100 animate-in fade-in duration-500">
-            <div className="max-w-5xl mx-auto space-y-8">
-                {/* Header */}
-                <div className="flex flex-col space-y-2">
-                    <h2 className="text-3xl font-bold tracking-tight text-white">Reviews</h2>
-                    <p className="text-slate-400">Manage your review requests and feedback.</p>
+        <div className="rd-shell">
+            <div className="rd-container">
+                <div className="rd-header">
+                    <div className="rd-header__left">
+                        <div className="rd-header__icon" aria-hidden="true"><FiCheckSquare /></div>
+                        <div>
+                            <h2 className="rd-title">Reviews</h2>
+                            <p className="rd-subtitle">Request, manage, and respond to reviews.</p>
+                        </div>
+                    </div>
+                    <button className="rd-btn rd-btn--primary" onClick={() => setShowCreateModal(true)}>
+                        <FiPlus size={16} />
+                        New Review
+                    </button>
                 </div>
 
-                {/* Tabs / Filter */}
-                <div className="border-b border-slate-800">
-                    <div className="flex space-x-6">
-                        <button
-                            onClick={() => setFilter('assigned')}
-                            className={`pb-3 text-sm font-medium transition-colors relative ${filter === 'assigned'
-                                ? 'text-blue-400 border-b-2 border-blue-400'
-                                : 'text-slate-400 hover:text-slate-200'
-                                }`}
-                        >
-                            Assigned to Me
-                        </button>
-                        <button
-                            onClick={() => setFilter('created')}
-                            className={`pb-3 text-sm font-medium transition-colors relative ${filter === 'created'
-                                ? 'text-blue-400 border-b-2 border-blue-400'
-                                : 'text-slate-400 hover:text-slate-200'
-                                }`}
-                        >
-                            Created by Me
-                        </button>
+                <div className="rd-stats">
+                    <div className="rd-stat">
+                        <span className="rd-stat__value">{stats.total}</span>
+                        <span className="rd-stat__label">Total</span>
+                    </div>
+                    <div className="rd-stat">
+                        <span className="rd-stat__value rd-stat__value--open">{stats.open}</span>
+                        <span className="rd-stat__label">Open</span>
+                    </div>
+                    <div className="rd-stat">
+                        <span className="rd-stat__value rd-stat__value--approved">{stats.approved}</span>
+                        <span className="rd-stat__label">Approved</span>
+                    </div>
+                    <div className="rd-stat">
+                        <span className="rd-stat__value rd-stat__value--rejected">{stats.rejected}</span>
+                        <span className="rd-stat__label">Rejected</span>
                     </div>
                 </div>
 
-                {/* Content */}
+                <div className="rd-tabs">
+                    <button
+                        className={`rd-tab ${filter === 'assigned' ? 'rd-tab--active' : ''}`}
+                        onClick={() => setFilter('assigned')}
+                    >
+                        Assigned to Me
+                    </button>
+                    <button
+                        className={`rd-tab ${filter === 'created' ? 'rd-tab--active' : ''}`}
+                        onClick={() => setFilter('created')}
+                    >
+                        Created by Me
+                    </button>
+                </div>
+
+                <ReviewRequestModal
+                    isOpen={showCreateModal}
+                    onClose={() => { setShowCreateModal(false); fetchReviews(); }}
+                    resourceId="new-review"
+                    resourceType="review"
+                    resourceName="New Review"
+                />
+
                 {loading ? (
-                    <div className="flex justify-center items-center py-20 text-slate-500">
-                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mr-3"></div>
-                        Loading reviews...
+                    <div className="rd-empty">
+                        <div className="rd-spinner"></div>
+                        <span>Loading reviews…</span>
                     </div>
                 ) : reviews.length === 0 ? (
-                    <div className="text-center py-20 bg-slate-900/50 rounded-lg border border-slate-800 border-dashed">
-                        <p className="text-slate-500">No reviews found.</p>
+                    <div className="rd-empty rd-empty--boxed">
+                        <p>No reviews found.</p>
+                        <button className="rd-btn rd-btn--primary" onClick={() => setShowCreateModal(true)}>
+                            Create your first review
+                        </button>
                     </div>
                 ) : (
-                    <div className="grid gap-4">
-                        {reviews.map(review => (
-                            <div
-                                key={review._id}
-                                className="group relative bg-slate-900/50 hover:bg-slate-900 border border-slate-800 hover:border-slate-700 rounded-lg p-5 transition-all duration-200 shadow-sm"
-                            >
-                                <div className="flex flex-col gap-4">
-                                    {/* Header Line */}
-                                    <div className="flex items-start justify-between gap-4">
-                                        <div className="flex-1 space-y-1">
-                                            {editingReview === review._id ? (
+                    <div className="rd-grid">
+                        {reviews.map(review => {
+                            const status = statusConfig[review.status] || statusConfig.open;
+                            const StatusIcon = status.icon;
+                            const isEditing = editingReview === review._id;
+
+                            return (
+                                <div key={review._id} className="rd-card">
+                                    <div className="rd-card__header">
+                                        <div className="rd-card__meta">
+                                            {isEditing ? (
                                                 <input
+                                                    className="rd-input"
                                                     value={editTitle}
                                                     onChange={(e) => setEditTitle(e.target.value)}
-                                                    className="w-full bg-slate-950 border border-blue-500/50 rounded px-3 py-1.5 text-white focus:outline-none focus:ring-1 focus:ring-blue-500"
-                                                    placeholder="Review title"
                                                     autoFocus
                                                 />
                                             ) : (
-                                                <h3 className="text-lg font-semibold text-white group-hover:text-blue-200 transition-colors">
-                                                    {review.title}
-                                                </h3>
+                                                <h3 className="rd-card__title">{review.title}</h3>
                                             )}
-                                        </div>
-                                        <div className={`px-2.5 py-0.5 rounded-full text-xs font-semibold border uppercase tracking-wide ${getStatusStyle(review.status)}`}>
-                                            {review.status}
-                                        </div>
-                                    </div>
-
-                                    {/* Description */}
-                                    <div className="relative">
-                                        {editingReview === review._id ? (
-                                            <textarea
-                                                value={editDescription}
-                                                onChange={(e) => setEditDescription(e.target.value)}
-                                                className="w-full min-h-[80px] bg-slate-950 border border-blue-500/50 rounded px-3 py-2 text-slate-300 focus:outline-none focus:ring-1 focus:ring-blue-500 text-sm"
-                                                placeholder="Add a description..."
-                                            />
-                                        ) : (
-                                            <p className="text-sm text-slate-400 leading-relaxed line-clamp-2">
-                                                {review.description || 'No description provided'}
-                                            </p>
-                                        )}
-                                    </div>
-
-                                    {/* Footer / Meta */}
-                                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-2 mt-2 border-t border-slate-800/50">
-                                        <div className="text-xs text-slate-500 flex flex-col sm:flex-row sm:gap-4">
-                                            <span>
-                                                Requested by
-                                                <span className="text-slate-300 font-medium ml-1">
-                                                    {review.requester?.displayName || 'Unknown'}
-                                                </span>
+                                            <span className={`rd-status ${status.class}`}>
+                                                <StatusIcon size={12} />
+                                                {status.label}
                                             </span>
-                                            <span className="hidden sm:inline text-slate-700">•</span>
-                                            <span>{new Date(review.createdAt).toLocaleDateString()}</span>
+                                        </div>
+                                    </div>
 
+                                    {isEditing ? (
+                                        <textarea
+                                            className="rd-textarea"
+                                            value={editDescription}
+                                            onChange={(e) => setEditDescription(e.target.value)}
+                                            rows={3}
+                                        />
+                                    ) : (
+                                        <p className="rd-card__desc">
+                                            {review.description || 'No description provided.'}
+                                        </p>
+                                    )}
+
+                                    <div className="rd-card__footer">
+                                        <div className="rd-card__info">
+                                            <span className="rd-card__info-item">
+                                                <FiUser size={12} />
+                                                {review.requester?.displayName || 'Unknown'}
+                                            </span>
+                                            <span className="rd-card__info-item">
+                                                <FiClock size={12} />
+                                                {formatDistanceToNow(new Date(review.createdAt), { addSuffix: true })}
+                                            </span>
                                             {review.status !== 'open' && review.reviewers?.length > 0 && (
-                                                <>
-                                                    <span className="hidden sm:inline text-slate-700">•</span>
-                                                    <span>
-                                                        Reviewed by:
-                                                        <span className="text-slate-300 ml-1">
-                                                            {review.reviewers.map(r => r.user?.displayName || 'Unknown').join(', ')}
-                                                        </span>
-                                                    </span>
-                                                </>
+                                                <span className="rd-card__info-item">
+                                                    {review.reviewers.map(r => r.user?.displayName).filter(Boolean).join(', ')}
+                                                </span>
                                             )}
                                         </div>
 
-                                        {/* Actions */}
-                                        <div className="flex items-center gap-2">
-                                            {/* Edit Actions */}
+                                        <div className="rd-card__actions">
                                             {filter === 'created' && (
-                                                editingReview === review._id ? (
+                                                isEditing ? (
                                                     <>
-                                                        <button
-                                                            onClick={(e) => { e.stopPropagation(); handleSaveEdit(review._id); }}
-                                                            className="px-3 py-1.5 rounded text-xs font-medium bg-emerald-600 hover:bg-emerald-500 text-white transition-colors"
-                                                        >
-                                                            Save
-                                                        </button>
-                                                        <button
-                                                            onClick={(e) => { e.stopPropagation(); handleCancelEdit(); }}
-                                                            className="px-3 py-1.5 rounded text-xs font-medium border border-slate-700 hover:bg-slate-800 text-slate-300 transition-colors"
-                                                        >
-                                                            Cancel
-                                                        </button>
+                                                        <button className="rd-btn rd-btn--success" onClick={() => handleSaveEdit(review._id)}>Save</button>
+                                                        <button className="rd-btn rd-btn--ghost" onClick={handleCancelEdit}>Cancel</button>
                                                     </>
                                                 ) : (
-                                                    <button
-                                                        onClick={(e) => { e.stopPropagation(); handleEdit(review); }}
-                                                        className="px-3 py-1.5 rounded text-xs font-medium border border-slate-700 hover:border-slate-600 hover:bg-slate-800 text-slate-400 hover:text-white transition-colors"
-                                                    >
+                                                    <button className="rd-btn rd-btn--ghost" onClick={() => handleEdit(review)}>
+                                                        <FiEdit2 size={14} />
                                                         Edit
                                                     </button>
                                                 )
                                             )}
 
-                                            {/* View Request */}
-                                            <button
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    const requestUrl = review.resourceType === 'collection'
-                                                        ? `/workspace/collections/${review.resourceId}`
-                                                        : `/workspace/api-network/requests/${review.resourceId}`;
-                                                    window.location.href = requestUrl;
-                                                }}
-                                                className="px-3 py-1.5 rounded text-xs font-medium bg-blue-600 hover:bg-blue-500 text-white transition-colors shadow-sm"
+                                            <a
+                                                href={review.resourceType === 'collection'
+                                                    ? `/workspace/collections/${review.resourceId}`
+                                                    : `/workspace/api-network/requests/${review.resourceId}`}
+                                                className="rd-btn rd-btn--ghost"
                                             >
-                                                View Request
-                                            </button>
+                                                <FiEye size={14} />
+                                                View
+                                            </a>
 
-                                            {/* Approve / Reject */}
                                             {filter === 'assigned' && review.status === 'open' && (
                                                 <>
                                                     <button
-                                                        onClick={(e) => { e.stopPropagation(); handleStatusUpdate(review._id, 'rejected'); }}
-                                                        className="px-3 py-1.5 rounded text-xs font-medium border border-red-900/50 hover:bg-red-900/20 text-red-500 transition-colors"
+                                                        className="rd-btn rd-btn--danger"
+                                                        onClick={() => handleStatusUpdate(review._id, 'rejected')}
                                                     >
+                                                        <FiXCircle size={14} />
                                                         Reject
                                                     </button>
                                                     <button
-                                                        onClick={(e) => { e.stopPropagation(); handleStatusUpdate(review._id, 'approved'); }}
-                                                        className="px-3 py-1.5 rounded text-xs font-medium bg-emerald-600 hover:bg-emerald-500 text-white transition-colors shadow-sm"
+                                                        className="rd-btn rd-btn--success"
+                                                        onClick={() => handleStatusUpdate(review._id, 'approved')}
                                                     >
+                                                        <FiCheckCircle size={14} />
                                                         Approve
                                                     </button>
                                                 </>
@@ -271,8 +265,8 @@ const ReviewDashboard = () => {
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                        ))}
+                            );
+                        })}
                     </div>
                 )}
             </div>

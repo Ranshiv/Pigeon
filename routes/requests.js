@@ -4,6 +4,8 @@ const router = express.Router();
 const { ensureAuthenticated } = require('../middleware/auth');
 const Request = require('../models/Request');
 const History = require('../models/History');
+const ActivityLog = require('../models/ActivityLog');
+const { broadcastActivity } = require('../utils/socket/socket-server');
 const fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args));
 const { executePreRequestScript, executeTestScript } = require('../utils/scriptRunner');
 const AuthenticationService = require('../services/AuthenticationService');
@@ -347,6 +349,29 @@ router.post('/:id/send', ensureAuthenticated, async (req, res) => {
             });
             await historyEntry.save();
             console.log("History entry saved for request ID:", requestDoc._id);
+
+            // Log activity for the sent request
+            try {
+                const activity = await ActivityLog.create({
+                    workspaceId: req.session.workspaceId || 'default',
+                    user: req.user.id,
+                    actionType: 'api_test',
+                    resourceId: String(requestDoc._id),
+                    resourceType: 'request',
+                    resourceName: `${method} ${requestWithScriptChanges.url || url}`,
+                    details: {
+                        status: responseStatus,
+                        duration,
+                        collectionId: req.body.collectionId || null
+                    }
+                });
+                const populatedActivity = await ActivityLog.findById(activity._id)
+                    .populate('user', 'displayName');
+                broadcastActivity(populatedActivity);
+            } catch (activityError) {
+                console.error("Error logging request activity:", activityError);
+                // Log the error, but don't fail the main request
+            }
         } catch (historyError) {
             console.error("Error saving history entry:", historyError);
             // Log the error, but don't fail the main request

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import Home from './Home';
 import APINetworkSection from './APINetworkSection';
@@ -30,8 +30,14 @@ import ActivityFeed from './collaboration/ActivityFeed';
 import ReviewDashboard from './collaboration/ReviewDashboard';
 
 const Workspace = () => {
-    const { emitCursorMove } = useCollaboration();
+    const { emitCursorMove, joinWorkspace, connected } = useCollaboration();
     const [isActivityOpen, setIsActivityOpen] = useState(false);
+
+    useEffect(() => {
+        if (connected) {
+            joinWorkspace('default');
+        }
+    }, [connected, joinWorkspace]);
 
     const handleMouseMove = (e) => {
         // Debounce happens in context or socket layer usually, but simple throttling here is okay too
