@@ -1,13 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const ActivityLog = require('../models/ActivityLog');
-
-const ensureAuthenticated = (req, res, next) => {
-    if (req.isAuthenticated && req.isAuthenticated()) {
-        return next();
-    }
-    return res.status(401).json({ error: 'Unauthorized' });
-};
+const { ensureAuthenticated } = require('../middleware/auth');
 
 // Get activity logs
 router.get('/', ensureAuthenticated, async (req, res) => {

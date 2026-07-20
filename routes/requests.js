@@ -19,10 +19,28 @@ const certificateManager = new CertificateManager();
 const userEnvironments = {};
 
 // Create a new request
-router.post('/', async (req, res) => {
+router.post('/', ensureAuthenticated, async (req, res) => {
     try {
         const newRequest = new Request(req.body);
         const savedRequest = await newRequest.save();
+
+        try {
+            const activity = await ActivityLog.create({
+                workspaceId: req.session?.workspaceId || 'default',
+                user: req.user?._id || req.session?.passport?.user,
+                actionType: 'create',
+                resourceId: String(savedRequest._id),
+                resourceType: 'request',
+                resourceName: savedRequest.name,
+                details: { method: savedRequest.method, url: savedRequest.url }
+            });
+            const populatedActivity = await ActivityLog.findById(activity._id)
+                .populate('user', 'displayName');
+            broadcastActivity(populatedActivity);
+        } catch (activityError) {
+            console.error('Error logging request creation activity:', activityError);
+        }
+
         res.status(201).json(savedRequest);
     } catch (err) {
         res.status(400).json({ message: err.message });
@@ -43,12 +61,30 @@ router.get('/:id', async (req, res) => {
 });
 
 // Update a specific request by ID
-router.put('/:id', async (req, res) => {
+router.put('/:id', ensureAuthenticated, async (req, res) => {
     try {
         const updatedRequest = await Request.findByIdAndUpdate(req.params.id, req.body, { new: true });
         if (!updatedRequest) {
             return res.status(404).json({ message: 'updated Request not found' });
         }
+
+        try {
+            const activity = await ActivityLog.create({
+                workspaceId: req.session?.workspaceId || 'default',
+                user: req.user?._id || req.session?.passport?.user,
+                actionType: 'update',
+                resourceId: String(updatedRequest._id),
+                resourceType: 'request',
+                resourceName: updatedRequest.name,
+                details: { method: updatedRequest.method, url: updatedRequest.url }
+            });
+            const populatedActivity = await ActivityLog.findById(activity._id)
+                .populate('user', 'displayName');
+            broadcastActivity(populatedActivity);
+        } catch (activityError) {
+            console.error('Error logging request update activity:', activityError);
+        }
+
         res.json(updatedRequest);
     } catch (err) {
         res.status(400).json({ message: err.message });

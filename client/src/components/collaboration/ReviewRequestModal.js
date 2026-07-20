@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useCollaboration } from '../../context/CollaborationContext';
+import AppSelect from '../common/AppSelect/AppSelect';
 import './ReviewRequestModal.css';
 
 const ReviewRequestModal = ({ isOpen, onClose, resourceId, resourceType, resourceName }) => {
@@ -8,15 +9,31 @@ const ReviewRequestModal = ({ isOpen, onClose, resourceId, resourceType, resourc
     const [teamMembers, setTeamMembers] = useState([]);
     const [selectedReviewers, setSelectedReviewers] = useState([]);
     const [loading, setLoading] = useState(false);
+    const [availableRequests, setAvailableRequests] = useState([]);
+    const [selectedRequestId, setSelectedRequestId] = useState(resourceId || '');
+
+    // No resourceId passed in means the caller wants the user to pick what's being reviewed.
+    const needsResourcePicker = !resourceId;
 
     useEffect(() => {
         if (isOpen) {
-            setTitle(`Review for ${resourceName || resourceType}`);
+            setTitle(resourceName ? `Review for ${resourceName}` : '');
             setDescription('');
             setSelectedReviewers([]);
+            setSelectedRequestId(resourceId || '');
             fetchTeamMembers();
+            if (needsResourcePicker) fetchAvailableRequests();
         }
-    }, [isOpen, resourceName, resourceType]);
+    }, [isOpen, resourceName, resourceType, resourceId]);
+
+    const fetchAvailableRequests = async () => {
+        try {
+            const res = await fetch('/api/requests', { credentials: 'include' });
+            if (res.ok) setAvailableRequests(await res.json());
+        } catch (err) {
+            console.error('Failed to fetch requests', err);
+        }
+    };
 
     const fetchTeamMembers = async () => {
         try {
@@ -77,8 +94,8 @@ const ReviewRequestModal = ({ isOpen, onClose, resourceId, resourceType, resourc
                 headers: { 'Content-Type': 'application/json' },
                 credentials: 'include',
                 body: JSON.stringify({
-                    resourceId,
-                    resourceType,
+                    resourceId: resourceId || selectedRequestId,
+                    resourceType: resourceId ? resourceType : 'request',
                     title,
                     description,
                     reviewers: selectedReviewers
@@ -111,6 +128,21 @@ const ReviewRequestModal = ({ isOpen, onClose, resourceId, resourceType, resourc
 
                 <div className="rrm-body">
                     <form onSubmit={handleSubmit} className="rrm-form">
+                        {needsResourcePicker && (
+                            <div className="rrm-field">
+                                <label className="rrm-label">What needs review?</label>
+                                <AppSelect
+                                    value={selectedRequestId}
+                                    onChange={(id) => {
+                                        setSelectedRequestId(id);
+                                        const req = availableRequests.find(r => r._id === id);
+                                        if (req) setTitle(`Review for ${req.name || 'Untitled'}`);
+                                    }}
+                                    options={availableRequests.map((req) => ({ value: req._id, label: req.name || 'Untitled' }))}
+                                />
+                            </div>
+                        )}
+
                         <div className="rrm-field">
                             <label className="rrm-label">Title</label>
                             <input
@@ -170,7 +202,7 @@ const ReviewRequestModal = ({ isOpen, onClose, resourceId, resourceType, resourc
                             <button
                                 type="submit"
                                 className="rrm-btn rrm-btn--primary"
-                                disabled={loading || selectedReviewers.length === 0}
+                                disabled={loading || selectedReviewers.length === 0 || (needsResourcePicker && !selectedRequestId)}
                             >
                                 {loading ? (
                                     <>

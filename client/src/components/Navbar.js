@@ -431,11 +431,11 @@ const Navbar = ({ isAuthenticated }) => {
                                             <div className="dropdown-item" onClick={() => handleNavigation('/workspace/history')}>
                                                 <FiClock size={16} style={{ marginRight: '10px' }} /> History
                                             </div>
-                                            <div className="dropdown-item" onClick={() => handleNavigation('/workspace/api-network/requests/new')}>
-                                                <FiPlus size={16} style={{ marginRight: '10px' }} /> Add Request
-                                            </div>
                                             <div className="dropdown-item" onClick={() => handleNavigation('/workspace/reviews')}>
                                                 <FiFileText size={16} style={{ marginRight: '10px' }} /> Reviews
+                                            </div>
+                                            <div className="dropdown-item" onClick={() => handleNavigation('/workspace/api-network/requests/new')}>
+                                                <FiPlus size={16} style={{ marginRight: '10px' }} /> Add Request
                                             </div>
                                         </div>
                                     )}

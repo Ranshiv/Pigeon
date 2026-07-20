@@ -921,27 +921,44 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
 
             const startTime = Date.now();
             requestId = `req-${startTime}`;
+            const requestHasId = interpolatedRequest._id || interpolatedRequest.id;
 
             // Log that we're making the actual HTTP request
             if (isDebugging) {
-                VisualizationDebugger.addLog(debugSessionId, 'info', `📡 Sending HTTP request via proxy...`);
+                VisualizationDebugger.addLog(debugSessionId, 'info', `📡 Sending HTTP request${requestHasId ? ' via saved request endpoint' : ' via proxy'}...`);
             }
 
-            // Use proxy endpoint with interpolated URL and debug flag
-            const response = await fetch(getApiUrl('/api/proxy'), {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
+            // Saved requests go through /api/requests/:id/send so history + activity are recorded.
+            // Unsaved/new requests fall back to the generic proxy.
+            const sendUrl = requestHasId
+                ? getApiUrl(`/api/requests/${requestHasId}/send`)
+                : getApiUrl('/api/proxy');
+            const sendBody = requestHasId
+                ? JSON.stringify({
+                    url: interpolatedRequest.url,
+                    method: interpolatedRequest.method,
+                    headers: interpolatedRequest.headers,
+                    body: requestBody,
+                    bodyType,
+                    params: interpolatedRequest.params,
+                    timeout: 30000,
+                    debug: isDebugging,
+                    debugSessionId
+                })
+                : JSON.stringify({
                     url: interpolatedRequest.url,
                     method: interpolatedRequest.method,
                     headers: headerObj,
                     body: requestBody,
                     timeout: 30000,
-                    debug: isDebugging, // Enable debug logging on backend
-                    debugSessionId: debugSessionId
-                }),
+                    debug: isDebugging,
+                    debugSessionId
+                });
+
+            const response = await fetch(sendUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: sendBody,
                 credentials: 'include'
             });
 
@@ -1018,11 +1035,6 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
             }
         } finally {
             setIsLoading(false);
-        }
-
-        // Save request if onSave provided
-        if (onSave) {
-            onSave(requestData);
         }
     };    // Update URL with query parameters
     useEffect(() => {

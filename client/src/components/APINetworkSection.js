@@ -11,6 +11,7 @@ import MarketplaceModerationQueue from './marketplace/MarketplaceModerationQueue
 import { toast } from 'react-toastify';
 import { FiPlus, FiFileText, FiSearch, FiChevronRight, FiGrid, FiClock, FiSidebar, FiChevronsLeft } from 'react-icons/fi';
 import MainShell from './common/MainShell/MainShell';
+import PageLoader from './common/PageLoader/PageLoader';
 import Footer from './Footer';
 // ponytail: RequestWorkspaceNew never created; RequestForm is the 2026 redesign replacement.
 // Revert to real import when ./request/RequestWorkspaceNew lands.
@@ -23,7 +24,7 @@ const APINetworkSection = () => {
     const [isLoadingRequests, setIsLoadingRequests] = useState(true);
     const [isLoadingHistory, setIsLoadingHistory] = useState(false);
     const [response, setResponse] = useState(null);
-    const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+    const [isSidebarOpen, setIsSidebarOpen] = useState(() => localStorage.getItem('apiNetworkSidebarOpen') !== 'false');
     const [sidebarBtnCorner, setSidebarBtnCorner] = useState(() => {
         const c = localStorage.getItem('sidebarBtnCorner');
         return c === 'bottom-left' ? c : 'top-left'; // left side only
@@ -117,13 +118,15 @@ const APINetworkSection = () => {
             const res = await fetch('/api/requests', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
                 body: JSON.stringify(newRequestData),
             });
             if (res.ok) {
                 const savedRequest = await res.json();
                 setRequests([...requests, savedRequest]);
+                await fetchRequests();
                 toast.success('Request saved successfully');
-                navigate(`requests/${savedRequest._id}`);
+                navigate(`/workspace/api-network/requests/${savedRequest._id}`);
             } else {
                 const errorData = await res.json();
                 toast.error('Failed to save request');
@@ -131,6 +134,7 @@ const APINetworkSection = () => {
             }
         } catch (err) {
             console.error('Error creating request:', err);
+            toast.error('Error creating request');
         }
     };
 
@@ -139,6 +143,7 @@ const APINetworkSection = () => {
             const res = await fetch(`/api/requests/${updatedRequestData._id}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
                 body: JSON.stringify(updatedRequestData),
             });
             if (res.ok) {
@@ -147,8 +152,9 @@ const APINetworkSection = () => {
                     req._id === updatedRequest._id ? updatedRequest : req
                 );
                 setRequests(updatedRequests);
+                await fetchRequests();
                 toast.success('Changes saved');
-                navigate(`requests/${updatedRequest._id}`);
+                navigate(`/workspace/api-network/requests/${updatedRequest._id}`);
             } else {
                 const errorData = await res.json();
                 toast.error('Failed to update request');
@@ -156,6 +162,7 @@ const APINetworkSection = () => {
             }
         } catch (err) {
             console.error('Error updating request:', err);
+            toast.error('Error updating request');
         }
     };
 
@@ -256,7 +263,7 @@ const APINetworkSection = () => {
                         </button>
                         <button
                             className="sidebar-toggle-btn"
-                            onClick={() => setIsSidebarOpen(false)}
+                            onClick={() => { setIsSidebarOpen(false); localStorage.setItem('apiNetworkSidebarOpen', 'false'); }}
                             title="Hide Sidebar"
                         >
                             <FiChevronsLeft />
@@ -329,7 +336,7 @@ const APINetworkSection = () => {
                         className={`sidebar-open-btn corner-${sidebarBtnCorner}`}
                         style={dragPos ? { top: dragPos.top, left: dragPos.left, right: 'auto', bottom: 'auto' } : undefined}
                         onPointerDown={startDragSidebarBtn}
-                        onClick={() => { if (!dragState.current.moved) setIsSidebarOpen(true); }}
+                        onClick={() => { if (!dragState.current.moved) { setIsSidebarOpen(true); localStorage.setItem('apiNetworkSidebarOpen', 'true'); } }}
                         title="Show Sidebar (drag to a corner)"
                     >
                         <FiSidebar size={32} />
@@ -516,23 +523,23 @@ const RequestDetails = ({ requests, onSave, isLoadingRequests, fetchHistory }) =
 
     if (isLoading || (isLoadingRequests && !localRequest)) {
         return (
-            <div className="empty-state h-full" style={{ background: 'var(--card-bg)', borderColor: 'var(--border-color)', color: 'var(--text-secondary)' }}>
-                <div className="h-8 w-8 animate-spin rounded-full border-2 border-slate-300 border-t-blue-500 mb-4"></div>
-                <span>Loading request details...</span>
+            <div className="hst-loading-container h-full">
+                <PageLoader size="lg" label="Loading request details..." />
             </div>
         );
     }
 
     if (!localRequest) {
         return (
-            <div className="empty-state h-full" style={{ background: 'var(--card-bg)', borderColor: 'var(--border-color)', color: 'var(--text-secondary)' }}>
-                <div className="text-4xl mb-2">🔍</div>
-                <h3 className="text-lg font-semibold" style={{ color: 'var(--text-color)' }}>Request Not Found</h3>
-                <p className="text-sm mt-1">We couldn't find the request you're looking for.</p>
+            <div className="hst-prompt h-full">
+                <div className="hst-prompt-icon">
+                    <FiSearch size={64} />
+                </div>
+                <h2 className="hst-prompt-title">Request Not Found</h2>
+                <p className="hst-prompt-text">We couldn't find the request you're looking for.</p>
                 <button
                     onClick={() => window.location.href = '/workspace/api-network/explore'}
-                    className="mt-6 px-4 py-2 rounded-md text-sm transition-colors"
-                    style={{ background: 'var(--primary-color)', color: '#fff' }}
+                    className="hst-btn hst-btn--primary"
                 >
                     Back to Explore
                 </button>
@@ -627,23 +634,23 @@ const EditRequestWorkspace = ({ requests, onSave, isLoadingRequests }) => {
 
     if (isLoadingRequests && !request) {
         return (
-            <div className="empty-state h-full" style={{ background: 'var(--card-bg)', borderColor: 'var(--border-color)', color: 'var(--text-secondary)' }}>
-                <div className="h-8 w-8 animate-spin rounded-full border-2 border-slate-300 border-t-blue-500 mb-4"></div>
-                <span>Loading request details...</span>
+            <div className="hst-loading-container h-full">
+                <PageLoader size="lg" label="Loading request details..." />
             </div>
         );
     }
 
     if (!request) {
         return (
-            <div className="empty-state h-full" style={{ background: 'var(--card-bg)', borderColor: 'var(--border-color)', color: 'var(--text-secondary)' }}>
-                <div className="text-4xl mb-2">🔍</div>
-                <h3 className="text-lg font-semibold" style={{ color: 'var(--text-color)' }}>Request Not Found</h3>
-                <p className="text-sm mt-1">We couldn't find the request you're looking for.</p>
+            <div className="hst-prompt h-full">
+                <div className="hst-prompt-icon">
+                    <FiSearch size={64} />
+                </div>
+                <h2 className="hst-prompt-title">Request Not Found</h2>
+                <p className="hst-prompt-text">We couldn't find the request you're looking for.</p>
                 <button
                     onClick={() => window.location.href = '/workspace/api-network/explore'}
-                    className="mt-6 px-4 py-2 rounded-md text-sm transition-colors"
-                    style={{ background: 'var(--primary-color)', color: '#fff' }}
+                    className="hst-btn hst-btn--primary"
                 >
                     Back to Explore
                 </button>

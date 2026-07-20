@@ -129,13 +129,13 @@ const ReviewDashboard = () => {
                 <div className="rd-tabs">
                     <button
                         className={`rd-tab ${filter === 'assigned' ? 'rd-tab--active' : ''}`}
-                        onClick={() => setFilter('assigned')}
+                        onClick={() => { setLoading(true); setFilter('assigned'); }}
                     >
                         Assigned to Me
                     </button>
                     <button
                         className={`rd-tab ${filter === 'created' ? 'rd-tab--active' : ''}`}
-                        onClick={() => setFilter('created')}
+                        onClick={() => { setLoading(true); setFilter('created'); }}
                     >
                         Created by Me
                     </button>
@@ -144,9 +144,6 @@ const ReviewDashboard = () => {
                 <ReviewRequestModal
                     isOpen={showCreateModal}
                     onClose={() => { setShowCreateModal(false); fetchReviews(); }}
-                    resourceId="new-review"
-                    resourceType="review"
-                    resourceName="New Review"
                 />
 
                 {loading ? (
