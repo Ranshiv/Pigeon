@@ -2,13 +2,11 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Routes, Route, useNavigate, useParams, Navigate } from 'react-router-dom';
 // import ExploreSection from './ExploreSection';
 import SpotlightSection from './SpotlightSection';
-import TrendingSection from './TrendingSection';
 import AIAgentToolsSection from './AIAgentToolsSection';
 import RequestForm from './RequestForm';
 import ResponseDisplay from './ResponseDisplay';
 import HistorySection from './HistorySection';
 import ExplorePage from './marketplace/ExplorePage';
-import MarketplaceSubmitListing from './marketplace/MarketplaceSubmitListing';
 import MarketplaceModerationQueue from './marketplace/MarketplaceModerationQueue';
 import { toast } from 'react-toastify';
 import { FiPlus, FiFileText, FiSearch, FiChevronRight, FiGrid, FiClock, FiSidebar, FiChevronsLeft } from 'react-icons/fi';
@@ -344,11 +342,6 @@ const APINetworkSection = () => {
                             <ExplorePage />
                         </MainShell>
                     } />
-                    <Route path="explore/submit" element={
-                        <MainShell>
-                            <MarketplaceSubmitListing />
-                        </MainShell>
-                    } />
                     <Route path="explore/moderate" element={
                         <MainShell>
                             <MarketplaceModerationQueue />
@@ -356,7 +349,6 @@ const APINetworkSection = () => {
                     } />
                     <Route path="history" element={<Navigate to="/workspace/history" replace />} />
 <Route path="spotlight" element={<SpotlightSection />} />
-                    <Route path="trending" element={<TrendingSection />} />
                     <Route path="ai-agent-tools" element={<AIAgentToolsSection />} />
                     <Route
                         path="requests/new"

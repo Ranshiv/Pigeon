@@ -23,6 +23,217 @@
     flex-shrink: 0;
 }
 
+.submit-api-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--primary-color);
+    color: #fff;
+    border: 1px solid var(--primary-color);
+    border-radius: var(--radius-sm, 8px);
+    padding: 8px 14px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.1s ease;
+}
+
+.submit-api-button:hover {
+    background: var(--primary-hover, var(--accent));
+    border-color: var(--primary-hover, var(--accent));
+}
+
+.submit-api-button:active {
+    transform: translateY(1px);
+}
+
+/* Submit API overlay */
+.submit-overlay-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.55);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 200;
+    padding: 24px;
+}
+
+.submit-overlay-panel {
+    background: var(--card-background);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    width: 100%;
+    max-width: 560px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 24px 70px rgba(0, 0, 0, 0.4);
+    padding: 28px;
+}
+
+.submit-overlay-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 6px;
+}
+
+.submit-overlay-header h2 {
+    margin: 0;
+    font-size: 1.25rem;
+    color: var(--text-color);
+}
+
+.submit-overlay-close {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.submit-overlay-close:hover {
+    color: var(--text-color);
+}
+
+.submit-overlay-subtitle {
+    margin: 0 0 18px 0;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+.submit-overlay-form {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.submit-overlay-form .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+}
+
+@media (max-width: 560px) {
+    .submit-overlay-form .form-row {
+        grid-template-columns: 1fr;
+    }
+}
+
+.submit-overlay-form label {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.submit-overlay-form input,
+.submit-overlay-form select,
+.submit-overlay-form textarea,
+.submit-overlay-form .app-select {
+    padding: 10px 12px;
+    border-radius: var(--radius-sm, 8px);
+    border: 1px solid var(--border-color);
+    background: var(--input-background, var(--background-color));
+    color: var(--text-color);
+    font-size: 0.9rem;
+    font-family: inherit;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.submit-overlay-form input:focus,
+.submit-overlay-form select:focus,
+.submit-overlay-form textarea:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 1px var(--accent);
+}
+
+.submit-overlay-form .app-select .app-select-trigger:focus-visible {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 1px var(--accent);
+}
+
+.submit-overlay-form textarea {
+    resize: vertical;
+}
+
+.submit-overlay-form input::placeholder,
+.submit-overlay-form textarea::placeholder {
+    color: var(--text-secondary);
+    opacity: 0.7;
+}
+
+.submit-overlay-form .app-select {
+    width: 100%;
+    background: transparent;
+    border: none;
+    padding: 0;
+}
+
+.submit-overlay-form .app-select .app-select-trigger {
+    background: var(--input-background, var(--background-color));
+    border: 1px solid var(--border-color);
+    padding: 10px 12px;
+    border-radius: var(--radius-sm, 8px);
+    box-shadow: none;
+}
+
+.submit-overlay-form .app-select .app-select-trigger:focus-visible {
+    border-color: var(--accent);
+    box-shadow: var(--ring, 0 0 0 2px var(--primary-color));
+}
+
+.submit-overlay-error {
+    color: var(--danger-text, #ef4444);
+    font-size: 0.85rem;
+}
+
+.submit-overlay-status {
+    color: var(--success-text, #10b981);
+    font-size: 0.85rem;
+}
+
+.submit-overlay-actions {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    margin-top: 16px;
+    padding-top: 8px;
+    border-top: 1px solid var(--border-color);
+}
+
+.submit-overlay-actions .btn-link {
+    background: transparent;
+    color: var(--text-secondary);
+    border: 1px solid transparent;
+    border-radius: var(--radius-sm, 8px);
+    padding: 10px 16px;
+    cursor: pointer;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.submit-overlay-actions .btn-link:hover {
+    background: var(--input-background, var(--background-color));
+    color: var(--text-color);
+    border-color: var(--border-color);
+}
+
+.submit-overlay-actions .btn-primary {
+    border-radius: var(--radius-sm, 8px);
+    padding: 10px 18px;
+    font-size: 0.9rem;
+}
+
 .header-content {
     margin-bottom: 0;
 }

@@ -200,8 +200,7 @@
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
 }
 
-.api-card.popular,
-.api-card.trending {
+.api-card.popular {
     border-left: 4px solid var(--primary-color);
     background: linear-gradient(to right, var(--primary-light), var(--card-background) 15%);
 }
@@ -881,13 +880,11 @@ section h2 {
 
 /* Popular and Trending Sections */
 .popular-section,
-.trending-section,
 .recommended-section {
     margin-bottom: 2rem;
 }
 
-.api-card.popular,
-.api-card.trending {
+.api-card.popular {
     border-left: 4px solid var(--primary-color);
 }
 

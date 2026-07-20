@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './APINetworkExplore.css';
 import { useNavigate } from 'react-router-dom';
-import { FiSearch, FiTrendingUp, FiStar, FiFolder, FiGlobe, FiLock, FiCheck, FiX, FiZap, FiThumbsUp } from 'react-icons/fi';
+import { FiSearch, FiStar, FiFolder, FiGlobe, FiLock, FiCheck, FiX, FiThumbsUp } from 'react-icons/fi';
 
 const APINetworkExplore = () => {
     const navigate = useNavigate();
@@ -17,7 +17,6 @@ const APINetworkExplore = () => {
     const [selectedRequest, setSelectedRequest] = useState(null);
     const [apis, setApis] = useState([]);
     const [popularAPIs, setPopularAPIs] = useState([]);
-    const [trendingAPIs, setTrendingAPIs] = useState([]);
     const [recommendedCollections, setRecommendedCollections] = useState([]);
 
     // Updated categories to match common API categories
@@ -73,7 +72,6 @@ const APINetworkExplore = () => {
         fetchCollections();
         fetchUserCollections();
         fetchPopularAPIs();
-        fetchTrendingAPIs();
         fetchRecommendedCollections();
     }, []);
 
@@ -142,26 +140,6 @@ const APINetworkExplore = () => {
             }
         } catch (err) {
             console.error('Error fetching popular APIs:', err);
-        }
-    };
-
-    const fetchTrendingAPIs = async () => {
-        try {
-            const response = await fetch('/api/marketplace/trending', {
-                credentials: 'include'
-            });
-            if (response.ok) {
-                const data = await response.json();
-                // Map marketplace data format to what the UI expects if needed
-                const formattedData = data.map(api => ({
-                    _id: { url: api.baseUrl, method: 'GET' },
-                    count: api.usageCount || 0,
-                    lastUsed: api.updatedAt || new Date()
-                }));
-                setTrendingAPIs(formattedData);
-            }
-        } catch (err) {
-            console.error('Error fetching trending APIs:', err);
         }
     };
 
@@ -288,7 +266,7 @@ const APINetworkExplore = () => {
             {/* Search Section */}
             <section className="search-section">
                 <h1>Discover Public APIs</h1>
-                <p className="search-description">Search from our curated collection of popular and trending APIs</p>
+                <p className="search-description">Search from our curated collection of popular APIs</p>
                 <form onSubmit={handleSearch} className="search-form">
                     <div className="search-input-container">
                         <FiSearch className="search-icon" />
@@ -313,13 +291,6 @@ const APINetworkExplore = () => {
                     <div className="stat-content">
                         <span className="stat-value">{popularAPIs.length}</span>
                         <span className="stat-label">Popular APIs</span>
-                    </div>
-                </div>
-                <div className="stat-card">
-                    <FiZap className="stat-icon" />
-                    <div className="stat-content">
-                        <span className="stat-value">{trendingAPIs.length}</span>
-                        <span className="stat-label">Trending Now</span>
                     </div>
                 </div>
                 <div className="stat-card">
@@ -420,35 +391,6 @@ const APINetworkExplore = () => {
                 </div>
             </section>
 
-            {/* Trending APIs this week */}
-            <section className="trending-section">
-                <h2><FiZap className="section-icon" /> Trending APIs this week</h2>
-                <div className="api-grid">
-                    {trendingAPIs.map((api, index) => (
-                        <div key={index} className="api-card trending">
-                            <div className="api-card-header">
-                                <h3>{api._id.url}</h3>
-                                <span className="usage-count">{api.count} uses today</span>
-                            </div>
-                            <div className="api-meta">
-                                <span className="method-tag">{api._id.method}</span>
-                                <span className="last-used">Last used: {new Date(api.lastUsed).toLocaleDateString()}</span>
-                            </div>
-                            <button
-                                className="add-api-button"
-                                onClick={() => handleAddToCollection({
-                                    name: api._id.url,
-                                    url: api._id.url,
-                                    method: api._id.method
-                                })}
-                            >
-                                Add to Requests
-                            </button>
-                        </div>
-                    ))}
-                </div>
-            </section>
-
             {/* Recommended Collections */}
             <section className="recommended-section">
                 <h2><FiStar className="section-icon" /> Recommended for you</h2>
@@ -477,7 +419,7 @@ const APINetworkExplore = () => {
 
             {/* Recent Activity */}
             <section className="recent-activity">
-                <h2><FiTrendingUp className="section-icon" /> Recent Activity</h2>
+                <h2>Recent Activity</h2>
                 <div className="request-list">
                     {recentRequests.length > 0 ? (
                         recentRequests.map(request => (

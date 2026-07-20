@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Search, Filter, Star, TrendingUp, ChevronDown, X, Play, BookOpen, Bookmark, Plus, ShieldCheck } from 'lucide-react';
 import ApiDetailModal from './ApiDetailModal';
 import { MarketplaceApi } from './MarketplaceApi';
+import AppSelect from '../common/AppSelect/AppSelect';
 import { debounce } from '../../utils/debounce';
 import './ExplorePage.css';
 
@@ -37,7 +38,48 @@ const ExplorePage = () => {
         try { return new Set(JSON.parse(localStorage.getItem(FAVORITES_KEY) || '[]')); }
         catch { return new Set(); }
     });
+    const [showSubmit, setShowSubmit] = useState(false);
+    const [submitForm, setSubmitForm] = useState({
+        name: '', provider: '', description: '', category: '', tags: '',
+        authType: 'None', pricing: 'Free', baseUrl: ''
+    });
+    const [submitStatus, setSubmitStatus] = useState(null);
+    const [submitError, setSubmitError] = useState(null);
     const abortRef = useRef(null);
+
+    const setSubmitField = (key, value) => setSubmitForm(prev => ({ ...prev, [key]: value }));
+
+    const resetSubmitForm = () => {
+        setSubmitForm({ name: '', provider: '', description: '', category: '', tags: '', authType: 'None', pricing: 'Free', baseUrl: '' });
+        setSubmitStatus(null);
+        setSubmitError(null);
+    };
+
+    const closeSubmitOverlay = () => {
+        setShowSubmit(false);
+        resetSubmitForm();
+    };
+
+    const onSubmitListing = async (e) => {
+        e.preventDefault();
+        setSubmitError(null);
+        setSubmitStatus('Submitting…');
+        try {
+            const payload = {
+                ...submitForm,
+                tags: submitForm.tags.split(',').map(t => t.trim()).filter(Boolean)
+            };
+            await MarketplaceApi.createListing(payload);
+            setSubmitStatus('Submitted! An admin will review it shortly.');
+            setTimeout(() => {
+                closeSubmitOverlay();
+                fetchApis();
+            }, 1200);
+        } catch (err) {
+            setSubmitError(err.message || 'Failed to submit');
+            setSubmitStatus(null);
+        }
+    };
 
     const toggleFavorite = (id) => {
         setFavorites(prev => {
@@ -180,7 +222,7 @@ const ExplorePage = () => {
                 </div>
                 <div className="explore-header-actions">
                     {user && (
-                        <button className="btn-link" onClick={() => window.location.href = '/workspace/api-network/explore/submit'}>
+                        <button className="submit-api-button" onClick={() => setShowSubmit(true)}>
                             <Plus size={16} /> Submit API
                         </button>
                     )}
@@ -523,6 +565,66 @@ const ExplorePage = () => {
                     initialTab={modalInitialTab}
                     onClose={closeApiModal}
                 />
+            )}
+
+            {/* Submit API Overlay */}
+            {showSubmit && (
+                <div className="submit-overlay-backdrop" onClick={(e) => { if (e.target === e.currentTarget) closeSubmitOverlay(); }}>
+                    <div className="submit-overlay-panel">
+                        <div className="submit-overlay-header">
+                            <h2>Submit an API</h2>
+                            <button className="submit-overlay-close" onClick={closeSubmitOverlay} aria-label="Close">
+                                <X size={20} />
+                            </button>
+                        </div>
+                        <p className="submit-overlay-subtitle">Your submission will be reviewed by an admin before it appears in the marketplace.</p>
+                        <form onSubmit={onSubmitListing} className="submit-overlay-form" aria-label="Submit listing">
+                            <div className="form-row">
+                                <label>Name<input value={submitForm.name} onChange={e => setSubmitField('name', e.target.value)} required placeholder="e.g. Weather API" /></label>
+                                <label>Provider<input value={submitForm.provider} onChange={e => setSubmitField('provider', e.target.value)} required placeholder="e.g. OpenWeather" /></label>
+                            </div>
+                            <div className="form-row">
+                                <label>Category<input value={submitForm.category} onChange={e => setSubmitField('category', e.target.value)} required placeholder="e.g. Weather" /></label>
+                                <label>Base URL<input type="url" value={submitForm.baseUrl} onChange={e => setSubmitField('baseUrl', e.target.value)} required placeholder="https://api.example.com" /></label>
+                            </div>
+                            <div className="form-row">
+                                <label>Auth type
+                                    <AppSelect
+                                        value={submitForm.authType}
+                                        onChange={(v) => setSubmitField('authType', v)}
+                                        options={[
+                                            { value: 'None', label: 'None' },
+                                            { value: 'API Key', label: 'API Key' },
+                                            { value: 'OAuth2', label: 'OAuth2' },
+                                            { value: 'Bearer', label: 'Bearer' }
+                                        ]}
+                                    />
+                                </label>
+                                <label>Pricing
+                                    <AppSelect
+                                        value={submitForm.pricing}
+                                        onChange={(v) => setSubmitField('pricing', v)}
+                                        options={[
+                                            { value: 'Free', label: 'Free' },
+                                            { value: 'Freemium', label: 'Freemium' },
+                                            { value: 'Paid', label: 'Paid' }
+                                        ]}
+                                    />
+                                </label>
+                            </div>
+                            <label>Tags (comma separated)<input value={submitForm.tags} onChange={e => setSubmitField('tags', e.target.value)} placeholder="rest, weather, public" /></label>
+                            <label>Description<textarea value={submitForm.description} onChange={e => setSubmitField('description', e.target.value)} rows={4} required placeholder="Briefly describe what this API does" /></label>
+
+                            {submitError && <div className="submit-overlay-error">{submitError}</div>}
+                            {submitStatus && <div className="submit-overlay-status">{submitStatus}</div>}
+
+                            <div className="submit-overlay-actions">
+                                <button className="btn-primary" type="submit">Submit for review</button>
+                                <button className="btn-link" type="button" onClick={closeSubmitOverlay}>Cancel</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
             )}
         </div>
     );

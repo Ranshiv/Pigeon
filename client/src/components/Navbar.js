@@ -415,9 +415,6 @@ const Navbar = ({ isAuthenticated }) => {
                                             <div className="dropdown-item" onClick={() => handleNavigation('/workspace/api-network/spotlight')}>
                                                 <FiBell size={16} style={{ marginRight: '10px' }} /> Spotlight
                                             </div>
-                                            <div className="dropdown-item" onClick={() => handleNavigation('/workspace/api-network/trending')}>
-                                                <FiTrendingUp size={16} style={{ marginRight: '10px' }} /> Trending
-                                            </div>
                                             <div className="dropdown-item" onClick={() => handleNavigation('/workspace/api-network/ai-agent-tools')}>
                                                 <FiZap size={16} style={{ marginRight: '10px' }} /> AI Agent Tools
                                             </div>

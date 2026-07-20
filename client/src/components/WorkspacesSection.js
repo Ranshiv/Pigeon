@@ -2,7 +2,6 @@
 import React, { useState, useEffect } from 'react';
 import { Routes, Route, useNavigate, useParams, Navigate, useLocation } from 'react-router-dom';
 import SpotlightSection from './SpotlightSection';
-import TrendingSection from './TrendingSection';
 import AIAgentToolsSection from './AIAgentToolsSection';
 import RequestForm from './RequestForm';
 import ResponseDisplay from './ResponseDisplay';
@@ -472,7 +471,6 @@ const WorkspacesSection = ({ requests, response, onSend, onCreate, onUpdate, onD
                 {/* Explore redirects to the new marketplace explore page */}
                 <Route path="explore" element={<Navigate to="/workspace/api-network/explore" replace />} />
                 <Route path="spotlight" element={<SpotlightSection />} />
-                <Route path="trending" element={<TrendingSection />} />
                 <Route path="ai-agent-tools" element={<AIAgentToolsSection />} />
                 <Route
                     path="requests/new"
