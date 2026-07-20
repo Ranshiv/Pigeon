@@ -132,6 +132,8 @@ const Notifications = () => {
         return `Sent request to ${activity.details?.endpoint || 'an API'}`;
       case 'comment_added':
         return `Added a comment: "${activity.details?.comment?.substring(0, 30)}${activity.details?.comment?.length > 30 ? '...' : ''}"`;
+      case 'review_requested':
+        return `${activity.details?.requesterName || 'Someone'} requested your review on ${activity.details?.title || 'a review'}`;
       default:
         return `${activity.type}: ${JSON.stringify(activity.details)}`;
     }

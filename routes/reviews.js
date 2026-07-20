@@ -3,7 +3,9 @@ const router = express.Router();
 const ReviewRequest = require('../models/ReviewRequest');
 const ActivityLog = require('../models/ActivityLog');
 const Collection = require('../models/Collection');
-const { broadcastActivity } = require('../utils/socket/socket-server');
+const { broadcastActivity, getUserSockets } = require('../utils/socket/socket-server');
+const EmailService = require('../services/EmailService');
+const emailService = new EmailService();
 
 // Middleware to check authentication (simplified)
 const ensureAuthenticated = (req, res, next) => {
@@ -52,6 +54,36 @@ router.post('/', ensureAuthenticated, async (req, res) => {
         const populatedActivity = await ActivityLog.findById(activity._id)
             .populate('user', 'displayName');
         broadcastActivity(populatedActivity);
+
+        // Notify reviewers directly: live socket ping to whoever's online, email fallback for everyone
+        try {
+            await review.populate('reviewers.user', 'displayName email');
+            const requesterName = req.user.displayName || req.user.email || 'Someone';
+            const reviewerIds = review.reviewers.map(r => String(r.user._id));
+            const sockets = Array.from(getUserSockets().values())
+                .filter(u => reviewerIds.includes(String(u.userData?.id)));
+
+            sockets.forEach(({ socket }) => {
+                socket.emit('userActivity', {
+                    userId: req.user._id,
+                    activity: {
+                        type: 'review_requested',
+                        details: { reviewId: String(review._id), title, requesterName }
+                    },
+                    timestamp: new Date().toISOString()
+                });
+            });
+
+            await Promise.allSettled(review.reviewers.map(r => emailService.sendReviewRequestNotification({
+                toEmail: r.user.email,
+                toName: r.user.displayName,
+                requesterName,
+                title,
+                reviewId: String(review._id)
+            })));
+        } catch (notifyError) {
+            console.error('Error notifying reviewers:', notifyError);
+        }
 
         res.status(201).json(review);
     } catch (err) {

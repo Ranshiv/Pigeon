@@ -40,9 +40,24 @@ const ReviewDashboard = () => {
                 credentials: 'include',
                 body: JSON.stringify({ status })
             });
-            if (res.ok) fetchReviews();
+            if (res.ok) {
+                fetchReviews();
+            } else {
+                const data = await res.json().catch(() => ({}));
+                alert(data.error || 'Failed to update review status');
+            }
         } catch (err) {
             console.error('Failed to update status', err);
+            alert('Failed to update review status');
+        }
+    };
+
+    const getCurrentUserId = () => {
+        try {
+            const user = JSON.parse(localStorage.getItem('user') || 'null');
+            return user?.id || user?._id || null;
+        } catch {
+            return null;
         }
     };
 
@@ -164,6 +179,9 @@ const ReviewDashboard = () => {
                             const status = statusConfig[review.status] || statusConfig.open;
                             const StatusIcon = status.icon;
                             const isEditing = editingReview === review._id;
+                            const currentUserId = getCurrentUserId();
+                            const myReviewerEntry = review.reviewers?.find(r => r.user?._id === currentUserId);
+                            const canVote = review.status === 'open' && (!myReviewerEntry || myReviewerEntry.status === 'pending');
 
                             return (
                                 <div key={review._id} className="rd-card">
@@ -241,7 +259,7 @@ const ReviewDashboard = () => {
                                                 View
                                             </a>
 
-                                            {filter === 'assigned' && review.status === 'open' && (
+                                            {filter === 'assigned' && canVote && (
                                                 <>
                                                     <button
                                                         className="rd-btn rd-btn--danger"

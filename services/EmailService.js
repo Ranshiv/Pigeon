@@ -766,6 +766,78 @@ If you have any questions, please contact our support team.
         }
     }
 
+    async sendReviewRequestNotification(reviewData) {
+        if (!this.transporter && !this.isBrevoConfigured()) {
+            console.log('📧 Email service not configured, skipping review request email');
+            return { skipped: true, reason: 'Email service not configured' };
+        }
+
+        try {
+            const { toEmail, toName, requesterName, title, reviewId } = reviewData;
+
+            const subject = `${requesterName} requested your review: ${title}`;
+            const reviewUrl = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/reviews/${reviewId}`;
+
+            const htmlContent = `
+                <html>
+                <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+                    <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+                        <div style="text-align: center; margin-bottom: 30px;">
+                            <h2 style="color: #014C75;">Review Requested</h2>
+                        </div>
+
+                        <p>Hi ${toName || 'there'},</p>
+                        <p><strong>${requesterName}</strong> has requested your review on <strong>${title}</strong>.</p>
+
+                        <div style="text-align: center; margin: 30px 0;">
+                            <a href="${reviewUrl}"
+                               style="background-color: #014C75; color: white; padding: 12px 30px;
+                                      text-decoration: none; border-radius: 5px; display: inline-block;">
+                                View Review
+                            </a>
+                        </div>
+
+                        <hr style="margin: 30px 0; border: none; border-top: 1px solid #eee;">
+                        <p style="font-size: 12px; color: #666;">
+                            Pigeon Monitoring - Review Requests
+                        </p>
+                    </div>
+                </body>
+                </html>
+            `;
+
+            const textContent = `${requesterName} has requested your review on ${title}.\n\nView it here: ${reviewUrl}\n\n--\nPigeon Monitoring`;
+
+            if (this.transporter) {
+                const mailOptions = {
+                    from: process.env.EMAIL_FROM || process.env.EMAIL_USER,
+                    to: toEmail,
+                    subject,
+                    text: textContent,
+                    html: htmlContent
+                };
+
+                const result = await this.transporter.sendMail(mailOptions);
+                console.log('✅ Review request email sent (SMTP):', result.messageId);
+                return { success: true, messageId: result.messageId };
+            }
+
+            const result = await this.sendViaBrevo({
+                toEmail,
+                toName,
+                subject,
+                textContent,
+                htmlContent
+            });
+            if (result?.success) {
+                console.log('✅ Review request email sent (Brevo):', result.messageId);
+            }
+            return result;
+        } catch (error) {
+            return this.handleEmailError(error, 'review request notification');
+        }
+    }
+
     generateReportHTML(reportName) {
         return `
             <html>
