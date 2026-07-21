@@ -80,9 +80,10 @@ router.post('/', ensureAuthenticated, async (req, res) => {
 
         await review.save();
 
-        // Log activity
+        // Log activity — scoped to the resource's real workspace so both the live
+        // notification (workspace room) and the historical feed agree on scope.
         const activity = await ActivityLog.create({
-            workspaceId: req.session.workspaceId || 'default', // Ideally from context
+            workspaceId: resourceWorkspaceId || req.session.workspaceId || 'default',
             user: req.user._id,
             actionType: 'review_request',
             resourceId: review._id,
@@ -166,9 +167,14 @@ router.patch('/:id/status', ensureAuthenticated, async (req, res) => {
 
         await review.save();
 
+        // Resolve the review's real workspace so the activity (and live room emit) is
+        // correctly scoped, not pinned to 'default'. Keeps the requester's historical
+        // feed and room-scoped notification in sync.
+        const reviewWorkspaceId = await resolveResourceWorkspace(review.resourceId, review.resourceType);
+
         // Log activity
         const activity = await ActivityLog.create({
-            workspaceId: 'default',
+            workspaceId: reviewWorkspaceId || 'default',
             user: req.user._id,
             actionType: status === 'approved' ? 'review_approve' : 'review_reject',
             resourceId: review._id,
@@ -180,6 +186,36 @@ router.patch('/:id/status', ensureAuthenticated, async (req, res) => {
         const populatedActivity = await ActivityLog.findById(activity._id)
             .populate('user', 'displayName');
         broadcastActivity(populatedActivity);
+
+        // Targeted ping to the requester: workspace room isolation would hide this if
+        // the requester isn't viewing the reviewed workspace, but they're the person
+        // who needs the outcome. Mirror the create route's reviewer-targeting pattern.
+        try {
+            await review.populate('requester', '_id');
+            const requesterId = review.requester && String(review.requester._id || review.requester);
+            const reviewerName = req.user.displayName || req.user.email || 'A reviewer';
+            if (requesterId) {
+                const sockets = Array.from(getUserSockets().values())
+                    .filter(u => String(u.userData?.id) === requesterId);
+                const actionType = status === 'approved' ? 'review_approve' : 'review_reject';
+                sockets.forEach(({ socket }) => {
+                    socket.emit('userActivity', {
+                        userId: req.user._id,
+                        activity: {
+                            type: 'log',
+                            details: {
+                                actionType,
+                                resourceName: review.title,
+                                actorName: reviewerName
+                            }
+                        },
+                        timestamp: new Date().toISOString()
+                    });
+                });
+            }
+        } catch (notifyError) {
+            console.error('Error notifying review requester of outcome:', notifyError);
+        }
 
         res.json(review);
     } catch (err) {

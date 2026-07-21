@@ -68,7 +68,13 @@ async function connectToDatabase() {
 // Connect to MongoDB using mongoose for schema-based operations
 async function connectMongoose() {
     try {
+        // Pin to the same DB the native driver uses (dbName) — the connection URI
+        // itself has no db path segment, so without this Mongoose silently defaults
+        // to "test" while the native driver writes to pigeon_db. Two DBs meant
+        // Mongoose-backed reads (e.g. /users/list) never saw native-driver writes
+        // (e.g. workspace invites) even though both looked like they "worked".
         await mongoose.connect(mongoURI, {
+            dbName,
             serverSelectionTimeoutMS: 10000,
             socketTimeoutMS: 45000
         });

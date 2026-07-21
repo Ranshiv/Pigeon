@@ -187,3 +187,6 @@ config/production.js
 
 #Ignore vscode AI rules
 .github\instructions\codacy.instructions.md
+
+# Local DB backups (contain secrets/PII — never commit)
+backups/

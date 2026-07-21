@@ -11,6 +11,7 @@ const ReviewRequestModal = ({ isOpen, onClose, resourceId, resourceType, resourc
     const [loading, setLoading] = useState(false);
     const [availableRequests, setAvailableRequests] = useState([]);
     const [selectedRequestId, setSelectedRequestId] = useState(resourceId || '');
+    const [selectedResourceType, setSelectedResourceType] = useState('request');
     const [selectedWorkspaceId, setSelectedWorkspaceId] = useState(workspaceId || '');
 
     // No resourceId passed in means the caller wants the user to pick what's being reviewed.
@@ -22,6 +23,7 @@ const ReviewRequestModal = ({ isOpen, onClose, resourceId, resourceType, resourc
             setDescription('');
             setSelectedReviewers([]);
             setSelectedRequestId(resourceId || '');
+            setSelectedResourceType(resourceType || 'request');
             setSelectedWorkspaceId(workspaceId || '');
             if (needsResourcePicker) fetchAvailableRequests();
         }
@@ -36,10 +38,26 @@ const ReviewRequestModal = ({ isOpen, onClose, resourceId, resourceType, resourc
     // Saved requests aren't tagged with a workspaceId at creation time, so the
     // picker shows all of the user's saved requests rather than filtering by
     // workspace (filtering here would always return empty).
+    // Most saved work lives in Collections (requests are usually embedded there,
+    // not saved standalone), so offer both as reviewable resources.
     const fetchAvailableRequests = async () => {
         try {
-            const res = await fetch('/api/requests', { credentials: 'include' });
-            if (res.ok) setAvailableRequests(await res.json());
+            const [reqRes, colRes] = await Promise.all([
+                fetch('/api/requests', { credentials: 'include' }),
+                fetch('/api/collections', { credentials: 'include' })
+            ]);
+            const requests = reqRes.ok ? await reqRes.json() : [];
+            let collections = colRes.ok ? await colRes.json() : [];
+            // Scope collections to the modal's workspace when known — otherwise a
+            // collection from another workspace could be picked, whose members
+            // don't overlap with the reviewer list shown (server would reject them).
+            if (workspaceId) {
+                collections = collections.filter(c => String(c.workspaceId) === String(workspaceId));
+            }
+            setAvailableRequests([
+                ...requests.map(r => ({ _id: r._id, name: r.name, resourceType: 'request' })),
+                ...collections.map(c => ({ _id: c._id, name: c.name, resourceType: 'collection', workspaceId: c.workspaceId }))
+            ]);
         } catch (err) {
             console.error('Failed to fetch requests', err);
         }
@@ -110,7 +128,7 @@ const ReviewRequestModal = ({ isOpen, onClose, resourceId, resourceType, resourc
                 credentials: 'include',
                 body: JSON.stringify({
                     resourceId: resourceId || selectedRequestId,
-                    resourceType: resourceId ? resourceType : 'request',
+                    resourceType: resourceId ? resourceType : selectedResourceType,
                     title,
                     description,
                     reviewers: selectedReviewers
@@ -151,7 +169,10 @@ const ReviewRequestModal = ({ isOpen, onClose, resourceId, resourceType, resourc
                                     onChange={(id) => {
                                         setSelectedRequestId(id);
                                         const req = availableRequests.find(r => r._id === id);
-                                        if (req) setTitle(`Review for ${req.name || 'Untitled'}`);
+                                        if (req) {
+                                            setTitle(`Review for ${req.name || 'Untitled'}`);
+                                            setSelectedResourceType(req.resourceType);
+                                        }
                                         setSelectedReviewers([]);
                                     }}
                                     options={availableRequests.map((req) => ({ value: req._id, label: req.name || 'Untitled' }))}

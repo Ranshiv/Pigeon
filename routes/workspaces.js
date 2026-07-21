@@ -4,9 +4,11 @@ const router = express.Router();
 const { ObjectId } = require('mongodb');
 const { ensureAuthenticated, authenticateJWT } = require('../middleware/auth');
 const { getDb } = require('../config/db');
+const User = require('../models/User');
 
 // Compliance audit logging (who changed what)
 const AuditLogger = require('../features/compliance/AuditLogger');
+const ActivityLog = require('../models/ActivityLog');
 
 // In-memory store for backward compatibility
 const workspacesStore = {};
@@ -521,7 +523,35 @@ router.get('/:id/activity', ensureAuthenticated, async (req, res) => {
 
         const workspaceObjectId = ObjectId.isValid(workspaceId) ? new ObjectId(workspaceId) : null;
 
-        // 1) Prefer persisted activity logs if present.
+        // 1) Prefer the real ActivityLog (reviews, comments, requests all write here).
+        try {
+            const logs = await ActivityLog.find({ workspaceId })
+                .populate('user', 'displayName email')
+                .sort({ createdAt: -1 })
+                .limit(25)
+                .lean();
+
+            if (logs && logs.length > 0) {
+                return res.json(
+                    logs.map(l => ({
+                        _id: l._id.toString(),
+                        type: l.actionType,
+                        message: `${l.actionType.replace(/_/g, ' ')} '${l.resourceName || ''}'`.trim(),
+                        user: {
+                            userId: l.user?._id?.toString?.() || l.user,
+                            displayName: l.user?.displayName || 'User',
+                            email: l.user?.email
+                        },
+                        timestamp: l.createdAt,
+                        details: l.details
+                    }))
+                );
+            }
+        } catch (err) {
+            console.log(`ActivityLog lookup failed for workspace ${workspaceId}: ${err.message}`);
+        }
+
+        // 2) Fallback: persisted workspaceActivity (native collection, collection-created events).
         try {
             const persisted = await db.collection('workspaceActivity')
                 .find({
@@ -726,33 +756,66 @@ router.get('/:id/activity', ensureAuthenticated, async (req, res) => {
     }
 });
 
-// Invite user to workspace
+// Invite user to workspace — persists a real collaborator so they actually
+// gain access (workspace queries, reviewer picker, etc). Previously this was
+// a stub that fabricated a fake userId and never touched the DB, so invited
+// users never became real collaborators anywhere in the app.
 router.post('/:id/invite', ensureAuthenticated, async (req, res) => {
     try {
         const workspaceId = req.params.id;
         const { email, role } = req.body;
 
-        // Validate inputs
+        if (!ObjectId.isValid(workspaceId)) {
+            return res.status(400).json({ message: 'Invalid workspace ID format' });
+        }
         if (!email) {
             return res.status(400).json({ message: 'Email is required' });
         }
-
         if (!['admin', 'editor', 'viewer'].includes(role)) {
             return res.status(400).json({ message: 'Invalid role. Must be either "admin", "editor", or "viewer"' });
         }
 
-        // Mock response with the newly invited user
-        const invitedUser = {
-            userId: `user-${Date.now()}`,
-            email: email,
-            displayName: email.split('@')[0], // Simple mock name from email
-            role: role,
-            status: 'pending',
-            invitedBy: req.user.id,
-            invitedAt: new Date()
+        const db = getDb();
+        const workspace = await db.collection('workspaces').findOne({ _id: new ObjectId(workspaceId) });
+        if (!workspace) {
+            return res.status(404).json({ message: 'Workspace not found' });
+        }
+
+        const requesterId = String(req.user.id);
+        const isOwner = String(workspace.owner) === requesterId;
+        const requesterCollab = (workspace.collaborators || []).find(c => String(c.userId) === requesterId);
+        if (!isOwner && requesterCollab?.role !== 'admin') {
+            return res.status(403).json({ message: 'Only the owner or an admin can invite members' });
+        }
+
+        // Users are created via Mongoose (models/User.js) on Google login, which
+        // may target a different DB/connection than getDb()'s native driver — go
+        // through the model, not db.collection('users'), so the lookup actually finds them.
+        const invitee = await User.findOne({ email });
+        if (!invitee) {
+            return res.status(404).json({ message: 'No user found with that email' });
+        }
+
+        const alreadyMember = String(workspace.owner) === String(invitee._id)
+            || (workspace.collaborators || []).some(c => String(c.userId) === String(invitee._id));
+        if (alreadyMember) {
+            return res.status(409).json({ message: 'User is already a member of this workspace' });
+        }
+
+        const newCollaborator = {
+            userId: invitee._id,
+            email: invitee.email,
+            displayName: invitee.displayName,
+            role,
+            joinedAt: new Date()
         };
 
-        res.status(201).json(invitedUser);
+        await db.collection('workspaces').updateOne(
+            { _id: new ObjectId(workspaceId) },
+            { $push: { collaborators: newCollaborator } }
+        );
+
+        res.status(201).json(newCollaborator);
     } catch (err) {
         console.error("Error inviting user:", err);
         res.status(500).json({ message: 'Error inviting user to workspace' });

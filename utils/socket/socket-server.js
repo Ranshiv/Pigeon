@@ -1,5 +1,6 @@
 // utils/socket/socket-server.js
 const socketIo = require('socket.io');
+const ActivityLog = require('../../models/ActivityLog');
 
 // Store for global socket data
 const userSockets = new Map(); // Map socketId -> userData
@@ -18,13 +19,34 @@ const protocolSessions = {
  * @param {Object} server - HTTP server instance
  * @return {Object} - Socket.io instance
  */
+// Emit a logged activity as a live `userActivity` notification to every client
+// currently in that activity's workspace room. Matches the workspace-scoped
+// historical feed (`scope=team` filtered by workspaceId in activities.js), so live
+// and historical see the same world. Previously emitted an unused 'activityLog'
+// event to a room nothing listened on — no live notification ever fired.
+//
+// ponytail: workspace room isolation. Only members viewing this workspace (they've
+// called joinWorkspace) receive the notification. Upgrade path: add an explicit
+// recipient/mention list when cross-workspace mentions or @-targeting are needed.
 function broadcastActivity(activity) {
     if (!ioInstance) {
         console.warn('broadcastActivity called before socket server initialized');
         return;
     }
-    const room = `workspace:${activity?.workspaceId || 'default'}`;
-    ioInstance.to(room).emit('activityLog', activity);
+    if (!activity) return;
+
+    const room = `workspace:${activity.workspaceId || 'default'}`;
+    const details = {
+        actionType: activity.actionType,
+        resourceName: activity.resourceName,
+        actorName: activity.user?.displayName
+    };
+    const payload = {
+        userId: String(activity.user?._id || activity.user || ''),
+        activity: { type: 'log', details },
+        timestamp: activity.createdAt || new Date().toISOString()
+    };
+    ioInstance.to(room).emit('userActivity', payload);
 }
 
 function initializeSocketServer(server) {
@@ -339,6 +361,43 @@ function initializeSocketServer(server) {
                 leaveRoom(roomName);
             } else {
                 console.warn(`User ${socket.id} attempted to leave a collection room they're not in: ${roomName}`);
+            }
+        });
+
+        // Skip pure view-tracking noise (page views, tab switches) — not worth logging.
+        const SKIP_ACTIVITY_ACTIONS = new Set(['workspace_view', 'collection_view', 'tab_change']);
+        // Map sendActivity()'s free-form action names to ActivityLog's fixed actionType enum.
+        const ACTIVITY_ACTION_TYPE = {
+            request_sent: 'api_test',
+            collection_run: 'api_test',
+            collection_run_completed: 'api_test',
+            request_deleted: 'delete',
+            member_invited: 'join',
+            member_removed: 'leave'
+        };
+
+        // Persist activity sent via sendActivity() (request_sent, collection_updated, etc.)
+        // to ActivityLog, then broadcast it the same way reviews/comments do. Previously
+        // this only fired the (unlistened) 'userActivity' broadcast below directly — nothing
+        // ever wrote these to a log, so they vanished on refresh.
+        socket.on('activity', async ({ room, action, data }) => {
+            if (!authenticatedUser || SKIP_ACTIVITY_ACTIONS.has(action)) return;
+            try {
+                const workspaceId = (room || '').startsWith('workspace:') ? room.slice('workspace:'.length) : 'default';
+                const resourceName = data?.requestName || data?.collectionName || data?.workspaceName || data?.name || '';
+                const activity = await ActivityLog.create({
+                    workspaceId,
+                    user: authenticatedUser.id,
+                    actionType: ACTIVITY_ACTION_TYPE[action] || 'update',
+                    resourceId: data?.requestId || data?.collectionId || data?.workspaceId || undefined,
+                    resourceType: action,
+                    resourceName,
+                    details: data
+                });
+                const populated = await ActivityLog.findById(activity._id).populate('user', 'displayName');
+                broadcastActivity(populated);
+            } catch (err) {
+                console.log('Non-fatal: failed to persist activity event:', err.message);
             }
         });
 

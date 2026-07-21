@@ -11,6 +11,7 @@ const Notifications = () => {
   const notificationRef = useRef(null);
   const recentActivityRef = useRef(new Map());
   const currentUserIdRef = useRef(null);
+  const monitorStatusRef = useRef(new Map());
   const { socket } = useCollaboration();
 
   useEffect(() => {
@@ -18,11 +19,43 @@ const Notifications = () => {
       const userStr = localStorage.getItem('user');
       if (userStr) {
         const user = JSON.parse(userStr);
-        currentUserIdRef.current = user?.id || user?._id || null;
+        // Normalize to string so self-activity suppression is robust to id-form drift
+        // (server emits String(_id); localStorage may store id or _id). compare as strings.
+        currentUserIdRef.current = String(user?.id || user?._id || '') || null;
       }
     } catch {
       currentUserIdRef.current = null;
     }
+  }, []);
+
+  // Load persisted activity history on mount (historical → shown as already read)
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch('/api/activities?scope=team&limit=50', { credentials: 'include' });
+        if (!res.ok) return;
+        const logs = await res.json();
+        if (cancelled || !Array.isArray(logs)) return;
+        setUserActivities(prev => [
+          ...prev,
+          ...logs.map(l => ({
+            id: l._id,
+            type: 'log',
+            details: {
+              actionType: l.actionType,
+              resourceName: l.resourceName,
+              actorName: l.user?.displayName
+            },
+            timestamp: l.createdAt,
+            read: true
+          }))
+        ].slice(0, 50));
+      } catch {
+        // history is best-effort; live socket events still work
+      }
+    })();
+    return () => { cancelled = true; };
   }, []);
 
   // Handle clicking outside to close notifications dropdown
@@ -48,8 +81,9 @@ const Notifications = () => {
 
       const { activity, userId, timestamp = new Date().toISOString() } = data;
 
-      // Ignore self-activity (common when a user has multiple tabs/sockets open)
-      if (currentUserIdRef.current && userId === currentUserIdRef.current) return;
+      // Ignore self-activity (common when a user has multiple tabs/sockets open).
+      // Compare as strings: server emits String(_id), localStorage id may differ in form.
+      if (currentUserIdRef.current && String(userId) === String(currentUserIdRef.current)) return;
 
       // Basic de-duplication / flood protection
       let detailsKey = '';
@@ -85,12 +119,35 @@ const Notifications = () => {
       setUnreadCount(prev => prev + 1);
     };
 
+    // Monitoring emits monitor_update on EVERY poll — only notify on status transitions
+    const handleMonitorUpdate = (data) => {
+      if (!data || !data.monitorId) return;
+      const status = data.currentStatus || data.status;
+      const prev = monitorStatusRef.current.get(data.monitorId);
+      monitorStatusRef.current.set(data.monitorId, status);
+      if (prev === undefined || prev === status) return; // seed silently; skip non-transitions
+
+      setUserActivities(prevActs => [
+        {
+          id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+          type: 'monitor_status',
+          details: { monitorId: data.monitorId, status, responseTime: data.responseTime },
+          timestamp: data.timestamp || new Date().toISOString(),
+          read: false
+        },
+        ...prevActs
+      ].slice(0, 50));
+      setUnreadCount(prev => prev + 1);
+    };
+
     // Subscribe to the userActivity event
     socket.on('userActivity', handleUserActivity);
+    socket.on('monitor_update', handleMonitorUpdate);
 
     // Clean up on unmount
     return () => {
       socket.off('userActivity', handleUserActivity);
+      socket.off('monitor_update', handleMonitorUpdate);
     };
   }, [socket]);
 
@@ -134,6 +191,10 @@ const Notifications = () => {
         return `Added a comment: "${activity.details?.comment?.substring(0, 30)}${activity.details?.comment?.length > 30 ? '...' : ''}"`;
       case 'review_requested':
         return `${activity.details?.requesterName || 'Someone'} requested your review on ${activity.details?.title || 'a review'}`;
+      case 'monitor_status':
+        return `Monitor is now ${activity.details?.status || 'updated'}`;
+      case 'log':
+        return `${activity.details?.actorName || 'Someone'} ${activity.details?.actionType || 'updated'} ${activity.details?.resourceName || ''}`.trim();
       default:
         return `${activity.type}: ${JSON.stringify(activity.details)}`;
     }
@@ -155,6 +216,8 @@ const Notifications = () => {
             {userActivities.length > 0 && (
               <button
                 className="mark-all-read-btn"
+                disabled={unreadCount === 0}
+                title={unreadCount === 0 ? 'All caught up' : 'Mark all as read'}
                 onClick={() => {
                   setUserActivities(prev =>
                     prev.map(activity => ({ ...activity, read: true }))
@@ -162,7 +225,7 @@ const Notifications = () => {
                   setUnreadCount(0);
                 }}
               >
-                Mark all as read
+                <span>Read all</span>
               </button>
             )}
           </div>

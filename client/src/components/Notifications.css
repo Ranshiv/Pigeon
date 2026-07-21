@@ -94,6 +94,33 @@
   color: var(--text-color);
 }
 
+.mark-all-read-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  background: none;
+  border: none;
+  border-radius: var(--border-radius-sm);
+  color: var(--primary-color);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  padding: 4px 8px;
+  cursor: pointer;
+  transition: background-color var(--transition-speed);
+}
+
+.mark-all-read-btn:hover:not(:disabled),
+.mark-all-read-btn:hover:not(:disabled) span {
+  background-color: var(--success-light);
+  color: var(--success-text, var(--success-color));
+}
+
+.mark-all-read-btn:disabled {
+  color: var(--text-secondary);
+  cursor: default;
+  opacity: 0.6;
+}
+
 .offline-status {
   font-size: var(--font-size-sm);
   color: var(--danger-color);
@@ -241,12 +268,14 @@
   right: 0;
   top: 100%;
   width: 320px;
+  max-height: 380px;
   background-color: var(--card-bg);
   border-radius: var(--border-radius-md);
-  overflow-y: auto;
-  max-height: 380px;
+  overflow: hidden;
   border: 1px solid var(--border-color);
   box-shadow: var(--dropdown-shadow);
+  display: flex;
+  flex-direction: column;
 }
 
 .notification-dismiss {
