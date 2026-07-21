@@ -3,7 +3,7 @@ import { useCollaboration } from '../../context/CollaborationContext';
 import AppSelect from '../common/AppSelect/AppSelect';
 import './ReviewRequestModal.css';
 
-const ReviewRequestModal = ({ isOpen, onClose, resourceId, resourceType, resourceName }) => {
+const ReviewRequestModal = ({ isOpen, onClose, resourceId, resourceType, resourceName, workspaceId }) => {
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
     const [teamMembers, setTeamMembers] = useState([]);
@@ -11,6 +11,7 @@ const ReviewRequestModal = ({ isOpen, onClose, resourceId, resourceType, resourc
     const [loading, setLoading] = useState(false);
     const [availableRequests, setAvailableRequests] = useState([]);
     const [selectedRequestId, setSelectedRequestId] = useState(resourceId || '');
+    const [selectedWorkspaceId, setSelectedWorkspaceId] = useState(workspaceId || '');
 
     // No resourceId passed in means the caller wants the user to pick what's being reviewed.
     const needsResourcePicker = !resourceId;
@@ -21,11 +22,20 @@ const ReviewRequestModal = ({ isOpen, onClose, resourceId, resourceType, resourc
             setDescription('');
             setSelectedReviewers([]);
             setSelectedRequestId(resourceId || '');
-            fetchTeamMembers();
+            setSelectedWorkspaceId(workspaceId || '');
             if (needsResourcePicker) fetchAvailableRequests();
         }
-    }, [isOpen, resourceName, resourceType, resourceId]);
+    }, [isOpen, resourceName, resourceType, resourceId, workspaceId]);
 
+    // Re-fetch reviewers whenever the effective workspace changes (including
+    // after the user picks a resource in the picker, which resolves its workspace).
+    useEffect(() => {
+        if (isOpen) fetchTeamMembers();
+    }, [isOpen, selectedWorkspaceId]);
+
+    // Saved requests aren't tagged with a workspaceId at creation time, so the
+    // picker shows all of the user's saved requests rather than filtering by
+    // workspace (filtering here would always return empty).
     const fetchAvailableRequests = async () => {
         try {
             const res = await fetch('/api/requests', { credentials: 'include' });
@@ -47,11 +57,16 @@ const ReviewRequestModal = ({ isOpen, onClose, resourceId, resourceType, resourc
 
             let members = [];
 
-            const res = await fetch('/api/auth/users/list', { credentials: 'include' });
+            const usersUrl = selectedWorkspaceId
+                ? `/api/auth/users/list?workspaceId=${encodeURIComponent(selectedWorkspaceId)}`
+                : '/api/auth/users/list';
+            const res = await fetch(usersUrl, { credentials: 'include' });
             if (res.ok) {
-                const users = await res.json();
-                members = users;
-            } else {
+                members = await res.json();
+            } else if (!selectedWorkspaceId) {
+                // Only fall back to the broader team list when we have no workspace
+                // to scope to at all — never as a workspace-scoped fallback, since
+                // that would leak members from unrelated teams into this workspace's list.
                 const teamRes = await fetch('/api/teams', { credentials: 'include' });
                 if (teamRes.ok) {
                     const teams = await teamRes.json();
@@ -137,6 +152,7 @@ const ReviewRequestModal = ({ isOpen, onClose, resourceId, resourceType, resourc
                                         setSelectedRequestId(id);
                                         const req = availableRequests.find(r => r._id === id);
                                         if (req) setTitle(`Review for ${req.name || 'Untitled'}`);
+                                        setSelectedReviewers([]);
                                     }}
                                     options={availableRequests.map((req) => ({ value: req._id, label: req.name || 'Untitled' }))}
                                 />

@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 
 const requestSchema = new mongoose.Schema({
     name: { type: String, required: true }, // Name of the request configuration
+    workspaceId: { type: mongoose.Schema.Types.ObjectId, ref: 'Workspace', default: null },
     url: { type: String, required: true },
     method: { type: String, required: true, enum: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS', 'HEAD', 'GRAPHQL'] },
     headers: [{ name: String, value: String }],

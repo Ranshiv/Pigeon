@@ -73,7 +73,11 @@
 
 .mfm-header h2 {
     margin: 0;
-    color: var(--text-color, #333333);
+    background: none;
+    -webkit-background-clip: initial;
+    background-clip: initial;
+    -webkit-text-fill-color: initial;
+    color: #ffffff;
     font-size: 1.5rem;
     font-weight: 600;
     letter-spacing: -0.02em;

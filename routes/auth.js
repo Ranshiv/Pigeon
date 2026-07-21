@@ -104,12 +104,32 @@ router.put('/user/profile', ensureAuthenticated, async (req, res) => {
     }
 });
 
-// Get all users for collaboration (simplified for dev/testing)
-router.get('/users/list', async (req, res) => {
-    console.log("Fetching user list...");
+// Get users who share a workspace with the current user (collaboration).
+// If ?workspaceId= is given, scope strictly to that workspace's members
+// (and only if the caller has access to it); otherwise any shared workspace.
+router.get('/users/list', ensureAuthenticated, async (req, res) => {
     try {
-        const users = await User.find({}, 'displayName email profilePicture');
-        console.log(`Found ${users.length} users`);
+        const Workspace = require('../models/Workspace');
+        const { workspaceId } = req.query;
+
+        const scopeQuery = workspaceId
+            ? { _id: workspaceId, $or: [{ owner: req.user._id }, { 'collaborators.userId': req.user._id }] }
+            : { $or: [{ owner: req.user._id }, { 'collaborators.userId': req.user._id }] };
+
+        const workspaces = await Workspace.find(scopeQuery, 'owner collaborators.userId');
+
+        if (workspaceId && !workspaces.length) {
+            return res.status(403).json({ message: 'You do not have access to this workspace' });
+        }
+
+        const userIds = new Set();
+        workspaces.forEach(w => {
+            if (w.owner) userIds.add(String(w.owner));
+            w.collaborators.forEach(c => c.userId && userIds.add(String(c.userId)));
+        });
+        userIds.add(String(req.user._id));
+
+        const users = await User.find({ _id: { $in: Array.from(userIds) } }, 'displayName email profilePicture');
         res.json(users);
     } catch (err) {
         console.error("Error fetching users:", err);

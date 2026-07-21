@@ -4,7 +4,7 @@ import { FiCheckCircle, FiXCircle, FiEdit2, FiEye, FiPlus, FiClock, FiUser, FiCh
 import ReviewRequestModal from './ReviewRequestModal';
 import './ReviewDashboard.css';
 
-const ReviewDashboard = () => {
+const ReviewDashboard = ({ workspaceId }) => {
     const [reviews, setReviews] = useState([]);
     const [filter, setFilter] = useState('assigned');
     const [loading, setLoading] = useState(true);
@@ -15,12 +15,13 @@ const ReviewDashboard = () => {
 
     useEffect(() => {
         fetchReviews();
-    }, [filter]);
+    }, [filter, workspaceId]);
 
     const fetchReviews = async () => {
         setLoading(true);
         try {
-            const res = await fetch(`/api/reviews?type=${filter}`, { credentials: 'include' });
+            const url = `/api/reviews?type=${filter}${workspaceId ? `&workspaceId=${encodeURIComponent(workspaceId)}` : ''}`;
+            const res = await fetch(url, { credentials: 'include' });
             if (res.ok) {
                 const data = await res.json();
                 setReviews(data);
@@ -159,6 +160,7 @@ const ReviewDashboard = () => {
                 <ReviewRequestModal
                     isOpen={showCreateModal}
                     onClose={() => { setShowCreateModal(false); fetchReviews(); }}
+                    workspaceId={workspaceId}
                 />
 
                 {loading ? (

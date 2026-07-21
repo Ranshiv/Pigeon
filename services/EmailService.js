@@ -773,10 +773,12 @@ If you have any questions, please contact our support team.
         }
 
         try {
-            const { toEmail, toName, requesterName, title, reviewId } = reviewData;
+            const { toEmail, toName, requesterName, title, reviewId, workspaceId } = reviewData;
 
             const subject = `${requesterName} requested your review: ${title}`;
-            const reviewUrl = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/reviews/${reviewId}`;
+            const reviewUrl = workspaceId
+                ? `${process.env.FRONTEND_URL || 'http://localhost:3000'}/workspace/workspaces/${workspaceId}?tab=reviews`
+                : `${process.env.FRONTEND_URL || 'http://localhost:3000'}/workspace/workspaces`;
 
             const htmlContent = `
                 <html>

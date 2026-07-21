@@ -3,6 +3,27 @@ const router = express.Router();
 const ReviewRequest = require('../models/ReviewRequest');
 const ActivityLog = require('../models/ActivityLog');
 const Collection = require('../models/Collection');
+const Request = require('../models/Request');
+const Workspace = require('../models/Workspace');
+
+// Resolve the workspace a resource belongs to, if any.
+async function resolveResourceWorkspace(resourceId, resourceType) {
+    if (resourceType === 'workspace') return resourceId;
+    const Model = resourceType === 'collection' ? Collection : resourceType === 'request' ? Request : null;
+    if (!Model) return null;
+    const doc = await Model.findById(resourceId, 'workspaceId').catch(() => null);
+    return doc?.workspaceId ? String(doc.workspaceId) : null;
+}
+
+// Member ids (owner + collaborators) of a set of workspaces.
+function memberIdsOf(workspaces) {
+    const ids = new Set();
+    workspaces.forEach(w => {
+        if (w.owner) ids.add(String(w.owner));
+        w.collaborators.forEach(c => c.userId && ids.add(String(c.userId)));
+    });
+    return ids;
+}
 const { broadcastActivity, getUserSockets } = require('../utils/socket/socket-server');
 const EmailService = require('../services/EmailService');
 const emailService = new EmailService();
@@ -21,6 +42,29 @@ const ensureAuthenticated = (req, res, next) => {
 router.post('/', ensureAuthenticated, async (req, res) => {
     try {
         const { resourceId, resourceType, title, description, reviewers, metadata } = req.body;
+        const resourceWorkspaceId = await resolveResourceWorkspace(resourceId, resourceType);
+
+        // Only reviewers who have access to the resource's workspace are allowed.
+        // Falls back to "any workspace shared with the requester" when the resource
+        // has no workspace association (e.g. legacy un-scoped requests).
+        if (reviewers && reviewers.length) {
+            const scopeQuery = resourceWorkspaceId
+                ? { _id: resourceWorkspaceId }
+                : { $or: [{ owner: req.user._id }, { 'collaborators.userId': req.user._id }] };
+
+            const workspaces = await Workspace.find(scopeQuery, 'owner collaborators.userId');
+            const allowedIds = memberIdsOf(workspaces);
+
+            // Requester must themselves have access to the resource's workspace.
+            if (resourceWorkspaceId && !allowedIds.has(String(req.user._id))) {
+                return res.status(403).json({ error: 'You do not have access to this workspace' });
+            }
+
+            const invalid = reviewers.filter(id => !allowedIds.has(String(id)));
+            if (invalid.length) {
+                return res.status(403).json({ error: 'One or more reviewers do not have access to this workspace' });
+            }
+        }
 
         // Create the review request
         const review = new ReviewRequest({
@@ -79,7 +123,8 @@ router.post('/', ensureAuthenticated, async (req, res) => {
                 toName: r.user.displayName,
                 requesterName,
                 title,
-                reviewId: String(review._id)
+                reviewId: String(review._id),
+                workspaceId: resourceWorkspaceId
             })));
         } catch (notifyError) {
             console.error('Error notifying reviewers:', notifyError);
@@ -178,14 +223,29 @@ router.patch('/:id', ensureAuthenticated, async (req, res) => {
 // Get reviews for a workspace or user
 router.get('/', ensureAuthenticated, async (req, res) => {
     try {
-        const { type } = req.query; // 'assigned' | 'created' | 'all'
+        const { type, workspaceId } = req.query; // 'assigned' | 'created' | 'all'
 
-        let query = {};
+        const filters = [];
         if (type === 'assigned') {
-            query = { 'reviewers.user': req.user._id };
+            filters.push({ 'reviewers.user': req.user._id });
         } else if (type === 'created') {
-            query = { requester: req.user._id };
+            filters.push({ requester: req.user._id });
         }
+
+        if (workspaceId) {
+            const [collections, requests] = await Promise.all([
+                Collection.find({ workspaceId }, '_id'),
+                Request.find({ workspaceId }, '_id')
+            ]);
+            const resourceIds = [
+                ...collections.map(c => String(c._id)),
+                ...requests.map(r => String(r._id)),
+                String(workspaceId) // reviews created directly on the workspace resource
+            ];
+            filters.push({ resourceId: { $in: resourceIds } });
+        }
+
+        const query = filters.length ? { $and: filters } : {};
 
         const reviews = await ReviewRequest.find(query)
             .populate('requester', 'displayName email profilePicture')

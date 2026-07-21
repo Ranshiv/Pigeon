@@ -55,7 +55,9 @@ const ActivityFeed = ({ isOpen, onToggle }) => {
 
     const getActivityLink = (act) => {
         if (!act) return null;
-        if (act.resourceType === 'review') return '/workspace/reviews';
+        if (act.resourceType === 'review') {
+            return act.workspaceId ? `/workspace/workspaces/${act.workspaceId}?tab=reviews` : null;
+        }
         if (act.resourceType === 'collection' && act.resourceId) {
             return `/workspace/collections/${act.resourceId}`;
         }

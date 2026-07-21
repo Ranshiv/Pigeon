@@ -6,12 +6,13 @@ import {
     FiUsers, FiPlus, FiEdit, FiTrash2, FiActivity,
     FiGitMerge, FiGitBranch, FiGitPullRequest, FiLock,
     FiCalendar, FiBarChart2, FiPackage, FiClock, FiStar,
-    FiGlobe, FiX, FiFolder, FiInbox
+    FiGlobe, FiX, FiFolder, FiInbox, FiCheckSquare
 } from 'react-icons/fi';
 import { useCollaboration } from '../context/CollaborationContext';
 import ActiveCollaborators from './ActiveCollaborators';
 import GlobalVariablesModal from './GlobalVariablesModal';
 import CollectionCreate from './CollectionCreate';
+import ReviewDashboard from './collaboration/ReviewDashboard';
 
 const WorkspaceDetail = () => {
     const { id } = useParams();
@@ -22,7 +23,7 @@ const WorkspaceDetail = () => {
     const [error, setError] = useState(null);
     const [debugInfo, setDebugInfo] = useState(null);
     const [collections, setCollections] = useState([]);
-    const [activeTab, setActiveTab] = useState('collections');
+    const [activeTab, setActiveTab] = useState(() => new URLSearchParams(location.search).get('tab') || 'collections');
     const [mergeRequests, setMergeRequests] = useState([]);
     const [collaborators, setCollaborators] = useState([]);
     const [activities, setActivities] = useState([]);
@@ -598,6 +599,12 @@ const WorkspaceDetail = () => {
                     >
                         <FiActivity /> Activity
                     </button>
+                    <button
+                        className={`ws-tab ${activeTab === 'reviews' ? 'active' : ''}`}
+                        onClick={() => handleTabChange('reviews')}
+                    >
+                        <FiCheckSquare /> Reviews
+                    </button>
                 </div>
                 <div className="ws-header-stats">
                     <span className="ws-header-stat">
@@ -909,6 +916,11 @@ const WorkspaceDetail = () => {
                             </div>
                         )}
                     </section>
+                )}
+
+                {/* Reviews tab */}
+                {activeTab === 'reviews' && (
+                    <ReviewDashboard workspaceId={id} />
                 )}
             </div>
 

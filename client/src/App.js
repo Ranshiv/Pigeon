@@ -37,7 +37,6 @@ const getPageTitle = (pathname) => {
     '/workspace': 'Workspace',
     '/workspace/home': 'Home',
     '/workspace/workspaces': 'Workspaces',
-    '/workspace/reviews': 'Reviews',
     '/workspace/collections': 'Collections',
     '/workspace/api-network': 'API Network',
     '/workspace/monitoring': 'Monitoring',

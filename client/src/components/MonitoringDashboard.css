@@ -258,7 +258,8 @@
 /* Filters */
 .filters {
     display: flex;
-    gap: 8px;
+    align-items: stretch;
+    gap: 4px;
     margin-bottom: 24px;
     padding: 4px;
     background: var(--card-bg);
@@ -269,28 +270,33 @@
     animation-delay: 0.2s;
 }
 
-.filter-btn {
-    padding: 8px 16px;
+.filters .filter-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    height: auto;
+    padding: 10px 16px;
     border: none;
     border-radius: 6px;
     background: transparent;
     color: var(--text-secondary);
+    font-size: 0.875rem;
     font-weight: 500;
+    white-space: nowrap;
     cursor: pointer;
     transition: background 0.2s ease, color 0.2s ease, transform 0.15s ease;
-    white-space: nowrap;
 }
 
-.filter-btn:hover {
+.filters .filter-btn:hover {
     background: var(--hover-bg);
     color: var(--text-color);
 }
 
-.filter-btn:active {
+.filters .filter-btn:active {
     transform: scale(0.97);
 }
 
-.filter-btn.active {
+.filters .filter-btn.active {
     background: var(--primary-color);
     color: white;
 }

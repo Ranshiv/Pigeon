@@ -107,7 +107,8 @@ router.delete('/:id', async (req, res) => {
 // Get all requests
 router.get('/', async (req, res) => {
     try {
-        const requests = await Request.find();
+        const { workspaceId } = req.query;
+        const requests = await Request.find(workspaceId ? { workspaceId } : {});
         res.json(requests);
     } catch (err) {
         res.status(500).json({ message: err.message });

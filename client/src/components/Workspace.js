@@ -27,7 +27,6 @@ import CursorOverlay from './collaboration/CursorOverlay';
 
 import VideoChatOverlay from './collaboration/VideoChatOverlay';
 import ActivityFeed from './collaboration/ActivityFeed';
-import ReviewDashboard from './collaboration/ReviewDashboard';
 
 const Workspace = () => {
     const { emitCursorMove, joinWorkspace, connected } = useCollaboration();
@@ -61,9 +60,6 @@ const Workspace = () => {
                 <Route index element={<Navigate to="/workspace/home" />} />
                 <Route path="home" element={<Home />} />
                 <Route path="workspaces/*" element={<WorkspacesSection />} />
-
-                {/* Process Reviews & Collaboration */}
-                <Route path="reviews" element={<ReviewDashboard />} />
 
                 {/* The order of these routes matters - more specific routes should come first */}
                 <Route path="collections/new" element={<CollectionCreate />} />
