@@ -23,13 +23,12 @@ import SettingsPage from './SettingsPage';
 import HistoryDetailsSection from './HistoryDetailsSection';
 
 import { useCollaboration } from '../context/CollaborationContext';
-import CursorOverlay from './collaboration/CursorOverlay';
 
 import VideoChatOverlay from './collaboration/VideoChatOverlay';
 import ActivityFeed from './collaboration/ActivityFeed';
 
 const Workspace = () => {
-    const { emitCursorMove, joinWorkspace, connected } = useCollaboration();
+    const { joinWorkspace, connected } = useCollaboration();
     const [isActivityOpen, setIsActivityOpen] = useState(false);
 
     useEffect(() => {
@@ -38,21 +37,8 @@ const Workspace = () => {
         }
     }, [connected, joinWorkspace]);
 
-    const handleMouseMove = (e) => {
-        // Debounce happens in context or socket layer usually, but simple throttling here is okay too
-        // or rely on the context's volatile emit
-        const x = e.clientX / window.innerWidth;
-        const y = e.clientY / window.innerHeight;
-
-        // Only emit if within bounds (0-1)
-        if (x >= 0 && x <= 1 && y >= 0 && y <= 1) {
-            emitCursorMove({ x, y }, window.location.pathname);
-        }
-    };
-
     return (
-        <div style={{ position: 'relative' }} onMouseMove={handleMouseMove}>
-            <CursorOverlay />
+        <div style={{ position: 'relative' }}>
             <VideoChatOverlay />
             <ActivityFeed isOpen={isActivityOpen} onToggle={() => setIsActivityOpen(o => !o)} />
 

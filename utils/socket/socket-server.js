@@ -106,17 +106,6 @@ function initializeSocketServer(server) {
                     rooms: userRooms
                 });
 
-                // --- NEW: Shared Cursor Handling ---
-                socket.on('cursorMove', ({ room, position, route }) => {
-                    // Broadcast to everyone in the room EXCEPT sender
-                    // Using volatile to drop packets if network congested
-                    socket.to(room).volatile.emit('cursorMove', {
-                        userId: authenticatedUser.id,
-                        position,
-                        route
-                    });
-                });
-
                 // --- NEW: WebRTC Signaling ---
                 socket.on('callUser', ({ userToCall, signalData, from }) => {
                     // Find target by either their User ID or Socket ID

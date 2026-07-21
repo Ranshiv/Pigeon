@@ -26,7 +26,6 @@ export const CollaborationProvider = ({ children }) => {
   const [mergeConflicts, setMergeConflicts] = useState({});
 
   // --- NEW: Collaboration State ---
-  const [cursors, setCursors] = useState({});
   // WebRTC State
   const [stream, setStream] = useState(null);
   const [callAccepted, setCallAccepted] = useState(false);
@@ -295,16 +294,6 @@ export const CollaborationProvider = ({ children }) => {
       }
     });
 
-    // --- NEW: Shared Cursor Handling ---
-    socketInstance.on('cursorMove', ({ userId, position, route }) => {
-      // position: { x, y } (percentage is better for responsive UI)
-      // route: current route/path the user is on
-      setCursors(prev => ({
-        ...prev,
-        [userId]: { ...prev[userId], position, route, lastActive: Date.now() }
-      }));
-    });
-
     // --- NEW: Review Request Events ---
     socketInstance.on('reviewCreated', (review) => {
       addNotification(`New review request: ${review.title}`);
@@ -377,18 +366,6 @@ export const CollaborationProvider = ({ children }) => {
       socketInstance.disconnect();
     };
   }, []); // Remove currentRoom dependency to avoid recreating socket
-
-  const emitCursorMove = useCallback((position, route) => {
-    if (socket && connected && currentRoom) {
-      // Flatten data to minimize payload
-      // Use volatile to discard if network is congested
-      socket.volatile.emit('cursorMove', {
-        room: currentRoom,
-        position, // { x: 0.5, y: 0.2 } normalized coordinates
-        route
-      });
-    }
-  }, [socket, connected, currentRoom]);
 
   const reconnect = useCallback(() => {
     if (socket) { // && !connected check might prevent forced reconnects
@@ -673,8 +650,6 @@ export const CollaborationProvider = ({ children }) => {
     createMergeRequest,
     resolveMergeConflict,
     // New Features
-    cursors,
-    emitCursorMove,
     // WebRTC
     stream,
     incomingCall,
