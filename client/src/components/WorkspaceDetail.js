@@ -68,7 +68,7 @@ const WorkspaceDetail = () => {
                 setDebugInfo(null);
 
                 console.log(`Fetching workspace with ID: ${id}`);
-                const response = await fetch(`http://localhost:5001/api/workspaces/${id}`, {
+                const response = await fetch(`/api/workspaces/${id}`, {
                     credentials: 'include'
                 });
 
@@ -157,7 +157,7 @@ const WorkspaceDetail = () => {
 
     const fetchCollections = async (workspaceId) => {
         try {
-            const response = await fetch(`http://localhost:5001/api/workspaces/${workspaceId}/collections`, {
+            const response = await fetch(`/api/workspaces/${workspaceId}/collections`, {
                 credentials: 'include'
             });
             if (response.ok) {
@@ -176,7 +176,7 @@ const WorkspaceDetail = () => {
 
     const fetchMergeRequests = async (workspaceId) => {
         try {
-            const response = await fetch(`http://localhost:5001/api/workspaces/${workspaceId}/merge-requests`, {
+            const response = await fetch(`/api/workspaces/${workspaceId}/merge-requests`, {
                 credentials: 'include'
             });
             if (response.ok) {
@@ -195,7 +195,7 @@ const WorkspaceDetail = () => {
 
     const fetchActivities = async (workspaceId) => {
         try {
-            const response = await fetch(`http://localhost:5001/api/workspaces/${workspaceId}/activity`, {
+            const response = await fetch(`/api/workspaces/${workspaceId}/activity`, {
                 credentials: 'include'
             });
             if (response.ok) {
@@ -230,7 +230,7 @@ const WorkspaceDetail = () => {
         e.preventDefault();
         try {
             setLoading(true);
-            const response = await fetch(`http://localhost:5001/api/workspaces/${id}/invite`, {
+            const response = await fetch(`/api/workspaces/${id}/invite`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 credentials: 'include',
@@ -266,7 +266,7 @@ const WorkspaceDetail = () => {
         if (window.confirm('Are you sure you want to remove this collaborator?')) {
             try {
                 setLoading(true);
-                const response = await fetch(`http://localhost:5001/api/workspaces/${id}/collaborators/${collaboratorId}`, {
+                const response = await fetch(`/api/workspaces/${id}/collaborators/${collaboratorId}`, {
                     method: 'DELETE',
                     credentials: 'include'
                 });
@@ -293,7 +293,7 @@ const WorkspaceDetail = () => {
     const handleUpdateCollaboratorRole = async (collaboratorId, newRole) => {
         try {
             setLoading(true);
-            const response = await fetch(`http://localhost:5001/api/workspaces/${id}/collaborators/${collaboratorId}`, {
+            const response = await fetch(`/api/workspaces/${id}/collaborators/${collaboratorId}`, {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
                 credentials: 'include',
@@ -334,7 +334,7 @@ const WorkspaceDetail = () => {
                 return;
             }
 
-            const response = await fetch(`http://localhost:5001/api/workspaces/${id}`, {
+            const response = await fetch(`/api/workspaces/${id}`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 credentials: 'include',
@@ -372,7 +372,7 @@ const WorkspaceDetail = () => {
         if (window.confirm('Are you sure you want to delete this workspace? This action cannot be undone.')) {
             try {
                 setLoading(true);
-                const response = await fetch(`http://localhost:5001/api/workspaces/${id}`, {
+                const response = await fetch(`/api/workspaces/${id}`, {
                     method: 'DELETE',
                     credentials: 'include'
                 });
@@ -392,7 +392,7 @@ const WorkspaceDetail = () => {
     const handleApproveMergeRequest = async (mergeRequestId) => {
         try {
             setLoading(true);
-            const response = await fetch(`http://localhost:5001/api/merge-requests/${mergeRequestId}/approve`, {
+            const response = await fetch(`/api/merge-requests/${mergeRequestId}/approve`, {
                 method: 'POST',
                 credentials: 'include'
             });
@@ -422,7 +422,7 @@ const WorkspaceDetail = () => {
     const handleRejectMergeRequest = async (mergeRequestId) => {
         try {
             setLoading(true);
-            const response = await fetch(`http://localhost:5001/api/merge-requests/${mergeRequestId}/reject`, {
+            const response = await fetch(`/api/merge-requests/${mergeRequestId}/reject`, {
                 method: 'POST',
                 credentials: 'include'
             });

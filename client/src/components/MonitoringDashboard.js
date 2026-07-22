@@ -5,13 +5,13 @@ import {
     FiActivity, FiAlertCircle, FiCheckCircle, FiClock,
     FiPlus, FiGlobe, FiRefreshCw, FiEye, FiEdit,
     FiTrash2, FiPause, FiPlay, FiTrendingUp, FiBarChart,
-    FiUsers, FiSettings, FiTool, FiBell
+    FiUsers, FiSettings, FiTool, FiBell, FiAlertTriangle
 } from 'react-icons/fi';
 import MonitorForm from './MonitorForm';
 import './MonitoringDashboard.css';
 import PageLoader from './common/PageLoader/PageLoader';
 
-const MonitoringDashboard = () => {
+const MonitoringDashboard = ({ createOnLoad = false }) => {
     const navigate = useNavigate();
     const [monitors, setMonitors] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -23,10 +23,13 @@ const MonitoringDashboard = () => {
 
     useEffect(() => {
         fetchMonitors();
+        if (createOnLoad) {
+            setShowCreateForm(true);
+        }
         // Auto-refresh every 30 seconds
         const interval = setInterval(fetchMonitors, 30000);
         return () => clearInterval(interval);
-    }, []);
+    }, [createOnLoad]);
 
     const fetchMonitors = async () => {
         try {
@@ -226,6 +229,12 @@ const MonitoringDashboard = () => {
                     onClick={() => navigate('/alerts/policies')}
                 >
                     <FiBell /> Alerts & Policies
+                </button>
+                <button
+                    className="nav-btn"
+                    onClick={() => navigate('/workspace/monitoring/incidents')}
+                >
+                    <FiAlertTriangle /> Incidents
                 </button>
                 <button
                     className="nav-btn"

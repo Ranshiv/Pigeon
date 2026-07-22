@@ -238,7 +238,7 @@ const TryItConsole = ({ api, selectedEndpoint, onEndpointChange, onSaveRequest }
                 body: showBody && body ? JSON.parse(body) : undefined
             };
 
-            const proxyResponse = await fetch('http://localhost:5001/api/marketplace/proxy', {
+            const proxyResponse = await fetch('/api/marketplace/proxy', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

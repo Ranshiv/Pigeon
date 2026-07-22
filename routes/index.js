@@ -49,6 +49,12 @@ const protocolsRoutes = require('./protocols');
 // Import API Marketplace routes
 const apiMarketplaceRoutes = require('./apiMarketplace');
 
+// Import Incident Management routes
+const incidentsRoutes = require('./incidents');
+
+// Import Alert routes
+const alertsRoutes = require('./alerts');
+
 // Register routes with their base paths
 router.use('/auth', authRoutes);
 router.use('/collections', collectionsRoutes);
@@ -95,6 +101,12 @@ router.use('/protocols', protocolsRoutes);
 
 // Register API Marketplace routes
 router.use('/marketplace', apiMarketplaceRoutes);
+
+// Register Incident Management routes
+router.use('/incidents', incidentsRoutes);
+
+// Register Alert routes
+router.use('/alerts', alertsRoutes);
 
 // Register Collaboration routes (Reviews & Comments & Activity)
 router.use('/reviews', require('./reviews'));

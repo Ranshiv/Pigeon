@@ -13,6 +13,7 @@ import ReportsManagement from './ReportsManagement';
 import TeamsManagement from './TeamsManagement';
 import IntegrationsManagement from './IntegrationsManagement';
 import MaintenanceManagement from './MaintenanceManagement';
+import IncidentManagement from './IncidentManagement';
 import AnalyticsDashboard from './Analytics/AnalyticsDashboard';
 import GraphQLTestPage from './GraphQLTestPage';
 import ProtocolTestPage from './ProtocolTestPage';
@@ -49,14 +50,18 @@ const Workspace = () => {
 
                 {/* The order of these routes matters - more specific routes should come first */}
                 <Route path="collections/new" element={<CollectionCreate />} />
-                <Route path="collections/:collectionId/documentation" element={<DocumentationManager />} />
-                <Route path="collections/:collectionId" element={<CollectionDetail />} />            <Route path="collections" element={<CollectionsManagement />} />            <Route path="api-network/*" element={<APINetworkSection />} />
+                <Route path="collections/:collectionId/documentation/*" element={<DocumentationManager />} />
+                <Route path="collections/:collectionId" element={<CollectionDetail />} />
+                <Route path="collections" element={<CollectionsManagement />} />
+                <Route path="api-network/*" element={<APINetworkSection />} />
                 <Route path="monitoring/:id/analytics" element={<AnalyticsDashboard />} />
                 <Route path="monitoring/:id/history" element={<MonitoringHistory />} />
                 <Route path="monitoring/reports" element={<ReportsManagement />} />
                 <Route path="monitoring/teams" element={<TeamsManagement />} />
                 <Route path="monitoring/integrations" element={<IntegrationsManagement />} />
                 <Route path="monitoring/maintenance" element={<MaintenanceManagement />} />
+                <Route path="monitoring/incidents" element={<IncidentManagement />} />
+                <Route path="monitoring/new" element={<MonitoringDashboard createOnLoad />} />
                 <Route path="monitoring" element={<MonitoringDashboard />} />
                 <Route path="graphql" element={<GraphQLTestPage />} />
                 <Route path="protocols" element={<ProtocolTestPage />} />

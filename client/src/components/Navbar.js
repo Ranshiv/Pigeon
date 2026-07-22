@@ -67,7 +67,7 @@ const Navbar = ({ isAuthenticated }) => {
     const fetchWorkspaces = async () => {
         try {
             setIsLoadingWorkspaces(true);
-            const response = await fetch('http://localhost:5001/api/workspaces', {
+            const response = await fetch('/api/workspaces', {
                 credentials: 'include'
             });
 
@@ -499,7 +499,7 @@ const Navbar = ({ isAuthenticated }) => {
                         </>
                     ) : (
                         <div className="navbar-end">
-                            <a href="http://localhost:5001/auth/google" className="login-button">
+                            <a href="/auth/google" className="login-button">
                                 Sign In
                             </a>
                         </div>

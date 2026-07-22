@@ -173,9 +173,8 @@ const MockEndpointEditor = ({ mockServer, onUpdate }) => {
     };
 
     const copyEndpointUrl = (endpoint) => {
-        // Use the backend URL directly (port 5001) instead of the React dev server port
-        const backendUrl = process.env.REACT_APP_API_URL || 'http://localhost:5001';
-        const url = `${backendUrl}/api/mock-servers/${mockServer._id}/simulate${endpoint.path}`;
+        const origin = window.location.origin;
+        const url = `${origin}/api/mock-servers/${mockServer._id}/simulate${endpoint.path}`;
         navigator.clipboard.writeText(url);
     };
 

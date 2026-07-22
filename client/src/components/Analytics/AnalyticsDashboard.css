@@ -58,7 +58,7 @@
     transform: translateX(-4px);
 }
 
-.header-info h1 {
+.analytics-dashboard .header-info h1 {
     display: flex;
     align-items: center;
     gap: 12px;

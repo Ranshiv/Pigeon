@@ -43,7 +43,7 @@ const CollectionCreate = ({
                 requestBody.workspaceId = workspaceId;
             }
 
-            const response = await fetch('http://localhost:5001/api/collections', {
+            const response = await fetch('/api/collections', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

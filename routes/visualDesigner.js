@@ -51,20 +51,10 @@ router.post('/designs', authenticateJWT, async (req, res) => {
         let collection = await Collection.findById(collectionId);
 
         if (!collection) {
-            // Create a new collection with the specified ID
-            console.log('Creating new collection with ID:', collectionId);
-            collection = new Collection({
-                _id: collectionId, // Use the specific ID that was requested
-                name: name || 'Visual Design Collection',
-                description: description || 'Collection for visual API design',
-                userId: userId,
-                owner: userId,
-                requests: [],
-                metadata: {}
+            return res.status(404).json({
+                success: false,
+                message: 'Collection not found'
             });
-
-            collection = await collection.save();
-            console.log('✅ New collection created with requested ID:', collection._id);
         }
 
         // Ensure metadata object exists

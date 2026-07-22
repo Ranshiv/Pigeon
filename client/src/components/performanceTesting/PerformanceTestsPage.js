@@ -171,7 +171,7 @@ const formatBytes = (bytes) => {
 const defaultForm = () => ({
     name: 'New Load Test',
     description: '',
-    targetUrl: 'http://localhost:5001/api/health',
+    targetUrl: `${window.location.origin}/api/health`,
     method: 'GET',
     timeoutSeconds: 30,
     headersJson: '{\n  "Content-Type": "application/json"\n}',

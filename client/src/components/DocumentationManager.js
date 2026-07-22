@@ -1,6 +1,6 @@
 // client/src/components/DocumentationManager.js
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, useNavigate, Link, useLocation } from 'react-router-dom';
 import { FiBook, FiDownload, FiUpload, FiSettings, FiGlobe, FiClock, FiChevronLeft, FiEdit, FiFileText, FiGitBranch } from 'react-icons/fi';
 import DocumentationEditor from './DocumentationEditor';
 import DocumentationViewer from './DocumentationViewer';
@@ -36,8 +36,10 @@ const isValidJSON = (str) => {
 };
 
 const DocumentationManager = () => {
-    const { collectionId } = useParams();
-    const navigate = useNavigate(); const [collection, setCollection] = useState(null);
+    const { collectionId, '*': subpath } = useParams();
+    const navigate = useNavigate();
+    const location = useLocation();
+    const [collection, setCollection] = useState(null);
     const [documentation, setDocumentation] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -47,6 +49,16 @@ const DocumentationManager = () => {
     const [originalSettings, setOriginalSettings] = useState(null);
     const [settingsChanged, setSettingsChanged] = useState(false);
     const [versionHistoryTab, setVersionHistoryTab] = useState('settings'); // 'settings' or 'content'
+
+    // Sync view with URL subpath (e.g. /swagger, /settings, /history, /api-versions)
+    useEffect(() => {
+        const tail = subpath || location.pathname.split('/documentation/')[1] || '';
+        const allowed = ['edit', 'view', 'swagger', 'settings', 'history', 'api-versions'];
+        const next = tail.split('/')[0];
+        if (next && allowed.includes(next)) {
+            setView(next);
+        }
+    }, [subpath, location.pathname]);
 
     // Listen for view changes for debugging
     useEffect(() => {

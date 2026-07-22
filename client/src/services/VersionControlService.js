@@ -191,7 +191,7 @@ const getVersionHistory = async (entityType, entityId) => {
             return [];
         }
 
-        const response = await fetch(`http://localhost:5001/api/${entityType}s/${entityId}/versions`, {
+        const response = await fetch(`/api/${entityType}s/${entityId}/versions`, {
             credentials: 'include'
         });
 
@@ -217,7 +217,7 @@ const getVersionHistory = async (entityType, entityId) => {
  */
 const saveVersion = async (entityType, entityId, changes, userId, message) => {
     try {
-        const response = await fetch(`http://localhost:5001/api/${entityType}s/${entityId}/versions`, {
+        const response = await fetch(`/api/${entityType}s/${entityId}/versions`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

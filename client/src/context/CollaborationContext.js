@@ -114,7 +114,7 @@ export const CollaborationProvider = ({ children }) => {
   // Initialize the socket connection
   useEffect(() => {
     // Connect to the server
-    const socketInstance = io('http://localhost:5001', {
+    const socketInstance = io(window.location.origin, {
       withCredentials: true,
       reconnection: true,
       reconnectionAttempts: 8,

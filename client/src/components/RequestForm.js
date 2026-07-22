@@ -43,13 +43,7 @@ import NetworkFlowHost from "./VisualApiDesigner/components/NetworkFlowHost";
 import AuthFlowHost from "./VisualApiDesigner/components/AuthFlowHost";
 import DebugConsoleHost from "./VisualApiDesigner/components/DebugConsoleHost";
 
-// Helper function to get the correct API base URL
-const getApiUrl = (path) => {
-    // In development, if proxy isn't working, use direct backend URL
-    const isDevelopment = process.env.NODE_ENV === 'development';
-    const baseUrl = isDevelopment ? 'http://localhost:5001' : '';
-    return `${baseUrl}${path}`;
-};
+const getApiUrl = (path) => path;
 
 // HTTP Methods
 const HTTP_METHODS = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD', 'OPTIONS'];

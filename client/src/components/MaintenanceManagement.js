@@ -7,7 +7,7 @@ import PageLoader from './common/PageLoader/PageLoader';
 import {
     FiTool, FiPlus, FiEdit, FiTrash2, FiClock, FiCalendar,
     FiRepeat, FiX, FiSave, FiAlertCircle, FiSettings, FiBell, FiEye,
-    FiActivity, FiBarChart, FiUsers
+    FiActivity, FiBarChart, FiUsers, FiAlertTriangle
 } from 'react-icons/fi';
 
 const RECURRENCE_TYPES = [
@@ -528,6 +528,12 @@ const MaintenanceManagement = () => {
                     onClick={() => navigate('/alerts/policies')}
                 >
                     <FiBell /> Alerts & Policies
+                </button>
+                <button
+                    className="mtm-nav-btn"
+                    onClick={() => navigate('/workspace/monitoring/incidents')}
+                >
+                    <FiAlertTriangle /> Incidents
                 </button>
                 <button
                     className="mtm-nav-btn"

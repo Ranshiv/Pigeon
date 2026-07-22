@@ -362,6 +362,9 @@ const AlertPolicyEditor = () => {
             <button type="button" className="nav-btn active">
                 <FiBell /> Alerts & Policies
             </button>
+            <button type="button" className="nav-btn" onClick={() => navigate('/workspace/monitoring/incidents')}>
+                <FiAlertTriangle /> Incidents
+            </button>
             <button type="button" className="nav-btn" onClick={() => navigate('/workspace/monitoring/reports')}>
                 <FiBarChart /> Reports
             </button>

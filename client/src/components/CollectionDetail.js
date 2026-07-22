@@ -787,7 +787,7 @@ function CollectionDetail() {
       <div className="collection-error">
         <h3><FiAlertCircle className="error-icon" /> Error</h3>
         <p>{error}</p>
-        <button onClick={() => navigate('/collections')}>Go Back to Collections</button>
+        <button onClick={() => navigate('/workspace/collections')}>Go Back to Collections</button>
       </div>
     );
   }

@@ -63,7 +63,7 @@ const WorkspacesSection = ({ requests, response, onSend, onCreate, onUpdate, onD
     const fetchWorkspaces = async () => {
         try {
             setLoading(true);
-            const response = await fetch('http://localhost:5001/api/workspaces', {
+            const response = await fetch('/api/workspaces', {
                 credentials: 'include'
             });
 
@@ -126,7 +126,7 @@ const WorkspacesSection = ({ requests, response, onSend, onCreate, onUpdate, onD
                 return;
             }
 
-            const response = await fetch('http://localhost:5001/api/workspaces', {
+            const response = await fetch('/api/workspaces', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

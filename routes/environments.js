@@ -116,6 +116,26 @@ router.get('/', ensureAuthenticated, async (req, res) => {
     }
 });
 
+// GET /api/environments/active/:workspaceId? - Get active environment for workspace
+// Must precede /:id or Express matches "active" as an id.
+router.get('/active/:workspaceId?', ensureAuthenticated, async (req, res) => {
+    try {
+        const workspaceId = req.params.workspaceId === 'null' ? null : req.params.workspaceId;
+
+        const activeEnvironment = await Environment.findOne({
+            userId: req.user.id,
+            workspaceId: workspaceId,
+            type: 'environment',
+            isActive: true
+        });
+
+        res.json(activeEnvironment);
+    } catch (error) {
+        console.error('Error fetching active environment:', error);
+        res.status(500).json({ error: 'Failed to fetch active environment' });
+    }
+});
+
 // GET /api/environments/:id - Get specific environment
 router.get('/:id', ensureAuthenticated, async (req, res) => {
     try {
@@ -572,25 +592,6 @@ router.post('/:id/collaborators', ensureAuthenticated, async (req, res) => {
     } catch (error) {
         console.error('Error adding collaborator:', error);
         res.status(500).json({ error: 'Failed to add collaborator' });
-    }
-});
-
-// GET /api/environments/active/:workspaceId? - Get active environment for workspace
-router.get('/active/:workspaceId?', ensureAuthenticated, async (req, res) => {
-    try {
-        const workspaceId = req.params.workspaceId === 'null' ? null : req.params.workspaceId;
-
-        const activeEnvironment = await Environment.findOne({
-            userId: req.user.id,
-            workspaceId: workspaceId,
-            type: 'environment',
-            isActive: true
-        });
-
-        res.json(activeEnvironment);
-    } catch (error) {
-        console.error('Error fetching active environment:', error);
-        res.status(500).json({ error: 'Failed to fetch active environment' });
     }
 });
 

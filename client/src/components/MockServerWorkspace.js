@@ -187,9 +187,7 @@ const MockServerWorkspace = ({ collectionId, versionId, onClose }) => {
 
     const copyServerUrl = () => {
         if (!selectedServer) return;
-        // Use the backend URL directly (port 5001) instead of the React dev server port
-        const backendUrl = process.env.REACT_APP_API_URL || 'http://localhost:5001';
-        const url = `${backendUrl}/api/mock-servers/${selectedServer._id}/simulate`;
+        const url = `${window.location.origin}/api/mock-servers/${selectedServer._id}/simulate`;
         navigator.clipboard.writeText(url);
     };
 

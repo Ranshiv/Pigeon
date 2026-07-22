@@ -8,7 +8,8 @@ import {
     FiSettings, FiPlus, FiEdit, FiTrash2, FiCheck, FiX,
     FiAlertCircle, FiMail, FiMessageSquare, FiBell, FiActivity,
     FiTool, FiExternalLink, FiRefreshCw, FiPlay,
-    FiBarChart, FiUsers, FiCheckCircle, FiEye, FiEyeOff
+    FiBarChart, FiUsers, FiCheckCircle, FiEye, FiEyeOff,
+    FiAlertTriangle
 } from 'react-icons/fi';
 
 const IntegrationsManagement = () => {
@@ -544,6 +545,9 @@ const IntegrationsManagement = () => {
                 </button>
                 <button className="im-nav-btn" onClick={() => navigate('/alerts/policies')}>
                     <FiBell /> Alerts & Policies
+                </button>
+                <button className="im-nav-btn" onClick={() => navigate('/workspace/monitoring/incidents')}>
+                    <FiAlertTriangle /> Incidents
                 </button>
                 <button className="im-nav-btn" onClick={() => navigate('/workspace/monitoring/reports')}>
                     <FiBarChart /> Reports

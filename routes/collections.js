@@ -25,11 +25,6 @@ router.get('/', ensureAuthenticated, async (req, res) => {
             })
             .toArray();
 
-        // Fallback for dev mode: if no collections match the current user, show all
-        if (collections.length === 0 && process.env.NODE_ENV !== 'production') {
-            collections = await db.collection('collections').find({}).limit(100).toArray();
-        }
-
         // If collections exist in MongoDB, populate owner information and return them
         if (collections && collections.length > 0) {
             const User = require('../models/User');
@@ -62,60 +57,9 @@ router.get('/', ensureAuthenticated, async (req, res) => {
             );
 
             return res.json(populatedCollections);
-        }        // Mock collections data
-        const mockCollections = [
-            {
-                _id: "coll1",
-                name: "Personal API Collection",
-                description: "My personal collection of frequently used APIs",
-                isPublic: false,
-                owner: {
-                    _id: userId,
-                    displayName: req.user.displayName || req.user.name || "User",
-                    email: req.user.email || "user@example.com"
-                },
-                requestCount: 5,
-                collaborators: [],
-                createdAt: new Date(),
-                updatedAt: new Date()
-            },
-            {
-                _id: "coll2",
-                name: "Project X APIs",
-                description: "APIs used in the Project X development",
-                isPublic: false,
-                owner: {
-                    _id: userId,
-                    displayName: req.user.displayName || req.user.name || "User",
-                    email: req.user.email || "user@example.com"
-                },
-                requestCount: 12,
-                collaborators: [
-                    {
-                        email: "collaborator@example.com",
-                        role: "viewer"
-                    }
-                ],
-                createdAt: new Date(),
-                updatedAt: new Date()
-            }, {
-                _id: "coll3",
-                name: "Public Demo Collection",
-                description: "Public collection of demo APIs",
-                isPublic: true,
-                owner: {
-                    _id: userId,
-                    displayName: req.user.displayName || req.user.name || "User",
-                    email: req.user.email || "user@example.com"
-                },
-                requestCount: 8,
-                collaborators: [],
-                createdAt: new Date(),
-                updatedAt: new Date()
-            }
-        ];
+        }
 
-        res.json(mockCollections);
+        res.json([]);
     } catch (err) {
         console.error("Error fetching collections:", err);
         res.status(500).json({ message: 'Error fetching collections' });

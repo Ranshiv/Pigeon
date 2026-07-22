@@ -21,7 +21,7 @@ router.get('/', ensureAuthenticated, async (req, res) => {
         const db = getDb();
 
         // Fetch workspaces from MongoDB (support both string and ObjectId owners/collaborators)
-        let workspaces = await db.collection('workspaces')
+        const workspaces = await db.collection('workspaces')
             .find({
                 $or: [
                     { owner: userId },
@@ -31,11 +31,6 @@ router.get('/', ensureAuthenticated, async (req, res) => {
                 ]
             })
             .toArray();
-
-        // Fallback for dev mode: if nothing matched the current user, show all existing workspaces
-        if (workspaces.length === 0 && process.env.NODE_ENV !== 'production') {
-            workspaces = await db.collection('workspaces').find({}).limit(50).toArray();
-        }
 
         // Separate into personal and team workspaces
         const personalWorkspaces = [];
@@ -74,50 +69,6 @@ router.get('/', ensureAuthenticated, async (req, res) => {
                 description: workspace.description || "",
                 isPersonal: workspace.isPersonal || false,
                 isPublic: workspace.isPublic || false
-            };
-        }
-
-        // Add default workspace if none exist
-        if (personalWorkspaces.length === 0 && teamWorkspaces.length === 0) {
-            // Create a default workspace in MongoDB
-            const defaultWorkspace = {
-                name: "API Testing",
-                description: "Workspace for API testing and documentation",
-                isPersonal: true,
-                isPublic: false,
-                owner: userObjectId || userId,
-                userRole: "admin",
-                collaborators: [
-                    {
-                        userId: userObjectId || userId,
-                        displayName: req.user.name || "User",
-                        email: req.user.email,
-                        role: "admin",
-                        joinedAt: new Date()
-                    }
-                ],
-                createdAt: new Date(),
-                updatedAt: new Date()
-            };
-
-            const result = await db.collection('workspaces').insertOne(defaultWorkspace);
-            const newWorkspaceId = result.insertedId.toString();
-
-            // Add to personal workspaces array
-            personalWorkspaces.push({
-                ...defaultWorkspace,
-                _id: newWorkspaceId,
-                owner: (defaultWorkspace.owner && defaultWorkspace.owner.toString) ? defaultWorkspace.owner.toString() : defaultWorkspace.owner,
-                collectionsCount: 0,
-                collaboratorsCount: 1
-            });
-
-            // Update the in-memory store
-            workspacesStore[newWorkspaceId] = {
-                name: defaultWorkspace.name,
-                description: defaultWorkspace.description,
-                isPersonal: defaultWorkspace.isPersonal,
-                isPublic: defaultWorkspace.isPublic
             };
         }
 
@@ -226,30 +177,7 @@ router.get('/:id', ensureAuthenticated, async (req, res) => {
 
                 return res.json(workspace);
             } else {
-                // Create a new personal workspace
-                const defaultWorkspace = {
-                    name: "API Testing",
-                    description: "Workspace for API testing and documentation",
-                    isPersonal: true,
-                    isPublic: false,
-                    owner: userId,
-                    userRole: "admin",
-                    memberCount: 1,
-                    collectionCount: 2,
-                    collaborators: [
-                        {
-                            userId: userId,
-                            displayName: req.user.name || "User",
-                            email: req.user.email,
-                            role: "admin",
-                            joinedAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
-                        }
-                    ],
-                    createdAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
-                    updatedAt: new Date()
-                };
-
-                return res.json(defaultWorkspace);
+                return res.status(404).json({ message: 'Personal workspace not found' });
             }
         }
 
@@ -394,104 +322,7 @@ router.get('/:id/collections', ensureAuthenticated, async (req, res) => {
             return res.json(collectionsWithStringIds);
         }
 
-        // Mock collections data based on workspace ID
-        let mockCollections = [];
-
-        switch (workspaceId) {
-            case "ws1":
-                mockCollections = [
-                    {
-                        _id: "coll1",
-                        name: "Personal API Collection",
-                        description: "My personal collection of frequently used APIs",
-                        workspaceId: "ws1",
-                        owner: userId,
-                        isPublic: false,
-                        requestsCount: 5,
-                        createdAt: new Date(Date.now() - 25 * 24 * 60 * 60 * 1000), // 25 days ago
-                        updatedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000)  // 1 day ago
-                    },
-                    {
-                        _id: "coll2",
-                        name: "Project X APIs",
-                        description: "APIs used in the Project X development",
-                        workspaceId: "ws1",
-                        owner: userId,
-                        isPublic: false,
-                        requestsCount: 12,
-                        createdAt: new Date(Date.now() - 25 * 24 * 60 * 60 * 1000), // 25 days ago
-                        updatedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000)  // 1 day ago
-                    },
-                    {
-                        _id: "coll3",
-                        name: "Public Demo Collection",
-                        description: "Public collection of demo APIs",
-                        workspaceId: "ws1",
-                        owner: userId,
-                        isPublic: true,
-                        requestsCount: 8,
-                        createdAt: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000), // 20 days ago
-                        updatedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000)  // 2 days ago
-                    }
-                ];
-                break;
-            case "ws2":
-                mockCollections = [
-                    {
-                        _id: "coll4",
-                        name: "API Testing Collection",
-                        description: "APIs for testing our services",
-                        workspaceId: "ws2",
-                        owner: "other-user-id",
-                        isPublic: false,
-                        requestsCount: 15,
-                        createdAt: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000), // 14 days ago
-                        updatedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000)  // 1 day ago
-                    },
-                    {
-                        _id: "coll5",
-                        name: "Authentication APIs",
-                        description: "All authentication-related API endpoints",
-                        workspaceId: "ws2",
-                        owner: "other-user-id",
-                        isPublic: false,
-                        requestsCount: 7,
-                        createdAt: new Date(Date.now() - 12 * 24 * 60 * 60 * 1000), // 12 days ago
-                        updatedAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000)  // 3 days ago
-                    },
-                    {
-                        _id: "coll6",
-                        name: "User Management APIs",
-                        description: "User creation, updates, and management endpoints",
-                        workspaceId: "ws2",
-                        owner: "member3",
-                        isPublic: false,
-                        requestsCount: 10,
-                        createdAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000), // 10 days ago
-                        updatedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000)  // 2 days ago
-                    }
-                ];
-                break;
-            case "ws3":
-                mockCollections = [
-                    {
-                        _id: "coll7",
-                        name: "Public API Documentation",
-                        description: "Public endpoints documentation",
-                        workspaceId: "ws3",
-                        owner: "another-user-id",
-                        isPublic: true,
-                        requestsCount: 12,
-                        createdAt: new Date(Date.now() - 58 * 24 * 60 * 60 * 1000), // 58 days ago
-                        updatedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000)  // 2 days ago
-                    }
-                ];
-                break;
-            default:
-                mockCollections = [];
-        }
-
-        res.json(mockCollections);
+        res.json([]);
     } catch (err) {
         console.error("Error fetching workspace collections:", err);
         res.status(500).json({ message: 'Error fetching workspace collections' });

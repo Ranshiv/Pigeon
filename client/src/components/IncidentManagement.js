@@ -4,10 +4,13 @@ import {
     FiAlertTriangle, FiPlus, FiEdit, FiTrash2,
     FiEye, FiClock, FiCheckCircle, FiAlertCircle,
     FiSearch, FiRefreshCw, FiBell, FiActivity, FiFileText,
-    FiUsers, FiArrowUp, FiCheck, FiLink, FiCalendar, FiMessageCircle
+    FiUsers, FiArrowUp, FiCheck, FiLink, FiCalendar, FiMessageCircle,
+    FiBarChart, FiSettings, FiTool
 } from 'react-icons/fi';
 import './IncidentManagement.css';
 import PageLoader from './common/PageLoader/PageLoader';
+import AppSelect from './common/AppSelect/AppSelect';
+import TabBar from './common/TabBar/TabBar';
 
 const IncidentManagement = () => {
     const [incidents, setIncidents] = useState([]);
@@ -33,13 +36,13 @@ const IncidentManagement = () => {
                 if (filter !== 'all') queryParams.append('status', filter);
                 if (searchTerm) queryParams.append('search', searchTerm);
 
-                const response = await fetch(`/api/monitoring/incidents?${queryParams}`, {
+                const response = await fetch(`/api/incidents?${queryParams}`, {
                     credentials: 'include'
                 });
 
                 if (response.ok) {
                     const data = await response.json();
-                    setIncidents(data);
+                    setIncidents(data.incidents || []);
                 }
             } catch (err) {
                 console.error('Error fetching incidents:', err);
@@ -59,13 +62,13 @@ const IncidentManagement = () => {
             if (filter !== 'all') queryParams.append('status', filter);
             if (searchTerm) queryParams.append('search', searchTerm);
 
-            const response = await fetch(`/api/monitoring/incidents?${queryParams}`, {
+            const response = await fetch(`/api/incidents?${queryParams}`, {
                 credentials: 'include'
             });
 
             if (response.ok) {
                 const data = await response.json();
-                setIncidents(data);
+                setIncidents(data.incidents || []);
             }
         } catch (error) {
             console.error('Error fetching incidents:', error);
@@ -76,7 +79,7 @@ const IncidentManagement = () => {
 
     const createIncident = async (incidentData) => {
         try {
-            const response = await fetch('/api/monitoring/incidents', {
+            const response = await fetch('/api/incidents', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -96,7 +99,7 @@ const IncidentManagement = () => {
 
     const updateIncident = async (incidentId, updateData) => {
         try {
-            const response = await fetch(`/api/monitoring/incidents/${incidentId}`, {
+            const response = await fetch(`/api/incidents/${incidentId}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json'
@@ -121,7 +124,7 @@ const IncidentManagement = () => {
         if (!window.confirm('Are you sure you want to delete this incident?')) return;
 
         try {
-            const response = await fetch(`/api/monitoring/incidents/${incidentId}`, {
+            const response = await fetch(`/api/incidents/${incidentId}`, {
                 method: 'DELETE',
                 credentials: 'include'
             });
@@ -139,20 +142,20 @@ const IncidentManagement = () => {
 
     const getSeverityColor = (severity) => {
         switch (severity) {
-            case 'critical': return '#dc3545';
-            case 'major': return '#fd7e14';
-            case 'minor': return '#ffc107';
-            default: return '#6c757d';
+            case 'critical': return '#ef4444';
+            case 'major': return '#f59e0b';
+            case 'minor': return '#3b82f6';
+            default: return '#6b7280';
         }
     };
 
     const getStatusIcon = (status) => {
         switch (status) {
-            case 'investigating': return <FiAlertTriangle className="status-icon investigating" />;
-            case 'identified': return <FiEye className="status-icon identified" />;
-            case 'monitoring': return <FiClock className="status-icon monitoring" />;
-            case 'resolved': return <FiCheckCircle className="status-icon resolved" />;
-            default: return <FiAlertCircle className="status-icon unknown" />;
+            case 'investigating': return <FiAlertTriangle className="incident-list-status-icon investigating" />;
+            case 'identified': return <FiEye className="incident-list-status-icon identified" />;
+            case 'monitoring': return <FiClock className="incident-list-status-icon monitoring" />;
+            case 'resolved': return <FiCheckCircle className="incident-list-status-icon resolved" />;
+            default: return <FiAlertCircle className="incident-list-status-icon unknown" />;
         }
     };
 
@@ -281,11 +284,27 @@ const IncidentManagement = () => {
         return matchesSearch;
     });
 
+    // Calculate stats
+    const stats = {
+        total: incidents.length,
+        investigating: incidents.filter(i => i.status === 'investigating').length,
+        identified: incidents.filter(i => i.status === 'identified').length,
+        monitoring: incidents.filter(i => i.status === 'monitoring').length,
+        resolved: incidents.filter(i => i.status === 'resolved').length
+    };
+
+    const closeIncidentDetails = () => {
+        setSelectedIncident(null);
+        setActiveTab('details');
+        setIncidentTimeline([]);
+        setLinkedAlerts([]);
+        setPostMortem(null);
+    };
+
     if (loading) {
         return (
             <div className="incident-management">
                 <PageLoader label="Loading incidents..." />
-                </div>
             </div>
         );
     }
@@ -293,15 +312,19 @@ const IncidentManagement = () => {
     return (
         <div className="incident-management">
             {error && (
-                <div className="error-banner" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 16px', background: 'var(--error-bg, #fef2f2)', color: 'var(--error-text, #ef4444)', borderRadius: '6px', marginBottom: '12px' }}>
+                <div className="error-banner">
+                    <FiAlertCircle />
                     <span>{error}</span>
-                    <button onClick={() => setError(null)} style={{ background: 'none', border: 'none', color: 'inherit', cursor: 'pointer', fontSize: '18px' }}>×</button>
+                    <button onClick={() => setError(null)}>Retry</button>
                 </div>
             )}
-            <div className="incident-header">
-                <div className="header-info">
-                    <h1><FiAlertTriangle /> Incident Management</h1>
-                    <p>Track and manage service incidents and outages</p>
+            <div className="dashboard-header incident-header">
+                <div className="header-left">
+                    <div className="header-icon" aria-hidden="true"><FiAlertTriangle /></div>
+                    <div className="header-info">
+                        <h1>Incident Management</h1>
+                        <p>Track and manage service incidents and outages</p>
+                    </div>
                 </div>
                 <div className="header-actions">
                     <button
@@ -309,7 +332,7 @@ const IncidentManagement = () => {
                         onClick={refetchIncidents}
                         title="Refresh incidents"
                     >
-                        <FiRefreshCw />
+                        <FiRefreshCw /> Refresh
                     </button>
                     <button
                         className="btn-primary"
@@ -320,7 +343,109 @@ const IncidentManagement = () => {
                 </div>
             </div>
 
+            {/* Navigation Tabs */}
+            <div className="monitoring-nav">
+                <button
+                    className="nav-btn"
+                    onClick={() => window.location.href = '/workspace/monitoring'}
+                >
+                    <FiActivity /> Dashboard
+                </button>
+                <button
+                    className="nav-btn"
+                    onClick={() => window.location.href = '/alerts/policies'}
+                >
+                    <FiBell /> Alerts & Policies
+                </button>
+                <button
+                    className="nav-btn active"
+                >
+                    <FiAlertTriangle /> Incidents
+                </button>
+                <button
+                    className="nav-btn"
+                    onClick={() => window.location.href = '/workspace/monitoring/reports'}
+                >
+                    <FiBarChart /> Reports
+                </button>
+                <button
+                    className="nav-btn"
+                    onClick={() => window.location.href = '/workspace/monitoring/teams'}
+                >
+                    <FiUsers /> Teams
+                </button>
+                <button
+                    className="nav-btn"
+                    onClick={() => window.location.href = '/workspace/monitoring/integrations'}
+                >
+                    <FiSettings /> Integrations
+                </button>
+                <button
+                    className="nav-btn"
+                    onClick={() => window.location.href = '/workspace/monitoring/maintenance'}
+                >
+                    <FiTool /> Maintenance
+                </button>
+            </div>
+
+            {/* Stats Overview */}
+            <div className="stats-grid">
+                <div className="stat-card">
+                    <div className="stat-icon">
+                        <FiFileText />
+                    </div>
+                    <div className="stat-content">
+                        <div className="stat-value">{stats.total}</div>
+                        <div className="stat-label">Total Incidents</div>
+                    </div>
+                </div>
+                <div className="stat-card">
+                    <div className="stat-icon degraded">
+                        <FiAlertCircle />
+                    </div>
+                    <div className="stat-content">
+                        <div className="stat-value">{stats.investigating + stats.identified}</div>
+                        <div className="stat-label">Active</div>
+                    </div>
+                </div>
+                <div className="stat-card">
+                    <div className="stat-icon up">
+                        <FiCheckCircle />
+                    </div>
+                    <div className="stat-content">
+                        <div className="stat-value">{stats.resolved}</div>
+                        <div className="stat-label">Resolved</div>
+                    </div>
+                </div>
+                <div className="stat-card">
+                    <div className="stat-icon down">
+                        <FiAlertTriangle />
+                    </div>
+                    <div className="stat-content">
+                        <div className="stat-value">{incidents.filter(i => i.severity === 'critical' && i.status !== 'resolved').length}</div>
+                        <div className="stat-label">Critical</div>
+                    </div>
+                </div>
+            </div>
+
             <div className="incident-filters">
+                <div className="filters">
+                    {[
+                        { key: 'all', label: 'All', count: stats.total },
+                        { key: 'investigating', label: 'Investigating', count: stats.investigating },
+                        { key: 'identified', label: 'Identified', count: stats.identified },
+                        { key: 'monitoring', label: 'Monitoring', count: stats.monitoring },
+                        { key: 'resolved', label: 'Resolved', count: stats.resolved }
+                    ].map(filterOption => (
+                        <button
+                            key={filterOption.key}
+                            className={`filter-btn ${filter === filterOption.key ? 'active' : ''}`}
+                            onClick={() => setFilter(filterOption.key)}
+                        >
+                            {filterOption.label} ({filterOption.count})
+                        </button>
+                    ))}
+                </div>
                 <div className="search-container">
                     <FiSearch className="search-icon" />
                     <input
@@ -331,24 +456,6 @@ const IncidentManagement = () => {
                         className="search-input"
                     />
                 </div>
-
-                <div className="filter-buttons">
-                    {[
-                        { key: 'all', label: 'All' },
-                        { key: 'investigating', label: 'Investigating' },
-                        { key: 'identified', label: 'Identified' },
-                        { key: 'monitoring', label: 'Monitoring' },
-                        { key: 'resolved', label: 'Resolved' }
-                    ].map(filterOption => (
-                        <button
-                            key={filterOption.key}
-                            className={`filter-btn ${filter === filterOption.key ? 'active' : ''}`}
-                            onClick={() => setFilter(filterOption.key)}
-                        >
-                            {filterOption.label}
-                        </button>
-                    ))}
-                </div>
             </div>
 
             <div className="incident-content">
@@ -358,6 +465,15 @@ const IncidentManagement = () => {
                             <FiAlertTriangle className="empty-icon" />
                             <h3>No incidents found</h3>
                             <p>No incidents match your current filters</p>
+                            {filter === 'all' && (
+                                <button
+                                    className="btn-primary"
+                                    onClick={() => setShowCreateForm(true)}
+                                    style={{ marginTop: '16px' }}
+                                >
+                                    <FiPlus /> Create Incident
+                                </button>
+                            )}
                         </div>
                     ) : (
                         filteredIncidents.map(incident => (
@@ -369,17 +485,41 @@ const IncidentManagement = () => {
                                 <div className="incident-header-row">
                                     <div className="incident-status">
                                         {getStatusIcon(incident.status)}
-                                        <span className="status-text">{incident.status}</span>
+                                        <div className="monitor-info">
+                                            <h3 className="incident-title">{incident.title}</h3>
+                                            <div style={{display: 'flex', gap: '8px', alignItems: 'center'}}>
+                                                <span className={`incident-list-severity-badge ${incident.severity}`}>
+                                                    {incident.severity}
+                                                </span>
+                                                <span className="status-text">{incident.status}</span>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div
-                                        className="severity-badge"
-                                        style={{ backgroundColor: getSeverityColor(incident.severity) }}
-                                    >
-                                        {incident.severity}
+                                    <div className="monitor-actions">
+                                        <button
+                                            className="action-btn"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                setEditingIncident(incident);
+                                                setShowCreateForm(true);
+                                            }}
+                                            title="Edit incident"
+                                        >
+                                            <FiEdit />
+                                        </button>
+                                        <button
+                                            className="action-btn delete"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                deleteIncident(incident._id);
+                                            }}
+                                            title="Delete incident"
+                                        >
+                                            <FiTrash2 />
+                                        </button>
                                     </div>
                                 </div>
 
-                                <h3 className="incident-title">{incident.title}</h3>
                                 <p className="incident-description">{incident.description}</p>
 
                                 <div className="incident-meta">
@@ -392,58 +532,39 @@ const IncidentManagement = () => {
                                         </span>
                                     )}
                                 </div>
-
-                                <div className="incident-actions">
-                                    <button
-                                        className="action-btn"
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            setEditingIncident(incident);
-                                            setShowCreateForm(true);
-                                        }}
-                                        title="Edit incident"
-                                    >
-                                        <FiEdit />
-                                    </button>
-                                    <button
-                                        className="action-btn delete"
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            deleteIncident(incident._id);
-                                        }}
-                                        title="Delete incident"
-                                    >
-                                        <FiTrash2 />
-                                    </button>
-                                </div>
                             </div>
                         ))
                     )}
                 </div>
 
-                {selectedIncident && (
-                    <EnhancedIncidentDetails
-                        incident={selectedIncident}
-                        timeline={incidentTimeline}
-                        linkedAlerts={linkedAlerts}
-                        postMortem={postMortem}
-                        activeTab={activeTab}
-                        onTabChange={setActiveTab}
-                        onUpdate={updateIncident}
-                        onClose={() => {
-                            setSelectedIncident(null);
-                            setActiveTab('details');
-                            setIncidentTimeline([]);
-                            setLinkedAlerts([]);
-                            setPostMortem(null);
-                        }}
-                        onAcknowledge={handleAcknowledge}
-                        onEscalate={handleEscalate}
-                        onResolve={handleResolve}
-                        actionLoading={actionLoading}
-                    />
-                )}
             </div>
+
+            {selectedIncident && (
+                <div className="incident-details-overlay" onClick={closeIncidentDetails}>
+                    <div
+                        className="incident-details-modal"
+                        role="dialog"
+                        aria-modal="true"
+                        aria-label={`Incident report: ${selectedIncident.title}`}
+                        onClick={(event) => event.stopPropagation()}
+                    >
+                        <EnhancedIncidentDetails
+                            incident={selectedIncident}
+                            timeline={incidentTimeline}
+                            linkedAlerts={linkedAlerts}
+                            postMortem={postMortem}
+                            activeTab={activeTab}
+                            onTabChange={setActiveTab}
+                            onUpdate={updateIncident}
+                            onClose={closeIncidentDetails}
+                            onAcknowledge={handleAcknowledge}
+                            onEscalate={handleEscalate}
+                            onResolve={handleResolve}
+                            actionLoading={actionLoading}
+                        />
+                    </div>
+                </div>
+            )}
 
             {showCreateForm && (
                 <IncidentForm
@@ -514,23 +635,23 @@ const EnhancedIncidentDetails = ({
     };
 
     return (
-        <div className="incident-details enhanced">
-            <div className="details-header">
-                <div className="header-left">
-                    <h2>{incident.title}</h2>
-                    <div className="incident-badges">
-                        <span className={`severity-badge ${incident.severity}`}>{incident.severity}</span>
-                        <span className={`status-badge ${incident.status}`}>{incident.status}</span>
+        <div className="incident-details enhanced incident-report">
+            <div className="incident-report-header">
+                <div className="incident-report-title-block">
+                    <h2 className="incident-report-title">{incident.title}</h2>
+                    <div className="incident-report-badges">
+                        <span className={`incident-report-severity ${incident.severity}`}>{incident.severity}</span>
+                        <span className={`incident-report-status ${incident.status}`}>{incident.status}</span>
                     </div>
                 </div>
-                <button className="close-btn" onClick={onClose}>×</button>
+                <button type="button" className="incident-report-close" onClick={onClose} aria-label="Close incident report">×</button>
             </div>
 
             {/* Workflow Action Buttons */}
-            <div className="workflow-actions">
+            <div className="incident-report-actions">
                 {incident.status !== 'acknowledged' && incident.status !== 'resolved' && (
                     <button
-                        className="action-btn acknowledge"
+                        className="incident-report-action acknowledge"
                         onClick={() => onAcknowledge(incident._id)}
                         disabled={actionLoading}
                     >
@@ -539,7 +660,7 @@ const EnhancedIncidentDetails = ({
                 )}
                 {incident.status !== 'resolved' && (
                     <button
-                        className="action-btn escalate"
+                        className="incident-report-action escalate"
                         onClick={() => setShowEscalateModal(true)}
                         disabled={actionLoading}
                     >
@@ -548,7 +669,7 @@ const EnhancedIncidentDetails = ({
                 )}
                 {incident.status !== 'resolved' && (
                     <button
-                        className="action-btn resolve"
+                        className="incident-report-action resolve"
                         onClick={() => setShowResolveModal(true)}
                         disabled={actionLoading}
                     >
@@ -558,37 +679,22 @@ const EnhancedIncidentDetails = ({
             </div>
 
             {/* Tab Navigation */}
-            <div className="details-tabs">
-                <button
-                    className={`tab-btn ${activeTab === 'details' ? 'active' : ''}`}
-                    onClick={() => onTabChange('details')}
-                >
-                    <FiFileText /> Details
-                </button>
-                <button
-                    className={`tab-btn ${activeTab === 'timeline' ? 'active' : ''}`}
-                    onClick={() => onTabChange('timeline')}
-                >
-                    <FiActivity /> Timeline
-                </button>
-                <button
-                    className={`tab-btn ${activeTab === 'alerts' ? 'active' : ''}`}
-                    onClick={() => onTabChange('alerts')}
-                >
-                    <FiBell /> Linked Alerts ({linkedAlerts.length})
-                </button>
-                {postMortem && (
-                    <button
-                        className={`tab-btn ${activeTab === 'postmortem' ? 'active' : ''}`}
-                        onClick={() => onTabChange('postmortem')}
-                    >
-                        <FiMessageCircle /> Post-Mortem
-                    </button>
-                )}
+            <div className="incident-report-tabs">
+                <TabBar
+                    tabs={[
+                        { id: 'details', label: 'Details', icon: <FiFileText /> },
+                        { id: 'timeline', label: 'Timeline', icon: <FiActivity /> },
+                        { id: 'alerts', label: 'Linked Alerts', icon: <FiBell />, badge: linkedAlerts.length },
+                        ...(postMortem ? [{ id: 'postmortem', label: 'Post-Mortem', icon: <FiMessageCircle /> }] : [])
+                    ]}
+                    activeId={activeTab}
+                    onChange={onTabChange}
+                    ariaLabel="Incident report sections"
+                />
             </div>
 
             {/* Tab Content */}
-            <div className="tab-content">
+            <div className="incident-report-content">
                 {activeTab === 'details' && (
                     <DetailsTab
                         incident={incident}
@@ -601,7 +707,7 @@ const EnhancedIncidentDetails = ({
                 )}
 
                 {activeTab === 'timeline' && (
-                    <TimelineTab timeline={timeline} />
+                    <TimelineTab timeline={timeline} status={incident.status} />
                 )}
 
                 {activeTab === 'alerts' && (
@@ -693,90 +799,91 @@ const EnhancedIncidentDetails = ({
 // Details Tab Component
 const DetailsTab = ({ incident, newUpdate, newStatus, onUpdateChange, onStatusChange, onAddUpdate }) => {
     return (
-        <div className="details-tab-content">
-            <div className="incident-info">
-                <div className="info-row">
-                    <strong>Status:</strong>
-                    <span className={`status ${incident.status}`}>{incident.status}</span>
+        <div className="incident-report-details">
+            <div className="incident-report-summary" aria-label="Incident summary">
+                <div className="incident-report-fact">
+                    <span className="incident-report-fact-label">Status</span>
+                    <span className={`incident-report-status ${incident.status}`}>{incident.status}</span>
                 </div>
-                <div className="info-row">
-                    <strong>Severity:</strong>
-                    <span className={`severity ${incident.severity}`}>{incident.severity}</span>
+                <div className="incident-report-fact">
+                    <span className="incident-report-fact-label">Severity</span>
+                    <span className={`incident-report-severity ${incident.severity}`}>{incident.severity}</span>
                 </div>
-                <div className="info-row">
-                    <strong>Created:</strong>
-                    <span>{new Date(incident.createdAt).toLocaleString()}</span>
+                <div className="incident-report-fact">
+                    <span className="incident-report-fact-label">Created</span>
+                    <span className="incident-report-fact-value">{new Date(incident.createdAt).toLocaleString()}</span>
                 </div>
                 {incident.resolvedAt && (
-                    <div className="info-row">
-                        <strong>Resolved:</strong>
-                        <span>{new Date(incident.resolvedAt).toLocaleString()}</span>
+                    <div className="incident-report-fact">
+                        <span className="incident-report-fact-label">Resolved</span>
+                        <span className="incident-report-fact-value">{new Date(incident.resolvedAt).toLocaleString()}</span>
                     </div>
                 )}
                 {incident.acknowledgedAt && (
-                    <div className="info-row">
-                        <strong>Acknowledged:</strong>
-                        <span>{new Date(incident.acknowledgedAt).toLocaleString()}</span>
+                    <div className="incident-report-fact">
+                        <span className="incident-report-fact-label">Acknowledged</span>
+                        <span className="incident-report-fact-value">{new Date(incident.acknowledgedAt).toLocaleString()}</span>
                     </div>
                 )}
             </div>
 
-            <div className="incident-description">
-                <h4>Description</h4>
+            <section className="incident-report-section">
+                <h3>Description</h3>
                 <p>{incident.description}</p>
-            </div>
+            </section>
 
             {incident.affectedServices && incident.affectedServices.length > 0 && (
-                <div className="affected-services-section">
-                    <h4>Affected Services</h4>
-                    <div className="services-list">
+                <section className="incident-report-section">
+                    <h3>Affected Services</h3>
+                    <div className="incident-report-services">
                         {incident.affectedServices.map((service, idx) => (
-                            <span key={idx} className="service-tag">{service.serviceName}</span>
+                            <span key={idx} className="incident-report-service-tag">{service.serviceName}</span>
                         ))}
                     </div>
-                </div>
+                </section>
             )}
 
-            <div className="incident-updates">
+            <section className="incident-report-section incident-report-updates">
                 <h3>Updates</h3>
-                <div className="updates-list">
+                <div className="incident-report-updates-list">
                     {incident.updates && incident.updates.length > 0 ? (
                         incident.updates.map((update, index) => (
-                            <div key={index} className="update-item">
-                                <div className="update-header">
-                                    <span className={`update-status ${update.status}`}>
+                            <div key={index} className={`incident-report-update-item ${update.status || ''}`}>
+                                <div className="incident-report-update-meta">
+                                    <span className={`incident-report-status ${update.status}`}>
                                         {update.status}
                                     </span>
-                                    <span className="update-time">
-                                        {new Date(update.timestamp).toLocaleString()}
+                                    <span className="incident-report-update-time">
+                                        <FiClock /> {new Date(update.timestamp).toLocaleString()}
                                     </span>
                                 </div>
-                                <p className="update-message">{update.message}</p>
+                                <p className="incident-report-update-message">{update.message}</p>
                             </div>
                         ))
                     ) : (
-                        <p className="no-updates">No updates yet</p>
+                        <p className="incident-report-empty">No updates yet</p>
                     )}
                 </div>
 
-                <div className="add-update">
+                <div className="incident-report-add-update">
                     <h4>Add Update</h4>
-                    <div className="update-form">
-                        <select
+                    <div className="incident-report-update-form">
+                        <AppSelect
                             value={newStatus}
-                            onChange={(e) => onStatusChange(e.target.value)}
-                            className="status-select"
-                        >
-                            <option value="investigating">Investigating</option>
-                            <option value="identified">Identified</option>
-                            <option value="monitoring">Monitoring</option>
-                            <option value="resolved">Resolved</option>
-                        </select>
+                            onChange={onStatusChange}
+                            className="incident-report-status-select"
+                            options={[
+                                { value: 'investigating', label: 'Investigating' },
+                                { value: 'identified', label: 'Identified' },
+                                { value: 'monitoring', label: 'Monitoring' },
+                                { value: 'resolved', label: 'Resolved' }
+                            ]}
+                        />
                         <textarea
                             value={newUpdate}
                             onChange={(e) => onUpdateChange(e.target.value)}
                             placeholder="Describe the current status..."
-                            className="update-textarea"
+                            className="incident-report-update-textarea"
                             rows={3}
                         />
                         <button
@@ -788,31 +895,72 @@ const DetailsTab = ({ incident, newUpdate, newStatus, onUpdateChange, onStatusCh
                         </button>
                     </div>
                 </div>
-            </div>
+            </section>
         </div>
     );
 };
 
 // Timeline Tab Component
-const TimelineTab = ({ timeline }) => {
+const TimelineTab = ({ timeline, status }) => {
     const getEventIcon = (eventType) => {
         switch (eventType) {
             case 'created':
-                return <FiAlertTriangle className="event-icon created" />;
+                return <FiAlertTriangle />;
             case 'acknowledged':
-                return <FiCheck className="event-icon acknowledged" />;
+                return <FiCheck />;
             case 'escalated':
-                return <FiArrowUp className="event-icon escalated" />;
+            case 'escalation':
+                return <FiArrowUp />;
             case 'alert_linked':
-                return <FiLink className="event-icon linked" />;
+            case 'routing':
+                return <FiLink />;
             case 'status_change':
-                return <FiActivity className="event-icon status-change" />;
+                return <FiActivity />;
             case 'resolved':
-                return <FiCheckCircle className="event-icon resolved" />;
+                return <FiCheckCircle />;
+            case 'prediction':
+                return <FiBell />;
+            case 'snoozed':
+                return <FiClock />;
+            case 'note':
+                return <FiMessageCircle />;
             default:
-                return <FiCalendar className="event-icon default" />;
+                return <FiCalendar />;
         }
     };
+
+    const getEventColor = (eventType) => {
+        switch (eventType) {
+            case 'created': return '#f59e0b';
+            case 'acknowledged':
+            case 'status_change': return '#3b82f6';
+            case 'escalated':
+            case 'escalation': return '#ef4444';
+            case 'resolved': return '#10b981';
+            case 'prediction':
+            case 'note': return 'var(--primary-color)';
+            case 'snoozed': return 'var(--warning-color)';
+            default: return 'var(--text-secondary)';
+        }
+    };
+
+    const normalizeEvent = (event) => {
+        const type = event.type || 'default';
+        const title = event.title || event.message || `${type.replace(/_/g, ' ')} event`;
+        const description = event.description || (event.data && typeof event.data === 'string' ? event.data : '');
+        const timestamp = event.at || event.timestamp;
+        const actorName = event.actor?.username || event.actor?.email || event.actor?.displayName || (typeof event.actor === 'string' ? event.actor : '');
+        return { type, title, description, timestamp, actorName };
+    };
+
+    const formatEventTime = (ts) => {
+        const d = new Date(ts);
+        return Number.isNaN(d.getTime()) ? '—' : d.toLocaleString();
+    };
+
+    const formatEventType = (type) => type.replace(/_/g, ' ');
+
+    const isLive = status !== 'resolved';
 
     return (
         <div className="timeline-tab-content">
@@ -822,29 +970,42 @@ const TimelineTab = ({ timeline }) => {
                     <p>No timeline events yet</p>
                 </div>
             ) : (
-                <div className="timeline-events">
-                    {timeline.map((event, index) => (
-                        <div key={index} className="timeline-event">
-                            <div className="event-icon-container">
-                                {getEventIcon(event.type)}
-                                {index < timeline.length - 1 && <div className="event-connector" />}
-                            </div>
-                            <div className="event-content">
-                                <div className="event-header">
-                                    <h4 className="event-title">{event.title}</h4>
-                                    <span className="event-time">
-                                        {new Date(event.timestamp).toLocaleString()}
-                                    </span>
+                <div className={`timeline-events${isLive ? ' is-live' : ''}`}>
+                    {timeline.map((event, index) => {
+                        const { type, title, description, timestamp, actorName } = normalizeEvent(event);
+                        const color = getEventColor(type);
+                        return (
+                            <div
+                                key={index}
+                                className={`timeline-event ${type.replace(/_/g, '-')}`}
+                                style={{ '--event-color': color }}
+                            >
+                                <div className="event-icon-container">
+                                    <div className={`event-icon ${type.replace(/_/g, '-')}`}>
+                                        {getEventIcon(type)}
+                                    </div>
+                                    {index < timeline.length - 1 && <div className="event-connector" />}
                                 </div>
-                                <p className="event-description">{event.description}</p>
-                                {event.actor && (
-                                    <span className="event-actor">
-                                        <FiUsers /> {event.actor}
-                                    </span>
-                                )}
+                                <div className="event-card">
+                                    <div className="event-meta">
+                                        <span className="event-type-label">{formatEventType(type)}</span>
+                                        <span className="event-time">
+                                            <FiClock /> {formatEventTime(timestamp)}
+                                        </span>
+                                    </div>
+                                    <h4 className="event-title">{title}</h4>
+                                    {description && <p className="event-description">{description}</p>}
+                                    {actorName && (
+                                        <div className="event-footer">
+                                            <span className="event-actor">
+                                                <FiUsers /> {actorName}
+                                            </span>
+                                        </div>
+                                    )}
+                                </div>
                             </div>
-                        </div>
-                    ))}
+                        );
+                    })}
                 </div>
             )}
         </div>
@@ -878,10 +1039,7 @@ const AlertsTab = ({ alerts }) => {
                     {alerts.map((alert) => (
                         <div key={alert._id} className="linked-alert-card">
                             <div className="alert-header">
-                                <div
-                                    className="alert-severity-indicator"
-                                    style={{ backgroundColor: getSeverityColor(alert.severity) }}
-                                />
+                                <div className={`alert-severity-indicator ${alert.severity}`} />
                                 <div className="alert-info">
                                     <h4 className="alert-name">{alert.name}</h4>
                                     <span className="alert-severity">{alert.severity}</span>
@@ -1025,17 +1183,19 @@ const IncidentForm = ({ incident, onSave, onClose }) => {
     };
 
     return (
-        <div className="modal-overlay">
+        <div className="incident-form-overlay">
             <div className="incident-form-modal">
-                <div className="modal-header">
+                <div className="incident-form-header">
                     <h2>{incident ? 'Edit Incident' : 'Create New Incident'}</h2>
-                    <button className="close-btn" onClick={onClose}>×</button>
+                    <button type="button" className="incident-form-close" onClick={onClose} aria-label="Close incident form">×</button>
                 </div>
 
                 <form onSubmit={handleSubmit} className="incident-form">
-                    <div className="form-group">
-                        <label>Title</label>
+                    <div className="incident-form-group">
+                        <label htmlFor="incident-title">Title</label>
                         <input
+                            id="incident-title"
+                            className="incident-form-control"
                             type="text"
                             value={formData.title}
                             onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
@@ -1044,9 +1204,11 @@ const IncidentForm = ({ incident, onSave, onClose }) => {
                         />
                     </div>
 
-                    <div className="form-group">
-                        <label>Description</label>
+                    <div className="incident-form-group">
+                        <label htmlFor="incident-description">Description</label>
                         <textarea
+                            id="incident-description"
+                            className="incident-form-control"
                             value={formData.description}
                             onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
                             required
@@ -1055,35 +1217,41 @@ const IncidentForm = ({ incident, onSave, onClose }) => {
                         />
                     </div>
 
-                    <div className="form-row">
-                        <div className="form-group">
-                            <label>Severity</label>
-                            <select
+                    <div className="incident-form-row">
+                        <div className="incident-form-group">
+                            <label htmlFor="incident-severity">Severity</label>
+                            <AppSelect
+                                id="incident-severity"
+                                className="incident-form-select"
                                 value={formData.severity}
-                                onChange={(e) => setFormData(prev => ({ ...prev, severity: e.target.value }))}
-                            >
-                                <option value="minor">Minor</option>
-                                <option value="major">Major</option>
-                                <option value="critical">Critical</option>
-                            </select>
+                                onChange={(severity) => setFormData(prev => ({ ...prev, severity }))}
+                                options={[
+                                    { value: 'minor', label: 'Minor' },
+                                    { value: 'major', label: 'Major' },
+                                    { value: 'critical', label: 'Critical' }
+                                ]}
+                            />
                         </div>
 
-                        <div className="form-group">
-                            <label>Status</label>
-                            <select
+                        <div className="incident-form-group">
+                            <label htmlFor="incident-status">Status</label>
+                            <AppSelect
+                                id="incident-status"
+                                className="incident-form-select"
                                 value={formData.status}
-                                onChange={(e) => setFormData(prev => ({ ...prev, status: e.target.value }))}
-                            >
-                                <option value="investigating">Investigating</option>
-                                <option value="identified">Identified</option>
-                                <option value="monitoring">Monitoring</option>
-                                <option value="resolved">Resolved</option>
-                            </select>
+                                onChange={(status) => setFormData(prev => ({ ...prev, status }))}
+                                options={[
+                                    { value: 'investigating', label: 'Investigating' },
+                                    { value: 'identified', label: 'Identified' },
+                                    { value: 'monitoring', label: 'Monitoring' },
+                                    { value: 'resolved', label: 'Resolved' }
+                                ]}
+                            />
                         </div>
                     </div>
 
-                    <div className="form-group">
-                        <label>
+                    <div className="incident-form-group">
+                        <label className="incident-form-toggle">
                             <input
                                 type="checkbox"
                                 checked={formData.isPublic}
@@ -1093,11 +1261,11 @@ const IncidentForm = ({ incident, onSave, onClose }) => {
                         </label>
                     </div>
 
-                    <div className="form-group">
+                    <div className="incident-form-group">
                         <label>Affected Services</label>
-                        <div className="services-grid">
+                        <div className="incident-services-grid">
                             {monitors.map(monitor => (
-                                <label key={monitor._id} className="service-checkbox">
+                                <label key={monitor._id} className="incident-service-checkbox">
                                     <input
                                         type="checkbox"
                                         checked={formData.affectedServices.some(s => s.monitorId === monitor._id)}
@@ -1109,7 +1277,7 @@ const IncidentForm = ({ incident, onSave, onClose }) => {
                         </div>
                     </div>
 
-                    <div className="form-actions">
+                    <div className="incident-form-actions">
                         <button type="button" className="btn-secondary" onClick={onClose}>
                             Cancel
                         </button>

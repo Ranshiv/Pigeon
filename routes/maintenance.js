@@ -95,25 +95,13 @@ router.post('/', ensureAuthenticated, async (req, res) => {
         const { getDb } = require('../config/db');
         const db = getDb();
 
-        let workspace = await db.collection('workspaces').findOne({
+        const workspace = await db.collection('workspaces').findOne({
             owner: req.user.id,
             isPersonal: true
         });
 
-        // If no personal workspace exists, create one
         if (!workspace) {
-            const newWorkspace = {
-                name: 'Personal Workspace',
-                description: 'Your personal workspace',
-                owner: req.user.id,
-                isPersonal: true,
-                collaborators: [],
-                createdAt: new Date(),
-                updatedAt: new Date()
-            };
-
-            const result = await db.collection('workspaces').insertOne(newWorkspace);
-            workspace = { ...newWorkspace, _id: result.insertedId };
+            return res.status(400).json({ message: 'Create a personal workspace first' });
         }
 
         const maintenanceData = {

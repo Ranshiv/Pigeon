@@ -497,21 +497,12 @@ const normalizeAlertPolicyPayload = (body) => {
     return payload;
 };
 
-const getOrCreateDefaultWorkspaceId = async (userObjectId) => {
+const getDefaultWorkspaceId = async (userObjectId) => {
     const existing = await Workspace.findOne({
         $or: [{ owner: userObjectId }, { userId: userObjectId }]
     }).select('_id');
 
-    if (existing) return existing._id;
-
-    const created = await Workspace.create({
-        name: 'Default Workspace',
-        description: 'Auto-created workspace for monitoring & alerting',
-        userId: userObjectId,
-        owner: userObjectId
-    });
-
-    return created._id;
+    return existing ? existing._id : null;
 };
 
 // Get all alert policies
@@ -560,10 +551,12 @@ router.post('/alert-policies', ensureAuthenticated, async (req, res) => {
     try {
         const normalized = normalizeAlertPolicyPayload(req.body);
 
-        // If workspaceId isn't provided (common when using /alerts/policies),
-        // default to the user's first workspace.
+        // If workspaceId isn't provided, default to the user's first workspace.
         if (!normalized.workspaceId) {
-            normalized.workspaceId = await getOrCreateDefaultWorkspaceId(req.user._id);
+            normalized.workspaceId = await getDefaultWorkspaceId(req.user._id);
+            if (!normalized.workspaceId) {
+                return res.status(400).json({ message: 'Create a workspace first' });
+            }
         }
 
         const policyData = {

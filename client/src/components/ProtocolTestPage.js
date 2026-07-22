@@ -45,7 +45,7 @@ const ProtocolTestPage = () => {
             case 'soap':
                 return <SoapTester initialWsdlUrl="http://www.dneonline.com/calculator.asmx?wsdl" />;
             case 'sse':
-                return <SseTester initialUrl="http://localhost:5001/api/protocols/sse/demo" />;
+                return <SseTester initialUrl={`${window.location.origin}/api/protocols/sse/demo`} />;
             default:
                 return (
                     <div className="protocol-welcome">

@@ -5,7 +5,7 @@ import {
     FiFileText, FiPlus, FiEdit, FiTrash2, FiDownload,
     FiClock, FiMail, FiCalendar, FiBarChart, FiTrendingUp,
     FiSettings, FiActivity, FiUsers, FiTool, FiCheckCircle, FiEye, FiBell,
-    FiSave, FiX
+    FiSave, FiX, FiAlertTriangle
 } from 'react-icons/fi';
 import './ReportsManagement.css';
 import AppSelect from './common/AppSelect/AppSelect';
@@ -262,6 +262,9 @@ const ReportsManagement = () => {
                 </button>
                 <button className="rpt-nav-btn" onClick={() => navigate('/alerts/policies')}>
                     <FiBell /> Alerts & Policies
+                </button>
+                <button className="rpt-nav-btn" onClick={() => navigate('/workspace/monitoring/incidents')}>
+                    <FiAlertTriangle /> Incidents
                 </button>
                 <button className="rpt-nav-btn active" onClick={() => navigate('/workspace/monitoring/reports')}>
                     <FiBarChart /> Reports

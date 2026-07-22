@@ -8,7 +8,7 @@ import {
     FiUsers, FiPlus, FiEdit, FiTrash2, FiMail, FiShield,
     FiCheckCircle, FiX, FiAlertCircle, FiSettings,
     FiEye, FiActivity, FiBarChart, FiTool, FiUser,
-    FiUserPlus, FiUserX, FiSave, FiBell
+    FiUserPlus, FiUserX, FiSave, FiBell, FiAlertTriangle
 } from 'react-icons/fi';
 
 const MEMBER_ROLES = [
@@ -172,6 +172,9 @@ const TeamsManagement = () => {
                 </button>
                 <button className="tm-nav-btn" onClick={() => navigate('/alerts/policies')}>
                     <FiBell /> Alerts & Policies
+                </button>
+                <button className="tm-nav-btn" onClick={() => navigate('/workspace/monitoring/incidents')}>
+                    <FiAlertTriangle /> Incidents
                 </button>
                 <button className="tm-nav-btn" onClick={() => navigate('/workspace/monitoring/reports')}>
                     <FiBarChart /> Reports

@@ -5,12 +5,7 @@ import EnvironmentModal from './EnvironmentModal';
 import VariablePreviewTooltip from './VariablePreviewTooltip';
 
 // Helper function to get the correct API base URL
-const getApiUrl = (path) => {
-    // In development, if proxy isn't working, use direct backend URL
-    const isDevelopment = process.env.NODE_ENV === 'development';
-    const baseUrl = isDevelopment ? 'http://localhost:5001' : '';
-    return `${baseUrl}${path}`;
-};
+const getApiUrl = (path) => path;
 
 const EnvironmentSelector = ({
     selectedEnvironmentId,
