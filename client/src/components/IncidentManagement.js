@@ -462,14 +462,12 @@ const IncidentManagement = () => {
                 <div className="incidents-list">
                     {filteredIncidents.length === 0 ? (
                         <div className="empty-state">
-                            <FiAlertTriangle className="empty-icon" />
-                            <h3>No incidents found</h3>
-                            <p>No incidents match your current filters</p>
+                            <FiAlertTriangle />
+                            <p>No incidents match your current filters.</p>
                             {filter === 'all' && (
                                 <button
-                                    className="btn-primary"
+                                    className="create-incident-btn"
                                     onClick={() => setShowCreateForm(true)}
-                                    style={{ marginTop: '16px' }}
                                 >
                                     <FiPlus /> Create Incident
                                 </button>

@@ -544,6 +544,12 @@
 
 .incidents-list > .empty-state {
     grid-column: 1 / -1;
+    width: 100%;
+    min-height: 420px;
+    align-self: stretch;
+    justify-content: center;
+    background-color: var(--card-bg);
+    border: 1px dashed var(--border-color);
 }
 
 .monitor-actions {
@@ -777,27 +783,61 @@
     align-items: center;
     justify-content: center;
     text-align: center;
-    padding: 60px 20px;
-    color: var(--text-secondary);
-}
-
-.empty-icon {
-    font-size: 4rem;
-    margin-bottom: 16px;
-    opacity: 0.5;
-}
-
-.empty-state h3 {
-    margin: 0 0 8px 0;
-    font-size: 1.25rem;
-    font-weight: 600;
+    padding: 6rem 2rem;
+    min-height: 320px;
+    background-color: color-mix(in srgb, var(--primary-color) 6%, var(--card-bg));
+    border: 1px dashed color-mix(in srgb, var(--primary-color) 35%, var(--border-color));
+    border-radius: var(--radius-lg, 16px);
+    margin-top: 2rem;
     color: var(--text-color);
 }
 
+.empty-state > svg {
+    font-size: 4rem;
+    color: var(--primary-color);
+    opacity: 1;
+    margin-bottom: 1.5rem;
+    width: 64px;
+    height: 64px;
+}
+
 .empty-state p {
-    margin: 0 0 24px 0;
+    font-size: 1.25rem;
+    margin: 0 0 2rem 0;
+    max-width: 420px;
+    line-height: 1.5;
+    font-weight: 500;
+}
+
+.empty-state .create-incident-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: var(--radius-sm, 8px);
     font-size: 1rem;
-    max-width: 400px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s cubic-bezier(0.16, 1, 0.3, 1), transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease;
+    box-shadow: 0 4px 12px color-mix(in srgb, var(--primary-color) 15%, transparent);
+}
+
+.empty-state .create-incident-btn:hover {
+    background-color: var(--primary-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px color-mix(in srgb, var(--primary-color) 25%, transparent);
+}
+
+.empty-state .create-incident-btn > svg {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    color: white;
+    opacity: 1;
+    margin-bottom: 0;
 }
 
 .loading-state {
