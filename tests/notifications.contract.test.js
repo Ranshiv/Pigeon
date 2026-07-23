@@ -1,7 +1,7 @@
 // ponytail: one runnable check — no framework. Verifies the contracts the live
 // notification path depends on:
 //  (a) broadcastActivity wraps a logged activity into the exact `userActivity`
-//      shape Notifications.js renders, and scopes the emit to a workspace room;
+//      shape Notifications.js renders, and selects online workspace members;
 //  (b) the actor's userId string matches the localStorage form so self-activity is
 //      suppressed client-side (now compared as strings, id-form-robust);
 //  (c) the targeted reviewer/requester ping carries the same renderable shape.
@@ -31,9 +31,17 @@ function buildPayload(activity) {
   };
 }
 
-// Mirror of broadcastActivity: which room an activity targets.
-function targetRoom(activity) {
-  return `workspace:${activity.workspaceId || 'default'}`;
+// Mirror of broadcastActivity: live workspace delivery is based on membership,
+// not on whichever workspace a connected user is currently viewing.
+function recipients(workspace, connectedUsers) {
+  const memberIds = new Set([
+    workspace.owner,
+    workspace.userId,
+    ...(workspace.collaborators || []).map((collaborator) => collaborator.userId)
+  ].filter(Boolean).map(String));
+  return connectedUsers
+    .filter((user) => memberIds.has(String(user.id)))
+    .map((user) => user.id);
 }
 
 // Mirror of Notifications.js getNotificationMessage `log` case + self-suppression
@@ -41,7 +49,8 @@ function targetRoom(activity) {
 function render(payload, currentUserId) {
   if (currentUserId && String(payload.userId) === String(currentUserId)) return null;
   const d = payload.activity.details;
-  return `${d.actorName || 'Someone'} ${d.actionType || 'updated'} ${d.resourceName || ''}`.trim();
+  const labels = { review_approve: 'approved' };
+  return `${d.actorName || 'Someone'} ${labels[d.actionType] || d.actionType || 'updated'} ${d.resourceName || ''}`.trim();
 }
 
 // Simulated Mongoose-ish logged activity (after .populate('user','displayName'))
@@ -61,13 +70,23 @@ assert(payload.activity.details.actorName === 'Priya', 'actorName surfaced in de
 assert(payload.activity.details.actionType === 'review_approve', 'actionType surfaced');
 assert(typeof payload.userId === 'string' && payload.userId.length > 0, 'userId is a non-empty string');
 
-// 2. Workspace isolation: emit targets the activity's workspace room, not global.
-assert(targetRoom(activity) === 'workspace:ws-42', 'emit must target workspace room, got ' + targetRoom(activity));
-assert(targetRoom({ workspaceId: undefined }) === 'workspace:default', 'missing workspaceId falls back to default');
+// 2. Workspace membership: send to every online owner/collaborator, even when
+// they are elsewhere in the app; never send to a connected non-member.
+const workspace = {
+  owner: 'owner-1',
+  userId: 'owner-1',
+  collaborators: [{ userId: 'member-2' }, { userId: 'member-3' }]
+};
+const deliveredTo = recipients(workspace, [
+  { id: 'owner-1' },
+  { id: 'member-2' },
+  { id: 'outsider-4' }
+]);
+assert(deliveredTo.join(',') === 'owner-1,member-2', 'only connected workspace members receive a live notification: ' + deliveredTo);
 
 // 3. Other-user rendering approves/rejects read correctly.
 const text = render(payload, 'someoneElse');
-assert(text === 'Priya review_approve Login flow review', 'other-user render: ' + text);
+assert(text === 'Priya approved Login flow review', 'other-user render: ' + text);
 
 // 4. Self-suppression fires even across id-form drift (id vs _id, padded forms).
 const selfTextA = render(payload, '507f1f77bcf86cd799439011');

@@ -123,7 +123,7 @@ const AlertsDashboard = () => {
                     <button
                         type="button"
                         className="btn-ghost"
-                        onClick={() => navigate('/alerts/policies')}
+                        onClick={() => navigate('/workspace/monitoring/policies')}
                     >
                         <FiArrowLeft /> Back
                     </button>

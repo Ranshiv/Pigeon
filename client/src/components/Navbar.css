@@ -79,7 +79,7 @@
     font-size: 13px;
 }
 
-.navbar-item span {
+.navbar-item > span {
     padding: var(--spacing-sm) var(--spacing-md);
     cursor: pointer;
     color: var(--text-color);
@@ -91,7 +91,7 @@
     font-weight: var(--font-weight-medium);
 }
 
-.navbar-item span:hover {
+.navbar-item > span:hover {
     color: #014C75;
     /* Deep blue primary on hover */
     background-color: rgba(1, 76, 117, 0.1);
@@ -101,7 +101,7 @@
     /* Subtle lift effect */
 }
 
-.navbar-item span.active {
+.navbar-item > span.active {
     color: #014C75;
     /* Deep blue primary for active */
     background-color: rgba(1, 76, 117, 0.15);
@@ -111,7 +111,7 @@
     font-weight: 600;
 }
 
-.navbar-item span.active::after {
+.navbar-item > span.active::after {
     content: '';
     position: absolute;
     bottom: -2px;

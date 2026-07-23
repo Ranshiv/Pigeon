@@ -546,7 +546,7 @@ code {
   font-weight: 600;
 }
 
-/* Scrollbar styling */
+/* Global scrollbar styling */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
@@ -557,22 +557,12 @@ code {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #d1d5db;
-  border-radius: 4px;
+  background: #014C75;
+  border-radius: 999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #9ca3af;
-}
-
-.dark-theme ::-webkit-scrollbar-thumb {
-  background: #013B5B;
-  /* Darker blue for scrollbar thumb */
-}
-
-.dark-theme ::-webkit-scrollbar-thumb:hover {
   background: #014368;
-  /* Even darker blue on hover */
 }
 
 /* Remove default margin and padding for headings and paragraphs */

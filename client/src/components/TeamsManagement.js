@@ -170,7 +170,7 @@ const TeamsManagement = () => {
                 <button className="tm-nav-btn" onClick={() => navigate('/workspace/monitoring')}>
                     <FiActivity /> Dashboard
                 </button>
-                <button className="tm-nav-btn" onClick={() => navigate('/alerts/policies')}>
+                <button className="tm-nav-btn" onClick={() => navigate('/workspace/monitoring/policies')}>
                     <FiBell /> Alerts & Policies
                 </button>
                 <button className="tm-nav-btn" onClick={() => navigate('/workspace/monitoring/incidents')}>

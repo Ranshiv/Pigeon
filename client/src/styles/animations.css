@@ -1,0 +1,178 @@
+/*
+ * Pigeon animation library
+ *
+ * This file is intentionally not imported anywhere yet. Add the classes below
+ * to a component when a motion treatment has been selected.
+ */
+
+:root {
+    --motion-duration-fast: 140ms;
+    --motion-duration: 220ms;
+    --motion-duration-slow: 360ms;
+    --motion-ease: cubic-bezier(0.22, 1, 0.36, 1);
+    --motion-ease-in: cubic-bezier(0.4, 0, 1, 1);
+    --motion-ease-out: cubic-bezier(0, 0, 0.2, 1);
+    --motion-ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Reusable transitions */
+.motion-transition {
+    transition: all var(--motion-duration) var(--motion-ease);
+}
+
+.motion-transition-colors {
+    transition: color var(--motion-duration-fast) var(--motion-ease),
+        background-color var(--motion-duration-fast) var(--motion-ease),
+        border-color var(--motion-duration-fast) var(--motion-ease),
+        box-shadow var(--motion-duration-fast) var(--motion-ease);
+}
+
+.motion-transition-transform {
+    transition: transform var(--motion-duration) var(--motion-ease),
+        opacity var(--motion-duration) var(--motion-ease);
+}
+
+.motion-interactive {
+    transition: transform var(--motion-duration-fast) var(--motion-ease),
+        box-shadow var(--motion-duration-fast) var(--motion-ease),
+        filter var(--motion-duration-fast) var(--motion-ease);
+}
+
+.motion-interactive:hover {
+    transform: translateY(-2px);
+}
+
+.motion-interactive:active {
+    transform: translateY(0) scale(0.98);
+}
+
+/* Entrances */
+.motion-fade-in { animation: motion-fade-in var(--motion-duration) var(--motion-ease) both; }
+.motion-slide-up { animation: motion-slide-up var(--motion-duration-slow) var(--motion-ease) both; }
+.motion-slide-down { animation: motion-slide-down var(--motion-duration-slow) var(--motion-ease) both; }
+.motion-slide-left { animation: motion-slide-left var(--motion-duration-slow) var(--motion-ease) both; }
+.motion-slide-right { animation: motion-slide-right var(--motion-duration-slow) var(--motion-ease) both; }
+.motion-scale-in { animation: motion-scale-in var(--motion-duration) var(--motion-ease) both; }
+.motion-pop-in { animation: motion-pop-in var(--motion-duration-slow) var(--motion-ease-spring) both; }
+
+/* Feedback and ambient motion */
+.motion-pulse { animation: motion-pulse 1.8s ease-in-out infinite; }
+.motion-pulse-once { animation: motion-pulse 650ms ease-in-out both; }
+.motion-bounce { animation: motion-bounce 900ms var(--motion-ease-spring) both; }
+.motion-shake { animation: motion-shake 420ms ease-in-out both; }
+.motion-spin { animation: motion-spin 900ms linear infinite; }
+.motion-spin-slow { animation: motion-spin 1.6s linear infinite; }
+.motion-float { animation: motion-float 3s ease-in-out infinite; }
+.motion-shimmer {
+    background-image: linear-gradient(
+        100deg,
+        transparent 20%,
+        color-mix(in srgb, currentColor 10%, transparent) 45%,
+        transparent 70%
+    );
+    background-size: 220% 100%;
+    animation: motion-shimmer 1.5s linear infinite;
+}
+
+/* Delays for lists and staged entrances */
+.motion-delay-1 { animation-delay: 50ms; }
+.motion-delay-2 { animation-delay: 100ms; }
+.motion-delay-3 { animation-delay: 150ms; }
+.motion-delay-4 { animation-delay: 200ms; }
+.motion-delay-5 { animation-delay: 250ms; }
+
+/* Keyframes */
+@keyframes motion-fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes motion-slide-up {
+    from { opacity: 0; transform: translateY(14px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes motion-slide-down {
+    from { opacity: 0; transform: translateY(-14px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes motion-slide-left {
+    from { opacity: 0; transform: translateX(14px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes motion-slide-right {
+    from { opacity: 0; transform: translateX(-14px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes motion-scale-in {
+    from { opacity: 0; transform: scale(0.96); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes motion-pop-in {
+    0% { opacity: 0; transform: scale(0.82); }
+    70% { opacity: 1; transform: scale(1.04); }
+    100% { opacity: 1; transform: scale(1); }
+}
+
+@keyframes motion-pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.72; transform: scale(1.04); }
+}
+
+@keyframes motion-bounce {
+    0% { transform: translateY(-8px); }
+    55% { transform: translateY(2px); }
+    100% { transform: translateY(0); }
+}
+
+@keyframes motion-shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    50% { transform: translateX(5px); }
+    75% { transform: translateX(-3px); }
+}
+
+@keyframes motion-spin {
+    to { transform: rotate(360deg); }
+}
+
+@keyframes motion-float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+}
+
+@keyframes motion-shimmer {
+    from { background-position: 100% 0; }
+    to { background-position: -100% 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .motion-transition,
+    .motion-transition-colors,
+    .motion-transition-transform,
+    .motion-interactive {
+        transition-duration: 0.01ms;
+    }
+
+    .motion-fade-in,
+    .motion-slide-up,
+    .motion-slide-down,
+    .motion-slide-left,
+    .motion-slide-right,
+    .motion-scale-in,
+    .motion-pop-in,
+    .motion-pulse,
+    .motion-pulse-once,
+    .motion-bounce,
+    .motion-shake,
+    .motion-spin,
+    .motion-spin-slow,
+    .motion-float,
+    .motion-shimmer {
+        animation: none;
+    }
+}

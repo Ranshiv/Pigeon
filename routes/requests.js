@@ -26,7 +26,7 @@ router.post('/', ensureAuthenticated, async (req, res) => {
 
         try {
             const activity = await ActivityLog.create({
-                workspaceId: req.session?.workspaceId || 'default',
+                workspaceId: savedRequest.workspaceId || 'default',
                 user: req.user?._id || req.session?.passport?.user,
                 actionType: 'create',
                 resourceId: String(savedRequest._id),
@@ -70,7 +70,7 @@ router.put('/:id', ensureAuthenticated, async (req, res) => {
 
         try {
             const activity = await ActivityLog.create({
-                workspaceId: req.session?.workspaceId || 'default',
+                workspaceId: updatedRequest.workspaceId || 'default',
                 user: req.user?._id || req.session?.passport?.user,
                 actionType: 'update',
                 resourceId: String(updatedRequest._id),
@@ -390,7 +390,7 @@ router.post('/:id/send', ensureAuthenticated, async (req, res) => {
             // Log activity for the sent request
             try {
                 const activity = await ActivityLog.create({
-                    workspaceId: req.session.workspaceId || 'default',
+                    workspaceId: requestDoc.workspaceId || req.body.workspaceId || 'default',
                     user: req.user.id,
                     actionType: 'api_test',
                     resourceId: String(requestDoc._id),

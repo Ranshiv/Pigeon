@@ -6,7 +6,7 @@ const HealthCheck = require('../../models/HealthCheck');
 const AlertPolicy = require('../../models/AlertPolicy');
 const EmailService = require('../EmailService');
 const IntegrationService = require('../IntegrationService');
-const { getIO } = require('../../utils/socket/socket-server');
+const { emitToWorkspaceMembers, emitWorkspaceNotification } = require('../../utils/socket/socket-server');
 
 class MonitoringService {
     constructor() {
@@ -627,19 +627,23 @@ class MonitoringService {
     // Emit real-time updates via socket
     emitHealthCheckUpdate(monitor, healthCheck) {
         try {
-            const io = getIO();
-            if (io) {
-                io.emit('monitor_update', {
-                    monitorId: monitor._id,
-                    status: healthCheck.status,
-                    responseTime: healthCheck.responseTime,
-                    timestamp: healthCheck.checkedAt,
-                    currentStatus: monitor.currentStatus
+            const nextStatus = this.mapHealthCheckStatusToMonitorStatus(healthCheck.status);
+            void emitToWorkspaceMembers(monitor.workspaceId, 'monitor_update', {
+                monitorId: monitor._id,
+                monitorName: monitor.name,
+                status: healthCheck.status,
+                responseTime: healthCheck.responseTime,
+                timestamp: healthCheck.checkedAt,
+                currentStatus: nextStatus
+            });
+            if (monitor.currentStatus !== nextStatus) {
+                emitWorkspaceNotification(monitor.workspaceId, {
+                    type: 'monitor_status',
+                    severity: nextStatus === 'down' ? 'error' : nextStatus === 'degraded' ? 'warning' : 'info',
+                    message: `${monitor.name} is now ${nextStatus}`
                 });
-                console.log(`Emitted monitor update for ${monitor.name}: ${healthCheck.status}`);
-            } else {
-                console.warn('Socket.IO instance not available for real-time updates');
             }
+            console.log(`Emitted monitor update for ${monitor.name}: ${healthCheck.status}`);
         } catch (error) {
             console.error('Failed to emit socket update:', error);
         }

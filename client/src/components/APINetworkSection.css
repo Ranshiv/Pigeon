@@ -23,7 +23,7 @@
     height: 100%;
     user-select: none;
     z-index: 10;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: width 180ms cubic-bezier(0.2, 0, 0, 1), opacity 120ms ease, border-color 120ms ease;
     position: relative;
     overflow: visible;
     white-space: nowrap;
@@ -518,8 +518,9 @@
 .response-section {
     flex: 1;
     min-height: 240px;
-    overflow: auto;
-    padding: 20px 24px;
+    min-width: 0;
+    overflow: hidden;
+    padding: 14px 24px 20px;
     background-color: var(--background-color);
     max-width: 100%;
     box-sizing: border-box;
@@ -527,7 +528,7 @@
 
 .response-section h3 {
     margin-top: 0;
-    margin-bottom: 16px;
+    margin-bottom: 10px;
     font-size: 0.9375rem;
     font-weight: 600;
     color: var(--text-color);
@@ -598,4 +599,10 @@
     .nav-item {
         padding: 8px 10px;
     }
+}
+
+.response-section .response-display.rd-shell {
+    height: calc(100% - 38px);
+    min-height: 0;
+    margin-top: 0;
 }

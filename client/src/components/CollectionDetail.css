@@ -398,6 +398,8 @@
 
 .request-name {
   flex: 1;
+  color: var(--text-color);
+  font-weight: 600;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -406,9 +408,10 @@
 }
 
 .request-url {
-  color: var(--text-secondary);
+  color: var(--text-muted);
   font-size: 10px;
-  opacity: 0.8;
+  font-weight: 500;
+  opacity: 1;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -436,30 +439,37 @@
   color: #fff;
   font-size: 10px;
   font-weight: 600;
+  color: #ffffff;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
   border-radius: 3px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
-.method-badge.get {
+.collection-sidebar .method-badge.get {
   background-color: var(--method-get);
+  color: #ffffff !important;
 }
 
-.method-badge.post {
+.collection-sidebar .method-badge.post {
   background-color: var(--method-post);
+  color: #ffffff !important;
 }
 
-.method-badge.put {
+.collection-sidebar .method-badge.put {
   background-color: var(--method-put);
+  color: #ffffff !important;
 }
 
-.method-badge.delete {
+.collection-sidebar .method-badge.delete {
   background-color: var(--method-delete);
+  color: #ffffff !important;
 }
 
-.method-badge.patch {
+.collection-sidebar .method-badge.patch {
   background-color: var(--method-patch);
+  color: #ffffff !important;
 }
 
 /* Redesigned add request button */

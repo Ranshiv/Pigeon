@@ -1,6 +1,9 @@
 // utils/socket/socket-server.js
 const socketIo = require('socket.io');
 const ActivityLog = require('../../models/ActivityLog');
+const Workspace = require('../../models/Workspace');
+const Notification = require('../../models/Notification');
+const Collection = require('../../models/Collection');
 
 // Store for global socket data
 const userSockets = new Map(); // Map socketId -> userData
@@ -19,15 +22,8 @@ const protocolSessions = {
  * @param {Object} server - HTTP server instance
  * @return {Object} - Socket.io instance
  */
-// Emit a logged activity as a live `userActivity` notification to every client
-// currently in that activity's workspace room. Matches the workspace-scoped
-// historical feed (`scope=team` filtered by workspaceId in activities.js), so live
-// and historical see the same world. Previously emitted an unused 'activityLog'
-// event to a room nothing listened on — no live notification ever fired.
-//
-// ponytail: workspace room isolation. Only members viewing this workspace (they've
-// called joinWorkspace) receive the notification. Upgrade path: add an explicit
-// recipient/mention list when cross-workspace mentions or @-targeting are needed.
+// The notification center is app-wide, so delivery must not depend on whether a
+// member happens to be viewing the workspace that generated the activity.
 function broadcastActivity(activity) {
     if (!ioInstance) {
         console.warn('broadcastActivity called before socket server initialized');
@@ -35,7 +31,6 @@ function broadcastActivity(activity) {
     }
     if (!activity) return;
 
-    const room = `workspace:${activity.workspaceId || 'default'}`;
     const details = {
         actionType: activity.actionType,
         resourceName: activity.resourceName,
@@ -46,7 +41,90 @@ function broadcastActivity(activity) {
         activity: { type: 'log', details },
         timestamp: activity.createdAt || new Date().toISOString()
     };
-    ioInstance.to(room).emit('userActivity', payload);
+    // Activity logging is non-critical; routes and socket handlers do not need to
+    // await the notification I/O.
+    void emitToWorkspaceMembers(activity.workspaceId, 'userActivity', payload);
+}
+
+async function emitToWorkspaceMembers(workspaceId, eventName, payload) {
+    if (!ioInstance) return;
+
+    // Preserve the legacy behavior for unscoped activity, which has no membership
+    // list to resolve.
+    if (!workspaceId || workspaceId === 'default') {
+        ioInstance.to(`workspace:${workspaceId || 'default'}`).emit(eventName, payload);
+        return;
+    }
+
+    try {
+        const workspace = await Workspace.findById(
+            workspaceId,
+            'owner userId collaborators.userId'
+        ).lean();
+
+        if (!workspace) {
+            console.warn(`Notification workspace not found: ${workspaceId}`);
+            return;
+        }
+
+        const memberIds = new Set([
+            workspace.owner,
+            workspace.userId,
+            ...(workspace.collaborators || []).map((collaborator) => collaborator.userId)
+        ].filter(Boolean).map((id) => String(id)));
+
+        for (const { socket, userData } of userSockets.values()) {
+            if (memberIds.has(String(userData?.id))) {
+                socket.emit(eventName, payload);
+            }
+        }
+    } catch (error) {
+        console.warn(`Failed to deliver workspace notification for ${workspaceId}: ${error.message}`);
+    }
+}
+
+function emitWorkspaceNotification(workspaceId, notification) {
+    if (!workspaceId || !notification?.message) return;
+    void persistWorkspaceNotification(workspaceId, notification);
+}
+
+function emitToUser(userId, eventName, payload) {
+    for (const { socket, userData } of userSockets.values()) {
+        if (String(userData?.id) === String(userId)) socket.emit(eventName, payload);
+    }
+}
+
+function emitUserNotification(recipientId, notification) {
+    if (!recipientId || !notification?.message) return;
+    void Notification.create({
+        recipientId: String(recipientId), workspaceId: notification.workspaceId ? String(notification.workspaceId) : null,
+        type: notification.type || 'api_failure', severity: notification.severity || 'error', message: notification.message
+    }).then((entry) => emitToUser(entry.recipientId, 'appNotification', {
+        id: String(entry._id), type: entry.type, severity: entry.severity, message: entry.message,
+        workspaceId: entry.workspaceId, read: false, timestamp: entry.createdAt
+    })).catch((error) => console.warn(`Failed to persist user notification: ${error.message}`));
+}
+
+async function persistWorkspaceNotification(workspaceId, notification) {
+    try {
+        const workspace = await Workspace.findById(workspaceId, 'owner userId collaborators.userId').lean();
+        if (!workspace) return;
+        const recipientIds = [...new Set([
+            workspace.owner, workspace.userId,
+            ...(workspace.collaborators || []).map((collaborator) => collaborator.userId)
+        ].filter(Boolean).map(String))];
+        const severity = notification.severity === 'error' ? 'error' : notification.severity === 'warning' ? 'warning' : 'info';
+        const saved = await Notification.insertMany(recipientIds.map((recipientId) => ({
+            recipientId, workspaceId: String(workspaceId), type: notification.type || 'system', severity,
+            message: notification.message, actorId: notification.actorId ? String(notification.actorId) : null
+        })));
+        saved.forEach((entry) => emitToUser(entry.recipientId, 'appNotification', {
+            id: String(entry._id), type: entry.type, severity: entry.severity, message: entry.message,
+            workspaceId: entry.workspaceId, actorId: entry.actorId, read: false, timestamp: entry.createdAt
+        }));
+    } catch (error) {
+        console.warn(`Failed to persist workspace notification: ${error.message}`);
+    }
 }
 
 function initializeSocketServer(server) {
@@ -372,7 +450,15 @@ function initializeSocketServer(server) {
         socket.on('activity', async ({ room, action, data }) => {
             if (!authenticatedUser || SKIP_ACTIVITY_ACTIONS.has(action)) return;
             try {
-                const workspaceId = (room || '').startsWith('workspace:') ? room.slice('workspace:'.length) : 'default';
+                let workspaceId = (room || '').startsWith('workspace:') ? room.slice('workspace:'.length) : data?.workspaceId || 'default';
+                // Collection pages join a collection room, not a workspace room.
+                // Resolve its real workspace before persisting so Team Activity and
+                // member-scoped live events see the change.
+                if ((room || '').startsWith('collection:')) {
+                    const collectionId = data?.collectionId || room.slice('collection:'.length);
+                    const collection = await Collection.findById(collectionId, 'workspaceId').lean().catch(() => null);
+                    if (collection?.workspaceId) workspaceId = String(collection.workspaceId);
+                }
                 const resourceName = data?.requestName || data?.collectionName || data?.workspaceName || data?.name || '';
                 const activity = await ActivityLog.create({
                     workspaceId,
@@ -854,6 +940,10 @@ function cleanupProtocolSessions(socketId) {
 module.exports = {
     initializeSocketServer,
     broadcastActivity,
+    emitToWorkspaceMembers,
+    emitWorkspaceNotification,
+    emitToUser,
+    emitUserNotification,
     getUserSockets: () => userSockets,
     getIO: () => ioInstance,
     getProtocolSessions: () => protocolSessions,

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
@@ -8,9 +9,7 @@ import DocumentationOverview from './components/DocumentationOverview';
 import PublicStatusPage from './components/PublicStatusPage';
 import EnhancedPublicStatusPage from './components/EnhancedPublicStatusPage';
 import OAuthCallback from './components/OAuthCallback';
-import AlertsDashboard from './components/alerting/AlertsDashboard';
-import AlertPolicyEditor from './components/alerting/AlertPolicyEditor';
-import { ToastContainer } from 'react-toastify';
+import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import PageLoader from './components/common/PageLoader/PageLoader';
 import './App.css';
@@ -50,8 +49,8 @@ const getPageTitle = (pathname) => {
     '/workspace/compliance': 'Compliance',
     '/workspace/settings': 'Settings',
     '/workspace/history': 'History',
-    '/alerts': 'Alerts Dashboard',
-    '/alerts/policies': 'Alert Policies',
+    '/workspace/monitoring/alerts': 'Alerts Dashboard',
+    '/workspace/monitoring/policies': 'Alert Policies',
     '/status': 'Status',
     '/documentation': 'Documentation',
     '/oauth/callback': 'OAuth Callback'
@@ -116,6 +115,36 @@ function App() {
     checkAuth();
   }, []);
 
+  useEffect(() => {
+    const interceptorId = axios.interceptors.response.use(
+      response => response,
+      error => {
+        const response = error.response;
+        if (response?.status !== 401) {
+          const method = String(error.config?.method || 'request').toUpperCase();
+          const url = String(error.config?.url || 'request').split('?')[0];
+          const message = response?.data?.message || response?.data?.error || error.message || 'Request failed';
+          toast.error(message, { toastId: `axios-failure:${method}:${url}:${response?.status || 'network'}` });
+        }
+        return Promise.reject(error);
+      }
+    );
+    return () => axios.interceptors.response.eject(interceptorId);
+  }, []);
+
+  useEffect(() => {
+    const showRequestFailure = (event) => {
+      const { method, url, status, message } = event.detail || {};
+      const path = String(url || 'request').split('?')[0];
+      toast.error(message || 'Request failed', {
+        toastId: `request-failure:${method}:${path}:${status}`
+      });
+    };
+
+    window.addEventListener('pigeon:request-failed', showRequestFailure);
+    return () => window.removeEventListener('pigeon:request-failed', showRequestFailure);
+  }, []);
+
 
   // Show loading spinner while checking authentication
   if (isLoading) {
@@ -133,8 +162,8 @@ function App() {
         <Routes>
           <Route path="/" element={isAuthenticated ? <Navigate to="/workspace" /> : <PublicHome />} />
           <Route path="/workspace/*" element={isAuthenticated ? <Workspace /> : <Navigate to="/" />} />
-          <Route path="/alerts" element={isAuthenticated ? <AlertsDashboard /> : <Navigate to="/" />} />
-          <Route path="/alerts/policies" element={isAuthenticated ? <AlertPolicyEditor /> : <Navigate to="/" />} />
+          <Route path="/alerts" element={isAuthenticated ? <Navigate to="/workspace/monitoring/alerts" /> : <Navigate to="/" />} />
+          <Route path="/alerts/policies" element={isAuthenticated ? <Navigate to="/workspace/monitoring/policies" /> : <Navigate to="/" />} />
           <Route path="/status" element={<PublicStatusPage />} />
           <Route path="/status/:workspaceId" element={<EnhancedPublicStatusPage />} />
           <Route path="/documentation" element={<DocumentationOverview />} /> {/* Add the documentation route */}
@@ -155,6 +184,7 @@ function App() {
         newestOnTop
         closeOnClick
         pauseOnHover
+        limit={4}
         icon
       />
       {/* api-network is a fixed-height app-shell that renders its own footer inside

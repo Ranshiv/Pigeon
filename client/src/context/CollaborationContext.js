@@ -294,6 +294,12 @@ export const CollaborationProvider = ({ children }) => {
       }
     });
 
+    socketInstance.on('appNotification', (notification) => {
+      if (!notification?.message) return;
+      const method = notification.severity === 'error' ? 'error' : notification.severity === 'warning' ? 'warn' : 'info';
+      toast[method](notification.message, { toastId: notification.id });
+    });
+
     // --- NEW: Review Request Events ---
     socketInstance.on('reviewCreated', (review) => {
       addNotification(`New review request: ${review.title}`);

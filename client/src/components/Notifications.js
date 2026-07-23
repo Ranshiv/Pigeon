@@ -1,5 +1,5 @@
 // client/src/components/Notifications.js
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { FiBell } from 'react-icons/fi';
 import './Notifications.css';
 import { useCollaboration } from '../context/CollaborationContext';
@@ -7,12 +7,15 @@ import { useCollaboration } from '../context/CollaborationContext';
 const Notifications = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [userActivities, setUserActivities] = useState([]);
-  const [unreadCount, setUnreadCount] = useState(0);
   const notificationRef = useRef(null);
   const recentActivityRef = useRef(new Map());
   const currentUserIdRef = useRef(null);
   const monitorStatusRef = useRef(new Map());
   const { socket } = useCollaboration();
+  const unreadCount = useMemo(
+    () => userActivities.reduce((count, activity) => count + (activity.read ? 0 : 1), 0),
+    [userActivities]
+  );
 
   useEffect(() => {
     try {
@@ -28,29 +31,16 @@ const Notifications = () => {
     }
   }, []);
 
-  // Load persisted activity history on mount (historical → shown as already read)
+  // Load persisted account-wide notification history on mount.
   useEffect(() => {
     let cancelled = false;
     (async () => {
       try {
-        const res = await fetch('/api/activities?scope=team&limit=50', { credentials: 'include' });
+        const res = await fetch('/api/notifications?limit=50', { credentials: 'include' });
         if (!res.ok) return;
-        const logs = await res.json();
-        if (cancelled || !Array.isArray(logs)) return;
-        setUserActivities(prev => [
-          ...prev,
-          ...logs.map(l => ({
-            id: l._id,
-            type: 'log',
-            details: {
-              actionType: l.actionType,
-              resourceName: l.resourceName,
-              actorName: l.user?.displayName
-            },
-            timestamp: l.createdAt,
-            read: true
-          }))
-        ].slice(0, 50));
+        const data = await res.json();
+        if (cancelled || !Array.isArray(data.notifications)) return;
+        setUserActivities(data.notifications);
       } catch {
         // history is best-effort; live socket events still work
       }
@@ -115,8 +105,6 @@ const Notifications = () => {
         return newActivities;
       });
 
-      // Increase unread count
-      setUnreadCount(prev => prev + 1);
     };
 
     // Monitoring emits monitor_update on EVERY poll — only notify on status transitions
@@ -125,42 +113,66 @@ const Notifications = () => {
       const status = data.currentStatus || data.status;
       const prev = monitorStatusRef.current.get(data.monitorId);
       monitorStatusRef.current.set(data.monitorId, status);
-      if (prev === undefined || prev === status) return; // seed silently; skip non-transitions
+      // Seed healthy monitors quietly, but surface an already failing/degraded
+      // monitor the first time this browser receives it.
+      if ((prev === undefined && status === 'up') || prev === status) return;
 
       setUserActivities(prevActs => [
         {
           id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
           type: 'monitor_status',
-          details: { monitorId: data.monitorId, status, responseTime: data.responseTime },
+          details: { monitorId: data.monitorId, monitorName: data.monitorName, status, responseTime: data.responseTime },
           timestamp: data.timestamp || new Date().toISOString(),
           read: false
         },
         ...prevActs
       ].slice(0, 50));
-      setUnreadCount(prev => prev + 1);
     };
+
+    const handleAppNotification = (notification) => {
+      if (!notification?.message) return;
+
+      setUserActivities(prev => {
+        if (notification.id && prev.some(item => item.id === notification.id)) return prev;
+        return [{
+          id: notification.id || `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,
+          type: notification.type || 'system', message: notification.message,
+          severity: notification.severity || 'info', timestamp: notification.timestamp || new Date().toISOString(),
+          read: Boolean(notification.read)
+        }, ...prev].slice(0, 50);
+      });
+    };
+
+    const handleNotificationRead = ({ id }) => setUserActivities(prev => prev.map(item => item.id === id ? { ...item, read: true } : item));
+    const handleNotificationsReadAll = () => setUserActivities(prev => prev.map(item => ({ ...item, read: true })));
 
     // Subscribe to the userActivity event
     socket.on('userActivity', handleUserActivity);
     socket.on('monitor_update', handleMonitorUpdate);
+    socket.on('appNotification', handleAppNotification);
+    socket.on('notificationRead', handleNotificationRead);
+    socket.on('notificationsReadAll', handleNotificationsReadAll);
 
     // Clean up on unmount
     return () => {
       socket.off('userActivity', handleUserActivity);
       socket.off('monitor_update', handleMonitorUpdate);
+      socket.off('appNotification', handleAppNotification);
+      socket.off('notificationRead', handleNotificationRead);
+      socket.off('notificationsReadAll', handleNotificationsReadAll);
     };
   }, [socket]);
 
-  // Toggle notifications dropdown
-  const toggleNotifications = () => {
-    setIsOpen(!isOpen);
-    if (!isOpen) {
-      // Mark all as read when opening notifications
-      setUserActivities(prev =>
-        prev.map(activity => ({ ...activity, read: true }))
-      );
-      setUnreadCount(0);
-    }
+  const markAllRead = async () => {
+    setUserActivities(prev => prev.map(activity => ({ ...activity, read: true })));
+    await fetch('/api/notifications/read-all', { method: 'POST', credentials: 'include' }).catch(() => {});
+  };
+
+  const markRead = async (activityId) => {
+    setUserActivities(prev => prev.map(activity => (
+      activity.id === activityId ? { ...activity, read: true } : activity
+    )));
+    await fetch(`/api/notifications/${activityId}/read`, { method: 'PATCH', credentials: 'include' }).catch(() => {});
   };
 
   // Format the timestamp
@@ -192,9 +204,24 @@ const Notifications = () => {
       case 'review_requested':
         return `${activity.details?.requesterName || 'Someone'} requested your review on ${activity.details?.title || 'a review'}`;
       case 'monitor_status':
-        return `Monitor is now ${activity.details?.status || 'updated'}`;
-      case 'log':
-        return `${activity.details?.actorName || 'Someone'} ${activity.details?.actionType || 'updated'} ${activity.details?.resourceName || ''}`.trim();
+        return `${activity.details?.monitorName || 'Monitor'} is now ${activity.details?.status || 'updated'}`;
+      case 'system':
+        return activity.message || activity.details?.message || 'System notification';
+      case 'log': {
+        const actionLabels = {
+          create: 'created',
+          update: 'updated',
+          delete: 'deleted',
+          review_request: 'requested a review for',
+          review_approve: 'approved',
+          review_reject: 'rejected',
+          comment: 'commented on',
+          api_test: 'ran',
+          deploy: 'deployed'
+        };
+        const action = actionLabels[activity.details?.actionType] || activity.details?.actionType || 'updated';
+        return `${activity.details?.actorName || 'Someone'} ${action} ${activity.details?.resourceName || ''}`.trim();
+      }
       default:
         return `${activity.type}: ${JSON.stringify(activity.details)}`;
     }
@@ -202,30 +229,33 @@ const Notifications = () => {
 
   return (
     <div className="notifications-container" ref={notificationRef}>
-      <div className="notification-icon-wrapper" onClick={toggleNotifications}>
+      <button
+        type="button"
+        className={`notification-icon-wrapper${unreadCount ? ' has-notifications' : ''}`}
+        onClick={() => setIsOpen(open => !open)}
+        aria-label={unreadCount ? `Notifications, ${unreadCount} unread` : 'Notifications'}
+        aria-expanded={isOpen}
+        aria-controls="notifications-dropdown"
+      >
         <FiBell size={20} />
         {unreadCount > 0 && (
-          <span className="notification-badge">{unreadCount}</span>
+          <span key={unreadCount} className="notification-badge" aria-hidden="true">{unreadCount > 99 ? '99+' : unreadCount}</span>
         )}
-      </div>
+      </button>
 
       {isOpen && (
-        <div className="notifications-dropdown">
+        <div className="notifications-dropdown" id="notifications-dropdown" role="dialog" aria-label="Notifications">
           <div className="notifications-header">
             <h3>Notifications</h3>
             {userActivities.length > 0 && (
               <button
+                type="button"
                 className="mark-all-read-btn"
                 disabled={unreadCount === 0}
                 title={unreadCount === 0 ? 'All caught up' : 'Mark all as read'}
-                onClick={() => {
-                  setUserActivities(prev =>
-                    prev.map(activity => ({ ...activity, read: true }))
-                  );
-                  setUnreadCount(0);
-                }}
+                onClick={markAllRead}
               >
-                <span>Read all</span>
+                Read all
               </button>
             )}
           </div>
@@ -233,17 +263,20 @@ const Notifications = () => {
           <div className="notifications-list">
             {userActivities?.length > 0 ? (
               userActivities.map(activity => (
-                <div
+                <button
+                  type="button"
                   key={activity.id}
                   className={`notification-item ${!activity.read ? 'unread' : ''}`}
+                  onClick={() => markRead(activity.id)}
+                  aria-label={`${getNotificationMessage(activity)}${activity.read ? '' : ', unread'}`}
                 >
                   <div className="notification-content">
-                    <p>{getNotificationMessage(activity)}</p>
+                    <p className="notification-message">{getNotificationMessage(activity)}</p>
                     <span className="notification-time">
                       {formatTimestamp(activity.timestamp)}
                     </span>
                   </div>
-                </div>
+                </button>
               ))
             ) : (
               <div className="no-notifications">

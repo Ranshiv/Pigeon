@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import './GlobalVariablesModal.css';
+import '../styles/animations.css';
 import VariableEditor from './VariableEditor';
 import { FiX, FiSave, FiGlobe } from 'react-icons/fi';
 
 const GlobalVariablesModal = ({
     isOpen,
     onClose,
-    workspaceId
+    workspaceId,
+    canEdit = false
 }) => {
     const [variables, setVariables] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -75,7 +77,6 @@ const GlobalVariablesModal = ({
                 <div className="global-variables-modal-header">
                     <h2>
                         <FiGlobe />
-                        <span className="ts-eyebrow">Global</span>
                         Global Variables
                     </h2>
                     <button className="gv-close-btn" onClick={onClose} aria-label="Close">
@@ -95,17 +96,6 @@ const GlobalVariablesModal = ({
                             <div className="global-variables-spinner"></div>
                             <p>Loading global variables…</p>
                         </div>
-                    ) : variables.length === 0 ? (
-                        <div className="global-variables-empty">
-                            <div className="global-variables-empty-icon">
-                                <FiGlobe />
-                            </div>
-                            <h3 className="global-variables-empty-title">No global variables yet</h3>
-                            <p className="global-variables-empty-subtext">
-                                Global variables are available across all collections and environments in this workspace.
-                                Create your first to share values like API base URLs, tokens, or feature flags.
-                            </p>
-                        </div>
                     ) : (
                         <>
                             <div className="global-variables-banner">
@@ -118,8 +108,9 @@ const GlobalVariablesModal = ({
                                 scope="global"
                                 variables={variables}
                                 onVariablesChange={setVariables}
-                                editable={true}
+                                editable={canEdit}
                                 hideHeader
+                                inlineAddForm
                             />
                         </>
                     )}
@@ -134,15 +125,19 @@ const GlobalVariablesModal = ({
                     >
                         Cancel
                     </button>
-                    <button
-                        type="button"
-                        className="gv-save-btn"
-                        onClick={handleSave}
-                        disabled={saving || loading}
-                    >
-                        <FiSave />
-                        {saving ? 'Saving…' : 'Save Changes'}
-                    </button>
+                    {canEdit ? (
+                        <button
+                            type="button"
+                            className="gv-save-btn"
+                            onClick={handleSave}
+                            disabled={saving || loading}
+                        >
+                            <FiSave />
+                            {saving ? 'Saving…' : 'Save Changes'}
+                        </button>
+                    ) : (
+                        <span className="gv-read-only-note">Only workspace admins can edit global variables.</span>
+                    )}
                 </div>
             </div>
         </div>

@@ -29,8 +29,8 @@ const APINetworkSection = () => {
         const c = localStorage.getItem('sidebarBtnCorner');
         return c === 'bottom-left' ? c : 'top-left'; // left side only
     });
-    const [dragPos, setDragPos] = useState(null); // {top,left} while dragging, else null
     const dragState = useRef({ moved: false });
+    const sidebarOpenButtonRef = useRef(null);
     const navigate = useNavigate();
 
     // Drag the "Show Sidebar" button; it snaps to the nearest corner on release.
@@ -40,28 +40,39 @@ const APINetworkSection = () => {
         // Button is position:fixed, so drag/snap math is in viewport coords (navbar = 60px tall).
         const NAV = 60;
         const vh = window.innerHeight, vw = window.innerWidth;
-        const startX = e.clientX, startY = e.clientY;
-        dragState.current.moved = false;
+        const button = sidebarOpenButtonRef.current;
+        if (!button) return;
+
+        const rect = button.getBoundingClientRect();
+        const drag = {
+            moved: false,
+            startX: e.clientX,
+            startY: e.clientY,
+            startLeft: rect.left,
+            startTop: rect.top
+        };
+        dragState.current = drag;
+
+        button.style.willChange = 'transform';
 
         const onMove = (ev) => {
-            const left = ev.clientX - 16;
-            const top = ev.clientY - 16;
-            if (Math.abs(ev.clientX - startX) > 3 || Math.abs(ev.clientY - startY) > 3) dragState.current.moved = true;
-            setDragPos({
-                top: Math.max(NAV + 16, Math.min(vh - 48, top)),
-                left: Math.max(16, Math.min(vw / 2 - 32, left)), // left side only
-            });
+            const left = Math.max(16, Math.min(vw / 2 - 32, drag.startLeft + ev.clientX - drag.startX));
+            const top = Math.max(NAV + 16, Math.min(vh - 48, drag.startTop + ev.clientY - drag.startY));
+            if (Math.abs(ev.clientX - drag.startX) > 3 || Math.abs(ev.clientY - drag.startY) > 3) drag.moved = true;
+
+            button.style.transform = `translate3d(${left - drag.startLeft}px, ${top - drag.startTop}px, 0)`;
         };
         const onUp = (ev) => {
             window.removeEventListener('pointermove', onMove);
             window.removeEventListener('pointerup', onUp);
-            if (dragState.current.moved) {
+            button.style.willChange = 'auto';
+            if (drag.moved) {
                 // Left side only: snap to top-left or bottom-left by vertical midpoint of viewport.
                 const corner = ev.clientY < vh / 2 ? 'top-left' : 'bottom-left';
                 setSidebarBtnCorner(corner);
                 localStorage.setItem('sidebarBtnCorner', corner);
             }
-            setDragPos(null);
+            button.style.transform = '';
         };
         window.addEventListener('pointermove', onMove);
         window.addEventListener('pointerup', onUp);
@@ -333,10 +344,17 @@ const APINetworkSection = () => {
             <div className="api-network-main-content">
                 {!isSidebarOpen && (
                     <button
+                        ref={sidebarOpenButtonRef}
                         className={`sidebar-open-btn corner-${sidebarBtnCorner}`}
-                        style={dragPos ? { top: dragPos.top, left: dragPos.left, right: 'auto', bottom: 'auto' } : undefined}
                         onPointerDown={startDragSidebarBtn}
-                        onClick={() => { if (!dragState.current.moved) { setIsSidebarOpen(true); localStorage.setItem('apiNetworkSidebarOpen', 'true'); } }}
+                        onClick={() => {
+                            if (dragState.current.moved) {
+                                dragState.current.moved = false;
+                                return;
+                            }
+                            setIsSidebarOpen(true);
+                            localStorage.setItem('apiNetworkSidebarOpen', 'true');
+                        }}
                         title="Show Sidebar (drag to a corner)"
                     >
                         <FiSidebar size={32} />

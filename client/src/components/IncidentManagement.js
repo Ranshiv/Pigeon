@@ -353,7 +353,7 @@ const IncidentManagement = () => {
                 </button>
                 <button
                     className="nav-btn"
-                    onClick={() => window.location.href = '/alerts/policies'}
+                    onClick={() => window.location.href = '/workspace/monitoring/policies'}
                 >
                     <FiBell /> Alerts & Policies
                 </button>

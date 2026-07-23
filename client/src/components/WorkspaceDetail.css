@@ -464,7 +464,23 @@
   margin-bottom: 12px;
 }
 
-.ws-collection-card .ws-btn {
+.ws-collection-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ws-collection-actions .ws-btn:first-child {
+  flex: 1;
+  justify-content: center;
+}
+
+.ws-collection-actions .ws-btn.icon-only {
+  width: 36px;
+  flex: 0 0 36px;
+}
+
+.ws-collection-card > .ws-btn {
   width: 100%;
   justify-content: center;
 }
@@ -609,17 +625,18 @@
 }
 
 .ws-role-select {
-  padding: 4px 8px;
-  background: var(--ws-inset);
-  border: 1px solid var(--ws-hairline);
-  border-radius: var(--ws-radius-btn);
-  color: var(--text-color);
-  font-size: 0.8rem;
-  cursor: pointer;
+  width: 96px;
 }
 
-.ws-role-select:focus {
-  outline: none;
+.ws-role-select .app-select-trigger {
+  padding: 4px 8px;
+  border-color: var(--ws-hairline);
+  border-radius: var(--ws-radius-btn);
+  background: var(--ws-inset);
+  font-size: 0.8rem;
+}
+
+.ws-role-select .app-select-trigger:focus-visible {
   border-color: var(--ws-accent);
   box-shadow: 0 0 0 2px color-mix(in srgb, var(--ws-accent) 15%, transparent);
 }
@@ -721,6 +738,8 @@
 
 .ws-mr-card.pending::before { background: var(--warning-color); }
 .ws-mr-card.approved::before { background: var(--success-color); }
+.ws-mr-card.merged::before { background: var(--success-color); }
+.ws-mr-card.rolled_back::before { background: var(--text-muted); }
 .ws-mr-card.rejected::before { background: var(--danger-color); }
 
 .ws-mr-header {
@@ -770,7 +789,104 @@
 
 .ws-mr-status.pending { color: var(--warning-color); border-color: color-mix(in srgb, var(--warning-color) 35%, var(--ws-hairline)); }
 .ws-mr-status.approved { color: var(--success-color); border-color: color-mix(in srgb, var(--success-color) 35%, var(--ws-hairline)); }
+.ws-mr-status.merged { color: var(--success-color); border-color: color-mix(in srgb, var(--success-color) 35%, var(--ws-hairline)); }
+.ws-mr-status.rolled_back { color: var(--text-muted); border-color: var(--ws-hairline); }
 .ws-mr-status.rejected { color: var(--danger-color); border-color: color-mix(in srgb, var(--danger-color) 35%, var(--ws-hairline)); }
+
+.ws-mr-description {
+  margin: 10px 0 0;
+  color: var(--text-secondary);
+  font-size: 0.84rem;
+  line-height: 1.5;
+}
+
+.ws-mr-changes-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 12px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--ws-accent);
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.ws-mr-changes-toggle svg { transition: transform 180ms ease; }
+.ws-mr-changes-toggle[aria-expanded="true"] svg { transform: rotate(180deg); }
+
+.ws-mr-changes-panel {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 180ms ease, margin-top 180ms ease;
+}
+
+.ws-mr-changes-panel.open {
+  grid-template-rows: 1fr;
+  margin-top: 10px;
+}
+
+.ws-mr-changes-content {
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.ws-mr-change {
+  display: grid;
+  grid-template-columns: minmax(88px, 0.7fr) minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border: 1px solid var(--ws-hairline);
+  border-radius: var(--ws-radius-btn);
+  background: var(--ws-inset);
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+}
+
+.ws-mr-change strong { color: var(--text-color); }
+.ws-mr-change span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ws-mr-change-arrow { color: var(--ws-accent); }
+
+.ws-mr-legacy-note {
+  margin: 12px 0 0;
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  line-height: 1.45;
+}
+
+.ws-modal-copy {
+  margin: 8px 0 18px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.ws-conflict-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.ws-conflict-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px;
+  border: 1px solid var(--ws-hairline);
+  border-radius: var(--ws-radius-btn);
+  background: var(--ws-inset);
+  color: var(--text-secondary);
+  font-size: 0.82rem;
+}
+
+.ws-conflict-item strong { color: var(--text-color); text-transform: capitalize; }
+.ws-conflict-actions { display: flex; gap: 8px; margin-top: 4px; }
 
 .ws-mr-collections {
   display: flex;
@@ -1111,6 +1227,48 @@
   outline: none;
   border-color: var(--ws-accent);
   box-shadow: 0 0 0 2px color-mix(in srgb, var(--ws-accent) 15%, transparent);
+}
+
+/* Merge-request selectors need an explicit empty state: an empty trigger
+   otherwise blends into the modal and leaves only the chevron visible. */
+.ws-form-group .merge-collection-select .app-select-trigger {
+  min-height: 42px;
+  padding: 10px 12px;
+  background: var(--ws-inset);
+  border-color: var(--ws-hairline);
+  color: var(--text-color);
+}
+
+.ws-form-group .merge-collection-select .app-select-trigger:hover,
+.ws-form-group .merge-collection-select .app-select-trigger:focus-visible {
+  border-color: var(--ws-accent);
+  background: color-mix(in srgb, var(--ws-accent) 5%, var(--ws-inset));
+}
+
+.ws-form-group .merge-collection-select .app-select-value--placeholder {
+  color: var(--text-secondary);
+  opacity: 0.9;
+}
+
+.ws-form-group .merge-collection-select .app-select-chevron {
+  color: var(--ws-accent);
+  width: 16px;
+  height: 16px;
+}
+
+.ws-form-group .merge-collection-select .app-select-list {
+  background: var(--ws-surface);
+  border-color: var(--ws-hairline);
+  box-shadow: 0 14px 30px color-mix(in srgb, #000 35%, transparent);
+}
+
+.ws-form-group .merge-collection-select .app-select-option {
+  color: var(--text-color);
+}
+
+.ws-form-group .merge-collection-select .app-select-option:hover,
+.ws-form-group .merge-collection-select .app-select-option--active:hover {
+  background: color-mix(in srgb, var(--ws-accent) 10%, var(--ws-inset));
 }
 
 .ws-form-group textarea {

@@ -42,7 +42,7 @@
     display: flex;
     justify-content: center;
     gap: 16px;
-    margin-top: 24px;
+    margin-bottom: 24px;
 }
 
 .refresh-btn,
@@ -348,8 +348,8 @@
 }
 
 .stat-card {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
     border-radius: 8px;
     padding: 24px;
     text-align: center;

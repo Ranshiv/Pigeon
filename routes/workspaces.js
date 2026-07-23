@@ -5,6 +5,7 @@ const { ObjectId } = require('mongodb');
 const { ensureAuthenticated, authenticateJWT } = require('../middleware/auth');
 const { getDb } = require('../config/db');
 const User = require('../models/User');
+const EmailService = require('../services/EmailService');
 
 // Compliance audit logging (who changed what)
 const AuditLogger = require('../features/compliance/AuditLogger');
@@ -191,6 +192,13 @@ router.get('/:id', ensureAuthenticated, async (req, res) => {
             : null;
 
         if (mongoWorkspace) {
+            const ownerId = String(mongoWorkspace.owner || mongoWorkspace.userId || '');
+            const collaborator = (mongoWorkspace.collaborators || []).find(
+                (member) => String(member.userId) === String(userId)
+            );
+            if (ownerId !== String(userId) && !collaborator) {
+                return res.status(403).json({ message: 'You do not have access to this workspace' });
+            }
             workspace = {
                 _id: mongoWorkspace._id.toString(),
                 name: mongoWorkspace.name,
@@ -198,7 +206,7 @@ router.get('/:id', ensureAuthenticated, async (req, res) => {
                 isPersonal: mongoWorkspace.isPersonal || false,
                 isPublic: mongoWorkspace.isPublic || false,
                 owner: mongoWorkspace.owner?.toString?.() || mongoWorkspace.owner,
-                userRole: "admin", // This should be determined based on the user's actual role
+                userRole: ownerId === String(userId) ? "admin" : (collaborator.role || "viewer"),
                 memberCount: mongoWorkspace.collaborators ? mongoWorkspace.collaborators.length : 1,
                 collectionCount: await db.collection('collections').countDocuments({
                     $or: [
@@ -245,6 +253,46 @@ router.get('/:id', ensureAuthenticated, async (req, res) => {
     } catch (err) {
         console.error("Error fetching workspace:", err);
         res.status(500).json({ message: 'Error fetching workspace' });
+    }
+});
+
+// Change a member role. Only the owner can grant/revoke workspace-admin access;
+// an existing admin may manage editor/viewer roles but cannot alter admins.
+router.patch('/:id/collaborators/:userId', ensureAuthenticated, async (req, res) => {
+    try {
+        const { role } = req.body;
+        const workspaceId = req.params.id;
+        const targetUserId = String(req.params.userId);
+        if (!['admin', 'editor', 'viewer'].includes(role)) {
+            return res.status(400).json({ message: 'Invalid collaborator role' });
+        }
+        if (!ObjectId.isValid(workspaceId)) return res.status(400).json({ message: 'Invalid workspace ID' });
+
+        const db = getDb();
+        const workspace = await db.collection('workspaces').findOne({ _id: new ObjectId(workspaceId) });
+        if (!workspace) return res.status(404).json({ message: 'Workspace not found' });
+
+        const requesterId = String(req.user.id || req.user._id);
+        const isOwner = String(workspace.owner || workspace.userId) === requesterId;
+        const requester = (workspace.collaborators || []).find((member) => String(member.userId) === requesterId);
+        const target = (workspace.collaborators || []).find((member) => String(member.userId) === targetUserId);
+        if (!target) return res.status(404).json({ message: 'Collaborator not found' });
+        if (!isOwner && requester?.role !== 'admin') return res.status(403).json({ message: 'Only the owner or an admin can manage members' });
+        if (!isOwner && (role === 'admin' || target.role === 'admin')) {
+            return res.status(403).json({ message: 'Only the owner can change workspace admin roles' });
+        }
+        if (targetUserId === String(workspace.owner || workspace.userId)) {
+            return res.status(403).json({ message: 'The workspace owner role cannot be changed' });
+        }
+
+        await db.collection('workspaces').updateOne(
+            { _id: new ObjectId(workspaceId), 'collaborators.userId': target.userId },
+            { $set: { 'collaborators.$.role': role, updatedAt: new Date() } }
+        );
+        res.json({ ...target, userId: String(target.userId), role });
+    } catch (error) {
+        console.error('Update collaborator role failed:', error);
+        res.status(500).json({ message: 'Failed to update collaborator role' });
     }
 });
 
@@ -353,6 +401,15 @@ router.get('/:id/activity', ensureAuthenticated, async (req, res) => {
         }
 
         const workspaceObjectId = ObjectId.isValid(workspaceId) ? new ObjectId(workspaceId) : null;
+        let isPersonalWorkspace = false;
+
+        if (workspaceObjectId) {
+            const workspace = await db.collection('workspaces').findOne(
+                { _id: workspaceObjectId },
+                { projection: { isPersonal: 1 } }
+            );
+            isPersonalWorkspace = Boolean(workspace?.isPersonal);
+        }
 
         // 1) Prefer the real ActivityLog (reviews, comments, requests all write here).
         try {
@@ -627,13 +684,16 @@ router.post('/:id/invite', ensureAuthenticated, async (req, res) => {
             return res.status(404).json({ message: 'No user found with that email' });
         }
 
-        const alreadyMember = String(workspace.owner) === String(invitee._id)
-            || (workspace.collaborators || []).some(c => String(c.userId) === String(invitee._id));
-        if (alreadyMember) {
-            return res.status(409).json({ message: 'User is already a member of this workspace' });
+        const inviteeIsOwner = String(workspace.owner) === String(invitee._id);
+        if (inviteeIsOwner) {
+            return res.status(409).json({ message: 'This user already owns the workspace.' });
         }
 
-        const newCollaborator = {
+        const existingCollaborator = (workspace.collaborators || []).find(
+            (collaborator) => String(collaborator.userId) === String(invitee._id)
+        );
+
+        const newCollaborator = existingCollaborator || {
             userId: invitee._id,
             email: invitee.email,
             displayName: invitee.displayName,
@@ -641,12 +701,40 @@ router.post('/:id/invite', ensureAuthenticated, async (req, res) => {
             joinedAt: new Date()
         };
 
-        await db.collection('workspaces').updateOne(
-            { _id: new ObjectId(workspaceId) },
-            { $push: { collaborators: newCollaborator } }
-        );
+        const emailService = new EmailService();
+        if (!emailService.emailConfigured) {
+            return res.status(503).json({
+                message: 'Email delivery is not configured. Set up SMTP or Brevo before inviting members.'
+            });
+        }
 
-        res.status(201).json(newCollaborator);
+        const emailResult = await emailService.sendWorkspaceInvitation({
+            email: invitee.email,
+            recipientName: invitee.displayName,
+            inviterName: req.user.displayName || req.user.name || req.user.email || 'A workspace administrator',
+            workspaceName: workspace.name,
+            workspaceId,
+            role: newCollaborator.role
+        });
+
+        if (!emailResult?.success) {
+            return res.status(502).json({
+                message: emailResult?.error || 'Unable to send the invitation email. Please try again.'
+            });
+        }
+
+        if (!existingCollaborator) {
+            await db.collection('workspaces').updateOne(
+                { _id: new ObjectId(workspaceId) },
+                { $push: { collaborators: newCollaborator } }
+            );
+        }
+
+        res.status(existingCollaborator ? 200 : 201).json({
+            ...newCollaborator,
+            emailSent: true,
+            alreadyMember: Boolean(existingCollaborator)
+        });
     } catch (err) {
         console.error("Error inviting user:", err);
         res.status(500).json({ message: 'Error inviting user to workspace' });
@@ -879,21 +967,14 @@ router.delete('/:id', ensureAuthenticated, async (req, res) => {
         const workspaceId = req.params.id;
         const db = getDb();
 
-        // Don't allow deleting personal workspace
-        if (workspaceId === "ws1") {
-            return res.status(400).json({ message: 'Cannot delete personal workspace' });
-        }
-
-        // Try to delete from MongoDB if it exists
-        const workspace = await db.collection('workspaces')
-            .findOne({ _id: new ObjectId(workspaceId) });
-
-        if (workspace && workspace.isPersonal) {
-            return res.status(400).json({ message: 'Cannot delete personal workspace' });
-        }
+        // Persisted workspaces use Mongo ObjectIds; seeded/local workspaces can use string IDs.
+        const mongoWorkspaceId = ObjectId.isValid(workspaceId) ? new ObjectId(workspaceId) : null;
+        const workspace = mongoWorkspaceId
+            ? await db.collection('workspaces').findOne({ _id: mongoWorkspaceId })
+            : null;
 
         if (workspace) {
-            await db.collection('workspaces').deleteOne({ _id: new ObjectId(workspaceId) });
+            await db.collection('workspaces').deleteOne({ _id: mongoWorkspaceId });
         }
 
         // Audit log: workspace deleted
@@ -1026,6 +1107,39 @@ router.post('/:id/versions', authenticateJWT, async (req, res) => {
 router.get('/:id/merge-requests', ensureAuthenticated, async (req, res) => {
     try {
         const workspaceId = req.params.id;
+        const { status } = req.query;
+
+        if (ObjectId.isValid(workspaceId)) {
+            const db = getDb();
+            const userId = String(req.user.id || req.user._id);
+            const workspace = await db.collection('workspaces').findOne({ _id: new ObjectId(workspaceId) });
+            const isOwner = String(workspace?.owner) === userId;
+            const collaborator = (workspace?.collaborators || []).find(
+                (member) => String(member.userId) === userId
+            );
+
+            if (!workspace || (!isOwner && !collaborator)) {
+                return res.status(403).json({ message: 'You do not have access to this workspace' });
+            }
+
+            const filter = {
+                workspaceId: { $in: [workspaceId, new ObjectId(workspaceId)] }
+            };
+            if (status) filter.status = status;
+
+            const mergeRequests = await db.collection('mergeRequests')
+                .find(filter)
+                .sort({ updatedAt: -1 })
+                .toArray();
+
+            return res.json(mergeRequests.map((mergeRequest) => ({
+                ...mergeRequest,
+                _id: mergeRequest._id.toString(),
+                workspaceId: mergeRequest.workspaceId?.toString?.() || mergeRequest.workspaceId,
+                sourceCollectionId: mergeRequest.sourceCollectionId?.toString?.() || mergeRequest.sourceCollectionId,
+                targetCollectionId: mergeRequest.targetCollectionId?.toString?.() || mergeRequest.targetCollectionId
+            })));
+        }
 
         // Mock merge requests data based on workspace ID
         let mergeRequests = [];
@@ -1148,7 +1262,7 @@ router.get('/:id/merge-requests', ensureAuthenticated, async (req, res) => {
 });
 
 // Get global variables for a workspace
-router.get('/:workspaceId/global-variables', async (req, res) => {
+router.get('/:workspaceId/global-variables', ensureAuthenticated, async (req, res) => {
     try {
         const { workspaceId } = req.params;
 
@@ -1165,7 +1279,8 @@ router.get('/:workspaceId/global-variables', async (req, res) => {
             return res.status(401).json({ message: 'Authentication required' });
         }
 
-        const userId = req.user.id;
+        const userId = String(req.user.id || req.user._id);
+        const userObjectId = ObjectId.isValid(userId) ? new ObjectId(userId) : null;
         const db = getDb();
 
         // Check if user has access to workspace
@@ -1173,7 +1288,9 @@ router.get('/:workspaceId/global-variables', async (req, res) => {
             _id: new ObjectId(workspaceId),
             $or: [
                 { owner: userId },
-                { "collaborators.userId": userId }
+                ...(userObjectId ? [{ owner: userObjectId }] : []),
+                { "collaborators.userId": userId },
+                ...(userObjectId ? [{ "collaborators.userId": userObjectId }] : [])
             ]
         });
 
@@ -1189,7 +1306,7 @@ router.get('/:workspaceId/global-variables', async (req, res) => {
 });
 
 // Update global variables for a workspace
-router.put('/:workspaceId/global-variables', async (req, res) => {
+router.put('/:workspaceId/global-variables', ensureAuthenticated, async (req, res) => {
     try {
         const { workspaceId } = req.params;
         const { variables } = req.body;
@@ -1206,7 +1323,8 @@ router.put('/:workspaceId/global-variables', async (req, res) => {
             return res.status(401).json({ message: 'Authentication required' });
         }
 
-        const userId = req.user.id;
+        const userId = String(req.user.id || req.user._id);
+        const userObjectId = ObjectId.isValid(userId) ? new ObjectId(userId) : null;
         const db = getDb();
 
         // Check if user has access to workspace
@@ -1214,7 +1332,9 @@ router.put('/:workspaceId/global-variables', async (req, res) => {
             _id: new ObjectId(workspaceId),
             $or: [
                 { owner: userId },
-                { "collaborators.userId": userId }
+                ...(userObjectId ? [{ owner: userObjectId }] : []),
+                { "collaborators.userId": userId },
+                ...(userObjectId ? [{ "collaborators.userId": userObjectId }] : [])
             ]
         });
 
@@ -1223,17 +1343,30 @@ router.put('/:workspaceId/global-variables', async (req, res) => {
         }
 
         // Check if user has write permissions
-        const isOwner = workspace.owner === userId;
-        const collaborator = workspace.collaborators?.find(c => c.userId === userId);
-        const canWrite = isOwner || (collaborator && ['admin', 'editor'].includes(collaborator.role));
+        const isOwner = String(workspace.owner) === userId;
+        const collaborator = workspace.collaborators?.find(c => String(c.userId) === userId);
+        const canWrite = isOwner || collaborator?.role === 'admin';
 
         if (!canWrite) {
-            return res.status(403).json({ message: 'Insufficient permissions' });
+            return res.status(403).json({ message: 'Only the workspace owner or an admin can update global variables' });
         }
 
         // Validate variables format
         if (!Array.isArray(variables)) {
             return res.status(400).json({ message: 'Variables must be an array' });
+        }
+
+        const keys = new Set();
+        for (const variable of variables) {
+            const key = String(variable?.key ?? '').trim();
+            if (!key || typeof variable.key !== 'string') {
+                return res.status(400).json({ message: 'Each variable must have a valid key' });
+            }
+            if (variable.value === undefined || variable.value === null) {
+                return res.status(400).json({ message: 'Each variable must have a value' });
+            }
+            if (keys.has(key)) return res.status(400).json({ message: `Duplicate global variable: ${key}` });
+            keys.add(key);
         }
 
         // Update workspace with new global variables

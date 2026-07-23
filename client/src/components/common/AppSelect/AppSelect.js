@@ -3,7 +3,7 @@ import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { FiChevronDown } from 'react-icons/fi';
 
-const AppSelect = ({ value, onChange, options, disabled, className = '', id }) => {
+const AppSelect = ({ value, onChange, options, disabled, className = '', id, placeholder = 'Select an option' }) => {
     const [open, setOpen] = useState(false);
     const [pos, setPos] = useState({ top: 0, left: 0, width: 0 });
     const rootRef = useRef(null);
@@ -73,7 +73,9 @@ const AppSelect = ({ value, onChange, options, disabled, className = '', id }) =
                 disabled={disabled}
                 onClick={() => setOpen((o) => !o)}
             >
-                <span className="app-select-value">{current ? current.label : ''}</span>
+                <span className={`app-select-value${current ? '' : ' app-select-value--placeholder'}`}>
+                    {current ? current.label : placeholder}
+                </span>
                 <FiChevronDown className="app-select-chevron" />
             </button>
             {list && createPortal(list, document.body)}

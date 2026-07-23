@@ -1,15 +1,37 @@
 // client/src/components/ResponseDisplay.js
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import './ResponseDisplay.css';
 import TestResultsDisplay from './TestResultsDisplay';
 import PageLoader from './common/PageLoader/PageLoader';
 import { FiCheckCircle, FiAlertCircle, FiClock, FiFileText } from 'react-icons/fi';
+
+const VOID_HTML_TAGS = /^(area|base|br|col|embed|hr|img|input|link|meta|param|source|track|wbr)\b/i;
+
+const formatMarkup = (markup) => {
+    let indentation = 0;
+
+    return markup
+        .replace(/>\s*</g, '>\n<')
+        .split('\n')
+        .map((line) => {
+            const tag = line.trim();
+            if (/^<\//.test(tag)) indentation = Math.max(0, indentation - 1);
+
+            const formatted = `${'  '.repeat(indentation)}${tag}`;
+            const isOpeningTag = /^<[a-z][^>]*>$/i.test(tag);
+            if (isOpeningTag && !VOID_HTML_TAGS.test(tag) && !/\/>$/.test(tag)) indentation += 1;
+
+            return formatted;
+        })
+        .join('\n');
+};
 
 const ResponseDisplay = ({ requestId, responseData }) => {
     const [response, setResponse] = useState(responseData || null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [activeTab, setActiveTab] = useState('body');
+    const [bodyView, setBodyView] = useState('pretty');
     const [htmlLoading, setHtmlLoading] = useState(false); // Add state for HTML loading
     const [contentType, setContentType] = useState(null);
 
@@ -102,45 +124,47 @@ const ResponseDisplay = ({ requestId, responseData }) => {
         return parseFloat((bytes / Math.pow(k, safeIndex)).toFixed(dm)) + ' ' + sizes[safeIndex];
     };
 
+    const bodyContent = useMemo(() => {
+        if (!response || response.body === undefined || response.body === null || response.body === '') {
+            return { value: null, language: 'text', isMarkup: false };
+        }
+
+        const responseContentType = response.headers && response.headers['content-type'];
+        const rawBody = typeof response.body === 'string'
+            ? response.body
+            : JSON.stringify(response.body, null, 2);
+
+        if (responseContentType && responseContentType.includes('application/json')) {
+            try {
+                return {
+                    value: JSON.stringify(typeof response.body === 'string' ? JSON.parse(response.body) : response.body, null, 2),
+                    language: 'json',
+                    isMarkup: false
+                };
+            } catch (error) {
+                console.warn('Failed to parse JSON response body', error);
+                return { value: rawBody, language: 'json', isMarkup: false };
+            }
+        }
+
+        const isMarkup = Boolean(responseContentType && (responseContentType.includes('text/html') || responseContentType.includes('application/xml')));
+        if (isMarkup) {
+            return {
+                value: bodyView === 'pretty' ? formatMarkup(rawBody) : rawBody,
+                language: responseContentType.includes('text/html') ? 'html' : 'xml',
+                isMarkup: true
+            };
+        }
+
+        return { value: rawBody, language: 'text', isMarkup: false };
+    }, [bodyView, response]);
+
     // Renders the response body with proper formatting and syntax highlighting
     const renderBody = () => {
-        if (!response || !response.body) {
+        if (!bodyContent.value) {
             return <div className="rd-empty"><span className="rd-empty-text">No response body available</span></div>;
         }
-
-        let formattedBody;
-        let language = 'text';
-
-        // Determine content type and try to format accordingly
         const ct = response.headers && response.headers['content-type'];
-
-        try {
-            if (ct && ct.includes('application/json')) {
-                // Format JSON
-                language = 'json';
-                if (typeof response.body === 'string') {
-                    try {
-                        const parsedJson = JSON.parse(response.body);
-                        formattedBody = JSON.stringify(parsedJson, null, 2);
-                    } catch (e) {
-                        formattedBody = response.body;
-                        console.warn('Failed to parse JSON response body', e);
-                    }
-                } else {
-                    formattedBody = JSON.stringify(response.body, null, 2);
-                }
-            } else if (ct && (ct.includes('text/html') || ct.includes('application/xml'))) {
-                // Format HTML/XML without state changes in the render function
-                language = ct.includes('text/html') ? 'html' : 'xml';
-                formattedBody = typeof response.body === 'string' ? response.body : String(response.body);
-            } else {
-                // Default text formatting
-                formattedBody = typeof response.body === 'string' ? response.body : JSON.stringify(response.body, null, 2);
-            }
-        } catch (err) {
-            console.warn('Error formatting response body:', err);
-            formattedBody = String(response.body);
-        }
 
         // Show loading indicator when fetching HTML content
         if (htmlLoading && (ct && (ct.includes('text/html') || ct.includes('application/xml')))) {
@@ -153,8 +177,17 @@ const ResponseDisplay = ({ requestId, responseData }) => {
 
         return (
             <div className="rd-body">
-                <div className={`rd-code language-${language}`}>
-                    <pre className="rd-code-pre">{formattedBody}</pre>
+                {bodyContent.isMarkup && (
+                    <div className="rd-body-toolbar" role="group" aria-label="Response formatting">
+                        <span className="rd-body-language">{bodyContent.language.toUpperCase()}</span>
+                        <div className="rd-body-view-toggle">
+                            <button type="button" className={bodyView === 'pretty' ? 'rd-body-view--active' : ''} onClick={() => setBodyView('pretty')}>Pretty</button>
+                            <button type="button" className={bodyView === 'raw' ? 'rd-body-view--active' : ''} onClick={() => setBodyView('raw')}>Raw</button>
+                        </div>
+                    </div>
+                )}
+                <div className={`rd-code language-${bodyContent.language}`}>
+                    <pre className="rd-code-pre">{bodyContent.value}</pre>
                 </div>
             </div>
         );
@@ -210,7 +243,7 @@ const ResponseDisplay = ({ requestId, responseData }) => {
 
     if (loading) {
         return (
-            <div className="rd-shell rd-shell--loading">
+            <div className="response-display rd-shell rd-shell--loading">
                 <div className="rd-panel-inner">
                     <PageLoader size="md" label="Loading response..." />
                 </div>
@@ -220,7 +253,7 @@ const ResponseDisplay = ({ requestId, responseData }) => {
 
     if (error) {
         return (
-            <div className="rd-shell">
+            <div className="response-display rd-shell">
                 <div className="rd-header">
                     <div className="rd-status rd-status--error">
                         <span className="rd-status-dot" />
@@ -237,7 +270,7 @@ const ResponseDisplay = ({ requestId, responseData }) => {
 
     if (!response) {
         return (
-            <div className="rd-shell">
+            <div className="response-display rd-shell">
                 <div className="rd-empty rd-empty--hero">
                     <FiFileText className="rd-empty-icon" />
                     <span className="rd-empty-text">Send a request to see the response</span>
@@ -265,7 +298,7 @@ const ResponseDisplay = ({ requestId, responseData }) => {
     ];
 
     return (
-        <div className="rd-shell">
+        <div className="response-display rd-shell">
             <div className="rd-header">
                 <div className={`rd-status ${statusClass}`}>
                     <span className="rd-status-dot" />
@@ -310,7 +343,7 @@ const ResponseDisplay = ({ requestId, responseData }) => {
                 ))}
             </div>
 
-            <div className="rd-panel">
+            <div className={`rd-panel rd-panel--${activeTab}`}>
                 {activeTab === 'body' && renderBody()}
                 {activeTab === 'headers' && renderHeaders()}
                 {activeTab === 'tests' && renderTestResults()}

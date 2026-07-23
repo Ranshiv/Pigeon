@@ -712,3 +712,143 @@
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(56, 189, 248, 0.25);
 }
+
+/* Workspace modal refinement: keep the create flow aligned with the
+   compact ws-modal surfaces used throughout WorkspaceDetail. */
+.ws-modal.wide .collection-create-page.embedded {
+    padding: 2px 2px 0;
+}
+
+.ws-modal.wide .collection-create-page.embedded .page-header {
+    margin: 0 0 22px;
+    padding-right: 42px;
+}
+
+.ws-modal.wide .collection-create-page.embedded .page-header h1 {
+    position: relative;
+    margin: 0 0 6px;
+    font-size: 1.15rem;
+    font-weight: 650;
+    letter-spacing: -0.01em;
+}
+
+.ws-modal.wide .collection-create-page.embedded .page-header h1::before {
+    content: 'COLLECTIONS';
+    display: block;
+    margin-bottom: 8px;
+    color: var(--ws-accent, var(--accent, #38bdf8));
+    font-family: var(--ws-mono, ui-monospace, monospace);
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+}
+
+.ws-modal.wide .collection-create-page.embedded .page-header .subtitle {
+    max-width: 58ch;
+    color: var(--text-secondary);
+    font-size: 0.78rem;
+    line-height: 1.45;
+}
+
+.ws-modal.wide .collection-create-page.embedded .create-collection-form .form-group {
+    margin-bottom: 16px;
+}
+
+.ws-modal.wide .collection-create-page.embedded .create-collection-form label {
+    margin-bottom: 7px;
+    color: var(--text-secondary);
+    font-family: var(--ws-mono, ui-monospace, monospace);
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+}
+
+.ws-modal.wide .collection-create-page.embedded .create-collection-form .form-input,
+.ws-modal.wide .collection-create-page.embedded .create-collection-form .form-textarea {
+    padding: 11px 12px;
+    background: var(--ws-inset, var(--surface-sunken, #000c14));
+    border: 1px solid var(--ws-hairline, var(--border-color));
+    border-radius: var(--ws-radius-btn, var(--radius-sm, 6px));
+    font-size: 0.85rem;
+    line-height: 1.45;
+}
+
+.ws-modal.wide .collection-create-page.embedded .create-collection-form .form-textarea {
+    min-height: 96px;
+    resize: vertical;
+}
+
+.ws-modal.wide .collection-create-page.embedded .create-collection-form .form-input::placeholder,
+.ws-modal.wide .collection-create-page.embedded .create-collection-form .form-textarea::placeholder {
+    color: var(--text-muted, #7a9bad);
+    opacity: 0.8;
+}
+
+.ws-modal.wide .collection-create-page.embedded .create-collection-form .form-input:focus,
+.ws-modal.wide .collection-create-page.embedded .create-collection-form .form-textarea:focus {
+    border-color: var(--ws-accent, var(--accent, #38bdf8));
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--ws-accent, var(--accent, #38bdf8)) 14%, transparent);
+}
+
+.ws-modal.wide .collection-create-page.embedded .create-collection-form .form-actions {
+    align-items: center;
+    gap: 8px;
+    margin-top: 22px;
+    padding-top: 14px;
+    border-top: 1px solid var(--ws-hairline, var(--border-color));
+}
+
+.ws-modal.wide .collection-create-page.embedded .create-collection-form .cancel-btn,
+.ws-modal.wide .collection-create-page.embedded .create-collection-form .create-btn {
+    min-height: 36px;
+    padding: 8px 14px;
+    border-radius: var(--ws-radius-btn, var(--radius-sm, 6px));
+    font-size: 0.78rem;
+    font-weight: 650;
+    transition: background-color 120ms ease, border-color 120ms ease,
+        color 120ms ease, transform 120ms ease, box-shadow 120ms ease;
+}
+
+.ws-modal.wide .collection-create-page.embedded .create-collection-form .cancel-btn {
+    border: 1px solid var(--ws-hairline, var(--border-color));
+    background: transparent;
+    color: var(--text-secondary);
+}
+
+.ws-modal.wide .collection-create-page.embedded .create-collection-form .cancel-btn:hover {
+    border-color: var(--ws-accent, var(--accent));
+    background: color-mix(in srgb, var(--ws-accent, var(--accent)) 8%, transparent);
+    color: var(--text-color);
+}
+
+.ws-modal.wide .collection-create-page.embedded .create-collection-form .create-btn {
+    background: var(--ws-accent, var(--accent, #38bdf8));
+    border: 1px solid var(--ws-accent, var(--accent, #38bdf8));
+    color: #fff;
+}
+
+.ws-modal.wide .collection-create-page.embedded .create-collection-form .create-btn:hover:not(:disabled) {
+    background: color-mix(in srgb, var(--ws-accent, var(--accent, #38bdf8)) 86%, white);
+    border-color: color-mix(in srgb, var(--ws-accent, var(--accent, #38bdf8)) 86%, white);
+    transform: translateY(-1px);
+    box-shadow: 0 5px 14px color-mix(in srgb, var(--ws-accent, var(--accent, #38bdf8)) 24%, transparent);
+}
+
+@media (max-width: 640px) {
+    .ws-modal.wide .collection-create-page.embedded {
+        padding: 0;
+    }
+
+    .ws-modal.wide .collection-create-page.embedded .page-header {
+        padding-right: 36px;
+    }
+
+    .ws-modal.wide .collection-create-page.embedded .create-collection-form .form-actions {
+        justify-content: stretch;
+    }
+
+    .ws-modal.wide .collection-create-page.embedded .create-collection-form .cancel-btn,
+    .ws-modal.wide .collection-create-page.embedded .create-collection-form .create-btn {
+        flex: 1;
+    }
+}

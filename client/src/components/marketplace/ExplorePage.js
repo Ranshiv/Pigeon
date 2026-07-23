@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { Search, Filter, Star, TrendingUp, ChevronDown, X, Play, BookOpen, Bookmark, Plus, ShieldCheck } from 'lucide-react';
 import ApiDetailModal from './ApiDetailModal';
 import { MarketplaceApi } from './MarketplaceApi';
@@ -27,6 +27,7 @@ const ExplorePage = () => {
     const [tags, setTags] = useState([]);
     const [loading, setLoading] = useState(true);
     const [showFilters, setShowFilters] = useState(true);
+    const [showAllCategories, setShowAllCategories] = useState(false);
     const [selectedApi, setSelectedApi] = useState(null);
     const [showApiModal, setShowApiModal] = useState(false);
     const [modalInitialTab, setModalInitialTab] = useState('overview');
@@ -211,6 +212,17 @@ const ExplorePage = () => {
 
     const formatRating = (r) => (r == null ? '—' : Number(r).toFixed(1));
 
+    const visibleCategories = useMemo(() => {
+        if (showAllCategories || categories.length <= 12) return categories;
+
+        const selected = categories.find((category) => category.name === selectedCategory);
+        const compact = categories.slice(0, 12);
+        if (selected && !compact.some((category) => category.name === selected.name)) {
+            return [...compact.slice(0, 11), selected];
+        }
+        return compact;
+    }, [categories, selectedCategory, showAllCategories]);
+
     return (
         <div className="explore-page">
             {/* Header */}
@@ -296,23 +308,39 @@ const ExplorePage = () => {
                 </div>
             </div>
 
-            {/* Row 2: category chips — reparented into sticky unit */}
-            <div className="category-chips" role="tablist" aria-label="Filter by category">
-                {categories.map(category => (
-                    <button
-                        key={category.name}
-                        role="tab"
-                        aria-selected={selectedCategory === category.name}
-                        className={`category-chip ${selectedCategory === category.name ? 'active' : ''}`}
-                        onClick={() => {
-                            setSelectedCategory(category.name);
-                            setPage(1);
-                        }}
-                    >
-                        <span>{category.name}</span>
-                        {category.count > 0 && <span className="chip-count">{category.count}</span>}
-                    </button>
-                ))}
+            {/* Row 2: compact category strip */}
+            <div className={`category-filter-bar ${showAllCategories ? 'is-expanded' : ''}`}>
+                <div className="category-filter-heading">
+                    <span>Categories</span>
+                    {categories.length > 12 && (
+                        <button
+                            type="button"
+                            className="category-expand-btn"
+                            onClick={() => setShowAllCategories((visible) => !visible)}
+                            aria-expanded={showAllCategories}
+                        >
+                            {showAllCategories ? 'Show less' : `All categories (${categories.length - 1})`}
+                            <ChevronDown size={14} />
+                        </button>
+                    )}
+                </div>
+                <div className="category-chips" role="tablist" aria-label="Filter by category">
+                    {visibleCategories.map(category => (
+                        <button
+                            key={category.name}
+                            role="tab"
+                            aria-selected={selectedCategory === category.name}
+                            className={`category-chip ${selectedCategory === category.name ? 'active' : ''}`}
+                            onClick={() => {
+                                setSelectedCategory(category.name);
+                                setPage(1);
+                            }}
+                        >
+                            <span>{category.name}</span>
+                            {category.count > 0 && <span className="chip-count">{category.count}</span>}
+                        </button>
+                    ))}
+                </div>
             </div>
             </div>
 
@@ -321,17 +349,16 @@ const ExplorePage = () => {
                 {showFilters && (
                     <aside className="filters-sidebar">
                         <div className="filter-section">
-                            {(selectedCategory !== 'All' || selectedTags.length > 0) && (
-                                <div className="filter-header">
-                                    <button className="clear-filters-btn" onClick={clearFilters}>
-                                        Clear All
-                                    </button>
-                                </div>
-                            )}
-
                             {/* Tags */}
                             <div className="filter-group">
-                                <label className="filter-label">Tags</label>
+                                <div className="filter-group-heading">
+                                    <label className="filter-label">Tags</label>
+                                    {(selectedCategory !== 'All' || selectedTags.length > 0) && (
+                                        <button className="clear-filters-btn" onClick={clearFilters}>
+                                            Clear all
+                                        </button>
+                                    )}
+                                </div>
                                 <div className="tags-list">
                                     {tags.map(tag => (
                                         <button

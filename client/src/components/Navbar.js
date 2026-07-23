@@ -27,6 +27,7 @@ import {
 import { TbVectorTriangle } from 'react-icons/tb'; // Mesh network icon for GraphQL
 import Notifications from './Notifications'; // Import the Notifications component
 import { useCollaboration } from '../context/CollaborationContext';
+import { getGoogleAuthUrl } from '../utils/apiBaseUrl';
 
 const Navbar = ({ isAuthenticated }) => {
     const navigate = useNavigate();
@@ -499,7 +500,7 @@ const Navbar = ({ isAuthenticated }) => {
                         </>
                     ) : (
                         <div className="navbar-end">
-                            <a href="/auth/google" className="login-button">
+                            <a href={getGoogleAuthUrl()} className="login-button">
                                 Sign In
                             </a>
                         </div>

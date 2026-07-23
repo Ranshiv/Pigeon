@@ -15,6 +15,8 @@ import IntegrationsManagement from './IntegrationsManagement';
 import MaintenanceManagement from './MaintenanceManagement';
 import IncidentManagement from './IncidentManagement';
 import AnalyticsDashboard from './Analytics/AnalyticsDashboard';
+import AlertsDashboard from './alerting/AlertsDashboard';
+import AlertPolicyEditor from './alerting/AlertPolicyEditor';
 import GraphQLTestPage from './GraphQLTestPage';
 import ProtocolTestPage from './ProtocolTestPage';
 import PerformanceTestsPage from './performanceTesting/PerformanceTestsPage';
@@ -62,6 +64,8 @@ const Workspace = () => {
                 <Route path="monitoring/maintenance" element={<MaintenanceManagement />} />
                 <Route path="monitoring/incidents" element={<IncidentManagement />} />
                 <Route path="monitoring/new" element={<MonitoringDashboard createOnLoad />} />
+                <Route path="monitoring/alerts" element={<AlertsDashboard />} />
+                <Route path="monitoring/policies" element={<AlertPolicyEditor />} />
                 <Route path="monitoring" element={<MonitoringDashboard />} />
                 <Route path="graphql" element={<GraphQLTestPage />} />
                 <Route path="protocols" element={<ProtocolTestPage />} />

@@ -766,6 +766,56 @@ If you have any questions, please contact our support team.
         }
     }
 
+    async sendWorkspaceInvitation({ email, recipientName, inviterName, workspaceName, workspaceId, role }) {
+        const workspaceUrl = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/workspace/workspaces/${encodeURIComponent(workspaceId)}`;
+        const subject = `${inviterName} invited you to ${workspaceName} on Pigeon`;
+        const htmlContent = `
+            <html>
+            <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #1f2937;">
+                <div style="max-width: 600px; margin: 0 auto; padding: 24px;">
+                    <h2 style="margin: 0 0 20px; color: #014C75;">Workspace invitation</h2>
+                    <p>Hi${recipientName ? ` ${recipientName}` : ''},</p>
+                    <p><strong>${inviterName}</strong> invited you to the <strong>${workspaceName}</strong> workspace on Pigeon as an <strong>${role}</strong>.</p>
+                    <p>You can now access the workspace and collaborate with its members.</p>
+                    <p style="margin: 28px 0;">
+                        <a href="${workspaceUrl}" style="display: inline-block; padding: 12px 20px; border-radius: 6px; background: #014C75; color: #ffffff; text-decoration: none; font-weight: 600;">Open workspace</a>
+                    </p>
+                    <p style="font-size: 13px; color: #6b7280;">If you were not expecting this invitation, you can safely ignore this email.</p>
+                </div>
+            </body>
+            </html>
+        `;
+        const textContent = `Hi${recipientName ? ` ${recipientName}` : ''},\n\n${inviterName} invited you to the ${workspaceName} workspace on Pigeon as an ${role}.\n\nOpen workspace: ${workspaceUrl}\n\nIf you were not expecting this invitation, you can safely ignore this email.`;
+
+        try {
+            if (this.transporter) {
+                const result = await this.transporter.sendMail({
+                    from: process.env.EMAIL_FROM || process.env.EMAIL_USER,
+                    to: email,
+                    subject,
+                    text: textContent,
+                    html: htmlContent
+                });
+                console.log('✅ Workspace invitation email sent:', result.messageId);
+                return { success: true, messageId: result.messageId };
+            }
+
+            if (this.isBrevoConfigured()) {
+                return this.sendViaBrevo({
+                    toEmail: email,
+                    toName: recipientName,
+                    subject,
+                    textContent,
+                    htmlContent
+                });
+            }
+
+            return { success: false, error: 'Email delivery is not configured.' };
+        } catch (error) {
+            return this.handleEmailError(error, 'workspace invitation');
+        }
+    }
+
     async sendReviewRequestNotification(reviewData) {
         if (!this.transporter && !this.isBrevoConfigured()) {
             console.log('📧 Email service not configured, skipping review request email');

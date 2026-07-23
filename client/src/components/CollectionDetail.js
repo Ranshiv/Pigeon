@@ -11,7 +11,7 @@ import CollectionVariablesManager from './CollectionVariablesManager';
 import VisualApiDesigner from './VisualApiDesigner/VisualApiDesigner';
 import { useCollaboration } from '../context/CollaborationContext';
 import {
-  FiSave, FiSettings, FiPlay, FiAlertCircle, FiCheckCircle, FiBook, FiEdit,
+  FiSettings, FiAlertCircle, FiCheckCircle, FiBook, FiEdit,
   FiPlus, FiTrash2, FiDatabase, FiGlobe, FiLock, FiUsers, FiPackage,
   FiFileText, FiInfo, FiGrid, FiChevronLeft, FiChevronRight
 } from 'react-icons/fi';
@@ -554,8 +554,45 @@ function CollectionDetail() {
   // Send a request and get the response
   const handleSendRequest = async (request) => {
     try {
-      // For client-side testing, create a fallback ID if _id is missing
-      const requestId = request._id || request.id;
+      // Requests in this view live in the collection document. Persist the
+      // current form state before sending so a newly sent request appears in
+      // the sidebar immediately and remains there after a refresh.
+      const requestId = request._id || request.id || `req-${Date.now()}`;
+      const requestToSave = {
+        ...request,
+        _id: requestId,
+        id: request.id || requestId,
+        isNew: false
+      };
+      const existingIndex = requests.findIndex(
+        (item) => (item._id || item.id) === requestId
+      );
+      const updatedRequests = existingIndex === -1
+        ? [...requests, requestToSave]
+        : requests.map((item, index) => index === existingIndex ? requestToSave : item);
+
+      const saveResponse = await fetch(`/api/collections/${collectionId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ requests: updatedRequests })
+      });
+
+      if (!saveResponse.ok) {
+        const errorData = await saveResponse.json().catch(() => ({}));
+        throw new Error(errorData.message || 'Failed to save the request to this collection');
+      }
+
+      const savedCollection = await saveResponse.json();
+      const persistedRequests = savedCollection.requests || updatedRequests;
+      const persistedRequest = persistedRequests.find(
+        (item) => (item._id || item.id) === requestId
+      ) || requestToSave;
+
+      setCollection(savedCollection);
+      setRequests(persistedRequests);
+      setSelectedRequest(persistedRequest);
+      setPendingChanges(false);
 
       // Set a flag to indicate that a request has been sent
       sessionStorage.setItem(`request_${requestId}_sent`, 'true');
@@ -568,14 +605,14 @@ function CollectionDetail() {
         credentials: 'include',
         // Include ALL request data in body, not just minimal information
         body: JSON.stringify({
-          method: request.method,
-          url: request.url,
-          headers: request.headers || [],
-          params: request.params || [],
-          body: request.body || '',
-          bodyType: request.bodyType || 'none',
-          preRequestScript: request.preRequestScript || '',
-          testScript: request.testScript || '',
+          method: persistedRequest.method,
+          url: persistedRequest.url,
+          headers: persistedRequest.headers || [],
+          params: persistedRequest.params || [],
+          body: persistedRequest.body || '',
+          bodyType: persistedRequest.bodyType || 'none',
+          preRequestScript: persistedRequest.preRequestScript || '',
+          testScript: persistedRequest.testScript || '',
           collectionId: collection._id
         })
       });
@@ -604,7 +641,7 @@ function CollectionDetail() {
       // Send activity notification about the request being sent
       sendActivity('request_sent', {
         requestId: requestId,
-        requestName: request.name,
+        requestName: persistedRequest.name,
         collectionName: collection.name
       });
 
@@ -862,24 +899,7 @@ function CollectionDetail() {
           </button>
         </div>
         <div className="collection-actions">
-          {pendingChanges && (
-            <div className="pending-changes-indicator">Unsaved changes</div>
-          )}
-          <button
-            className={`action-btn ${isSaving ? 'disabled' : ''} ${pendingChanges ? 'highlight' : ''} ${saveSuccess ? 'success' : ''}`}
-            onClick={saveCollection}
-            disabled={isSaving || !pendingChanges}
-          >
-            {saveSuccess ? <FiCheckCircle className="icon" /> : <FiSave className="icon" />}
-            {isSaving ? 'Saving...' : saveSuccess ? 'Saved!' : 'Save'}
-          </button>
-          <button
-            className={`action-btn ${isRunningAll ? 'disabled' : ''}`}
-            onClick={runAllRequests}
-            disabled={isRunningAll || requests.length === 0}
-          >
-            <FiPlay className="icon" /> {isRunningAll ? 'Running...' : 'Run All'}
-          </button>          <button className="action-btn" onClick={handleSettingsClick}>
+          <button className="action-btn" onClick={handleSettingsClick}>
             <FiSettings className="icon" /> Settings
           </button>
         </div>

@@ -226,7 +226,7 @@ const MonitoringDashboard = ({ createOnLoad = false }) => {
                 </button>
                 <button
                     className="nav-btn"
-                    onClick={() => navigate('/alerts/policies')}
+                    onClick={() => navigate('/workspace/monitoring/policies')}
                 >
                     <FiBell /> Alerts & Policies
                 </button>

@@ -492,7 +492,7 @@ const AlertPolicyEditor = () => {
                         </div>
                     </div>
                     <div className="policyHeaderActions">
-                        <button type="button" className="policyBtn policyBtnSecondary" onClick={() => navigate('/alerts')}>
+                        <button type="button" className="policyBtn policyBtnSecondary" onClick={() => navigate('/workspace/monitoring/alerts')}>
                             <FiActivity /> View Alerts
                         </button>
                         <button type="button" className="policyBtn policyBtnPrimary" onClick={handleCreateNew}>

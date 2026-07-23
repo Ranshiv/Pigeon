@@ -6,13 +6,44 @@ import {
     FiUsers, FiPlus, FiEdit, FiTrash2, FiActivity,
     FiGitMerge, FiGitBranch, FiGitPullRequest, FiLock,
     FiCalendar, FiBarChart2, FiPackage, FiClock, FiStar,
-    FiGlobe, FiX, FiFolder, FiInbox, FiCheckSquare
+    FiGlobe, FiX, FiFolder, FiInbox, FiCheckSquare, FiChevronDown
 } from 'react-icons/fi';
 import { useCollaboration } from '../context/CollaborationContext';
 import ActiveCollaborators from './ActiveCollaborators';
 import GlobalVariablesModal from './GlobalVariablesModal';
 import CollectionCreate from './CollectionCreate';
 import ReviewDashboard from './collaboration/ReviewDashboard';
+import AppSelect from './common/AppSelect/AppSelect';
+
+const COLLABORATOR_ROLE_OPTIONS = [
+    { value: 'admin', label: 'Admin' },
+    { value: 'editor', label: 'Editor' },
+    { value: 'viewer', label: 'Viewer' }
+];
+
+const getMergeChangeSummary = (request) => {
+    const source = request.proposedSnapshot;
+    const target = request.targetSnapshot;
+    if (!source || !target) return [];
+
+    const changed = (field) => JSON.stringify(source[field]) !== JSON.stringify(target[field]);
+    const count = (value) => Array.isArray(value) ? value.length : 0;
+    const preview = (value) => {
+        const text = String(value || 'No description');
+        return text.length > 90 ? `${text.slice(0, 90)}…` : text;
+    };
+    const changes = [];
+
+    if (changed('requests')) changes.push({ label: 'Requests', from: `${count(target.requests)} requests`, to: `${count(source.requests)} requests` });
+    if (changed('variables')) changes.push({ label: 'Variables', from: `${count(target.variables)} variables`, to: `${count(source.variables)} variables` });
+    if (changed('description')) changes.push({ label: 'Description', from: preview(target.description), to: preview(source.description) });
+    if (changed('documentation')) changes.push({ label: 'Documentation', from: 'Existing documentation', to: 'Updated documentation' });
+    if (changed('tags')) changes.push({ label: 'Tags', from: `${count(target.tags)} tags`, to: `${count(source.tags)} tags` });
+    if (changed('category')) changes.push({ label: 'Category', from: target.category || 'None', to: source.category || 'None' });
+    if (changed('metadata')) changes.push({ label: 'Metadata', from: 'Existing metadata', to: 'Updated metadata' });
+
+    return changes;
+};
 
 const WorkspaceDetail = () => {
     const { id } = useParams();
@@ -33,6 +64,14 @@ const WorkspaceDetail = () => {
     const [activeUsers, setActiveUsers] = useState([]);
     const [showGlobalVariablesModal, setShowGlobalVariablesModal] = useState(false);
     const [showCreateCollectionModal, setShowCreateCollectionModal] = useState(false);
+    const [showCreateMergeRequestModal, setShowCreateMergeRequestModal] = useState(false);
+    const [mergeRequestSourceId, setMergeRequestSourceId] = useState('');
+    const [mergeRequestTargetId, setMergeRequestTargetId] = useState('');
+    const [mergeRequestTitle, setMergeRequestTitle] = useState('');
+    const [mergeRequestDescription, setMergeRequestDescription] = useState('');
+    const [mergeConflict, setMergeConflict] = useState(null);
+    const [mergeResolutions, setMergeResolutions] = useState({});
+    const [expandedMergeRequests, setExpandedMergeRequests] = useState({});
 
     // Edit modal state
     const [showEditModal, setShowEditModal] = useState(false);
@@ -58,6 +97,20 @@ const WorkspaceDetail = () => {
         ).slice(0, 3),
         [collections]
     );
+
+    const canManageMembers = useMemo(() => {
+        if (!workspace) return false;
+        try {
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            const currentUserId = String(user.id || user._id || '');
+            if (!currentUserId) return false;
+            if (String(workspace.owner || '') === currentUserId) return true;
+            const currentMember = collaborators.find((member) => String(member.userId || member.id || '') === currentUserId);
+            return currentMember?.role === 'admin';
+        } catch {
+            return false;
+        }
+    }, [workspace, collaborators]);
 
     // Fetch workspace data
     useEffect(() => {
@@ -243,7 +296,9 @@ const WorkspaceDetail = () => {
             }
 
             const updatedCollaborator = await response.json();
-            setCollaborators([...collaborators, updatedCollaborator]);
+            if (!updatedCollaborator.alreadyMember) {
+                setCollaborators([...collaborators, updatedCollaborator]);
+            }
 
             if (connected) {
                 sendActivity('member_invited', {
@@ -255,7 +310,7 @@ const WorkspaceDetail = () => {
             setInviteRole('viewer');
             setShowAddUserModal(false);
         } catch (err) {
-            setError('Failed to invite user. Please try again.');
+            setError(err.message || 'Failed to invite user. Please try again.');
             console.error('Error inviting user:', err);
         } finally {
             setLoading(false);
@@ -389,20 +444,69 @@ const WorkspaceDetail = () => {
         }
     };
 
-    const handleApproveMergeRequest = async (mergeRequestId) => {
+    const handleDeleteCollection = async (collection) => {
+        const confirmed = window.confirm(
+            `Delete "${collection.name}"? This permanently removes the collection and its requests.`
+        );
+
+        if (!confirmed) return;
+
+        try {
+            setLoading(true);
+            const response = await fetch(`/api/collections/${collection._id}`, {
+                method: 'DELETE',
+                credentials: 'include'
+            });
+
+            if (!response.ok) {
+                const payload = await response.json().catch(() => ({}));
+                throw new Error(payload.message || 'Failed to delete collection');
+            }
+
+            setCollections((current) => current.filter((item) => item._id !== collection._id));
+
+            if (connected) {
+                sendActivity('collection_deleted', {
+                    workspaceId: id,
+                    workspaceName: workspace?.name,
+                    collectionId: collection._id,
+                    collectionName: collection.name
+                });
+            }
+        } catch (err) {
+            setError(err.message || 'Failed to delete collection. Please try again.');
+            console.error('Error deleting collection:', err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleApproveMergeRequest = async (mergeRequestId, resolutions = {}) => {
         try {
             setLoading(true);
             const response = await fetch(`/api/merge-requests/${mergeRequestId}/approve`, {
                 method: 'POST',
-                credentials: 'include'
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify({ resolutions })
             });
 
-            if (!response.ok) throw new Error('Failed to approve merge request');
+            const updatedMergeRequest = await response.json();
+            if (!response.ok) {
+                if (updatedMergeRequest.code === 'MERGE_CONFLICT') {
+                    setMergeConflict({ mergeRequestId, conflicts: updatedMergeRequest.conflicts, message: updatedMergeRequest.message });
+                    setMergeResolutions({});
+                    return;
+                }
+                throw new Error(updatedMergeRequest.message || 'Failed to merge request');
+            }
 
             const mergeRequest = mergeRequests.find(mr => mr._id === mergeRequestId);
             setMergeRequests(mergeRequests.map(mr =>
-                mr._id === mergeRequestId ? { ...mr, status: 'approved' } : mr
+                mr._id === mergeRequestId ? updatedMergeRequest : mr
             ));
+            setMergeConflict(null);
+            setMergeResolutions({});
 
             if (connected && mergeRequest) {
                 sendActivity('merge_approved', {
@@ -427,11 +531,12 @@ const WorkspaceDetail = () => {
                 credentials: 'include'
             });
 
-            if (!response.ok) throw new Error('Failed to reject merge request');
+            const updatedMergeRequest = await response.json();
+            if (!response.ok) throw new Error(updatedMergeRequest.message || 'Failed to reject merge request');
 
             const mergeRequest = mergeRequests.find(mr => mr._id === mergeRequestId);
             setMergeRequests(mergeRequests.map(mr =>
-                mr._id === mergeRequestId ? { ...mr, status: 'rejected' } : mr
+                mr._id === mergeRequestId ? updatedMergeRequest : mr
             ));
 
             if (connected && mergeRequest) {
@@ -444,6 +549,66 @@ const WorkspaceDetail = () => {
         } catch (err) {
             setError('Failed to reject merge request. Please try again.');
             console.error('Error rejecting merge request:', err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleCreateMergeRequest = async (event) => {
+        event.preventDefault();
+        if (!mergeRequestSourceId || !mergeRequestTargetId) {
+            setError('Choose a source and target collection.');
+            return;
+        }
+
+        if (mergeRequestSourceId === mergeRequestTargetId) {
+            setError('The source and target collections must be different.');
+            return;
+        }
+
+        try {
+            setLoading(true);
+            const response = await fetch(`/api/collections/${mergeRequestSourceId}/merge-request`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify({
+                    targetCollectionId: mergeRequestTargetId,
+                    title: mergeRequestTitle,
+                    description: mergeRequestDescription,
+                    workspaceId: workspace._id
+                })
+            });
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.message || 'Failed to create merge request');
+
+            setMergeRequests((current) => [data, ...current]);
+            setShowCreateMergeRequestModal(false);
+            setMergeRequestSourceId('');
+            setMergeRequestTargetId('');
+            setMergeRequestTitle('');
+            setMergeRequestDescription('');
+        } catch (err) {
+            setError(err.message || 'Failed to create merge request. Please try again.');
+            console.error('Error creating merge request:', err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleRollbackMergeRequest = async (mergeRequestId) => {
+        try {
+            setLoading(true);
+            const response = await fetch(`/api/merge-requests/${mergeRequestId}/rollback`, {
+                method: 'POST',
+                credentials: 'include'
+            });
+            const updatedMergeRequest = await response.json();
+            if (!response.ok) throw new Error(updatedMergeRequest.message || 'Failed to roll back merge request');
+            setMergeRequests(mergeRequests.map((request) => request._id === mergeRequestId ? updatedMergeRequest : request));
+        } catch (err) {
+            setError(err.message || 'Failed to roll back merge request. Please try again.');
+            console.error('Error rolling back merge request:', err);
         } finally {
             setLoading(false);
         }
@@ -540,7 +705,16 @@ const WorkspaceDetail = () => {
                         <FiGlobe /> Global Variables
                     </button>
 
-                    {workspace.userRole === 'admin' && (
+                    {workspace.userRole !== 'viewer' && (
+                        <button
+                            className="ws-btn"
+                            onClick={() => setShowCreateMergeRequestModal(true)}
+                        >
+                            <FiGitPullRequest /> New Merge Request
+                        </button>
+                    )}
+
+                    {canManageMembers && (
                         <>
                             <button
                                 className="ws-btn icon-only"
@@ -555,16 +729,14 @@ const WorkspaceDetail = () => {
                             >
                                 <FiEdit />
                             </button>
-                            {!workspace.isPersonal && (
-                                <button
-                                    className="ws-btn icon-only danger"
-                                    onClick={handleDeleteWorkspace}
-                                    aria-label="Delete workspace"
-                                    title="Delete"
-                                >
-                                    <FiTrash2 />
-                                </button>
-                            )}
+                            <button
+                                className="ws-btn icon-only danger"
+                                onClick={handleDeleteWorkspace}
+                                aria-label="Delete workspace"
+                                title="Delete workspace"
+                            >
+                                <FiTrash2 />
+                            </button>
                         </>
                     )}
                 </div>
@@ -690,12 +862,25 @@ const WorkspaceDetail = () => {
                                                     <span>{collection.requestsCount || 0} requests</span>
                                                     <span>Updated {formatDate(collection.updatedAt)}</span>
                                                 </div>
-                                                <button
-                                                    className="ws-btn"
-                                                    onClick={() => navigate(`/workspace/collections/${collection._id}`)}
-                                                >
-                                                    Open Collection
-                                                </button>
+                                                <div className="ws-collection-actions">
+                                                    <button
+                                                        className="ws-btn"
+                                                        onClick={() => navigate(`/workspace/collections/${collection._id}`)}
+                                                    >
+                                                        Open Collection
+                                                    </button>
+                                                    {canManageMembers && (
+                                                        <button
+                                                            type="button"
+                                                            className="ws-btn icon-only danger"
+                                                            onClick={() => handleDeleteCollection(collection)}
+                                                            aria-label={`Delete ${collection.name}`}
+                                                            title="Delete collection"
+                                                        >
+                                                            <FiTrash2 />
+                                                        </button>
+                                                    )}
+                                                </div>
                                             </div>
                                         ))}
                                     </div>
@@ -710,7 +895,7 @@ const WorkspaceDetail = () => {
                     <section className="ws-panel">
                         <h2 className="ws-panel-title">
                             <FiUsers /> Workspace Members
-                            {workspace.userRole === 'admin' && (
+                            {canManageMembers && (
                                 <span className="ws-panel-title-right">
                                     <button className="ws-btn primary" onClick={() => setShowAddUserModal(true)}>
                                         <FiPlus /> Invite Member
@@ -736,7 +921,7 @@ const WorkspaceDetail = () => {
                                         <th>User</th>
                                         <th>Role</th>
                                         <th>Joined</th>
-                                        {workspace.userRole === 'admin' && <th style={{ textAlign: 'right' }}>Actions</th>}
+                                        {canManageMembers && <th style={{ textAlign: 'right' }}>Actions</th>}
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -757,16 +942,13 @@ const WorkspaceDetail = () => {
                                                 </div>
                                             </td>
                                             <td>
-                                                {workspace.userRole === 'admin' && collab.userId !== workspace.owner && !collab.isActiveVisitor ? (
-                                                    <select
+                                                {canManageMembers && String(collab.userId) !== String(workspace.owner) && !collab.isActiveVisitor ? (
+                                                    <AppSelect
                                                         value={collab.role}
-                                                        onChange={(e) => handleUpdateCollaboratorRole(collab.userId, e.target.value)}
+                                                        onChange={(role) => handleUpdateCollaboratorRole(collab.userId, role)}
+                                                        options={COLLABORATOR_ROLE_OPTIONS}
                                                         className="ws-role-select"
-                                                    >
-                                                        <option value="admin">Admin</option>
-                                                        <option value="editor">Editor</option>
-                                                        <option value="viewer">Viewer</option>
-                                                    </select>
+                                                    />
                                                 ) : (
                                                     <span className={`ws-role-chip ${collab.role}`}>
                                                         {collab.role === 'admin' ? 'Admin' : collab.role === 'editor' ? 'Editor' : collab.role === 'visitor' ? 'Visitor' : 'Viewer'}
@@ -774,7 +956,7 @@ const WorkspaceDetail = () => {
                                                 )}
                                             </td>
                                             <td>{formatDate(collab.joinedAt)}</td>
-                                            {workspace.userRole === 'admin' && (
+                                            {canManageMembers && (
                                                 <td style={{ textAlign: 'right' }}>
                                                     {collab.userId !== workspace.owner ? (
                                                         <button
@@ -813,6 +995,11 @@ const WorkspaceDetail = () => {
                             <div className="ws-mr-list">
                                 {mergeRequests.map(request => (
                                     <div key={request._id} className={`ws-mr-card ${request.status}`}>
+                                        {(() => {
+                                            const changes = getMergeChangeSummary(request);
+                                            const isExpanded = Boolean(expandedMergeRequests[request._id]);
+                                            return (
+                                                <>
                                         <div className="ws-mr-header">
                                             <div className="ws-mr-title">
                                                 <FiGitPullRequest className="ws-muted" />
@@ -822,9 +1009,12 @@ const WorkspaceDetail = () => {
                                             </div>
                                             <span className={`ws-mr-status ${request.status}`}>
                                                 {request.status === 'pending' ? 'Pending' :
-                                                    request.status === 'approved' ? 'Approved' : 'Rejected'}
+                                                    request.status === 'merged' ? 'Merged' :
+                                                        request.status === 'rolled_back' ? 'Rolled back' : 'Rejected'}
                                             </span>
                                         </div>
+
+                                        {request.description && <p className="ws-mr-description">{request.description}</p>}
 
                                         <div className="ws-mr-collections">
                                             <div className="ws-mr-source">
@@ -849,7 +1039,7 @@ const WorkspaceDetail = () => {
                                                     className="ws-btn primary"
                                                     onClick={() => handleApproveMergeRequest(request._id)}
                                                 >
-                                                    Approve
+                                                    Merge changes
                                                 </button>
                                                 <button
                                                     className="ws-btn danger"
@@ -863,13 +1053,52 @@ const WorkspaceDetail = () => {
                                         {request.status !== 'pending' && request.actionBy && (
                                             <div className="ws-mr-result">
                                                 <span>
-                                                    {request.status === 'approved' ? 'Approved' : 'Rejected'} by: {request.actionBy.displayName}
+                                                    {request.status === 'merged' ? 'Merged' : 'Rejected'} by: {request.actionBy.displayName}
                                                 </span>
                                                 <span>
-                                                    {request.status === 'approved' ? 'Approved' : 'Rejected'} on: {formatDate(request.updatedAt)}
+                                                    {request.status === 'merged' ? 'Merged' : 'Rejected'} on: {formatDate(request.updatedAt)}
                                                 </span>
                                             </div>
                                         )}
+
+                                        {request.status === 'merged' && request.mergeBackup?.snapshot && workspace.userRole !== 'viewer' && (
+                                            <div className="ws-mr-actions">
+                                                <button className="ws-btn" onClick={() => handleRollbackMergeRequest(request._id)}>
+                                                    Roll back merge
+                                                </button>
+                                            </div>
+                                        )}
+
+                                        {request.status === 'merged' && !request.mergeBackup?.snapshot && (
+                                            <p className="ws-mr-legacy-note">Rollback is unavailable because this merge was completed before backups were enabled.</p>
+                                        )}
+
+                                        <button
+                                            type="button"
+                                            className="ws-mr-changes-toggle"
+                                            onClick={() => setExpandedMergeRequests((current) => ({ ...current, [request._id]: !current[request._id] }))}
+                                            aria-expanded={isExpanded}
+                                        >
+                                            <span>{changes.length ? `View ${changes.length} proposed change${changes.length === 1 ? '' : 's'}` : 'View change details'}</span>
+                                            <FiChevronDown />
+                                        </button>
+                                        <div className={`ws-mr-changes-panel ${isExpanded ? 'open' : ''}`}>
+                                            <div className="ws-mr-changes-content">
+                                                {changes.length ? changes.map((change) => (
+                                                    <div className="ws-mr-change" key={change.label}>
+                                                        <strong>{change.label}</strong>
+                                                        <span>{change.from}</span>
+                                                        <span className="ws-mr-change-arrow">→</span>
+                                                        <span>{change.to}</span>
+                                                    </div>
+                                                )) : (
+                                                    <p className="ws-mr-legacy-note">Detailed change snapshots are unavailable for this older merge request.</p>
+                                                )}
+                                            </div>
+                                        </div>
+                                                </>
+                                            );
+                                        })()}
                                     </div>
                                 ))}
                             </div>
@@ -1071,7 +1300,85 @@ const WorkspaceDetail = () => {
                 isOpen={showGlobalVariablesModal}
                 onClose={() => setShowGlobalVariablesModal(false)}
                 workspaceId={workspace._id}
+                canEdit={canManageMembers}
             />
+
+            {showCreateMergeRequestModal && (
+                <div className="ws-modal-overlay" onClick={(event) => { if (event.target === event.currentTarget) setShowCreateMergeRequestModal(false); }}>
+                    <div className="ws-modal" onClick={(event) => event.stopPropagation()}>
+                        <button className="ws-modal-close" onClick={() => setShowCreateMergeRequestModal(false)} aria-label="Close">
+                            <FiX />
+                        </button>
+                        <div className="ws-modal-title">Review changes</div>
+                        <h2>Create merge request</h2>
+                        <form onSubmit={handleCreateMergeRequest}>
+                            <div className="ws-form-group">
+                                <label htmlFor="merge-source">Source collection</label>
+                                <AppSelect
+                                    id="merge-source"
+                                    className="merge-collection-select"
+                                    value={mergeRequestSourceId}
+                                    onChange={setMergeRequestSourceId}
+                                    placeholder="Choose a source collection"
+                                    options={collections.map((collection) => ({ value: collection._id, label: collection.name }))}
+                                />
+                            </div>
+                            <div className="ws-form-group">
+                                <label htmlFor="merge-target">Target collection</label>
+                                <AppSelect
+                                    id="merge-target"
+                                    className="merge-collection-select"
+                                    value={mergeRequestTargetId}
+                                    onChange={setMergeRequestTargetId}
+                                    placeholder="Choose a target collection"
+                                    options={collections
+                                        .filter((collection) => collection._id !== mergeRequestSourceId)
+                                        .map((collection) => ({ value: collection._id, label: collection.name }))}
+                                />
+                            </div>
+                            <div className="ws-form-group">
+                                <label htmlFor="merge-title">Title</label>
+                                <input id="merge-title" value={mergeRequestTitle} onChange={(event) => setMergeRequestTitle(event.target.value)} placeholder="Describe the proposed change" />
+                            </div>
+                            <div className="ws-form-group">
+                                <label htmlFor="merge-description">Description</label>
+                                <textarea id="merge-description" value={mergeRequestDescription} onChange={(event) => setMergeRequestDescription(event.target.value)} placeholder="Add context for reviewers" rows="3" />
+                            </div>
+                            <div className="ws-modal-actions">
+                                <button type="button" className="ws-btn" onClick={() => setShowCreateMergeRequestModal(false)}>Cancel</button>
+                                <button type="submit" className="ws-btn primary" disabled={loading || collections.length < 2}>Create merge request</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+
+            {mergeConflict && (
+                <div className="ws-modal-overlay" onClick={(event) => { if (event.target === event.currentTarget) setMergeConflict(null); }}>
+                    <div className="ws-modal" onClick={(event) => event.stopPropagation()}>
+                        <button className="ws-modal-close" onClick={() => setMergeConflict(null)} aria-label="Close"><FiX /></button>
+                        <div className="ws-modal-title">Review required</div>
+                        <h2>Resolve merge conflicts</h2>
+                        <p className="ws-modal-copy">{mergeConflict.message}</p>
+                        <div className="ws-conflict-list">
+                            {mergeConflict.conflicts.map(({ field }) => (
+                                <div className="ws-conflict-item" key={field}>
+                                    <strong>{field}</strong>
+                                    <span>Both collections changed this field after the request was created.</span>
+                                    <div className="ws-conflict-actions">
+                                        <button type="button" className={`ws-btn ${mergeResolutions[field] === 'target' ? 'primary' : ''}`} onClick={() => setMergeResolutions((current) => ({ ...current, [field]: 'target' }))}>Keep target</button>
+                                        <button type="button" className={`ws-btn ${mergeResolutions[field] === 'source' ? 'primary' : ''}`} onClick={() => setMergeResolutions((current) => ({ ...current, [field]: 'source' }))}>Use source</button>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                        <div className="ws-modal-actions">
+                            <button type="button" className="ws-btn" onClick={() => setMergeConflict(null)}>Cancel</button>
+                            <button type="button" className="ws-btn primary" disabled={loading || mergeConflict.conflicts.some(({ field }) => !mergeResolutions[field])} onClick={() => handleApproveMergeRequest(mergeConflict.mergeRequestId, mergeResolutions)}>Merge resolved changes</button>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* Create Collection Modal */}
             {showCreateCollectionModal && (

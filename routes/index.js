@@ -1,6 +1,24 @@
 // routes/index.js
 const express = require('express');
 const router = express.Router();
+const { emitUserNotification } = require('../utils/socket/socket-server');
+
+router.use((req, res, next) => {
+    if (req.method === 'GET' || req.path.startsWith('/notifications')) return next();
+    let responseMessage = '';
+    const originalJson = res.json.bind(res);
+    res.json = (body) => {
+        responseMessage = body?.message || body?.error || responseMessage;
+        return originalJson(body);
+    };
+    res.on('finish', () => {
+        const recipientId = req.user?.id || req.user?._id;
+        if (recipientId && res.statusCode >= 400 && res.statusCode !== 401) {
+            emitUserNotification(recipientId, { message: responseMessage || `Request failed (${res.statusCode})` });
+        }
+    });
+    next();
+});
 
 // Import all route modules
 const authRoutes = require('./auth');
@@ -112,5 +130,6 @@ router.use('/alerts', alertsRoutes);
 router.use('/reviews', require('./reviews'));
 router.use('/comments', require('./comments'));
 router.use('/activities', require('./activities'));
+router.use('/notifications', require('./notifications'));
 
 module.exports = router;

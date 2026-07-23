@@ -6,6 +6,7 @@ const { ensureAuthenticated, authenticateJWT } = require('../middleware/auth');
 const { getDb } = require('../config/db');
 const ApiVersioningService = require('../services/ApiVersioningService');
 const MockServerService = require('../services/MockServerService');
+const { emitWorkspaceNotification } = require('../utils/socket/socket-server');
 
 // In-memory store for backward compatibility
 const collectionsStore = {};
@@ -658,29 +659,116 @@ router.post('/:id/fork', ensureAuthenticated, async (req, res) => {
 router.post('/:id/merge-request', ensureAuthenticated, async (req, res) => {
     try {
         const sourceCollectionId = req.params.id;
-        const { targetCollectionId, title, description } = req.body;
+        const { targetCollectionId, title, description, workspaceId: requestedWorkspaceId } = req.body;
 
         const db = getDb();
         if (!db) {
             return res.status(500).json({ message: 'Database not initialized' });
         }
 
-        if (!targetCollectionId) {
-            return res.status(400).json({ message: 'Target collection ID is required' });
+        if (!ObjectId.isValid(sourceCollectionId) || !ObjectId.isValid(targetCollectionId)) {
+            return res.status(400).json({ message: 'A valid source and target collection are required' });
         }
 
-        const mergeRequest = {
+        if (sourceCollectionId === targetCollectionId) {
+            return res.status(400).json({ message: 'Choose two different collections for a merge request' });
+        }
+
+        const [sourceCollection, targetCollection] = await Promise.all([
+            db.collection('collections').findOne({ _id: new ObjectId(sourceCollectionId) }),
+            db.collection('collections').findOne({ _id: new ObjectId(targetCollectionId) })
+        ]);
+
+        if (!sourceCollection || !targetCollection) {
+            return res.status(404).json({ message: 'Source or target collection not found' });
+        }
+
+        const sourceWorkspaceId = String(sourceCollection.workspaceId || '');
+        const targetWorkspaceId = String(targetCollection.workspaceId || '');
+        const effectiveWorkspaceId = String(requestedWorkspaceId || sourceWorkspaceId || targetWorkspaceId || '');
+        if (!ObjectId.isValid(effectiveWorkspaceId) ||
+            (sourceWorkspaceId && sourceWorkspaceId !== effectiveWorkspaceId) ||
+            (targetWorkspaceId && targetWorkspaceId !== effectiveWorkspaceId)) {
+            return res.status(400).json({ message: 'Collections must belong to the same workspace' });
+        }
+
+        const userId = String(req.user.id || req.user._id);
+        const workspace = await db.collection('workspaces').findOne({ _id: new ObjectId(effectiveWorkspaceId) });
+        const collaborator = (workspace?.collaborators || []).find((member) => String(member.userId) === userId);
+        const isOwner = String(workspace?.owner) === userId;
+        if (!workspace || (!isOwner && !collaborator) || !['admin', 'editor'].includes(isOwner ? 'admin' : collaborator.role)) {
+            return res.status(403).json({ message: 'Only workspace admins and editors can create merge requests' });
+        }
+
+        if ((!sourceWorkspaceId || !targetWorkspaceId) && !workspace.isPersonal) {
+            return res.status(400).json({ message: 'Collections without a workspace can only be merged in a personal workspace' });
+        }
+
+        const existing = await db.collection('mergeRequests').findOne({
+            workspaceId: effectiveWorkspaceId,
             sourceCollectionId,
             targetCollectionId,
-            title: title || 'Merge Request',
+            status: 'pending'
+        });
+        if (existing) {
+            return res.status(409).json({ message: 'An open merge request already exists for these collections' });
+        }
+
+        const proposedSnapshot = {
+            description: sourceCollection.description || '',
+            requests: sourceCollection.requests || [],
+            variables: sourceCollection.variables || [],
+            documentation: sourceCollection.documentation || {},
+            tags: sourceCollection.tags || [],
+            category: sourceCollection.category || '',
+            metadata: sourceCollection.metadata || {}
+        };
+
+        const targetSnapshot = {
+            description: targetCollection.description || '',
+            requests: targetCollection.requests || [],
+            variables: targetCollection.variables || [],
+            documentation: targetCollection.documentation || {},
+            tags: targetCollection.tags || [],
+            category: targetCollection.category || '',
+            metadata: targetCollection.metadata || {}
+        };
+
+        const mergeRequest = {
+            workspaceId: effectiveWorkspaceId,
+            sourceCollectionId,
+            targetCollectionId,
+            sourceCollection: { _id: sourceCollectionId, name: sourceCollection.name },
+            targetCollection: { _id: targetCollectionId, name: targetCollection.name },
+            proposedSnapshot,
+            targetSnapshot,
+            title: title || `Merge ${sourceCollection.name} into ${targetCollection.name}`,
             description: description || '',
             status: 'pending',
-            createdBy: req.user.id,
+            createdBy: {
+                userId,
+                displayName: req.user.displayName || req.user.name || 'User',
+                email: req.user.email
+            },
             createdAt: new Date(),
             updatedAt: new Date()
         };
 
         const result = await db.collection('mergeRequests').insertOne(mergeRequest);
+
+        await db.collection('workspaceActivity').insertOne({
+            workspaceId: effectiveWorkspaceId,
+            type: 'merge_requested',
+            message: `Created merge request: ${mergeRequest.title}`,
+            user: mergeRequest.createdBy,
+            timestamp: new Date(),
+            details: { mergeRequestId: result.insertedId.toString() }
+        });
+
+        emitWorkspaceNotification(effectiveWorkspaceId, {
+            actorId: userId,
+            message: `${mergeRequest.createdBy.displayName} created merge request: ${mergeRequest.title}`
+        });
 
         res.status(201).json({
             ...mergeRequest,

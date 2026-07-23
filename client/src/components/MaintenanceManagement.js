@@ -525,7 +525,7 @@ const MaintenanceManagement = () => {
                 </button>
                 <button
                     className="mtm-nav-btn"
-                    onClick={() => navigate('/alerts/policies')}
+                    onClick={() => navigate('/workspace/monitoring/policies')}
                 >
                     <FiBell /> Alerts & Policies
                 </button>

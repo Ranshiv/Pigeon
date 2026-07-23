@@ -37,6 +37,10 @@ body {
 }
 
 /* Toast notifications - themed to match app tokens instead of react-toastify defaults */
+.Toastify__toast-container {
+  z-index: 1100;
+}
+
 .Toastify__toast {
   align-items: center;
   gap: 10px;
@@ -60,6 +64,14 @@ body {
   fill: var(--success-color);
 }
 
+.Toastify__toast--error .Toastify__toast-icon svg {
+  fill: var(--danger-color);
+}
+
+.Toastify__toast--info .Toastify__toast-icon svg {
+  fill: var(--primary-color);
+}
+
 .Toastify__progress-bar {
   background: var(--primary-color);
   opacity: 0.6;
@@ -68,6 +80,10 @@ body {
 
 .Toastify__toast--success .Toastify__progress-bar {
   background: var(--success-color);
+}
+
+.Toastify__toast--error .Toastify__progress-bar {
+  background: var(--danger-color);
 }
 
 .Toastify__close-button {
@@ -248,40 +264,7 @@ select:focus {
   }
 }
 
-/* Style scrollbars for WebKit browsers */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: var(--background-color);
-}
-
-::-webkit-scrollbar-thumb {
-  background: #cdcdcd;
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #ababab;
-}
-
-/* Dark theme scrollbar - Enhanced with Blue Palette */
-.dark-theme ::-webkit-scrollbar-track {
-  background: var(--background-color);
-}
-
-.dark-theme ::-webkit-scrollbar-thumb {
-  background: #013B5B;
-  /* Darker blue for scrollbar thumb */
-  border-radius: 4px;
-}
-
-.dark-theme ::-webkit-scrollbar-thumb:hover {
-  background: #014368;
-  /* Even darker blue on hover */
-}
+/* Global scrollbar chrome lives in index.css. */
 
 /* Loading spinner animation */
 @keyframes spin {
