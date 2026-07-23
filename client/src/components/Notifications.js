@@ -1,6 +1,7 @@
 // client/src/components/Notifications.js
-import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { FiBell } from 'react-icons/fi';
+import React, { useState, useEffect, useLayoutEffect, useRef, useMemo } from 'react';
+import { createPortal } from 'react-dom';
+import { FiBell, FiX } from 'react-icons/fi';
 import './Notifications.css';
 import { useCollaboration } from '../context/CollaborationContext';
 
@@ -8,6 +9,9 @@ const Notifications = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [userActivities, setUserActivities] = useState([]);
   const notificationRef = useRef(null);
+  const notificationButtonRef = useRef(null);
+  const dropdownRef = useRef(null);
+  const [dropdownPosition, setDropdownPosition] = useState({ top: 68, left: 8, width: 320, maxHeight: 380 });
   const recentActivityRef = useRef(new Map());
   const currentUserIdRef = useRef(null);
   const monitorStatusRef = useRef(new Map());
@@ -51,7 +55,9 @@ const Notifications = () => {
   // Handle clicking outside to close notifications dropdown
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (notificationRef.current && !notificationRef.current.contains(event.target)) {
+      const clickedBell = notificationRef.current?.contains(event.target);
+      const clickedDropdown = dropdownRef.current?.contains(event.target);
+      if (!clickedBell && !clickedDropdown) {
         setIsOpen(false);
       }
     };
@@ -61,6 +67,34 @@ const Notifications = () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
+
+  // The bell may live inside the responsive drawer, which has a transform and
+  // scroll clipping. Positioning the panel from the viewport lets it remain
+  // visible in both the drawer and the desktop navbar.
+  useLayoutEffect(() => {
+    if (!isOpen || !notificationButtonRef.current) return undefined;
+
+    const updatePosition = () => {
+      const rect = notificationButtonRef.current.getBoundingClientRect();
+      const viewportWidth = window.innerWidth;
+      const viewportHeight = window.innerHeight;
+      const width = Math.min(320, viewportWidth - 16);
+      const left = Math.max(8, Math.min(viewportWidth - width - 8, rect.right - width));
+      const maxHeight = Math.min(380, viewportHeight - 16);
+      const top = rect.bottom + 8 + maxHeight <= viewportHeight || rect.top < maxHeight + 8
+        ? rect.bottom + 8
+        : Math.max(8, rect.top - 8 - maxHeight);
+      setDropdownPosition({ top, left, width, maxHeight });
+    };
+
+    updatePosition();
+    window.addEventListener('resize', updatePosition);
+    window.addEventListener('scroll', updatePosition, true);
+    return () => {
+      window.removeEventListener('resize', updatePosition);
+      window.removeEventListener('scroll', updatePosition, true);
+    };
+  }, [isOpen]);
 
   // Listen for user activity events
   useEffect(() => {
@@ -231,6 +265,7 @@ const Notifications = () => {
     <div className="notifications-container" ref={notificationRef}>
       <button
         type="button"
+        ref={notificationButtonRef}
         className={`notification-icon-wrapper${unreadCount ? ' has-notifications' : ''}`}
         onClick={() => setIsOpen(open => !open)}
         aria-label={unreadCount ? `Notifications, ${unreadCount} unread` : 'Notifications'}
@@ -243,21 +278,49 @@ const Notifications = () => {
         )}
       </button>
 
-      {isOpen && (
-        <div className="notifications-dropdown" id="notifications-dropdown" role="dialog" aria-label="Notifications">
+      {isOpen && createPortal(
+        <>
+          <button
+            type="button"
+            className="notifications-sheet-backdrop"
+            aria-label="Close notifications"
+            onClick={() => setIsOpen(false)}
+          />
+          <div
+            ref={dropdownRef}
+            className="notifications-dropdown"
+            id="notifications-dropdown"
+            role="dialog"
+            aria-label="Notifications"
+            style={{
+              top: dropdownPosition.top,
+              left: dropdownPosition.left,
+              width: dropdownPosition.width,
+              maxHeight: dropdownPosition.maxHeight
+            }}
+          >
+          <div className="notifications-sheet-handle" aria-hidden="true" />
           <div className="notifications-header">
-            <h3>Notifications</h3>
-            {userActivities.length > 0 && (
-              <button
-                type="button"
-                className="mark-all-read-btn"
-                disabled={unreadCount === 0}
-                title={unreadCount === 0 ? 'All caught up' : 'Mark all as read'}
-                onClick={markAllRead}
-              >
-                Read all
+            <div className="notifications-heading">
+              <h3>Notifications</h3>
+              {unreadCount > 0 && <span className="notifications-unread-count">{unreadCount} new</span>}
+            </div>
+            <div className="notifications-header-actions">
+              {userActivities.length > 0 && (
+                <button
+                  type="button"
+                  className="mark-all-read-btn"
+                  disabled={unreadCount === 0}
+                  title={unreadCount === 0 ? 'All caught up' : 'Mark all as read'}
+                  onClick={markAllRead}
+                >
+                  Read all
+                </button>
+              )}
+              <button type="button" className="notifications-close-btn" onClick={() => setIsOpen(false)} aria-label="Close notifications">
+                <FiX />
               </button>
-            )}
+            </div>
           </div>
 
           <div className="notifications-list">
@@ -284,7 +347,9 @@ const Notifications = () => {
               </div>
             )}
           </div>
-        </div>
+          </div>
+        </>,
+        document.body
       )}
     </div>
   );

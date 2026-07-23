@@ -273,6 +273,13 @@
     transition: color 0.2s ease;
 }
 
+/* Semantic summary colors: totals are neutral, while operational state is
+   communicated by the metric itself rather than one default green value. */
+.incident-management .stat-card--total .stat-value { color: var(--text-color); }
+.incident-management .stat-card--active .stat-value { color: #f59e0b; }
+.incident-management .stat-card--resolved .stat-value { color: #10b981; }
+.incident-management .stat-card--critical .stat-value { color: #ef4444; }
+
 .stat-label {
     display: block;
     font-size: 0.875rem;

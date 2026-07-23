@@ -300,9 +300,7 @@
 }
 
 .notifications-dropdown {
-  position: absolute;
-  right: 0;
-  top: 100%;
+  position: fixed;
   width: 320px;
   max-height: 380px;
   background-color: var(--card-bg);
@@ -312,7 +310,32 @@
   box-shadow: var(--dropdown-shadow, var(--shadow-lg));
   display: flex;
   flex-direction: column;
-  z-index: 1001;
+  z-index: 1200;
+}
+
+.notifications-sheet-backdrop,
+.notifications-sheet-handle,
+.notifications-close-btn {
+  display: none;
+}
+
+.notifications-heading,
+.notifications-header-actions {
+  display: flex;
+  align-items: center;
+}
+
+.notifications-heading { gap: 8px; min-width: 0; }
+.notifications-header-actions { gap: 4px; }
+
+.notifications-unread-count {
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--primary-color) 13%, transparent);
+  color: var(--primary-color);
+  font-size: 0.68rem;
+  font-weight: 700;
+  white-space: nowrap;
 }
 
 .notification-dismiss {
@@ -341,17 +364,102 @@
 
 @media (max-width: 640px) {
   .notifications-dropdown {
-    position: fixed;
-    top: 60px;
-    left: 0;
-    right: 0;
-    width: auto;
-    margin: 0;
-    border-radius: 0;
-    max-height: calc(100vh - 60px);
+    max-height: min(380px, calc(100dvh - 76px));
   }
 
   .notifications-list {
     max-height: calc(100vh - 120px);
   }
+}
+
+/* On narrow screens notifications become a dedicated sheet instead of trying
+   to fit a full activity stream inside the navigation drawer. */
+@media (max-width: 700px) {
+  .notifications-sheet-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 1199;
+    border: 0;
+    background: color-mix(in srgb, #000 58%, transparent);
+    -webkit-backdrop-filter: blur(3px);
+    backdrop-filter: blur(3px);
+    animation: notifications-sheet-fade 180ms ease-out both;
+  }
+
+  .notifications-dropdown {
+    top: auto !important;
+    right: auto;
+    bottom: 8px;
+    left: 8px !important;
+    width: calc(100vw - 16px) !important;
+    max-height: min(72dvh, 560px) !important;
+    border-radius: 18px;
+    border-color: color-mix(in srgb, var(--primary-color) 28%, var(--border-color));
+    box-shadow: 0 20px 52px color-mix(in srgb, #000 48%, transparent);
+    animation: notifications-sheet-rise 240ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .notifications-sheet-handle {
+    display: block;
+    width: 34px;
+    height: 4px;
+    margin: 9px auto 3px;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--text-secondary) 40%, transparent);
+  }
+
+  .notifications-header {
+    padding: 10px 14px 12px;
+  }
+
+  .notifications-header h3 {
+    font-size: 0.95rem;
+    font-weight: 650;
+  }
+
+  .notifications-close-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    border: 1px solid var(--border-color);
+    border-radius: 9px;
+    background: var(--hover-bg);
+    color: var(--text-secondary);
+    cursor: pointer;
+  }
+
+  .notifications-close-btn:hover {
+    border-color: var(--primary-color);
+    color: var(--text-color);
+  }
+
+  .notifications-list {
+    flex: 1;
+    min-height: 0;
+    max-height: none;
+    padding: 4px 0 8px;
+  }
+
+  .notification-item {
+    padding: 12px 14px;
+  }
+
+  .notification-message {
+    font-size: 0.8rem;
+    line-height: 1.45;
+  }
+}
+
+@keyframes notifications-sheet-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes notifications-sheet-rise {
+  from { opacity: 0; transform: translateY(18px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
 }

@@ -249,16 +249,32 @@ const Navbar = ({ isAuthenticated }) => {
             <div className="navbar-container">
                 <div className="navbar-brand" onClick={() => handleNavigation(isAuthenticated ? '/workspace/home' : '/')}>
                     Pigeon
-                </div>                <div className="hamburger" onClick={(e) => {
-                    e.stopPropagation();
-                    e.preventDefault();
-                    console.log('Hamburger clicked, current state:', isMobileMenuOpen);
-                    setIsMobileMenuOpen(!isMobileMenuOpen);
-                }}>
-                    {isMobileMenuOpen ? <FiX size={24} /> : <FiMenu size={24} />}
                 </div>
+                <button
+                    type="button"
+                    className="hamburger"
+                    aria-label={isMobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
+                    aria-expanded={isMobileMenuOpen}
+                    aria-controls="primary-navigation"
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        e.preventDefault();
+                        setIsMobileMenuOpen(!isMobileMenuOpen);
+                    }}
+                >
+                    {isMobileMenuOpen ? <FiX size={24} /> : <FiMenu size={24} />}
+                </button>
 
-                <div className={`navbar-menu ${isMobileMenuOpen ? 'active' : ''}`}>
+                {isMobileMenuOpen && (
+                    <button
+                        type="button"
+                        className="navbar-menu-backdrop"
+                        aria-label="Close navigation menu"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                    />
+                )}
+
+                <div id="primary-navigation" className={`navbar-menu ${isMobileMenuOpen ? 'active' : ''}`}>
                     {isAuthenticated ? (
                         <>
                             <div className="navbar-start">

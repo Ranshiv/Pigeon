@@ -667,3 +667,394 @@
     background-color: rgba(56, 189, 248, 0.10);
     color: var(--primary-color);
 }
+
+/* Responsive navigation drawer — deliberate, app-like navigation instead of
+   a compressed desktop menu. These rules only affect the hamburger layout. */
+@media (max-width: 1225px) {
+    .navbar-container {
+        padding: 0 16px;
+    }
+
+    .hamburger {
+        position: relative;
+        z-index: 503;
+        width: 38px;
+        height: 38px;
+        border: 1px solid var(--border-color);
+        border-radius: 10px;
+        background: color-mix(in srgb, var(--card-bg) 72%, transparent);
+        color: var(--text-color);
+        box-shadow: 0 2px 8px color-mix(in srgb, #000 18%, transparent);
+        transition: background-color 160ms ease, border-color 160ms ease,
+            color 160ms ease, transform 160ms ease;
+    }
+
+    .hamburger:hover {
+        border-color: color-mix(in srgb, var(--primary-color) 55%, var(--border-color));
+        background: color-mix(in srgb, var(--primary-color) 10%, var(--card-bg));
+        color: var(--primary-color);
+    }
+
+    .hamburger:active { transform: scale(0.95); }
+
+    .navbar-menu-backdrop {
+        position: fixed;
+        inset: 0;
+        z-index: 501;
+        border: 0;
+        padding: 0;
+        background: color-mix(in srgb, #000 48%, transparent);
+        -webkit-backdrop-filter: blur(3px);
+        backdrop-filter: blur(3px);
+        cursor: default;
+        animation: navDrawerBackdropIn 180ms ease-out both;
+    }
+
+    .navbar-menu {
+        top: 0;
+        left: 0;
+        width: min(336px, calc(100vw - 42px));
+        max-width: none;
+        height: 100dvh;
+        min-height: 100vh;
+        box-sizing: border-box;
+        padding: 80px 14px 16px;
+        gap: 18px;
+        background: color-mix(in srgb, var(--sidebar-bg) 94%, #00111a);
+        border: 1px solid color-mix(in srgb, var(--border-color) 80%, transparent);
+        border-left: 0;
+        border-radius: 0 18px 18px 0;
+        box-shadow: 18px 0 48px color-mix(in srgb, #000 34%, transparent);
+        overflow-x: hidden;
+        overscroll-behavior: contain;
+        z-index: 502;
+        transform: translateX(-104%);
+        transition: transform 280ms cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .navbar-menu.active {
+        left: 0;
+        transform: translateX(0);
+    }
+
+    .navbar-menu::before {
+        content: 'NAVIGATION';
+        display: block;
+        width: 100%;
+        margin: 0 10px -6px;
+        color: var(--text-secondary);
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+        font-size: 0.64rem;
+        font-weight: 700;
+        letter-spacing: 0.15em;
+        opacity: 0.75;
+    }
+
+    .navbar-start,
+    .navbar-end {
+        gap: 4px;
+        margin: 0;
+    }
+
+    .navbar-start {
+        height: auto;
+    }
+
+    .navbar-end {
+        height: auto;
+        margin-top: auto;
+        padding-top: 14px;
+        border-top: 1px solid var(--border-color);
+        flex-direction: row;
+        align-items: center;
+        align-self: stretch;
+        flex-wrap: wrap;
+    }
+
+    .navbar-end::before {
+        content: 'ACCOUNT';
+        display: block;
+        width: 100%;
+        margin: 0 10px 6px;
+        color: var(--text-secondary);
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+        font-size: 0.64rem;
+        font-weight: 700;
+        letter-spacing: 0.15em;
+        opacity: 0.75;
+        flex-basis: 100%;
+    }
+
+    .navbar-item {
+        width: 100%;
+        min-height: 44px;
+        margin: 0;
+    }
+
+    .navbar-item > span {
+        width: 100%;
+        min-height: 44px;
+        box-sizing: border-box;
+        padding: 10px 12px;
+        border: 1px solid transparent;
+        border-radius: 10px;
+        color: var(--text-secondary);
+        font-size: 0.88rem;
+        font-weight: 600;
+        gap: 11px;
+        transform: none;
+        transition: background-color 160ms ease, border-color 160ms ease,
+            color 160ms ease, transform 160ms ease;
+    }
+
+    .navbar-item > span svg {
+        width: 18px;
+        height: 18px;
+        padding: 7px;
+        border-radius: 8px;
+        background: color-mix(in srgb, var(--card-bg) 66%, transparent);
+        color: var(--text-secondary);
+        box-sizing: content-box;
+        transition: background-color 160ms ease, color 160ms ease, transform 160ms ease;
+    }
+
+    .navbar-item > span:hover {
+        background: color-mix(in srgb, var(--primary-color) 9%, transparent);
+        border-color: color-mix(in srgb, var(--primary-color) 18%, transparent);
+        color: var(--text-color);
+        transform: none;
+    }
+
+    .navbar-item > span:hover svg {
+        background: color-mix(in srgb, var(--primary-color) 18%, transparent);
+        color: var(--primary-color);
+        transform: scale(1.04);
+    }
+
+    .navbar-item > span.active {
+        background: color-mix(in srgb, var(--primary-color) 15%, transparent);
+        border-color: color-mix(in srgb, var(--primary-color) 30%, var(--border-color));
+        color: var(--text-color);
+        font-weight: 650;
+        box-shadow: inset 3px 0 0 var(--primary-color);
+    }
+
+    .navbar-item > span.active svg {
+        background: var(--primary-color);
+        color: #fff;
+    }
+
+    .navbar-item > span.active::after {
+        display: none;
+    }
+
+    .navbar-item.has-dropdown {
+        align-items: stretch;
+    }
+
+    .navbar-item.has-dropdown::after { display: none; }
+
+    .navbar-dropdown,
+    .workspace-selector-dropdown {
+        width: calc(100% - 12px);
+        box-sizing: border-box;
+        margin: 2px 6px 8px;
+        padding: 8px;
+        border: 1px solid var(--border-color);
+        border-radius: 10px;
+        background: color-mix(in srgb, var(--card-bg) 74%, transparent);
+    }
+
+    .dropdown-item {
+        min-height: 36px;
+        box-sizing: border-box;
+        padding: 8px 10px;
+        border-left: 0;
+        border-radius: 7px;
+        color: var(--text-secondary);
+        font-size: 0.8rem;
+    }
+
+    .dropdown-item:hover {
+        background: color-mix(in srgb, var(--primary-color) 10%, transparent);
+        color: var(--text-color);
+    }
+
+    .notifications-menu,
+    .navbar-end > .navbar-item {
+        width: auto;
+        min-height: 38px;
+    }
+
+    .navbar-end > .navbar-item > span,
+    .navbar-end .profile-trigger {
+        width: 40px;
+        min-width: 40px;
+        height: 40px;
+        min-height: 40px;
+        padding: 0;
+        justify-content: center;
+        border: 1px solid var(--border-color);
+        border-radius: 10px;
+        background: color-mix(in srgb, var(--card-bg) 66%, transparent);
+    }
+
+    .navbar-end > .navbar-item > span svg { padding: 0; background: transparent; }
+
+    .profile-trigger { margin: 0; }
+}
+
+@keyframes navDrawerBackdropIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* Final mobile drawer refinements: dropdowns are inline disclosure content,
+   not desktop popovers placed inside a narrow panel. */
+@media (max-width: 1225px) {
+    .navbar-menu .navbar-dropdown {
+        position: static;
+        width: auto;
+        min-width: 0;
+        max-height: 290px;
+        margin: 2px 6px 8px 18px;
+        padding: 3px 0 3px 10px;
+        overflow-y: auto;
+        border: 0;
+        border-left: 1px solid color-mix(in srgb, var(--primary-color) 35%, var(--border-color));
+        border-radius: 0;
+        background: transparent;
+        box-shadow: none;
+    }
+
+    .navbar-menu .navbar-dropdown .dropdown-item {
+        min-height: 34px;
+        padding: 7px 9px;
+        color: var(--text-secondary);
+        font-size: 0.76rem;
+        font-weight: 550;
+    }
+
+    .navbar-menu .navbar-dropdown .dropdown-item:hover {
+        color: var(--text-color);
+        background: color-mix(in srgb, var(--primary-color) 10%, transparent);
+    }
+
+    .navbar-menu .workspace-selector-dropdown {
+        position: static;
+        top: auto;
+        left: auto;
+        transform: none;
+        opacity: 1;
+        visibility: visible;
+        display: flex;
+        width: auto;
+        min-width: 0;
+        max-height: min(390px, calc(100dvh - 225px));
+        margin: 3px 6px 10px;
+        padding: 10px;
+        overflow-y: auto;
+        border-color: color-mix(in srgb, var(--primary-color) 25%, var(--border-color));
+        border-radius: 12px;
+        background: color-mix(in srgb, var(--card-bg) 88%, var(--sidebar-bg));
+        box-shadow: inset 0 1px 0 color-mix(in srgb, #fff 5%, transparent);
+    }
+
+    .navbar-menu .workspace-search-container {
+        margin-bottom: 8px;
+    }
+
+    .navbar-menu .workspace-search-input[type="text"] {
+        min-height: 38px;
+        padding: 9px 11px 9px 36px;
+        border-radius: 9px;
+        background: var(--ws-inset, var(--surface-sunken));
+        font-size: 0.78rem;
+    }
+
+    .navbar-menu .workspace-selector-dropdown .create-workspace-btn {
+        width: 100%;
+        min-height: 36px;
+        margin: 0 0 8px;
+        padding: 8px 12px;
+        border-radius: 9px;
+        font-size: 0.78rem;
+        box-shadow: none;
+    }
+
+    .navbar-menu .workspace-section {
+        padding: 7px 0 2px;
+    }
+
+    .navbar-menu .workspace-section-title {
+        margin: 2px 4px 5px;
+        font-size: 0.61rem;
+        letter-spacing: 0.11em;
+    }
+
+    .navbar-menu .workspace-item {
+        padding: 7px 6px;
+        border-left: 0;
+        border-radius: 8px;
+        font-size: 0.78rem;
+    }
+
+    .navbar-menu .workspace-item:hover,
+    .navbar-menu .workspace-item.is-current {
+        border-left-color: transparent;
+        background: color-mix(in srgb, var(--primary-color) 10%, transparent);
+    }
+
+    .navbar-menu .workspace-icon-small {
+        width: 26px;
+        height: 26px;
+        border-radius: 7px;
+    }
+
+    .navbar-menu .view-all-workspaces {
+        margin-top: 6px;
+        padding: 9px 6px 2px;
+        border-top-color: var(--border-color);
+        background: transparent;
+        color: var(--text-secondary);
+        font-size: 0.76rem;
+    }
+
+    .navbar-menu .view-all-workspaces:hover {
+        background: transparent;
+        color: var(--primary-color);
+    }
+
+    .navbar-item.has-dropdown:has(.navbar-dropdown) > span,
+    .navbar-item.has-dropdown:has(.workspace-selector-dropdown) > span {
+        background: color-mix(in srgb, var(--primary-color) 9%, transparent);
+        border-color: color-mix(in srgb, var(--primary-color) 22%, transparent);
+        color: var(--text-color);
+    }
+
+    .navbar-item.has-dropdown > span::after {
+        content: '⌄';
+        display: block;
+        position: static;
+        top: auto;
+        right: auto;
+        bottom: auto;
+        left: auto;
+        width: auto;
+        height: auto;
+        margin: 0 0 0 auto;
+        background: transparent;
+        box-shadow: none;
+        color: var(--text-secondary);
+        font-size: 1rem;
+        line-height: 1;
+        transform: none;
+        transition: transform 160ms ease, color 160ms ease;
+    }
+
+    .navbar-item.has-dropdown:has(.navbar-dropdown) > span::after,
+    .navbar-item.has-dropdown:has(.workspace-selector-dropdown) > span::after {
+        color: var(--primary-color);
+        transform: rotate(180deg);
+    }
+}

@@ -390,7 +390,7 @@ const IncidentManagement = () => {
 
             {/* Stats Overview */}
             <div className="stats-grid">
-                <div className="stat-card">
+                <div className="stat-card stat-card--total">
                     <div className="stat-icon">
                         <FiFileText />
                     </div>
@@ -399,7 +399,7 @@ const IncidentManagement = () => {
                         <div className="stat-label">Total Incidents</div>
                     </div>
                 </div>
-                <div className="stat-card">
+                <div className="stat-card stat-card--active">
                     <div className="stat-icon degraded">
                         <FiAlertCircle />
                     </div>
@@ -408,7 +408,7 @@ const IncidentManagement = () => {
                         <div className="stat-label">Active</div>
                     </div>
                 </div>
-                <div className="stat-card">
+                <div className="stat-card stat-card--resolved">
                     <div className="stat-icon up">
                         <FiCheckCircle />
                     </div>
@@ -417,7 +417,7 @@ const IncidentManagement = () => {
                         <div className="stat-label">Resolved</div>
                     </div>
                 </div>
-                <div className="stat-card">
+                <div className="stat-card stat-card--critical">
                     <div className="stat-icon down">
                         <FiAlertTriangle />
                     </div>

@@ -123,6 +123,18 @@ const MonitoringDashboard = ({ createOnLoad = false }) => {
         return '#ef4444';
     };
 
+    const formatLastCheck = (timestamp) => {
+        if (!timestamp) return 'Never checked';
+        const date = new Date(timestamp);
+        if (Number.isNaN(date.getTime())) return 'Unavailable';
+        return date.toLocaleString([], {
+            month: 'short',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    };
+
     const filteredMonitors = monitors.filter(monitor => {
         if (filter === 'all') return true;
         return monitor.currentStatus === filter;
@@ -264,7 +276,7 @@ const MonitoringDashboard = ({ createOnLoad = false }) => {
 
             {/* Stats Overview */}
             <div className="stats-grid">
-                <div className="stat-card">
+                <div className="stat-card stat-card--total">
                     <div className="stat-icon">
                         <FiGlobe />
                     </div>
@@ -273,7 +285,7 @@ const MonitoringDashboard = ({ createOnLoad = false }) => {
                         <div className="stat-label">Total Monitors</div>
                     </div>
                 </div>
-                <div className="stat-card">
+                <div className="stat-card stat-card--up">
                     <div className="stat-icon up">
                         <FiCheckCircle />
                     </div>
@@ -282,7 +294,7 @@ const MonitoringDashboard = ({ createOnLoad = false }) => {
                         <div className="stat-label">Operational</div>
                     </div>
                 </div>
-                <div className="stat-card">
+                <div className="stat-card stat-card--down">
                     <div className="stat-icon down">
                         <FiAlertCircle />
                     </div>
@@ -291,7 +303,7 @@ const MonitoringDashboard = ({ createOnLoad = false }) => {
                         <div className="stat-label">Down</div>
                     </div>
                 </div>
-                <div className="stat-card">
+                <div className="stat-card stat-card--uptime">
                     <div className="stat-icon">
                         <FiTrendingUp />
                     </div>
@@ -433,10 +445,7 @@ const MonitoringDashboard = ({ createOnLoad = false }) => {
                                 <div className="metric">
                                     <span className="metric-label">Last Check</span>
                                     <span className="metric-value">
-                                        {monitor.lastChecked
-                                            ? new Date(monitor.lastChecked).toLocaleString()
-                                            : 'Never'
-                                        }
+                                        {formatLastCheck(monitor.lastChecked)}
                                     </span>
                                 </div>
                                 <div className="metric">

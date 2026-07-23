@@ -678,3 +678,230 @@
         animation: none;
     }
 }
+
+/* Semantic values prevent summary cards from implying every count is healthy. */
+.monitoring-dashboard .stat-card--total .stat-value { color: var(--text-color); }
+.monitoring-dashboard .stat-card--up .stat-value { color: #10b981; }
+.monitoring-dashboard .stat-card--down .stat-value { color: #ef4444; }
+.monitoring-dashboard .stat-card--uptime .stat-value { color: var(--primary-color); }
+
+/* A filtered-empty result belongs to the whole monitor area, not a single
+   grid cell. This keeps the message centered and intentional at all widths. */
+.monitors-list > .empty-state {
+    grid-column: 1 / -1;
+    min-height: 320px;
+    padding: 48px 24px;
+    border: 1px dashed color-mix(in srgb, var(--primary-color) 28%, var(--border-color));
+    border-radius: 16px;
+    background: radial-gradient(
+        circle at 50% 0,
+        color-mix(in srgb, var(--primary-color) 8%, transparent),
+        transparent 54%
+    );
+    box-sizing: border-box;
+}
+
+.monitors-list > .empty-state .empty-icon {
+    width: 52px;
+    height: 52px;
+    margin-bottom: 14px;
+    padding: 14px;
+    border-radius: 16px;
+    background: color-mix(in srgb, var(--primary-color) 12%, transparent);
+    color: var(--primary-color);
+    box-sizing: content-box;
+    opacity: 1;
+}
+
+.monitors-list > .empty-state h3 {
+    font-size: 1.05rem;
+    font-weight: 650;
+}
+
+.monitors-list > .empty-state p {
+    max-width: 40ch;
+    line-height: 1.55;
+}
+
+@media (max-width: 680px) {
+    .monitors-list > .empty-state {
+        min-height: 260px;
+        padding: 36px 20px;
+    }
+}
+
+/* Monitor card system — compact operational hierarchy that remains legible
+   across two, three, or four-column dashboard layouts. */
+.monitors-list {
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 18px;
+}
+
+.monitor-card {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    min-width: 0;
+    padding: 16px;
+    border-radius: 14px;
+    background: var(--card-bg);
+    border-color: color-mix(in srgb, var(--border-color) 86%, transparent);
+    box-shadow: 0 8px 24px color-mix(in srgb, #000 10%, transparent);
+}
+
+.monitor-card:hover {
+    border-color: color-mix(in srgb, var(--primary-color) 52%, var(--border-color));
+    box-shadow: 0 12px 30px color-mix(in srgb, #000 16%, transparent);
+    transform: translateY(-2px);
+}
+
+.monitor-header {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 14px;
+    margin: 0;
+}
+
+.monitor-status { gap: 11px; }
+
+.status-icon {
+    width: 38px;
+    height: 38px;
+    flex: 0 0 38px;
+}
+
+.monitor-info h3 {
+    margin: 0 0 6px;
+    font-size: 0.9rem;
+    font-weight: 650;
+    letter-spacing: -0.01em;
+}
+
+.monitor-url {
+    max-width: 100%;
+    margin: 0;
+    padding: 5px 8px;
+    font-size: 0.68rem;
+    line-height: 1.25;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    border-radius: 6px;
+}
+
+.monitor-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 6px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border-color);
+}
+
+.monitor-card .action-btn {
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    border-radius: 8px;
+    background: color-mix(in srgb, var(--background-color) 60%, var(--card-bg));
+}
+
+.monitor-card .action-btn svg {
+    width: 14px;
+    height: 14px;
+}
+
+.monitor-metrics {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1px;
+    margin: 0;
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    background: var(--border-color);
+}
+
+.metric {
+    min-width: 0;
+    gap: 5px;
+    padding: 11px 12px;
+    background: var(--card-bg);
+}
+
+.metric:nth-child(5) {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.metric-label {
+    font-size: 0.61rem;
+    font-weight: 700;
+    letter-spacing: 0.09em;
+}
+
+.metric-value {
+    overflow: hidden;
+    color: var(--text-color);
+    font-size: 0.82rem;
+    font-weight: 650;
+    line-height: 1.35;
+    text-overflow: ellipsis;
+}
+
+.metric-status-value {
+    font-size: 0.72rem;
+    letter-spacing: 0.03em;
+}
+
+.monitor-tags { margin-top: -4px; gap: 6px; }
+.tag { padding: 3px 7px; border-radius: 999px; font-size: 0.68rem; }
+
+@media (max-width: 680px) {
+    .monitors-list { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 380px) {
+    .monitor-card { padding: 14px; }
+    .monitor-metrics { grid-template-columns: 1fr; }
+    .metric:nth-child(5) { grid-column: auto; }
+}
+
+/* Softer metric treatment: each value has its own breathing room instead of
+   becoming part of a rigid, table-like grid with visible divider lines. */
+.monitor-card { gap: 14px; }
+
+.monitor-header { gap: 12px; }
+
+.monitor-actions {
+    padding-top: 0;
+    border-top: 0;
+}
+
+.monitor-metrics {
+    gap: 8px;
+    overflow: visible;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+}
+
+.metric {
+    min-height: 58px;
+    justify-content: center;
+    padding: 10px 11px;
+    border-radius: 10px;
+    background: color-mix(in srgb, var(--background-color) 48%, var(--card-bg));
+    box-shadow: inset 0 1px 0 color-mix(in srgb, #fff 3%, transparent);
+}
+
+.metric:nth-child(5) {
+    min-height: 38px;
+    padding: 8px 11px;
+    background: color-mix(in srgb, var(--primary-color) 7%, var(--card-bg));
+}
+
+.metric-label { opacity: 0.82; }
