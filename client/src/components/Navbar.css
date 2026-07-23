@@ -462,7 +462,7 @@
     padding: 0;
 }
 
-.search-icon {
+.workspace-search-icon {
     position: absolute;
     left: 12px;
     top: 50%;
@@ -470,6 +470,7 @@
     color: var(--text-secondary);
     font-size: 14px;
     pointer-events: none;
+    z-index: 1;
 }
 
 .workspace-search-input[type="text"] {
@@ -666,6 +667,210 @@
 .view-all-workspaces:hover {
     background-color: rgba(56, 189, 248, 0.10);
     color: var(--primary-color);
+}
+
+/* Desktop dropdown polish: stable widths prevent wrapped navigation labels and
+   keep workspace discovery visually consistent with the product header. */
+@media (min-width: 1226px) {
+    .navbar-dropdown {
+        top: calc(100% + 8px);
+        min-width: 250px;
+        padding: 6px;
+        border-radius: 12px;
+        background: color-mix(in srgb, var(--card-bg) 96%, #00111a);
+        border-color: color-mix(in srgb, var(--border-color) 92%, transparent);
+        box-shadow: 0 16px 38px color-mix(in srgb, #000 32%, transparent);
+    }
+
+    .navbar-dropdown .dropdown-item {
+        min-height: 38px;
+        box-sizing: border-box;
+        padding: 9px 10px;
+        border-left: 0;
+        border-radius: 8px;
+        color: var(--text-secondary);
+        font-size: 0.82rem;
+        font-weight: 550;
+        white-space: nowrap;
+    }
+
+    .navbar-dropdown .dropdown-item:hover {
+        background: color-mix(in srgb, #38bdf8 10%, transparent);
+        color: #e9f9ff;
+    }
+
+    .navbar-dropdown .dropdown-item.active {
+        background: color-mix(in srgb, #38bdf8 15%, transparent);
+        color: #e9f9ff;
+        font-weight: 650;
+    }
+
+    .navbar-dropdown .dropdown-item.active svg { color: #38bdf8; }
+
+    .workspace-selector-dropdown {
+        top: calc(100% + 9px);
+        left: 0;
+        transform: none;
+        width: 304px;
+        max-height: 480px;
+        border-radius: 13px;
+        background: color-mix(in srgb, var(--card-bg) 96%, #00111a);
+        border-color: color-mix(in srgb, var(--border-color) 92%, transparent);
+        box-shadow: 0 16px 38px color-mix(in srgb, #000 32%, transparent);
+    }
+
+    .workspace-selector-dropdown .workspace-search-container {
+        width: auto;
+        margin: 9px 9px 0;
+        padding: 0;
+    }
+
+    .workspace-search-input[type="text"] {
+        min-height: 38px;
+        box-sizing: border-box;
+        border-radius: 9px;
+        font-size: 0.82rem;
+    }
+
+    .workspace-selector-dropdown .workspace-search-icon {
+        left: 12px;
+        color: var(--text-secondary);
+        font-size: 13px;
+    }
+
+    .workspace-selector-dropdown .create-workspace-btn {
+        min-height: 36px;
+        margin: 7px 9px 4px;
+        padding: 7px 12px;
+        border-radius: 9px;
+        font-size: 0.8rem;
+        box-shadow: none;
+    }
+
+    .workspace-section-title {
+        margin: 10px 14px 5px;
+        font-size: 0.62rem;
+        letter-spacing: 0.1em;
+    }
+
+    .workspace-item {
+        margin: 0 6px;
+        padding: 8px;
+        border-left: 0;
+        border-radius: 8px;
+    }
+
+    .workspace-item:hover,
+    .workspace-item.is-current {
+        border-left-color: transparent;
+        background: color-mix(in srgb, #38bdf8 10%, transparent);
+    }
+
+    .view-all-workspaces {
+        margin-top: 6px;
+        padding: 10px 14px;
+        background: color-mix(in srgb, var(--background-color) 36%, transparent);
+    }
+}
+
+/* Desktop product header — compact, high-contrast, and visually separate from
+   the workspace canvas without changing the navigation structure. */
+@media (min-width: 1226px) {
+    .navbar {
+        height: 64px;
+        background: color-mix(in srgb, var(--navbar-bg) 92%, #00111a);
+        border-bottom: 1px solid color-mix(in srgb, var(--border-color) 88%, transparent);
+        box-shadow: 0 8px 24px color-mix(in srgb, #000 18%, transparent);
+    }
+
+    .navbar.scrolled {
+        background: color-mix(in srgb, var(--navbar-bg) 96%, #00111a);
+        box-shadow: 0 10px 28px color-mix(in srgb, #000 24%, transparent);
+    }
+
+    .navbar-container {
+        max-width: 1520px;
+        padding: 0 22px;
+    }
+
+    .navbar-brand {
+        display: inline-flex;
+        align-items: center;
+        min-height: 34px;
+        padding-right: 22px;
+        border-right: 1px solid var(--border-color);
+        color: var(--text-color);
+        font-size: 1.08rem;
+        font-weight: 720;
+        letter-spacing: -0.03em;
+    }
+
+    .navbar-brand:hover { color: #dff6ff; }
+
+    .navbar-start {
+        height: 64px;
+        gap: 3px;
+        margin-left: 18px;
+    }
+
+    .navbar-end {
+        height: 64px;
+        gap: 4px;
+    }
+
+    .navbar-item {
+        height: 64px;
+    }
+
+    .navbar-item > span {
+        min-height: 38px;
+        padding: 8px 12px;
+        border: 1px solid transparent;
+        border-radius: 9px;
+        color: var(--text-secondary);
+        font-size: 0.88rem;
+        font-weight: 600;
+        gap: 7px;
+        transition: background-color 150ms ease, border-color 150ms ease,
+            color 150ms ease, transform 150ms ease;
+    }
+
+    .navbar-item > span:hover {
+        background: color-mix(in srgb, #38bdf8 8%, transparent);
+        border-color: color-mix(in srgb, #38bdf8 16%, transparent);
+        color: #e8f8ff;
+        transform: none;
+    }
+
+    .navbar-item > span.active {
+        background: color-mix(in srgb, #38bdf8 15%, transparent);
+        border-color: color-mix(in srgb, #38bdf8 28%, var(--border-color));
+        color: #e9f9ff;
+        font-weight: 650;
+        box-shadow: inset 0 1px 0 color-mix(in srgb, #fff 8%, transparent);
+    }
+
+    .navbar-item > span.active svg { color: #38bdf8; }
+
+    .navbar-item > span.active::after { display: none; }
+
+    .profile-trigger,
+    .notification-icon-wrapper {
+        width: 36px;
+        height: 36px;
+        border: 1px solid var(--border-color);
+        border-radius: 10px;
+        background: color-mix(in srgb, var(--card-bg) 62%, transparent);
+        margin: 0;
+    }
+
+    .profile-trigger:hover,
+    .notification-icon-wrapper:hover {
+        border-color: color-mix(in srgb, #38bdf8 30%, var(--border-color));
+        background: color-mix(in srgb, #38bdf8 9%, transparent);
+    }
+
+    .navbar-end > .navbar-item:last-child { margin-left: 2px; }
 }
 
 /* Responsive navigation drawer — deliberate, app-like navigation instead of

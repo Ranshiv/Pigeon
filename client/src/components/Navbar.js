@@ -240,6 +240,12 @@ const Navbar = ({ isAuthenticated }) => {
         }
     };
 
+    const handleApiNavigation = (event, path) => {
+        event.stopPropagation();
+        setShowApiDropdown(false);
+        handleNavigation(path);
+    };
+
     return (
         <nav
             className={`navbar ${isScrolled ? 'scrolled' : ''}`}
@@ -308,7 +314,7 @@ const Navbar = ({ isAuthenticated }) => {
                                     {showWorkspaceDropdown && (
                                         <div className="workspace-selector-dropdown" ref={workspaceDropdownRef}>
                                             <div className="workspace-search-container">
-                                                <FiSearch className="search-icon" />
+                                                <FiSearch className="workspace-search-icon" aria-hidden="true" />
                                                 <input
                                                     ref={searchInputRef}
                                                     type="text"
@@ -426,28 +432,28 @@ const Navbar = ({ isAuthenticated }) => {
 
                                     {showApiDropdown && (
                                         <div className="navbar-dropdown">
-                                            <div className="dropdown-item" onClick={() => handleNavigation('/workspace/api-network/explore')}>
+                                            <div className={`dropdown-item${location.pathname === '/workspace/api-network/explore' ? ' active' : ''}`} onClick={(event) => handleApiNavigation(event, '/workspace/api-network/explore')}>
                                                 <FiGlobe size={16} style={{ marginRight: '10px' }} /> Explore Public APIs
                                             </div>
-                                            <div className="dropdown-item" onClick={() => handleNavigation('/workspace/api-network/spotlight')}>
+                                            <div className={`dropdown-item${location.pathname === '/workspace/api-network/spotlight' ? ' active' : ''}`} onClick={(event) => handleApiNavigation(event, '/workspace/api-network/spotlight')}>
                                                 <FiBell size={16} style={{ marginRight: '10px' }} /> Spotlight
                                             </div>
-                                            <div className="dropdown-item" onClick={() => handleNavigation('/workspace/api-network/ai-agent-tools')}>
+                                            <div className={`dropdown-item${location.pathname === '/workspace/api-network/ai-agent-tools' ? ' active' : ''}`} onClick={(event) => handleApiNavigation(event, '/workspace/api-network/ai-agent-tools')}>
                                                 <FiZap size={16} style={{ marginRight: '10px' }} /> AI Agent Tools
                                             </div>
-                                            <div className="dropdown-item" onClick={() => handleNavigation('/workspace/graphql')}>
+                                            <div className={`dropdown-item${location.pathname === '/workspace/graphql' ? ' active' : ''}`} onClick={(event) => handleApiNavigation(event, '/workspace/graphql')}>
                                                 <TbVectorTriangle size={16} style={{ marginRight: '10px' }} /> GraphQL
                                             </div>
-                                            <div className="dropdown-item" onClick={() => handleNavigation('/workspace/protocols')}>
+                                            <div className={`dropdown-item${location.pathname === '/workspace/protocols' ? ' active' : ''}`} onClick={(event) => handleApiNavigation(event, '/workspace/protocols')}>
                                                 <FiLink size={16} style={{ marginRight: '10px' }} /> Protocols
                                             </div>
-                                            <div className="dropdown-item" onClick={() => handleNavigation('/workspace/performance-tests')}>
+                                            <div className={`dropdown-item${location.pathname === '/workspace/performance-tests' ? ' active' : ''}`} onClick={(event) => handleApiNavigation(event, '/workspace/performance-tests')}>
                                                 <FiBarChart2 size={16} style={{ marginRight: '10px' }} /> Performance Tests
                                             </div>
-                                            <div className="dropdown-item" onClick={() => handleNavigation('/workspace/history')}>
+                                            <div className={`dropdown-item${location.pathname === '/workspace/history' ? ' active' : ''}`} onClick={(event) => handleApiNavigation(event, '/workspace/history')}>
                                                 <FiClock size={16} style={{ marginRight: '10px' }} /> History
                                             </div>
-                                            <div className="dropdown-item" onClick={() => handleNavigation('/workspace/api-network/requests/new')}>
+                                            <div className={`dropdown-item${location.pathname === '/workspace/api-network/requests/new' ? ' active' : ''}`} onClick={(event) => handleApiNavigation(event, '/workspace/api-network/requests/new')}>
                                                 <FiPlus size={16} style={{ marginRight: '10px' }} /> Add Request
                                             </div>
                                         </div>
