@@ -199,6 +199,121 @@ export const pigeonDarkTheme = {
     }
 };
 
+// Omni theme: dark editor surfaces with the workspace's black/orange accent.
+// Kept as a separate Monaco theme so editor hover, selection, widgets, and
+// active controls follow the selected application theme instead of blue.
+export const pigeonOmniTheme = {
+    ...pigeonDarkTheme,
+    rules: [
+        { token: 'string.key.json', foreground: 'FFB35C', fontStyle: 'bold' },
+        { token: 'string.value.json', foreground: '6EE7A5' },
+        { token: 'number', foreground: 'FF9086' },
+        { token: 'keyword', foreground: 'FFB35C', fontStyle: 'bold' },
+        { token: 'string', foreground: '6EE7A5' },
+        { token: 'comment', foreground: 'A89484', fontStyle: 'italic' },
+        { token: 'delimiter', foreground: 'FFF7ED' },
+        { token: 'delimiter.bracket', foreground: 'FFB35C' },
+        { token: 'delimiter.square', foreground: 'FF9086' },
+        { token: 'delimiter.curly', foreground: 'FFB35C' },
+        { token: 'key', foreground: 'FFB35C', fontStyle: 'bold' },
+        { token: 'tag', foreground: 'FFB35C' },
+        { token: 'operators', foreground: 'FFF7ED' },
+        { token: 'punctuation', foreground: 'A89484' },
+        { token: 'constant.language.boolean', foreground: 'FF9086' },
+        { token: 'constant.language.null', foreground: 'A89484' },
+        { token: 'invalid', foreground: 'FF6B5E', fontStyle: 'bold' }
+    ],
+    colors: {
+        ...pigeonDarkTheme.colors,
+        'editor.background': '#12100E',
+        'editor.foreground': '#FFF7ED',
+        'editorLineNumber.foreground': '#A89484',
+        'editorLineNumber.activeForeground': '#FF8A1F',
+        'editorGutter.background': '#0D0B09',
+        'editor.selectionBackground': '#FF8A1F40',
+        'editor.inactiveSelectionBackground': '#FF8A1F20',
+        'editor.selectionHighlightBackground': '#FF8A1F30',
+        'editorCursor.foreground': '#FFB35C',
+        'editor.lineHighlightBackground': '#26170D',
+        'editor.lineHighlightBorder': '#3A2719',
+        'editorIndentGuide.background': '#3A2719',
+        'editorIndentGuide.activeBackground': '#FF8A1F',
+        'editorBracketMatch.background': '#FF8A1F40',
+        'editorBracketMatch.border': '#FFB35C',
+        'editor.findRangeHighlightBackground': '#FF8A1F20',
+        'scrollbarSlider.activeBackground': '#FFB35C80',
+        'editorInfo.foreground': '#FFB35C',
+        'minimap.background': '#1B1611',
+        'minimap.selectionHighlight': '#FF8A1F40',
+        'editorWidget.background': '#1B1611',
+        'editorWidget.border': '#3A2719',
+        'editorWidget.foreground': '#FFF7ED',
+        'editorWidget.resizeBorder': '#FF8A1F',
+        'editorSuggestWidget.background': '#1B1611',
+        'editorSuggestWidget.border': '#3A2719',
+        'editorSuggestWidget.foreground': '#FFF7ED',
+        'editorSuggestWidget.highlightForeground': '#FFB35C',
+        'editorSuggestWidget.selectedBackground': '#5D2E0B',
+        'editorHoverWidget.background': '#1B1611',
+        'editorHoverWidget.border': '#3A2719',
+        'editorHoverWidget.foreground': '#FFF7ED'
+    }
+};
+
+export const pigeonBlackTheme = {
+    base: 'vs-dark',
+    inherit: true,
+    rules: [
+        { token: 'string.key.json', foreground: 'FFFFFF', fontStyle: 'bold' },
+        { token: 'string.value.json', foreground: 'FFFFFF' },
+        { token: 'number', foreground: 'FFFFFF' },
+        { token: 'keyword', foreground: 'FFFFFF', fontStyle: 'bold' },
+        { token: 'string', foreground: 'FFFFFF' },
+        { token: 'comment', foreground: 'B3B3B3', fontStyle: 'italic' },
+        { token: 'delimiter', foreground: 'FFFFFF' },
+        { token: 'key', foreground: 'FFFFFF', fontStyle: 'bold' },
+        { token: 'tag', foreground: 'FFFFFF' },
+        { token: 'operators', foreground: 'FFFFFF' },
+        { token: 'punctuation', foreground: 'B3B3B3' },
+        { token: 'invalid', foreground: 'FFFFFF', fontStyle: 'bold' }
+    ],
+    colors: {
+        'editor.background': '#000000',
+        'editor.foreground': '#FFFFFF',
+        'editorLineNumber.foreground': '#808080',
+        'editorLineNumber.activeForeground': '#FFFFFF',
+        'editorGutter.background': '#000000',
+        'editor.selectionBackground': '#FFFFFF40',
+        'editor.inactiveSelectionBackground': '#FFFFFF20',
+        'editor.selectionHighlightBackground': '#FFFFFF30',
+        'editorCursor.foreground': '#FFFFFF',
+        'editor.lineHighlightBackground': '#FFFFFF12',
+        'editor.lineHighlightBorder': '#FFFFFF28',
+        'editorIndentGuide.background': '#FFFFFF28',
+        'editorIndentGuide.activeBackground': '#FFFFFF',
+        'editorBracketMatch.background': '#FFFFFF40',
+        'editorBracketMatch.border': '#FFFFFF',
+        'scrollbarSlider.background': '#FFFFFF30',
+        'scrollbarSlider.hoverBackground': '#FFFFFF50',
+        'scrollbarSlider.activeBackground': '#FFFFFF70',
+        'editorInfo.foreground': '#FFFFFF',
+        'minimap.background': '#000000',
+        'minimap.selectionHighlight': '#FFFFFF40',
+        'editorWidget.background': '#000000',
+        'editorWidget.border': '#FFFFFF40',
+        'editorWidget.foreground': '#FFFFFF',
+        'editorWidget.resizeBorder': '#FFFFFF',
+        'editorSuggestWidget.background': '#000000',
+        'editorSuggestWidget.border': '#FFFFFF40',
+        'editorSuggestWidget.foreground': '#FFFFFF',
+        'editorSuggestWidget.highlightForeground': '#FFFFFF',
+        'editorSuggestWidget.selectedBackground': '#FFFFFF20',
+        'editorHoverWidget.background': '#000000',
+        'editorHoverWidget.border': '#FFFFFF40',
+        'editorHoverWidget.foreground': '#FFFFFF'
+    }
+};
+
 // Theme registration and utility functions
 export const registerPigeonThemes = (monaco) => {
     if (!monaco) {
@@ -213,6 +328,8 @@ export const registerPigeonThemes = (monaco) => {
 
         // Define and register the dark theme
         monaco.editor.defineTheme('pigeon-dark', pigeonDarkTheme);
+        monaco.editor.defineTheme('pigeon-omni', pigeonOmniTheme);
+        monaco.editor.defineTheme('pigeon-black', pigeonBlackTheme);
         console.log('✓ Pigeon dark theme registered successfully');
 
         console.log('✓ All Pigeon Monaco themes registered successfully');
@@ -223,7 +340,12 @@ export const registerPigeonThemes = (monaco) => {
 
 // Helper function to get the appropriate theme name based on app theme
 export const getPigeonMonacoTheme = (appTheme) => {
-    const themeName = appTheme === 'dark' ? 'pigeon-dark' : 'pigeon-light';
+    const themeName = {
+        light: 'pigeon-light',
+        dark: 'pigeon-dark',
+        omni: 'pigeon-omni',
+        black: 'pigeon-black'
+    }[appTheme] || 'pigeon-dark';
     console.log(`Using Monaco theme: ${themeName} (app theme: ${appTheme})`);
     return themeName;
 };
@@ -275,12 +397,16 @@ export const pigeonEditorOptions = {
 // Export themes by name for easy access
 export const THEMES = {
     LIGHT: 'pigeon-light',
-    DARK: 'pigeon-dark'
+    DARK: 'pigeon-dark',
+    OMNI: 'pigeon-omni',
+    BLACK: 'pigeon-black'
 };
 
 const monacoThemes = {
     pigeonLightTheme,
     pigeonDarkTheme,
+    pigeonOmniTheme,
+    pigeonBlackTheme,
     registerPigeonThemes,
     getPigeonMonacoTheme,
     pigeonEditorOptions,

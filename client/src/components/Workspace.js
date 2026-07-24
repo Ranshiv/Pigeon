@@ -71,7 +71,8 @@ const Workspace = () => {
                 <Route path="protocols" element={<ProtocolTestPage />} />
                 <Route path="performance-tests" element={<PerformanceTestsPage />} />
                 <Route path="compliance/*" element={<ComplianceSection />} />
-                <Route path="settings" element={<SettingsPage />} />
+                <Route path="settings" element={<Navigate to="/workspace/settings/profile" replace />} />
+                <Route path="settings/:section/*" element={<SettingsPage />} />
                 <Route path="history/*" element={<HistoryDetailsSection />} />
 
                 {/* Add a catch-all redirect for unmatched routes under collections */}

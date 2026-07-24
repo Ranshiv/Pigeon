@@ -76,7 +76,6 @@
     width: 44px;
     height: 44px;
     border-radius: 12px;
-    background: rgba(1, 76, 117, 0.12);
     background: color-mix(in srgb, var(--primary-color) 14%, transparent);
     color: var(--primary-color);
     display: flex;
@@ -354,7 +353,6 @@
 .policyTextarea:focus {
     outline: none;
     border-color: var(--primary-color);
-    box-shadow: 0 0 0 4px rgba(1, 76, 117, 0.18);
     box-shadow: 0 0 0 4px color-mix(in srgb, var(--primary-color) 22%, transparent);
 }
 
@@ -434,7 +432,6 @@
 }
 
 .policyCardMain:focus-visible {
-    box-shadow: 0 0 0 4px rgba(1, 76, 117, 0.18);
     box-shadow: 0 0 0 4px color-mix(in srgb, var(--primary-color) 22%, transparent);
 }
 
@@ -854,7 +851,6 @@
 }
 
 .policyToggleInput:focus-visible+.policyToggleFill {
-    box-shadow: 0 0 0 4px rgba(1, 76, 117, 0.18);
     box-shadow: 0 0 0 4px color-mix(in srgb, var(--primary-color) 22%, transparent);
 }
 

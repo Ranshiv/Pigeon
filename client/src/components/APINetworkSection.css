@@ -182,7 +182,8 @@
 }
 
 .sidebar-search input.sidebar-filter-input:hover {
-    border-color: rgba(255, 255, 255, 0.12);
+    border-color: color-mix(in srgb, var(--primary-color) 55%, var(--border-color));
+    background-color: color-mix(in srgb, var(--primary-color) 6%, var(--hover-bg));
 }
 
 .sidebar-search input.sidebar-filter-input:focus {
@@ -353,6 +354,13 @@
     overflow: hidden;
     text-overflow: ellipsis;
     min-width: 0;
+    color: inherit;
+    transition: color 0.15s ease;
+}
+
+.request-item:hover .request-name,
+.request-item:focus-visible .request-name {
+    color: var(--primary-color);
 }
 
 .item-arrow {

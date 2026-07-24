@@ -57,14 +57,14 @@ router.get('/logout', (req, res) => {
 router.put('/user/profile', ensureAuthenticated, async (req, res) => {
     try {
         // Include profileIcon
-        const { displayName, theme, fontSize, profileIcon } = req.body;
+        const { displayName, theme, fontSize, profileIcon, notificationPreferences } = req.body;
         const userId = req.user.id;
 
         const updateData = {};
         if (displayName && typeof displayName === 'string' && displayName.trim() !== '') {
             updateData.displayName = displayName.trim();
         }
-        if (theme && ['light', 'dark'].includes(theme)) {
+        if (theme && ['light', 'dark', 'omni', 'black'].includes(theme)) {
             updateData.theme = theme;
         }
         if (fontSize && ['14px', '16px', '18px'].includes(fontSize)) {
@@ -78,6 +78,21 @@ router.put('/user/profile', ensureAuthenticated, async (req, res) => {
                 console.warn(`Invalid profileIcon received: ${profileIcon}`);
                 // Optionally return a specific error, or just ignore it
                 // return res.status(400).json({ message: 'Invalid profile icon selected' });
+            }
+        }
+        if (notificationPreferences && typeof notificationPreferences === 'object' && !Array.isArray(notificationPreferences)) {
+            const allowedPreferences = ['inAppEnabled', 'workspaceActivity', 'mergeRequests', 'monitoring', 'systemFailures'];
+            const sanitizedPreferences = {};
+            allowedPreferences.forEach((key) => {
+                if (typeof notificationPreferences[key] === 'boolean') {
+                    sanitizedPreferences[key] = notificationPreferences[key];
+                }
+            });
+            if (Object.keys(sanitizedPreferences).length > 0) {
+                updateData.notificationPreferences = {
+                    ...(req.user.notificationPreferences?.toObject?.() || req.user.notificationPreferences || {}),
+                    ...sanitizedPreferences
+                };
             }
         }
 

@@ -144,11 +144,14 @@
 .cmp-btn--primary:hover { background: var(--accent-hover); transform: translateY(-1px); }
 
 .cmp-btn--ghost {
-    background: transparent;
+    background: var(--surface-sunken);
     color: var(--text-color);
     border-color: var(--border-color);
 }
-.cmp-btn--ghost:hover { background: var(--hover-bg); border-color: var(--accent); }
+.cmp-btn--ghost:hover {
+    background: color-mix(in srgb, var(--accent) 8%, var(--surface-sunken));
+    border-color: var(--accent);
+}
 
 .cmp-btn:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
 
@@ -184,7 +187,7 @@
     padding: 9px 11px;
     border-radius: var(--radius-sm);
     border: 1px solid var(--border-color);
-    background: var(--surface);
+    background: var(--surface-sunken);
     color: var(--text-color);
     outline: none;
     font: inherit;
@@ -398,4 +401,18 @@
 @media (prefers-reduced-motion: reduce) {
     .cmp-card, .cmp-btn, .cmp-tab, .cmp-table tbody tr, .cmp-team-card { transition: none; }
     .cmp-btn--primary:hover, .cmp-btn--ghost:hover { transform: none; }
+}
+
+.cmp-field .app-select-trigger {
+    min-height: 38px;
+    padding: 9px 11px;
+    border-color: var(--border-color);
+    background: var(--surface-sunken);
+    color: var(--text-color);
+    font-size: 0.86rem;
+}
+
+.cmp-field .app-select-trigger:hover {
+    border-color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 6%, var(--surface-sunken));
 }

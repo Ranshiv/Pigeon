@@ -43,8 +43,47 @@ const GraphQLTester = () => {
                 'editorWidget.border': '#003956'
             }
         });
+        monaco.editor.defineTheme('pigeon-omni', {
+            base: 'vs-dark',
+            inherit: true,
+            rules: [],
+            colors: {
+                'editor.background': '#12100e',
+                'editor.foreground': '#fff7ed',
+                'editor.lineHighlightBackground': '#26170d',
+                'editorLineNumber.foreground': '#a89484',
+                'editorLineNumber.activeForeground': '#ff8a1f',
+                'editorGutter.background': '#0d0b09',
+                'editorWidget.background': '#1b1611',
+                'editorWidget.border': '#3a2719',
+                'editorWidget.foreground': '#fff7ed',
+                'editor.selectionBackground': '#ff8a1f40',
+                'editorCursor.foreground': '#ffb35c'
+            }
+        });
+        monaco.editor.defineTheme('pigeon-black', {
+            base: 'vs-dark',
+            inherit: true,
+            rules: [],
+            colors: {
+                'editor.background': '#000000',
+                'editor.foreground': '#ffffff',
+                'editor.lineHighlightBackground': '#ffffff12',
+                'editorLineNumber.foreground': '#808080',
+                'editorLineNumber.activeForeground': '#ffffff',
+                'editorGutter.background': '#000000',
+                'editorWidget.background': '#000000',
+                'editorWidget.border': '#ffffff40',
+                'editorWidget.foreground': '#ffffff',
+                'editor.selectionBackground': '#ffffff40',
+                'editorCursor.foreground': '#ffffff'
+            }
+        });
     };
-    const editorTheme = theme === 'dark' ? 'pigeon-dark' : 'vs-light';
+    const editorTheme = {
+        light: 'vs-light', dark: 'pigeon-dark', omni: 'pigeon-omni',
+        black: 'pigeon-black'
+    }[theme] || 'pigeon-dark';
 
     // Execute GraphQL query
     const executeQuery = async () => {

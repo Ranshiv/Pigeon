@@ -116,7 +116,7 @@
 }
 
 .rd-tab--active {
-    color: #fff;
+    color: var(--button-text);
     background: var(--primary-color);
 }
 
@@ -136,7 +136,7 @@
 
 .rd-btn--primary {
     background: var(--primary-color);
-    color: #fff;
+    color: var(--button-text);
     border-color: var(--primary-color);
 }
 
@@ -343,4 +343,3 @@
 .rd-textarea {
     resize: vertical;
 }
-

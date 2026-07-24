@@ -1,14 +1,16 @@
 /* client/src/components/Footer.css */
 .footer {
-    background-color: var(--card-bg, #0d1117);
+    background-color: var(--footer-bg, var(--card-bg));
     color: var(--text-secondary);
     position: relative;
     width: 100%;
     z-index: 10;
-    font-size: 14px;
+    font-family: var(--font-family);
+    font-size: 13px;
+    line-height: 1.45;
     margin-top: 0;
     overflow: visible;
-    border-top: 1px solid var(--border-color);
+    border-top: 1px solid color-mix(in srgb, var(--border-color) 82%, transparent);
 }
 
 .footer-container {
@@ -33,17 +35,17 @@
 
 .footer-brand-section h3 {
     color: var(--text-color);
-    font-size: 1.5rem;
+    font-size: 1rem;
     font-weight: 700;
-    margin: 0 0 8px 0;
-    letter-spacing: -0.5px;
+    margin: 0 0 6px 0;
+    letter-spacing: -0.02em;
 }
 
 .footer-tagline {
     color: var(--text-secondary);
-    margin: 0 0 20px 0;
-    font-size: 0.9rem;
-    line-height: 1.5;
+    margin: 0 0 18px 0;
+    font-size: 0.75rem;
+    line-height: 1.45;
 }
 
 .footer-social {
@@ -59,10 +61,15 @@
     width: 36px;
     height: 36px;
     border-radius: 8px;
-    background-color: var(--background-color);
+    background-color: color-mix(in srgb, var(--footer-bg, var(--card-bg)) 74%, var(--background-color));
     border: 1px solid var(--border-color);
     color: var(--text-secondary);
     transition: all 0.2s ease;
+}
+
+.social-icon svg {
+    width: 17px;
+    height: 17px;
 }
 
 .social-icon:hover {
@@ -82,11 +89,11 @@
 .footer-links-section h4,
 .footer-contact-section h4 {
     color: var(--text-color);
-    font-size: 0.95rem;
-    margin: 0 0 20px 0;
-    font-weight: 600;
+    font-size: 0.67rem;
+    margin: 0 0 14px 0;
+    font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.06em;
 }
 
 .footer-links {
@@ -95,7 +102,7 @@
     margin: 0;
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 10px;
 }
 
 .footer-links li a,
@@ -106,9 +113,13 @@
     display: inline-flex;
     align-items: center;
     gap: 8px;
+    font-size: 0.82rem;
+    font-weight: 500;
 }
 
 .footer-icon {
+    width: 16px;
+    height: 16px;
     opacity: 0.7;
     transition: opacity 0.2s ease;
 }
@@ -124,10 +135,10 @@
 }
 
 .contact-message {
-    font-size: 0.9rem;
-    line-height: 1.5;
+    font-size: 0.72rem;
+    line-height: 1.45;
     color: var(--text-secondary);
-    margin: 16px 0 0;
+    margin: 12px 0 0;
 }
 
 .footer-bottom {
@@ -135,14 +146,14 @@
     justify-content: space-between;
     align-items: center;
     padding-top: 24px;
-    border-top: 1px solid var(--border-color);
-    font-size: 0.85rem;
+    border-top: 1px solid color-mix(in srgb, var(--border-color) 82%, transparent);
+    font-size: 0.68rem;
     color: var(--text-secondary);
 }
 
 .footer-legal-links {
     display: flex;
-    gap: 24px;
+    gap: 20px;
 }
 
 .footer-legal-links a {

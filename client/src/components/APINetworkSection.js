@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { Routes, Route, useNavigate, useParams, Navigate } from 'react-router-dom';
 // import ExploreSection from './ExploreSection';
 import SpotlightSection from './SpotlightSection';
@@ -21,6 +21,7 @@ import './APINetworkSection.css';
 const APINetworkSection = () => {
     const [requests, setRequests] = useState([]);
     const [history, setHistory] = useState([]);
+    const [requestSearch, setRequestSearch] = useState('');
     const [isLoadingRequests, setIsLoadingRequests] = useState(true);
     const [isLoadingHistory, setIsLoadingHistory] = useState(false);
     const [response, setResponse] = useState(null);
@@ -32,6 +33,17 @@ const APINetworkSection = () => {
     const dragState = useRef({ moved: false });
     const sidebarOpenButtonRef = useRef(null);
     const navigate = useNavigate();
+
+    const filteredRequests = useMemo(() => {
+        const query = requestSearch.trim().toLowerCase();
+        if (!query) return requests;
+
+        return requests.filter((request) => [
+            request.name,
+            request.method,
+            request.url
+        ].some((value) => String(value || '').toLowerCase().includes(query)));
+    }, [requests, requestSearch]);
 
     // Drag the "Show Sidebar" button; it snaps to the nearest corner on release.
     // Click still opens the sidebar unless the button was dragged.
@@ -284,7 +296,14 @@ const APINetworkSection = () => {
 
                 <div className="sidebar-search">
                     <FiSearch className="search-icon" />
-                    <input type="text" placeholder="Filter requests..." className="sidebar-filter-input" />
+                    <input
+                        type="search"
+                        placeholder="Filter requests..."
+                        className="sidebar-filter-input"
+                        value={requestSearch}
+                        onChange={(event) => setRequestSearch(event.target.value)}
+                        aria-label="Filter saved requests"
+                    />
                 </div>
 
                 <div className="sidebar-nav">
@@ -321,8 +340,12 @@ const APINetworkSection = () => {
                             <div className="sidebar-empty">
                                 <p>No saved requests</p>
                             </div>
+                        ) : filteredRequests.length === 0 ? (
+                            <div className="sidebar-empty">
+                                <p>No requests match “{requestSearch}”</p>
+                            </div>
                         ) : (
-                            requests.map(req => {
+                            filteredRequests.map(req => {
                                 const isActive = window.location.pathname.includes(`/requests/${req._id}`);
                                 return (
                                     <div

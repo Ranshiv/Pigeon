@@ -186,7 +186,7 @@
 }
 
 .notification-item.unread {
-  background-color: rgba(1, 76, 117, 0.05);
+  background-color: color-mix(in srgb, var(--primary-color) 5%, transparent);
 }
 
 .notification-icon-container {

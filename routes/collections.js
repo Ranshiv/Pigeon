@@ -767,6 +767,7 @@ router.post('/:id/merge-request', ensureAuthenticated, async (req, res) => {
 
         emitWorkspaceNotification(effectiveWorkspaceId, {
             actorId: userId,
+            category: 'mergeRequests',
             message: `${mergeRequest.createdBy.displayName} created merge request: ${mergeRequest.title}`
         });
 

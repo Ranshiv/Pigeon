@@ -1,13 +1,36 @@
 // client/src/components/Notifications.js
-import React, { useState, useEffect, useLayoutEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useLayoutEffect, useRef, useMemo, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { FiBell, FiX } from 'react-icons/fi';
 import './Notifications.css';
 import { useCollaboration } from '../context/CollaborationContext';
 
+const defaultNotificationPreferences = {
+  inAppEnabled: true,
+  workspaceActivity: true,
+  mergeRequests: true,
+  monitoring: true,
+  systemFailures: true
+};
+
+const getActivityCategory = (activity = {}) => {
+  if (activity.category) return activity.category;
+  if (activity.type === 'monitor_status' || activity.type === 'monitor_update') return 'monitoring';
+  if (['merge_created', 'merge_approved', 'merge_rejected', 'merge_rolled_back', 'merge_request'].includes(activity.type)) return 'mergeRequests';
+  // Older workspace notifications were stored as generic `system` entries.
+  if (activity.workspaceId && activity.type === 'system') return 'workspaceActivity';
+  if (['system', 'api_failure', 'request_failed', 'invalid_request'].includes(activity.type)) return 'systemFailures';
+  return 'workspaceActivity';
+};
+
+const isNotificationEnabled = (preferences, category) => (
+  preferences.inAppEnabled !== false && preferences[category] !== false
+);
+
 const Notifications = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [userActivities, setUserActivities] = useState([]);
+  const [notificationPreferences, setNotificationPreferences] = useState(defaultNotificationPreferences);
   const notificationRef = useRef(null);
   const notificationButtonRef = useRef(null);
   const dropdownRef = useRef(null);
@@ -15,13 +38,27 @@ const Notifications = () => {
   const recentActivityRef = useRef(new Map());
   const currentUserIdRef = useRef(null);
   const monitorStatusRef = useRef(new Map());
+  const notificationPreferencesRef = useRef(defaultNotificationPreferences);
   const { socket } = useCollaboration();
+  const visibleActivities = useMemo(
+    () => notificationPreferences.inAppEnabled === false
+      ? []
+      : userActivities.filter((activity) => isNotificationEnabled(notificationPreferences, getActivityCategory(activity))),
+    [notificationPreferences, userActivities]
+  );
   const unreadCount = useMemo(
-    () => userActivities.reduce((count, activity) => count + (activity.read ? 0 : 1), 0),
-    [userActivities]
+    () => visibleActivities.reduce((count, activity) => count + (activity.read ? 0 : 1), 0),
+    [visibleActivities]
   );
 
+  const applyNotificationPreferences = useCallback((preferences) => {
+    const next = { ...defaultNotificationPreferences, ...(preferences || {}) };
+    notificationPreferencesRef.current = next;
+    setNotificationPreferences(next);
+  }, []);
+
   useEffect(() => {
+    let cancelled = false;
     try {
       const userStr = localStorage.getItem('user');
       if (userStr) {
@@ -29,11 +66,30 @@ const Notifications = () => {
         // Normalize to string so self-activity suppression is robust to id-form drift
         // (server emits String(_id); localStorage may store id or _id). compare as strings.
         currentUserIdRef.current = String(user?.id || user?._id || '') || null;
+        if (user?.notificationPreferences) applyNotificationPreferences(user.notificationPreferences);
       }
     } catch {
       currentUserIdRef.current = null;
     }
-  }, []);
+
+    const handlePreferencesUpdated = (event) => applyNotificationPreferences(event.detail);
+    window.addEventListener('notification-preferences-updated', handlePreferencesUpdated);
+
+    // Hydrate from the server as the app shell may have mounted before Settings.
+    fetch('/api/auth/check', { credentials: 'include' })
+      .then((res) => res.ok ? res.json() : null)
+      .then((data) => {
+        if (cancelled || !data?.isAuthenticated || !data.user) return;
+        currentUserIdRef.current = String(data.user._id || data.user.id || '') || null;
+        applyNotificationPreferences(data.user.notificationPreferences);
+      })
+      .catch(() => {});
+
+    return () => {
+      cancelled = true;
+      window.removeEventListener('notification-preferences-updated', handlePreferencesUpdated);
+    };
+  }, [applyNotificationPreferences]);
 
   // Load persisted account-wide notification history on mount.
   useEffect(() => {
@@ -105,6 +161,8 @@ const Notifications = () => {
 
       const { activity, userId, timestamp = new Date().toISOString() } = data;
 
+      if (!isNotificationEnabled(notificationPreferencesRef.current, 'workspaceActivity')) return;
+
       // Ignore self-activity (common when a user has multiple tabs/sockets open).
       // Compare as strings: server emits String(_id), localStorage id may differ in form.
       if (currentUserIdRef.current && String(userId) === String(currentUserIdRef.current)) return;
@@ -130,6 +188,7 @@ const Notifications = () => {
             userId,
             type: activity.type,
             details: activity.details,
+            category: 'workspaceActivity',
             timestamp,
             read: false
           },
@@ -145,6 +204,7 @@ const Notifications = () => {
     const handleMonitorUpdate = (data) => {
       if (!data || !data.monitorId) return;
       const status = data.currentStatus || data.status;
+      if (!isNotificationEnabled(notificationPreferencesRef.current, 'monitoring')) return;
       const prev = monitorStatusRef.current.get(data.monitorId);
       monitorStatusRef.current.set(data.monitorId, status);
       // Seed healthy monitors quietly, but surface an already failing/degraded
@@ -155,6 +215,8 @@ const Notifications = () => {
         {
           id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
           type: 'monitor_status',
+          category: 'monitoring',
+          message: `${data.monitorName || 'Monitor'} is now ${status || 'updated'}`,
           details: { monitorId: data.monitorId, monitorName: data.monitorName, status, responseTime: data.responseTime },
           timestamp: data.timestamp || new Date().toISOString(),
           read: false
@@ -165,12 +227,21 @@ const Notifications = () => {
 
     const handleAppNotification = (notification) => {
       if (!notification?.message) return;
+      const category = getActivityCategory(notification);
+      if (!isNotificationEnabled(notificationPreferencesRef.current, category)) return;
 
       setUserActivities(prev => {
-        if (notification.id && prev.some(item => item.id === notification.id)) return prev;
+        const message = notification.message;
+        const duplicate = prev.some((item) => {
+          if (notification.id && item.id === notification.id) return true;
+          if (category !== 'monitoring' || item.category !== 'monitoring') return false;
+          const age = Date.now() - new Date(item.timestamp || 0).getTime();
+          return age < 10000 && getNotificationMessage(item) === message;
+        });
+        if (duplicate) return prev;
         return [{
           id: notification.id || `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,
-          type: notification.type || 'system', message: notification.message,
+          type: notification.type || 'system', category, message: notification.message,
           severity: notification.severity || 'info', timestamp: notification.timestamp || new Date().toISOString(),
           read: Boolean(notification.read)
         }, ...prev].slice(0, 50);
@@ -238,7 +309,7 @@ const Notifications = () => {
       case 'review_requested':
         return `${activity.details?.requesterName || 'Someone'} requested your review on ${activity.details?.title || 'a review'}`;
       case 'monitor_status':
-        return `${activity.details?.monitorName || 'Monitor'} is now ${activity.details?.status || 'updated'}`;
+        return activity.message || `${activity.details?.monitorName || 'Monitor'} is now ${activity.details?.status || 'updated'}`;
       case 'system':
         return activity.message || activity.details?.message || 'System notification';
       case 'log': {
@@ -306,7 +377,7 @@ const Notifications = () => {
               {unreadCount > 0 && <span className="notifications-unread-count">{unreadCount} new</span>}
             </div>
             <div className="notifications-header-actions">
-              {userActivities.length > 0 && (
+              {visibleActivities.length > 0 && (
                 <button
                   type="button"
                   className="mark-all-read-btn"
@@ -324,8 +395,8 @@ const Notifications = () => {
           </div>
 
           <div className="notifications-list">
-            {userActivities?.length > 0 ? (
-              userActivities.map(activity => (
+            {visibleActivities?.length > 0 ? (
+              visibleActivities.map(activity => (
                 <button
                   type="button"
                   key={activity.id}

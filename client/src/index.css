@@ -34,6 +34,7 @@ body {
   --background-color: #f8f9fa;
   --card-bg: #ffffff;
   --card-background: #ffffff;
+  --footer-bg: #f1f5f9;
   --hover-bg: #f5f5f5;
   --hover-background: #f3f4f6;
 
@@ -330,7 +331,7 @@ body.light-theme {
 }
 
 .navbar-links span:hover {
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: color-mix(in srgb, var(--primary-color) 10%, transparent);
 }
 
 .navbar-links .active {
@@ -471,7 +472,7 @@ code {
 }
 
 .badge-primary {
-  background-color: rgba(1, 76, 117, 0.15);
+  background-color: color-mix(in srgb, var(--primary-color) 15%, transparent);
   color: var(--primary-color);
 }
 
@@ -533,16 +534,13 @@ code {
 .tab:hover {
   color: var(--text-color);
   background-color: var(--hover-bg);
-  border-bottom-color: #013B5B;
-  /* Darker blue on hover */
+  border-bottom-color: var(--primary-hover);
 }
 
 .tab.active {
-  color: #ffffff;
-  /* White text for active tab */
+  color: var(--button-text);
   background-color: var(--primary-color);
-  /* Deep blue background */
-  border-bottom-color: var(--primary-color);
+  border-bottom-color: var(--primary-hover);
   font-weight: 600;
 }
 
@@ -557,12 +555,12 @@ code {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #014C75;
+  background: var(--primary-color);
   border-radius: 999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #014368;
+  background: var(--primary-hover);
 }
 
 /* Remove default margin and padding for headings and paragraphs */
@@ -623,7 +621,7 @@ input[type="radio"] {
 input[type="checkbox"]:hover,
 input[type="radio"]:hover {
   border-color: var(--primary-color);
-  background: rgba(1, 76, 117, 0.06);
+  background: color-mix(in srgb, var(--primary-color) 6%, transparent);
 }
 
 input[type="checkbox"]:checked,
@@ -662,7 +660,7 @@ input[type="radio"]:checked::after {
 input[type="checkbox"]:focus-visible,
 input[type="radio"]:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 3px rgba(1, 76, 117, 0.18);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary-color) 18%, transparent);
 }
 
 @keyframes globalCheckPop {
@@ -675,6 +673,234 @@ input[type="radio"]:focus-visible {
   input[type="radio"]:checked::after {
     animation: none;
   }
+}
+
+/* Omni interaction overrides for legacy component selectors that historically
+   used fixed Pigeon-blue hover and active colors. */
+body.omni-theme .navbar-links .active,
+body.omni-theme .tab.active,
+body.omni-theme .category-tab.active,
+body.omni-theme .tab-btn.active,
+body.omni-theme .time-btn.active,
+body.omni-theme .nav-item.active,
+body.omni-theme .policy-page .nav-btn.active {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+  color: var(--button-text);
+}
+
+body.omni-theme .tab:hover,
+body.omni-theme .category-tab:hover,
+body.omni-theme .time-btn:hover,
+body.omni-theme .policy-page .nav-btn:hover {
+  background-color: color-mix(in srgb, var(--primary-color) 14%, var(--card-bg));
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+}
+
+body.omni-theme .create-request-button,
+body.omni-theme .create-request-button:hover,
+body.omni-theme .search-button,
+body.omni-theme .add-api-button,
+body.omni-theme .add-to-collection-button,
+body.omni-theme .fork-button,
+body.omni-theme .btn-primary,
+body.omni-theme .policyBtnPrimary {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+  color: var(--button-text);
+}
+
+body.omni-theme .create-request-button:hover,
+body.omni-theme .search-button:hover,
+body.omni-theme .add-api-button:hover,
+body.omni-theme .add-to-collection-button:hover,
+body.omni-theme .fork-button:hover,
+body.omni-theme .btn-primary:hover,
+body.omni-theme .policyBtnPrimary:hover {
+  background-color: var(--primary-hover);
+  border-color: var(--primary-hover);
+  color: var(--button-text);
+}
+
+body.omni-theme .api-card:hover,
+body.omni-theme .collection-card:hover,
+body.omni-theme .stat-card:hover,
+body.omni-theme .summary-card:hover,
+body.omni-theme .chart-card:hover,
+body.omni-theme .metric-card:hover,
+body.omni-theme .prediction-card:hover {
+  border-color: var(--primary-color);
+  box-shadow: var(--shadow-md);
+}
+
+body.omni-theme .api-network-sidebar .nav-item.active::before {
+  background: var(--primary-color);
+}
+
+body.omni-theme .api-network-sidebar .nav-item.active .nav-icon,
+body.omni-theme .api-network-sidebar .nav-item.active .item-arrow {
+  color: var(--primary-color);
+}
+
+/* Omni theme: a black/orange workspace preset. It intentionally keeps the
+   dark-theme class as a compatibility layer for legacy component selectors. */
+body.omni-theme {
+  --background-color: #070707;
+  --card-bg: #12100e;
+  --card-background: #12100e;
+  --panel-bg: #12100e;
+  --surface: #12100e;
+  --surface-elevated: #1b1611;
+  --surface-sunken: #0d0b09;
+  --text-color: #fff7ed;
+  --text-secondary: #d6c5b8;
+  --text-muted: #a89484;
+  --border-color: #3a2719;
+  --hover-bg: #26170d;
+  --hover-background: #26170d;
+  --navbar-bg: #0d0b09;
+  --navbar-background: #0d0b09;
+  --footer-bg: #0d0b09;
+  --navbar-text: #fff7ed;
+  --navbar-border: rgba(255, 138, 31, 0.18);
+  --sidebar-bg: #0d0b09;
+  --sidebar-background: #0d0b09;
+  --sidebar-text: #fff7ed;
+  --primary-color: #ff8a1f;
+  --primary-hover: #ffb35c;
+  --primary-light: rgba(255, 138, 31, 0.16);
+  --button-background: #ff8a1f;
+  --button-text: #160b02;
+  --secondary-color: #9b806b;
+  --secondary-hover: #d1ab8c;
+  --icon-color: #fff7ed;
+  --active-color: #5d2e0b;
+  --accent: #ff8a1f;
+  --accent-hover: #ffb35c;
+  --ring: 0 0 0 2px #ff8a1f;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.5), 0 1px 3px rgba(255, 138, 31, 0.06);
+  --shadow-md: 0 4px 14px rgba(0, 0, 0, 0.6), 0 2px 6px rgba(255, 138, 31, 0.08);
+  --shadow-lg: 0 16px 38px rgba(0, 0, 0, 0.72), 0 6px 16px rgba(255, 138, 31, 0.1);
+  --glass-bg: rgba(18, 16, 14, 0.78);
+  --glass-border: rgba(255, 138, 31, 0.2);
+  --gradient-hero: linear-gradient(135deg, #3d1a06 0%, #120d08 58%, #070707 100%);
+  --success-color: #44d483;
+  --success-bg: rgba(68, 212, 131, 0.14);
+  --success-text: #6ee7a5;
+  --warning-color: #ffb020;
+  --warning-light: rgba(255, 176, 32, 0.16);
+  --danger-color: #ff6b5e;
+  --danger-bg: rgba(255, 107, 94, 0.14);
+  --danger-bg-hover: rgba(255, 107, 94, 0.22);
+  --danger-text: #ff9086;
+  --info-color: #ff8a1f;
+  --info-light: rgba(255, 138, 31, 0.15);
+  --protocol-ws: #ffb35c;
+  --protocol-grpc: #ff8a1f;
+  --protocol-graphql: #f59e0b;
+  --protocol-soap: #fdba74;
+  --protocol-mqtt: #fbbf24;
+  --protocol-sse: #fb923c;
+  --protocol-http: #ff8a1f;
+  --designer-bg: #070707;
+  --designer-card: #12100e;
+  --designer-border: #3a2719;
+  --designer-border-light: #26170d;
+  --designer-text-primary: #fff7ed;
+  --designer-text-secondary: #d6c5b8;
+  --designer-text-muted: #a89484;
+  --designer-canvas-bg: #0d0b09;
+  --designer-component-bg: #1b1611;
+  --designer-card-rgb: 18, 16, 14;
+}
+
+/* Black theme: strict black-and-white surfaces and controls. */
+body.black-theme {
+  --background-color: #000000;
+  --card-bg: #000000;
+  --card-background: #000000;
+  --panel-bg: #000000;
+  --surface: #000000;
+  --surface-elevated: #000000;
+  --surface-sunken: #000000;
+  --text-color: #ffffff;
+  --text-secondary: #ffffff;
+  --text-muted: rgba(255, 255, 255, 0.7);
+  --border-color: rgba(255, 255, 255, 0.28);
+  --hover-bg: rgba(255, 255, 255, 0.12);
+  --hover-background: rgba(255, 255, 255, 0.12);
+  --navbar-bg: #000000;
+  --navbar-background: #000000;
+  --footer-bg: #000000;
+  --navbar-text: #ffffff;
+  --navbar-border: rgba(255, 255, 255, 0.28);
+  --sidebar-bg: #000000;
+  --sidebar-background: #000000;
+  --sidebar-text: #ffffff;
+  --primary-color: #ffffff;
+  --primary-hover: rgba(255, 255, 255, 0.82);
+  --primary-light: rgba(255, 255, 255, 0.16);
+  --button-background: #ffffff;
+  --button-text: #000000;
+  --secondary-color: #ffffff;
+  --secondary-hover: rgba(255, 255, 255, 0.82);
+  --icon-color: #ffffff;
+  --active-color: rgba(255, 255, 255, 0.2);
+  --accent: #ffffff;
+  --accent-hover: rgba(255, 255, 255, 0.82);
+  --ring: 0 0 0 2px #ffffff;
+  --glass-bg: rgba(0, 0, 0, 0.86);
+  --glass-border: rgba(255, 255, 255, 0.28);
+  --gradient-hero: linear-gradient(135deg, #000000 0%, #000000 100%);
+  --designer-bg: #000000;
+  --designer-card: #000000;
+  --designer-border: rgba(255, 255, 255, 0.28);
+  --designer-border-light: rgba(255, 255, 255, 0.16);
+  --designer-text-primary: #ffffff;
+  --designer-text-secondary: #ffffff;
+  --designer-text-muted: rgba(255, 255, 255, 0.7);
+  --designer-canvas-bg: #000000;
+  --designer-component-bg: #000000;
+  --designer-card-rgb: 0, 0, 0;
+  --info-color: #ffffff;
+  --info-light: rgba(255, 255, 255, 0.16);
+}
+
+/* Legacy controls that still use fixed dark-theme colors. */
+body.black-theme .navbar-links .active,
+body.black-theme .tab.active,
+body.black-theme .category-tab.active,
+body.black-theme .tab-btn.active,
+body.black-theme .time-btn.active,
+body.black-theme .nav-item.active,
+body.black-theme .policy-page .nav-btn.active,
+body.black-theme .create-request-button,
+body.black-theme .search-button,
+body.black-theme .add-api-button,
+body.black-theme .add-to-collection-button,
+body.black-theme .fork-button,
+body.black-theme .btn-primary,
+body.black-theme .policyBtnPrimary {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+  color: var(--button-text);
+}
+
+body.black-theme .tab:hover,
+body.black-theme .category-tab:hover,
+body.black-theme .time-btn:hover,
+body.black-theme .policy-page .nav-btn:hover,
+body.black-theme .create-request-button:hover,
+body.black-theme .search-button:hover,
+body.black-theme .add-api-button:hover,
+body.black-theme .add-to-collection-button:hover,
+body.black-theme .fork-button:hover,
+body.black-theme .btn-primary:hover,
+body.black-theme .policyBtnPrimary:hover {
+  background-color: var(--primary-hover);
+  border-color: var(--primary-hover);
+  color: var(--button-text);
 }
 
 /* ============================================================
@@ -722,7 +948,7 @@ input[type="time"]:hover,
 input[type="search"]:hover,
 textarea:hover,
 select:hover {
-  border-color: rgba(1, 76, 117, 0.35);
+  border-color: color-mix(in srgb, var(--primary-color) 35%, transparent);
 }
 
 input[type="text"]:focus,
@@ -739,7 +965,7 @@ textarea:focus,
 select:focus {
   outline: none;
   border-color: var(--primary-color, #014C75);
-  box-shadow: 0 0 0 3px rgba(1, 76, 117, 0.12);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary-color) 12%, transparent);
   background: var(--card-bg, #fff);
 }
 

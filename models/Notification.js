@@ -4,6 +4,7 @@ const notificationSchema = new mongoose.Schema({
     recipientId: { type: String, required: true, index: true },
     workspaceId: { type: String, default: null, index: true },
     type: { type: String, default: 'system' },
+    category: { type: String, default: 'systemFailures' },
     severity: { type: String, enum: ['info', 'warning', 'error'], default: 'info' },
     message: { type: String, required: true },
     actorId: { type: String, default: null },

@@ -639,6 +639,7 @@ class MonitoringService {
             if (monitor.currentStatus !== nextStatus) {
                 emitWorkspaceNotification(monitor.workspaceId, {
                     type: 'monitor_status',
+                    category: 'monitoring',
                     severity: nextStatus === 'down' ? 'error' : nextStatus === 'degraded' ? 'warning' : 'info',
                     message: `${monitor.name} is now ${nextStatus}`
                 });

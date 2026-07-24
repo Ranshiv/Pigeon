@@ -4,7 +4,7 @@ const router = express.Router();
 const { emitUserNotification } = require('../utils/socket/socket-server');
 
 router.use((req, res, next) => {
-    if (req.method === 'GET' || req.path.startsWith('/notifications')) return next();
+    if (req.path.startsWith('/notifications')) return next();
     let responseMessage = '';
     const originalJson = res.json.bind(res);
     res.json = (body) => {
@@ -14,7 +14,10 @@ router.use((req, res, next) => {
     res.on('finish', () => {
         const recipientId = req.user?.id || req.user?._id;
         if (recipientId && res.statusCode >= 400 && res.statusCode !== 401) {
-            emitUserNotification(recipientId, { message: responseMessage || `Request failed (${res.statusCode})` });
+            emitUserNotification(recipientId, {
+                category: 'systemFailures',
+                message: responseMessage || `Request failed (${res.statusCode})`
+            });
         }
     });
     next();

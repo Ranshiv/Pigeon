@@ -323,8 +323,8 @@ section h2 {
 
 .create-request-button {
     padding: 10px 20px;
-    background-color: #014C75;
-    color: white;
+    background-color: var(--primary-color);
+    color: var(--button-text);
     border: none;
     border-radius: 5px;
     cursor: pointer;
@@ -332,7 +332,7 @@ section h2 {
 }
 
 .create-request-button:hover {
-    background-color: #013B5B;
+    background-color: var(--primary-hover);
 }
 
 .example-requests,
@@ -638,8 +638,8 @@ section h2 {
 .method {
     padding: 2px 8px;
     border-radius: 4px;
-    background-color: #e3f2fd;
-    color: #014C75;
+    background-color: color-mix(in srgb, var(--primary-color) 12%, transparent);
+    color: var(--primary-color);
     font-weight: 500;
 }
 
@@ -896,8 +896,8 @@ section h2 {
 }
 
 .usage-count {
-    background: #e3f2fd;
-    color: #014C75;
+    background: color-mix(in srgb, var(--primary-color) 12%, transparent);
+    color: var(--primary-color);
     padding: 4px 8px;
     border-radius: 12px;
     font-size: 12px;

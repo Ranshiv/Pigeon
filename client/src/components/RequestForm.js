@@ -32,6 +32,7 @@ import {
     AlertCircle
 } from 'lucide-react';
 import ResponseDisplay from './ResponseDisplay';
+import AppSelect from './common/AppSelect/AppSelect';
 import UnifiedVariableViewer from './UnifiedVariableViewer';
 import { interpolateRequest, resolveVariables, validateVariables, extractVariables } from '../utils/variableInterpolation';
 import { PostRequestScriptService } from './VisualApiDesigner/services/PostRequestScriptService';
@@ -280,7 +281,9 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
             return 'has-variables';
         }
     };// Handlers for form inputs
-    const handleMethodChange = (e) => setMethod(e.target.value);
+    const handleMethodChange = (nextMethod) => setMethod(
+        typeof nextMethod === 'string' ? nextMethod : nextMethod.target.value
+    );
     const handleUrlChange = (e) => setUrl(e.target.value);
 
     // Variable loading and resolution effects
@@ -2928,16 +2931,17 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
 
                 {/* URL bar */}
                 <div className="request-url-bar">
-                    <select
-                        className="method-select"
-                        data-method={method}
+                    <AppSelect
+                        className={`request-method-select method-${method.toLowerCase()}`}
                         value={method}
                         onChange={handleMethodChange}
-                    >
-                        {HTTP_METHODS.map(m => (
-                            <option key={m} value={m}>{m}</option>
-                        ))}
-                    </select>                    <input
+                        options={HTTP_METHODS.map((httpMethod) => ({
+                            value: httpMethod,
+                            label: httpMethod
+                        }))}
+                        id="request-method"
+                    />
+                    <input
                         type="text"
                         className={`url-input ${getVariableInputClass(url)}`}
                         value={url}

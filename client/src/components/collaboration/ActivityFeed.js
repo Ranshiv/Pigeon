@@ -237,7 +237,7 @@ const ActivityFeed = ({ isOpen, onToggle }) => {
                             role="tab"
                             aria-selected={scope === 'me'}
                             onClick={() => handleScopeChange('me')}
-                            className={`flex min-h-9 items-center justify-center gap-1.5 rounded-md px-2 py-1.5 text-[11px] font-semibold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[var(--primary-color)] focus:ring-offset-1 focus:ring-offset-[var(--sidebar-bg)] ${scope === 'me' ? 'bg-[var(--primary-color)] text-white shadow-sm' : 'text-[var(--text-secondary)] hover:bg-[var(--card-bg)] hover:text-[var(--text-color)]'}`}
+                            className={`flex min-h-9 items-center justify-center gap-1.5 rounded-md px-2 py-1.5 text-[11px] font-semibold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[var(--primary-color)] focus:ring-offset-1 focus:ring-offset-[var(--sidebar-bg)] ${scope === 'me' ? 'bg-[var(--primary-color)] text-white shadow-sm' : 'bg-[var(--sidebar-bg)] text-[var(--text-secondary)] hover:bg-[var(--card-bg)] hover:text-[var(--text-color)]'}`}
                         >
                             <FiUser size={13} />
                             My Activity
@@ -247,7 +247,7 @@ const ActivityFeed = ({ isOpen, onToggle }) => {
                             role="tab"
                             aria-selected={scope === 'team'}
                             onClick={() => handleScopeChange('team')}
-                            className={`flex min-h-9 items-center justify-center gap-1.5 rounded-md px-2 py-1.5 text-[11px] font-semibold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[var(--primary-color)] focus:ring-offset-1 focus:ring-offset-[var(--sidebar-bg)] ${scope === 'team' ? 'bg-[var(--primary-color)] text-white shadow-sm' : 'text-[var(--text-secondary)] hover:bg-[var(--card-bg)] hover:text-[var(--text-color)]'}`}
+                            className={`flex min-h-9 items-center justify-center gap-1.5 rounded-md px-2 py-1.5 text-[11px] font-semibold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[var(--primary-color)] focus:ring-offset-1 focus:ring-offset-[var(--sidebar-bg)] ${scope === 'team' ? 'bg-[var(--primary-color)] text-white shadow-sm' : 'bg-[var(--sidebar-bg)] text-[var(--text-secondary)] hover:bg-[var(--card-bg)] hover:text-[var(--text-color)]'}`}
                         >
                             <FiUsers size={13} />
                             Team

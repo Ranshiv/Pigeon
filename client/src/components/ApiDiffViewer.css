@@ -93,8 +93,8 @@
 }
 
 .api-diff-viewer .version-badge.base {
-    background: #e3f2fd;
-    color: #1976d2;
+    background: var(--primary-light);
+    color: var(--primary-color);
     border: 1px solid #bbdefb;
 }
 
@@ -165,7 +165,7 @@
 }
 
 .api-diff-viewer .close-btn:focus {
-    outline: 2px solid #014C75;
+    outline: 2px solid var(--primary-color);
     outline-offset: 2px;
 }
 
@@ -290,7 +290,7 @@
     width: 40px;
     height: 40px;
     border: 3px solid #f3f3f3;
-    border-top: 3px solid #007bff;
+    border-top: 3px solid var(--primary-color);
     border-radius: 50%;
     animation: spin 1s linear infinite;
     margin-bottom: 15px;
@@ -299,21 +299,8 @@
 .api-diff-viewer .retry-btn {
     margin-top: 15px;
     padding: 10px 20px;
-    background: #007bff;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    border-top: 3px solid #014C75;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-    margin-bottom: 15px;
-}
-
-.api-diff-viewer .retry-btn {
-    margin-top: 15px;
-    padding: 10px 20px;
-    background: #014C75;
-    color: white;
+    background: var(--primary-color);
+    color: var(--button-text);
     border: none;
     border-radius: 6px;
     cursor: pointer;
@@ -321,8 +308,7 @@
 }
 
 .api-diff-viewer .retry-btn:hover {
-    background: #013B5B;
-    px;
+    background: var(--primary-hover);
 }
 
 .api-diff-viewer .diff-section:last-child {
@@ -376,7 +362,7 @@
 
 .api-diff-viewer .badge.total {
     background: #eff6ff;
-    color: #2563eb;
+    color: var(--primary-color);
     border: 1px solid #bfdbfe;
 }
 
@@ -444,11 +430,11 @@
 }
 
 .api-diff-viewer .summary-card.added {
-    --card-accent-color: #014C75;
+    --card-accent-color: var(--primary-color);
 }
 
 .api-diff-viewer .summary-card.added .summary-number {
-    color: #014C75;
+    color: var(--primary-color);
 }
 
 .api-diff-viewer .summary-card.removed {
@@ -481,13 +467,14 @@
 }
 
 .api-diff-viewer .summary-number {
-    font-siz --card-accent-color: #014C75;
+    color: var(--card-accent-color, var(--primary-color));
 }
 
 .api-diff-viewer .summary-card.modified .summary-number {
-    color: #014C75;
+    color: var(--primary-color);
+}
 
-    .api-diff-viewer .summary-label {
+.api-diff-viewer .summary-label {
         color: #64748b;
         font-size: 0.875rem;
         font-weight: 500;
@@ -542,8 +529,8 @@
     }
 
     .api-diff-viewer .change-item.info {
-        --change-accent-color: #014C75;
-        background: #E5F3FF;
+        --change-accent-color: var(--primary-color);
+        background: color-mix(in srgb, var(--primary-color) 10%, transparent);
         border-color: #b8e0ff;
     }
 
@@ -603,7 +590,7 @@
 
     .api-diff-viewer .severity-badge.info {
         background: #eff6ff;
-        color: #2563eb;
+        color: var(--primary-color);
         border: 1px solid #bfdbfe;
     }
 

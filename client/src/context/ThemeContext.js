@@ -1,41 +1,43 @@
-// src/context/ThemeContext.js
 import React, { createContext, useState, useEffect, useContext } from 'react';
 
 const ThemeContext = createContext();
+export const themeOptions = ['light', 'dark', 'omni', 'black'];
+
+const normalizeTheme = (value) => themeOptions.includes(value) ? value : 'dark';
 
 export const ThemeProvider = ({ children }) => {
-    // Initialize theme from localStorage or default to 'dark'
-    const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'dark');
+    const [theme, setThemeState] = useState(() => normalizeTheme(localStorage.getItem('theme')));
 
     useEffect(() => {
-        // Apply theme class to the body element
-        document.body.className = theme + '-theme';
+        // Omni uses the dark selector family for legacy component styles while
+        // its own token palette is defined in index.css.
+        document.body.className = theme === 'light'
+            ? 'light-theme'
+            : theme === 'dark'
+                ? 'dark-theme'
+                : `${theme}-theme dark-theme`;
 
-        // Also set data-theme attribute for components that use it
-        if (theme === 'dark') {
+        if (theme !== 'light') {
             document.body.setAttribute('data-theme', 'dark');
         } else {
             document.body.removeAttribute('data-theme');
         }
 
-        // Save theme preference to localStorage
         localStorage.setItem('theme', theme);
     }, [theme]);
 
+    const setTheme = (nextTheme) => setThemeState(normalizeTheme(nextTheme));
+
+    // Preserve the existing two-state toggle for components that still use it.
     const toggleTheme = () => {
-        setTheme((prevTheme) => (prevTheme === 'light' ? 'dark' : 'light'));
-        // In a real app, you'd also call the backend to save the theme preference
-        // for the logged-in user here.
-        // Example: You would call an update function passed from App.js or fetched context
-        // updateUserThemePreference(theme === 'light' ? 'dark' : 'light');
+        setThemeState((prevTheme) => (prevTheme === 'light' ? 'dark' : 'light'));
     };
 
     return (
-        <ThemeContext.Provider value={{ theme, toggleTheme }}>
+        <ThemeContext.Provider value={{ theme, setTheme, toggleTheme }}>
             {children}
         </ThemeContext.Provider>
     );
 };
 
-// Custom hook to use the theme context
 export const useTheme = () => useContext(ThemeContext);

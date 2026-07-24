@@ -1,0 +1,513 @@
+/* Theme bridge for legacy component styles in the Black preset. */
+body.black-theme {
+  color: var(--text-color);
+}
+
+body.black-theme .not-found-container {
+  color: var(--text-color) !important;
+}
+
+body.black-theme .not-found-container a,
+body.black-theme a {
+  color: var(--primary-color) !important;
+}
+
+body.black-theme h1,
+body.black-theme h2,
+body.black-theme h3,
+body.black-theme h4,
+body.black-theme h5,
+body.black-theme h6,
+body.black-theme label {
+  color: var(--text-color) !important;
+}
+
+body.black-theme .text-gray-900,
+body.black-theme .text-gray-600,
+body.black-theme .text-gray-500,
+body.black-theme .text-slate-500 {
+  color: var(--text-secondary) !important;
+}
+
+body.black-theme .text-blue-500 {
+  color: var(--primary-color) !important;
+}
+
+body.black-theme .bg-white,
+body.black-theme .bg-gray-50,
+body.black-theme .bg-gray-100,
+body.black-theme .bg-slate-50 {
+  background-color: var(--card-bg) !important;
+}
+
+body.black-theme svg {
+  color: currentColor;
+}
+
+body.black-theme button {
+  color: var(--text-color);
+  border-color: var(--border-color);
+}
+
+/* Legacy primary actions often hard-code white text. Black uses a white
+   action surface, so those labels must use the theme's black foreground. */
+body.black-theme button[class*="primary"],
+body.black-theme button[class*="Primary"],
+body.black-theme button[class*="create"],
+body.black-theme button[class*="Create"],
+body.black-theme button[class*="explore"],
+body.black-theme button[class*="Explore"],
+body.black-theme button[class*="save"],
+body.black-theme button[class*="Save"],
+body.black-theme button[class*="submit"],
+body.black-theme button[class*="Submit"],
+body.black-theme button[class*="send"],
+body.black-theme button[class*="Send"],
+body.black-theme button[class*="search"],
+body.black-theme button[class*="Search"],
+body.black-theme button[class*="add-"],
+body.black-theme button[class*="Add"],
+body.black-theme .new-collection-btn,
+body.black-theme .create-collection-btn,
+body.black-theme .create-btn,
+body.black-theme .share-btn,
+body.black-theme .form-actions button[type="submit"],
+body.black-theme .rd-tab--active,
+body.black-theme .rd-btn--primary,
+body.black-theme a[class*="primary"],
+body.black-theme a[class*="Primary"],
+body.black-theme a[class*="create"],
+body.black-theme a[class*="Create"],
+body.black-theme a[class*="save"],
+body.black-theme a[class*="Save"] {
+  color: var(--button-text) !important;
+}
+
+body.black-theme button.active,
+body.black-theme button[class*="--active"],
+body.black-theme button[class*="-active"],
+body.black-theme [role="tab"][aria-selected="true"] {
+  color: var(--button-text) !important;
+}
+
+body.black-theme .ws-tab.active {
+  background: var(--button-background) !important;
+  border-color: var(--button-background) !important;
+  color: var(--button-text) !important;
+}
+
+body.black-theme .ws-tab:not(.active) {
+  background: var(--sidebar-bg) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-secondary) !important;
+}
+
+body.black-theme button svg,
+body.black-theme [class*="icon"] svg,
+body.black-theme [class*="Icon"] svg {
+  color: currentColor !important;
+  stroke: currentColor;
+}
+
+body.black-theme input,
+body.black-theme select,
+body.black-theme textarea {
+  background-color: var(--card-bg) !important;
+  color: var(--text-color) !important;
+  border-color: var(--border-color) !important;
+}
+
+body.black-theme select {
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23ffffff' d='M2 4l4 4 4-4'/%3E%3C/svg%3E");
+}
+
+/* Give every native/custom selector an elevated Black surface. A pure-black
+   control on a pure-black page loses its affordance even when the text is
+   technically readable. Method selectors retain their semantic colors. */
+body.black-theme select:not(.ub__method-select),
+body.black-theme .app-select-trigger {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  color: var(--text-color) !important;
+  border-color: rgba(255, 255, 255, 0.5) !important;
+}
+
+body.black-theme select:not(.ub__method-select):hover,
+body.black-theme .app-select-trigger:hover,
+body.black-theme select:not(.ub__method-select):focus,
+body.black-theme .app-select-trigger:focus-visible {
+  background-color: rgba(255, 255, 255, 0.16) !important;
+  border-color: var(--primary-color) !important;
+}
+
+body.black-theme option {
+  background-color: #141414 !important;
+  color: #ffffff !important;
+}
+
+body.black-theme .app-select-list {
+  background-color: #141414 !important;
+  border-color: rgba(255, 255, 255, 0.5) !important;
+}
+
+body.black-theme .app-select-option {
+  background-color: #141414 !important;
+  color: var(--text-color) !important;
+}
+
+body.black-theme .app-select-option:hover,
+body.black-theme .app-select-option--active,
+body.black-theme .app-select-option--active:hover {
+  background-color: var(--button-background) !important;
+  color: var(--button-text) !important;
+}
+
+body.black-theme .app-select-chevron {
+  color: var(--text-color) !important;
+}
+
+body.black-theme .navbar,
+body.black-theme .sidebar,
+body.black-theme .workspace-sidebar,
+body.black-theme .api-network-sidebar,
+body.black-theme .settings-page,
+body.black-theme .settings-card,
+body.black-theme .card,
+body.black-theme .panel,
+body.black-theme .modal-content,
+body.black-theme .dropdown-menu,
+body.black-theme .popover {
+  background-color: var(--card-bg) !important;
+  color: var(--text-color) !important;
+  border-color: var(--border-color) !important;
+}
+
+body.black-theme .navbar,
+body.black-theme .workspace-sidebar,
+body.black-theme .api-network-sidebar {
+  background-color: var(--navbar-bg) !important;
+  color: var(--navbar-text) !important;
+}
+
+body.black-theme .settings-theme-option,
+body.black-theme .settings-preference-row,
+body.black-theme .settings-notification-row,
+body.black-theme .settings-master-row {
+  background-color: var(--card-bg) !important;
+  color: var(--text-color) !important;
+  border-color: var(--border-color) !important;
+}
+
+body.black-theme .settings-theme-option.selected {
+  background-color: color-mix(in srgb, var(--primary-color) 14%, var(--card-bg)) !important;
+  border-color: var(--primary-color) !important;
+}
+
+body.black-theme .btn-primary,
+body.black-theme .primary-button,
+body.black-theme .settings-primary-button,
+body.black-theme .create-request-button,
+body.black-theme .send-request-button,
+body.black-theme .explore-community-btn,
+body.black-theme .search-button,
+body.black-theme .add-api-button,
+body.black-theme .add-to-collection-button,
+body.black-theme .fork-button,
+body.black-theme .policyBtnPrimary {
+  background-color: var(--button-background) !important;
+  border-color: var(--primary-color) !important;
+  color: var(--button-text) !important;
+}
+
+body.black-theme .btn-primary:hover,
+body.black-theme .primary-button:hover,
+body.black-theme .settings-primary-button:hover,
+body.black-theme .create-request-button:hover,
+body.black-theme .send-request-button:hover,
+body.black-theme .explore-community-btn:hover,
+body.black-theme .search-button:hover,
+body.black-theme .add-api-button:hover,
+body.black-theme .add-to-collection-button:hover,
+body.black-theme .fork-button:hover,
+body.black-theme .policyBtnPrimary:hover {
+  background-color: var(--primary-hover) !important;
+  border-color: var(--primary-hover) !important;
+  color: var(--button-text) !important;
+}
+
+body.black-theme .icon-button,
+body.black-theme .ghost-button,
+body.black-theme .secondary-button,
+body.black-theme .close-button,
+body.black-theme .btn-secondary {
+  background-color: transparent !important;
+  color: var(--text-color) !important;
+  border-color: var(--border-color) !important;
+}
+
+body.black-theme .settings-switch {
+  color: var(--button-text) !important;
+  background-color: rgba(255, 255, 255, 0.16) !important;
+  border-color: var(--border-color) !important;
+}
+
+body.black-theme .settings-switch span {
+  background-color: #ffffff !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.45) !important;
+}
+
+body.black-theme .settings-switch.on {
+  background-color: var(--primary-color) !important;
+  border-color: var(--primary-color) !important;
+}
+
+body.black-theme .settings-switch.on span {
+  background-color: var(--button-text) !important;
+}
+
+/* Monitoring form toggles: the checked track is white in Black, so its
+   knob/checkmark must switch to the black button foreground. */
+body.black-theme .mfm-toggle-slider,
+body.black-theme .toggle-switch,
+body.black-theme .policyToggleFill {
+  background-color: rgba(255, 255, 255, 0.16) !important;
+}
+
+body.black-theme .mfm-toggle-slider::before,
+body.black-theme .toggle-knob,
+body.black-theme .policyToggleFill::after {
+  background-color: #ffffff !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.45) !important;
+}
+
+body.black-theme .mfm-toggle-switch input:checked + .mfm-toggle-slider,
+body.black-theme .toggle-row.on .toggle-switch,
+body.black-theme .policyToggleInput:checked + .policyToggleFill {
+  background-color: var(--button-background) !important;
+}
+
+body.black-theme .mfm-toggle-switch input:checked + .mfm-toggle-slider::before,
+body.black-theme .toggle-row.on .toggle-knob,
+body.black-theme .policyToggleInput:checked + .policyToggleFill::after {
+  background-color: var(--button-text) !important;
+}
+
+body.black-theme .toggle-row.on {
+  background-color: rgba(255, 255, 255, 0.12) !important;
+  border-color: rgba(255, 255, 255, 0.55) !important;
+}
+
+body.black-theme .mfm-location-chip.selected {
+  background-color: var(--button-background) !important;
+  border-color: var(--button-background) !important;
+  color: var(--button-text) !important;
+}
+
+body.black-theme .mfm-checkbox-label input[type="checkbox"]:checked + .mfm-checkmark {
+  background-color: var(--button-background) !important;
+  border-color: var(--button-background) !important;
+}
+
+body.black-theme .mfm-checkbox-label input[type="checkbox"]:checked + .mfm-checkmark::after {
+  border-color: var(--button-text) !important;
+}
+
+body.black-theme .request-workspace .custom-checkbox input:checked + label::after {
+  border-color: var(--button-text) !important;
+}
+
+body.black-theme .export-copy-btn {
+  background-color: var(--button-background) !important;
+  border-color: var(--button-background) !important;
+  color: var(--button-text) !important;
+}
+
+body.black-theme .mfm-modal .mfm-btn-add:hover {
+  background-color: var(--button-background) !important;
+  color: var(--button-text) !important;
+}
+
+/* Monitoring page header actions use a solid white primary surface in Black. */
+body.black-theme .monitoring-dashboard .header-actions .btn-primary,
+body.black-theme .alerts-dashboard .header-actions .btn-primary,
+body.black-theme .escalation-policy-manager .manager-header .btn-primary,
+body.black-theme .policy-page .header-actions .policyBtnPrimary,
+body.black-theme .im-header .im-btn-primary,
+body.black-theme .mfm-header-actions .mfm-btn-primary {
+  background-color: var(--button-background) !important;
+  border-color: var(--button-background) !important;
+  color: var(--button-text) !important;
+}
+
+body.black-theme .monitoring-dashboard .header-actions .btn-primary:hover,
+body.black-theme .alerts-dashboard .header-actions .btn-primary:hover,
+body.black-theme .escalation-policy-manager .manager-header .btn-primary:hover,
+body.black-theme .policy-page .header-actions .policyBtnPrimary:hover,
+body.black-theme .im-header .im-btn-primary:hover,
+body.black-theme .mfm-header-actions .mfm-btn-primary:hover {
+  background-color: var(--primary-hover) !important;
+  border-color: var(--primary-hover) !important;
+  color: var(--button-text) !important;
+}
+
+/* Request-form authentication cards are shared by auth and export views. */
+body.black-theme .auth-type-card {
+  background-color: rgba(255, 255, 255, 0.04) !important;
+  color: var(--text-color) !important;
+}
+
+body.black-theme .auth-type-card-icon {
+  background-color: rgba(255, 255, 255, 0.12) !important;
+  color: var(--text-color) !important;
+}
+
+body.black-theme .auth-type-card.active {
+  background-color: var(--button-background) !important;
+  border-color: var(--button-background) !important;
+  color: var(--button-text) !important;
+  box-shadow: 0 0 0 1px var(--button-background), 0 8px 24px -16px rgba(255, 255, 255, 0.6) !important;
+}
+
+body.black-theme .auth-type-card.active .auth-type-card-icon {
+  background-color: rgba(0, 0, 0, 0.14) !important;
+  color: var(--button-text) !important;
+}
+
+body.black-theme .auth-type-card.active .auth-type-card-desc {
+  color: rgba(0, 0, 0, 0.72) !important;
+}
+
+/* Integration type chips use the same white-primary/black-foreground rule. */
+body.black-theme .im-type-chip {
+  background-color: rgba(255, 255, 255, 0.04) !important;
+  color: var(--text-color) !important;
+}
+
+body.black-theme .im-type-chip-icon {
+  background-color: rgba(255, 255, 255, 0.12) !important;
+  color: var(--text-color) !important;
+}
+
+body.black-theme .im-type-chip.selected {
+  background-color: rgba(255, 255, 255, 0.12) !important;
+  border-color: var(--button-background) !important;
+  box-shadow: 0 0 0 1px var(--button-background) !important;
+}
+
+body.black-theme .im-type-chip.selected .im-type-chip-icon {
+  background-color: var(--button-background) !important;
+  color: var(--button-text) !important;
+}
+
+body.black-theme input[type="checkbox"],
+body.black-theme input[type="radio"] {
+  accent-color: var(--primary-color);
+}
+
+/* Protocol and GraphQL segmented controls use the same white-primary rule. */
+body.black-theme .pt-tab {
+  background-color: transparent !important;
+  color: var(--text-color) !important;
+}
+
+body.black-theme .pt-tab.active {
+  background-color: var(--button-background) !important;
+  color: var(--button-text) !important;
+}
+
+body.black-theme .lint-toggle-button {
+  background-color: transparent !important;
+  color: var(--text-color) !important;
+}
+
+body.black-theme .lint-toggle-button.active {
+  background-color: var(--button-background) !important;
+  border-color: var(--button-background) !important;
+  color: var(--button-text) !important;
+}
+
+body.black-theme .execute-button {
+  background-color: var(--button-background) !important;
+  border-color: var(--button-background) !important;
+  color: var(--button-text) !important;
+}
+
+body.black-theme .execute-button:hover:not(:disabled) {
+  background-color: var(--primary-hover) !important;
+  color: var(--button-text) !important;
+}
+
+/* Request-history active rows and method badges. */
+body.black-theme .api-network-sidebar .nav-item.active {
+  background-color: var(--button-background) !important;
+  color: var(--button-text) !important;
+}
+
+body.black-theme .api-network-sidebar .nav-item.active .request-name,
+body.black-theme .api-network-sidebar .nav-item.active .item-arrow,
+body.black-theme .api-network-sidebar .nav-item.active .nav-icon {
+  color: var(--button-text) !important;
+}
+
+body.black-theme .api-network-sidebar .nav-item.active .method-indicator {
+  background-color: var(--button-text) !important;
+  color: var(--button-background) !important;
+}
+
+/* Request-form add-row actions are secondary controls, not white-on-white
+   primary actions. */
+body.black-theme .request-workspace .modern-add-btn {
+  background-color: rgba(255, 255, 255, 0.12) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-color) !important;
+}
+
+body.black-theme .request-workspace .modern-add-btn:hover {
+  background-color: var(--button-background) !important;
+  border-color: var(--button-background) !important;
+  color: var(--button-text) !important;
+}
+
+/* Marketplace endpoint actions. */
+body.black-theme .btn-try-modern {
+  background-color: var(--button-background) !important;
+  border-color: var(--button-background) !important;
+  color: var(--button-text) !important;
+}
+
+body.black-theme .btn-try-modern:hover {
+  background-color: var(--primary-hover) !important;
+  color: var(--button-text) !important;
+}
+
+/* AI tool cards previously rendered white buttons with white labels. */
+body.black-theme .use-tool-btn {
+  background-color: var(--button-background) !important;
+  border-color: var(--button-background) !important;
+  color: var(--button-text) !important;
+}
+
+body.black-theme .use-tool-btn:hover {
+  background-color: var(--primary-hover) !important;
+  color: var(--button-text) !important;
+}
+
+body.black-theme .muted,
+body.black-theme .text-muted,
+body.black-theme .secondary-text,
+body.black-theme .empty-state,
+body.black-theme .empty-state p {
+  color: var(--text-muted) !important;
+}
+
+body.black-theme .error-message,
+body.black-theme .alert-error {
+  color: var(--danger-text, #ff9086) !important;
+  background-color: var(--danger-bg) !important;
+  border-color: var(--danger-border, rgba(255, 107, 94, 0.45)) !important;
+}
+
+body.black-theme .success-message,
+body.black-theme .alert-success {
+  color: var(--success-text, #6ee7a5) !important;
+  background-color: var(--success-bg) !important;
+}

@@ -125,7 +125,7 @@
 .monitoring-dashboard .btn-primary:hover {
     background: var(--primary-hover);
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(1, 76, 117, 0.25);
+    box-shadow: 0 4px 12px color-mix(in srgb, var(--primary-color) 25%, transparent);
 }
 
 .monitoring-dashboard .btn-primary:active {
@@ -506,7 +506,7 @@
 
 /* Analytics button special styling */
 .action-btn:hover:has(svg):first-child {
-    background: rgba(1, 76, 117, 0.1);
+    background: color-mix(in srgb, var(--primary-color) 10%, transparent);
     border-color: var(--primary-color);
     color: var(--primary-color);
 }
@@ -733,7 +733,7 @@
 /* Monitor card system — compact operational hierarchy that remains legible
    across two, three, or four-column dashboard layouts. */
 .monitors-list {
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 18px;
 }
 
@@ -793,7 +793,7 @@
 .monitor-actions {
     display: flex;
     justify-content: flex-end;
-    gap: 6px;
+    gap: 10px;
     padding-top: 12px;
     border-top: 1px solid var(--border-color);
 }
@@ -859,6 +859,44 @@
 
 .monitor-tags { margin-top: -4px; gap: 6px; }
 .tag { padding: 3px 7px; border-radius: 999px; font-size: 0.68rem; }
+
+/* Compact operational toolbar: the actions read as one control group instead
+   of a row of unrelated icon boxes. */
+.monitor-actions {
+    width: fit-content;
+    align-self: flex-end;
+    gap: 8px;
+    flex-wrap: wrap;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+}
+
+.monitor-card .action-btn {
+    width: 31px;
+    height: 31px;
+    flex: 0 0 31px;
+    box-sizing: border-box;
+    border: 1px solid color-mix(in srgb, var(--border-color) 88%, transparent);
+    border-radius: 9px;
+    background: color-mix(in srgb, var(--background-color) 52%, var(--card-bg));
+    color: var(--text-secondary);
+    box-shadow: inset 0 1px 0 color-mix(in srgb, #fff 3%, transparent);
+}
+
+.monitor-card .action-btn:hover {
+    background: color-mix(in srgb, var(--primary-color) 13%, transparent);
+    border-color: color-mix(in srgb, var(--primary-color) 44%, var(--border-color));
+    color: var(--primary-color);
+    transform: none;
+}
+
+.monitor-card .action-btn.delete:hover {
+    background: color-mix(in srgb, #ef4444 13%, transparent);
+    color: #ef4444;
+}
 
 @media (max-width: 680px) {
     .monitors-list { grid-template-columns: 1fr; }

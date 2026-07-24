@@ -456,7 +456,7 @@
 }
 
 .api-version-manager .checkbox-group input[type="checkbox"]:checked {
-    background-color: #014C75 !important;
+    background-color: var(--primary-color) !important;
 }
 
 .api-version-manager .checkbox-group input[type="checkbox"]::after {

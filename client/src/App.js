@@ -13,6 +13,7 @@ import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import PageLoader from './components/common/PageLoader/PageLoader';
 import './App.css';
+import './theme-overrides.css';
 
 const APP_NAME = 'Pigeon';
 
@@ -30,6 +31,10 @@ const getPageTitle = (pathname) => {
   if (/^\/workspace\/collections\/[^/]+\/?$/.test(pathname)) return 'Collection Details';
   if (/^\/workspace\/monitoring\/[^/]+\/analytics\/?$/.test(pathname)) return 'Monitoring Analytics';
   if (/^\/workspace\/monitoring\/[^/]+\/history\/?$/.test(pathname)) return 'Monitoring History';
+  if (/^\/workspace\/settings\/(profile|appearance|notifications|account)\/?$/.test(pathname)) {
+    const section = pathname.split('/')[3] || 'profile';
+    return `${formatSegment(section)} Settings`;
+  }
   if (/^\/status\/[^/]+\/?$/.test(pathname)) return 'Public Status Page';
 
   const staticRouteTitles = {
@@ -101,7 +106,8 @@ function App() {
             id: data.user._id || data.user.id,
             displayName: data.user.displayName || data.user.name || "User",
             email: data.user.email,
-            profileIcon: data.user.profileIcon
+            profileIcon: data.user.profileIcon,
+            notificationPreferences: data.user.notificationPreferences
           }));
         }
       } catch (err) {

@@ -120,6 +120,7 @@ router.post('/:id/approve', ensureAuthenticated, async (req, res) => {
         await writeActivity(db, req.user, 'merge_merged', updated);
         emitWorkspaceNotification(mergeRequest.workspaceId, {
             actorId: actionBy.userId,
+            category: 'mergeRequests',
             message: `${actionBy.displayName} merged: ${mergeRequest.title}`
         });
         return res.json(serialize(updated));
@@ -147,6 +148,7 @@ router.post('/:id/reject', ensureAuthenticated, async (req, res) => {
         await writeActivity(db, req.user, 'merge_rejected', updated);
         emitWorkspaceNotification(mergeRequest.workspaceId, {
             actorId: actionBy.userId,
+            category: 'mergeRequests',
             severity: 'warning',
             message: `${actionBy.displayName} rejected merge request: ${mergeRequest.title}`
         });
@@ -202,6 +204,7 @@ router.post('/:id/rollback', ensureAuthenticated, async (req, res) => {
         await writeActivity(db, req.user, 'merge_rolled_back', updated);
         emitWorkspaceNotification(mergeRequest.workspaceId, {
             actorId: actionBy.userId,
+            category: 'mergeRequests',
             severity: 'warning',
             message: `${actionBy.displayName} rolled back merge: ${mergeRequest.title}`
         });

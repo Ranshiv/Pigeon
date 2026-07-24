@@ -6,7 +6,7 @@ const { emitToUser } = require('../utils/socket/socket-server');
 
 const userId = (req) => String(req.user?.id || req.user?._id || '');
 const serialize = (notification) => ({
-    id: String(notification._id), type: notification.type, severity: notification.severity,
+    id: String(notification._id), type: notification.type, category: notification.category, severity: notification.severity,
     message: notification.message, workspaceId: notification.workspaceId,
     actorId: notification.actorId, read: notification.read, timestamp: notification.createdAt
 });

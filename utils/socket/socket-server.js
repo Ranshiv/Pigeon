@@ -4,6 +4,7 @@ const ActivityLog = require('../../models/ActivityLog');
 const Workspace = require('../../models/Workspace');
 const Notification = require('../../models/Notification');
 const Collection = require('../../models/Collection');
+const User = require('../../models/User');
 
 // Store for global socket data
 const userSockets = new Map(); // Map socketId -> userData
@@ -96,13 +97,27 @@ function emitToUser(userId, eventName, payload) {
 
 function emitUserNotification(recipientId, notification) {
     if (!recipientId || !notification?.message) return;
-    void Notification.create({
-        recipientId: String(recipientId), workspaceId: notification.workspaceId ? String(notification.workspaceId) : null,
-        type: notification.type || 'api_failure', severity: notification.severity || 'error', message: notification.message
-    }).then((entry) => emitToUser(entry.recipientId, 'appNotification', {
-        id: String(entry._id), type: entry.type, severity: entry.severity, message: entry.message,
-        workspaceId: entry.workspaceId, read: false, timestamp: entry.createdAt
-    })).catch((error) => console.warn(`Failed to persist user notification: ${error.message}`));
+    const category = notification.category || 'systemFailures';
+    void User.findById(recipientId, 'notificationPreferences').lean().then((user) => {
+        if (!isNotificationEnabled(user, category)) return null;
+        return Notification.create({
+            recipientId: String(recipientId), workspaceId: notification.workspaceId ? String(notification.workspaceId) : null,
+            type: notification.type || 'api_failure', category,
+            severity: notification.severity || 'error', message: notification.message
+        });
+    }).then((entry) => {
+        if (!entry) return;
+        emitToUser(entry.recipientId, 'appNotification', {
+            id: String(entry._id), type: entry.type, category: entry.category,
+            severity: entry.severity, message: entry.message, workspaceId: entry.workspaceId,
+            read: false, timestamp: entry.createdAt
+        });
+    }).catch((error) => console.warn(`Failed to persist user notification: ${error.message}`));
+}
+
+function isNotificationEnabled(user, category) {
+    const preferences = user?.notificationPreferences || {};
+    return preferences.inAppEnabled !== false && preferences[category] !== false;
 }
 
 async function persistWorkspaceNotification(workspaceId, notification) {
@@ -114,12 +129,18 @@ async function persistWorkspaceNotification(workspaceId, notification) {
             ...(workspace.collaborators || []).map((collaborator) => collaborator.userId)
         ].filter(Boolean).map(String))];
         const severity = notification.severity === 'error' ? 'error' : notification.severity === 'warning' ? 'warning' : 'info';
-        const saved = await Notification.insertMany(recipientIds.map((recipientId) => ({
+        const category = notification.category || 'workspaceActivity';
+        const users = await User.find({ _id: { $in: recipientIds } }, 'notificationPreferences').lean();
+        const usersById = new Map(users.map((user) => [String(user._id), user]));
+        const enabledRecipients = recipientIds.filter((recipientId) => isNotificationEnabled(usersById.get(recipientId), category));
+        if (!enabledRecipients.length) return;
+        const saved = await Notification.insertMany(enabledRecipients.map((recipientId) => ({
             recipientId, workspaceId: String(workspaceId), type: notification.type || 'system', severity,
+            category,
             message: notification.message, actorId: notification.actorId ? String(notification.actorId) : null
         })));
         saved.forEach((entry) => emitToUser(entry.recipientId, 'appNotification', {
-            id: String(entry._id), type: entry.type, severity: entry.severity, message: entry.message,
+            id: String(entry._id), type: entry.type, category: entry.category, severity: entry.severity, message: entry.message,
             workspaceId: entry.workspaceId, actorId: entry.actorId, read: false, timestamp: entry.createdAt
         }));
     } catch (error) {

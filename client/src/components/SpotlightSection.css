@@ -204,7 +204,7 @@
 .explore-community-btn {
     flex-shrink: 0;
     background-color: var(--primary-color);
-    color: #ffffff;
+    color: var(--button-text);
     border: 1px solid var(--primary-color);
     border-radius: var(--radius-sm, 8px);
     padding: 10px 20px;
