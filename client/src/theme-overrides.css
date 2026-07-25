@@ -511,3 +511,35 @@ body.black-theme .alert-success {
   color: var(--success-text, #6ee7a5) !important;
   background-color: var(--success-bg) !important;
 }
+
+/* The desktop navbar polish in Navbar.css blends in a dark navy tint. Keep
+   that treatment scoped to dark presets so Light remains a clean white bar. */
+body.light-theme .navbar,
+body.light-theme .navbar.scrolled {
+  background-color: var(--navbar-bg) !important;
+  border-bottom: 1px solid var(--border-color) !important;
+  color: var(--navbar-text) !important;
+}
+
+body.light-theme .navbar-item > span {
+  color: var(--text-secondary) !important;
+}
+
+body.light-theme .navbar-item > span:hover {
+  background-color: color-mix(in srgb, var(--primary-color) 8%, transparent) !important;
+  border-color: color-mix(in srgb, var(--primary-color) 16%, transparent) !important;
+  color: var(--text-color) !important;
+}
+
+body.light-theme .navbar-item > span.active {
+  background-color: color-mix(in srgb, var(--primary-color) 12%, transparent) !important;
+  border-color: color-mix(in srgb, var(--primary-color) 28%, var(--border-color)) !important;
+  color: var(--primary-color) !important;
+}
+
+body.light-theme .profile-trigger,
+body.light-theme .notification-icon-wrapper {
+  background-color: var(--card-bg) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-secondary) !important;
+}

@@ -187,7 +187,15 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
     );
     const [globalVariables, setGlobalVariables] = useState({});
     const [variableValidation, setVariableValidation] = useState({ isValid: true, missingVariables: [] });
+    const [isVariableWarningDismissed, setIsVariableWarningDismissed] = useState(false);
     const [requestAddSignal, setRequestAddSignal] = useState(0);
+    const missingVariableKey = variableValidation.missingVariables.join('\u001f');
+
+    // A dismissed warning returns only when the set of unresolved variables changes.
+    // Validation itself continues to prevent sending an incomplete request.
+    useEffect(() => {
+        setIsVariableWarningDismissed(false);
+    }, [missingVariableKey]);
 
     // Advanced features state
     const [showVisualizationDebugger, setShowVisualizationDebugger] = useState(false);
@@ -213,6 +221,7 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
         setRequestName(nextData.name || 'Get Users');
         setParams(nextData.params || []);
         setHeaders(nextData.headers || []);
+        setBodyFormData(nextData.bodyFormData || [{ enabled: true, key: '', value: '', description: '' }]);
         setBodyType(nextData.bodyType || 'none');
         setBodyContent(nextData.body || '');
         setBinaryFile(null);
@@ -795,11 +804,19 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
             headers: headers.filter(h => h.enabled && h.key),
             bodyType,
             body: bodyContent,
+            bodyFormData,
             preRequestScript,
             tests,
+            testScript: tests,
             variables: variables.filter(v => v.key),
             authConfig,
             sslConfig,
+            description: initialData.description || '',
+            protocol: initialData.protocol || 'http',
+            graphql: initialData.graphql,
+            folderPath: initialData.folderPath || [],
+            metadata: initialData.metadata || {},
+            order: initialData.order,
             isNew
         };
 
@@ -823,11 +840,19 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
             headers: headers.filter(h => h.enabled && h.key),
             bodyType,
             body: bodyContent,
+            bodyFormData,
             preRequestScript,
             tests,
+            testScript: tests,
             variables: variables.filter(v => v.key),
             authConfig,
             sslConfig,
+            description: initialData.description || '',
+            protocol: initialData.protocol || 'http',
+            graphql: initialData.graphql,
+            folderPath: initialData.folderPath || [],
+            metadata: initialData.metadata || {},
+            order: initialData.order,
             isNew
         };
 
@@ -2966,20 +2991,31 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
                 </div>
 
                 {/* Variable validation display */}
-                {!variableValidation.isValid && (
-                    <div className="variable-validation-error">
-                        <div className="validation-header">
-                            <span className="validation-icon">⚠️</span>
-                            <span>Missing Variables</span>
+                {!variableValidation.isValid && !isVariableWarningDismissed && (
+                    <div className="variable-validation-error" role="alert">
+                        <div className="variable-validation-header">
+                            <span className="variable-validation-title">
+                                <span className="variable-validation-icon" aria-hidden="true">⚠️</span>
+                                <span>Missing Variables</span>
+                            </span>
+                            <button
+                                type="button"
+                                className="variable-validation-dismiss"
+                                onClick={() => setIsVariableWarningDismissed(true)}
+                                aria-label="Hide missing variables warning"
+                                title="Hide warning"
+                            >
+                                <X size={16} aria-hidden="true" />
+                            </button>
                         </div>
-                        <div className="missing-variables">
+                        <div className="missing-variables-list">
                             {variableValidation.missingVariables.map(varName => (
-                                <span key={varName} className="missing-variable">
+                                <span key={varName} className="missing-variable-chip">
                                     {varName}
                                 </span>
                             ))}
                         </div>
-                        <div className="validation-message">
+                        <div className="variable-validation-message">
                             Please define these variables in your environment, collection, or request variables.
                         </div>
                     </div>

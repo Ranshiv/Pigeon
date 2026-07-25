@@ -86,36 +86,17 @@ const Home = () => {
                     allWorkspaces.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
                     setRecentWorkspaces(allWorkspaces.slice(0, 3));
 
-                    // Update stats
+                    // Update stats. Collections count sums per-workspace collectionsCount
+                    // (same value shown on workspace cards/detail), so dashboard matches.
                     setStats(prev => ({
                         ...prev,
-                        workspaces: allWorkspaces.length
+                        workspaces: allWorkspaces.length,
+                        collections: allWorkspaces.reduce(
+                            (sum, ws) => sum + (ws.collectionsCount || 0), 0
+                        )
                     }));
 
-                    // Fetch all collections (global view) to populate stats and recent cards.
-                    // The backend already returns all collections in dev when user filtering finds none.
-                    const allCollectionsResponse = await fetch(
-                        '/api/collections',
-                        { credentials: 'include' }
-                    );
-
-                    if (allCollectionsResponse.ok) {
-                        const allCollections = await allCollectionsResponse.json();
-
-                        // Recent collections (global)
-                        setRecentCollections(allCollections.slice(0, 4));
-
-                        // Stats: collections count and total requests
-                        setStats(prev => ({
-                            ...prev,
-                            collections: allCollections.length,
-                            requests: allCollections.reduce(
-                                (sum, collection) => sum + (collection.requestsCount || 0), 0
-                            )
-                        }));
-                    }
-
-                    // If we have workspaces, also fetch workspace-specific data for the first workspace (activity/merges)
+                    // If we have workspaces, fetch workspace-specific data for recent cards and activity
                     if (allWorkspaces.length > 0) {
                         const collectionsResponse = await fetch(
                             `/api/workspaces/${allWorkspaces[0]._id}/collections`,
@@ -125,14 +106,13 @@ const Home = () => {
                         if (collectionsResponse.ok) {
                             const collectionsData = await collectionsResponse.json();
 
-                            // If global collections call failed or returned empty, fall back to these
-                            setRecentCollections(prev => prev && prev.length > 0 ? prev : collectionsData.slice(0, 4));
+                            // Recent collections from primary workspace
+                            setRecentCollections(collectionsData.slice(0, 4));
 
-                            // Update stats only if not already populated
+                            // Requests stat sums across primary workspace collections
                             setStats(prev => ({
                                 ...prev,
-                                collections: prev.collections || collectionsData.length,
-                                requests: prev.requests || collectionsData.reduce(
+                                requests: collectionsData.reduce(
                                     (sum, collection) => sum + (collection.requestsCount || 0), 0
                                 )
                             }));

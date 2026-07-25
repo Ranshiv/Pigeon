@@ -359,6 +359,146 @@
   margin: 0;
 }
 
+/* Nested folders imported from Postman.  A request remains a normal sidebar
+   item, while folders act as lightweight context that can be selected to view
+   their documentation and inherited scripts. */
+.request-tree {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.request-tree.depth-1,
+.request-tree.depth-2,
+.request-tree.depth-3,
+.request-tree.depth-4 {
+  margin-left: 12px;
+  padding-left: 7px;
+  border-left: 1px solid var(--border-color);
+}
+
+.request-folder {
+  margin: 2px 0;
+}
+
+.folder-tree-item {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  gap: 6px;
+  min-width: 0;
+  padding: 7px 10px;
+  border: 0;
+  border-radius: var(--border-radius);
+  background: transparent;
+  color: var(--text-secondary);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+}
+
+.folder-tree-item span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.folder-tree-item:hover {
+  background: var(--hover-bg, rgba(1, 76, 117, 0.1));
+  color: var(--text-color);
+}
+
+.folder-tree-item.active {
+  background: color-mix(in srgb, var(--primary-color, #014C75) 14%, transparent);
+  color: var(--primary-color, #014C75);
+}
+
+.folder-tree-item svg:first-child {
+  flex: 0 0 auto;
+  width: 13px;
+}
+
+.folder-tree-item svg:nth-child(2) {
+  flex: 0 0 auto;
+}
+
+.imported-folder-overview {
+  max-width: 920px;
+  margin: 24px;
+  padding: 24px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg, 12px);
+  background: var(--card-bg);
+  color: var(--text-color);
+}
+
+.imported-folder-overview-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.imported-folder-overview-header > svg {
+  margin-top: 4px;
+  color: var(--primary-color, #014C75);
+  font-size: 22px;
+}
+
+.imported-folder-overview-header span {
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.imported-folder-overview-header h2 {
+  margin: 2px 0 0;
+  font-size: 22px;
+}
+
+.imported-folder-description {
+  margin: 22px 0;
+  color: var(--text-color);
+  line-height: 1.65;
+  white-space: pre-wrap;
+}
+
+.imported-folder-description.muted {
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+.imported-folder-scripts {
+  padding-top: 18px;
+  border-top: 1px solid var(--border-color);
+}
+
+.imported-folder-scripts h3,
+.imported-folder-scripts h4 {
+  margin: 0 0 10px;
+}
+
+.imported-folder-scripts h4 {
+  margin-top: 18px;
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+
+.imported-folder-scripts pre {
+  margin: 0;
+  padding: 14px;
+  overflow: auto;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md, 8px);
+  background: var(--background-color);
+  color: var(--text-color);
+  font: 12px/1.55 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  white-space: pre-wrap;
+}
+
 /* Improved request item styling for clean, minimalistic look */
 .request-item {
   display: flex;

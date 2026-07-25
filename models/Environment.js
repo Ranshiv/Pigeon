@@ -6,6 +6,7 @@ const variableSchema = new mongoose.Schema({
     value: { type: String, required: true },
     description: { type: String, default: '' },
     isSecret: { type: Boolean, default: false },
+    enabled: { type: Boolean, default: true },
     type: { type: String, enum: ['string', 'number', 'boolean', 'object'], default: 'string' }
 });
 
@@ -47,6 +48,11 @@ const environmentSchema = new mongoose.Schema({
         },
         addedAt: { type: Date, default: Date.now }
     }],
+
+    metadata: {
+        type: mongoose.Schema.Types.Mixed,
+        default: {}
+    },
 
     // Metadata
     createdAt: { type: Date, default: Date.now },

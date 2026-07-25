@@ -5,17 +5,30 @@ const variableSchema = new mongoose.Schema({
     key: { type: String, required: true },
     value: { type: String, required: true },
     description: { type: String, default: '' },
-    type: { type: String, enum: ['string', 'number', 'boolean', 'object'], default: 'string' }
+    type: { type: String, enum: ['string', 'number', 'boolean', 'object'], default: 'string' },
+    isSecret: { type: Boolean, default: false },
+    enabled: { type: Boolean, default: true }
 });
 
 const requestSchema = new mongoose.Schema({
     name: { type: String, required: true },
+    description: { type: String, default: '' },
     url: { type: String, required: true },
     method: { type: String, required: true, enum: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS', 'HEAD', 'GRAPHQL'] },
-    headers: [{ name: String, value: String }],
-    params: [{ name: String, value: String }],
+    protocol: { type: String, enum: ['http', 'websocket', 'grpc', 'soap', 'mqtt', 'sse', 'graphql'], default: 'http' },
+    headers: [{ name: String, key: String, value: String, description: String, enabled: { type: Boolean, default: true } }],
+    params: [{ name: String, key: String, value: String, description: String, enabled: { type: Boolean, default: true } }],
     body: { type: String, default: '' },
-    bodyType: { type: String, enum: ['none', 'json', 'form-data', 'x-www-form-urlencoded', 'raw', 'graphql'], default: 'none' },
+    bodyType: { type: String, enum: ['none', 'json', 'form-data', 'x-www-form-urlencoded', 'raw', 'binary', 'graphql'], default: 'none' },
+    bodyFormData: [{
+        key: String,
+        name: String,
+        value: String,
+        description: String,
+        enabled: { type: Boolean, default: true },
+        type: { type: String, default: 'text' },
+        src: { type: mongoose.Schema.Types.Mixed, default: null }
+    }],
 
     // GraphQL-specific fields
     graphql: {
@@ -29,6 +42,11 @@ const requestSchema = new mongoose.Schema({
 
     preRequestScript: { type: String, default: '' },
     testScript: { type: String, default: '' },
+    tests: { type: String, default: '' },
+    authConfig: { type: mongoose.Schema.Types.Mixed, default: {} },
+    sslConfig: { type: mongoose.Schema.Types.Mixed, default: {} },
+    folderPath: [{ type: String }],
+    metadata: { type: mongoose.Schema.Types.Mixed, default: {} },
     order: { type: Number, default: 0 }, // For ordering requests within collection
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now }

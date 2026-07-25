@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './CollectionsManagement.css';
-import { FiFolder, FiPlus, FiFolderPlus, FiTrash2, FiShare2, FiLock, FiUsers, FiGitMerge, FiGitPullRequest, FiEdit, FiCopy, FiStar, FiGitBranch, FiEye, FiCheck, FiX, FiArrowRight, FiCornerDownRight } from 'react-icons/fi';
+import PostmanImportModal from './PostmanImportModal';
+import { FiFolder, FiPlus, FiFolderPlus, FiTrash2, FiShare2, FiLock, FiUsers, FiGitMerge, FiGitPullRequest, FiEdit, FiCopy, FiStar, FiGitBranch, FiEye, FiCheck, FiX, FiArrowRight, FiCornerDownRight, FiUploadCloud } from 'react-icons/fi';
 
 const CollectionsManagement = () => {
     const navigate = useNavigate();
@@ -10,6 +11,7 @@ const CollectionsManagement = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [showCreateModal, setShowCreateModal] = useState(false);
+    const [showImportModal, setShowImportModal] = useState(false);
     const [showShareModal, setShowShareModal] = useState(false);
     const [selectedCollection, setSelectedCollection] = useState(null);
     const [newCollectionName, setNewCollectionName] = useState('');
@@ -624,18 +626,23 @@ const CollectionsManagement = () => {
         <div className="collections-management">
             <div className="collections-header">
                 <h1>API Collections</h1>
-                {activeView === 'my' && (
-                    <button className="new-collection-btn" onClick={(e) => {
-                        e.preventDefault(); // Prevent any default navigation
-                        setShowCreateModal(true);
-                        // Reset form fields when opening the modal
-                        setNewCollectionName('');
-                        setNewCollectionDesc('');
-                        setError(null); // Clear any previous errors
-                    }}>
-                        <FiPlus /> New Collection
+                <div className="collections-header-actions">
+                    <button type="button" className="import-collection-btn" onClick={() => setShowImportModal(true)}>
+                        <FiUploadCloud /> Import
                     </button>
-                )}
+                    {activeView === 'my' && (
+                        <button className="new-collection-btn" onClick={(e) => {
+                            e.preventDefault(); // Prevent any default navigation
+                            setShowCreateModal(true);
+                            // Reset form fields when opening the modal
+                            setNewCollectionName('');
+                            setNewCollectionDesc('');
+                            setError(null); // Clear any previous errors
+                        }}>
+                            <FiPlus /> New Collection
+                        </button>
+                    )}
+                </div>
             </div>
 
             <div className="view-tabs">
@@ -654,6 +661,18 @@ const CollectionsManagement = () => {
             </div>
 
             {displayCollectionsByView()}
+
+            <PostmanImportModal
+                isOpen={showImportModal}
+                onClose={() => setShowImportModal(false)}
+                onImported={(importResult) => {
+                    if (importResult.kind === 'collection') fetchCollections();
+                }}
+                onOpenCollection={(collectionId) => {
+                    setShowImportModal(false);
+                    navigate(`/workspace/collections/${collectionId}`);
+                }}
+            />
 
             {/* Create Collection Modal */}
             {showCreateModal && (

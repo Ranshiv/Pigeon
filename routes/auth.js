@@ -28,11 +28,26 @@ router.get('/google/callback',
 
 // Auth check route
 router.get('/check', (req, res) => {
-    if (req.isAuthenticated()) {
-        res.json({ isAuthenticated: true, user: req.user });
-    } else {
-        res.json({ isAuthenticated: false });
+    const devBrowserAuthBypass = process.env.NODE_ENV !== 'production'
+        && process.env.DEV_BROWSER_AUTH_BYPASS === 'true';
+
+    if (devBrowserAuthBypass) {
+        return res.json({
+            isAuthenticated: true,
+            user: {
+                id: '507f1f77bcf86cd799439011',
+                _id: '507f1f77bcf86cd799439011',
+                name: 'Development User',
+                displayName: 'Development User',
+                email: 'dev@pigeon.local'
+            }
+        });
     }
+
+    if (req.isAuthenticated()) {
+        return res.json({ isAuthenticated: true, user: req.user });
+    }
+    return res.json({ isAuthenticated: false });
 });
 
 // Logout route

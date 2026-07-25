@@ -852,3 +852,431 @@
         flex: 1;
     }
 }
+
+/* Postman migration */
+.collections-header-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.import-collection-btn,
+.postman-import-primary,
+.postman-import-secondary,
+.postman-import-close {
+    font: inherit;
+}
+
+.import-collection-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-sm) var(--spacing-md);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-md);
+    background: var(--card-bg);
+    color: var(--text-color);
+    font-size: var(--font-size-sm);
+    cursor: pointer;
+    transition: border-color var(--transition-speed), background-color var(--transition-speed), color var(--transition-speed);
+}
+
+.import-collection-btn:hover {
+    border-color: var(--primary-color);
+    background: var(--primary-light);
+    color: var(--primary-color);
+}
+
+.postman-import-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1200;
+    display: grid;
+    place-items: center;
+    padding: 24px;
+    background: rgba(0, 17, 26, 0.66);
+    backdrop-filter: blur(5px);
+}
+
+.postman-import-modal {
+    width: min(620px, 100%);
+    max-height: min(760px, calc(100vh - 48px));
+    overflow-y: auto;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg, 16px);
+    background: var(--surface-elevated, var(--card-bg));
+    color: var(--text-color);
+    box-shadow: var(--shadow-lg, 0 20px 60px rgba(0, 0, 0, 0.24));
+}
+
+.postman-import-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 24px;
+    padding: 24px 24px 20px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.postman-import-eyebrow {
+    display: block;
+    margin-bottom: 7px;
+    color: var(--primary-color);
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+}
+
+.postman-import-header h2 {
+    margin: 0;
+    color: var(--text-color);
+    font-size: 1.35rem;
+}
+
+.postman-import-header p {
+    margin: 7px 0 0;
+    color: var(--text-secondary);
+    font-size: var(--font-size-sm);
+    line-height: 1.5;
+}
+
+.postman-import-close {
+    flex: 0 0 auto;
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    border: 1px solid transparent;
+    border-radius: var(--radius-sm, 8px);
+    background: transparent;
+    color: var(--text-secondary);
+    cursor: pointer;
+}
+
+.postman-import-close:hover:not(:disabled) {
+    border-color: var(--border-color);
+    background: var(--hover-bg);
+    color: var(--text-color);
+}
+
+.postman-import-modal form,
+.postman-import-result {
+    padding: 24px;
+}
+
+.postman-import-dropzone {
+    display: flex;
+    min-height: 190px;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 8px;
+    padding: 28px;
+    border: 1.5px dashed color-mix(in srgb, var(--primary-color) 42%, var(--border-color));
+    border-radius: var(--radius-md, 12px);
+    background: color-mix(in srgb, var(--primary-color) 4%, var(--surface-sunken, var(--background-color)));
+    text-align: center;
+    cursor: pointer;
+    transition: border-color var(--transition-speed), background-color var(--transition-speed), transform var(--transition-speed);
+}
+
+.postman-import-dropzone:hover,
+.postman-import-dropzone.dragging {
+    border-color: var(--primary-color);
+    background: color-mix(in srgb, var(--primary-color) 10%, var(--card-bg));
+}
+
+.postman-import-dropzone.dragging {
+    transform: scale(1.01);
+}
+
+.postman-import-dropzone.ready {
+    border-style: solid;
+}
+
+.postman-import-dropzone input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    white-space: nowrap;
+}
+
+.postman-import-upload-icon {
+    width: 36px;
+    height: 36px;
+    margin-bottom: 4px;
+    color: var(--primary-color);
+}
+
+.postman-import-dropzone strong {
+    overflow-wrap: anywhere;
+    color: var(--text-color);
+    font-size: 0.95rem;
+}
+
+.postman-import-dropzone span {
+    color: var(--text-secondary);
+    font-size: var(--font-size-sm);
+}
+
+.postman-import-error,
+.postman-import-note {
+    display: flex;
+    align-items: flex-start;
+    gap: 9px;
+    margin-top: 14px;
+    padding: 11px 13px;
+    border-radius: var(--radius-sm, 8px);
+    font-size: var(--font-size-sm);
+    line-height: 1.45;
+}
+
+.postman-import-error svg,
+.postman-import-note svg {
+    flex: 0 0 auto;
+    margin-top: 2px;
+}
+
+.postman-import-error {
+    border: 1px solid var(--danger-border);
+    background: var(--danger-bg);
+    color: var(--danger-text);
+}
+
+.postman-import-note {
+    border: 1px solid color-mix(in srgb, var(--warning-color) 45%, var(--border-color));
+    background: var(--warning-light);
+    color: color-mix(in srgb, var(--warning-color) 70%, var(--text-color));
+}
+
+.postman-import-preview {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-top: 16px;
+    padding: 15px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md, 12px);
+    background: var(--card-bg);
+}
+
+.postman-import-preview-icon {
+    display: grid;
+    flex: 0 0 auto;
+    place-items: center;
+    width: 42px;
+    height: 42px;
+    border-radius: 10px;
+    background: var(--primary-light);
+    color: var(--primary-color);
+}
+
+.postman-import-preview-copy {
+    min-width: 0;
+}
+
+.postman-import-preview-copy > span {
+    display: block;
+    margin-bottom: 3px;
+    color: var(--text-secondary);
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+.postman-import-preview-copy > strong {
+    display: block;
+    overflow: hidden;
+    color: var(--text-color);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.postman-import-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 14px;
+    margin-top: 8px;
+    color: var(--text-secondary);
+    font-size: 0.78rem;
+}
+
+.postman-import-stats span {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.postman-import-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 22px;
+}
+
+.postman-import-primary,
+.postman-import-secondary {
+    display: inline-flex;
+    min-height: 38px;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    padding: 8px 15px;
+    border-radius: var(--radius-sm, 8px);
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.postman-import-primary {
+    border: 1px solid var(--primary-color);
+    background: var(--primary-color);
+    color: var(--button-text, #fff);
+}
+
+.postman-import-primary:hover:not(:disabled) {
+    border-color: var(--primary-hover);
+    background: var(--primary-hover);
+}
+
+.postman-import-secondary {
+    border: 1px solid var(--border-color);
+    background: transparent;
+    color: var(--text-color);
+}
+
+.postman-import-secondary:hover:not(:disabled) {
+    background: var(--hover-bg);
+}
+
+.postman-import-primary:disabled,
+.postman-import-secondary:disabled,
+.postman-import-close:disabled {
+    cursor: not-allowed;
+    opacity: 0.55;
+}
+
+.import-collection-btn:focus-visible,
+.postman-import-dropzone:focus-within,
+.postman-import-primary:focus-visible,
+.postman-import-secondary:focus-visible,
+.postman-import-close:focus-visible {
+    outline: none;
+    box-shadow: var(--ring, 0 0 0 2px var(--primary-color));
+}
+
+.postman-import-result {
+    text-align: center;
+}
+
+.postman-import-success-icon {
+    width: 48px;
+    height: 48px;
+    margin-bottom: 10px;
+    color: var(--success-color);
+}
+
+.postman-import-result h3 {
+    margin: 0;
+    color: var(--text-color);
+    font-size: 1.2rem;
+}
+
+.postman-import-result > p {
+    margin: 7px 0 18px;
+    color: var(--text-secondary);
+}
+
+.postman-import-result-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 14px 16px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md, 12px);
+    background: var(--surface-sunken, var(--background-color));
+    text-align: left;
+}
+
+.postman-import-result-card span {
+    color: var(--text-secondary);
+    font-size: var(--font-size-sm);
+    white-space: nowrap;
+}
+
+.postman-import-warnings {
+    margin-top: 16px;
+    padding: 14px 16px;
+    border: 1px solid color-mix(in srgb, var(--warning-color) 45%, var(--border-color));
+    border-radius: var(--radius-md, 12px);
+    background: var(--warning-light);
+    color: var(--text-color);
+    text-align: left;
+}
+
+.postman-import-warning-title {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    color: color-mix(in srgb, var(--warning-color) 70%, var(--text-color));
+    font-size: var(--font-size-sm);
+    font-weight: 700;
+}
+
+.postman-import-warnings ul {
+    margin: 9px 0 0 18px;
+    color: var(--text-secondary);
+    font-size: var(--font-size-sm);
+    line-height: 1.55;
+}
+
+@media (max-width: 640px) {
+    .collections-header {
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .collections-header-actions {
+        flex-wrap: wrap;
+        justify-content: flex-end;
+    }
+
+    .postman-import-overlay {
+        align-items: end;
+        padding: 0;
+    }
+
+    .postman-import-modal {
+        max-height: 92vh;
+        border-right: 0;
+        border-bottom: 0;
+        border-left: 0;
+        border-radius: var(--radius-lg, 16px) var(--radius-lg, 16px) 0 0;
+    }
+
+    .postman-import-header,
+    .postman-import-modal form,
+    .postman-import-result {
+        padding: 19px;
+    }
+
+    .postman-import-dropzone {
+        min-height: 160px;
+        padding: 20px;
+    }
+
+    .postman-import-result-card {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .postman-import-result-card span {
+        white-space: normal;
+    }
+}

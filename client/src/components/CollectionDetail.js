@@ -13,9 +13,152 @@ import { useCollaboration } from '../context/CollaborationContext';
 import {
   FiSettings, FiAlertCircle, FiCheckCircle, FiBook, FiEdit,
   FiPlus, FiTrash2, FiDatabase, FiGlobe, FiLock, FiUsers, FiPackage,
-  FiFileText, FiInfo, FiGrid, FiChevronLeft, FiChevronRight
+  FiFileText, FiInfo, FiGrid, FiFolder, FiChevronDown, FiChevronLeft, FiChevronRight
 } from 'react-icons/fi';
 import { toast } from 'react-toastify'; // Import toast notification library
+
+const folderPathKey = (path) => (Array.isArray(path) ? path : []).join('\u001f');
+
+const buildRequestTree = (requests) => {
+  const root = { folders: new Map(), requests: [] };
+  requests.forEach((request) => {
+    let branch = root;
+    (request.folderPath || []).forEach((folderName) => {
+      if (!branch.folders.has(folderName)) {
+        branch.folders.set(folderName, { name: folderName, path: [...(branch.path || []), folderName], folders: new Map(), requests: [] });
+      }
+      branch = branch.folders.get(folderName);
+    });
+    branch.requests.push(request);
+  });
+
+  const toNodes = (branch) => [
+    ...Array.from(branch.folders.values()).map((folder) => ({
+      type: 'folder',
+      name: folder.name,
+      path: folder.path,
+      children: toNodes(folder)
+    })),
+    ...branch.requests.map((request) => ({ type: 'request', request }))
+  ];
+  return toNodes(root);
+};
+
+const requestPath = (request) => {
+  try {
+    return request.url ? new URL(request.url).pathname : '/';
+  } catch {
+    return request.url || '/';
+  }
+};
+
+const ImportedRequestTree = ({ nodes, selectedRequest, selectedFolderPath, onRequestSelect, onFolderSelect, onDelete, depth = 0 }) => (
+  <ul className={`request-tree depth-${depth}`}>
+    {nodes.map((node) => {
+      if (node.type === 'folder') {
+        const selected = folderPathKey(node.path) === folderPathKey(selectedFolderPath);
+        return (
+          <li key={`folder-${folderPathKey(node.path)}`} className="request-folder">
+            <button
+              type="button"
+              className={`folder-tree-item ${selected ? 'active' : ''}`}
+              onClick={() => onFolderSelect(node.path)}
+            >
+              <FiChevronDown aria-hidden="true" />
+              <FiFolder aria-hidden="true" />
+              <span>{node.name}</span>
+            </button>
+            <ImportedRequestTree
+              nodes={node.children}
+              selectedRequest={selectedRequest}
+              selectedFolderPath={selectedFolderPath}
+              onRequestSelect={onRequestSelect}
+              onFolderSelect={onFolderSelect}
+              onDelete={onDelete}
+              depth={depth + 1}
+            />
+          </li>
+        );
+      }
+
+      const request = node.request;
+      const requestId = request._id || request.id;
+      const isSelected = selectedRequest && (selectedRequest._id === request._id || selectedRequest.id === request.id);
+      return (
+        <li
+          key={requestId}
+          className={`request-item ${isSelected ? 'active' : ''}`}
+          onClick={() => onRequestSelect(request)}
+        >
+          <span className={`method-badge ${request.method.toLowerCase()}`}>{request.method}</span>
+          <div className="request-info">
+            <span className="request-name">{request.name}</span>
+            <small className="request-url">{requestPath(request)}</small>
+          </div>
+          <button
+            className="delete-btn"
+            onClick={(event) => {
+              event.stopPropagation();
+              onDelete(requestId);
+            }}
+            title="Delete request"
+          >
+            <FiTrash2 />
+          </button>
+        </li>
+      );
+    })}
+  </ul>
+);
+
+const ImportedFolderOverview = ({ folder }) => (
+  <div className="imported-folder-overview">
+    <div className="imported-folder-overview-header">
+      <FiFolder aria-hidden="true" />
+      <div>
+        <span>Imported Postman folder</span>
+        <h2>{folder.path.join(' / ')}</h2>
+      </div>
+    </div>
+    {folder.description ? <p className="imported-folder-description">{folder.description}</p> : <p className="imported-folder-description muted">No folder description was provided in Postman.</p>}
+    {(folder.preRequestScript || folder.testScript) && (
+      <div className="imported-folder-scripts">
+        <h3>Folder scripts</h3>
+        {folder.preRequestScript && <><h4>Pre-request script</h4><pre>{folder.preRequestScript}</pre></>}
+        {folder.testScript && <><h4>Test script</h4><pre>{folder.testScript}</pre></>}
+      </div>
+    )}
+  </div>
+);
+
+const importedScriptMarkdown = (title, script) => script
+  ? `#### ${title}\n\n\`\`\`javascript\n${script.replace(/\`\`\`/g, '\\\`\\\`\\\`')}\n\`\`\``
+  : '';
+
+const buildImportedDocumentationFallback = (collection, requests) => {
+  if (collection?.metadata?.importSource !== 'postman' || !collection.description) return null;
+  const folders = (collection.metadata.folderTree || []).map((folder) => [
+    `### ${folder.path.join(' / ')}`,
+    folder.description || 'No folder description provided.',
+    importedScriptMarkdown('Folder pre-request script', folder.preRequestScript),
+    importedScriptMarkdown('Folder test script', folder.testScript)
+  ].filter(Boolean).join('\n\n'));
+  const requestSections = requests.map((request) => [
+    `### ${request.name}`,
+    `- **${request.method}** \`${request.url}\``,
+    request.description,
+    importedScriptMarkdown('Pre-request script', request.preRequestScript),
+    importedScriptMarkdown('Test script', request.testScript || request.tests),
+    request.metadata?.savedExamples?.length
+      ? `_Saved response examples: ${request.metadata.savedExamples.length}_`
+      : ''
+  ].filter(Boolean).join('\n\n'));
+  return {
+    title: `${collection.name} Documentation`,
+    content: [`# ${collection.name}`, collection.description, folders.length ? `## Folders\n\n${folders.join('\n\n')}` : '', requestSections.length ? `## Requests\n\n${requestSections.join('\n\n')}` : ''].filter(Boolean).join('\n\n'),
+    importedFrom: 'postman'
+  };
+};
 
 function CollectionDetail() {
   const { collectionId } = useParams();
@@ -41,6 +184,7 @@ function CollectionDetail() {
   });
   const [selectedEnvironment, setSelectedEnvironment] = useState(null);
   const [requestSidebarCollapsed, setRequestSidebarCollapsed] = useState(false);
+  const [selectedFolderPath, setSelectedFolderPath] = useState(null);
 
   // Add keyboard shortcut for toggling the requests sidebar
   useEffect(() => {
@@ -393,12 +537,21 @@ function CollectionDetail() {
 
   // Handle request selection
   const handleSelectRequest = (request) => {
+    setSelectedFolderPath(null);
     setSelectedRequest(request);
     setShowRequestForm(true);
   };
 
+  const handleSelectFolder = (folderPath) => {
+    setSelectedFolderPath(folderPath);
+    setSelectedRequest(null);
+    setShowRequestForm(false);
+    setResponseData(null);
+  };
+
   // Handle adding a new request
   const handleAddRequest = () => {
+    setSelectedFolderPath(null);
     const newRequest = {
       id: `req-${Date.now()}`, // Temporary ID
       name: 'New Request',
@@ -611,8 +764,11 @@ function CollectionDetail() {
           params: persistedRequest.params || [],
           body: persistedRequest.body || '',
           bodyType: persistedRequest.bodyType || 'none',
+          bodyFormData: persistedRequest.bodyFormData || [],
           preRequestScript: persistedRequest.preRequestScript || '',
           testScript: persistedRequest.testScript || '',
+          authConfig: persistedRequest.authConfig || { type: 'No Auth' },
+          sslConfig: persistedRequest.sslConfig || {},
           collectionId: collection._id
         })
       });
@@ -830,6 +986,15 @@ function CollectionDetail() {
   }
 
   const activeUsers = getActiveUsers(collectionId);
+  const requestTree = buildRequestTree(requests);
+  const importedFolders = collection?.metadata?.folderTree || [];
+  const selectedFolder = selectedFolderPath
+    ? importedFolders.find((folder) => folderPathKey(folder.path) === folderPathKey(selectedFolderPath))
+    : null;
+  // Collections imported before documentation records were created still have
+  // their source description and folder metadata. Render that data immediately
+  // instead of making the user re-import a collection just to read it.
+  const documentationToDisplay = documentation || buildImportedDocumentationFallback(collection, requests);
 
   return (
     <div className="collection-detail">
@@ -933,33 +1098,14 @@ function CollectionDetail() {
                   <small>Click "Add Request" below to create your first API request</small>
                 </div>
               ) : (
-                <ul>
-                  {requests.map(request => (
-                    <li
-                      key={request._id || request.id}
-                      className={`request-item ${selectedRequest && (selectedRequest._id === request._id || selectedRequest.id === request.id) ? 'active' : ''}`}
-                      onClick={() => handleSelectRequest(request)}
-                    >
-                      <span className={`method-badge ${request.method.toLowerCase()}`}>
-                        {request.method}
-                      </span>
-                      <div className="request-info">
-                        <span className="request-name">{request.name}</span>
-                        <small className="request-url">{(() => { try { return request.url ? new URL(request.url).pathname : '/'; } catch { return request.url || '/'; } })()}</small>
-                      </div>
-                      <button
-                        className="delete-btn"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleDeleteRequest(request._id || request.id);
-                        }}
-                        title="Delete request"
-                      >
-                        <FiTrash2 />
-                      </button>
-                    </li>
-                  ))}
-                </ul>
+                <ImportedRequestTree
+                  nodes={requestTree}
+                  selectedRequest={selectedRequest}
+                  selectedFolderPath={selectedFolderPath}
+                  onRequestSelect={handleSelectRequest}
+                  onFolderSelect={handleSelectFolder}
+                  onDelete={handleDeleteRequest}
+                />
               )}
             </div>
           )}
@@ -978,7 +1124,9 @@ function CollectionDetail() {
         <div className="collection-main">
           {activeTab === 'requests' && (
             <>
-              {!selectedRequest && !showRequestForm ? (<div className="collection-info">
+              {selectedFolder ? (
+                <ImportedFolderOverview folder={selectedFolder} />
+              ) : !selectedRequest && !showRequestForm ? (<div className="collection-info">
                 <h2>Collection Details</h2>
 
                 <div className="collection-overview-card">
@@ -1063,8 +1211,8 @@ function CollectionDetail() {
                   <div className="spinner"></div>
                   <p>Loading documentation...</p>
                 </div>
-              ) : documentation ? (
-                <DocumentationViewer documentation={documentation} collection={collection} />
+              ) : documentationToDisplay ? (
+                <DocumentationViewer documentation={documentationToDisplay} collection={collection} />
               ) : (
                 <div className="documentation-placeholder">
                   <FiBook className="placeholder-icon" />

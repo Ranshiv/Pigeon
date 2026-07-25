@@ -1,0 +1,18 @@
+{
+  "id": "browser-smoke-environment",
+  "name": "QA Browser Import Environment",
+  "_postman_variable_scope": "environment",
+  "values": [
+    {
+      "key": "apiToken",
+      "value": "browser-test-token",
+      "type": "secret",
+      "enabled": true
+    },
+    {
+      "key": "disabledValue",
+      "value": "not-active",
+      "enabled": false
+    }
+  ]
+}

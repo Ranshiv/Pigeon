@@ -6,7 +6,7 @@ import {
     FiUsers, FiPlus, FiEdit, FiTrash2, FiActivity,
     FiGitMerge, FiGitBranch, FiGitPullRequest, FiLock,
     FiCalendar, FiBarChart2, FiPackage, FiClock, FiStar,
-    FiGlobe, FiX, FiFolder, FiInbox, FiCheckSquare, FiChevronDown
+    FiGlobe, FiX, FiFolder, FiInbox, FiCheckSquare, FiChevronDown, FiUploadCloud
 } from 'react-icons/fi';
 import { useCollaboration } from '../context/CollaborationContext';
 import ActiveCollaborators from './ActiveCollaborators';
@@ -14,6 +14,7 @@ import GlobalVariablesModal from './GlobalVariablesModal';
 import CollectionCreate from './CollectionCreate';
 import ReviewDashboard from './collaboration/ReviewDashboard';
 import AppSelect from './common/AppSelect/AppSelect';
+import PostmanImportModal from './PostmanImportModal';
 
 const COLLABORATOR_ROLE_OPTIONS = [
     { value: 'admin', label: 'Admin' },
@@ -64,6 +65,7 @@ const WorkspaceDetail = () => {
     const [activeUsers, setActiveUsers] = useState([]);
     const [showGlobalVariablesModal, setShowGlobalVariablesModal] = useState(false);
     const [showCreateCollectionModal, setShowCreateCollectionModal] = useState(false);
+    const [showImportModal, setShowImportModal] = useState(false);
     const [showCreateMergeRequestModal, setShowCreateMergeRequestModal] = useState(false);
     const [mergeRequestSourceId, setMergeRequestSourceId] = useState('');
     const [mergeRequestTargetId, setMergeRequestTargetId] = useState('');
@@ -800,6 +802,9 @@ const WorkspaceDetail = () => {
                         <h2 className="ws-panel-title">
                             <FiFolder /> Collections
                             <span className="ws-panel-title-right">
+                                <button type="button" className="ws-btn" onClick={() => setShowImportModal(true)}>
+                                    <FiUploadCloud /> Import
+                                </button>
                                 <button className="ws-btn primary" onClick={openCreateCollectionModal}>
                                     <FiPlus /> New Collection
                                 </button>
@@ -1296,6 +1301,21 @@ const WorkspaceDetail = () => {
             )}
 
             {/* Global Variables Modal */}
+            <PostmanImportModal
+                isOpen={showImportModal}
+                workspaceId={workspace._id || id}
+                onClose={() => setShowImportModal(false)}
+                onImported={async (importResult) => {
+                    if (importResult.kind === 'collection') {
+                        await fetchCollections(workspace._id || id);
+                    }
+                }}
+                onOpenCollection={(collectionId) => {
+                    setShowImportModal(false);
+                    navigate(`/workspace/collections/${collectionId}`);
+                }}
+            />
+
             <GlobalVariablesModal
                 isOpen={showGlobalVariablesModal}
                 onClose={() => setShowGlobalVariablesModal(false)}

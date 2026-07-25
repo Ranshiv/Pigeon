@@ -46,13 +46,35 @@ router.get('/', ensureAuthenticated, async (req, res) => {
             };
 
             // Add collection count information
-            const collectionsCount = await db.collection('collections')
-                .countDocuments({
-                    $or: [
-                        { workspaceId: workspace._id.toString() },
-                        ...(workspace._id ? [{ workspaceId: workspace._id }] : [])
+            // For personal workspaces, also count unassigned collections (workspaceId:null)
+            // owned by the user — matches the per-workspace list endpoint at /:id/collections.
+            const ownerOr = [
+                { owner: userId },
+                ...(userObjectId ? [{ owner: userObjectId }] : [])
+            ];
+
+            const collectionOr = [
+                { workspaceId: workspace._id.toString() },
+                ...(workspace._id ? [{ workspaceId: workspace._id }] : [])
+            ];
+
+            if (workspace.isPersonal) {
+                collectionOr.push({
+                    $and: [
+                        { workspaceId: null },
+                        { $or: ownerOr }
                     ]
                 });
+            }
+
+            const collectionsCount = await db.collection('collections')
+                .countDocuments({ $or: collectionOr });
+
+            // DEBUG: log filter and result to diagnose count mismatches
+            console.log(
+                `[workspace-count] ws=${workspace._id} isPersonal=${workspace.isPersonal} ` +
+                `filter=${JSON.stringify(collectionOr)} count=${collectionsCount}`
+            );
 
             wsWithStringId.collectionsCount = collectionsCount;
             wsWithStringId.collaboratorsCount = workspace.collaborators ? workspace.collaborators.length : 1;

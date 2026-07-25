@@ -160,13 +160,14 @@ router.post('/:id/send', ensureAuthenticated, async (req, res) => {
                 headers: requestData.headers || [],
                 body: requestData.body || '',
                 bodyType: requestData.bodyType || 'none',
+                bodyFormData: requestData.bodyFormData || [],
                 preRequestScript: requestData.preRequestScript || '',
                 testScript: requestData.testScript || ''
             };
             console.log(`Using request data from body: ${requestDoc.method} ${requestDoc.url}`);
         }
 
-        const { url, method, headers, body, bodyType, preRequestScript, testScript } = requestDoc;
+        const { url, method, headers, body, bodyType, bodyFormData, preRequestScript, testScript } = requestDoc;
 
         // --- Prepare and Send Fetch Request ---
         const fetchOptions = {
@@ -198,11 +199,23 @@ router.post('/:id/send', ensureAuthenticated, async (req, res) => {
                 }
             } else if (bodyType === 'x-www-form-urlencoded') {
                 try {
-                    const parsedBody = JSON.parse(body); // Assume body is stored as JSON string for key-value pairs
-                    fetchOptions.body = new URLSearchParams(parsedBody).toString();
+                    const formEntries = Array.isArray(bodyFormData) && bodyFormData.length
+                        ? bodyFormData.filter((field) => field.enabled !== false && field.key)
+                            .map((field) => [field.key, field.value || ''])
+                        : Object.entries(JSON.parse(body));
+                    fetchOptions.body = new URLSearchParams(formEntries).toString();
                 } catch (parseError) {
                     throw new Error("Invalid key-value format for x-www-form-urlencoded body (expected JSON string)");
                 }
+            } else if (bodyType === 'form-data') {
+                const multipartBody = new FormData();
+                (Array.isArray(bodyFormData) ? bodyFormData : [])
+                    .filter((field) => field.enabled !== false && field.key && field.type !== 'file')
+                    .forEach((field) => multipartBody.append(field.key, field.value || ''));
+                const contentTypeKey = Object.keys(fetchOptions.headers)
+                    .find((header) => header.toLowerCase() === 'content-type');
+                if (contentTypeKey) delete fetchOptions.headers[contentTypeKey];
+                fetchOptions.body = multipartBody;
             } else { // raw, text, etc.
                 fetchOptions.body = body;
             }

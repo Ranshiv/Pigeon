@@ -27,6 +27,7 @@ router.use((req, res, next) => {
 const authRoutes = require('./auth');
 const collectionsRoutes = require('./collections');
 const environmentsRoutes = require('./environments');
+const importsRoutes = require('./imports');
 const workspacesRoutes = require('./workspaces');
 const requestsRoutes = require('./requests');
 const historyRoutes = require('./history');
@@ -80,6 +81,7 @@ const alertsRoutes = require('./alerts');
 router.use('/auth', authRoutes);
 router.use('/collections', collectionsRoutes);
 router.use('/environments', environmentsRoutes);
+router.use('/imports', importsRoutes);
 router.use('/workspaces', workspacesRoutes);
 router.use('/requests', requestsRoutes);
 router.use('/history', historyRoutes);
