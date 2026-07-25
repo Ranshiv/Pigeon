@@ -2203,6 +2203,47 @@ router.get('/:id/documentation', async (req, res) => {
         });
 
         if (!doc) {
+            // Collections imported before generated documentation records were
+            // introduced still retain their Postman source metadata. Serve a
+            // generated document for those collections instead of returning a
+            // misleading 404 while the client can already display the data.
+            if (!ObjectId.isValid(collectionId)) {
+                return res.status(404).json({ message: 'Documentation not found' });
+            }
+
+            const collection = await db.collection('collections').findOne({
+                _id: new ObjectId(collectionId)
+            });
+            const embeddedDocumentation = collection?.documentation;
+            if (embeddedDocumentation?.content) {
+                return res.json({
+                    ...embeddedDocumentation,
+                    collectionId,
+                    _id: embeddedDocumentation._id?.toString?.() || null
+                });
+            }
+
+            if (collection?.metadata?.importSource === 'postman') {
+                const { buildPostmanDocumentation } = require('../services/importers/PostmanImporter');
+                const content = buildPostmanDocumentation({
+                    name: collection.name,
+                    description: collection.description,
+                    collectionScripts: { prerequest: '', test: '' },
+                    folderTree: collection.metadata.folderTree || [],
+                    requests: collection.requests || []
+                });
+
+                return res.json({
+                    _id: null,
+                    title: `${collection.name} Documentation`,
+                    content,
+                    collectionId,
+                    importedFrom: 'postman',
+                    createdAt: collection.createdAt,
+                    updatedAt: collection.updatedAt
+                });
+            }
+
             return res.status(404).json({ message: 'Documentation not found' });
         }
 

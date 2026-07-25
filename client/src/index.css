@@ -151,9 +151,10 @@ body {
   --designer-text-primary: var(--text-color);
   --designer-text-secondary: var(--text-secondary);
   --designer-text-muted: var(--text-muted);
-  --designer-canvas-bg: #001A26;
-  --designer-component-bg: #002D45;
-  --designer-card-rgb: 0, 34, 52;
+  --designer-canvas-bg: #f4f8fb;
+  --designer-component-bg: #edf4f8;
+  --designer-card-rgb: 255, 255, 255;
+  --designer-grid-line: rgba(1, 76, 117, 0.1);
   --designer-shadow: var(--shadow);
   --designer-shadow-md: var(--shadow-md);
   --designer-shadow-lg: var(--shadow-lg);
@@ -275,6 +276,7 @@ body.dark-theme {
   --designer-canvas-bg: #001A26;
   --designer-component-bg: #002D45;
   --designer-card-rgb: 0, 34, 52;
+  --designer-grid-line: rgba(255, 255, 255, 0.05);
 
   --debug-bg: #013B5B;
   --debug-bg2: #012A41;
@@ -813,6 +815,7 @@ body.omni-theme {
   --designer-canvas-bg: #0d0b09;
   --designer-component-bg: #1b1611;
   --designer-card-rgb: 18, 16, 14;
+  --designer-grid-line: rgba(255, 255, 255, 0.05);
 }
 
 /* Black theme: strict black-and-white surfaces and controls. */
@@ -863,6 +866,7 @@ body.black-theme {
   --designer-canvas-bg: #000000;
   --designer-component-bg: #000000;
   --designer-card-rgb: 0, 0, 0;
+  --designer-grid-line: rgba(255, 255, 255, 0.1);
   --info-color: #ffffff;
   --info-light: rgba(255, 255, 255, 0.16);
 }

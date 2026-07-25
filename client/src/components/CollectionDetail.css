@@ -772,9 +772,10 @@
 }
 
 .tab-btn.active .fi,
-.tab-btn.active i {
+.tab-btn.active i,
+.tab-btn.active svg {
   opacity: 1 !important;
-  color: var(--primary-color, #014C75);
+  color: var(--button-text, #fff) !important;
 }
 
 /* Focus states for accessibility */

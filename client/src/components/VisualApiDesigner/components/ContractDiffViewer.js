@@ -181,7 +181,7 @@ const ContractDiffViewer = ({
     // Early returns for loading, error, and empty states
     if (isLoading && availableVersions.length === 0) {
         return (
-            <div className="contract-diff-viewer">
+            <div className="contract-diff-viewer contract-diff-empty">
                 <div className="loading-state">
                     <div className="loading-spinner"></div>
                     <p>Loading API versions...</p>
@@ -206,9 +206,9 @@ const ContractDiffViewer = ({
 
     if (availableVersions.length === 0) {
         return (
-            <div className="contract-diff-viewer">
+            <div className="contract-diff-viewer contract-diff-empty">
                 <div className="empty-state">
-                    <div className="empty-icon">📋</div>
+                    <div className="empty-icon" aria-hidden="true"><FiGitBranch /></div>
                     <h3>No API Versions Found</h3>
                     <p>
                         To use Contract Diff & Breaking Changes analysis, you need to save your API designs as versions first.

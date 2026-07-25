@@ -232,8 +232,9 @@ const buildPostmanDocumentation = ({ name, description, collectionScripts, folde
                 scriptMarkdown('Pre-request script', request.preRequestScript),
                 scriptMarkdown('Test script', request.testScript)
             ].filter(Boolean).join('\n');
-            const examples = request.metadata.savedExamples.length
-                ? `\n\n_Saved response examples: ${request.metadata.savedExamples.length}_`
+            const savedExampleCount = request.metadata?.savedExamples?.length || 0;
+            const examples = savedExampleCount
+                ? `\n\n_Saved response examples: ${savedExampleCount}_`
                 : '';
             return [`### ${request.name}`, details, scripts, examples].filter(Boolean).join('\n\n');
         });

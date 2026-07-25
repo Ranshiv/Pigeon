@@ -3,69 +3,27 @@
     display: flex;
     flex-direction: column;
     height: 100%;
-    background: var(--bg-primary, #f8f9fa);
-    color: var(--text-primary, #333333);
+    background: var(--designer-bg);
+    color: var(--designer-text-primary);
     font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', system-ui, sans-serif;
 
-    /* Light theme defaults - matching application theme */
-    --bg-primary: #f8f9fa;
-    --bg-surface: #ffffff;
-    --bg-hover: #f5f5f5;
-    --text-primary: #333333;
-    --text-secondary: #6c757d;
-    --text-tertiary: #9ca3af;
-    --text-placeholder: #9ca3af;
-    --border-light: #e1e4e8;
-    --border-hover: #d1d5db;
-    --color-primary: #014C75;
-    --color-primary-hover: #013B5B;
-    --color-primary-alpha: rgba(1, 76, 117, 0.1);
-    --color-success: #10b981;
-    --color-warning: #f59e0b;
-    --color-error: #ef4444;
-    --shadow-light: rgba(1, 76, 117, 0.08);
-}
-
-/* Dark theme support - matching application theme */
-.contract-diff-viewer[data-theme="dark"],
-.dark .contract-diff-viewer {
-    --bg-primary: #00111A;
-    --bg-surface: #002234;
-    --bg-hover: #013B5B;
-    --text-primary: #ffffff;
-    --text-secondary: #B8D4E3;
-    --text-tertiary: #7A9BAD;
-    --text-placeholder: #7A9BAD;
-    --border-light: #003956;
-    --border-hover: #004A6B;
-    --color-primary: #38bdf8;
-    --color-primary-hover: #7dd3fc;
-    --color-primary-alpha: rgba(56, 189, 248, 0.15);
-    --color-success: #3fb950;
-    --color-warning: #d29922;
-    --color-error: #f85149;
-    --shadow-light: rgba(0, 0, 0, 0.3);
-}
-
-@media (prefers-color-scheme: dark) {
-    .contract-diff-viewer:not([data-theme="light"]) {
-        --bg-primary: #00111A;
-        --bg-surface: #002234;
-        --bg-hover: #013B5B;
-        --text-primary: #ffffff;
-        --text-secondary: #B8D4E3;
-        --text-tertiary: #7A9BAD;
-        --text-placeholder: #7A9BAD;
-        --border-light: #003956;
-        --border-hover: #004A6B;
-        --color-primary: #58a6ff;
-        --color-primary-hover: #409cff;
-        --color-primary-alpha: rgba(88, 166, 255, 0.15);
-        --color-success: #3fb950;
-        --color-warning: #d29922;
-        --color-error: #f85149;
-        --shadow-light: rgba(0, 0, 0, 0.3);
-    }
+    /* Bind all diff-specific aliases to the active Pigeon theme. */
+    --bg-primary: var(--designer-bg);
+    --bg-surface: var(--designer-card);
+    --bg-hover: var(--hover-bg);
+    --text-primary: var(--designer-text-primary);
+    --text-secondary: var(--designer-text-secondary);
+    --text-tertiary: var(--designer-text-muted);
+    --text-placeholder: var(--designer-text-muted);
+    --border-light: var(--designer-border);
+    --border-hover: var(--designer-border-light);
+    --color-primary: var(--designer-primary);
+    --color-primary-hover: var(--designer-primary-hover);
+    --color-primary-alpha: color-mix(in srgb, var(--designer-primary) 14%, transparent);
+    --color-success: var(--designer-success);
+    --color-warning: var(--designer-warning);
+    --color-error: var(--designer-error);
+    --shadow-light: var(--designer-shadow);
 }
 
 /* Header Section */

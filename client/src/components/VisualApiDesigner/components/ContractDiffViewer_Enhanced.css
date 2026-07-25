@@ -2,49 +2,96 @@
 
 /* Toolbar button styles */
 .toolbar-btn-primary {
-    background: #014C75 !important;
-    color: white !important;
-    border: 1px solid #014C75 !important;
+    background: var(--designer-primary) !important;
+    color: var(--button-text, #fff) !important;
+    border: 1px solid var(--designer-primary) !important;
 }
 
 .toolbar-btn-primary:hover:not(:disabled) {
-    background: #013B5B !important;
-    border-color: #013B5B !important;
+    background: var(--designer-primary-hover) !important;
+    border-color: var(--designer-primary-hover) !important;
 }
 
 .toolbar-btn-primary:disabled {
-    background: #9ca3af !important;
-    border-color: #9ca3af !important;
-    color: #f3f4f6 !important;
+    background: var(--designer-border) !important;
+    border-color: var(--designer-border) !important;
+    color: var(--designer-text-muted) !important;
     cursor: not-allowed;
 }
 
 /* Enhanced empty state styles for ContractDiffViewer */
+.contract-diff-viewer.contract-diff-empty {
+    flex: 1 1 auto;
+    height: 100%;
+    min-height: 0;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    width: 100%;
+    max-width: none;
+    overflow: hidden;
+}
+
+.contract-diff-viewer.contract-diff-empty .empty-state {
+    width: 100%;
+    max-width: none;
+    min-height: 0;
+    flex: 1 1 auto;
+    align-self: stretch;
+    margin: 0;
+    overflow-y: auto;
+}
+
 .contract-diff-viewer .empty-state {
+    display: flex;
+    flex: 1;
+    min-height: 440px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
     text-align: center;
-    padding: 60px 40px;
-    background: #f8fafc;
-    border-radius: 12px;
+    padding: 48px 32px;
+    background: var(--bg-surface);
+    border-radius: var(--designer-radius-lg, 16px);
     margin: 20px;
-    border: 1px solid #e2e8f0;
+    border: 1px dashed color-mix(in srgb, var(--color-primary) 35%, var(--border-light));
+    box-shadow: var(--designer-shadow);
 }
 
 .contract-diff-viewer .empty-icon {
-    font-size: 48px;
-    margin-bottom: 16px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    height: 56px;
+    margin-bottom: 18px;
+    border-radius: 16px;
+    background: color-mix(in srgb, var(--color-primary) 14%, transparent);
+    color: var(--color-primary);
+}
+
+.contract-diff-viewer .empty-icon svg {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 28px;
+    height: 28px;
+    transform: translate(-50%, -50%);
 }
 
 .contract-diff-viewer .empty-state h3 {
-    font-size: 24px;
-    color: #1f2937;
-    margin-bottom: 12px;
-    font-weight: 600;
+    font-size: 1.25rem;
+    color: var(--text-primary);
+    margin: 0 0 8px;
+    font-weight: 650;
 }
 
 .contract-diff-viewer .empty-state p {
-    font-size: 16px;
-    color: #6b7280;
-    margin-bottom: 32px;
+    max-width: 540px;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin: 0 0 24px;
     line-height: 1.5;
 }
 
@@ -52,21 +99,21 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 24px;
+    gap: 16px;
 }
 
 .contract-diff-viewer .help-text {
-    background: white;
-    border: 1px solid #e5e7eb;
-    border-radius: 8px;
-    padding: 20px;
-    max-width: 400px;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-light);
+    border-radius: var(--designer-radius-sm, 10px);
+    padding: 16px 18px;
+    max-width: 440px;
     text-align: left;
 }
 
 .contract-diff-viewer .help-text strong {
     display: block;
-    color: #374151;
+    color: var(--text-primary);
     margin-bottom: 12px;
     font-size: 14px;
 }
@@ -74,7 +121,7 @@
 .contract-diff-viewer .help-text ol {
     margin: 0;
     padding-left: 20px;
-    color: #6b7280;
+    color: var(--text-secondary);
     font-size: 14px;
     line-height: 1.6;
 }
@@ -84,19 +131,20 @@
 }
 
 .contract-diff-viewer .refresh-btn {
-    background: #014C75;
-    color: white;
-    border: none;
-    padding: 12px 24px;
-    border-radius: 8px;
-    font-size: 14px;
-    font-weight: 500;
+    background: var(--color-primary);
+    color: var(--button-text, #fff);
+    border: 1px solid var(--color-primary);
+    padding: 9px 14px;
+    border-radius: var(--designer-radius-sm, 8px);
+    font-size: 0.85rem;
+    font-weight: 600;
     cursor: pointer;
-    transition: background 0.2s ease;
+    transition: filter 0.15s ease;
 }
 
 .contract-diff-viewer .refresh-btn:hover {
-    background: #013B5B;
+    background: var(--color-primary);
+    filter: brightness(1.08);
 }
 
 /* Loading and error states */
@@ -113,8 +161,8 @@
 .contract-diff-viewer .loading-spinner {
     width: 32px;
     height: 32px;
-    border: 3px solid #e5e7eb;
-    border-top: 3px solid #014C75;
+    border: 3px solid var(--border-light);
+    border-top: 3px solid var(--color-primary);
     border-radius: 50%;
     animation: spin 1s linear infinite;
     margin-bottom: 16px;
@@ -131,8 +179,8 @@
 }
 
 .contract-diff-viewer .retry-btn {
-    background: #ef4444;
-    color: white;
+    background: var(--color-error);
+    color: var(--button-text, #fff);
     border: none;
     padding: 10px 20px;
     border-radius: 6px;
@@ -142,11 +190,15 @@
 }
 
 .contract-diff-viewer .retry-btn:hover {
-    background: #dc2626;
+    background: color-mix(in srgb, var(--color-error) 82%, #000);
 }
 
 /* Responsive adjustments */
 @media (max-width: 640px) {
+    .contract-diff-viewer.contract-diff-empty {
+        padding: 16px;
+    }
+
     .contract-diff-viewer .empty-state {
         padding: 40px 20px;
         margin: 16px;

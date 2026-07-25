@@ -206,8 +206,8 @@
     width: 100%;
     height: 100%;
     background-image:
-        linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+        linear-gradient(var(--designer-grid-line) 1px, transparent 1px),
+        linear-gradient(90deg, var(--designer-grid-line) 1px, transparent 1px);
     background-size: 20px 20px;
     pointer-events: none;
     z-index: 0;
@@ -1147,8 +1147,32 @@
     flex: 1;
     display: flex;
     flex-direction: column;
+    width: 100%;
+    min-height: 0;
+    min-width: 0;
     overflow: hidden;
+}
 
+/* Diff mode is not a three-panel canvas. Let it use the full workspace so
+   its empty and comparison states are centred across the designer, not only
+   inside the leftover canvas column. */
+.designer-content > .diff-container {
+    display: flex;
+    flex: 1;
+    height: 100%;
+    width: 100%;
+    min-height: 0;
+    min-width: 0;
+    overflow: hidden;
+}
+
+.diff-container > .contract-diff-viewer {
+    flex: 1;
+    height: 100%;
+    width: 100%;
+    min-height: 0;
+    min-width: 0;
+    overflow: hidden;
 }
 
 /* Design Workspace */
@@ -2852,22 +2876,6 @@ input.palette-search {
 .workspace-right::-webkit-scrollbar-thumb:hover,
 .preview-container::-webkit-scrollbar-thumb:hover {
     background: var(--designer-text-secondary);
-}
-
-/* Dark mode support (if needed) */
-@media (prefers-color-scheme: dark) {
-    .visual-api-designer {
-        --designer-bg: #00111A;
-        --designer-card: #002234;
-        --designer-border: #003956;
-        --designer-border-light: #002938;
-        --designer-text-primary: #ffffff;
-        --designer-text-secondary: #B8D4E3;
-        --designer-text-muted: #7A9BAD;
-        --designer-shadow: 0 1px 3px rgba(1, 76, 117, 0.15);
-        --designer-shadow-md: 0 4px 6px rgba(1, 76, 117, 0.12);
-        --designer-shadow-lg: 0 8px 25px rgba(0, 0, 0, 0.3);
-    }
 }
 
 /* Design Canvas Styles */
