@@ -9,11 +9,13 @@ import DocumentationViewer from './DocumentationViewer';
 import EnvironmentSelector from './EnvironmentSelector';
 import CollectionVariablesManager from './CollectionVariablesManager';
 import VisualApiDesigner from './VisualApiDesigner/VisualApiDesigner';
+import CollectionMcpServerPanel from './CollectionMcpServerPanel';
 import { useCollaboration } from '../context/CollaborationContext';
 import {
   FiSettings, FiAlertCircle, FiCheckCircle, FiBook, FiEdit,
   FiPlus, FiTrash2, FiDatabase, FiGlobe, FiLock, FiUsers, FiPackage,
-  FiFileText, FiInfo, FiGrid, FiFolder, FiChevronDown, FiChevronLeft, FiChevronRight
+  FiFileText, FiInfo, FiGrid, FiFolder, FiChevronDown, FiChevronLeft, FiChevronRight,
+  FiServer
 } from 'react-icons/fi';
 import { toast } from 'react-toastify'; // Import toast notification library
 
@@ -1062,6 +1064,12 @@ function CollectionDetail() {
           >
             <FiGrid /> API Designer
           </button>
+          <button
+            className={`tab-btn ${activeTab === 'mcp-server' ? 'active' : ''}`}
+            onClick={() => setActiveTab('mcp-server')}
+          >
+            <FiServer /> MCP Server
+          </button>
         </div>
         <div className="collection-actions">
           <button className="action-btn" onClick={handleSettingsClick}>
@@ -1259,6 +1267,10 @@ function CollectionDetail() {
                 }}
               />
             </div>
+          )}
+
+          {activeTab === 'mcp-server' && (
+            <CollectionMcpServerPanel collectionId={collectionId} />
           )}
         </div>      </div>
       {renderSettingsModal()}

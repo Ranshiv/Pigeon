@@ -2045,3 +2045,35 @@
   flex: 1;
   min-height: 0;
 }
+
+/* Keep the collection tools on a dedicated header row. Keeping this set
+   between the title and settings button clipped the final MCP Server tab. */
+.collection-header {
+  height: auto;
+  min-height: 54px;
+  flex-wrap: wrap;
+  gap: 10px 14px;
+  padding: 12px 20px;
+}
+
+.collection-header .tab-navigation {
+  order: 3;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  flex-shrink: 1;
+  scrollbar-width: none;
+}
+
+.collection-header .tab-navigation::-webkit-scrollbar { display: none; }
+
+.collection-content {
+  height: auto;
+  min-height: 0;
+  flex: 1;
+}
+
+@media (max-width: 600px) {
+  .collection-header .tab-navigation { width: calc(100% + 8px); }
+  .collection-header .tab-btn { padding: 8px 10px; }
+}

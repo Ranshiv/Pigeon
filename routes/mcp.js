@@ -4,6 +4,9 @@ const { ensureAuthenticated } = require('../middleware/auth');
 const McpConnectionProfile = require('../models/McpConnectionProfile');
 const McpHistory = require('../models/McpHistory');
 const mcp = require('../services/McpHttpService');
+const { ObjectId } = require('mongodb');
+const { getDb } = require('../config/db');
+const collectionMcpServer = require('../services/CollectionMcpServerService');
 
 const MAX_HISTORY_PAYLOAD_BYTES = 100000;
 
@@ -68,6 +71,146 @@ const runMcpAction = (action, operation, getTarget, getInput, fallbackMessage) =
         res.status(400).json({ message: error.message || fallbackMessage, trace: error.mcpTrace });
     }
 };
+
+const getUserIdVariants = (user) => {
+    const id = String(user?.id || user?._id || '');
+    if (!id) return [];
+    return ObjectId.isValid(id) ? [id, new ObjectId(id)] : [id];
+};
+
+const getManagedCollection = async (collectionId, user) => {
+    if (!ObjectId.isValid(collectionId)) return null;
+    const db = getDb();
+    if (!db) throw new Error('Database not initialized');
+
+    const userIds = getUserIdVariants(user);
+    if (!userIds.length) return null;
+    return db.collection('collections').findOne({
+        _id: new ObjectId(collectionId),
+        $or: [
+            { userId: { $in: userIds } },
+            { owner: { $in: userIds } },
+            { collaborators: { $elemMatch: { userId: { $in: userIds }, role: { $in: ['editor', 'admin'] } } } }
+        ]
+    });
+};
+
+const getMcpServerEndpoint = (req, collectionId) => {
+    const configuredBaseUrl = String(process.env.PUBLIC_APP_URL || '').replace(/\/$/, '');
+    const inferredBaseUrl = `${req.protocol}://${req.get('host')}`;
+    return `${configuredBaseUrl || inferredBaseUrl}/api/mcp-server/collections/${collectionId}`;
+};
+
+const buildMcpServerManagementResponse = (req, collection) => {
+    const collectionId = String(collection._id);
+    return {
+        configuration: collectionMcpServer.publicConfig(collection, getMcpServerEndpoint(req, collectionId)),
+        requests: collectionMcpServer.getEligibleRequests(collection).map((request) => ({
+            id: String(request._id || request.id),
+            name: request.name || 'Unnamed request',
+            description: request.description || '',
+            method: request.method || 'GET',
+            url: request.url || ''
+        }))
+    };
+};
+
+router.get('/servers/collections/:collectionId', ensureAuthenticated, async (req, res) => {
+    try {
+        const collection = await getManagedCollection(req.params.collectionId, req.user);
+        if (!collection) return res.status(404).json({ message: 'Collection not found or you do not have permission to configure its MCP server.' });
+        return res.json(buildMcpServerManagementResponse(req, collection));
+    } catch (error) {
+        return res.status(500).json({ message: error.message || 'Unable to load the collection MCP server.' });
+    }
+});
+
+router.put('/servers/collections/:collectionId', ensureAuthenticated, async (req, res) => {
+    try {
+        const collection = await getManagedCollection(req.params.collectionId, req.user);
+        if (!collection) return res.status(404).json({ message: 'Collection not found or you do not have permission to configure its MCP server.' });
+
+        const current = collectionMcpServer.getConfig(collection);
+        const body = req.body || {};
+        const name = body.name === undefined ? (current.name || `${collection.name || 'Collection'} MCP Server`) : String(body.name).trim();
+        const description = body.description === undefined ? current.description : String(body.description).trim();
+        const enabled = body.enabled === undefined ? current.enabled : body.enabled;
+        const rawRequestIds = body.requestIds === undefined ? current.requestIds : body.requestIds;
+
+        if (typeof enabled !== 'boolean') return res.status(400).json({ message: 'Enabled must be true or false.' });
+        if (!name || name.length > 100) return res.status(400).json({ message: 'Server name must be between 1 and 100 characters.' });
+        if (description.length > 500) return res.status(400).json({ message: 'Server description must be 500 characters or fewer.' });
+        if (!Array.isArray(rawRequestIds) || rawRequestIds.length > 100) return res.status(400).json({ message: 'Choose up to 100 collection requests to expose.' });
+
+        const requestIds = [...new Set(rawRequestIds.map(String))];
+        const eligibleIds = new Set(collectionMcpServer.getEligibleRequests(collection).map((request) => String(request._id || request.id)));
+        if (requestIds.some((requestId) => !eligibleIds.has(requestId))) {
+            return res.status(400).json({ message: 'Only HTTP requests from this collection can be exposed as MCP tools.' });
+        }
+        if (enabled && requestIds.length === 0) return res.status(400).json({ message: 'Select at least one HTTP request before enabling the MCP server.' });
+
+        const now = new Date();
+        const nextConfig = {
+            ...current,
+            enabled,
+            name,
+            description,
+            requestIds,
+            createdAt: current.createdAt || now,
+            updatedAt: now
+        };
+        const db = getDb();
+        await db.collection('collections').updateOne(
+            { _id: collection._id },
+            { $set: { 'metadata.mcpServer': nextConfig, updatedAt: now } }
+        );
+
+        const updatedCollection = {
+            ...collection,
+            metadata: { ...(collection.metadata || {}), mcpServer: nextConfig }
+        };
+        return res.json(buildMcpServerManagementResponse(req, updatedCollection));
+    } catch (error) {
+        return res.status(500).json({ message: error.message || 'Unable to save the collection MCP server.' });
+    }
+});
+
+router.post('/servers/collections/:collectionId/token', ensureAuthenticated, async (req, res) => {
+    try {
+        const collection = await getManagedCollection(req.params.collectionId, req.user);
+        if (!collection) return res.status(404).json({ message: 'Collection not found or you do not have permission to configure its MCP server.' });
+
+        const current = collectionMcpServer.getConfig(collection);
+        const accessToken = collectionMcpServer.createAccessToken();
+        const now = new Date();
+        const nextConfig = {
+            ...current,
+            name: current.name || `${collection.name || 'Collection'} MCP Server`,
+            description: current.description || '',
+            accessTokenHash: collectionMcpServer.hashAccessToken(accessToken),
+            tokenLastFour: accessToken.slice(-4),
+            createdAt: current.createdAt || now,
+            updatedAt: now,
+            lastRotatedAt: now
+        };
+        const db = getDb();
+        await db.collection('collections').updateOne(
+            { _id: collection._id },
+            { $set: { 'metadata.mcpServer': nextConfig, updatedAt: now } }
+        );
+
+        const updatedCollection = {
+            ...collection,
+            metadata: { ...(collection.metadata || {}), mcpServer: nextConfig }
+        };
+        return res.json({
+            ...buildMcpServerManagementResponse(req, updatedCollection),
+            accessToken
+        });
+    } catch (error) {
+        return res.status(500).json({ message: error.message || 'Unable to generate a collection MCP access token.' });
+    }
+});
 
 router.get('/profiles', ensureAuthenticated, async (req, res) => {
     try {

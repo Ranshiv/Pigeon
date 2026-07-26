@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
@@ -9,8 +8,6 @@ import DocumentationOverview from './components/DocumentationOverview';
 import PublicStatusPage from './components/PublicStatusPage';
 import EnhancedPublicStatusPage from './components/EnhancedPublicStatusPage';
 import OAuthCallback from './components/OAuthCallback';
-import { toast, ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 import PageLoader from './components/common/PageLoader/PageLoader';
 import './App.css';
 import './theme-overrides.css';
@@ -121,37 +118,6 @@ function App() {
     checkAuth();
   }, []);
 
-  useEffect(() => {
-    const interceptorId = axios.interceptors.response.use(
-      response => response,
-      error => {
-        const response = error.response;
-        if (response?.status !== 401) {
-          const method = String(error.config?.method || 'request').toUpperCase();
-          const url = String(error.config?.url || 'request').split('?')[0];
-          const message = response?.data?.message || response?.data?.error || error.message || 'Request failed';
-          toast.error(message, { toastId: `axios-failure:${method}:${url}:${response?.status || 'network'}` });
-        }
-        return Promise.reject(error);
-      }
-    );
-    return () => axios.interceptors.response.eject(interceptorId);
-  }, []);
-
-  useEffect(() => {
-    const showRequestFailure = (event) => {
-      const { method, url, status, message } = event.detail || {};
-      const path = String(url || 'request').split('?')[0];
-      toast.error(message || 'Request failed', {
-        toastId: `request-failure:${method}:${path}:${status}`
-      });
-    };
-
-    window.addEventListener('pigeon:request-failed', showRequestFailure);
-    return () => window.removeEventListener('pigeon:request-failed', showRequestFailure);
-  }, []);
-
-
   // Show loading spinner while checking authentication
   if (isLoading) {
     return (
@@ -182,17 +148,6 @@ function App() {
           </div>} />
         </Routes>
       </main>
-      <ToastContainer
-        theme="dark"
-        position="bottom-right"
-        autoClose={2800}
-        hideProgressBar={false}
-        newestOnTop
-        closeOnClick
-        pauseOnHover
-        limit={4}
-        icon
-      />
       {/* api-network is a fixed-height app-shell that renders its own footer inside
           the scroll region — a second global footer here would create a 2nd scrollbar */}
       {!location.pathname.startsWith('/workspace/api-network') && <Footer />}

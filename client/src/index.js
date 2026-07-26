@@ -95,40 +95,6 @@ const handleGlobalErrors = () => {
 // Initialize global error handling
 handleGlobalErrors();
 
-// Surface failed API calls consistently, including pages that only log a failed
-// response instead of rendering their own error feedback. Authentication 401s
-// are expected during initial session checks and remain silent.
-const originalFetch = window.fetch.bind(window);
-window.fetch = async (input, init = {}) => {
-  const request = typeof input === 'string' ? { url: input, method: init.method || 'GET' } : input;
-  const method = String(request?.method || init.method || 'GET').toUpperCase();
-  const url = String(request?.url || input || 'Request');
-
-  try {
-    const response = await originalFetch(input, init);
-    if (!response.ok && response.status !== 401 && url.includes('/api/')) {
-      let message = `${method} request failed (${response.status})`;
-      try {
-        const body = await response.clone().json();
-        message = body.message || body.error || message;
-      } catch {
-        // Some endpoints return an empty or non-JSON error response.
-      }
-      window.dispatchEvent(new CustomEvent('pigeon:request-failed', {
-        detail: { method, url, status: response.status, message }
-      }));
-    }
-    return response;
-  } catch (error) {
-    if (url.includes('/api/') && error?.name !== 'AbortError') {
-      window.dispatchEvent(new CustomEvent('pigeon:request-failed', {
-        detail: { method, url, status: 0, message: `Network error: ${error.message || 'request failed'}` }
-      }));
-    }
-    throw error;
-  }
-};
-
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
