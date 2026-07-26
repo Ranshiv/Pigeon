@@ -392,4 +392,145 @@ router.put('/:collectionId/settings', ensureAuthenticated, async (req, res) => {
     }
 });
 
+// ------------------------------------------------------------------- AsyncAPI
+
+/**
+ * POST /documentation/asyncapi/:documentId
+ * Generates a readable markdown doc from an AsyncAPI document and (when a
+ * target collectionId is provided) saves it under that collection's
+ * documentation object — mirroring the import/openapi handler's save pattern.
+ * Access check: workspace owner/collaborator via the document's workspaceId.
+ */
+router.post('/asyncapi/:documentId', ensureAuthenticated, async (req, res) => {
+    try {
+        const AsyncApiDocument = require('../models/AsyncApiDocument');
+        const Workspace = require('../models/Workspace');
+        const mongoose = require('mongoose');
+
+        const doc = await AsyncApiDocument.findById(req.params.documentId);
+        if (!doc) return res.status(404).json({ message: 'AsyncAPI document not found' });
+
+        const wsId = doc.workspaceId;
+        const userId = req.user.id;
+        const userOid = mongoose.Types.ObjectId.isValid(userId) ? new mongoose.Types.ObjectId(userId) : null;
+        const ids = userOid ? [userId, userOid] : [userId];
+        const ws = await Workspace.findOne({
+            _id: wsId,
+            $or: [{ owner: { $in: ids } }, { userId: { $in: ids } }, { 'collaborators.userId': { $in: ids } }]
+        }).select('_id');
+        if (!ws) return res.status(403).json({ message: 'You do not have access to this workspace' });
+
+        const content = generateAsyncApiMarkdown(doc);
+
+        // Optional target collection — mirror the import/openapi save pattern.
+        const collectionId = req.body?.collectionId;
+        let savedDocumentation = null;
+        if (collectionId) {
+            const collection = await Collection.findOne({
+                _id: collectionId,
+                $or: [
+                    { userId },
+                    { owner: userId },
+                    { collaborators: { $elemMatch: { userId, role: { $in: ['editor', 'admin'] } } } }
+                ]
+            });
+            if (!collection) return res.status(404).json({ message: 'Collection not found or no edit permission' });
+            const documentation = {
+                title: req.body?.title || `${doc.name} (AsyncAPI)`,
+                content,
+                collectionId,
+                importedFrom: 'asyncapi',
+                updatedAt: new Date()
+            };
+            collection.documentation = documentation;
+            collection.updatedAt = new Date();
+            await collection.save();
+            savedDocumentation = documentation;
+            res.status(201).json({ documentation: savedDocumentation, content });
+        } else {
+            // No target collection: just return the generated markdown so the
+            // UI can show it / hand off to the Documentation section.
+            res.status(200).json({ documentation: { title: `${doc.name} (AsyncAPI)`, content, importedFrom: 'asyncapi' }, content });
+        }
+    } catch (err) {
+        console.error('Error generating AsyncAPI documentation:', err);
+        res.status(500).json({ message: 'Error generating AsyncAPI documentation' });
+    }
+});
+
+function escapeMd(text) {
+    return String(text || '').replace(/[\n]+/g, ' ').trim();
+}
+
+function generateAsyncApiMarkdown(doc) {
+    const lines = [];
+    lines.push(`# ${doc.name || 'Untitled AsyncAPI'}`);
+    lines.push('');
+    lines.push(`**AsyncAPI version:** ${doc.asyncApiVersion || '2.6.0'}  `);
+    lines.push(`**Document version:** ${doc.version || '1.0.0'}  `);
+    if (doc.description) lines.push(`  \n${doc.description}`);
+    if (Array.isArray(doc.tags) && doc.tags.length) {
+        lines.push(`  \n**Tags:** ${doc.tags.map((t) => `\`${t}\``).join(', ')}`);
+    }
+    lines.push('');
+    lines.push('## Servers');
+    if (Array.isArray(doc.servers) && doc.servers.length) {
+        lines.push('| Name | URL | Protocol | Security |');
+        lines.push('|------|-----|----------|----------|');
+        for (const s of doc.servers) {
+            lines.push(`| ${escapeMd(s.name)} | \`${escapeMd(s.url)}\` | ${escapeMd(s.protocol)} |${s.security ? ` ${escapeMd(s.security)}` : ' —'} |`);
+        }
+    } else {
+        lines.push('_No servers defined._');
+    }
+    lines.push('');
+    lines.push('## Channels');
+    if (Array.isArray(doc.channels) && doc.channels.length) {
+        for (const c of doc.channels) {
+            lines.push(`### \`${c.address || c.name || ''}\``);
+            if (c.description) lines.push(c.description);
+            const ops = (doc.operations || []).filter((o) => o.channelName === c.name || o.channelName === c.address);
+            if (ops.length) {
+                lines.push('');
+                lines.push('**Operations:**');
+                for (const op of ops) {
+                    lines.push(`- **${op.action}**${op.messageName ? ` → message \`${op.messageName}\`` : ''}${op.summary ? ` — ${op.summary}` : ''}`);
+                }
+            }
+            lines.push('');
+        }
+    } else {
+        lines.push('_No channels defined._');
+    }
+    lines.push('## Messages');
+    if (Array.isArray(doc.messages) && doc.messages.length) {
+        for (const m of doc.messages) {
+            lines.push(`### \`${m.name}\``);
+            if (m.title) lines.push(`**Title:** ${m.title}  `);
+            if (m.description) lines.push(`  \n${m.description}`);
+            lines.push(`  \n**Content-Type:** ${m.contentType || 'application/json'}`);
+            if (m.payloadSchema && Object.keys(m.payloadSchema).length) {
+                lines.push('  \n**Payload schema:**');
+                lines.push('```json');
+                lines.push(JSON.stringify(m.payloadSchema, null, 2));
+                lines.push('```');
+            }
+            if (m.payloadExample) {
+                lines.push('  \n**Payload example:**');
+                lines.push('```json');
+                lines.push(m.payloadExample);
+                lines.push('```');
+            }
+            lines.push('');
+        }
+    } else {
+        lines.push('_No messages defined._');
+    }
+    if (Array.isArray(doc.importWarnings) && doc.importWarnings.length) {
+        lines.push('## Import notes');
+        for (const w of doc.importWarnings) lines.push(`- ${w}`);
+    }
+    return lines.join('\n');
+}
+
 module.exports = router;

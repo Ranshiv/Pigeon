@@ -9,7 +9,7 @@ const router = express.Router();
 const { ObjectId } = require('mongodb');
 const { ensureAuthenticated } = require('../middleware/auth');
 const { getDb } = require('../config/db');
-const { scoreCollection, CATEGORY_WEIGHTS, CATEGORY_LABELS } = require('../services/GovernanceScoringService');
+const { scoreCollection, scoreAsyncApiDocument, CATEGORY_WEIGHTS, CATEGORY_LABELS } = require('../services/GovernanceScoringService');
 
 function toObjectId(value) {
     if (!value) return null;
@@ -56,7 +56,7 @@ router.get('/scorecard', ensureAuthenticated, async (req, res) => {
 
         if (collections.length === 0) {
             return res.json({
-                items: [],
+                items: await includeAsyncApiItems(req, [], requestedWorkspaceId),
                 summary: emptySummary(),
                 weights: CATEGORY_WEIGHTS,
                 categoryLabels: CATEGORY_LABELS
@@ -128,7 +128,7 @@ router.get('/scorecard', ensureAuthenticated, async (req, res) => {
         items.sort((a, b) => a.score - b.score);
 
         res.json({
-            items,
+            items: await includeAsyncApiItems(req, items, requestedWorkspaceId),
             summary: summarize(items),
             weights: CATEGORY_WEIGHTS,
             categoryLabels: CATEGORY_LABELS
@@ -174,6 +174,68 @@ function summarize(items) {
         documentedPercent: totalRequests === 0 ? 0 : Math.round((documented / totalRequests) * 100),
         atRisk: items.filter((i) => i.score < 50).length
     };
+}
+
+/**
+ * Add AsyncAPI documents the user can access to the items array. Each item
+ * carries a `type: 'asyncapi'` discriminant and the same score/categories/
+ * metrics/recommendations shape as a REST collection item, so the existing UI
+ * reads it without changes. Additive only — never lowers an existing REST
+ * collection's score.
+ */
+async function includeAsyncApiItems(req, items, requestedWorkspaceId) {
+    try {
+        const AsyncApiDocument = require('../models/AsyncApiDocument');
+        const AsyncApiScenario = require('../models/AsyncApiScenario');
+        const AsyncApiTestRun = require('../models/AsyncApiTestRun');
+        const Workspace = require('../models/Workspace');
+        const Environment = require('../models/Environment');
+
+        const ids = [req.user.id, ...(toObjectId(req.user.id) ? [toObjectId(req.user.id)] : [])];
+        const wsFilter = {
+            $or: [{ owner: { $in: ids } }, { userId: { $in: ids } }, { 'collaborators.userId': { $in: ids } }]
+        };
+        if (requestedWorkspaceId && requestedWorkspaceId !== 'all') {
+            const wsOid = toObjectId(requestedWorkspaceId);
+            wsFilter._id = { $in: [requestedWorkspaceId, ...(wsOid ? [wsOid] : [])] };
+        }
+        const workspaces = await Workspace.find(wsFilter).select('_id name').lean();
+        const workspaceIds = workspaces.map((w) => String(w._id));
+        if (workspaceIds.length === 0) return items;
+
+        const docs = await AsyncApiDocument.find({ workspaceId: { $in: workspaces.map((w) => w._id) } }).lean();
+        if (docs.length === 0) return items;
+
+        const workspaceById = new Map(workspaces.map((w) => [String(w._id), w]));
+        const docIds = docs.map((d) => d._id);
+        const [scenarios, runs] = await Promise.all([
+            AsyncApiScenario.find({ documentId: { $in: docIds } }).lean(),
+            AsyncApiTestRun.find({ documentId: { $in: docIds } }).sort({ createdAt: -1 }).limit(200).lean()
+        ]);
+        const envCounts = await Environment.find({ userId: { $in: ids } }).countDocuments();
+
+        const scenariosByDoc = groupBy(scenarios, (s) => String(s.documentId));
+        const runsByDoc = groupBy(runs, (r) => String(r.documentId));
+
+        const asyncItems = docs.map((doc) => {
+            const ws = workspaceById.get(String(doc.workspaceId));
+            return scoreAsyncApiDocument(doc, {
+                scenarios: scenariosByDoc.get(String(doc._id)) || [],
+                runs: runsByDoc.get(String(doc._id)) || [],
+                environmentCount: envCounts,
+                workspaceId: String(doc.workspaceId),
+                workspaceName: ws?.name || 'Unassigned',
+                ownerId: doc.owner ? String(doc.owner) : null,
+                ownerName: 'Unknown'
+            });
+        });
+        // Back-compat: existing consumers see REST + AsyncAPI items together,
+        // sorted by score (Asc), matching the existing sort above.
+        return [...items, ...asyncItems].sort((a, b) => a.score - b.score);
+    } catch (err) {
+        console.error('Error including AsyncAPI items in governance scorecard:', err);
+        return items; // fail-soft: scorecard still works without AsyncAPI items.
+    }
 }
 
 module.exports = router;

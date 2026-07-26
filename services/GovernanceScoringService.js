@@ -320,6 +320,136 @@ function scoreCollection(collection, context = {}) {
     };
 }
 
+/**
+ * AsyncAPI coverage metrics — channel-documentation, server/environment,
+ * message-schema, scenario/test, latest-test health. Returned as the
+ * `metrics` object of scoreAsyncApiDocument. Pure, additive — does not touch
+ * the existing collection path.
+ */
+function computeAsyncApiMetrics(doc, context = {}) {
+    const servers = Array.isArray(doc?.servers) ? doc.servers : [];
+    const channels = Array.isArray(doc?.channels) ? doc.channels : [];
+    const messages = Array.isArray(doc?.messages) ? doc.messages : [];
+    const operations = Array.isArray(doc?.operations) ? doc.operations : [];
+    const scenarios = Array.isArray(context.scenarios) ? context.scenarios : [];
+    const runs = Array.isArray(context.runs) ? context.runs : [];
+
+    const documentedChannels = channels.filter((c) => isNonEmpty((c && c.description) || (c && c.name))).length;
+    const documentedMessages = messages.filter((m) => isNonEmpty((m && (m.description || m.title)))).length;
+    const schemaMessages = messages.filter((m) => m && m.payloadSchema && typeof m.payloadSchema === 'object' && Object.keys(m.payloadSchema).length > 0).length;
+    const documentedOps = operations.filter((o) => isNonEmpty(o?.summary)).length;
+
+    const hasServerEnv = servers.some((s) => s && /\{\{.*\}\}/.test(String(s.url || '')));
+    const serverCount = servers.length;
+    const lastRun = doc?.lastRun && doc.lastRun.result ? doc.lastRun : (runs.length ? { result: runs[0]?.status, ranAt: runs[0]?.createdAt } : null);
+    const lastRunPassed = lastRun && (lastRun.result === 'passed');
+    const lastRunFailed = lastRun && (lastRun.result === 'failed' || lastRun.result === 'error');
+    const scenariosCount = scenarios.length;
+
+    return {
+        channelCount: channels.length,
+        messageCount: messages.length,
+        operationCount: operations.length,
+        documentedChannelCount: documentedChannels,
+        documentedOperationCount: documentedOps,
+        documentedMessageCount: documentedMessages,
+        schemaMessageCount: schemaMessages,
+        channelDocumentationPercent: pct(documentedChannels, channels.length),
+        messageDocumentationPercent: pct(documentedMessages, messages.length),
+        messageSchemaPercent: pct(schemaMessages, messages.length),
+        operationDocumentationPercent: pct(documentedOps, operations.length),
+        environmentCount: Number(context.environmentCount || 0),
+        serverCount,
+        usesEnvVariables: hasServerEnv,
+        scenariosCount,
+        hasRuns: runs.length > 0 || Boolean(lastRun),
+        lastRunResult: lastRun?.result || null
+    };
+}
+
+function scoreAsyncApiCategories(m) {
+    const documentation = m.channelCount === 0 && m.messageCount === 0
+        ? 0
+        : Math.round(
+            m.channelDocumentationPercent * 0.35 +
+            m.messageDocumentationPercent * 0.2 +
+            m.operationDocumentationPercent * 0.25 +
+            m.messageSchemaPercent * 0.2
+        );
+    const security = m.channelCount === 0
+        ? 0
+        : Math.round(m.messageSchemaPercent * 0.4 + (m.usesEnvVariables ? 30 : 0) + Math.min(m.environmentCount, 2) * 5);
+    const monitoring = m.hasRuns ? (m.lastRunResult === 'passed' ? 100 : m.lastRunResult === 'failed' ? 50 : 30) : 0;
+    const versioning = 0; // AsyncAPI docs don't carry api-versions here yet.
+    const requestQuality = Math.round(
+        Math.min(m.scenariosCount, 5) * 12 +
+        Math.min(m.messageSchemaPercent, 70) / 2
+    );
+    const compliance = m.usesEnvVariables ? 60 : 20;
+    const clamp = (n) => Math.max(0, Math.min(100, Math.round(n) || 0));
+    return {
+        documentation: clamp(documentation),
+        security: clamp(security),
+        requestQuality: clamp(Math.min(100, requestQuality)),
+        monitoring: clamp(monitoring),
+        versioning: clamp(versioning),
+        compliance: clamp(compliance)
+    };
+}
+
+function buildAsyncApiRecommendations(m, categories) {
+    const recs = [];
+    if (m.channelCount > 0 && m.channelDocumentationPercent < 100) {
+        recs.push({ category: 'documentation', severity: m.channelDocumentationPercent < 50 ? 'high' : 'medium',
+            message: `Document ${m.channelCount - m.documentedChannelCount} channel${(m.channelCount - m.documentedChannelCount) === 1 ? '' : 's'}` });
+    }
+    if (m.messageCount > 0 && m.messageSchemaPercent < 100) {
+        recs.push({ category: 'security', severity: 'high',
+            message: `Add payload schemas to ${m.messageCount - m.schemaMessageCount} message${(m.messageCount - m.schemaMessageCount) === 1 ? '' : 's'}` });
+    }
+    if (!m.usesEnvVariables && m.serverCount > 0) {
+        recs.push({ category: 'security', severity: 'medium',
+            message: 'Replace hardcoded server URLs/secrets with environment variables' });
+    }
+    if (m.scenariosCount === 0) {
+        recs.push({ category: 'requestQuality', severity: 'medium', message: 'Add a test scenario per channel' });
+    }
+    if (!m.hasRuns) {
+        recs.push({ category: 'monitoring', severity: 'high', message: 'Run at least one AsyncAPI test' });
+    } else if (m.lastRunResult === 'failed' || m.lastRunResult === 'error') {
+        recs.push({ category: 'monitoring', severity: 'high', message: `Latest AsyncAPI test ${m.lastRunResult} — investigate` });
+    }
+    const order = { high: 0, medium: 1, low: 2 };
+    return recs.sort((a, b) => order[a.severity] - order[b.severity]);
+}
+
+/**
+ * Score an AsyncApiDocument. Shape parallels scoreCollection's return, but
+ * carries a `type: 'asyncapi'` discriminant so consumers can tell REST
+ * collections apart from event-driven specs in the same items[] array.
+ */
+function scoreAsyncApiDocument(doc, context = {}) {
+    const metrics = computeAsyncApiMetrics(doc, context);
+    const categories = scoreAsyncApiCategories(metrics);
+    const score = overallScore(categories);
+    return {
+        type: 'asyncapi',
+        collectionId: String(doc?._id || ''),
+        documentId: String(doc?._id || ''),
+        name: doc?.name || 'Untitled AsyncAPI document',
+        workspaceId: context.workspaceId ? String(context.workspaceId) : (doc?.workspaceId ? String(doc.workspaceId) : null),
+        workspaceName: context.workspaceName || 'Unassigned',
+        ownerId: context.ownerId ? String(context.ownerId) : (doc?.owner ? String(doc.owner) : null),
+        ownerName: context.ownerName || 'Unknown',
+        score,
+        grade: score >= 80 ? 'good' : score >= 50 ? 'fair' : 'poor',
+        // The existing REST UI reads `categories` + `metrics`; keep both names.
+        categories,
+        metrics,
+        recommendations: buildAsyncApiRecommendations(metrics, categories)
+    };
+}
+
 module.exports = {
     CATEGORY_WEIGHTS,
     CATEGORY_LABELS,
@@ -327,5 +457,10 @@ module.exports = {
     scoreCategories,
     overallScore,
     buildRecommendations,
-    scoreCollection
+    scoreCollection,
+    // AsyncAPI scoring — additive, new functions only.
+    computeAsyncApiMetrics,
+    scoreAsyncApiCategories,
+    buildAsyncApiRecommendations,
+    scoreAsyncApiDocument
 };

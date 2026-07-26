@@ -109,6 +109,10 @@ router.use('/consumer-contracts', require('./consumerContracts'));
 // Register OpenTelemetry Trace-to-Test routes
 router.use('/traces', require('./traces'));
 
+// Register AsyncAPI design & testing routes (scenarios sub-router mounted
+// inside ./asyncapi at /asyncapi/scenarios).
+router.use('/asyncapi', require('./asyncapi'));
+
 // Register Multi-Protocol routes (WebSocket, gRPC, SOAP, MQTT, SSE)
 router.use('/protocols', protocolsRoutes);
 

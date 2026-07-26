@@ -26,7 +26,8 @@ import {
     FiLink, // Add FiLink icon for protocols
     FiCpu,
     FiAward, // Governance scorecard
-    FiActivity // OpenTelemetry trace-to-test
+    FiActivity, // OpenTelemetry trace-to-test
+    FiRadio // AsyncAPI event-driven design & testing
 } from 'react-icons/fi';
 import { TbVectorTriangle } from 'react-icons/tb'; // Mesh network icon for GraphQL
 import Notifications from './Notifications'; // Import the Notifications component
@@ -462,6 +463,9 @@ const Navbar = ({ isAuthenticated }) => {
                                             </div>
                                             <div className={`dropdown-item${location.pathname === '/workspace/trace-to-test' ? ' active' : ''}`} onClick={(event) => handleApiNavigation(event, '/workspace/trace-to-test')}>
                                                 <FiActivity size={16} style={{ marginRight: '10px' }} /> Trace to Test
+                                            </div>
+                                            <div className={`dropdown-item${location.pathname === '/workspace/asyncapi' ? ' active' : ''}`} onClick={(event) => handleApiNavigation(event, '/workspace/asyncapi')}>
+                                                <FiRadio size={16} style={{ marginRight: '10px' }} /> AsyncAPI
                                             </div>
                                             <div className={`dropdown-item${location.pathname === '/workspace/history' ? ' active' : ''}`} onClick={(event) => handleApiNavigation(event, '/workspace/history')}>
                                                 <FiClock size={16} style={{ marginRight: '10px' }} /> History
