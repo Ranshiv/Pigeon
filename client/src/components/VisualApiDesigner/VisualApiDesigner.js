@@ -18,6 +18,7 @@ import PropertiesPanel from './components/PropertiesPanel';
 import SpecPreview from './components/SpecPreview';
 import ValidationPanel from './components/ValidationPanel';
 import ContractDiffViewer from './components/ContractDiffViewer';
+import ArazzoWorkflowWorkspace from './components/ArazzoWorkflowWorkspace';
 import VersionCreationModal from './components/VersionCreationModal';
 import ErrorBoundary from './components/ErrorBoundary';
 import useDesignerState from './hooks/useDesignerState';
@@ -93,7 +94,8 @@ const VisualApiDesigner = ({
     const { loadDesign: loadDesignerState } = designerState;
 
     const { generatedSpec, validationErrors } = useSpecGeneration(nodes, edges);
-    const [viewMode, setViewMode] = useState('design'); // 'design', 'preview', 'split', 'diff'
+    const [viewMode, setViewMode] = useState('design'); // 'design', 'workflow', 'preview', 'split', 'diff'
+    const [arazzoWorkflow, setArazzoWorkflow] = useState(null);
     const [isTransitioning, setIsTransitioning] = useState(false); // Smooth mode transitions
     const [saveStatus, setSaveStatus] = useState('saved'); // 'saved', 'saving', 'unsaved'
     const [visualizationContext, setVisualizationContext] = useState(null); // For handling visualization requests
@@ -219,7 +221,7 @@ const VisualApiDesigner = ({
         };
     }, [collectionId, joinCollectionFn, leaveCollectionFn, sendActivityFn]);
 
-    const saveDesign = useCallback(async () => {
+    const saveDesign = useCallback(async (workflowOverride = arazzoWorkflow) => {
         try {
             // Skip if collection ID is invalid or contains '#' character
             if (!collectionId || typeof collectionId !== 'string' || collectionId.includes('#')) {
@@ -251,6 +253,7 @@ const VisualApiDesigner = ({
                     collectionId,
                     designerState,
                     openApiSpec: generatedSpec,
+                    arazzoWorkflow: workflowOverride,
                     name: collection?.name ? `${collection.name} Visual Design` : 'Untitled Design'
                 })
             });
@@ -291,7 +294,7 @@ const VisualApiDesigner = ({
                 message: error.message || 'Failed to save design'
             };
         }
-    }, [collectionId, nodes, edges, generatedSpec, onSpecUpdate, collection?.name, isDev, markClean]);
+    }, [collectionId, nodes, edges, generatedSpec, arazzoWorkflow, onSpecUpdate, collection?.name, isDev, markClean]);
 
     const loadDesign = useCallback(async () => {
         try {
@@ -347,6 +350,8 @@ const VisualApiDesigner = ({
             } else {
                 console.log('📝 No designer state found in response');
             }
+
+            setArazzoWorkflow(result.data?.arazzoWorkflow || null);
 
             return result.data;
         } catch (error) {
@@ -757,6 +762,15 @@ const VisualApiDesigner = ({
                         Design
                     </button>
                     <button
+                        className={`toggle-btn ${viewMode === 'workflow' ? 'active' : ''}`}
+                        onClick={() => handleViewModeChange('workflow')}
+                        disabled={isTransitioning}
+                        title="Arazzo API workflows"
+                    >
+                        <FiGitBranch />
+                        Workflow
+                    </button>
+                    <button
                         className={`toggle-btn ${viewMode === 'preview' ? 'active' : ''}`}
                         onClick={() => handleViewModeChange('preview')}
                         disabled={isTransitioning}
@@ -788,6 +802,21 @@ const VisualApiDesigner = ({
 
     const renderMainContent = () => {
         switch (viewMode) {
+            case 'workflow':
+                return (
+                    <ArazzoWorkflowWorkspace
+                        collectionName={collection?.name || 'Pigeon API'}
+                        collectionId={collectionId}
+                        requests={requests}
+                        collectionVariables={collection?.variables || []}
+                        workflow={arazzoWorkflow}
+                        onWorkflowChange={setArazzoWorkflow}
+                        onSave={async (workflow) => {
+                            setArazzoWorkflow(workflow);
+                            return saveDesign(workflow);
+                        }}
+                    />
+                );
             case 'preview':
                 return (
                     <div className="preview-container">

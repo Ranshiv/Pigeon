@@ -76,6 +76,7 @@ const incidentsRoutes = require('./incidents');
 
 // Import Alert routes
 const alertsRoutes = require('./alerts');
+const mcpRoutes = require('./mcp');
 
 // Register routes with their base paths
 router.use('/auth', authRoutes);
@@ -130,6 +131,7 @@ router.use('/incidents', incidentsRoutes);
 
 // Register Alert routes
 router.use('/alerts', alertsRoutes);
+router.use('/mcp', mcpRoutes);
 
 // Register Collaboration routes (Reviews & Comments & Activity)
 router.use('/reviews', require('./reviews'));

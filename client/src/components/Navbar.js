@@ -22,7 +22,8 @@ import {
     FiBarChart2,
     FiShield,
     FiBook,  // Add FiBook icon for documentation
-    FiLink  // Add FiLink icon for protocols
+    FiLink, // Add FiLink icon for protocols
+    FiCpu
 } from 'react-icons/fi';
 import { TbVectorTriangle } from 'react-icons/tb'; // Mesh network icon for GraphQL
 import Notifications from './Notifications'; // Import the Notifications component
@@ -440,6 +441,9 @@ const Navbar = ({ isAuthenticated }) => {
                                             </div>
                                             <div className={`dropdown-item${location.pathname === '/workspace/api-network/ai-agent-tools' ? ' active' : ''}`} onClick={(event) => handleApiNavigation(event, '/workspace/api-network/ai-agent-tools')}>
                                                 <FiZap size={16} style={{ marginRight: '10px' }} /> AI Agent Tools
+                                            </div>
+                                            <div className={`dropdown-item${location.pathname === '/workspace/api-network/mcp' ? ' active' : ''}`} onClick={(event) => handleApiNavigation(event, '/workspace/api-network/mcp')}>
+                                                <FiCpu size={16} style={{ marginRight: '10px' }} /> MCP Workbench
                                             </div>
                                             <div className={`dropdown-item${location.pathname === '/workspace/graphql' ? ' active' : ''}`} onClick={(event) => handleApiNavigation(event, '/workspace/graphql')}>
                                                 <TbVectorTriangle size={16} style={{ marginRight: '10px' }} /> GraphQL

@@ -21,8 +21,7 @@ router.post('/designs', authenticateJWT, async (req, res) => {
             userId: req.user?._id || req.user?.id
         });
 
-        const { collectionId, designerState, openApiSpec, name, description } = req.body;
-        const userId = req.user._id || req.user.id;
+        const { collectionId, designerState, openApiSpec, arazzoWorkflow, name, description } = req.body;
 
         if (!collectionId) {
             return res.status(400).json({
@@ -47,8 +46,12 @@ router.post('/designs', authenticateJWT, async (req, res) => {
             });
         }
 
-        // Find the collection
-        let collection = await Collection.findById(collectionId);
+        // Read only the persisted designer state. Loading and saving the complete
+        // collection would revalidate every embedded request, including legacy
+        // request records unrelated to the visual design.
+        const collection = await Collection.findById(collectionId)
+            .select({ metadata: 1 })
+            .lean();
 
         if (!collection) {
             return res.status(404).json({
@@ -57,13 +60,7 @@ router.post('/designs', authenticateJWT, async (req, res) => {
             });
         }
 
-        // Ensure metadata object exists
-        if (!collection.metadata) {
-            collection.metadata = {};
-        }
-
-        // Update the collection with the designer state and spec
-        collection.metadata.visualDesigner = {
+        const visualDesigner = {
             lastUpdated: new Date(),
             designerState: {
                 nodes: designerState.nodes || [],
@@ -71,48 +68,37 @@ router.post('/designs', authenticateJWT, async (req, res) => {
                 viewport: designerState.viewport || { x: 0, y: 0, zoom: 1 }
             },
             openApiSpec: openApiSpec || null,
+            arazzoWorkflow: Object.prototype.hasOwnProperty.call(req.body, 'arazzoWorkflow')
+                ? arazzoWorkflow
+                : collection.metadata?.visualDesigner?.arazzoWorkflow || null,
             name: name || 'Visual Design',
             description: description || 'Visual API design'
         };
 
-        // Mark the metadata field as modified to ensure Mongoose saves it
-        collection.markModified('metadata');
-
-        console.log('💾 About to save collection:', {
+        console.log('💾 Updating visual design only:', {
             collectionId: collection._id,
-            hasMetadata: !!collection.metadata,
-            hasVisualDesigner: !!collection.metadata.visualDesigner,
-            nodeCount: collection.metadata.visualDesigner.designerState.nodes.length,
-            edgeCount: collection.metadata.visualDesigner.designerState.edges.length
+            nodeCount: visualDesigner.designerState.nodes.length,
+            edgeCount: visualDesigner.designerState.edges.length
         });
 
-        const saveResult = await collection.save();
+        const updateResult = await Collection.updateOne(
+            { _id: collectionId },
+            { $set: { 'metadata.visualDesigner': visualDesigner } },
+            { runValidators: false }
+        );
 
-        console.log('✅ Collection save completed:', {
-            savedId: saveResult._id,
-            requestedId: collectionId,
-            idsMatch: saveResult._id.toString() === collectionId,
-            lastModified: saveResult.updatedAt,
-            metadataExists: !!saveResult.metadata?.visualDesigner,
-            nodeCount: saveResult.metadata?.visualDesigner?.designerState?.nodes?.length || 0
-        });
-
-        // Verify the save actually worked by querying the database
-        const verifyCollection = await Collection.findById(collectionId);
-        console.log('🔍 Save verification:', {
-            foundAfterSave: !!verifyCollection,
-            hasVisualDesigner: !!verifyCollection?.metadata?.visualDesigner,
-            nodeCount: verifyCollection?.metadata?.visualDesigner?.designerState?.nodes?.length || 0
-        });
+        if (updateResult.matchedCount !== 1) {
+            return res.status(404).json({ success: false, message: 'Collection not found' });
+        }
 
         return res.status(200).json({
             success: true,
             message: 'Design saved successfully',
             data: {
                 id: collection._id,
-                nodeCount: collection.metadata.visualDesigner.designerState.nodes.length,
-                edgeCount: collection.metadata.visualDesigner.designerState.edges.length,
-                lastUpdated: collection.metadata.visualDesigner.lastUpdated
+                nodeCount: visualDesigner.designerState.nodes.length,
+                edgeCount: visualDesigner.designerState.edges.length,
+                lastUpdated: visualDesigner.lastUpdated
             }
         });
     } catch (error) {
@@ -137,7 +123,6 @@ router.get('/designs/:collectionId', authenticateJWT, async (req, res) => {
         });
 
         const { collectionId } = req.params;
-        const userId = req.user._id || req.user.id;
 
         // Validate collectionId format
         const mongoose = require('mongoose');
@@ -149,7 +134,9 @@ router.get('/designs/:collectionId', authenticateJWT, async (req, res) => {
         }
 
         // Find the collection
-        const collection = await Collection.findById(collectionId);
+        const collection = await Collection.findById(collectionId)
+            .select({ metadata: 1 })
+            .lean();
 
         console.log('🔍 Collection lookup result:', {
             found: !!collection,
@@ -181,6 +168,7 @@ router.get('/designs/:collectionId', authenticateJWT, async (req, res) => {
         const visualDesigner = collection.metadata?.visualDesigner || {
             designerState: { nodes: [], edges: [], viewport: { x: 0, y: 0, zoom: 1 } },
             openApiSpec: null,
+            arazzoWorkflow: null,
             lastUpdated: null,
             name: 'Visual Design',
             description: 'Visual API design'

@@ -1,0 +1,437 @@
+/* MCP Workbench follows the API Network workspace: full-width, compact panels,
+   and the shared theme tokens rather than a centred marketing-page layout. */
+.mcp-workbench {
+    box-sizing: border-box;
+    width: 100%;
+    min-height: 100%;
+    padding: 24px 28px 36px;
+    color: var(--text-color);
+}
+
+.mcp-hero,
+.mcp-card-heading,
+.mcp-server-details,
+.mcp-connection-pill {
+    display: flex;
+    align-items: center;
+}
+
+.mcp-hero {
+    justify-content: space-between;
+    gap: 20px;
+    margin: 0 0 20px;
+    padding: 0 0 18px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.mcp-hero-actions {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    gap: 9px;
+}
+
+.mcp-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    color: var(--primary-color);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.mcp-hero h1 {
+    margin: 6px 0 5px;
+    color: var(--text-color);
+    font-size: 1.35rem;
+    font-weight: 650;
+    letter-spacing: -0.02em;
+}
+
+.mcp-hero p,
+.mcp-card-heading p,
+.mcp-empty {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: 0.84rem;
+    line-height: 1.5;
+}
+
+.mcp-connection-pill {
+    flex: 0 0 auto;
+    gap: 7px;
+    padding: 7px 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background: var(--card-bg);
+    color: var(--text-secondary);
+    font-size: 0.76rem;
+    font-weight: 600;
+}
+
+.mcp-connection-pill span {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--text-muted);
+}
+
+.mcp-connection-pill--connected span { background: var(--success-color); }
+.mcp-connection-pill--connecting span { background: var(--warning-color); }
+
+.mcp-card {
+    box-sizing: border-box;
+    padding: 18px;
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    background: var(--card-bg);
+    box-shadow: none;
+}
+
+.mcp-card-heading {
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.mcp-card-heading h2,
+.mcp-catalog-card h2,
+.mcp-result h3 {
+    margin: 0 0 3px;
+    color: var(--text-color);
+    font-size: 0.95rem;
+    font-weight: 650;
+    letter-spacing: -0.01em;
+}
+
+.mcp-primary-button {
+    display: inline-flex;
+    min-height: 36px;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    padding: 8px 13px;
+    border: 1px solid var(--primary-color);
+    border-radius: 8px;
+    background: var(--primary-color);
+    color: var(--button-text, #fff);
+    cursor: pointer;
+    font: inherit;
+    font-size: 0.82rem;
+    font-weight: 600;
+    transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+}
+
+.mcp-primary-button:hover:not(:disabled) {
+    border-color: var(--primary-hover);
+    background: var(--primary-hover);
+}
+
+.mcp-primary-button:active:not(:disabled) { transform: translateY(1px); }
+.mcp-primary-button:disabled { cursor: not-allowed; opacity: 0.55; }
+.mcp-primary-button:focus-visible { outline: none; box-shadow: var(--ring); }
+
+.mcp-secondary-button,
+.mcp-icon-button,
+.mcp-text-button {
+    display: inline-flex;
+    min-height: 36px;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background: var(--card-bg);
+    color: var(--text-color);
+    cursor: pointer;
+    font: inherit;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.mcp-secondary-button { padding: 8px 11px; }
+.mcp-icon-button { width: 36px; padding: 0; color: var(--text-secondary); }
+.mcp-text-button { min-height: auto; padding: 3px 0; border: 0; background: transparent; color: var(--primary-color); }
+.mcp-secondary-button:hover:not(:disabled), .mcp-icon-button:hover:not(:disabled) { border-color: var(--primary-color); background: var(--primary-light); color: var(--primary-color); }
+.mcp-text-button:hover { color: var(--primary-hover); text-decoration: underline; }
+.mcp-secondary-button:disabled, .mcp-icon-button:disabled { cursor: not-allowed; opacity: 0.52; }
+.mcp-secondary-button:focus-visible, .mcp-icon-button:focus-visible, .mcp-text-button:focus-visible { outline: none; box-shadow: var(--ring); }
+
+.mcp-profile-grid {
+    display: grid;
+    grid-template-columns: minmax(180px, 0.9fr) minmax(180px, 1fr) auto;
+    gap: 12px;
+    align-items: end;
+    margin-bottom: 16px;
+}
+
+.mcp-profile-grid label {
+    display: grid;
+    gap: 7px;
+    color: var(--text-secondary);
+    font-size: 0.72rem;
+    font-weight: 650;
+}
+
+.mcp-profile-grid input {
+    box-sizing: border-box;
+    width: 100%;
+    min-height: 40px;
+    padding: 10px 11px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background: var(--surface-sunken, var(--background-color));
+    color: var(--text-color);
+    font: inherit;
+    font-size: 0.84rem;
+}
+
+.mcp-profile-grid input:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary-color) 14%, transparent); }
+.mcp-profile-actions { display: flex; gap: 7px; }
+
+.mcp-form-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 16px;
+}
+
+.mcp-form-grid label {
+    display: grid;
+    gap: 7px;
+    color: var(--text-secondary);
+    font-size: 0.72rem;
+    font-weight: 650;
+}
+
+.mcp-form-grid input,
+.mcp-form-grid textarea {
+    box-sizing: border-box;
+    width: 100%;
+    padding: 10px 11px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background: var(--surface-sunken, var(--background-color));
+    color: var(--text-color);
+    font: inherit;
+    font-size: 0.84rem;
+    resize: vertical;
+}
+
+.mcp-form-grid input:focus,
+.mcp-form-grid textarea:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary-color) 14%, transparent);
+}
+
+.mcp-form-grid textarea {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.8rem;
+    line-height: 1.45;
+}
+
+/* The global selector surface can equal the card surface in dark themes.
+   Keep MCP selectors visibly grouped with its other form controls. */
+.mcp-workbench .app-select.app-select .app-select-trigger {
+    min-height: 40px;
+    padding: 10px 11px;
+    border-color: var(--border-color);
+    border-radius: 8px;
+    background-color: var(--surface-sunken, var(--background-color)) !important;
+    font-size: 0.84rem;
+}
+
+.mcp-workbench .app-select.app-select .app-select-trigger:hover,
+.mcp-workbench .app-select.app-select .app-select-trigger:focus-visible {
+    border-color: var(--primary-color);
+    background-color: color-mix(in srgb, var(--primary-color) 6%, var(--surface-sunken, var(--background-color))) !important;
+}
+
+.mcp-server-details {
+    flex-wrap: wrap;
+    gap: 9px;
+    margin-top: 14px;
+    color: var(--text-secondary);
+    font-size: 0.76rem;
+}
+
+.mcp-server-details strong { color: var(--text-color); }
+.mcp-server-details span { padding-left: 9px; border-left: 1px solid var(--border-color); }
+
+.mcp-error {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 14px 0 0;
+    color: var(--error-color, #ef4444);
+    font-size: 0.82rem;
+}
+
+.mcp-operations-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 16px;
+    margin-top: 16px;
+}
+
+.mcp-history-card .mcp-card-heading h2,
+.mcp-inspector-card .mcp-card-heading h2 {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.mcp-history-list {
+    display: grid;
+    gap: 2px;
+    max-height: 214px;
+    margin: 0;
+    padding: 0;
+    overflow: auto;
+    list-style: none;
+}
+
+.mcp-history-list li {
+    display: grid;
+    grid-template-columns: 8px minmax(0, 1fr) auto;
+    gap: 9px;
+    align-items: center;
+    padding: 8px 2px;
+    border-bottom: 1px solid color-mix(in srgb, var(--border-color) 70%, transparent);
+}
+
+.mcp-history-list li:last-child { border-bottom: 0; }
+.mcp-history-status { width: 7px; height: 7px; border-radius: 50%; background: var(--success-color); }
+.mcp-history-status--failed { background: var(--error-color, #ef4444); }
+.mcp-history-list div { display: grid; min-width: 0; gap: 2px; }
+.mcp-history-list strong { overflow: hidden; color: var(--text-color); font-size: 0.76rem; text-overflow: ellipsis; white-space: nowrap; }
+.mcp-history-list span, .mcp-history-list time { overflow: hidden; color: var(--text-secondary); font-size: 0.7rem; text-overflow: ellipsis; white-space: nowrap; }
+.mcp-history-list time { max-width: 138px; }
+
+.mcp-inspector-list {
+    display: grid;
+    gap: 7px;
+    max-height: 214px;
+    overflow: auto;
+}
+
+.mcp-inspector-list details {
+    border: 1px solid var(--border-color);
+    border-radius: 7px;
+    background: var(--surface-sunken, var(--background-color));
+}
+
+.mcp-inspector-list summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 8px 10px;
+    color: var(--text-color);
+    cursor: pointer;
+    font-size: 0.76rem;
+    font-weight: 600;
+}
+
+.mcp-inspector-list summary time { color: var(--text-secondary); font-size: 0.7rem; font-weight: 400; }
+.mcp-inspector-list pre { max-height: 260px; margin: 0; padding: 0 10px 10px; overflow: auto; color: var(--text-color); font: 0.72rem/1.45 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; white-space: pre-wrap; }
+
+.mcp-catalog-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+    margin: 16px 0;
+}
+
+.mcp-catalog-card { min-height: 174px; }
+
+.mcp-catalog-card h2 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.mcp-catalog-card h2 span {
+    padding: 2px 6px;
+    border-radius: 5px;
+    background: var(--primary-light);
+    color: var(--primary-color);
+    font-size: 0.69rem;
+}
+
+.mcp-catalog-card ul {
+    display: grid;
+    gap: 12px;
+    max-height: 230px;
+    margin: 14px 0 0;
+    padding: 0;
+    overflow: auto;
+    list-style: none;
+}
+
+.mcp-catalog-card li { display: grid; gap: 3px; }
+.mcp-catalog-card li strong { color: var(--text-color); font-size: 0.8rem; }
+.mcp-catalog-card li span { color: var(--text-secondary); font-size: 0.76rem; line-height: 1.4; }
+
+.mcp-tool-runner { margin-top: 16px; }
+.mcp-runner-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin-top: 16px; }
+.mcp-runner-grid .mcp-tool-runner { margin-top: 0; }
+.mcp-form-grid--stacked { grid-template-columns: 1fr; }
+
+.mcp-guided-fields {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 10px;
+    padding: 11px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background: color-mix(in srgb, var(--primary-color) 3%, var(--surface-sunken, var(--background-color)));
+}
+
+.mcp-guided-fields label { display: grid; gap: 6px; color: var(--text-secondary); font-size: 0.72rem; font-weight: 650; }
+.mcp-guided-fields input { box-sizing: border-box; width: 100%; min-height: 38px; padding: 8px 9px; border: 1px solid var(--border-color); border-radius: 7px; background: var(--card-bg); color: var(--text-color); font: inherit; font-size: 0.8rem; }
+.mcp-guided-fields input:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary-color) 12%, transparent); }
+.mcp-guided-fields em { margin-left: 5px; color: var(--error-color, #ef4444); font-size: 0.65rem; font-style: normal; font-weight: 600; }
+
+.mcp-schema,
+.mcp-result {
+    margin-top: 16px;
+    padding: 13px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background: var(--surface-sunken, var(--background-color));
+}
+
+.mcp-schema summary { cursor: pointer; color: var(--text-color); font-size: 0.82rem; font-weight: 600; }
+
+.mcp-schema pre,
+.mcp-result pre {
+    max-height: 420px;
+    margin: 11px 0 0;
+    overflow: auto;
+    color: var(--text-color);
+    font: 0.78rem/1.45 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    white-space: pre-wrap;
+}
+
+@media (max-width: 900px) {
+    .mcp-catalog-grid,
+    .mcp-runner-grid,
+    .mcp-operations-grid { grid-template-columns: 1fr; }
+    .mcp-hero { align-items: flex-start; flex-direction: column; }
+}
+
+@media (max-width: 650px) {
+    .mcp-workbench { padding: 18px; }
+    .mcp-form-grid { grid-template-columns: 1fr; }
+    .mcp-profile-grid { grid-template-columns: 1fr; }
+    .mcp-card-heading { align-items: flex-start; flex-direction: column; }
+    .mcp-primary-button, .mcp-secondary-button { width: 100%; }
+    .mcp-profile-actions { width: 100%; }
+    .mcp-icon-button { flex: 0 0 36px; }
+    .mcp-hero-actions { width: 100%; flex-direction: column-reverse; align-items: stretch; }
+    .mcp-server-details { align-items: flex-start; flex-direction: column; }
+    .mcp-server-details span { padding: 0; border: 0; }
+}

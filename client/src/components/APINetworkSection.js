@@ -3,6 +3,7 @@ import { Routes, Route, useNavigate, useParams, Navigate } from 'react-router-do
 // import ExploreSection from './ExploreSection';
 import SpotlightSection from './SpotlightSection';
 import AIAgentToolsSection from './AIAgentToolsSection';
+import McpWorkbench from './McpWorkbench';
 import RequestForm from './RequestForm';
 import ResponseDisplay from './ResponseDisplay';
 import HistorySection from './HistorySection';
@@ -398,6 +399,7 @@ const APINetworkSection = () => {
                     <Route path="history" element={<Navigate to="/workspace/history" replace />} />
 <Route path="spotlight" element={<SpotlightSection />} />
                     <Route path="ai-agent-tools" element={<AIAgentToolsSection />} />
+                    <Route path="mcp" element={<McpWorkbench />} />
                     <Route
                         path="requests/new"
                         element={<RequestWorkspaceNew onSave={handleRequestCreate} onSend={fetchHistory} />}
