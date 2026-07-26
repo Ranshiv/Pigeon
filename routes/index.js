@@ -100,6 +100,15 @@ router.use('/graphql', graphqlRoutes);
 // Register Compliance routes
 router.use('/compliance', complianceRoutes);
 
+// Register Governance scorecard routes
+router.use('/governance', require('./governance'));
+
+// Register Consumer-Driven Contract Testing routes
+router.use('/consumer-contracts', require('./consumerContracts'));
+
+// Register OpenTelemetry Trace-to-Test routes
+router.use('/traces', require('./traces'));
+
 // Register Multi-Protocol routes (WebSocket, gRPC, SOAP, MQTT, SSE)
 router.use('/protocols', protocolsRoutes);
 

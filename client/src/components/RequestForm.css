@@ -29,6 +29,18 @@
     background-color: var(--background-color);
 }
 
+/* Only rendered on requests generated from an OpenTelemetry trace. */
+.request-source-trace {
+    display: inline-block;
+    margin-top: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--primary-color);
+    text-decoration: none;
+}
+
+.request-source-trace:hover { text-decoration: underline; }
+
 .request-name-input {
     width: 100%;
     font-size: 18px;

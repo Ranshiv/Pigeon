@@ -10,12 +10,13 @@ import EnvironmentSelector from './EnvironmentSelector';
 import CollectionVariablesManager from './CollectionVariablesManager';
 import VisualApiDesigner from './VisualApiDesigner/VisualApiDesigner';
 import CollectionMcpServerPanel from './CollectionMcpServerPanel';
+import FuzzTestingPanel from './FuzzTestingPanel';
 import { useCollaboration } from '../context/CollaborationContext';
 import {
   FiSettings, FiAlertCircle, FiCheckCircle, FiBook, FiEdit,
   FiPlus, FiTrash2, FiDatabase, FiGlobe, FiLock, FiUsers, FiPackage,
   FiFileText, FiInfo, FiGrid, FiFolder, FiChevronDown, FiChevronLeft, FiChevronRight,
-  FiArrowLeft, FiRefreshCw, FiServer
+  FiArrowLeft, FiRefreshCw, FiServer, FiTarget
 } from 'react-icons/fi';
 import { toast } from 'react-toastify'; // Import toast notification library
 
@@ -742,9 +743,16 @@ function CollectionDetail() {
 
       const savedCollection = await saveResponse.json();
       const persistedRequests = savedCollection.requests || updatedRequests;
-      const persistedRequest = persistedRequests.find(
+      const savedRequest = persistedRequests.find(
         (item) => (item._id || item.id) === requestId
       ) || requestToSave;
+      // Keep the temporary client id as a stable form identity even if the
+      // database assigns an embedded-document _id during the first save.
+      const persistedRequest = {
+        ...savedRequest,
+        id: request.id || savedRequest.id || requestId,
+        isNew: false
+      };
 
       setCollection(savedCollection);
       setRequests(persistedRequests);
@@ -1107,8 +1115,19 @@ function CollectionDetail() {
           >
             <FiServer /> MCP Server
           </button>
+          <button
+            className={`tab-btn ${activeTab === 'fuzz-testing' ? 'active' : ''}`}
+            onClick={() => setActiveTab('fuzz-testing')}
+          >
+            <FiTarget /> Fuzz Testing
+          </button>
         </div>
         <div className="collection-actions">
+          {activeTab === 'requests' && (
+            <button className="action-btn new-request-header-btn" onClick={handleAddRequest}>
+              <FiPlus className="icon" /> New Request
+            </button>
+          )}
           <button className="action-btn" onClick={handleSettingsClick}>
             <FiSettings className="icon" /> Settings
           </button>
@@ -1171,16 +1190,23 @@ function CollectionDetail() {
             <>
               {selectedFolder ? (
                 <ImportedFolderOverview folder={selectedFolder} />
-              ) : !selectedRequest && !showRequestForm ? (<div className="collection-info">
-                <h2>Collection Details</h2>
+              ) : (!selectedRequest || !showRequestForm) ? (<div className={`collection-info ${requests.length ? 'requests-welcome' : ''}`}>
+                <h2>{requests.length ? 'Choose a request to begin' : 'Collection Details'}</h2>
 
                 <div className="collection-overview-card">
                   <div className="collection-description">
-                    {collection?.description || 'No description provided.'}
+                    {requests.length
+                      ? 'Select a request from the left panel to edit and send it, or create a new request to add an endpoint to this collection.'
+                      : (collection?.description || 'No description provided.')}
                   </div>
+                  {requests.length > 0 && (
+                    <button className="primary-button" onClick={handleAddRequest}>
+                      <FiPlus className="icon" /> Create New Request
+                    </button>
+                  )}
                 </div>
 
-                <div className="collection-metadata-section">
+                {requests.length === 0 && <div className="collection-metadata-section">
                   <div className="metadata-header">
                     <FiInfo className="metadata-icon" />
                     <h3 className="metadata-title">Collection Information</h3>
@@ -1210,9 +1236,9 @@ function CollectionDetail() {
                       <div className="collaborator-count">{activeUsers.length}</div>
                     </div>
                   </div>
-                </div>
+                </div>}
 
-                <div className="real-time-info">
+                {requests.length === 0 && <div className="real-time-info">
                   <h4><FiUsers className="info-icon" /> Real-time Collaboration</h4>
                   <p>This collection supports real-time collaboration. You can work together with your team members simultaneously.</p>
                   {requests.length === 0 && (
@@ -1220,13 +1246,13 @@ function CollectionDetail() {
                       <FiPlus className="icon" /> Create Your First Request
                     </button>
                   )}
-                </div>
+                </div>}
               </div>
               ) : (
                 showRequestForm && selectedRequest && (
                   <div className="request-workspace">
                     <RequestForm
-                      key={selectedRequest?._id || selectedRequest?.id || 'new-request'}
+                      key={selectedRequest?.id || selectedRequest?._id || 'new-request'}
                       request={selectedRequest}
                       collection={collection}
                       collectionId={collectionId}
@@ -1309,6 +1335,16 @@ function CollectionDetail() {
 
           {activeTab === 'mcp-server' && (
             <CollectionMcpServerPanel collectionId={collectionId} />
+          )}
+
+          {activeTab === 'fuzz-testing' && (
+            <FuzzTestingPanel
+              requests={requests}
+              collectionId={collectionId}
+              workspaceId={collection?.workspaceId}
+              selectedEnvironment={selectedEnvironment}
+              collectionVariables={collection?.variables}
+            />
           )}
         </div>      </div>
       {renderSettingsModal()}

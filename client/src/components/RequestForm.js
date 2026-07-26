@@ -215,6 +215,12 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
     const prevRequestIdRef = useRef(null);
     useEffect(() => {
         const nextData = request || initialRequest || {};
+        const nextId = nextData.id || nextData._id;
+
+        // A save/send returns a fresh object for the same request. Keep the
+        // in-progress form intact in that case instead of resetting it just
+        // after the first Send click.
+        if (prevRequestIdRef.current === nextId) return;
 
         setMethod(nextData.method || 'GET');
         setUrl(nextData.url || '');
@@ -260,14 +266,11 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
         // reference for the same id, and clipping responseData there wipes
         // the just-rendered response (matches the "flashes then disappears"
         // symptom on Send).
-        const nextId = nextData._id || nextData.id;
-        if (prevRequestIdRef.current !== nextId) {
-            setResponseData(null);
-            setResponseError(null);
-            setIsLoading(false);
-            setPostRequestScriptResults(null);
-            prevRequestIdRef.current = nextId;
-        }
+        setResponseData(null);
+        setResponseError(null);
+        setIsLoading(false);
+        setPostRequestScriptResults(null);
+        prevRequestIdRef.current = nextId;
     }, [request, initialRequest]);
 
     // Debug console state
@@ -2952,6 +2955,16 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
                         onChange={(e) => setRequestName(e.target.value)}
                         placeholder="Request Name"
                     />
+                    {/* Generated from an OpenTelemetry span — link back while the trace still exists. */}
+                    {initialData.metadata?.traceId && (
+                        <a
+                            className="request-source-trace"
+                            href={`/workspace/trace-to-test?traceId=${encodeURIComponent(initialData.metadata.traceId)}`}
+                            title={`Trace ${initialData.metadata.traceId} · span ${initialData.metadata.spanId || '—'}`}
+                        >
+                            Open source trace
+                        </a>
+                    )}
                 </div>
 
                 {/* URL bar */}

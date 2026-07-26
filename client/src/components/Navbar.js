@@ -20,10 +20,13 @@ import {
     FiCheck,
     FiChevronRight,
     FiBarChart2,
+    FiFileText, // Consumer-driven contracts
     FiShield,
     FiBook,  // Add FiBook icon for documentation
     FiLink, // Add FiLink icon for protocols
-    FiCpu
+    FiCpu,
+    FiAward, // Governance scorecard
+    FiActivity // OpenTelemetry trace-to-test
 } from 'react-icons/fi';
 import { TbVectorTriangle } from 'react-icons/tb'; // Mesh network icon for GraphQL
 import Notifications from './Notifications'; // Import the Notifications component
@@ -454,6 +457,12 @@ const Navbar = ({ isAuthenticated }) => {
                                             <div className={`dropdown-item${location.pathname === '/workspace/performance-tests' ? ' active' : ''}`} onClick={(event) => handleApiNavigation(event, '/workspace/performance-tests')}>
                                                 <FiBarChart2 size={16} style={{ marginRight: '10px' }} /> Performance Tests
                                             </div>
+                                            <div className={`dropdown-item${location.pathname === '/workspace/consumer-contracts' ? ' active' : ''}`} onClick={(event) => handleApiNavigation(event, '/workspace/consumer-contracts')}>
+                                                <FiFileText size={16} style={{ marginRight: '10px' }} /> Consumer Contracts
+                                            </div>
+                                            <div className={`dropdown-item${location.pathname === '/workspace/trace-to-test' ? ' active' : ''}`} onClick={(event) => handleApiNavigation(event, '/workspace/trace-to-test')}>
+                                                <FiActivity size={16} style={{ marginRight: '10px' }} /> Trace to Test
+                                            </div>
                                             <div className={`dropdown-item${location.pathname === '/workspace/history' ? ' active' : ''}`} onClick={(event) => handleApiNavigation(event, '/workspace/history')}>
                                                 <FiClock size={16} style={{ marginRight: '10px' }} /> History
                                             </div>
@@ -466,6 +475,12 @@ const Navbar = ({ isAuthenticated }) => {
                                 <div className="navbar-item" onClick={() => handleNavigation('/workspace/monitoring')}>
                                     <span className={isActive('/workspace/monitoring') ? 'active' : ''}>
                                         <FiTrendingUp size={18} /> Monitoring
+                                    </span>
+                                </div>
+
+                                <div className="navbar-item" onClick={() => handleNavigation('/workspace/governance')}>
+                                    <span className={isActive('/workspace/governance') ? 'active' : ''}>
+                                        <FiAward size={18} /> Governance
                                     </span>
                                 </div>
 

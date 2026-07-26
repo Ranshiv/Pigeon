@@ -169,6 +169,22 @@ router.post('/:id/send', ensureAuthenticated, async (req, res) => {
 
         const { url, method, headers, body, bodyType, bodyFormData, preRequestScript, testScript } = requestDoc;
 
+        // node-fetch correctly rejects bodies on GET/HEAD. Return a useful
+        // client error before attempting the request instead of reporting it
+        // as an internal server failure.
+        if (body && bodyType !== 'none' && ['GET', 'HEAD'].includes(String(method).toUpperCase())) {
+            return res.status(400).json({
+                error: `${method} requests cannot include a request body`,
+                message: 'Use POST, PUT, PATCH, or DELETE for a JSON payload.',
+                status: 400,
+                statusText: 'Invalid Request Configuration',
+                headers: {},
+                body: null,
+                duration: Date.now() - startTime,
+                testResults: null
+            });
+        }
+
         // --- Prepare and Send Fetch Request ---
         const fetchOptions = {
             method,
@@ -443,10 +459,13 @@ router.post('/:id/send', ensureAuthenticated, async (req, res) => {
 
         // --- Optionally save failed attempt to History ---
         try {
+            const hasStoredRequestId = /^[0-9a-fA-F]{24}$/.test(req.params.id || '');
+            const storedRequest = hasStoredRequestId ? await Request.findById(req.params.id) : null;
+            const suppliedRequest = req.body || {};
             const historyEntry = new History({
                 userId: req.user.id,
-                url: req.params.id ? (await Request.findById(req.params.id))?.url || 'Unknown URL' : 'Unknown URL', // Attempt to get URL
-                method: req.params.id ? (await Request.findById(req.params.id))?.method || 'Unknown Method' : 'Unknown Method', // Attempt to get method
+                url: suppliedRequest.url || storedRequest?.url || 'Unknown URL',
+                method: suppliedRequest.method || storedRequest?.method || 'Unknown Method',
                 responseStatus: 500, // Indicate internal error
                 responseStatusText: 'Server Error During Send',
                 responseBody: `Error: ${err.message}`,

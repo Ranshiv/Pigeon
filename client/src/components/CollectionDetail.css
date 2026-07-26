@@ -2155,6 +2155,60 @@
   height: auto;
   min-height: 0;
   flex: 1;
+  flex-direction: row;
+}
+
+/* The request list is intentionally a vertical workspace rail.  A previous
+   documentation layout override made it a column, allowing a long request
+   list to consume the whole page and leaving the request area blank. */
+.collection-sidebar {
+  min-height: 0;
+  flex: 0 0 260px;
+}
+
+.collection-sidebar.collapsed {
+  flex-basis: 45px;
+}
+
+.collection-main {
+  min-width: 0;
+  min-height: 0;
+}
+
+.new-request-header-btn {
+  background: var(--primary-color, #ff8a1f);
+  border-color: var(--primary-color, #ff8a1f);
+  color: var(--button-text, #fff);
+}
+
+.new-request-header-btn:hover {
+  filter: brightness(1.08);
+}
+
+.requests-welcome {
+  display: grid;
+  place-items: center;
+  min-height: min(48vh, 440px);
+  padding: 32px;
+  text-align: center;
+}
+
+.requests-welcome .collection-overview-card {
+  display: grid;
+  justify-items: center;
+  gap: 18px;
+  width: min(100%, 580px);
+  margin: 0;
+}
+
+.requests-welcome .collection-description {
+  max-width: 52ch;
+  line-height: 1.6;
+}
+
+@media (max-width: 768px) {
+  .collection-content { flex-direction: column; }
+  .collection-sidebar { flex-basis: auto; }
 }
 
 @media (max-width: 600px) {
