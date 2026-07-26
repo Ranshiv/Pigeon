@@ -113,6 +113,9 @@ router.use('/traces', require('./traces'));
 // inside ./asyncapi at /asyncapi/scenarios).
 router.use('/asyncapi', require('./asyncapi'));
 
+// Git-native, local-first collection export and repository status.
+router.use('/git-collections', require('./gitCollections'));
+
 // Register Multi-Protocol routes (WebSocket, gRPC, SOAP, MQTT, SSE)
 router.use('/protocols', protocolsRoutes);
 

@@ -173,6 +173,19 @@ collectionSchema.index({ isPublic: 1 });
 collectionSchema.index({ 'collaborators.userId': 1 });
 
 // Pre-save middleware to update timestamps and stats
+collectionSchema.pre('validate', function (next) {
+    if (this.requests && Array.isArray(this.requests)) {
+        this.requests.forEach((request) => {
+            ['headers', 'params', 'bodyFormData'].forEach((field) => {
+                (request[field] || []).forEach((item) => {
+                    if (item?._id && !mongoose.isValidObjectId(item._id)) item._id = undefined;
+                });
+            });
+        });
+    }
+    next();
+});
+
 collectionSchema.pre('save', function (next) {
     this.updatedAt = new Date();
 

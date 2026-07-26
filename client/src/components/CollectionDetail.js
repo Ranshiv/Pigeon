@@ -11,12 +11,13 @@ import CollectionVariablesManager from './CollectionVariablesManager';
 import VisualApiDesigner from './VisualApiDesigner/VisualApiDesigner';
 import CollectionMcpServerPanel from './CollectionMcpServerPanel';
 import FuzzTestingPanel from './FuzzTestingPanel';
+import CollectionGitSyncPanel from './CollectionGitSyncPanel';
 import { useCollaboration } from '../context/CollaborationContext';
 import {
   FiSettings, FiAlertCircle, FiCheckCircle, FiBook, FiEdit,
   FiPlus, FiTrash2, FiDatabase, FiGlobe, FiLock, FiUsers, FiPackage,
   FiFileText, FiInfo, FiGrid, FiFolder, FiChevronDown, FiChevronLeft, FiChevronRight,
-  FiArrowLeft, FiRefreshCw, FiServer, FiTarget
+  FiArrowLeft, FiRefreshCw, FiServer, FiTarget, FiGitBranch
 } from 'react-icons/fi';
 import { toast } from 'react-toastify'; // Import toast notification library
 
@@ -1121,6 +1122,12 @@ function CollectionDetail() {
           >
             <FiTarget /> Fuzz Testing
           </button>
+          <button
+            className={`tab-btn ${activeTab === 'git-sync' ? 'active' : ''}`}
+            onClick={() => setActiveTab('git-sync')}
+          >
+            <FiGitBranch /> Git Sync
+          </button>
         </div>
         <div className="collection-actions">
           {activeTab === 'requests' && (
@@ -1345,6 +1352,10 @@ function CollectionDetail() {
               selectedEnvironment={selectedEnvironment}
               collectionVariables={collection?.variables}
             />
+          )}
+
+          {activeTab === 'git-sync' && (
+            <CollectionGitSyncPanel collectionId={collectionId} collectionName={collection?.name} />
           )}
         </div>      </div>
       {renderSettingsModal()}
