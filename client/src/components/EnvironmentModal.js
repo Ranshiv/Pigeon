@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './EnvironmentModal.css';
 import VariableEditor from './VariableEditor';
-import { FiX, FiSave, FiTrash2 } from 'react-icons/fi';
+import { FiBox, FiInfo, FiKey, FiSave, FiTrash2, FiX } from 'react-icons/fi';
 
 const EnvironmentModal = ({
     isOpen,
@@ -86,100 +86,148 @@ const EnvironmentModal = ({
 
     return (
         <div className="environment-modal-overlay" onClick={onClose}>
-            <div className="environment-modal" onClick={e => e.stopPropagation()}>
-                <div className="environment-modal-header">
-                    <h2>
-                        {environment ? 'Edit Environment' : 'Create Environment'}
-                        {environment?.isActive && <span className="active-badge">Active</span>}
-                    </h2>
-                    <button className="close-button" onClick={onClose}>
-                        <FiX />
-                    </button>
-                </div>
-
-                {error && (
-                    <div className="error-message">
-                        {error}
-                    </div>
-                )}
-
-                <form onSubmit={handleSubmit} className="environment-form">
-                    <div className="form-group">
-                        <label htmlFor="name">Environment Name *</label>
-                        <input
-                            type="text"
-                            id="name"
-                            value={formData.name}
-                            onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                            placeholder="e.g., Development, Staging, Production"
-                            required
-                            disabled={isReadOnly || loading}
-                        />
-                    </div>
-
-                    <div className="form-group">
-                        <label htmlFor="description">Description</label>
-                        <textarea
-                            id="description"
-                            value={formData.description}
-                            onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                            placeholder="Optional description for this environment"
-                            rows={3}
-                            disabled={isReadOnly || loading}
-                        />
-                    </div>
-
-                    <div className="form-group">
-                        <label>Environment Variables</label>
-                        <div className="variables-container">
-                            <VariableEditor
-                                scope="environment"
-                                variables={formData.variables}
-                                onVariablesChange={(variables) =>
-                                    setFormData(prev => ({ ...prev, variables }))
-                                }
-                                helpText="Define variables specific to this environment. These will be available to all requests when this environment is active."
-                                readOnly={isReadOnly}
-                                environmentId={environment ? environment._id : undefined}
-                            />
+            <div
+                className="environment-editor-modal"
+                onClick={e => e.stopPropagation()}
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="environment-editor-title"
+            >
+                <header className="env-editor-header">
+                    <div className="env-editor-heading">
+                        <span className="env-editor-heading-icon" aria-hidden="true">
+                            <FiBox />
+                        </span>
+                        <div>
+                            <span className="env-editor-eyebrow">
+                                {environment ? 'Environment settings' : 'New environment'}
+                            </span>
+                            <div className="env-editor-title-row">
+                                <h2 id="environment-editor-title">
+                                    {environment ? 'Edit Environment' : 'Create Environment'}
+                                </h2>
+                                {environment?.isActive ? <span className="active-badge">Active</span> : null}
+                            </div>
+                            <p>Configure reusable values for requests in this workspace.</p>
                         </div>
                     </div>
+                    <button className="env-editor-close" type="button" onClick={onClose} aria-label="Close environment editor">
+                        <FiX />
+                    </button>
+                </header>
 
-                    <div className="environment-modal-actions">
+                <form onSubmit={handleSubmit} className="env-editor-form">
+                    <div className="env-editor-body">
+                        {error ? (
+                            <div className="env-editor-error" role="alert">
+                                {error}
+                            </div>
+                        ) : null}
+
+                        <section className="env-form-section" aria-labelledby="environment-basics-title">
+                            <div className="env-section-heading">
+                                <span className="env-section-icon" aria-hidden="true"><FiInfo /></span>
+                                <div>
+                                    <h3 id="environment-basics-title">Basic information</h3>
+                                    <p>Name this environment and explain where it should be used.</p>
+                                </div>
+                            </div>
+
+                            <div className="env-field-grid">
+                                <div className="env-field">
+                                    <label htmlFor="environment-name">Environment name <span aria-hidden="true">*</span></label>
+                                    <input
+                                        type="text"
+                                        id="environment-name"
+                                        value={formData.name}
+                                        onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                                        placeholder="Development, Staging, Production"
+                                        required
+                                        disabled={isReadOnly || loading}
+                                        autoFocus
+                                    />
+                                    <span className="env-field-hint">Use a short name your team will recognize.</span>
+                                </div>
+
+                                <div className="env-field">
+                                    <label htmlFor="environment-description">Description <span className="env-optional">Optional</span></label>
+                                    <textarea
+                                        id="environment-description"
+                                        value={formData.description}
+                                        onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                                        placeholder="Describe the services, region, or workflow this environment targets"
+                                        rows={3}
+                                        disabled={isReadOnly || loading}
+                                    />
+                                </div>
+                            </div>
+                        </section>
+
+                        <section className="env-form-section env-variables-section" aria-labelledby="environment-variables-title">
+                            <div className="env-section-heading env-section-heading--split">
+                                <div className="env-section-heading-main">
+                                    <span className="env-section-icon" aria-hidden="true"><FiKey /></span>
+                                    <div>
+                                        <h3 id="environment-variables-title">Environment variables</h3>
+                                        <p>Store values such as base URLs, tokens, and service identifiers.</p>
+                                    </div>
+                                </div>
+                                <span className="env-variable-count">
+                                    {formData.variables.length} {formData.variables.length === 1 ? 'variable' : 'variables'}
+                                </span>
+                            </div>
+
+                            <div className="env-variables-shell">
+                                <VariableEditor
+                                    scope="environment"
+                                    variables={formData.variables}
+                                    onVariablesChange={(variables) =>
+                                        setFormData(prev => ({ ...prev, variables }))
+                                    }
+                                    editable={!isReadOnly && !loading}
+                                    hideHeader
+                                    inlineAddForm
+                                    environmentId={environment ? environment._id : undefined}
+                                />
+                            </div>
+                        </section>
+                    </div>
+
+                    <footer className="env-editor-footer">
                         <div className="left-actions">
-                            {environment && !isReadOnly && (
+                            {environment && !isReadOnly ? (
                                 <button
                                     type="button"
-                                    className="delete-button"
+                                    className="env-delete-button"
                                     onClick={handleDelete}
                                     disabled={loading}
                                 >
                                     <FiTrash2 />
-                                    Delete
+                                    Delete environment
                                 </button>
-                            )}
+                            ) : null}
                         </div>
                         <div className="right-actions">
                             <button
                                 type="button"
-                                className="cancel-button"
+                                className="env-cancel-button"
                                 onClick={onClose}
                                 disabled={loading}
                             >
                                 Cancel
                             </button>
-                            {!isReadOnly && (
+                            {!isReadOnly ? (
                                 <button
                                     type="submit"
-                                    className="save-button"
+                                    className="env-save-button"
                                     disabled={loading || !formData.name.trim()}
                                 >
                                     <FiSave />
                                     {loading ? 'Saving...' : environment ? 'Update' : 'Create'}
                                 </button>
-                            )}
+                            ) : null}
                         </div>
-                    </div>
+                    </footer>
                 </form>
             </div>
         </div>

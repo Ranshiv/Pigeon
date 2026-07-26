@@ -313,3 +313,795 @@ body.dark-theme .environment-modal-overlay {
         transform: translateY(0) scale(1);
     }
 }
+
+/* Environment editor modal — independent from the selector's management
+   modal and from generic form/modal classes elsewhere in the application. */
+.environment-editor-modal {
+    display: flex;
+    width: min(600px, calc(100vw - 40px));
+    max-height: min(88vh, 860px);
+    flex-direction: column;
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg, 12px);
+    background: var(--card-bg);
+    box-shadow: 0 22px 60px rgba(0, 0, 0, 0.42);
+    animation: slideIn 0.25s ease;
+}
+
+.environment-editor-modal .environment-modal-header {
+    padding: 18px 24px;
+    border-bottom-color: var(--border-color);
+    background: var(--card-bg);
+}
+
+.environment-editor-modal .environment-modal-header h2 {
+    color: var(--text-color);
+    font-size: 1.05rem;
+    font-weight: 650;
+}
+
+.environment-editor-modal .close-button {
+    border: 1px solid transparent;
+    color: var(--text-secondary);
+}
+
+.environment-editor-modal .close-button:hover {
+    border-color: var(--border-color);
+    background: var(--hover-bg);
+    color: var(--text-color);
+}
+
+.environment-editor-modal .environment-form {
+    min-height: 0;
+    padding: 22px 24px 0;
+    gap: 18px;
+    overflow-y: auto;
+}
+
+.environment-editor-modal .form-group {
+    gap: 7px;
+}
+
+.environment-editor-modal .form-group label {
+    color: var(--text-secondary);
+    font-size: 0.72rem;
+    font-weight: 650;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.environment-editor-modal .form-group input,
+.environment-editor-modal .form-group textarea {
+    border-color: var(--border-color);
+    border-radius: var(--radius-sm, 8px);
+    background: var(--background-color);
+    color: var(--text-color);
+}
+
+.environment-editor-modal .form-group input:focus,
+.environment-editor-modal .form-group textarea:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary-color) 20%, transparent);
+}
+
+.environment-editor-modal .variables-container {
+    padding: 0;
+    overflow: hidden;
+    border-color: var(--border-color);
+    background: var(--background-color);
+}
+
+.environment-editor-modal .variable-editor {
+    min-height: 220px;
+    height: auto;
+}
+
+.environment-editor-modal .variable-editor-header {
+    padding: 14px 16px;
+    border-bottom-color: var(--border-color);
+    background: color-mix(in srgb, var(--primary-color) 7%, var(--card-bg));
+    box-shadow: none;
+}
+
+.environment-editor-modal .scope-badge {
+    background: var(--primary-color) !important;
+    color: var(--button-text, #fff);
+}
+
+.environment-editor-modal .scope-indicator h3 {
+    color: var(--text-color);
+    font-size: 0.95rem;
+    font-weight: 650;
+}
+
+.environment-editor-modal .variable-editor .empty-state {
+    min-height: 190px;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 32px 18px !important;
+    border: 0 !important;
+    background: transparent !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+}
+
+.environment-editor-modal .empty-state-content {
+    max-width: 330px;
+}
+
+.environment-editor-modal .empty-state-icon {
+    color: var(--primary-color);
+    opacity: 1;
+}
+
+.environment-editor-modal .variable-editor .empty-state h3 {
+    color: var(--text-color);
+    font-size: 1rem;
+}
+
+.environment-editor-modal .variable-editor .empty-state p {
+    max-width: 300px;
+    margin-bottom: 18px;
+    color: var(--text-secondary);
+}
+
+.environment-editor-modal .variable-editor .add-variable-form {
+    width: 100%;
+    max-width: 400px;
+    margin: 20px auto 0 !important;
+    padding: 16px !important;
+    box-sizing: border-box;
+    border-color: var(--border-color);
+    border-radius: 10px;
+    background: var(--background-color);
+}
+
+.environment-editor-modal .variable-editor .add-variable-form .form-actions {
+    position: static;
+    display: flex;
+    width: 100%;
+    margin: 16px 0 0 !important;
+    padding: 14px 0 0 !important;
+    box-sizing: border-box;
+    justify-content: flex-end;
+    gap: 8px;
+    border-top: 1px solid var(--border-color);
+    background: transparent !important;
+}
+
+.environment-editor-modal .variable-editor .add-variable-form .form-actions button {
+    width: auto !important;
+    min-width: 0 !important;
+    min-height: 36px;
+    padding: 8px 12px !important;
+    box-sizing: border-box;
+}
+
+.environment-editor-modal .variable-editor .add-variable-btn {
+    background: var(--primary-color) !important;
+    color: var(--button-text, #fff) !important;
+    box-shadow: none !important;
+}
+
+.environment-editor-modal .variable-editor .add-variable-btn:hover:not(:disabled) {
+    background: var(--primary-hover) !important;
+    box-shadow: none !important;
+}
+
+/* Rebuilt environment editor */
+.environment-modal-overlay {
+    padding: 24px;
+    box-sizing: border-box;
+    background: rgba(0, 0, 0, 0.74);
+    -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px);
+}
+
+.environment-editor-modal {
+    width: min(780px, 100%);
+    max-height: min(90vh, 920px);
+    border-radius: 14px;
+}
+
+.env-editor-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border-color);
+    background: var(--card-bg);
+}
+
+.env-editor-heading {
+    display: flex;
+    min-width: 0;
+    align-items: flex-start;
+    gap: 14px;
+}
+
+.env-editor-heading-icon,
+.env-section-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    border: 1px solid color-mix(in srgb, var(--primary-color) 34%, transparent);
+    background: color-mix(in srgb, var(--primary-color) 12%, transparent);
+    color: var(--primary-color);
+}
+
+.env-editor-heading-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+}
+
+.env-editor-heading-icon svg {
+    width: 18px;
+    height: 18px;
+}
+
+.env-editor-eyebrow {
+    display: block;
+    margin-bottom: 3px;
+    color: var(--primary-color);
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.env-editor-title-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.env-editor-title-row h2 {
+    margin: 0;
+    color: var(--text-color);
+    font-size: 1.12rem;
+    font-weight: 680;
+}
+
+.env-editor-heading p {
+    margin: 5px 0 0;
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+    line-height: 1.45;
+}
+
+.env-editor-close {
+    display: inline-flex;
+    width: 34px;
+    height: 34px;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 34px;
+    padding: 0;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--text-secondary);
+    cursor: pointer;
+}
+
+.env-editor-close:hover {
+    border-color: var(--border-color);
+    background: var(--hover-bg);
+    color: var(--text-color);
+}
+
+.env-editor-close svg {
+    width: 17px;
+    height: 17px;
+    margin: 0 !important;
+    color: currentColor !important;
+    stroke: currentColor;
+}
+
+.env-editor-form {
+    display: flex;
+    min-height: 0;
+    flex: 1;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.env-editor-body {
+    display: flex;
+    min-height: 0;
+    padding: 22px 24px;
+    flex: 1;
+    flex-direction: column;
+    gap: 16px;
+    overflow-y: auto;
+    background: var(--background-color);
+}
+
+.env-editor-error {
+    padding: 11px 13px;
+    border: 1px solid color-mix(in srgb, var(--error-color, #dc3545) 45%, transparent);
+    border-radius: 8px;
+    background: color-mix(in srgb, var(--error-color, #dc3545) 10%, transparent);
+    color: var(--error-color, #dc3545);
+    font-size: 0.82rem;
+}
+
+.env-form-section {
+    padding: 18px;
+    border: 1px solid var(--border-color);
+    border-radius: 11px;
+    background: var(--card-bg);
+}
+
+.env-section-heading,
+.env-section-heading-main {
+    display: flex;
+    min-width: 0;
+    align-items: flex-start;
+    gap: 11px;
+}
+
+.env-section-heading {
+    margin-bottom: 17px;
+}
+
+.env-section-heading--split {
+    justify-content: space-between;
+    gap: 18px;
+}
+
+.env-section-icon {
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+}
+
+.env-section-icon svg {
+    width: 14px;
+    height: 14px;
+}
+
+.env-section-heading h3 {
+    margin: 1px 0 3px;
+    color: var(--text-color);
+    font-size: 0.9rem;
+    font-weight: 650;
+}
+
+.env-section-heading p {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: 0.76rem;
+    line-height: 1.45;
+}
+
+.env-variable-count {
+    flex: 0 0 auto;
+    padding: 5px 9px;
+    border: 1px solid var(--border-color);
+    border-radius: 999px;
+    background: var(--background-color);
+    color: var(--text-secondary);
+    font-size: 0.7rem;
+    font-weight: 600;
+}
+
+.env-field-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+    gap: 14px;
+}
+
+.env-field {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.env-field label {
+    color: var(--text-secondary);
+    font-size: 0.69rem;
+    font-weight: 680;
+    letter-spacing: 0.045em;
+    text-transform: uppercase;
+}
+
+.env-field label > span:not(.env-optional) {
+    color: var(--primary-color);
+}
+
+.env-optional {
+    margin-left: 5px;
+    color: var(--text-muted);
+    font-size: 0.62rem;
+    font-weight: 550;
+}
+
+.env-field input,
+.env-field textarea {
+    width: 100%;
+    padding: 10px 12px;
+    box-sizing: border-box;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    outline: none;
+    background: var(--background-color);
+    color: var(--text-color);
+    font: inherit;
+    font-size: 0.82rem;
+    transition: border-color 0.16s ease, box-shadow 0.16s ease;
+}
+
+.env-field input {
+    min-height: 40px;
+}
+
+.env-field textarea {
+    min-height: 82px;
+    resize: vertical;
+}
+
+.env-field input:focus,
+.env-field textarea:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary-color) 18%, transparent);
+}
+
+.env-field input::placeholder,
+.env-field textarea::placeholder {
+    color: var(--text-muted);
+    opacity: 0.8;
+}
+
+.env-field-hint {
+    color: var(--text-muted);
+    font-size: 0.68rem;
+}
+
+.env-variables-shell {
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+    border-radius: 9px;
+    background: var(--background-color);
+}
+
+.env-variables-shell .variable-editor {
+    min-height: 210px;
+    height: auto;
+}
+
+.env-variables-shell .variables-list {
+    min-height: 210px;
+}
+
+.env-variables-shell .variable-editor .empty-state {
+    min-height: 210px;
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 28px 20px !important;
+    box-sizing: border-box;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+}
+
+.env-variables-shell .empty-state-content {
+    width: 100%;
+    max-width: 420px;
+    margin: 0 auto !important;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+}
+
+.env-variables-shell .empty-state-icon {
+    color: var(--primary-color);
+    opacity: 0.8;
+}
+
+.env-variables-shell .empty-state-icon svg {
+    width: 34px;
+    height: 34px;
+}
+
+.env-variables-shell .empty-state h3 {
+    margin-bottom: 6px;
+    color: var(--text-color);
+    font-size: 0.92rem;
+}
+
+.env-variables-shell .empty-state p {
+    max-width: 360px;
+    margin: 0 auto 16px;
+    color: var(--text-secondary);
+    font-size: 0.76rem;
+}
+
+.env-variables-shell .empty-state-action {
+    min-height: 36px;
+    padding: 8px 13px;
+    border: 1px solid var(--primary-color);
+    border-radius: 8px;
+    background: var(--primary-color);
+    color: var(--button-text, #fff);
+    font-size: 0.76rem;
+    font-weight: 650;
+}
+
+.env-variables-shell .variable-editor .add-variable-form {
+    width: 100%;
+    max-width: none;
+    margin: 0 !important;
+    padding: 18px !important;
+    box-sizing: border-box;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+}
+
+.env-variables-shell .add-variable-form .form-section {
+    display: flex;
+    margin: 0;
+    padding: 0;
+    flex-direction: column;
+    gap: 13px;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+}
+
+.env-variables-shell .add-variable-form .form-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(140px, 0.45fr);
+    gap: 12px;
+    margin: 0;
+}
+
+.env-variables-shell .add-variable-form .input-group {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.env-variables-shell .add-variable-form .input-label {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: 0.67rem;
+    font-weight: 680;
+    letter-spacing: 0.045em;
+    text-align: left;
+    text-transform: uppercase;
+}
+
+.env-variables-shell .add-variable-form .form-input,
+.env-variables-shell .add-variable-form .form-select {
+    min-height: 40px;
+    padding: 9px 11px;
+    box-sizing: border-box;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background-color: var(--card-bg);
+    color: var(--text-color);
+    font-size: 0.8rem;
+}
+
+.env-variables-shell .add-variable-form .form-input:focus,
+.env-variables-shell .add-variable-form .form-select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary-color) 18%, transparent);
+}
+
+.env-variables-shell .add-variable-form .form-actions {
+    position: static;
+    display: flex;
+    width: 100%;
+    margin: 16px 0 0 !important;
+    padding: 14px 0 0 !important;
+    box-sizing: border-box;
+    justify-content: flex-end;
+    gap: 8px;
+    border-top: 1px solid var(--border-color);
+    background: transparent !important;
+}
+
+.env-variables-shell .add-variable-form .form-actions button {
+    width: auto !important;
+    min-width: 0 !important;
+    min-height: 36px;
+    padding: 8px 12px !important;
+    border-radius: 8px !important;
+    font-size: 0.76rem !important;
+}
+
+.env-variables-shell .add-variable-form .add-variable-btn {
+    border: 1px solid var(--primary-color) !important;
+    background: var(--primary-color) !important;
+    color: var(--button-text, #fff) !important;
+    box-shadow: none !important;
+}
+
+.env-variables-shell .add-variable-form .cancel-add-btn {
+    border: 1px solid var(--border-color) !important;
+    background: var(--card-bg) !important;
+    color: var(--text-color) !important;
+}
+
+.env-editor-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 15px 24px;
+    border-top: 1px solid var(--border-color);
+    background: var(--card-bg);
+}
+
+.env-editor-footer .left-actions,
+.env-editor-footer .right-actions {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+}
+
+.env-editor-footer button {
+    display: inline-flex;
+    min-height: 38px;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    padding: 8px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.78rem;
+    font-weight: 650;
+}
+
+.env-cancel-button {
+    border: 1px solid var(--border-color);
+    background: var(--background-color);
+    color: var(--text-color);
+}
+
+.env-cancel-button:hover {
+    border-color: color-mix(in srgb, var(--primary-color) 45%, var(--border-color));
+    background: var(--hover-bg);
+}
+
+.env-save-button {
+    border: 1px solid var(--primary-color);
+    background: var(--primary-color);
+    color: var(--button-text, #fff);
+}
+
+.env-save-button:hover:not(:disabled) {
+    border-color: var(--primary-hover);
+    background: var(--primary-hover);
+}
+
+.env-delete-button {
+    border: 1px solid color-mix(in srgb, var(--error-color, #dc3545) 55%, transparent);
+    background: transparent;
+    color: var(--error-color, #dc3545);
+}
+
+.env-delete-button:hover:not(:disabled) {
+    background: color-mix(in srgb, var(--error-color, #dc3545) 10%, transparent);
+}
+
+.env-editor-footer button:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+.env-editor-footer button svg {
+    width: 14px;
+    height: 14px;
+    margin: 0 !important;
+    color: currentColor !important;
+    stroke: currentColor;
+}
+
+@media (max-width: 700px) {
+    .environment-modal-overlay {
+        padding: 10px;
+    }
+
+    .environment-editor-modal {
+        max-height: calc(100svh - 20px);
+    }
+
+    .env-editor-header,
+    .env-editor-body,
+    .env-editor-footer {
+        padding-left: 16px;
+        padding-right: 16px;
+    }
+
+    .env-field-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .env-variables-shell .add-variable-form .form-row {
+        grid-template-columns: 1fr;
+    }
+
+    .env-section-heading--split {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .env-editor-footer {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .env-editor-footer .left-actions,
+    .env-editor-footer .right-actions {
+        width: 100%;
+    }
+
+    .env-editor-footer .right-actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .env-delete-button {
+        width: 100%;
+    }
+}
+
+.environment-editor-modal .empty-state-action {
+    border-color: var(--primary-color);
+    background: var(--primary-color);
+    color: var(--button-text, #fff);
+}
+
+.environment-editor-modal .environment-modal-actions {
+    margin-top: 18px;
+    padding: 16px 24px;
+    border-top-color: var(--border-color);
+    background: var(--card-bg);
+}
+
+.environment-editor-modal .environment-modal-actions button {
+    min-height: 38px;
+    padding: 8px 14px;
+    border-radius: var(--radius-sm, 8px);
+    font-weight: 650;
+}
+
+.environment-editor-modal .cancel-button {
+    border: 1px solid var(--border-color);
+    background: var(--hover-bg);
+    color: var(--text-color);
+}
+
+.environment-editor-modal .save-button {
+    background: var(--primary-color);
+    color: var(--button-text, #fff);
+    box-shadow: none;
+}
+
+.environment-editor-modal .save-button:hover:not(:disabled) {
+    background: var(--primary-hover);
+    box-shadow: none;
+}
+
+.environment-editor-modal .environment-modal-actions svg {
+    margin: 0 !important;
+    color: currentColor !important;
+    stroke: currentColor;
+}

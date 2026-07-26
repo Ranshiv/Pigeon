@@ -477,6 +477,15 @@
     gap: 10px;
 }
 
+/* The collection tab has its own generic documentation-actions layout. Keep
+   viewer metadata pinned to the toolbar's right edge. */
+.documentation-tab-content .documentation-viewer .documentation-actions {
+    width: auto;
+    margin-top: 0;
+    margin-left: auto;
+    justify-content: flex-end;
+}
+
 .documentation-viewer .last-updated {
     margin-left: 0;
     white-space: nowrap;

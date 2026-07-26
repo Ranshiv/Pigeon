@@ -504,3 +504,114 @@ body.dark-theme .environment-selector {
         padding: 12px 16px;
     }
 }
+
+/* Environment management modal — scoped to prevent generic modal styles from
+   other workspaces changing its layout. */
+.environment-manage-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.72);
+    -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px);
+}
+
+.environment-manage-modal {
+    width: min(560px, 100%);
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg, 12px);
+    background: var(--card-bg);
+    box-shadow: 0 22px 60px rgba(0, 0, 0, 0.38);
+}
+
+.environment-manage-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 20px;
+    border-bottom: 1px solid var(--border-color);
+    background: var(--card-bg);
+}
+
+.environment-manage-header h3 {
+    margin: 0;
+    color: var(--text-color);
+    font-size: 1rem;
+    font-weight: 650;
+}
+
+.environment-manage-close {
+    display: inline-flex;
+    width: 32px;
+    height: 32px;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--text-secondary);
+    cursor: pointer;
+    font-size: 1.1rem;
+}
+
+.environment-manage-close:hover {
+    border-color: var(--border-color);
+    background: var(--hover-bg);
+    color: var(--text-color);
+}
+
+.environment-manage-content {
+    max-height: min(60vh, 540px);
+    padding: 20px;
+    overflow-y: auto;
+}
+
+.environment-manage-modal .no-environments {
+    display: flex;
+    min-height: 170px;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 14px;
+    padding: 22px;
+    box-sizing: border-box;
+    border: 1px dashed color-mix(in srgb, var(--primary-color) 36%, var(--border-color));
+    border-radius: 10px;
+    background: var(--background-color);
+    text-align: center;
+}
+
+.environment-manage-modal .no-environments p {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: 0.88rem;
+}
+
+.environment-manage-modal .create-first-btn {
+    display: inline-flex;
+    min-height: 38px;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    padding: 8px 14px;
+    border: 1px solid var(--primary-color);
+    border-radius: var(--radius-sm, 8px);
+    background: var(--primary-color);
+    color: var(--button-text, #fff);
+    cursor: pointer;
+    font-size: 0.82rem;
+    font-weight: 650;
+}
+
+.environment-manage-modal .create-first-btn svg {
+    flex: 0 0 14px;
+    margin: 0 !important;
+    color: currentColor !important;
+    stroke: currentColor;
+}

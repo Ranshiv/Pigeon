@@ -235,19 +235,20 @@ const EnvironmentSelector = ({
 
             {/* Environment Management Modal */}
             {showManageModal && (
-                <div className="modal-overlay">
-                    <div className="environment-modal">
-                        <div className="modal-header">
+                <div className="environment-manage-overlay" onClick={() => setShowManageModal(false)}>
+                    <div className="environment-manage-modal" onClick={(e) => e.stopPropagation()}>
+                        <div className="environment-manage-header">
                             <h3>Manage Environments</h3>
                             <button
-                                className="close-btn"
+                                className="environment-manage-close"
                                 onClick={() => setShowManageModal(false)}
+                                aria-label="Close environment management"
                             >
                                 ×
                             </button>
                         </div>
 
-                        <div className="modal-content">
+                        <div className="environment-manage-content">
                             <div className="environments-list">
                                 {environments.map(env => (
                                     <div key={env._id} className="environment-item">
@@ -318,7 +319,7 @@ const EnvironmentSelector = ({
                                 {environments.length === 0 && (
                                     <div className="no-environments">
                                         <p>No environments found</p>
-                                        <button className="create-first-btn">
+                                        <button className="create-first-btn" onClick={handleCreateEnvironment}>
                                             <FiPlus /> Create Your First Environment
                                         </button>
                                     </div>
