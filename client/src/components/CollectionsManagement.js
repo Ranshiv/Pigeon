@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './CollectionsManagement.css';
 import PostmanImportModal from './PostmanImportModal';
-import { FiFolder, FiPlus, FiFolderPlus, FiTrash2, FiShare2, FiLock, FiUsers, FiGitMerge, FiGitPullRequest, FiEdit, FiCopy, FiStar, FiGitBranch, FiEye, FiCheck, FiX, FiArrowRight, FiCornerDownRight, FiUploadCloud } from 'react-icons/fi';
+import { FiFolder, FiPlus, FiFolderPlus, FiTrash2, FiShare2, FiLock, FiUsers, FiGitMerge, FiGitPullRequest, FiEdit, FiCopy, FiStar, FiGitBranch, FiEye, FiCheck, FiX, FiArrowRight, FiCornerDownRight, FiUploadCloud, FiAlertCircle, FiRefreshCw } from 'react-icons/fi';
 
 const CollectionsManagement = () => {
     const navigate = useNavigate();
@@ -49,6 +49,7 @@ const CollectionsManagement = () => {
 
     const fetchCollections = async () => {
         try {
+            setError(null);
             setLoading(true);
             const response = await fetch('/api/collections', {
                 credentials: 'include'
@@ -539,7 +540,22 @@ const CollectionsManagement = () => {
         const collectionsToDisplay = activeView === 'my' ? collections : sharedCollections;
 
         if (loading) return <div className="loading-message">Loading collections...</div>;
-        if (error) return <div className="error-message">{error}</div>;
+        if (error) {
+            return (
+                <section className="collections-error-state" role="alert" aria-live="assertive">
+                    <div className="collections-error-icon" aria-hidden="true">
+                        <FiAlertCircle />
+                    </div>
+                    <span className="collections-error-label">Collections unavailable</span>
+                    <h2>Unable to load your collections</h2>
+                    <p>{error}</p>
+                    <button type="button" className="collections-error-retry" onClick={fetchCollections}>
+                        <FiRefreshCw aria-hidden="true" />
+                        Try Again
+                    </button>
+                </section>
+            );
+        }
 
         if (collectionsToDisplay.length === 0) {
             return (

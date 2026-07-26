@@ -64,11 +64,11 @@ const CollectionCreate = ({
                     return;
                 }
 
-                // Navigate to either the workspace detail or collections list
+                // Navigate to either the workspace detail or workspace list
                 if (workspaceId) {
-                    navigate(`/workspace/workspaces/${workspaceId}`);
+                    navigate(`/workspace/workspaces/${workspaceId}?tab=collections`);
                 } else {
-                    navigate('/workspace/collections');
+                    navigate('/workspace/workspaces');
                 }
             } else {
                 // Try to get more detailed error information
@@ -95,11 +95,11 @@ const CollectionCreate = ({
             onCancel();
             return;
         }
-        // Navigate back to either the workspace detail or collections list
+        // Navigate back to either the workspace detail or workspace list
         if (workspaceId) {
-            navigate(`/workspace/workspaces/${workspaceId}`);
+            navigate(`/workspace/workspaces/${workspaceId}?tab=collections`);
         } else {
-            navigate('/workspace/collections');
+            navigate('/workspace/workspaces');
         }
     };
 

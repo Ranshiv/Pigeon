@@ -10,7 +10,7 @@ const commentSchema = new mongoose.Schema({
     resourceType: {
         type: String,
         required: true,
-        enum: ['request', 'collection', 'review', 'api']
+        enum: ['request', 'collection', 'review', 'api', 'documentation']
     },
     // For inline comments on JSON structures
     jsonPath: {

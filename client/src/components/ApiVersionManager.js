@@ -476,7 +476,12 @@ const ApiVersionManager = ({ collectionId, collection }) => {
                             >
 
                                 <label htmlFor="isBackwardCompatible">
-                                    Backward Compatible Version
+                                    <span className="checkbox-copy">
+                                        <span className="checkbox-title">Backward Compatible Version</span>
+                                        <span className="checkbox-description">
+                                            This version maintains compatibility with previous versions and won't break existing integrations
+                                        </span>
+                                    </span>
                                     <input
                                         type="checkbox"
                                         id="isBackwardCompatible"
@@ -484,9 +489,6 @@ const ApiVersionManager = ({ collectionId, collection }) => {
                                         checked={formData.isBackwardCompatible}
                                         onChange={handleInputChange}
                                     />
-                                    <div className="checkbox-description">
-                                        This version maintains compatibility with previous versions and won't break existing integrations
-                                    </div>
                                 </label>
 
                             </div>

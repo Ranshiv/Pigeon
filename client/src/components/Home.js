@@ -23,6 +23,21 @@ const Home = () => {
     });
     const [loading, setLoading] = useState(true);
     const [userData, setUserData] = useState(null);
+    const primaryWorkspaceId = recentWorkspaces[0]?._id;
+    const primaryWorkspaceCollectionsPath = primaryWorkspaceId
+        ? `/workspace/workspaces/${primaryWorkspaceId}?tab=collections`
+        : '/workspace/workspaces';
+
+    const openRecentCollection = (collection) => {
+        const workspaceId = collection.workspaceId || primaryWorkspaceId;
+        const returnTo = workspaceId
+            ? `/workspace/workspaces/${workspaceId}?tab=collections`
+            : '/workspace/workspaces';
+
+        navigate(`/workspace/collections/${collection._id}`, {
+            state: workspaceId ? { workspaceId, returnTo } : undefined
+        });
+    };
 
     // Draggable dashboard cards. Flat order maps row-major into the 2-col grid:
     // [0]=top-left, [1]=top-right, [2]=bottom-left, [3]=bottom-right.
@@ -162,7 +177,7 @@ const Home = () => {
             const commands = [
                 { label: 'New Request', path: '../api-network/requests/new' },
                 { label: 'GraphQL', path: '../graphql' },
-                { label: 'New Collection', path: '../collections/new' },
+                { label: 'Workspace Collections', path: primaryWorkspaceCollectionsPath },
                 { label: 'Monitoring', path: '../monitoring' },
                 { label: 'Workspaces', path: '../workspaces' },
                 { label: 'Settings', path: '../settings' }
@@ -176,7 +191,7 @@ const Home = () => {
                 navigate(commands[idx].path);
             }
         }
-    }, [navigate]);
+    }, [navigate, primaryWorkspaceCollectionsPath]);
 
     useEffect(() => {
         window.addEventListener('keydown', handleCommandShortcut);
@@ -318,7 +333,7 @@ const Home = () => {
             <section className="pgh-card">
                 <div className="pgh-card-header">
                     <h2 className="pgh-card-title"><FiPackage /> Recent Collections</h2>
-                    <button className="pgh-link-btn" onClick={() => navigate('../collections')}>View All</button>
+                    <button className="pgh-link-btn" onClick={() => navigate(primaryWorkspaceCollectionsPath)}>View All</button>
                 </div>
                 <div className="pgh-collections">
                     {loading ? (
@@ -326,13 +341,13 @@ const Home = () => {
                     ) : recentCollections.length === 0 ? (
                         <div className="pgh-empty">
                             <p>You have no collections yet. Create your first collection to get started.</p>
-                            <button className="pgh-empty-btn" onClick={() => navigate('../collections/new')}>
+                            <button className="pgh-empty-btn" onClick={() => navigate(primaryWorkspaceCollectionsPath)}>
                                 <FiPlus /> Create Collection
                             </button>
                         </div>
                     ) : (
                         recentCollections.map((collection) => (
-                            <div key={collection._id} className="pgh-collection-card" onClick={() => navigate(`../collections/${collection._id}`)}>
+                            <div key={collection._id} className="pgh-collection-card" onClick={() => openRecentCollection(collection)}>
                                 <h3>{collection.name}</h3>
                                 <p>{collection.description || 'No description'}</p>
                                 <div className="pgh-collection-meta">
@@ -365,7 +380,7 @@ const Home = () => {
                         <FiCode className="pgh-action-icon" />
                         <span>GraphQL</span>
                     </button>
-                    <button className="pgh-action-btn" onClick={() => navigate('../collections/new')}>
+                    <button className="pgh-action-btn" onClick={() => navigate(primaryWorkspaceCollectionsPath)}>
                         <FiPackage className="pgh-action-icon" />
                         <span>New Collection</span>
                     </button>

@@ -40,6 +40,7 @@ const getPageTitle = (pathname) => {
     '/workspace/workspaces': 'Workspaces',
     '/workspace/collections': 'Collections',
     '/workspace/api-network': 'API Network',
+    '/workspace/api-network/mcp': 'MCP Workbench',
     '/workspace/monitoring': 'Monitoring',
     '/workspace/monitoring/reports': 'Monitoring Reports',
     '/workspace/monitoring/teams': 'Teams',

@@ -273,7 +273,7 @@ const DocumentationSettingsVersionHistory = ({ documentation, onSettingsRestore,
 
     if (loading) {
         return (
-            <div className="settings-version-history loading">
+            <div className="settings-version-history is-loading">
                 <div className="loading-spinner"></div>
                 <p>Loading settings history...</p>
             </div>
@@ -282,7 +282,7 @@ const DocumentationSettingsVersionHistory = ({ documentation, onSettingsRestore,
 
     if (error) {
         return (
-            <div className="settings-version-history error">
+            <div className="settings-version-history has-error">
                 <p>Error: {error}</p>
             </div>
         );

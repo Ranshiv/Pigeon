@@ -1,6 +1,6 @@
 // client/src/components/DocumentationViewer.js
 import React, { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { FiEdit, FiClock, FiExternalLink, FiFileText } from 'react-icons/fi';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -9,6 +9,12 @@ import './DocumentationViewer.css';
 const DocumentationViewer = ({ documentation, collection }) => {
     const [viewerReady, setViewerReady] = useState(false);
     const navigate = useNavigate();
+    const location = useLocation();
+    const workspaceId = location.state?.workspaceId || collection?.workspaceId?._id || collection?.workspaceId;
+    const returnTo = location.state?.returnTo || (workspaceId
+        ? `/workspace/workspaces/${workspaceId}?tab=collections`
+        : '/workspace/workspaces');
+    const collectionRouteState = workspaceId ? { workspaceId, returnTo } : location.state;
 
     useEffect(() => {
         // This simulates any initialization that might be needed
@@ -26,7 +32,7 @@ const DocumentationViewer = ({ documentation, collection }) => {
 
         // Navigate to the documentation page with edit mode
         if (collection && collection._id) {
-            navigate(`/workspace/collections/${collection._id}/documentation`);
+            navigate(`/workspace/collections/${collection._id}/documentation`, { state: collectionRouteState });
         } else {
             console.error('Cannot navigate to edit page: missing collection ID');
         }
@@ -37,7 +43,7 @@ const DocumentationViewer = ({ documentation, collection }) => {
             <div className="documentation-empty-state">
                 <p>No documentation to display</p>
                 <div className="documentation-actions">
-                    <Link to={`/workspace/collections/${collection?._id}/documentation`} className="create-doc-link">
+                    <Link to={`/workspace/collections/${collection?._id}/documentation`} state={collectionRouteState} className="create-doc-link">
                         <FiEdit /> Create Documentation
                     </Link>
                 </div>

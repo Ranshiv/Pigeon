@@ -191,6 +191,49 @@
     padding: 0;
 }
 
+.documentation-manager:has(.api-version-manager),
+.documentation-manager:has(.mock-workspace) {
+    height: auto;
+    min-height: calc(100svh - 64px);
+    overflow: visible;
+}
+
+.documentation-content.api-versions-view:has(.api-version-manager),
+.documentation-content.api-versions-view:has(.mock-workspace) {
+    display: flex;
+    min-height: calc(100svh - 128px);
+    overflow: visible;
+}
+
+.documentation-content.api-versions-view > .mock-workspace {
+    flex: 1;
+    min-width: 0;
+}
+
+/* Let the authoring workspace occupy the usable viewport instead of leaving a
+   large gap before the global footer. Other documentation views keep their
+   existing content-driven height. */
+.documentation-manager:has(.documentation-editor) {
+    height: auto;
+    min-height: calc(100svh - 64px);
+    overflow: visible;
+}
+
+.documentation-content:has(.documentation-editor) {
+    display: flex;
+    min-height: clamp(620px, calc(100svh - 176px), 980px);
+    padding: 20px;
+    box-sizing: border-box;
+    overflow: visible;
+}
+
+.documentation-content > .documentation-editor {
+    flex: 1;
+    min-height: 0;
+    height: auto;
+    box-sizing: border-box;
+}
+
 /* Loading state */
 .documentation-loading {
     position: fixed;
@@ -436,4 +479,177 @@
     padding: 24px;
     background-color: var(--card-bg);
     min-height: 300px;
+}
+
+/* Documentation settings workspace */
+.documentation-manager .documentation-settings {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-content: start;
+    gap: 18px;
+    width: 100%;
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 28px clamp(20px, 3vw, 44px) 40px;
+    box-sizing: border-box;
+}
+
+.documentation-manager .documentation-settings > h3,
+.documentation-manager .documentation-settings > .settings-history-block,
+.documentation-manager .documentation-settings > .settings-actions {
+    grid-column: 1 / -1;
+}
+
+.documentation-manager .documentation-settings > h3 {
+    margin: 0 0 2px;
+    padding-bottom: 14px;
+    font-size: 1.2rem;
+}
+
+.documentation-manager .documentation-settings .settings-section {
+    min-width: 0;
+    margin: 0;
+    padding: 20px;
+    box-sizing: border-box;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg, 12px);
+    background: var(--card-bg);
+}
+
+.documentation-manager .documentation-settings .settings-section h4 {
+    margin-bottom: 18px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border-color);
+    font-size: 0.95rem;
+    font-weight: 650;
+}
+
+.documentation-manager .documentation-settings .setting-option:last-child,
+.documentation-manager .documentation-settings .form-group:last-child {
+    margin-bottom: 0;
+}
+
+.documentation-manager .documentation-settings .setting-option label {
+    align-items: flex-start;
+    font-size: 0.86rem;
+    font-weight: 600;
+}
+
+.documentation-manager .documentation-settings input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    margin: 1px 0 0;
+    flex: 0 0 16px;
+    accent-color: var(--primary-color);
+}
+
+.documentation-manager .documentation-settings .setting-description {
+    padding-left: 24px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+}
+
+.documentation-manager .documentation-settings .form-group label {
+    color: var(--text-secondary);
+    font-size: 0.72rem;
+    font-weight: 650;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.documentation-manager .documentation-settings .form-group input,
+.documentation-manager .documentation-settings .form-group textarea {
+    width: 100%;
+    padding: 10px 12px;
+    box-sizing: border-box;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm, 8px);
+    background: var(--background-color);
+    color: var(--text-color);
+    font: inherit;
+}
+
+.documentation-manager .documentation-settings .form-group input:focus,
+.documentation-manager .documentation-settings .form-group textarea:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary-color) 20%, transparent);
+}
+
+.documentation-manager .settings-history-block {
+    margin: 4px 0 0;
+}
+
+.documentation-manager .documentation-settings .version-history-section {
+    margin-top: 0;
+    border-radius: var(--radius-lg, 12px);
+}
+
+.documentation-manager .documentation-settings .version-history-header {
+    padding: 18px 20px;
+    background: var(--card-bg);
+}
+
+.documentation-manager .documentation-settings .version-history-tabs {
+    padding: 0 12px;
+    gap: 6px;
+    background: var(--background-color);
+}
+
+.documentation-manager .documentation-settings .tab-btn {
+    min-height: 46px;
+    padding: 10px 14px;
+    border-radius: 8px 8px 0 0;
+    color: var(--text-secondary);
+}
+
+.documentation-manager .documentation-settings .tab-btn.active {
+    background: color-mix(in srgb, var(--primary-color) 10%, transparent);
+    color: var(--primary-color);
+    border-bottom-color: var(--primary-color);
+}
+
+.documentation-manager .documentation-settings .tab-btn.active svg {
+    color: currentColor;
+}
+
+.documentation-manager .documentation-settings .version-history-content {
+    min-height: 0;
+    padding: 20px;
+    background: var(--card-bg);
+}
+
+.documentation-manager .documentation-settings .settings-actions {
+    margin-top: 0;
+    padding-top: 2px;
+}
+
+.documentation-manager .documentation-settings .cancel-btn,
+.documentation-manager .documentation-settings .save-btn {
+    min-height: 40px;
+    padding: 9px 16px;
+    border-radius: var(--radius-sm, 8px);
+    font-weight: 600;
+}
+
+.documentation-manager .documentation-settings .save-btn {
+    color: var(--button-text, #fff);
+}
+
+.documentation-manager .documentation-settings .save-btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+@media (max-width: 900px) {
+    .documentation-manager .documentation-settings {
+        grid-template-columns: 1fr;
+        padding: 20px 16px 32px;
+    }
+
+    .documentation-manager .documentation-settings > h3,
+    .documentation-manager .documentation-settings > .settings-history-block,
+    .documentation-manager .documentation-settings > .settings-actions {
+        grid-column: 1;
+    }
 }

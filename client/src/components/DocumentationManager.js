@@ -49,6 +49,15 @@ const DocumentationManager = () => {
     const [originalSettings, setOriginalSettings] = useState(null);
     const [settingsChanged, setSettingsChanged] = useState(false);
     const [versionHistoryTab, setVersionHistoryTab] = useState('settings'); // 'settings' or 'content'
+    const routeWorkspaceId = location.state?.workspaceId;
+    const collectionWorkspaceId = collection?.workspaceId?._id || collection?.workspaceId;
+    const workspaceId = routeWorkspaceId || collectionWorkspaceId;
+    const collectionsReturnPath = location.state?.returnTo || (workspaceId
+        ? `/workspace/workspaces/${workspaceId}?tab=collections`
+        : '/workspace/workspaces');
+    const collectionRouteState = workspaceId
+        ? { workspaceId, returnTo: collectionsReturnPath }
+        : location.state;
 
     // Sync view with URL subpath (e.g. /swagger, /settings, /history, /api-versions)
     useEffect(() => {
@@ -382,11 +391,10 @@ const DocumentationManager = () => {
                                 setDocumentation(completeDoc);
                                 console.log('Updated documentation state after retry save:', completeDoc);
 
-                                // Show success message
-                                alert('Documentation saved successfully');
-
-                                // Navigate back to the same collection page
-                                navigate(`/workspace/collections/${collectionId}`);
+                                if (!docData.isAutoSave) {
+                                    alert('Documentation saved successfully');
+                                    navigate(`/workspace/collections/${collectionId}`, { state: collectionRouteState });
+                                }
                             }, 50);
 
                             // Return early from this function
@@ -429,11 +437,10 @@ const DocumentationManager = () => {
                     // Update state with the complete doc
                     setDocumentation(completeDoc);
 
-                    // Show success message
-                    alert('Documentation saved successfully');
-
-                    // Navigate back to the same collection page
-                    navigate(`/workspace/collections/${collectionId}`);
+                    if (!docData.isAutoSave) {
+                        alert('Documentation saved successfully');
+                        navigate(`/workspace/collections/${collectionId}`, { state: collectionRouteState });
+                    }
                 }, 50);
             } else {
                 throw new Error('Received empty response when saving documentation');
@@ -999,7 +1006,7 @@ const DocumentationManager = () => {
             <div className="documentation-error">
                 <h3>Error</h3>
                 <p>{error}</p>
-                <button onClick={() => navigate('/workspace/collections')}>Go Back to Collections</button>
+                <button onClick={() => navigate(collectionsReturnPath)}>Go Back to Collections</button>
             </div>
         );
     }
@@ -1008,7 +1015,7 @@ const DocumentationManager = () => {
         <div className="documentation-manager">
             <div className="documentation-header">
                 <div className="documentation-nav">
-                    <Link to={`/workspace/collections/${collectionId}`} className="back-link">
+                    <Link to={`/workspace/collections/${collectionId}`} state={collectionRouteState} className="back-link">
                         <FiChevronLeft /> Back to Collection
                     </Link>
                 </div>
@@ -1076,6 +1083,7 @@ const DocumentationManager = () => {
                             }}
                             collection={collection}
                             onSave={handleSaveDocumentation}
+                            onAutoSave={handleSaveDocumentation}
                             isSaving={isSaving}
                         />
                     </>
@@ -1201,8 +1209,10 @@ const DocumentationManager = () => {
                                 </label>
                                 <p className="setting-description">Automatically generate and display a table of contents.</p>
                             </div>
-                        </div>                        {/* Version History Section - placed before actions */}
-                        <div style={{ margin: '32px 0' }}>
+                        </div>
+
+                        {/* Version History Section - placed before actions */}
+                        <div className="settings-history-block">
                             <div className="version-history-section">
                                 <div className="version-history-header">
                                     <h3>Version History</h3>

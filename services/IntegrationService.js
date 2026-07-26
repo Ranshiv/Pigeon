@@ -105,6 +105,12 @@ class IntegrationService {
                 case 'jira':
                     await this.createJiraTicket(integration, alertData);
                     break;
+                case 'telegram':
+                    await this.sendTelegramAlert(integration, alertData);
+                    break;
+                case 'googlechat':
+                    await this.sendGoogleChatAlert(integration, alertData);
+                    break;
                 case 'webhook':
                     await this.sendWebhookAlert(integration, alertData);
                     break;
@@ -142,16 +148,15 @@ class IntegrationService {
         const nodemailer = require('nodemailer');
 
         // Create transporter with integration-specific SMTP settings
+        const port = Number(config.smtpPort) || 587;
         const transporter = nodemailer.createTransport({
             host: config.smtpHost,
-            port: config.smtpPort || 587,
-            secure: config.smtpPort === 465, // true for 465, false for other ports
+            port,
+            secure: port === 465, // implicit TLS on 465, STARTTLS elsewhere
+            requireTLS: port !== 465 && config.useTls !== false,
             auth: {
                 user: config.smtpUser,
                 pass: config.smtpPass
-            },
-            tls: {
-                rejectUnauthorized: false
             }
         });
 
@@ -293,17 +298,8 @@ class IntegrationService {
             }
         };
 
-        const response = await fetch('https://events.pagerduty.com/v2/enqueue', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(payload)
-        });
-
-        if (!response.ok) {
-            throw new Error(`PagerDuty API error: ${response.status} ${response.statusText}`);
-        }
+        // Shared transport gives us test mode, timeout and consistent error handling.
+        await this.sendWebhookPayload('https://events.pagerduty.com/v2/enqueue', payload);
     }
 
     async sendSlackAlert(integration, alertData) {
@@ -339,7 +335,7 @@ class IntegrationService {
                     }
                 ],
                 footer: 'Pigeon Monitoring',
-                ts: Math.floor(healthCheck.checkedAt.getTime() / 1000)
+                ts: Math.floor(new Date(healthCheck.checkedAt).getTime() / 1000)
             }]
         };
 
@@ -432,7 +428,7 @@ class IntegrationService {
                         inline: true
                     }
                 ],
-                timestamp: healthCheck.checkedAt.toISOString(),
+                timestamp: new Date(healthCheck.checkedAt).toISOString(),
                 footer: {
                     text: "Pigeon Monitoring"
                 }
@@ -467,6 +463,11 @@ class IntegrationService {
         // Log the API call for debugging
         console.log(`Making Jira API call to: ${serverUrl}/rest/api/2/issue`);
         console.log(`Project: ${config.projectKey}, Issue Type: ${config.issueType || 'Bug'}`);
+
+        if (this.isTestMode()) {
+            console.log('🧪 TEST MODE: Would create Jira issue in', config.projectKey);
+            return { key: 'TEST-1' };
+        }
 
         const auth = Buffer.from(`${config.username}:${config.apiToken}`).toString('base64');
 
@@ -553,22 +554,76 @@ class IntegrationService {
             'Content-Type': 'application/json'
         };
 
-        // Add custom headers
-        if (config.headers) {
-            config.headers.forEach(header => {
-                if (header.key && header.value) {
-                    headers[header.key] = header.value;
-                }
+        // Custom headers arrive either as [{key,value}] or as a plain object.
+        if (Array.isArray(config.headers)) {
+            config.headers.forEach(h => {
+                if (h.key && h.value) headers[h.key] = h.value;
             });
+        } else if (config.headers && typeof config.headers === 'object') {
+            Object.assign(headers, config.headers);
         }
 
-        await this.sendWebhookPayload(integration.configuration.webhookUrl, payload, headers);
+        await this.sendWebhookPayload(config.webhookUrl, payload, headers);
+    }
+
+    async sendTelegramAlert(integration, alertData) {
+        const { monitor, healthCheck, alertType } = alertData;
+        const { botToken, chatId } = integration.configuration;
+
+        const lines = [
+            `<b>${this.getAlertMessage(alertType)}</b>`,
+            `<b>Monitor:</b> ${monitor.name}`,
+            `<b>URL:</b> ${monitor.url}`,
+            `<b>Status:</b> ${String(healthCheck.status).toUpperCase()}`,
+            `<b>Response Time:</b> ${healthCheck.responseTime}ms`,
+            `<b>Time:</b> ${new Date(healthCheck.checkedAt).toISOString()}`
+        ];
+        if (healthCheck.errorMessage) lines.push(`<b>Error:</b> ${healthCheck.errorMessage}`);
+
+        await this.sendWebhookPayload(
+            `https://api.telegram.org/bot${botToken}/sendMessage`,
+            { chat_id: chatId, text: lines.join('\n'), parse_mode: 'HTML' }
+        );
+    }
+
+    async sendGoogleChatAlert(integration, alertData) {
+        const { monitor, healthCheck, alertType } = alertData;
+
+        const payload = {
+            cardsV2: [{
+                cardId: `monitor-${monitor._id}`,
+                card: {
+                    header: {
+                        title: monitor.name,
+                        subtitle: this.getAlertMessage(alertType)
+                    },
+                    sections: [{
+                        widgets: [
+                            { decoratedText: { topLabel: 'URL', text: monitor.url } },
+                            { decoratedText: { topLabel: 'Status', text: String(healthCheck.status).toUpperCase() } },
+                            { decoratedText: { topLabel: 'Response Time', text: `${healthCheck.responseTime}ms` } },
+                            { decoratedText: { topLabel: 'Time', text: new Date(healthCheck.checkedAt).toISOString() } },
+                            ...(healthCheck.errorMessage
+                                ? [{ decoratedText: { topLabel: 'Error', text: healthCheck.errorMessage } }]
+                                : [])
+                        ]
+                    }]
+                }
+            }]
+        };
+
+        await this.sendWebhookPayload(integration.configuration.webhookUrl, payload);
+    }
+
+    // Telegram puts the bot token in the path — never echo it into logs or errors.
+    redactUrl(url) {
+        return String(url).replace(/\/bot[^/]+\//, '/bot***/');
     }
 
     async sendWebhookPayload(url, payload, customHeaders = {}) {
         // Test mode - don't make actual HTTP requests
         if (this.isTestMode()) {
-            console.log('🧪 TEST MODE: Would send webhook to:', url);
+            console.log('🧪 TEST MODE: Would send webhook to:', this.redactUrl(url));
             console.log('📦 Payload:', JSON.stringify(payload, null, 2));
             console.log('🔧 Headers:', JSON.stringify(customHeaders, null, 2));
             return Promise.resolve({ ok: true, status: 200 });
@@ -579,12 +634,16 @@ class IntegrationService {
             ...customHeaders
         };
 
+        // node-fetch v3 ignores `timeout`; AbortSignal is the supported mechanism.
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), 10000);
+
         try {
             const response = await fetch(url, {
                 method: 'POST',
                 headers,
-                body: JSON.stringify(payload),
-                timeout: 10000 // 10 second timeout
+                body: typeof payload === 'string' ? payload : JSON.stringify(payload),
+                signal: controller.signal
             });
 
             if (!response.ok) {
@@ -604,15 +663,18 @@ class IntegrationService {
 
             return response;
         } catch (error) {
+            const safeUrl = this.redactUrl(url);
             // Better error handling for network issues
             if (error.code === 'ENOTFOUND') {
-                throw new Error(`Webhook URL not found: ${url}`);
+                throw new Error(`Webhook URL not found: ${safeUrl}`);
             } else if (error.code === 'ECONNREFUSED') {
-                throw new Error(`Connection refused to webhook URL: ${url}`);
+                throw new Error(`Connection refused to webhook URL: ${safeUrl}`);
             } else if (error.name === 'AbortError') {
-                throw new Error(`Webhook request timeout after 10 seconds: ${url}`);
+                throw new Error(`Webhook request timeout after 10 seconds: ${safeUrl}`);
             }
             throw error;
+        } finally {
+            clearTimeout(timer);
         }
     }
 
@@ -999,6 +1061,31 @@ class IntegrationService {
                 if (integration.configuration.serverUrl &&
                     !integration.configuration.serverUrl.match(/^https?:\/\/.+\.atlassian\.(net|com)/)) {
                     errors.push('Invalid Jira server URL format');
+                }
+                break;
+
+            case 'telegram':
+                if (!integration.configuration.botToken) {
+                    errors.push('Telegram bot token is required');
+                }
+                if (!integration.configuration.chatId) {
+                    errors.push('Telegram chat ID is required');
+                }
+                break;
+
+            case 'googlechat':
+                if (!integration.configuration.webhookUrl) {
+                    errors.push('Google Chat webhook URL is required');
+                } else if (!/^https:\/\/chat\.googleapis\.com\/v1\/spaces\/.+/.test(integration.configuration.webhookUrl)) {
+                    errors.push('Invalid Google Chat webhook URL format');
+                }
+                break;
+
+            case 'webhook':
+                if (!integration.configuration.webhookUrl) {
+                    errors.push('Webhook URL is required');
+                } else if (!/^https?:\/\/.+/.test(integration.configuration.webhookUrl)) {
+                    errors.push('Invalid webhook URL format');
                 }
                 break;
         }

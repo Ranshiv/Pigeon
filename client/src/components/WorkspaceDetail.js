@@ -280,6 +280,15 @@ const WorkspaceDetail = () => {
 
     const openCreateCollectionModal = () => setShowCreateCollectionModal(true);
     const closeCreateCollectionModal = () => setShowCreateCollectionModal(false);
+    const openCollection = (collectionId) => {
+        const owningWorkspaceId = workspace?._id || id;
+        navigate(`/workspace/collections/${collectionId}`, {
+            state: {
+                workspaceId: owningWorkspaceId,
+                returnTo: `/workspace/workspaces/${owningWorkspaceId}?tab=collections`
+            }
+        });
+    };
 
     const handleInviteUser = async (e) => {
         e.preventDefault();
@@ -832,7 +841,7 @@ const WorkspaceDetail = () => {
                                                 <div
                                                     key={collection._id}
                                                     className="ws-recent-item"
-                                                    onClick={() => navigate(`/workspace/collections/${collection._id}`)}
+                                                    onClick={() => openCollection(collection._id)}
                                                     role="button"
                                                     tabIndex={0}
                                                 >
@@ -870,7 +879,7 @@ const WorkspaceDetail = () => {
                                                 <div className="ws-collection-actions">
                                                     <button
                                                         className="ws-btn"
-                                                        onClick={() => navigate(`/workspace/collections/${collection._id}`)}
+                                                        onClick={() => openCollection(collection._id)}
                                                     >
                                                         Open Collection
                                                     </button>
@@ -1312,7 +1321,7 @@ const WorkspaceDetail = () => {
                 }}
                 onOpenCollection={(collectionId) => {
                     setShowImportModal(false);
-                    navigate(`/workspace/collections/${collectionId}`);
+                    openCollection(collectionId);
                 }}
             />
 

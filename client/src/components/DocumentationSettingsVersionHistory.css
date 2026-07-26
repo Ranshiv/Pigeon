@@ -3,8 +3,8 @@
     overflow: hidden;
 }
 
-.settings-version-history.loading,
-.settings-version-history.error {
+.settings-version-history.is-loading,
+.settings-version-history.has-error {
     text-align: center;
 }
 
@@ -316,13 +316,13 @@
 }
 
 /* Improved error handling */
-.settings-version-history.error {
+.settings-version-history.has-error {
     text-align: center;
     padding: 24px;
     color: var(--error-color, #dc3545);
 }
 
-.settings-version-history.error p {
+.settings-version-history.has-error p {
     margin: 0;
     font-weight: 500;
 }
@@ -410,45 +410,10 @@
     margin: 0;
 }
 
-/* Dark mode support - 2025 Blue Theme */
+/* Dark mode follows the application's active theme tokens. */
 @media (prefers-color-scheme: dark) {
     .settings-version-history {
-        /* --background-color: #00111A; */
-        --header-bg: #012A41;
-        --details-bg: #001927;
-        --border-color: #003956;
-        --text-primary: #e0e0e0;
-        --text-muted: #7A9BAD;
-        --hover-bg: #013B5B;
-        --selected-bg: #002b42;
-        --icon-bg: #013B5B;
-        --code-bg: #002234;
-        --success-bg: #0f2419;
-        --success-color: #28a745;
-        --danger-bg: #2d1117;
-        --danger-color: #dc3545;
-        --warning-color: #ffc107;
-        --info-color: #014C75;
-    }
-
-    .version-icon {
-        color: #ffffff;
-    }
-
-    .success-message {
-        --success-bg: #0f2419;
-        --success-text: #28a745;
-        --success-border: #1e3a28;
-    }
-
-    .pagination button {
-        --background-color: #002234;
-        --border-color: #003956;
-        --text-primary: #e0e0e0;
-    }
-
-    .pagination button:hover:not(:disabled) {
-        --primary-color: #014C75;
+        color-scheme: dark;
     }
 }
 
@@ -476,5 +441,211 @@
         flex-direction: column;
         align-items: flex-start;
         gap: 4px;
+    }
+}
+
+/* Project-themed, flattened history list. */
+.settings-version-history {
+    background: transparent;
+    color: var(--text-color);
+}
+
+.settings-version-history.is-loading,
+.settings-version-history.has-error {
+    padding: 32px 20px;
+    border: 1px dashed var(--border-color);
+    border-radius: var(--radius-md, 10px);
+    background: var(--background-color);
+}
+
+.settings-version-history .version-history-header {
+    padding: 0 0 14px;
+    background: transparent;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.settings-version-history .version-history-header h4 {
+    color: var(--text-color);
+}
+
+.settings-version-history .version-count {
+    color: var(--text-secondary);
+}
+
+.settings-version-history .versions-list {
+    max-height: none;
+    margin-top: 16px;
+    padding: 0;
+    overflow: visible;
+    border: 0;
+    background: transparent;
+}
+
+.settings-version-history .version-item,
+.settings-version-history .version-item:last-child {
+    margin-bottom: 10px;
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md, 10px);
+    background: var(--background-color);
+}
+
+.settings-version-history .version-item:last-child {
+    margin-bottom: 0;
+}
+
+.settings-version-history .version-item:hover {
+    border-color: color-mix(in srgb, var(--primary-color) 55%, var(--border-color));
+    background: var(--hover-bg);
+}
+
+.settings-version-history .version-item.selected {
+    border-color: var(--primary-color);
+    border-left: 3px solid var(--primary-color);
+    background: color-mix(in srgb, var(--primary-color) 8%, var(--background-color));
+}
+
+.settings-version-history .version-header {
+    margin: 0;
+    padding: 14px 16px;
+    align-items: center;
+}
+
+.settings-version-history .version-icon {
+    width: 34px;
+    height: 34px;
+    flex: 0 0 34px;
+    background: color-mix(in srgb, var(--primary-color) 14%, transparent);
+    color: var(--primary-color);
+}
+
+.settings-version-history .version-title {
+    color: var(--text-color);
+    font-weight: 600;
+}
+
+.settings-version-history .version-meta,
+.settings-version-history .version-actions,
+.settings-version-history .arrow,
+.settings-version-history .version-timestamp {
+    color: var(--text-secondary);
+}
+
+.settings-version-history .version-details {
+    display: block;
+    margin: 0;
+    padding: 16px 20px;
+    border: 0;
+    border-top: 1px solid var(--border-color);
+    border-radius: 0;
+    background: var(--card-bg);
+}
+
+.settings-version-history .version-timestamp {
+    margin: 0 0 16px;
+    padding: 0;
+}
+
+.settings-version-history .settings-changes {
+    margin-bottom: 18px;
+}
+
+.settings-version-history .changes-section {
+    margin-bottom: 16px;
+}
+
+.settings-version-history .changes-section:last-child {
+    margin-bottom: 0;
+}
+
+.settings-version-history .changes-section ul {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 8px;
+}
+
+.settings-version-history .changes-section li {
+    display: grid;
+    grid-template-columns: minmax(110px, auto) minmax(0, 1fr);
+    align-items: center;
+    gap: 10px;
+    min-height: 34px;
+    padding: 7px 10px;
+    box-sizing: border-box;
+    border: 1px solid var(--border-color);
+    border-radius: 7px;
+    background: var(--background-color);
+}
+
+.settings-version-history .setting-name {
+    min-width: 0;
+    overflow: hidden;
+    color: var(--text-secondary);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.settings-version-history .setting-value {
+    width: fit-content;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.settings-version-history .version-actions-panel {
+    margin-top: 0;
+    padding-top: 14px;
+    border-top: 1px solid var(--border-color);
+}
+
+.settings-version-history .restore-btn,
+.settings-version-history .compare-btn {
+    min-height: 36px;
+    padding: 8px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm, 8px);
+    background: var(--background-color);
+    color: var(--text-color);
+    box-shadow: none;
+    font-weight: 600;
+}
+
+.settings-version-history .restore-btn {
+    border-color: var(--primary-color);
+    background: var(--primary-color);
+    color: var(--button-text, #fff);
+}
+
+.settings-version-history .restore-btn:hover,
+.settings-version-history .compare-btn:hover {
+    transform: translateY(-1px);
+}
+
+.settings-version-history .restore-btn:hover {
+    border-color: var(--primary-hover);
+    background: var(--primary-hover);
+    color: var(--button-text, #fff);
+}
+
+.settings-version-history .restore-btn svg,
+.settings-version-history .compare-btn svg {
+    margin: 0 !important;
+    color: currentColor !important;
+    stroke: currentColor;
+}
+
+.settings-version-history .loading-spinner {
+    border-color: var(--border-color);
+    border-top-color: var(--primary-color);
+}
+
+@media (max-width: 700px) {
+    .settings-version-history .version-details {
+        padding: 14px;
+    }
+
+    .settings-version-history .changes-section ul {
+        grid-template-columns: 1fr;
     }
 }

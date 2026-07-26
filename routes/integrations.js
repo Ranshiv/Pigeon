@@ -5,21 +5,36 @@ const { ensureAuthenticated } = require('../middleware/auth');
 const Integration = require('../models/Integration');
 const IntegrationService = require('../services/IntegrationService');
 
-// Get all integrations for workspace
+// UI sends `enabled`; the model stores `isActive`. Keep both sides in sync.
+const ALL_EVENTS = [
+    'monitor_down', 'monitor_up', 'monitor_degraded',
+    'incident_created', 'incident_updated', 'incident_resolved',
+    'maintenance_started', 'maintenance_completed'
+];
+
+const withEnabled = (doc) => {
+    const o = doc.toObject ? doc.toObject() : { ...doc };
+    o.enabled = o.isActive;
+    if (o.configuration?.apiToken) o.configuration.apiToken = '***';
+    if (o.configuration?.smtpPass) o.configuration.smtpPass = '***';
+    if (o.configuration?.botToken) o.configuration.botToken = '***';
+    return o;
+};
+
+// Get integrations for the account. A workspace filter includes reusable,
+// account-level integrations as well as integrations scoped to that workspace.
 router.get('/', ensureAuthenticated, async (req, res) => {
     try {
         const { workspaceId } = req.query;
         const query = { userId: req.user.id };
 
         if (workspaceId) {
-            query.workspaceId = workspaceId;
+            query.$or = [{ workspaceId }, { workspaceId: null }];
         }
 
-        const integrations = await Integration.find(query)
-            .select('-configuration.apiToken -configuration.webhookUrl') // Hide sensitive data
-            .sort({ createdAt: -1 });
+        const integrations = await Integration.find(query).sort({ createdAt: -1 });
 
-        res.json(integrations);
+        res.json(integrations.map(withEnabled));
     } catch (error) {
         console.error('Error fetching integrations:', error);
         res.status(500).json({ message: 'Error fetching integrations', error: error.message });
@@ -32,13 +47,13 @@ router.get('/:id', ensureAuthenticated, async (req, res) => {
         const integration = await Integration.findOne({
             _id: req.params.id,
             userId: req.user.id
-        }).select('-configuration.apiToken'); // Hide API token but show other config
+        });
 
         if (!integration) {
             return res.status(404).json({ message: 'Integration not found' });
         }
 
-        res.json(integration);
+        res.json(withEnabled(integration));
     } catch (error) {
         console.error('Error fetching integration:', error);
         res.status(500).json({ message: 'Error fetching integration', error: error.message });
@@ -48,23 +63,15 @@ router.get('/:id', ensureAuthenticated, async (req, res) => {
 // Create new integration
 router.post('/', ensureAuthenticated, async (req, res) => {
     try {
-        // Get or create default workspace for user
-        const { getDb } = require('../config/db');
-        const db = getDb();
-
-        const workspace = await db.collection('workspaces').findOne({
-            owner: req.user.id,
-            isPersonal: true
-        });
-
-        if (!workspace) {
-            return res.status(400).json({ message: 'Create a personal workspace first' });
-        }
-
+        const { enabled, ...body } = req.body;
         const integrationData = {
-            ...req.body,
+            ...body,
             userId: req.user.id,
-            workspaceId: workspace._id.toString()
+            // Integrations can be created before a workspace exists. The
+            // delivery service applies account-level integrations to monitors
+            // owned by the same user.
+            workspaceId: null,
+            isActive: enabled !== false
         };
 
         // Apply smart defaults for email integration
@@ -113,6 +120,12 @@ router.post('/', ensureAuthenticated, async (req, res) => {
             integrationData.configuration = config;
         }
 
+        // Without enabledEvents the monitoring query never matches this integration.
+        if (!integrationData.configuration) integrationData.configuration = {};
+        if (!integrationData.configuration.enabledEvents?.length) {
+            integrationData.configuration.enabledEvents = ALL_EVENTS;
+        }
+
         // Log integration data for debugging
         console.log('Creating integration:', {
             type: integrationData.type,
@@ -125,13 +138,7 @@ router.post('/', ensureAuthenticated, async (req, res) => {
         const integration = new Integration(integrationData);
         await integration.save();
 
-        // Remove sensitive data from response
-        const response = integration.toObject();
-        if (response.configuration.apiToken) {
-            response.configuration.apiToken = '***';
-        }
-
-        res.status(201).json(response);
+        res.status(201).json(withEnabled(integration));
     } catch (error) {
         console.error('Error creating integration:', error);
         res.status(400).json({ message: 'Error creating integration', error: error.message });
@@ -141,23 +148,32 @@ router.post('/', ensureAuthenticated, async (req, res) => {
 // Update integration
 router.put('/:id', ensureAuthenticated, async (req, res) => {
     try {
-        const integration = await Integration.findOneAndUpdate(
-            { _id: req.params.id, userId: req.user.id },
-            req.body,
-            { new: true, runValidators: true }
-        );
+        const integration = await Integration.findOne({ _id: req.params.id, userId: req.user.id });
 
         if (!integration) {
             return res.status(404).json({ message: 'Integration not found' });
         }
 
-        // Remove sensitive data from response
-        const response = integration.toObject();
-        if (response.configuration.apiToken) {
-            response.configuration.apiToken = '***';
+        const { enabled, configuration, name, type } = req.body;
+
+        if (name !== undefined) integration.name = name;
+        if (type !== undefined) integration.type = type;
+        if (enabled !== undefined) integration.isActive = enabled;
+
+        if (configuration) {
+            // '***' is the masked placeholder we sent out; never persist it over a real secret.
+            const clean = Object.fromEntries(
+                Object.entries(configuration).filter(([, v]) => v !== '***')
+            );
+            integration.configuration = { ...integration.configuration.toObject?.() ?? integration.configuration, ...clean };
+            if (!integration.configuration.enabledEvents?.length) {
+                integration.configuration.enabledEvents = ALL_EVENTS;
+            }
         }
 
-        res.json(response);
+        await integration.save(); // runs pre-save config validation
+
+        res.json(withEnabled(integration));
     } catch (error) {
         console.error('Error updating integration:', error);
         res.status(400).json({ message: 'Error updating integration', error: error.message });
@@ -227,6 +243,21 @@ router.post('/:id/test', ensureAuthenticated, async (req, res) => {
 router.get('/types/list', ensureAuthenticated, async (req, res) => {
     try {
         const integrationTypes = [
+            {
+                type: 'email',
+                name: 'Email',
+                description: 'Send alerts via SMTP email',
+                icon: '📧',
+                configSchema: [
+                    { key: 'smtpHost', label: 'SMTP Host', type: 'text', required: true, placeholder: 'smtp.gmail.com' },
+                    { key: 'smtpPort', label: 'SMTP Port', type: 'number', required: true, default: 587 },
+                    { key: 'smtpUser', label: 'SMTP Username', type: 'email', required: true },
+                    { key: 'smtpPass', label: 'SMTP Password', type: 'password', required: true },
+                    { key: 'fromEmail', label: 'From Email Address', type: 'email', required: true },
+                    { key: 'useTls', label: 'Use TLS Encryption', type: 'checkbox', default: true }
+                ],
+                supportedEvents: ['monitor_down', 'monitor_up', 'monitor_degraded', 'incident_created', 'incident_resolved']
+            },
             {
                 type: 'pagerduty',
                 name: 'PagerDuty',
@@ -342,6 +373,27 @@ router.get('/types/list', ensureAuthenticated, async (req, res) => {
                     }
                 ],
                 supportedEvents: ['monitor_down', 'incident_created']
+            },
+            {
+                type: 'telegram',
+                name: 'Telegram',
+                description: 'Send alerts to a Telegram chat',
+                icon: '✈️',
+                configSchema: [
+                    { key: 'botToken', label: 'Bot Token', type: 'password', required: true, placeholder: 'From @BotFather' },
+                    { key: 'chatId', label: 'Chat ID', type: 'text', required: true, placeholder: '-1001234567890' }
+                ],
+                supportedEvents: ['monitor_down', 'monitor_up', 'monitor_degraded', 'incident_created', 'incident_resolved']
+            },
+            {
+                type: 'googlechat',
+                name: 'Google Chat',
+                description: 'Send alerts to a Google Chat space',
+                icon: '💠',
+                configSchema: [
+                    { key: 'webhookUrl', label: 'Webhook URL', type: 'url', required: true, placeholder: 'https://chat.googleapis.com/v1/spaces/...' }
+                ],
+                supportedEvents: ['monitor_down', 'monitor_up', 'monitor_degraded', 'incident_created', 'incident_resolved']
             },
             {
                 type: 'webhook',

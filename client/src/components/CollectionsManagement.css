@@ -245,15 +245,94 @@
     background-color: var(--primary-hover);
 }
 
-.loading-message,
-.error-message {
+.loading-message {
     text-align: center;
     padding: var(--spacing-lg);
     color: var(--text-secondary);
 }
 
-.error-message {
+.collections-error-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 320px;
+    padding: clamp(32px, 5vw, 56px) 24px;
+    text-align: center;
+    background: var(--card-bg);
+    border: 1px dashed color-mix(in srgb, var(--danger-color) 30%, var(--border-color));
+    border-radius: var(--radius-lg, 16px);
+    box-shadow: var(--card-shadow);
+}
+
+.collections-error-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 52px;
+    height: 52px;
+    margin-bottom: 16px;
+    border: 1px solid color-mix(in srgb, var(--danger-color) 28%, transparent);
+    border-radius: 15px;
+    background: color-mix(in srgb, var(--danger-color) 12%, transparent);
     color: var(--danger-color);
+}
+
+.collections-error-icon svg {
+    width: 26px;
+    height: 26px;
+}
+
+.collections-error-label {
+    margin-bottom: 7px;
+    color: var(--danger-color);
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+}
+
+.collections-error-state h2 {
+    margin: 0 0 8px;
+    color: var(--text-color);
+    font-size: clamp(1.25rem, 2.5vw, 1.55rem);
+    font-weight: 650;
+    letter-spacing: -0.02em;
+}
+
+.collections-error-state p {
+    max-width: 44ch;
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: 0.88rem;
+    line-height: 1.6;
+}
+
+.collections-error-retry {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    min-height: 40px;
+    margin-top: 24px;
+    padding: 9px 16px;
+    background: var(--primary-color);
+    border: 1px solid var(--primary-color);
+    border-radius: var(--radius-sm, 8px);
+    color: var(--button-text, #fff);
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: filter 0.15s ease;
+}
+
+.collections-error-retry:hover {
+    filter: brightness(1.08);
+}
+
+.collections-error-retry:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary-color) 22%, transparent);
 }
 
 /* Modal styles */

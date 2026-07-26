@@ -412,10 +412,17 @@ class MonitoringService {
     // Send alerts to configured integrations with rate limiting
     async sendIntegrationAlerts(monitor, alertData) {
         try {
-            // Get active integrations for the workspace
+            // A user can keep an integration account-level or scope it to a
+            // workspace. Continue honoring scoped integrations while allowing
+            // account-level alert channels to work without any workspace setup.
             const Integration = require('../../models/Integration');
+            const integrationScopes = [{ workspaceId: null }];
+            if (monitor.workspaceId) {
+                integrationScopes.unshift({ workspaceId: monitor.workspaceId });
+            }
             const integrations = await Integration.find({
-                workspaceId: monitor.workspaceId,
+                userId: monitor.userId,
+                $or: integrationScopes,
                 isActive: true,
                 'configuration.enabledEvents': {
                     $in: [

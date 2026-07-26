@@ -2,255 +2,316 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import './DocumentationOverview.css';
 import {
-    FiHome,
-    FiSend,
+    FiArrowRight,
+    FiBarChart2,
+    FiBookOpen,
+    FiBriefcase,
+    FiClipboard,
     FiCode,
-    FiFolder,
-    FiRefreshCw,
-    FiShield,
-    FiServer,
+    FiCpu,
     FiDatabase,
     FiFileText,
-    FiMonitor,
-    FiUsers,
-    FiTool,
-    FiTerminal,
-    FiGrid,
-    FiCpu,
-    FiLock,
-    FiBarChart2,
+    FiFolder,
     FiGlobe,
-    FiBriefcase,
-    FiClipboard
+    FiHome,
+    FiMonitor,
+    FiRefreshCw,
+    FiSend,
+    FiShield,
+    FiTerminal,
+    FiTool,
+    FiUsers
 } from 'react-icons/fi';
 
-const DocumentationOverview = () => {
-    return (
-        <div className="documentation-overview">
-            <div className="documentation-header">
-                <h1>Pigeon Documentation</h1>
-                <p className="documentation-intro">
-                    Welcome to the Pigeon Docs! This is the place to find official information on how to use Pigeon in your API projects.
-                    If you're learning to carry out a specific task or workflow in Pigeon, check out the following topics to find resources:
-                </p>
+const documentationSections = [
+    {
+        title: 'Get started',
+        description: 'Set up Pigeon and learn the essentials for making your first API call.',
+        icon: FiHome,
+        links: [
+            ['Installation', '/documentation/getting-started/installation'],
+            ['Your first request', '/documentation/getting-started/your-first-request'],
+            ['Navigate the workspace', '/documentation/getting-started/pigeon-UI']
+        ]
+    },
+    {
+        title: 'Send requests',
+        description: 'Build requests, work with responses, and authenticate against your APIs.',
+        icon: FiSend,
+        links: [
+            ['Send API requests', '/documentation/requests/sending-requests'],
+            ['Handle responses', '/documentation/requests/response-handling'],
+            ['Authorization', '/documentation/requests/authorization']
+        ]
+    },
+    {
+        title: 'Write scripts',
+        description: 'Use the Pigeon runtime to add dynamic behaviour before and after a request.',
+        icon: FiCode,
+        links: [
+            ['Pre-request scripts', '/documentation/scripting/pre-request-scripts'],
+            ['Test scripts', '/documentation/scripting/test-scripts'],
+            ['Using variables', '/documentation/scripting/variables']
+        ]
+    },
+    {
+        title: 'Use collections',
+        description: 'Organize related requests in a workspace, run them together, and share them.',
+        icon: FiFolder,
+        links: [
+            ['Create collections', '/documentation/collections/creating-collections'],
+            ['Run collections', '/documentation/collections/running-collections'],
+            ['Share collections', '/documentation/collections/sharing']
+        ]
+    },
+    {
+        title: 'Build flows',
+        description: 'Create visual API workflows and chain requests into reusable automations.',
+        icon: FiRefreshCw,
+        links: [
+            ['Introduction to flows', '/documentation/flows/introduction'],
+            ['Build workflows', '/documentation/flows/building-workflows'],
+            ['Advanced flow features', '/documentation/flows/advanced-features']
+        ]
+    },
+    {
+        title: 'Use the Pigeon CLI',
+        description: 'Run collections securely from the command line and integrate them with CI/CD.',
+        icon: FiTerminal,
+        links: [
+            ['CLI installation', '/documentation/cli/installation'],
+            ['Run collections', '/documentation/cli/running-collections'],
+            ['CI/CD integration', '/documentation/cli/ci-cd-integration']
+        ]
+    },
+    {
+        title: 'Collaborate',
+        description: 'Invite teammates, coordinate changes, and use version control in a workspace.',
+        icon: FiUsers,
+        links: [
+            ['Team workspaces', '/documentation/collaboration/workspaces'],
+            ['Real-time collaboration', '/documentation/collaboration/real-time'],
+            ['Version control', '/documentation/collaboration/version-control']
+        ]
+    },
+    {
+        title: 'Design and develop APIs',
+        description: 'Work API-first with specifications, the API Builder, and integrated testing.',
+        icon: FiFileText,
+        links: [
+            ['API Builder', '/documentation/api-development/api-builder'],
+            ['OpenAPI support', '/documentation/api-development/openapi-support'],
+            ['API testing', '/documentation/api-development/api-testing']
+        ]
+    },
+    {
+        title: 'Document your API',
+        description: 'Create, publish, and tailor clear documentation for every collection and API.',
+        icon: FiClipboard,
+        links: [
+            ['Auto-documentation', '/documentation/api-documentation/auto-documentation'],
+            ['Publish documentation', '/documentation/api-documentation/publishing'],
+            ['Customize documentation', '/documentation/api-documentation/customization']
+        ]
+    },
+    {
+        title: 'Monitor your API',
+        description: 'Track API health and performance, then act on alerts when something changes.',
+        icon: FiMonitor,
+        links: [
+            ['Set up monitors', '/documentation/monitoring/setting-up'],
+            ['Performance metrics', '/documentation/monitoring/performance-metrics'],
+            ['Alerts and notifications', '/documentation/monitoring/alerts']
+        ]
+    },
+    {
+        title: 'Governance and security',
+        description: 'Set standards, find weaknesses, and report on your API security posture.',
+        icon: FiShield,
+        links: [
+            ['Governance rules', '/documentation/governance/rules'],
+            ['Security testing', '/documentation/governance/security-testing'],
+            ['Compliance reporting', '/documentation/governance/reporting']
+        ]
+    },
+    {
+        title: 'Administration',
+        description: 'Manage your team, access controls, and the settings that shape your workspace.',
+        icon: FiBriefcase,
+        links: [
+            ['Team management', '/documentation/admin/team-management'],
+            ['Access control', '/documentation/admin/access-control'],
+            ['Settings configuration', '/documentation/admin/settings']
+        ]
+    },
+    {
+        title: 'Use reports',
+        description: 'Understand how your team uses Pigeon with usage, security, and API reports.',
+        icon: FiBarChart2,
+        links: [
+            ['Usage reports', '/documentation/reports/usage-reports'],
+            ['Security reports', '/documentation/reports/security-reports'],
+            ['API metrics', '/documentation/reports/api-metrics']
+        ]
+    },
+    {
+        title: 'AI agent tools',
+        description: 'Use Pigeon AI to accelerate testing, analyze APIs, and generate documentation.',
+        icon: FiCpu,
+        links: [
+            ['Test generation', '/documentation/ai-tools/test-generation'],
+            ['API analysis', '/documentation/ai-tools/api-analysis'],
+            ['Auto-documentation', '/documentation/ai-tools/auto-documentation']
+        ]
+    },
+    {
+        title: 'Environments',
+        description: 'Keep variables and secrets organized across local, staging, and production work.',
+        icon: FiDatabase,
+        links: [
+            ['Set up environments', '/documentation/environments/setup'],
+            ['Work with variables', '/documentation/environments/variables'],
+            ['Manage secrets', '/documentation/environments/secrets']
+        ]
+    },
+    {
+        title: 'Developer resources',
+        description: 'Connect Pigeon to your development workflow with APIs, SDKs, and extensions.',
+        icon: FiTool,
+        links: [
+            ['Pigeon API reference', '/documentation/developer/api-reference'],
+            ['SDK documentation', '/documentation/developer/sdk'],
+            ['Create extensions', '/documentation/developer/extensions']
+        ]
+    },
+    {
+        title: 'Integrations',
+        description: 'Connect the tools your team already uses to keep API work moving smoothly.',
+        icon: FiGlobe,
+        links: [
+            ['GitHub', '/documentation/integrations/github'],
+            ['Jenkins', '/documentation/integrations/jenkins'],
+            ['Slack', '/documentation/integrations/slack']
+        ]
+    }
+];
+
+const resourceGroups = [
+    {
+        title: 'Collection templates',
+        links: [
+            ['Integration testing', '/templates/integration-testing'],
+            ['REST API basics', '/templates/rest-api-basics'],
+            ['API documentation', '/templates/api-documentation']
+        ]
+    },
+    {
+        title: 'Flow templates',
+        links: [
+            ['Data transformation', '/flow-templates/data-transformation'],
+            ['API chaining', '/flow-templates/api-chaining'],
+            ['Webhook processing', '/flow-templates/webhook-processing']
+        ]
+    },
+    {
+        title: 'Popular videos',
+        links: [
+            ['Build API applications with flows', 'https://youtube.com/pigeon/flows-tutorial'],
+            ['API basics', 'https://youtube.com/pigeon/api-basics'],
+            ['API testing fundamentals', 'https://youtube.com/pigeon/testing-tutorial']
+        ]
+    }
+];
+
+const communityLinks = [
+    ['GitHub', 'https://github.com/pigeon-api'],
+    ['Twitter', 'https://twitter.com/pigeonapi'],
+    ['Discord', 'https://discord.gg/pigeon'],
+    ['Forum', 'https://forum.pigeon.io']
+];
+
+const DocumentationOverview = () => (
+    <main className="docs-hub">
+        <header className="docs-hub-hero">
+            <div className="docs-hub-hero-copy">
+                <span className="docs-hub-eyebrow"><FiBookOpen /> Documentation hub</span>
+                <h1>Everything you need to build with Pigeon.</h1>
+                <p>Guides for sending requests, collaborating in workspaces, testing APIs, and building dependable API workflows.</p>
             </div>
-
-            <div className="documentation-grid">
-                <section className="documentation-section">
-                    <h2><FiHome /> Get Started</h2>
-                    <p>To get started using Pigeon, check out the Get Started section.</p>
-                    <div className="documentation-links">
-                        <Link to="/documentation/getting-started/installation">Installation</Link>
-                        <Link to="/documentation/getting-started/your-first-request">Your First Request</Link>
-                        <Link to="/documentation/getting-started/pigeon-UI">Navigating the UI</Link>
-                    </div>
-                </section>
-
-                <section className="documentation-section">
-                    <h2><FiSend /> Send Requests</h2>
-                    <p>You can send requests in Pigeon to connect to APIs you are working with.</p>
-                    <div className="documentation-links">
-                        <Link to="/documentation/requests/sending-requests">Send API Requests</Link>
-                        <Link to="/documentation/requests/response-handling">Handling Responses</Link>
-                        <Link to="/documentation/requests/authorization">Authorization</Link>
-                    </div>
-                </section>
-
-                <section className="documentation-section">
-                    <h2><FiCode /> Write Scripts</h2>
-                    <p>Pigeon has a powerful runtime based on Node.js that enables you to add dynamic behavior to requests and collections.</p>
-                    <div className="documentation-links">
-                        <Link to="/documentation/scripting/pre-request-scripts">Pre-request Scripts</Link>
-                        <Link to="/documentation/scripting/test-scripts">Test Scripts</Link>
-                        <Link to="/documentation/scripting/variables">Using Variables</Link>
-                    </div>
-                </section>
-
-                <section className="documentation-section">
-                    <h2><FiFolder /> Use Collections</h2>
-                    <p>Pigeon Collections are groups of saved requests that can be organized and run together.</p>
-                    <div className="documentation-links">
-                        <Link to="/documentation/collections/creating-collections">Create Collections</Link>
-                        <Link to="/documentation/collections/running-collections">Run Collections</Link>
-                        <Link to="/documentation/collections/sharing">Share Collections</Link>
-                    </div>
-                </section>
-
-                <section className="documentation-section">
-                    <h2><FiRefreshCw /> Use Pigeon Flows</h2>
-                    <p>Pigeon Flows is a visual tool for creating API workflows and chaining requests.</p>
-                    <div className="documentation-links">
-                        <Link to="/documentation/flows/introduction">Introduction to Flows</Link>
-                        <Link to="/documentation/flows/building-workflows">Building Workflows</Link>
-                        <Link to="/documentation/flows/advanced-features">Advanced Features</Link>
-                    </div>
-                </section>
-
-                <section className="documentation-section">
-                    <h2><FiTerminal /> Use the Pigeon CLI</h2>
-                    <p>The Pigeon CLI is a secure command-line companion for Pigeon to run collections and integrate with CI/CD pipelines.</p>
-                    <div className="documentation-links">
-                        <Link to="/documentation/cli/installation">CLI Installation</Link>
-                        <Link to="/documentation/cli/running-collections">Running Collections</Link>
-                        <Link to="/documentation/cli/ci-cd-integration">CI/CD Integration</Link>
-                    </div>
-                </section>
-
-                <section className="documentation-section">
-                    <h2><FiUsers /> Collaborate in Pigeon</h2>
-                    <p>Pigeon provides tools to enable and enhance collaboration within your team.</p>
-                    <div className="documentation-links">
-                        <Link to="/documentation/collaboration/workspaces">Team Workspaces</Link>
-                        <Link to="/documentation/collaboration/real-time">Real-time Collaboration</Link>
-                        <Link to="/documentation/collaboration/version-control">Version Control</Link>
-                    </div>
-                </section>
-
-                <section className="documentation-section">
-                    <h2><FiFileText /> Design and Develop your API</h2>
-                    <p>Pigeon supports API-first development with API specifications and the API Builder.</p>
-                    <div className="documentation-links">
-                        <Link to="/documentation/api-development/api-builder">API Builder</Link>
-                        <Link to="/documentation/api-development/openapi-support">OpenAPI Support</Link>
-                        <Link to="/documentation/api-development/api-testing">API Testing</Link>
-                    </div>
-                </section>
-
-                <section className="documentation-section">
-                    <h2><FiClipboard /> Document your API</h2>
-                    <p>Documentation is an important part of any collection or API to help others understand how it works.</p>
-                    <div className="documentation-links">
-                        <Link to="/documentation/api-documentation/auto-documentation">Auto-Documentation</Link>
-                        <Link to="/documentation/api-documentation/publishing">Publishing Documentation</Link>
-                        <Link to="/documentation/api-documentation/customization">Customizing Documentation</Link>
-                    </div>
-                </section>
-
-                <section className="documentation-section">
-                    <h2><FiMonitor /> Monitor your API</h2>
-                    <p>Pigeon Monitors give you continuous visibility into the health and performance of your APIs.</p>
-                    <div className="documentation-links">
-                        <Link to="/documentation/monitoring/setting-up">Setting Up Monitors</Link>
-                        <Link to="/documentation/monitoring/performance-metrics">Performance Metrics</Link>
-                        <Link to="/documentation/monitoring/alerts">Alerts and Notifications</Link>
-                    </div>
-                </section>
-
-                <section className="documentation-section">
-                    <h2><FiShield /> API Governance and API Security</h2>
-                    <p>Pigeon's governance and security features identify inconsistencies or weaknesses in your APIs.</p>
-                    <div className="documentation-links">
-                        <Link to="/documentation/governance/rules">Governance Rules</Link>
-                        <Link to="/documentation/governance/security-testing">Security Testing</Link>
-                        <Link to="/documentation/governance/reporting">Compliance Reporting</Link>
-                    </div>
-                </section>
-
-                <section className="documentation-section">
-                    <h2><FiBriefcase /> Administration</h2>
-                    <p>Pigeon provides options to customize your team's experience, from setup to ongoing team management.</p>
-                    <div className="documentation-links">
-                        <Link to="/documentation/admin/team-management">Team Management</Link>
-                        <Link to="/documentation/admin/access-control">Access Control</Link>
-                        <Link to="/documentation/admin/settings">Settings Configuration</Link>
-                    </div>
-                </section>
-
-                <section className="documentation-section">
-                    <h2><FiBarChart2 /> Use Reports</h2>
-                    <p>Pigeon generates reports that enable you to visualize data for how your team uses Pigeon.</p>
-                    <div className="documentation-links">
-                        <Link to="/documentation/reports/usage-reports">Usage Reports</Link>
-                        <Link to="/documentation/reports/security-reports">Security Reports</Link>
-                        <Link to="/documentation/reports/api-metrics">API Metrics</Link>
-                    </div>
-                </section>
-
-                <section className="documentation-section">
-                    <h2><FiCpu /> AI Agent Tools</h2>
-                    <p>Leverage Pigeon's AI capabilities to enhance your API development and testing workflow.</p>
-                    <div className="documentation-links">
-                        <Link to="/documentation/ai-tools/test-generation">Test Generation</Link>
-                        <Link to="/documentation/ai-tools/api-analysis">API Analysis</Link>
-                        <Link to="/documentation/ai-tools/auto-documentation">Auto-Documentation</Link>
-                    </div>
-                </section>
-
-                <section className="documentation-section">
-                    <h2><FiDatabase /> Environments</h2>
-                    <p>Use environments to store and manage variables across different development stages.</p>
-                    <div className="documentation-links">
-                        <Link to="/documentation/environments/setup">Setting Up Environments</Link>
-                        <Link to="/documentation/environments/variables">Working with Variables</Link>
-                        <Link to="/documentation/environments/secrets">Managing Secrets</Link>
-                    </div>
-                </section>
-
-                <section className="documentation-section">
-                    <h2><FiTool /> Developer Resources</h2>
-                    <p>If you're integrating Pigeon with your CI/CD workflow or developing with Pigeon APIs, check out these resources.</p>
-                    <div className="documentation-links">
-                        <Link to="/documentation/developer/api-reference">Pigeon API Reference</Link>
-                        <Link to="/documentation/developer/sdk">SDK Documentation</Link>
-                        <Link to="/documentation/developer/extensions">Creating Extensions</Link>
-                    </div>
-                </section>
-
-                <section className="documentation-section">
-                    <h2><FiGlobe /> Integrations</h2>
-                    <p>Connect Pigeon to your API workflows with integrations for popular third-party solutions.</p>
-                    <div className="documentation-links">
-                        <Link to="/documentation/integrations/github">GitHub</Link>
-                        <Link to="/documentation/integrations/jenkins">Jenkins</Link>
-                        <Link to="/documentation/integrations/slack">Slack</Link>
-                    </div>
-                </section>
+            <div className="docs-hub-hero-meta" aria-label="Documentation overview">
+                <div><strong>{documentationSections.length}</strong><span>product guides</span></div>
+                <div><strong>3</strong><span>resources per guide</span></div>
             </div>
+        </header>
 
-            <div className="documentation-footer">
-                <h3>Additional Resources</h3>
-                <div className="resource-grid">
-                    <div className="resource-card">
-                        <h4>Collection Templates</h4>
-                        <ul>
-                            <li><Link to="/templates/integration-testing">Integration Testing</Link></li>
-                            <li><Link to="/templates/rest-api-basics">REST API Basics</Link></li>
-                            <li><Link to="/templates/api-documentation">API Documentation</Link></li>
-                        </ul>
-                    </div>
-
-                    <div className="resource-card">
-                        <h4>Flow Templates</h4>
-                        <ul>
-                            <li><Link to="/flow-templates/data-transformation">Data Transformation</Link></li>
-                            <li><Link to="/flow-templates/api-chaining">API Chaining</Link></li>
-                            <li><Link to="/flow-templates/webhook-processing">Webhook Processing</Link></li>
-                        </ul>
-                    </div>
-
-                    <div className="resource-card">
-                        <h4>Popular Videos</h4>
-                        <ul>
-                            <li><a href="https://youtube.com/pigeon/flows-tutorial">Pigeon Flows: Build API Applications</a></li>
-                            <li><a href="https://youtube.com/pigeon/api-basics">API Basics: What is an API?</a></li>
-                            <li><a href="https://youtube.com/pigeon/testing-tutorial">API Testing Fundamentals</a></li>
-                        </ul>
-                    </div>
+        <section className="docs-hub-catalog" aria-labelledby="docs-catalog-heading">
+            <div className="docs-hub-section-heading">
+                <div>
+                    <span className="docs-hub-kicker">Explore</span>
+                    <h2 id="docs-catalog-heading">Find the right guide for your workflow</h2>
                 </div>
-
-                <div className="join-community">
-                    <h3>Join the Pigeon Community</h3>
-                    <div className="community-links">
-                        <a href="https://github.com/pigeon-api" target="_blank" rel="noopener noreferrer">GitHub</a>
-                        <a href="https://twitter.com/pigeonapi" target="_blank" rel="noopener noreferrer">Twitter</a>
-                        <a href="https://discord.gg/pigeon" target="_blank" rel="noopener noreferrer">Discord</a>
-                        <a href="https://forum.pigeon.io" target="_blank" rel="noopener noreferrer">Forum</a>
-                    </div>
-                </div>
+                <p>Start with the basics or jump directly to the capability you need.</p>
             </div>
 
-        </div>
-    );
-};
+            <div className="docs-hub-grid">
+                {documentationSections.map(({ title, description, icon: Icon, links }) => (
+                    <article className="docs-hub-topic" key={title}>
+                        <div className="docs-hub-topic-icon" aria-hidden="true"><Icon /></div>
+                        <h3>{title}</h3>
+                        <p>{description}</p>
+                        <ul>
+                            {links.map(([label, to]) => (
+                                <li key={to}>
+                                    <Link to={to}>{label}<FiArrowRight aria-hidden="true" /></Link>
+                                </li>
+                            ))}
+                        </ul>
+                    </article>
+                ))}
+            </div>
+        </section>
+
+        <section className="docs-hub-resources" aria-labelledby="docs-resources-heading">
+            <div className="docs-hub-section-heading">
+                <div>
+                    <span className="docs-hub-kicker">More resources</span>
+                    <h2 id="docs-resources-heading">Take a shortcut</h2>
+                </div>
+                <p>Ready-to-use starting points and practical learning resources.</p>
+            </div>
+
+            <div className="docs-hub-resource-grid">
+                {resourceGroups.map(({ title, links }) => (
+                    <article className="docs-hub-resource-card" key={title}>
+                        <h3>{title}</h3>
+                        <ul>
+                            {links.map(([label, href]) => (
+                                <li key={href}>
+                                    {href.startsWith('http') ? (
+                                        <a href={href} target="_blank" rel="noopener noreferrer">{label}<FiArrowRight aria-hidden="true" /></a>
+                                    ) : (
+                                        <Link to={href}>{label}<FiArrowRight aria-hidden="true" /></Link>
+                                    )}
+                                </li>
+                            ))}
+                        </ul>
+                    </article>
+                ))}
+            </div>
+        </section>
+
+        <aside className="docs-hub-community">
+            <div>
+                <span className="docs-hub-kicker">Community</span>
+                <h2>Keep learning with the Pigeon community.</h2>
+            </div>
+            <nav aria-label="Pigeon community links">
+                {communityLinks.map(([label, href]) => (
+                    <a key={href} href={href} target="_blank" rel="noopener noreferrer">{label}<FiArrowRight aria-hidden="true" /></a>
+                ))}
+            </nav>
+        </aside>
+    </main>
+);
 
 export default DocumentationOverview;

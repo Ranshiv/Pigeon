@@ -1,14 +1,29 @@
 // client/src/components/DocumentationEditor.js
-import React, { useState, useEffect } from 'react';
-import { FiSave, FiCode, FiLink, FiImage, FiTable, FiX, FiEdit3, FiEye } from 'react-icons/fi';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
+import { FiSave, FiCode, FiLink, FiImage, FiTable, FiX, FiEdit3, FiEye, FiColumns } from 'react-icons/fi';
 import './DocumentationEditor.css';
 
-const DocumentationEditor = ({ documentation, collection, onSave, isSaving }) => {
+const DOCUMENTATION_TEMPLATES = [
+    { id: 'quickstart', label: 'Quick start', content: '# Getting started\n\n## Base URL\n\n`https://api.example.com`\n\n## Authentication\n\nExplain how to authenticate requests.\n\n## Make your first request\n\n```bash\ncurl https://api.example.com/health\n```\n' },
+    { id: 'reference', label: 'API reference', content: '# API reference\n\n## Authentication\n\nDescribe the required headers and credentials.\n\n## Endpoints\n\nAdd endpoint details, parameters, and responses here.\n' },
+    { id: 'changelog', label: 'Changelog', content: '# Changelog\n\n## Unreleased\n\n### Added\n\n- Describe new capabilities.\n\n### Changed\n\n- Describe changes.\n\n### Fixed\n\n- Describe fixes.\n' }
+];
+
+const DocumentationEditor = ({ documentation, collection, onSave, onAutoSave, isSaving }) => {
     // Initialize with empty strings to ensure blank editor by default
     const [content, setContent] = useState('');
     const [title, setTitle] = useState('');
-    const [isPreview, setIsPreview] = useState(false);
+    const [viewMode, setViewMode] = useState('edit');
     const [endpoints, setEndpoints] = useState([]);
+    const [autoSaveStatus, setAutoSaveStatus] = useState('Saved');
+    const [showFind, setShowFind] = useState(false);
+    const [findText, setFindText] = useState('');
+    const [replaceText, setReplaceText] = useState('');
+    const [commentText, setCommentText] = useState('');
+    const [comments, setComments] = useState([]);
+    const autoSaveTimerRef = useRef(null);
+    const skipAutoSaveRef = useRef(true);
+    const tableOfContents = useMemo(() => Array.from(content.matchAll(/^(#{1,3})\s+(.+)$/gm)).map((match) => ({ level: match[1].length, title: match[2], index: match.index })), [content]);
 
     // Debug log for initial render
     console.log('DocumentationEditor initial render:', {
@@ -63,6 +78,7 @@ const DocumentationEditor = ({ documentation, collection, onSave, isSaving }) =>
 
         // Small delay before setting actual content to ensure clean re-render
         setTimeout(() => {
+            skipAutoSaveRef.current = true;
             setContent(docContent);
             setTitle(docTitle);
         }, 10);
@@ -78,6 +94,33 @@ const DocumentationEditor = ({ documentation, collection, onSave, isSaving }) =>
             setEndpoints(extractedEndpoints);
         }
     }, [documentation, collection]);
+
+    useEffect(() => {
+        if (!onAutoSave) return undefined;
+        if (skipAutoSaveRef.current) {
+            skipAutoSaveRef.current = false;
+            return undefined;
+        }
+
+        setAutoSaveStatus('Unsaved changes');
+        clearTimeout(autoSaveTimerRef.current);
+        autoSaveTimerRef.current = setTimeout(async () => {
+            setAutoSaveStatus('Saving…');
+            try {
+                await onAutoSave({
+                    title: title || (collection?.name ? `${collection.name} Documentation` : ''),
+                    content: content || ' ',
+                    collectionId: collection?._id,
+                    isAutoSave: true
+                });
+                setAutoSaveStatus('Saved just now');
+            } catch {
+                setAutoSaveStatus('Save failed');
+            }
+        }, 1200);
+
+        return () => clearTimeout(autoSaveTimerRef.current);
+    }, [content, title, collection, onAutoSave]);
 
     // Generate documentation template based on collection data
     // This function should only be called when the user explicitly requests it
@@ -189,6 +232,18 @@ const DocumentationEditor = ({ documentation, collection, onSave, isSaving }) =>
         setShowImageModal(true);
     };
 
+    const handleImageFileUpload = (event) => {
+        const file = event.target.files?.[0];
+        if (!file) return;
+        if (!file.type.startsWith('image/')) { alert('Choose an image file.'); return; }
+        const reader = new FileReader();
+        reader.onload = () => {
+            setImageUrl(String(reader.result));
+            if (!imageAlt) setImageAlt(file.name.replace(/\.[^.]+$/, ''));
+        };
+        reader.readAsDataURL(file);
+    };
+
     // Insert image with attributes
     const insertCustomImage = () => {
         const textarea = document.getElementById('documentation-textarea');
@@ -290,7 +345,7 @@ const DocumentationEditor = ({ documentation, collection, onSave, isSaving }) =>
         const before = content.substring(0, start);
         const after = content.substring(start);
 
-        const endpointMarkdown = `\n### ${endpoint.name}\n\n\`${endpoint.method} ${endpoint.url}\`\n\n**Description:** Add a description of this endpoint.\n\n`;
+        const endpointMarkdown = `\n### ${endpoint.name}\n\n> **${endpoint.method}** \`${endpoint.url}\`\n\nAdd a concise description of what this endpoint does.\n\n#### Request\n\n| Field | Value |\n| --- | --- |\n| Method | \`${endpoint.method}\` |\n| URL | \`${endpoint.url}\` |\n| Authentication | Add required credentials |\n\n#### Parameters\n\n| Name | Location | Type | Required | Description |\n| --- | --- | --- | --- | --- |\n| Add parameter | query/path/header | string | No | Describe it |\n\n#### Example request\n\n\`\`\`bash\ncurl -X ${endpoint.method} '${endpoint.url}' \\\n  -H 'Authorization: Bearer <token>'\n\`\`\`\n\n#### Example response\n\n\`\`\`json\n{\n  "success": true\n}\n\`\`\`\n\n`;
 
         setContent(`${before}${endpointMarkdown}${after}`);
 
@@ -392,6 +447,10 @@ const DocumentationEditor = ({ documentation, collection, onSave, isSaving }) =>
                                 placeholder="https://example.com/image.jpg"
                             />
                         </div>
+                        <div className="form-group">
+                            <label htmlFor="imageFile">Or upload an image</label>
+                            <input id="imageFile" type="file" accept="image/*" onChange={handleImageFileUpload} />
+                        </div>
                         <div className="form-row">
                             <div className="form-group half">
                                 <label htmlFor="imageWidth">Width (px)</label>
@@ -489,15 +548,31 @@ const DocumentationEditor = ({ documentation, collection, onSave, isSaving }) =>
         setContent(template);
         setTitle(`${collection?.name || ''} API Documentation`);
 
-        // Switch to edit mode if in preview mode
-        if (isPreview) {
-            setIsPreview(false);
+        // Switch from the read-only preview so the inserted template is visible.
+        if (viewMode === 'preview') {
+            setViewMode('edit');
         }
 
         // Let the user know template was inserted
         console.log('Swagger example template inserted successfully');
         alert('Swagger example template has been inserted.');
     };
+
+    const applyTemplate = (template) => {
+        if (content.trim() && !window.confirm(`Replace the current documentation with the ${template.label} template?`)) return;
+        setContent(template.content);
+        setTitle(title || `${collection?.name || 'API'} Documentation`);
+        setViewMode('edit');
+    };
+    const replaceAll = () => { if (findText) setContent(content.split(findText).join(replaceText)); };
+    const syncEndpoints = () => {
+        const missing = endpoints.filter((endpoint) => !content.includes(`### ${endpoint.name}`));
+        if (!missing.length) { alert('Documentation is already in sync with the collection endpoints.'); return; }
+        const blocks = missing.map((endpoint) => `### ${endpoint.name}\n\n> **${endpoint.method}** \`${endpoint.url}\`\n\nAdd endpoint documentation.\n\n#### Parameters\n\n| Name | Location | Required | Description |\n| --- | --- | --- | --- |\n| Add parameter | query/path/header | No | Describe it |\n\n#### Example response\n\n\`\`\`json\n{ "success": true }\n\`\`\``).join('\n\n');
+        setContent(`${content.trim()}\n\n## Collection endpoint reference\n\n${blocks}\n`);
+        setViewMode('edit');
+    };
+    const postComment = async () => { if (!commentText.trim() || !collection?._id) return; const response = await fetch('/api/comments', { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'include', body: JSON.stringify({ resourceId: String(collection._id), resourceType: 'documentation', content: commentText }) }); if (response.ok) { setComments([...comments, await response.json()]); setCommentText(''); } };
 
     return (
         <div className="documentation-editor" data-key={`editor-instance-${Date.now()}`}>
@@ -512,16 +587,27 @@ const DocumentationEditor = ({ documentation, collection, onSave, isSaving }) =>
                     />
                 </div>
                 <div className="editor-actions">
+                    <span className={`autosave-status ${autoSaveStatus === 'Save failed' ? 'error' : ''}`} aria-live="polite">{autoSaveStatus}</span>
+                    <button type="button" className="editor-find-toggle" onClick={() => setShowFind(!showFind)}>Find</button>
                     <div className="view-toggle-group">
                         <button
-                            className={`view-toggle-btn ${!isPreview ? 'active' : ''}`}
-                            onClick={() => setIsPreview(false)}
+                            type="button"
+                            className={`view-toggle-btn ${viewMode === 'edit' ? 'active' : ''}`}
+                            onClick={() => setViewMode('edit')}
                         >
                             <FiEdit3 /> Edit
                         </button>
                         <button
-                            className={`view-toggle-btn ${isPreview ? 'active' : ''}`}
-                            onClick={() => setIsPreview(true)}
+                            type="button"
+                            className={`view-toggle-btn ${viewMode === 'split' ? 'active' : ''}`}
+                            onClick={() => setViewMode('split')}
+                        >
+                            <FiColumns /> Split
+                        </button>
+                        <button
+                            type="button"
+                            className={`view-toggle-btn ${viewMode === 'preview' ? 'active' : ''}`}
+                            onClick={() => setViewMode('preview')}
                         >
                             <FiEye /> Preview
                         </button>
@@ -535,12 +621,21 @@ const DocumentationEditor = ({ documentation, collection, onSave, isSaving }) =>
                     </button>
                 </div>
             </div>
+            {showFind ? <div className="editor-findbar"><input value={findText} onChange={(e) => setFindText(e.target.value)} placeholder="Find" /><input value={replaceText} onChange={(e) => setReplaceText(e.target.value)} placeholder="Replace with" /><span>{findText ? content.split(findText).length - 1 : 0} matches</span><button type="button" onClick={replaceAll}>Replace all</button></div> : null}
 
             <div className="editor-main">
                 <div className="editor-sidebar">
                     <button className="insert-template-btn" onClick={handleInsertTemplate}>
                         <FiCode /> Try Swagger Example
                     </button>
+                    <div className="doc-template-picker">
+                        <span>Start from a template</span>
+                        <div>
+                            {DOCUMENTATION_TEMPLATES.map((template) => (
+                                <button type="button" key={template.id} onClick={() => applyTemplate(template)}>{template.label}</button>
+                            ))}
+                        </div>
+                    </div>
                     <div className="editor-tools">
                         <h4>Formatting</h4>
                         <button onClick={() => insertMarkdown('bold', 'bold text')}>
@@ -570,6 +665,7 @@ const DocumentationEditor = ({ documentation, collection, onSave, isSaving }) =>
                         <div className="endpoints-list">
                             <h4>Endpoints</h4>
                             <p className="help-text">Click to insert endpoint documentation</p>
+                            <button type="button" className="sync-endpoints-btn" onClick={syncEndpoints}>Sync endpoints</button>
                             {endpoints.map((endpoint) => (
                                 <div
                                     key={endpoint.id}
@@ -584,10 +680,22 @@ const DocumentationEditor = ({ documentation, collection, onSave, isSaving }) =>
                             ))}
                         </div>
                     )}
+                    {tableOfContents.length > 0 && (
+                        <nav className="doc-toc" aria-label="Document outline">
+                            <h4>On this page</h4>
+                            {tableOfContents.map((heading) => (
+                                <button type="button" key={`${heading.index}-${heading.title}`} style={{ paddingLeft: `${(heading.level - 1) * 10 + 8}px` }} onClick={() => {
+                                    setViewMode('edit');
+                                    setTimeout(() => { const editor = document.getElementById('documentation-textarea'); if (editor) { editor.focus(); editor.setSelectionRange(heading.index, heading.index); editor.scrollTop = Math.max(0, editor.value.slice(0, heading.index).split('\n').length * 25 - 80); } }, 0);
+                                }}>{heading.title}</button>
+                            ))}
+                        </nav>
+                    )}
+                    <section className="doc-comments"><h4>Comments</h4><div>{comments.map((comment) => <p key={comment._id}>{comment.content}</p>)}</div><textarea value={commentText} onChange={(e) => setCommentText(e.target.value)} placeholder="Leave feedback" /><button type="button" onClick={postComment}>Comment</button></section>
                 </div>
 
-                <div className="editor-content">
-                    {!isPreview ? (
+                <div className={`editor-content editor-content--${viewMode}`}>
+                    {viewMode !== 'preview' ? (
                         <textarea
                             id="documentation-textarea"
                             className="documentation-textarea"
@@ -595,12 +703,13 @@ const DocumentationEditor = ({ documentation, collection, onSave, isSaving }) =>
                             onChange={(e) => setContent(e.target.value)}
                             placeholder="Write your documentation here..."
                         />
-                    ) : (
+                    ) : null}
+                    {viewMode !== 'edit' ? (
                         <div
                             className="documentation-preview"
                             dangerouslySetInnerHTML={{ __html: convertMarkdownToHtml(content) }}
                         />
-                    )}
+                    ) : null}
                 </div>
             </div>
 

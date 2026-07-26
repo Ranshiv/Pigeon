@@ -1183,6 +1183,7 @@ router.post('/:id/documentation', authenticateJWT, async (req, res) => {
         const collectionId = req.params.id;
         const { title, content, importedFrom } = req.body;
         const userId = req.user.id;
+        const userObjectId = ObjectId.isValid(userId) ? new ObjectId(userId) : null;
         const db = getDb();
 
         // Allow empty content but ensure field exists
@@ -1195,6 +1196,8 @@ router.post('/:id/documentation', authenticateJWT, async (req, res) => {
             _id: new ObjectId(collectionId),
             $or: [
                 { owner: userId },
+                { userId: userId },
+                ...(userObjectId ? [{ owner: userObjectId }, { userId: userObjectId }] : []),
                 { collaborators: { $elemMatch: { userId: userId, role: { $in: ['editor', 'admin'] } } } }
             ]
         });

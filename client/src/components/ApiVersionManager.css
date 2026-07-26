@@ -1145,3 +1145,229 @@
 .versions-list h3 {
     margin-bottom: 16px;
 }
+
+/* Workspace theme alignment. Scope every shared class to this component so
+   documentation-history styles cannot leak into the API version screen. */
+.api-version-manager {
+    flex: 1;
+    min-height: calc(100svh - 128px);
+    padding: 24px;
+    box-sizing: border-box;
+    background: var(--background-color);
+}
+
+.api-version-manager .api-version-header {
+    min-height: 0;
+    padding: 0 0 20px;
+    border-bottom: 1px solid var(--border-color);
+    background: transparent;
+}
+
+.api-version-manager .header-info h2 { color: var(--text-color); font-size: 1.25rem; font-weight: 650; }
+.api-version-manager .header-info h2 .icon { color: var(--primary-color); }
+.api-version-manager .header-info p { color: var(--text-secondary); }
+
+.api-version-manager .versions-list {
+    flex: 1;
+    width: 100%;
+    margin-top: 18px;
+    padding: 0;
+    box-sizing: border-box;
+    overflow: visible;
+    border: 0 !important;
+    border-radius: 0;
+    background: transparent !important;
+}
+
+.api-version-manager .versions-list h3 {
+    margin: 0 0 14px;
+    color: var(--text-color);
+    font-size: 0.95rem;
+    font-weight: 650;
+}
+
+.api-version-manager .versions-grid {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr));
+    gap: 16px;
+}
+
+.api-version-manager .version-card {
+    display: flex;
+    min-width: 0;
+    padding: 20px;
+    flex-direction: column;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg, 12px);
+    background: var(--card-bg);
+}
+
+.api-version-manager .version-details {
+    flex: 1;
+    margin-bottom: 16px;
+    background: var(--background-color);
+}
+
+.api-version-manager .version-actions {
+    display: grid;
+    grid-template-columns: minmax(180px, 1fr) auto;
+    align-items: center;
+    gap: 10px;
+    margin-top: auto;
+}
+
+.api-version-manager .action-btn-group {
+    display: flex;
+    gap: 8px;
+}
+
+.api-version-manager .action-btn {
+    min-width: 0;
+    min-height: 38px;
+    padding: 9px 13px;
+    color: var(--button-text, #fff);
+}
+
+.api-version-manager .action-btn svg {
+    width: 15px;
+    height: 15px;
+    flex: 0 0 15px;
+    margin: 0 !important;
+    color: currentColor !important;
+    stroke: currentColor;
+    opacity: 1;
+}
+
+.api-version-manager .action-btn.deprecate svg {
+    width: 15px;
+    height: 15px;
+    color: currentColor !important;
+}
+
+.api-version-manager .action-btn.mock-server,
+.api-version-manager .action-btn.deprecate,
+.api-version-manager .action-btn.delete,
+.api-version-manager .action-btn.mock-server:hover,
+.api-version-manager .action-btn.deprecate:hover,
+.api-version-manager .action-btn.delete:hover {
+    color: var(--button-text, #fff) !important;
+}
+
+.api-version-manager .empty-state {
+    max-width: 680px;
+    min-height: 230px;
+    margin: 0 auto;
+    padding: 34px 28px;
+    box-sizing: border-box;
+    border: 1px dashed color-mix(in srgb, var(--primary-color) 42%, var(--border-color)) !important;
+    border-radius: var(--radius-lg, 12px);
+    background: var(--surface, var(--background-color)) !important;
+}
+
+.api-version-manager .empty-state > svg {
+    width: 52px;
+    height: 52px;
+    margin-bottom: 18px;
+    padding: 13px;
+    box-sizing: border-box;
+    border: 1px solid color-mix(in srgb, var(--primary-color) 30%, transparent);
+    border-radius: 14px;
+    background: color-mix(in srgb, var(--primary-color) 12%, transparent);
+    color: var(--primary-color);
+    opacity: 1;
+}
+
+.api-version-manager .empty-state h4 { margin-bottom: 8px; color: var(--text-color); font-size: 1rem; font-weight: 650; }
+.api-version-manager .empty-state p { margin-bottom: 20px; color: var(--text-secondary); font-size: 0.84rem; }
+
+.api-version-manager .create-version-btn {
+    min-height: 38px;
+    padding: 8px 14px;
+    background: var(--primary-color);
+    border: 1px solid var(--primary-color);
+    border-radius: var(--radius-sm, 8px);
+    color: var(--button-text, #fff);
+    font-size: 0.82rem;
+    font-weight: 650;
+}
+
+.api-version-manager .create-version-btn svg {
+    width: 14px;
+    height: 14px;
+    flex: 0 0 14px;
+    margin: 0 !important;
+    align-self: center;
+    color: currentColor !important;
+    stroke: currentColor;
+    opacity: 1;
+}
+
+.api-version-manager .create-version-btn:hover {
+    background: var(--primary-hover);
+    border-color: var(--primary-hover);
+    color: var(--button-text, #fff);
+    filter: none;
+}
+
+/* Keep the version modal isolated from generic form styles used by other editors. */
+.api-version-manager .create-version-form .form-header {
+    background: var(--card-bg) !important;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.api-version-manager .create-version-form .form-header h3 {
+    color: var(--text-color);
+}
+
+.api-version-manager .create-version-form .form-header h3 svg,
+.api-version-manager .create-version-form .close-btn svg,
+.api-version-manager .create-version-form .form-actions button svg {
+    width: 16px;
+    height: 16px;
+    flex: 0 0 16px;
+    margin: 0 !important;
+    align-self: center;
+    color: currentColor !important;
+    stroke: currentColor;
+    opacity: 1;
+}
+
+.api-version-manager .create-version-form .form-header h3 svg {
+    color: var(--primary-color) !important;
+}
+
+.api-version-manager .create-version-form .checkbox-group label {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    column-gap: 16px;
+    width: 100%;
+}
+
+.api-version-manager .create-version-form .checkbox-group .checkbox-copy {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+}
+
+.api-version-manager .create-version-form .checkbox-group .checkbox-title {
+    color: var(--text-color);
+    font-weight: 600;
+}
+
+.api-version-manager .create-version-form .checkbox-group .checkbox-description {
+    margin-top: 4px;
+}
+
+.api-version-manager .create-version-form .form-actions button[type="submit"] {
+    color: var(--button-text, #fff);
+}
+
+@media (max-width: 700px) {
+    .api-version-manager { padding: 16px; }
+    .api-version-manager .api-version-header { align-items: stretch; }
+    .api-version-manager .create-version-btn { justify-content: center; }
+    .api-version-manager .versions-list { padding: 0; }
+    .api-version-manager .empty-state { padding: 28px 18px; }
+    .api-version-manager .version-actions { grid-template-columns: 1fr; }
+    .api-version-manager .action-btn-group { display: grid; grid-template-columns: 1fr 1fr; }
+}

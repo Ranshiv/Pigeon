@@ -9,13 +9,15 @@ const integrationSchema = new mongoose.Schema({
     },
     type: {
         type: String,
-        enum: ['email', 'pagerduty', 'slack', 'teams', 'discord', 'jira', 'webhook'],
+        enum: ['email', 'pagerduty', 'slack', 'teams', 'discord', 'jira', 'webhook', 'telegram', 'googlechat'],
         required: true
     },
     workspaceId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Workspace',
-        required: true
+        // Integrations are owned by a user. A workspace is optional because an
+        // account-level alert channel can be used by any of that user's monitors.
+        default: null
     },
     userId: {
         type: mongoose.Schema.Types.ObjectId,
@@ -35,9 +37,13 @@ const integrationSchema = new mongoose.Schema({
         integrationKey: String,
         routingKey: String,
 
-        // Slack/Teams/Discord
+        // Slack/Teams/Discord/Google Chat
         webhookUrl: String,
         channel: String,
+
+        // Telegram
+        botToken: String,
+        chatId: String,
 
         // Jira
         serverUrl: String,
@@ -120,9 +126,16 @@ integrationSchema.methods.validateConfiguration = function () {
             }
             break;
 
+        case 'telegram':
+            if (!this.configuration.botToken || !this.configuration.chatId) {
+                errors.push('Telegram requires botToken and chatId');
+            }
+            break;
+
         case 'slack':
         case 'teams':
         case 'discord':
+        case 'googlechat':
             if (!this.configuration.webhookUrl) {
                 errors.push(`${this.type} webhook URL is required`);
             } else if (!this.isValidUrl(this.configuration.webhookUrl)) {

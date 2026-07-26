@@ -1244,45 +1244,129 @@
 /* Error state */
 .collection-error {
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 100vh;
-  padding: 16px;
+  min-height: calc(100vh - 60px);
+  padding: clamp(24px, 5vw, 64px);
   text-align: center;
-  background-color: var(--background-color);
+  background: var(--background-color);
 }
 
-.error-icon {
-  color: #f44336;
-  font-size: 32px;
-  margin-right: 8px;
+.collection-error-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: min(100%, 560px);
+  padding: clamp(28px, 4vw, 44px);
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg, 16px);
+  box-shadow: var(--card-shadow);
 }
 
-.collection-error h3 {
-  color: #f44336;
-  margin-top: 0;
-  margin-bottom: 16px;
+.collection-error-icon {
   display: flex;
   align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  margin-bottom: 20px;
+  border: 1px solid color-mix(in srgb, var(--danger-color) 28%, transparent);
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--danger-color) 12%, transparent);
+  color: var(--danger-color);
 }
 
-.collection-error button {
-  margin-top: 20px;
-  padding: 10px 16px;
-  background-color: var(--primary-color, #014C75);
-  color: white;
-  border: none;
-  border-radius: var(--border-radius);
+.collection-error-icon svg {
+  width: 28px;
+  height: 28px;
+}
+
+.collection-error-copy {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.collection-error-label {
+  color: var(--danger-color);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.collection-error-copy h1 {
+  margin: 0;
+  color: var(--text-color);
+  font-size: clamp(1.35rem, 3vw, 1.75rem);
+  font-weight: 650;
+  letter-spacing: -0.02em;
+}
+
+.collection-error-copy p {
+  max-width: 44ch;
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.collection-error-actions {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 28px;
+}
+
+.collection-error-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 40px;
+  padding: 9px 15px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm, 8px);
+  font-size: 0.85rem;
+  font-weight: 600;
   cursor: pointer;
-  font-weight: 500;
-  transition: all 0.2s ease;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease, filter 0.15s ease;
 }
 
-.collection-error button:hover {
-  background-color: var(--primary-hover, #013B5B);
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-sm);
+.collection-error-btn.primary {
+  background: var(--primary-color);
+  border-color: var(--primary-color);
+  color: var(--button-text, #fff);
+}
+
+.collection-error-btn.primary:hover {
+  filter: brightness(1.08);
+}
+
+.collection-error-btn.secondary {
+  background: transparent;
+  color: var(--text-secondary);
+}
+
+.collection-error-btn.secondary:hover {
+  background: var(--hover-bg);
+  border-color: color-mix(in srgb, var(--primary-color) 35%, var(--border-color));
+  color: var(--text-color);
+}
+
+.collection-error-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary-color) 22%, transparent);
+}
+
+@media (max-width: 480px) {
+  .collection-error-actions,
+  .collection-error-btn {
+    width: 100%;
+  }
 }
 
 /* Settings modal */
@@ -2076,4 +2160,113 @@
 @media (max-width: 600px) {
   .collection-header .tab-navigation { width: calc(100% + 8px); }
   .collection-header .tab-btn { padding: 8px 10px; }
+}
+
+/* Documentation empty state — a compact workspace card rather than a large,
+   unstructured empty canvas. */
+.documentation-tab-content:has(.documentation-placeholder) {
+  display: grid;
+  align-items: start;
+  justify-items: center;
+  min-height: 100%;
+  padding: clamp(24px, 5vw, 56px);
+  box-sizing: border-box;
+}
+
+.documentation-tab-content .documentation-placeholder {
+  width: min(100%, 640px);
+  margin: clamp(16px, 6vh, 72px) auto 0;
+  padding: clamp(28px, 5vw, 44px);
+  box-sizing: border-box;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg, 16px);
+  background: var(--card-bg, var(--surface));
+  box-shadow: var(--card-shadow);
+  gap: 0;
+}
+
+.documentation-tab-content .placeholder-icon {
+  display: grid;
+  width: 52px;
+  height: 52px;
+  margin: 0 0 18px;
+  padding: 13px;
+  box-sizing: border-box;
+  border: 1px solid color-mix(in srgb, var(--primary-color) 30%, transparent);
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--primary-color) 13%, transparent);
+  color: var(--primary-color);
+  font-size: 1.5rem;
+  opacity: 1;
+}
+
+.documentation-placeholder-eyebrow {
+  margin-bottom: 8px;
+  color: var(--primary-color);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.documentation-tab-content .documentation-placeholder h3 {
+  margin: 0;
+  color: var(--text-color);
+  font-size: clamp(1.2rem, 2.2vw, 1.45rem);
+  font-weight: 650;
+  letter-spacing: -0.02em;
+}
+
+.documentation-tab-content .documentation-placeholder p {
+  max-width: 48ch;
+  margin: 10px 0 0;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.documentation-tab-content .documentation-actions {
+  width: 100%;
+  margin-top: 26px;
+  justify-content: center;
+  gap: 10px;
+}
+
+.documentation-tab-content .create-doc-link,
+.documentation-tab-content .preview-swagger-btn {
+  min-height: 40px;
+  padding: 9px 14px;
+  border-radius: var(--radius-sm, 8px);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+/* Global link hover styles must not override the primary action foreground. */
+.documentation-tab-content .create-doc-link,
+.documentation-tab-content .create-doc-link:hover,
+.documentation-tab-content .create-doc-link:focus-visible {
+  color: var(--button-text, #fff) !important;
+}
+
+.documentation-tab-content .create-doc-link svg {
+  color: currentColor !important;
+}
+
+.documentation-tab-content .preview-swagger-btn {
+  border-color: var(--border-color);
+  background: var(--surface, transparent);
+  color: var(--text-color);
+}
+
+.documentation-tab-content .preview-swagger-btn:hover {
+  border-color: color-mix(in srgb, var(--primary-color) 45%, var(--border-color));
+  background: var(--hover-bg);
+  color: var(--text-color);
+}
+
+@media (max-width: 520px) {
+  .documentation-tab-content:has(.documentation-placeholder) { padding: 18px; }
+  .documentation-tab-content .documentation-placeholder { margin-top: 0; }
+  .documentation-tab-content .documentation-actions { flex-direction: column; }
+  .documentation-tab-content .create-doc-link,
+  .documentation-tab-content .preview-swagger-btn { width: 100%; justify-content: center; }
 }

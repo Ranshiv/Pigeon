@@ -411,8 +411,8 @@ const MockServerWorkspace = ({ collectionId, versionId, onClose }) => {
 
     if (isLoading && !mockServers.length) {
         return (
-            <div className="mock-workspace loading">
-                <div className="spinner"></div>
+            <div className="mock-workspace mock-loading">
+                <div className="mock-spinner"></div>
                 <p>Loading mock servers...</p>
             </div>
         );

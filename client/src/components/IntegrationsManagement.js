@@ -1,44 +1,19 @@
 // client/src/components/IntegrationsManagement.js
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './IntegrationsManagement.css';
 import AppSelect from './common/AppSelect/AppSelect';
+import transformConfigForBackend from './integrations/transformConfig';
 import PageLoader from './common/PageLoader/PageLoader';
 import {
     FiSettings, FiPlus, FiEdit, FiTrash2, FiCheck, FiX,
     FiAlertCircle, FiMail, FiMessageSquare, FiBell, FiActivity,
     FiTool, FiExternalLink, FiRefreshCw, FiPlay,
-    FiBarChart, FiUsers, FiCheckCircle, FiEye, FiEyeOff,
-    FiAlertTriangle
+    FiBarChart, FiUsers, FiEye, FiEyeOff,
+    FiAlertTriangle, FiSend, FiHash
 } from 'react-icons/fi';
 
 const IntegrationsManagement = () => {
-    const transformConfigForBackend = (type, config) => {
-        const transformed = { ...config };
-        if (['slack', 'teams', 'discord', 'webhook'].includes(type)) {
-            if (transformed.webhook_url) {
-                transformed.webhookUrl = transformed.webhook_url;
-                delete transformed.webhook_url;
-            }
-        }
-        if (transformed.smtp_host) { transformed.smtpHost = transformed.smtp_host; delete transformed.smtp_host; }
-        if (transformed.smtp_port) { transformed.smtpPort = transformed.smtp_port; delete transformed.smtp_port; }
-        else if (type === 'email') { transformed.smtpPort = 587; }
-        if (transformed.smtp_user) { transformed.smtpUser = transformed.smtp_user; delete transformed.smtp_user; }
-        if (transformed.smtp_pass) { transformed.smtpPass = transformed.smtp_pass; delete transformed.smtp_pass; }
-        if (transformed.smtp_password) { transformed.smtpPass = transformed.smtp_password; delete transformed.smtp_password; }
-        if (transformed.from_email) { transformed.fromEmail = transformed.from_email; delete transformed.from_email; }
-        if (transformed.use_tls) { transformed.useTls = transformed.use_tls; delete transformed.use_tls; }
-        else if (type === 'email') { transformed.useTls = true; }
-        if (transformed.routing_key) { transformed.routingKey = transformed.routing_key; delete transformed.routing_key; }
-        if (transformed.server_url) { transformed.serverUrl = transformed.server_url; delete transformed.server_url; }
-        if (transformed.api_token) { transformed.apiToken = transformed.api_token; delete transformed.api_token; }
-        if (transformed.project_key) { transformed.projectKey = transformed.project_key; delete transformed.project_key; }
-        if (transformed.base_url) { transformed.serverUrl = transformed.base_url; delete transformed.base_url; }
-        if (transformed.issue_type) { transformed.issueType = transformed.issue_type; delete transformed.issue_type; }
-        return transformed;
-    };
-
     const navigate = useNavigate();
     const [integrations, setIntegrations] = useState([]);
     const [selectedIntegration, setSelectedIntegration] = useState(null);
@@ -47,6 +22,7 @@ const IntegrationsManagement = () => {
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [showEditModal, setShowEditModal] = useState(false);
     const [testStatus, setTestStatus] = useState({});
+    const testingIntegrationIds = useRef(new Set());
     const [formData, setFormData] = useState({
         name: '', type: 'email', enabled: true, config: {}
     });
@@ -83,6 +59,7 @@ const IntegrationsManagement = () => {
     const createIntegrationWithDefaults = (type) => {
         let defaultConfig = {};
         if (type === 'email' && currentUser?.email) defaultConfig = getEmailDefaults();
+        setError(null);
         setFormData({ name: integrationTypes[type]?.name || '', type, enabled: true, config: defaultConfig });
         setShowCreateModal(true);
     };
@@ -124,8 +101,7 @@ const IntegrationsManagement = () => {
         pagerduty: {
             name: 'PagerDuty', icon: <FiTool />, description: 'Create incidents in PagerDuty',
             configFields: [
-                { key: 'integration_key', label: 'Integration Key', type: 'text', required: true },
-                { key: 'severity', label: 'Default Severity', type: 'select', options: ['info', 'warning', 'error', 'critical'], default: 'error' }
+                { key: 'integration_key', label: 'Integration Key (Events API v2 routing key)', type: 'password', required: true, placeholder: '32-character integration key' }
             ]
         },
         jira: {
@@ -138,13 +114,25 @@ const IntegrationsManagement = () => {
                 { key: 'issueType', label: 'Issue Type', type: 'text', default: 'Bug', placeholder: 'Bug, Task, Story, etc.' }
             ]
         },
+        telegram: {
+            name: 'Telegram', icon: <FiSend />, description: 'Send alerts to a Telegram chat',
+            configFields: [
+                { key: 'bot_token', label: 'Bot Token', type: 'password', required: true, placeholder: 'From @BotFather' },
+                { key: 'chat_id', label: 'Chat ID', type: 'text', required: true, placeholder: 'e.g., -1001234567890' }
+            ]
+        },
+        googlechat: {
+            name: 'Google Chat', icon: <FiHash />, description: 'Send alerts to a Google Chat space',
+            configFields: [
+                { key: 'webhook_url', label: 'Webhook URL', type: 'url', required: true, placeholder: 'https://chat.googleapis.com/v1/spaces/...' }
+            ]
+        },
         webhook: {
             name: 'Custom Webhook', icon: <FiSettings />, description: 'Send alerts to custom webhook endpoints',
             configFields: [
-                { key: 'url', label: 'Webhook URL', type: 'url', required: true },
-                { key: 'method', label: 'HTTP Method', type: 'select', options: ['POST', 'PUT'], default: 'POST' },
+                { key: 'webhook_url', label: 'Webhook URL', type: 'url', required: true },
                 { key: 'headers', label: 'Custom Headers (JSON)', type: 'textarea', placeholder: '{"Authorization": "Bearer token"}' },
-                { key: 'timeout', label: 'Timeout (seconds)', type: 'number', default: 30 }
+                { key: 'payloadTemplate', label: 'Payload Template (JSON, optional)', type: 'textarea', placeholder: '{"alert": "{{alertType}}", "monitor": "{{monitor.name}}"}' }
             ]
         }
     };
@@ -155,20 +143,32 @@ const IntegrationsManagement = () => {
         setLoading(true);
         try {
             const response = await fetch('/api/integrations', { credentials: 'include' });
-            if (response.ok) setIntegrations(await response.json());
+            if (response.ok) {
+                setIntegrations(await response.json());
+                setError(null);
+            }
             else setError('Failed to fetch integrations');
         } catch (err) { setError('Error fetching integrations: ' + err.message); }
         finally { setLoading(false); }
     };
 
     const createIntegration = async () => {
+        setError(null);
+        let configuration;
+        try { configuration = transformConfigForBackend(formData.type, formData.config); }
+        catch (err) { setError(err.message); return; }
         setLoading(true);
         try {
             const response = await fetch('/api/integrations', {
                 method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'include',
-                body: JSON.stringify({ ...formData, configuration: transformConfigForBackend(formData.type, formData.config) })
+                body: JSON.stringify({ ...formData, configuration })
             });
-            if (response.ok) { await fetchIntegrations(); setShowCreateModal(false); resetForm(); }
+            if (response.ok) {
+                await fetchIntegrations();
+                setError(null);
+                setShowCreateModal(false);
+                resetForm();
+            }
             else { const errorData = await response.json(); setError(errorData.message || 'Failed to create integration'); }
         } catch (err) { setError('Error creating integration: ' + err.message); }
         finally { setLoading(false); }
@@ -176,11 +176,14 @@ const IntegrationsManagement = () => {
 
     const updateIntegration = async () => {
         if (!selectedIntegration) return;
+        let configuration;
+        try { configuration = transformConfigForBackend(formData.type, formData.config); }
+        catch (err) { setError(err.message); return; }
         setLoading(true);
         try {
             const response = await fetch(`/api/integrations/${selectedIntegration._id}`, {
                 method: 'PUT', headers: { 'Content-Type': 'application/json' }, credentials: 'include',
-                body: JSON.stringify({ ...formData, configuration: transformConfigForBackend(formData.type, formData.config) })
+                body: JSON.stringify({ ...formData, configuration })
             });
             if (response.ok) { await fetchIntegrations(); setShowEditModal(false); setSelectedIntegration(null); resetForm(); }
             else { const errorData = await response.json(); setError(errorData.message || 'Failed to update integration'); }
@@ -189,20 +192,33 @@ const IntegrationsManagement = () => {
     };
 
     const testIntegration = async (integrationId) => {
-        setTestStatus({ ...testStatus, [integrationId]: 'testing' });
+        if (testingIntegrationIds.current.has(integrationId)) return;
+
+        testingIntegrationIds.current.add(integrationId);
+        const mark = (v) => setTestStatus(prev => ({ ...prev, [integrationId]: v }));
+        setError(null);
+        mark('testing');
         try {
-            const response = await fetch(`/api/integrations/${integrationId}/test`, { method: 'POST', credentials: 'include' });
+            const response = await fetch(`/api/integrations/${integrationId}/test`, {
+                method: 'POST',
+                credentials: 'include',
+                // This screen renders a contextual error banner itself. Avoid
+                // routing the same failure through the global toast handler.
+                suppressGlobalErrorToast: true
+            });
             if (response.ok) {
-                setTestStatus({ ...testStatus, [integrationId]: 'success' });
-                setTimeout(() => setTestStatus({ ...testStatus, [integrationId]: null }), 3000);
+                mark('success');
+                setTimeout(() => mark(null), 3000);
             } else {
                 const errorData = await response.json();
-                setTestStatus({ ...testStatus, [integrationId]: 'error' });
+                mark('error');
                 setError(errorData.message || 'Test failed');
             }
         } catch (err) {
-            setTestStatus({ ...testStatus, [integrationId]: 'error' });
+            mark('error');
             setError('Error testing integration: ' + err.message);
+        } finally {
+            testingIntegrationIds.current.delete(integrationId);
         }
     };
 
@@ -317,7 +333,7 @@ const IntegrationsManagement = () => {
         const status = testStatus[integrationId];
         switch (status) {
             case 'testing': return <FiRefreshCw className="im-test-icon testing" />;
-            case 'success': return <FiCheckCircle className="im-test-icon success" />;
+            case 'success': return <FiCheck className="im-test-icon success" aria-hidden="true" />;
             case 'error': return <FiAlertCircle className="im-test-icon error" />;
             default: return <FiPlay className="im-test-icon" />;
         }
@@ -336,7 +352,11 @@ const IntegrationsManagement = () => {
                     case 'fromEmail': frontendConfig.from_email = value; break;
                     case 'useTls': frontendConfig.use_tls = value; break;
                     case 'webhookUrl': frontendConfig.webhook_url = value; break;
-                    case 'routingKey': frontendConfig.routing_key = value; break;
+                    case 'routingKey': frontendConfig.integration_key = value; break;
+                    case 'botToken': frontendConfig.bot_token = value; break;
+                    case 'chatId': frontendConfig.chat_id = value; break;
+                    case 'headers': frontendConfig.headers = value ? JSON.stringify(value, null, 2) : ''; break;
+                    case 'enabledEvents': break; // managed server-side
                     case 'apiToken': frontendConfig.apiToken = value; break;
                     case 'projectKey': frontendConfig.projectKey = value; break;
                     case 'issueType': frontendConfig.issueType = value; break;
@@ -431,6 +451,46 @@ const IntegrationsManagement = () => {
                             ⚠️ <strong>Security:</strong> API tokens are safer than passwords. Keep them secure!
                         </div>
                         <a href="https://support.atlassian.com/atlassian-account/docs/manage-api-tokens-for-your-atlassian-account/" target="_blank" rel="noopener noreferrer">📖 Official Atlassian API token guide →</a>
+                    </div>
+                </div>
+            ),
+            pagerduty: (
+                <div className="im-config-note" data-integration="pagerduty">
+                    <div className="im-note-icon">📟</div>
+                    <div className="im-note-content">
+                        <strong>PagerDuty Quick Setup:</strong>
+                        <ol style={{ marginTop: '8px', paddingLeft: '20px' }}>
+                            <li>Open your PagerDuty <strong>Service</strong> → <strong>Integrations</strong></li>
+                            <li>Add an integration of type <strong>Events API v2</strong></li>
+                            <li>Copy the <strong>Integration Key</strong> and paste below</li>
+                        </ol>
+                        <a href="https://support.pagerduty.com/docs/services-and-integrations" target="_blank" rel="noopener noreferrer">📖 PagerDuty integration guide →</a>
+                    </div>
+                </div>
+            ),
+            telegram: (
+                <div className="im-config-note" data-integration="telegram">
+                    <div className="im-note-icon">✈️</div>
+                    <div className="im-note-content">
+                        <strong>Telegram Quick Setup:</strong>
+                        <ol style={{ marginTop: '8px', paddingLeft: '20px' }}>
+                            <li>Message <strong>@BotFather</strong> → <code>/newbot</code> → copy the token</li>
+                            <li>Add the bot to your group/channel (or DM it once)</li>
+                            <li>Get the chat ID from <code>https://api.telegram.org/bot&lt;token&gt;/getUpdates</code></li>
+                        </ol>
+                    </div>
+                </div>
+            ),
+            googlechat: (
+                <div className="im-config-note" data-integration="googlechat">
+                    <div className="im-note-icon">💠</div>
+                    <div className="im-note-content">
+                        <strong>Google Chat Quick Setup:</strong>
+                        <ol style={{ marginTop: '8px', paddingLeft: '20px' }}>
+                            <li>Open the space → <strong>Apps &amp; integrations</strong></li>
+                            <li>Click <strong>Webhooks</strong> → <strong>Add webhook</strong></li>
+                            <li>Copy the URL (starts with <code>https://chat.googleapis.com/v1/spaces/</code>)</li>
+                        </ol>
                     </div>
                 </div>
             ),
@@ -607,9 +667,11 @@ const IntegrationsManagement = () => {
                                         </div>
                                         <div className="im-item-actions">
                                             <button
-                                                className="im-action-btn test"
+                                                className={`im-action-btn test ${testStatus[integration._id] === 'success' ? 'success' : ''}`}
                                                 onClick={() => testIntegration(integration._id)}
                                                 title="Test integration"
+                                                disabled={testStatus[integration._id] === 'testing'}
+                                                aria-label={`Test ${integration.name} integration`}
                                             >
                                                 {getTestStatusIcon(integration._id)}
                                             </button>

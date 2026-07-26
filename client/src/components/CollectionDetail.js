@@ -1,6 +1,6 @@
 // client/src/components/CollectionDetail.js
 import React, { useEffect, useState, useCallback } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, useNavigate, useLocation, Link } from 'react-router-dom';
 import './CollectionDetail.css';
 import ActiveCollaborators from './ActiveCollaborators';
 import RequestForm from './RequestForm';
@@ -15,7 +15,7 @@ import {
   FiSettings, FiAlertCircle, FiCheckCircle, FiBook, FiEdit,
   FiPlus, FiTrash2, FiDatabase, FiGlobe, FiLock, FiUsers, FiPackage,
   FiFileText, FiInfo, FiGrid, FiFolder, FiChevronDown, FiChevronLeft, FiChevronRight,
-  FiServer
+  FiArrowLeft, FiRefreshCw, FiServer
 } from 'react-icons/fi';
 import { toast } from 'react-toastify'; // Import toast notification library
 
@@ -165,6 +165,7 @@ const buildImportedDocumentationFallback = (collection, requests) => {
 function CollectionDetail() {
   const { collectionId } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const [collection, setCollection] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -246,6 +247,7 @@ function CollectionDetail() {
   // Fetch collection data
   const fetchCollection = useCallback(async () => {
     try {
+      setError(null);
       setLoading(true);
       const response = await fetch(`/api/collections/${collectionId}`, {
         credentials: 'include'
@@ -977,12 +979,47 @@ function CollectionDetail() {
     );
   }
 
+  const routeWorkspaceId = location.state?.workspaceId;
+  const collectionWorkspaceId = collection?.workspaceId?._id || collection?.workspaceId;
+  const workspaceId = routeWorkspaceId || collectionWorkspaceId;
+  const collectionsReturnPath = location.state?.returnTo || (workspaceId
+    ? `/workspace/workspaces/${workspaceId}?tab=collections`
+    : '/workspace/workspaces');
+  const collectionRouteState = workspaceId
+    ? { workspaceId, returnTo: collectionsReturnPath }
+    : location.state;
+
   if (error) {
     return (
       <div className="collection-error">
-        <h3><FiAlertCircle className="error-icon" /> Error</h3>
-        <p>{error}</p>
-        <button onClick={() => navigate('/workspace/collections')}>Go Back to Collections</button>
+        <section className="collection-error-panel" role="alert" aria-live="assertive">
+          <div className="collection-error-icon" aria-hidden="true">
+            <FiAlertCircle />
+          </div>
+          <div className="collection-error-copy">
+            <span className="collection-error-label">Collection unavailable</span>
+            <h1>Unable to load this collection</h1>
+            <p>{error}</p>
+          </div>
+          <div className="collection-error-actions">
+            <button
+              type="button"
+              className="collection-error-btn primary"
+              onClick={fetchCollection}
+            >
+              <FiRefreshCw aria-hidden="true" />
+              Try Again
+            </button>
+            <button
+              type="button"
+              className="collection-error-btn secondary"
+              onClick={() => navigate(collectionsReturnPath)}
+            >
+              <FiArrowLeft aria-hidden="true" />
+              Back to Collections
+            </button>
+          </div>
+        </section>
       </div>
     );
   }
@@ -1224,13 +1261,14 @@ function CollectionDetail() {
               ) : (
                 <div className="documentation-placeholder">
                   <FiBook className="placeholder-icon" />
-                  <h3>No Documentation Available</h3>
-                  <p>This collection doesn't have any documentation yet.</p>
+                  <span className="documentation-placeholder-eyebrow">Collection documentation</span>
+                  <h3>Start documenting your API</h3>
+                  <p>Create documentation from this collection, or preview the generated Swagger documentation when you are ready to share it.</p>
                   <div className="documentation-actions">
-                    <Link to={`/workspace/collections/${collectionId}/documentation`} className="create-doc-link">
+                    <Link to={`/workspace/collections/${collectionId}/documentation`} state={collectionRouteState} className="create-doc-link">
                       <FiEdit /> Create Documentation
                     </Link>
-                    <button onClick={() => navigate(`/workspace/collections/${collectionId}/documentation/swagger`)} className="preview-swagger-btn">
+                    <button onClick={() => navigate(`/workspace/collections/${collectionId}/documentation/swagger`, { state: collectionRouteState })} className="preview-swagger-btn">
                       <FiFileText /> Preview Swagger Documentation
                     </button>
                   </div>

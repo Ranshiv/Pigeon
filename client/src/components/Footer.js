@@ -43,11 +43,11 @@ const Footer = () => {
                                 </Link>
                             </li>
                             <li>
-                                <Link to="/workspace/collections">
+                                <Link to="/workspace/workspaces">
                                     <svg viewBox="0 0 24 24" className="footer-icon" width="18" height="18" stroke="currentColor" fill="none" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                         <path d="M16 18l6-6-6-6"></path>
                                         <path d="M8 6l-6 6 6 6"></path>
-                                    </svg> Collections
+                                    </svg> Workspaces
                                 </Link>
                             </li>
                             <li>
