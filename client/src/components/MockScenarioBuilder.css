@@ -110,7 +110,7 @@
 /* Form Groups */
 .form-row {
     display: grid;
-    grid-template-columns: 1fr 120px;
+    grid-template-columns: minmax(0, 2fr) minmax(120px, 1fr);
     gap: 16px;
     margin-bottom: 16px;
 }
@@ -657,3 +657,210 @@
         grid-template-columns: 1fr;
     }
 }
+/* Pigeon dark surface overrides */
+.mock-workspace .scenario-builder-overlay { background: rgba(10,8,7,.76); padding: 24px; overscroll-behavior: contain; }
+.mock-workspace .scenario-builder-modal { background: #211f1e; border: 1px solid #4b3828; border-radius: 12px; box-shadow: 0 24px 70px rgba(0,0,0,.48); max-height: min(900px, calc(100vh - 48px)); }
+.mock-workspace .scenario-builder-modal { max-width: 900px; }
+.mock-workspace .scenario-builder-modal .modal-header { min-height: 56px; box-sizing: border-box; background: #272320; border-bottom-color: #4b3828; color: #f6efe8; }
+.mock-workspace .scenario-builder-modal .close-btn { border: 1px solid #4b3828; border-radius: 8px; color: #c8b9ad; }
+.mock-workspace .scenario-builder-modal .close-btn:hover { background: rgba(255,148,31,.12); border-color: #ff941f; color: #ffb766; }
+.mock-workspace .scenario-builder-modal .scenario-form { padding: 20px 24px 24px; background: #211f1e; }
+.mock-workspace .scenario-builder-modal .scenario-form::-webkit-scrollbar { width: 10px; }
+.mock-workspace .scenario-builder-modal .scenario-form::-webkit-scrollbar-track { background: #171616; }
+.mock-workspace .scenario-builder-modal .scenario-form::-webkit-scrollbar-thumb { background: #8d531d; border: 2px solid #171616; border-radius: 999px; }
+.mock-workspace .scenario-builder-modal .scenario-form::-webkit-scrollbar-thumb:hover { background: #ff941f; }
+.mock-workspace .scenario-builder-modal .scenario-form { scrollbar-color: #8d531d #171616; scrollbar-width: thin; }
+.mock-workspace .scenario-builder-modal .form-section,
+.mock-workspace .scenario-builder-modal .form-actions { border-color: #4b3828; }
+.mock-workspace .scenario-builder-modal .form-section { margin-bottom: 18px; padding: 18px; border: 1px solid #4b3828; border-radius: 10px; background: #171616; }
+.mock-workspace .scenario-builder-modal .form-section h4,
+.mock-workspace .scenario-builder-modal .form-group label { color: #f6efe8; }
+.mock-workspace .scenario-builder-modal .form-section h4 { margin-bottom: 14px; }
+.mock-workspace .scenario-builder-modal .form-section > .form-row {
+    width: 100%;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    box-sizing: border-box;
+}
+.mock-workspace .scenario-builder-modal .form-row .form-group { margin: 0 !important; min-width: 0; }
+.mock-workspace .scenario-builder-modal .form-section > .form-group {
+    width: 100%;
+    margin: 0 0 16px !important;
+    box-sizing: border-box;
+}
+.mock-workspace .scenario-builder-modal .form-group input,
+.mock-workspace .scenario-builder-modal .form-group textarea,
+.mock-workspace .scenario-builder-modal .form-group select,
+.mock-workspace .scenario-builder-modal .condition-field-row input,
+.mock-workspace .scenario-builder-modal .condition-field-row select {
+    box-sizing: border-box;
+    border: 1px solid #4b3828;
+    border-radius: 8px;
+    background-color: #211f1e;
+    color: #f6efe8;
+}
+.mock-workspace .scenario-builder-modal .app-select,
+.mock-workspace .scenario-builder-modal .app-select-trigger {
+    width: 100%;
+}
+.mock-workspace .scenario-builder-modal .app-select-trigger {
+    min-height: 44px;
+    border-color: var(--border-color);
+    border-radius: var(--radius-sm);
+    background: var(--surface);
+    color: var(--text-color);
+}
+.mock-workspace .scenario-builder-modal .app-select-trigger:hover {
+    border-color: var(--accent);
+    background: var(--hover-bg);
+}
+.mock-workspace .scenario-builder-modal .app-select-trigger:focus-visible {
+    border-color: var(--accent);
+    box-shadow: var(--ring);
+}
+.mock-workspace .scenario-builder-modal .form-group input::placeholder,
+.mock-workspace .scenario-builder-modal .form-group textarea::placeholder,
+.mock-workspace .scenario-builder-modal .condition-field-row input::placeholder { color: #928276; opacity: 1; }
+.mock-workspace .scenario-builder-modal select { appearance: auto; background-image: none !important; }
+.mock-workspace .scenario-builder-modal .form-group select,
+.mock-workspace .scenario-builder-modal .condition-field-row select { color-scheme: dark; }
+.mock-workspace .scenario-builder-modal .section-header {
+    margin: 0 0 14px;
+    padding: 0;
+    background: transparent;
+    border: 0;
+    box-shadow: none;
+}
+.mock-workspace .scenario-builder-modal .section-header h4 { color: #f6efe8; }
+.mock-workspace .scenario-builder-modal .condition-card,
+.mock-workspace .scenario-builder-modal .response-card,
+.mock-workspace .scenario-builder-modal .test-section { background: #272320; border-color: #4b3828; border-radius: 10px; }
+.mock-workspace .scenario-builder-modal .condition-header,
+.mock-workspace .scenario-builder-modal .response-header { background: #211f1e; }
+.mock-workspace .scenario-builder-modal .condition-header:hover,
+.mock-workspace .scenario-builder-modal .response-header:hover { background: #2a2725; }
+.mock-workspace .scenario-builder-modal .condition-type,
+.mock-workspace .scenario-builder-modal .response-title { color: #f6efe8; }
+.mock-workspace .scenario-builder-modal .condition-preview,
+.mock-workspace .scenario-builder-modal .condition-field-row label,
+.mock-workspace .scenario-builder-modal .weight-badge { color: #c8b9ad; }
+.mock-workspace .scenario-builder-modal .condition-body,
+.mock-workspace .scenario-builder-modal .response-body,
+.mock-workspace .scenario-builder-modal .test-result { background: #1b1918; border-color: #4b3828; }
+.mock-workspace .scenario-builder-modal .btn-add,
+.mock-workspace .scenario-builder-modal .btn-primary { background: #ff941f; color: #21160c; }
+.mock-workspace .scenario-builder-modal .btn-secondary { background: #272320; color: #f6efe8; border-color: #4b3828; }
+.mock-workspace .scenario-builder-modal .btn-test {
+    background: #ff941f;
+    color: #21160c;
+    border-radius: 8px;
+}
+.mock-workspace .scenario-builder-modal .btn-test:hover { background: #e98212; box-shadow: none; }
+.mock-workspace .scenario-builder-modal .form-actions { background: #211f1e; }
+.mock-workspace .scenario-builder-modal .weighted-toggle.is-active {
+    border-color: #ff941f;
+    background: rgba(255,148,31,.12);
+    box-shadow: 0 0 0 3px rgba(255,148,31,.08);
+}
+.mock-workspace .scenario-builder-modal .weighted-toggle.is-active .weighted-toggle-switch { background: #ff941f; }
+.mock-workspace .scenario-builder-modal .weighted-toggle-switch { background: #4b3828; }
+.mock-workspace .scenario-builder-modal .btn-add { border-radius: 8px; }
+.mock-workspace .scenario-builder-modal .response-card {
+    border-color: var(--border-color);
+    background: var(--surface);
+    border-radius: var(--radius-sm);
+}
+.mock-workspace .scenario-builder-modal .response-header {
+    min-height: 54px;
+    box-sizing: border-box;
+    padding: 10px 14px;
+    background: var(--surface-elevated);
+    border-bottom: 1px solid var(--border-color);
+}
+.mock-workspace .scenario-builder-modal .response-header:hover { background: var(--hover-bg); }
+.mock-workspace .scenario-builder-modal .response-title { gap: 9px; min-width: 0; }
+.mock-workspace .scenario-builder-modal .response-name { color: var(--text-color); font-size: 13px; font-weight: 650; }
+.mock-workspace .scenario-builder-modal .response-actions { gap: 6px; color: var(--text-secondary); }
+.mock-workspace .scenario-builder-modal .response-actions .btn-icon {
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    background: var(--surface);
+    color: var(--text-secondary);
+}
+.mock-workspace .scenario-builder-modal .response-actions .btn-icon:hover {
+    border-color: var(--danger-color);
+    background: var(--danger-bg);
+    color: var(--danger-text);
+}
+.mock-workspace .scenario-builder-modal .response-body {
+    padding: 16px;
+    background: var(--surface-sunken);
+    border-top-color: var(--border-color);
+}
+.mock-workspace .scenario-builder-modal .response-body .form-group { margin: 0; }
+.mock-workspace .scenario-builder-modal .response-body .form-group label { color: var(--text-secondary); }
+.mock-workspace .scenario-builder-modal .response-row { gap: 12px; margin-bottom: 14px; }
+.mock-workspace .scenario-builder-modal .response-body-editor {
+    width: 100%;
+    box-sizing: border-box;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    background: var(--surface);
+    color: var(--text-color);
+}
+.mock-workspace .scenario-builder-modal .status-badge { border-radius: 999px; }
+.mock-workspace .scenario-builder-modal .status-badge.status-2xx { background: var(--success-bg); color: var(--success-text); }
+.mock-workspace .scenario-builder-modal .status-badge.status-4xx { background: var(--warning-light); color: var(--warning-color); }
+.mock-workspace .scenario-builder-modal .status-badge.status-5xx { background: var(--danger-bg); color: var(--danger-text); }
+.mock-workspace .scenario-builder-modal .weight-badge { background: var(--surface-sunken); color: var(--text-secondary); }
+.mock-workspace .scenario-builder-modal .delay-badge { background: var(--warning-light); color: var(--warning-color); }
+.mock-workspace .scenario-builder-modal .empty-state { width: 100%; box-sizing: border-box; min-height: 0; padding: 22px 18px; border: 1px dashed #4b3828; border-radius: 10px; background: #211f1e; color: #c8b9ad; }
+.mock-workspace .scenario-builder-modal .empty-state p { color: #c8b9ad; }
+.mock-workspace .scenario-builder-modal .weighted-toggle { min-width: 0; border-color: #4b3828; border-radius: 9px; background: #211f1e; }
+.mock-workspace .scenario-builder-modal .weighted-toggle-copy .title { color: #f6efe8; }
+.mock-workspace .scenario-builder-modal .weighted-toggle-copy .subtitle { color: #c8b9ad; }
+.mock-workspace .scenario-builder-modal :focus-visible { outline: 2px solid #ff941f; outline-offset: 2px; }
+
+@media (prefers-reduced-motion: reduce) {
+    .scenario-builder-modal *, .scenario-builder-modal *::before, .scenario-builder-modal *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; }
+}
+
+/* Theme-token bridge: scenario UI follows the active application theme. */
+.mock-workspace .scenario-builder-overlay { background: color-mix(in srgb, var(--surface-sunken) 72%, transparent); }
+.mock-workspace .scenario-builder-modal { background: var(--surface-elevated); border-color: var(--border-color); box-shadow: var(--shadow-lg); }
+.mock-workspace .scenario-builder-modal .modal-header { background: var(--surface); border-color: var(--border-color); color: var(--text-color); }
+.mock-workspace .scenario-builder-modal .scenario-form,
+.mock-workspace .scenario-builder-modal .form-actions { background: var(--surface-elevated); }
+.mock-workspace .scenario-builder-modal .form-section,
+.mock-workspace .scenario-builder-modal .test-section { background: var(--surface); border-color: var(--border-color); }
+.mock-workspace .scenario-builder-modal .form-section h4,
+.mock-workspace .scenario-builder-modal .section-header h4,
+.mock-workspace .scenario-builder-modal .form-group label { color: var(--text-color); }
+.mock-workspace .scenario-builder-modal .form-group input,
+.mock-workspace .scenario-builder-modal .form-group textarea,
+.mock-workspace .scenario-builder-modal .condition-field-row input { background: var(--surface-sunken); border-color: var(--border-color); color: var(--text-color); }
+.mock-workspace .scenario-builder-modal .close-btn,
+.mock-workspace .scenario-builder-modal .btn-secondary { background: var(--surface); border-color: var(--border-color); color: var(--text-color); }
+.mock-workspace .scenario-builder-modal .btn-add,
+.mock-workspace .scenario-builder-modal .btn-primary,
+.mock-workspace .scenario-builder-modal .btn-test { background: var(--accent); color: var(--button-text); }
+.mock-workspace .scenario-builder-modal .btn-add:hover,
+.mock-workspace .scenario-builder-modal .btn-primary:hover,
+.mock-workspace .scenario-builder-modal .btn-test:hover { background: var(--accent-hover); }
+.mock-workspace .scenario-builder-modal .empty-state,
+.mock-workspace .scenario-builder-modal .weighted-toggle,
+.mock-workspace .scenario-builder-modal .condition-card,
+.mock-workspace .scenario-builder-modal .response-card { background: var(--surface-elevated); border-color: var(--border-color); color: var(--text-color); }
+.mock-workspace .scenario-builder-modal .empty-state p,
+.mock-workspace .scenario-builder-modal .weighted-toggle-copy .subtitle,
+.mock-workspace .scenario-builder-modal .condition-preview { color: var(--text-secondary); }
+.mock-workspace .scenario-builder-modal .weighted-toggle.is-active { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 10%, var(--surface)); box-shadow: var(--ring); }
+.mock-workspace .scenario-builder-modal .weighted-toggle.is-active .weighted-toggle-switch { background: var(--accent); }
+.mock-workspace .scenario-builder-modal .weighted-toggle-switch { background: var(--border-color); }
+.mock-workspace .scenario-builder-modal .scenario-form::-webkit-scrollbar-track { background: var(--surface); }
+.mock-workspace .scenario-builder-modal .scenario-form::-webkit-scrollbar-thumb { background: var(--border-color); border-color: var(--surface); }
+.mock-workspace .scenario-builder-modal .scenario-form::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+.mock-workspace .scenario-builder-modal .scenario-form { scrollbar-color: var(--border-color) var(--surface); }

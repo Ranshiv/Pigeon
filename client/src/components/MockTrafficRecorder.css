@@ -1121,3 +1121,377 @@ body.dark-theme .detail-card pre {
         flex-wrap: wrap;
     }
 }
+/* Pigeon dark surface overrides */
+.mock-workspace .traffic-recorder {
+    --recorder-bg-primary: var(--surface-elevated);
+    --recorder-bg-secondary: var(--surface);
+    --recorder-bg-tertiary: var(--hover-bg);
+    --recorder-border-primary: var(--border-color);
+    --recorder-text-primary: var(--text-color);
+    --recorder-text-secondary: var(--text-secondary);
+    --recorder-text-muted: var(--text-muted);
+    --recorder-primary-color: var(--accent);
+    --recorder-primary-hover: var(--accent-hover);
+    --recorder-primary-light: color-mix(in srgb, var(--accent) 14%, transparent);
+    min-height: 0;
+    background: transparent;
+}
+.mock-workspace .traffic-recorder .recorder-content {
+    grid-template-columns: minmax(240px, 300px) minmax(0, 1fr);
+    gap: 14px;
+    padding: 0;
+    background: transparent;
+}
+.mock-workspace .traffic-recorder .recorder-header,
+.mock-workspace .traffic-recorder .recordings-panel,
+.mock-workspace .traffic-recorder .recording-details-panel,
+.mock-workspace .traffic-recorder .recording-empty-state { background: var(--recorder-bg-primary); border-color: var(--recorder-border-primary); box-shadow: none; }
+.mock-workspace .traffic-recorder .recording-item:hover,
+.mock-workspace .traffic-recorder .recording-item.selected { background: var(--recorder-primary-light); border-color: var(--accent); }
+.mock-workspace .traffic-recorder .btn-recording.start { background: var(--accent); color: var(--button-text); }
+.mock-workspace .traffic-recorder .btn-import { background: var(--recorder-bg-tertiary); border-color: var(--recorder-border-primary); color: var(--recorder-text-primary); }
+.mock-workspace .traffic-recorder .recording-empty-icon { background: var(--recorder-primary-light); color: var(--accent); }
+.mock-workspace .traffic-recorder .empty-state,
+.mock-workspace .traffic-recorder .requests-empty-state {
+    background: var(--surface-sunken);
+    border-color: var(--recorder-border-primary);
+}
+.mock-workspace .traffic-recorder .recording-empty-state {
+    min-height: 132px;
+    margin: 14px;
+    padding: 24px;
+}
+.mock-workspace .traffic-recorder .recordings-list { max-height: 420px; }
+.mock-workspace .traffic-recorder .recording-item { padding: 11px 12px; }
+.mock-workspace .traffic-recorder select { background-color: var(--surface-sunken); color: var(--text-color); border-color: var(--border-color); }
+.mock-workspace .traffic-recorder :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+@media (max-width: 900px) {
+    .mock-workspace .traffic-recorder .recorder-content { grid-template-columns: 1fr; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .traffic-recorder *, .traffic-recorder *::before, .traffic-recorder *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+body .mock-workspace .traffic-recorder {
+    --recorder-bg-primary: var(--surface-elevated);
+    --recorder-bg-secondary: var(--surface);
+    --recorder-bg-tertiary: var(--hover-bg);
+    --recorder-border-primary: var(--border-color);
+    --recorder-text-primary: var(--text-color);
+    --recorder-text-secondary: var(--text-secondary);
+    --recorder-text-muted: var(--text-muted);
+    --recorder-primary-color: var(--accent);
+    --recorder-primary-hover: var(--accent-hover);
+    --recorder-primary-light: color-mix(in srgb, var(--accent) 14%, transparent);
+}
+
+/* Keep the recorder aligned with the workspace theme.  These rules are
+   deliberately scoped through the workspace so the legacy blue dark-theme
+   selectors above cannot leak into this screen. */
+body .mock-workspace .traffic-recorder {
+    background: transparent;
+    color: var(--text-color);
+}
+
+body .mock-workspace .traffic-recorder .recorder-header,
+body .mock-workspace .traffic-recorder .recordings-panel,
+body .mock-workspace .traffic-recorder .recording-details-panel {
+    background: var(--surface);
+    border-color: var(--border-color);
+    box-shadow: none;
+}
+
+body .mock-workspace .traffic-recorder .recorder-header {
+    margin-bottom: 14px;
+    padding: 14px 16px;
+    border-radius: var(--radius-lg, 10px);
+}
+
+body .mock-workspace .traffic-recorder .header-title h2,
+body .mock-workspace .traffic-recorder .recordings-panel > h3,
+body .mock-workspace .traffic-recorder .recording-empty-content h3,
+body .mock-workspace .traffic-recorder .empty-state p {
+    color: var(--text-color);
+}
+
+body .mock-workspace .traffic-recorder .header-title h2 svg,
+body .mock-workspace .traffic-recorder .recordings-panel > h3 {
+    color: var(--accent);
+}
+
+body .mock-workspace .traffic-recorder .server-name,
+body .mock-workspace .traffic-recorder .empty-state span,
+body .mock-workspace .traffic-recorder .recording-empty-content p {
+    color: var(--text-secondary);
+}
+
+body .mock-workspace .traffic-recorder .header-actions {
+    gap: 8px;
+}
+
+body .mock-workspace .traffic-recorder .btn-recording,
+body .mock-workspace .traffic-recorder .btn-import,
+body .mock-workspace .traffic-recorder .btn-icon-text {
+    min-height: 36px;
+    border-radius: var(--radius-md, 8px);
+    font-weight: 600;
+}
+
+body .mock-workspace .traffic-recorder .btn-recording.start {
+    background: var(--accent);
+    color: var(--button-text, #fff);
+}
+
+body .mock-workspace .traffic-recorder .btn-recording.start:hover {
+    background: var(--accent-hover);
+}
+
+body .mock-workspace .traffic-recorder .btn-import,
+body .mock-workspace .traffic-recorder .btn-icon-text {
+    background: transparent;
+    border-color: var(--border-color);
+    color: var(--text-color);
+}
+
+body .mock-workspace .traffic-recorder .btn-import:hover,
+body .mock-workspace .traffic-recorder .btn-icon-text:hover {
+    background: var(--hover-bg);
+    border-color: var(--accent);
+    color: var(--text-color);
+}
+
+body .mock-workspace .traffic-recorder .recorder-error {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 46px;
+    padding: 10px 12px;
+    margin-bottom: 14px;
+    background: var(--danger-bg, color-mix(in srgb, var(--danger-color) 12%, transparent));
+    border-color: var(--danger-color);
+    color: var(--danger-text, var(--danger-color));
+    border-radius: var(--radius-md, 8px);
+    font-size: 13px;
+    line-height: 1.4;
+}
+
+body .mock-workspace .traffic-recorder .recorder-error > svg {
+    flex: 0 0 auto;
+}
+
+body .mock-workspace .traffic-recorder .recorder-error-message {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+body .mock-workspace .traffic-recorder .recorder-error button {
+    flex: 0 0 auto;
+    min-height: 30px;
+    padding: 5px 9px;
+    border: 1px solid var(--danger-border, currentColor);
+    border-radius: var(--radius-sm, 8px);
+    background: transparent;
+    color: var(--danger-text, var(--danger-color));
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out);
+}
+
+body .mock-workspace .traffic-recorder .recorder-error button:hover {
+    background: var(--danger-bg-hover, var(--hover-bg));
+    border-color: var(--danger-text, var(--danger-color));
+}
+
+body .mock-workspace .traffic-recorder .recorder-content {
+    grid-template-columns: minmax(240px, 280px) minmax(0, 1fr);
+    align-items: start;
+    gap: 14px;
+}
+
+body .mock-workspace .traffic-recorder .recordings-panel {
+    align-self: start;
+    border-radius: var(--radius-lg, 10px);
+}
+
+body .mock-workspace .traffic-recorder .recordings-panel > h3 {
+    padding: 13px 16px;
+    font-size: 14px;
+    background: var(--surface);
+    border-bottom-color: var(--border-color);
+}
+
+body .mock-workspace .traffic-recorder .recordings-panel .empty-state {
+    min-height: 146px;
+    margin: 10px;
+    padding: 22px 16px;
+    background: transparent;
+    border-color: var(--border-color);
+    border-radius: var(--radius-md, 8px);
+}
+
+body .mock-workspace .traffic-recorder .empty-state svg {
+    color: var(--accent);
+}
+
+body .mock-workspace .traffic-recorder .recording-details-panel {
+    border-radius: var(--radius-lg, 10px);
+}
+
+body .mock-workspace .traffic-recorder .recording-details-panel.is-empty {
+    min-height: 166px;
+    padding: 10px;
+}
+
+body .mock-workspace .traffic-recorder .recording-empty-state {
+    min-height: 0;
+    min-height: 144px;
+    margin: 0;
+    padding: 22px;
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+}
+
+body .mock-workspace .traffic-recorder .recording-empty-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: var(--radius-md, 8px);
+    background: var(--recorder-primary-light);
+    color: var(--accent);
+}
+
+/* Use the shared selector component here. Native-select background artwork
+   from old global theme rules can otherwise repeat across these controls. */
+body .mock-workspace .traffic-recorder .request-filters .recorder-filter-select {
+    flex: 1 1 180px;
+    min-width: 0;
+}
+
+body .mock-workspace .traffic-recorder .request-filters .app-select-trigger,
+body .mock-workspace .traffic-recorder .replay-controls .app-select-trigger {
+    min-height: 36px;
+    padding: 8px 11px;
+    border-color: var(--border-color);
+    border-radius: var(--radius-sm, 8px);
+    background: var(--surface-sunken);
+    color: var(--text-color);
+    box-shadow: none;
+}
+
+body .mock-workspace .traffic-recorder .request-filters .app-select-trigger:hover,
+body .mock-workspace .traffic-recorder .replay-controls .app-select-trigger:hover {
+    border-color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 7%, var(--surface-sunken));
+}
+
+body .mock-workspace .traffic-recorder .request-filters .app-select-chevron,
+body .mock-workspace .traffic-recorder .replay-controls .app-select-chevron {
+    color: var(--text-secondary);
+}
+
+body .mock-workspace .traffic-recorder .replay-speed-select {
+    width: 74px;
+}
+
+/* Selected-recording summary: use compact metric chips rather than the
+   legacy large dashboard summary layout. */
+body .mock-workspace .traffic-recorder .recording-summary {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 14px 16px;
+    background: transparent;
+    border-bottom: 0;
+}
+
+body .mock-workspace .traffic-recorder .recording-summary .summary-item {
+    display: flex;
+    flex: 0 1 auto;
+    flex-direction: row;
+    align-items: baseline;
+    gap: 8px;
+    min-height: 38px;
+    padding: 8px 10px;
+    border: 1px solid var(--border-color);
+    border-left: 3px solid var(--accent);
+    border-radius: var(--radius-sm, 8px);
+    background: var(--surface-sunken);
+}
+
+/* GraphQL's legacy global .summary-item adds a muted ::before stripe.
+   It must not be allowed to overlap this recorder's accent border. */
+body .mock-workspace .traffic-recorder .recording-summary .summary-item::before {
+    content: none;
+}
+
+body .mock-workspace .traffic-recorder .recording-summary .summary-value {
+    color: var(--text-color);
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+body .mock-workspace .traffic-recorder .recording-summary .summary-label {
+    color: var(--text-secondary);
+    font-size: 10px;
+    font-weight: 650;
+    line-height: 1.2;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+}
+
+body .mock-workspace .traffic-recorder .requests-panel-header {
+    padding: 13px 16px 10px;
+    border-bottom-color: var(--border-color);
+}
+
+body .mock-workspace .traffic-recorder .request-filters {
+    padding: 12px 16px;
+    border-top: 1px solid var(--border-color);
+    border-bottom: 0;
+}
+
+body .mock-workspace .traffic-recorder .status-legend {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 10px;
+    color: var(--text-secondary);
+    white-space: nowrap;
+}
+
+body .mock-workspace .traffic-recorder .legend-dot {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    color: var(--text-secondary);
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1;
+}
+
+body .mock-workspace .traffic-recorder .legend-dot i {
+    display: block;
+    width: 6px;
+    height: 6px;
+    flex: 0 0 6px;
+    border-radius: 50%;
+    background: currentColor;
+}
+
+body .mock-workspace .traffic-recorder .legend-2xx { color: var(--success-color); }
+body .mock-workspace .traffic-recorder .legend-4xx { color: var(--warning-color); }
+body .mock-workspace .traffic-recorder .legend-5xx { color: var(--danger-color); }
+
+@media (max-width: 640px) {
+    body .mock-workspace .traffic-recorder .requests-panel-header {
+        align-items: flex-start;
+        gap: 10px;
+        flex-direction: column;
+    }
+}

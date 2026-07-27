@@ -3,13 +3,14 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
     FiServer, FiPlay, FiSquare, FiSettings, FiGitBranch, FiDatabase,
     FiActivity, FiBarChart2, FiPlus, FiRefreshCw, FiCopy, FiTrash2, FiX,
-    FiAlertCircle, FiCheck, FiZap
+    FiAlertCircle, FiCheck, FiZap, FiAlertTriangle
 } from 'react-icons/fi';
 import MockScenarioBuilder from './MockScenarioBuilder';
 import MockStateManager from './MockStateManager';
 import MockTrafficRecorder from './MockTrafficRecorder';
 import MockAnalyticsDashboard from './MockAnalyticsDashboard';
 import MockEndpointEditor from './MockEndpointEditor';
+import MockFaultLab from './MockFaultLab';
 import './MockServerWorkspace.css';
 
 const SIDEBAR_SIZES = {
@@ -42,6 +43,7 @@ const MockServerWorkspace = ({ collectionId, versionId, onClose }) => {
         { id: 'scenarios', label: 'Scenarios', icon: FiGitBranch },
         { id: 'state', label: 'State', icon: FiDatabase },
         { id: 'recording', label: 'Recording', icon: FiActivity },
+        { id: 'fault-lab', label: 'Fault Lab', icon: FiAlertTriangle },
         { id: 'analytics', label: 'Analytics', icon: FiBarChart2 }
     ];
 
@@ -403,6 +405,9 @@ const MockServerWorkspace = ({ collectionId, versionId, onClose }) => {
                         serverName={selectedServer.name}
                     />
                 );
+
+            case 'fault-lab':
+                return <MockFaultLab mockServerId={selectedServer._id} />;
 
             default:
                 return null;

@@ -18,6 +18,7 @@ import {
     Filler
 } from 'chart.js';
 import { Bar, Doughnut } from 'react-chartjs-2';
+import AppSelect from './common/AppSelect/AppSelect';
 import './MockAnalyticsDashboard.css';
 
 // Register Chart.js components
@@ -177,6 +178,22 @@ const MockAnalyticsDashboard = ({ mockServerId, mockServerName }) => {
         return 'status-5xx';
     };
 
+    const themeToken = (name, fallback) => {
+        if (typeof window === 'undefined') return fallback;
+        return getComputedStyle(document.documentElement).getPropertyValue(name).trim() || fallback;
+    };
+
+    const chartTheme = {
+        surface: themeToken('--surface-elevated', '#ffffff'),
+        text: themeToken('--text-color', '#1f2937'),
+        secondaryText: themeToken('--text-secondary', '#6b7280'),
+        border: themeToken('--border-color', '#d1d5db'),
+        accent: themeToken('--accent', '#2563eb'),
+        success: themeToken('--success-color', '#16a34a'),
+        warning: themeToken('--warning-color', '#d97706'),
+        danger: themeToken('--danger-color', '#dc2626')
+    };
+
     // Chart configurations
     const chartOptions = {
         responsive: true,
@@ -186,10 +203,10 @@ const MockAnalyticsDashboard = ({ mockServerId, mockServerName }) => {
                 display: false
             },
             tooltip: {
-                backgroundColor: '#1e1e1e',
-                titleColor: '#ffffff',
-                bodyColor: '#d4d4d4',
-                borderColor: '#333333',
+                backgroundColor: chartTheme.surface,
+                titleColor: chartTheme.text,
+                bodyColor: chartTheme.secondaryText,
+                borderColor: chartTheme.border,
                 borderWidth: 1,
                 padding: 12,
                 cornerRadius: 8
@@ -201,16 +218,16 @@ const MockAnalyticsDashboard = ({ mockServerId, mockServerName }) => {
                     display: false
                 },
                 ticks: {
-                    color: '#666666',
+                    color: chartTheme.secondaryText,
                     font: { size: 11 }
                 }
             },
             y: {
                 grid: {
-                    color: '#e5e5e5'
+                    color: chartTheme.border
                 },
                 ticks: {
-                    color: '#666666',
+                    color: chartTheme.secondaryText,
                     font: { size: 11 }
                 }
             }
@@ -228,7 +245,7 @@ const MockAnalyticsDashboard = ({ mockServerId, mockServerName }) => {
             datasets: [{
                 label: 'Requests',
                 data: analytics.responseTimeDistribution.buckets.map(d => d.count),
-                backgroundColor: '#014C75',
+                backgroundColor: chartTheme.accent,
                 borderRadius: 4
             }]
         };
@@ -244,10 +261,10 @@ const MockAnalyticsDashboard = ({ mockServerId, mockServerName }) => {
         const data = Object.values(statusData);
 
         const colors = {
-            '2xx': '#10b981',
-            '3xx': '#3b82f6',
-            '4xx': '#f59e0b',
-            '5xx': '#ef4444'
+            '2xx': chartTheme.success,
+            '3xx': chartTheme.accent,
+            '4xx': chartTheme.warning,
+            '5xx': chartTheme.danger
         };
 
         // Map status codes to categories
@@ -262,7 +279,7 @@ const MockAnalyticsDashboard = ({ mockServerId, mockServerName }) => {
             labels: labels,
             datasets: [{
                 data: data,
-                backgroundColor: labels.map(l => colors[getStatusCategory(l)] || '#6b7280'),
+                backgroundColor: labels.map(l => colors[getStatusCategory(l)] || chartTheme.secondaryText),
                 borderWidth: 0
             }]
         };
@@ -280,7 +297,7 @@ const MockAnalyticsDashboard = ({ mockServerId, mockServerName }) => {
             datasets: [{
                 label: 'Requests',
                 data: analytics.topEndpoints.topEndpoints.map(d => d.totalRequests),
-                backgroundColor: '#014C75',
+                backgroundColor: chartTheme.accent,
                 borderRadius: 4
             }]
         };
@@ -315,16 +332,12 @@ const MockAnalyticsDashboard = ({ mockServerId, mockServerName }) => {
                 <div className="header-controls">
                     <div className="time-range-selector">
                         <FiClock size={14} />
-                        <select
+                        <AppSelect
+                            id="analytics-time-range"
                             value={timeRange}
-                            onChange={(e) => setTimeRange(e.target.value)}
-                        >
-                            {TIME_RANGES.map(range => (
-                                <option key={range.value} value={range.value}>
-                                    {range.label}
-                                </option>
-                            ))}
-                        </select>
+                            onChange={setTimeRange}
+                            options={TIME_RANGES}
+                        />
                     </div>
 
                     <label className={`auto-refresh-toggle ${autoRefresh ? 'active' : ''}`}>

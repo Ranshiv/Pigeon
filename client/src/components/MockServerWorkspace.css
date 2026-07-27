@@ -1362,3 +1362,93 @@ body.dark-theme .scenario-meta .method.patch {
         flex-direction: row;
     }
 }
+/* ===== Pigeon virtualization surface alignment ===== */
+.mock-workspace {
+    --mock-bg-primary: var(--surface-elevated);
+    --mock-bg-secondary: var(--surface);
+    --mock-bg-tertiary: var(--hover-bg);
+    --mock-border-primary: var(--border-color);
+    --mock-text-primary: var(--text-color);
+    --mock-text-secondary: var(--text-secondary);
+    --mock-text-muted: var(--text-muted);
+    --mock-primary-color: var(--accent);
+    --mock-primary-hover: var(--accent-hover);
+    --mock-primary-light: color-mix(in srgb, var(--accent) 14%, transparent);
+    --mock-shadow: var(--shadow-lg);
+    min-width: 0;
+    min-height: min(780px, calc(100svh - 128px));
+    background: var(--mock-bg-secondary);
+    border: 1px solid var(--mock-border-primary);
+    border-radius: 0;
+    overflow: hidden;
+}
+.mock-workspace .workspace-header { padding: 14px 20px; background: var(--mock-bg-primary); }
+.mock-workspace .header-icon { width: 34px; height: 34px; padding: 8px; border-radius: 9px; background: var(--mock-primary-light); color: var(--mock-primary-color); }
+.mock-workspace .workspace-content { background: var(--mock-bg-secondary); }
+.mock-workspace .workspace-sidebar { background: var(--mock-bg-primary); border-right-color: var(--mock-border-primary); }
+.mock-workspace .servers-list { padding: 10px; }
+.mock-workspace .server-item { background: transparent; border-color: transparent; }
+.mock-workspace .server-item:hover, .mock-workspace .server-item.selected { background: var(--mock-primary-light); border-color: var(--mock-primary-color); }
+.mock-workspace .server-icon { background: var(--mock-bg-tertiary); color: var(--mock-primary-color); }
+.mock-workspace .server-info-bar { padding: 14px 20px; background: var(--mock-bg-primary); }
+.mock-workspace .info-right { gap: 10px; }
+.mock-workspace .stat-item { min-width: 72px; padding: 9px 11px; border: 1px solid var(--mock-border-primary); border-radius: 8px; background: var(--surface-sunken); }
+.mock-workspace .stat-value { font-size: 18px; color: var(--accent); }
+.mock-workspace .tabs-container { padding: 0 14px; gap: 2px; background: var(--mock-bg-primary); overflow-x: auto; }
+.mock-workspace .tab-button { padding: 11px 12px; white-space: nowrap; }
+.mock-workspace .tab-button:hover { background: var(--mock-primary-light); color: var(--mock-text-primary); }
+.mock-workspace .tab-button.active { color: var(--mock-primary-color); border-bottom-color: var(--mock-primary-color); }
+.mock-workspace .tab-content { padding: 18px 20px 28px; overflow: auto; background: var(--mock-bg-secondary); }
+.mock-workspace .btn-primary, .mock-workspace .btn-add, .mock-workspace .btn-copy { background: var(--mock-primary-color); color: var(--button-text); font-weight: 650; }
+.mock-workspace .btn-primary:hover, .mock-workspace .btn-add:hover, .mock-workspace .btn-copy:hover { background: var(--mock-primary-hover); }
+.mock-workspace .btn-icon-text, .mock-workspace .btn-secondary { background: var(--mock-bg-tertiary); border-color: var(--mock-border-primary); color: var(--mock-text-primary); }
+.mock-workspace .btn-status.active { background: var(--danger-color); }
+.mock-workspace .btn-status.inactive { background: var(--success-color); }
+body .mock-workspace {
+    --mock-bg-primary: var(--surface-elevated);
+    --mock-bg-secondary: var(--surface);
+    --mock-bg-tertiary: var(--hover-bg);
+    --mock-border-primary: var(--border-color);
+    --mock-text-primary: var(--text-color);
+    --mock-text-secondary: var(--text-secondary);
+    --mock-text-muted: var(--text-muted);
+    --mock-primary-color: var(--accent);
+    --mock-primary-hover: var(--accent-hover);
+    --mock-primary-light: color-mix(in srgb, var(--accent) 14%, transparent);
+}
+body .mock-workspace .tabs-container {
+    min-height: 52px;
+    padding: 7px 14px;
+    gap: 6px;
+    align-items: center;
+    background: var(--surface-elevated);
+    border-bottom-color: var(--border-color);
+    scrollbar-width: none;
+}
+body .mock-workspace .tabs-container::-webkit-scrollbar { display: none; }
+body .mock-workspace .tab-button {
+    min-height: 36px;
+    padding: 8px 11px;
+    border: 1px solid transparent;
+    border-radius: var(--radius-sm);
+    color: var(--text-secondary);
+    font-weight: 600;
+}
+body .mock-workspace .tab-button:hover {
+    background: var(--hover-bg);
+    color: var(--text-color);
+}
+body .mock-workspace .tab-button.active {
+    border-color: color-mix(in srgb, var(--accent) 38%, var(--border-color));
+    border-bottom-color: color-mix(in srgb, var(--accent) 38%, var(--border-color));
+    background: color-mix(in srgb, var(--accent) 12%, var(--surface));
+    color: var(--accent);
+}
+body .mock-workspace .tab-button svg { color: currentColor; }
+@media (max-width: 780px) {
+    .mock-workspace { border-radius: 0; border-left: 0; border-right: 0; }
+    .mock-workspace .workspace-sidebar { display: none; }
+    .mock-workspace .workspace-header { padding: 12px 14px; }
+    .mock-workspace .header-left .header-info { display: none; }
+    .mock-workspace .tab-content { padding: 14px; }
+}

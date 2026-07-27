@@ -7,6 +7,37 @@ const TrafficRecorder = require('../services/TrafficRecorder');
 const MockAnalyticsService = require('../services/MockAnalyticsService');
 const { authenticateJWT } = require('../middleware/auth');
 
+const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+async function sendMockResponse(res, response) {
+    const transport = response.transport;
+    if (transport && !res.getHeader('Content-Type')) res.set('Content-Type', 'application/json');
+    if (transport?.type === 'abort') {
+        if (transport.phase === 'after_headers') {
+            res.status(response.status || 200).flushHeaders();
+        }
+        res.socket?.destroy();
+        return;
+    }
+    if (transport?.type === 'throttle') {
+        res.status(response.status || 200);
+        const raw = Buffer.from(transport.rawBody || '');
+        const chunkSize = Math.max(16, Number(transport.chunkSize || 256));
+        const bytesPerSecond = Math.max(64, Number(transport.bytesPerSecond || 1024));
+        for (let offset = 0; offset < raw.length; offset += chunkSize) {
+            res.write(raw.subarray(offset, offset + chunkSize));
+            if (offset + chunkSize < raw.length) await wait(Math.ceil((chunkSize / bytesPerSecond) * 1000));
+        }
+        res.end();
+        return;
+    }
+    if (transport?.type === 'raw') {
+        res.status(response.status || 200).send(transport.rawBody);
+        return;
+    }
+    res.status(response.status).json(response.body);
+}
+
 // =====================
 // STATIC ROUTES (must come BEFORE parameterized routes)
 // =====================
@@ -212,7 +243,7 @@ router.all('/:mockServerId/simulate/*', async (req, res) => {
         }
 
         console.log('[Mock Route] Sending response body:', JSON.stringify(response.body));
-        res.status(response.status).json(response.body);
+        await sendMockResponse(res, response);
     } catch (error) {
         console.error('Error handling mock request:', error);
         console.error('Error type:', typeof error);
@@ -224,6 +255,74 @@ router.all('/:mockServerId/simulate/*', async (req, res) => {
             error: String(error?.message || 'Mock server error'),
             message: String(error?.message || error || 'Unknown error')
         });
+    }
+});
+
+// =====================
+// FAULT LAB MANAGEMENT
+// =====================
+
+router.get('/:mockServerId/fault-lab', authenticateJWT, async (req, res) => {
+    try {
+        res.json(await MockServerService.getFaultLab(req.params.mockServerId, req.query.limit));
+    } catch (error) {
+        res.status(400).json({ message: error.message || 'Failed to load Fault Lab' });
+    }
+});
+
+router.put('/:mockServerId/fault-lab', authenticateJWT, async (req, res) => {
+    try {
+        res.json(await MockServerService.updateFaultLab(req.params.mockServerId, req.body));
+    } catch (error) {
+        res.status(400).json({ message: error.message || 'Failed to update Fault Lab' });
+    }
+});
+
+router.post('/:mockServerId/fault-lab/profiles', authenticateJWT, async (req, res) => {
+    try {
+        res.status(201).json(await MockServerService.addFaultProfile(req.params.mockServerId, req.body));
+    } catch (error) {
+        res.status(400).json({ message: error.message || 'Failed to add fault profile' });
+    }
+});
+
+router.put('/:mockServerId/fault-lab/profiles/:profileId', authenticateJWT, async (req, res) => {
+    try {
+        res.json(await MockServerService.updateFaultProfile(req.params.mockServerId, req.params.profileId, req.body));
+    } catch (error) {
+        res.status(400).json({ message: error.message || 'Failed to update fault profile' });
+    }
+});
+
+router.patch('/:mockServerId/fault-lab/profiles/:profileId/toggle', authenticateJWT, async (req, res) => {
+    try {
+        res.json(await MockServerService.toggleFaultProfile(req.params.mockServerId, req.params.profileId));
+    } catch (error) {
+        res.status(400).json({ message: error.message || 'Failed to toggle fault profile' });
+    }
+});
+
+router.post('/:mockServerId/fault-lab/profiles/:profileId/preview', authenticateJWT, async (req, res) => {
+    try {
+        res.json(await MockServerService.previewFaultProfile(req.params.mockServerId, req.params.profileId));
+    } catch (error) {
+        res.status(400).json({ message: error.message || 'Failed to preview fault profile' });
+    }
+});
+
+router.delete('/:mockServerId/fault-lab/profiles/:profileId', authenticateJWT, async (req, res) => {
+    try {
+        res.json(await MockServerService.deleteFaultProfile(req.params.mockServerId, req.params.profileId));
+    } catch (error) {
+        res.status(400).json({ message: error.message || 'Failed to delete fault profile' });
+    }
+});
+
+router.delete('/:mockServerId/fault-lab/events', authenticateJWT, async (req, res) => {
+    try {
+        res.json(await MockServerService.clearFaultEvents(req.params.mockServerId));
+    } catch (error) {
+        res.status(400).json({ message: error.message || 'Failed to clear fault events' });
     }
 });
 

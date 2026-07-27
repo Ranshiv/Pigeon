@@ -116,11 +116,7 @@ body.dark-theme .analytics-dashboard {
     gap: 6px;
 }
 
-.time-range-selector select {
-    /* Inherit global index.css select styling; only layout overrides */
-    width: auto;
-    min-width: 160px;
-}
+.time-range-selector .app-select { width: 164px; }
 
 /* ===== Auto Refresh Toggle ===== */
 .auto-refresh-toggle {
@@ -644,3 +640,157 @@ body.dark-theme .status.status-3xx {
         height: 200px;
     }
 }
+/* Pigeon dark surface overrides */
+.mock-workspace .analytics-dashboard {
+    --analytics-bg-primary: var(--surface-elevated);
+    --analytics-bg-secondary: var(--surface);
+    --analytics-bg-tertiary: var(--hover-bg);
+    --analytics-border-primary: var(--border-color);
+    --analytics-text-primary: var(--text-color);
+    --analytics-text-secondary: var(--text-secondary);
+    --analytics-text-muted: var(--text-muted);
+    --analytics-primary-color: var(--accent);
+    --analytics-primary-hover: var(--accent-hover);
+    --analytics-primary-light: color-mix(in srgb, var(--accent) 14%, transparent);
+    min-height: 0;
+}
+.mock-workspace .analytics-dashboard .analytics-header {
+    margin-bottom: 14px;
+    padding: 13px 16px;
+}
+.mock-workspace .analytics-dashboard .summary-cards {
+    gap: 12px;
+    margin-bottom: 14px;
+}
+.mock-workspace .analytics-dashboard .summary-card {
+    gap: 11px;
+    min-height: 72px;
+    padding: 12px 14px;
+}
+.mock-workspace .analytics-dashboard .card-icon { width: 38px; height: 38px; }
+.mock-workspace .analytics-dashboard .card-value { font-size: 20px; }
+.mock-workspace .analytics-dashboard .charts-grid { gap: 12px; margin-bottom: 14px; }
+.mock-workspace .analytics-dashboard .chart-header { padding: 11px 15px; }
+.mock-workspace .analytics-dashboard .chart-container { height: 210px; padding: 14px; }
+.mock-workspace .analytics-dashboard .table-header { padding: 11px 15px; }
+.mock-workspace .analytics-dashboard .table-container th,
+.mock-workspace .analytics-dashboard .table-container td { padding: 9px 12px; }
+.mock-workspace .analytics-dashboard .auto-refresh-toggle.active {
+    background: var(--analytics-primary-light);
+    border-color: var(--accent);
+    color: var(--accent);
+}
+.mock-workspace .analytics-dashboard .auto-refresh-toggle.active .auto-refresh-indicator {
+    background: var(--accent);
+    border-color: var(--accent);
+}
+.mock-workspace .analytics-dashboard select {
+    background-color: var(--surface-sunken);
+    border-color: var(--border-color);
+    color: var(--text-color);
+}
+.mock-workspace .analytics-dashboard :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+@media (prefers-reduced-motion: reduce) {
+    .analytics-dashboard *, .analytics-dashboard *::before, .analytics-dashboard *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+.mock-workspace .analytics-dashboard .analytics-header,
+.mock-workspace .analytics-dashboard .summary-card,
+.mock-workspace .analytics-dashboard .chart-card,
+.mock-workspace .analytics-dashboard .recent-requests { background: var(--analytics-bg-primary); border-color: var(--analytics-border-primary); box-shadow: none; }
+.mock-workspace .analytics-dashboard .chart-header,
+.mock-workspace .analytics-dashboard .table-header { border-color: var(--analytics-border-primary); }
+.mock-workspace .analytics-dashboard .table-container th { background: var(--analytics-bg-tertiary); border-color: var(--analytics-border-primary); color: var(--analytics-text-secondary); }
+.mock-workspace .analytics-dashboard .table-container td { border-color: var(--analytics-border-primary); }
+.mock-workspace .analytics-dashboard .btn-icon-text,
+.mock-workspace .analytics-dashboard .time-range-selector { background: var(--analytics-bg-tertiary); border-color: var(--analytics-border-primary); color: var(--analytics-text-primary); }
+.mock-workspace .analytics-dashboard .card-icon.requests,
+.mock-workspace .analytics-dashboard .card-icon.endpoints { background: var(--analytics-primary-light); color: var(--accent); }
+body .mock-workspace .analytics-dashboard {
+    --analytics-bg-primary: var(--surface-elevated);
+    --analytics-bg-secondary: var(--surface);
+    --analytics-bg-tertiary: var(--hover-bg);
+    --analytics-border-primary: var(--border-color);
+    --analytics-text-primary: var(--text-color);
+    --analytics-text-secondary: var(--text-secondary);
+    --analytics-text-muted: var(--text-muted);
+    --analytics-primary-color: var(--accent);
+    --analytics-primary-hover: var(--accent-hover);
+    --analytics-primary-light: color-mix(in srgb, var(--accent) 14%, transparent);
+}
+body .mock-workspace .analytics-dashboard .table-container table {
+    table-layout: fixed;
+}
+body .mock-workspace .analytics-dashboard .table-container tbody tr {
+    height: 40px !important;
+    min-height: 40px !important;
+    max-height: 40px !important;
+}
+body .mock-workspace .analytics-dashboard .table-container th,
+body .mock-workspace .analytics-dashboard .table-container td {
+    height: 40px !important;
+    min-height: 40px !important;
+    padding: 4px 12px !important;
+    vertical-align: middle;
+    line-height: 1.35;
+    white-space: nowrap;
+}
+body .mock-workspace .analytics-dashboard .table-container td { font-size: 12px; }
+body .mock-workspace .analytics-dashboard .table-container .method,
+body .mock-workspace .analytics-dashboard .table-container .status {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    width: auto !important;
+    min-width: 0 !important;
+    min-height: 22px;
+    padding: 2px 7px;
+    border-radius: 999px;
+    line-height: 1;
+}
+body .mock-workspace .analytics-dashboard .table-container .timestamp,
+body .mock-workspace .analytics-dashboard .table-container .path,
+body .mock-workspace .analytics-dashboard .table-container .scenario {
+    display: table-cell;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+body .mock-workspace .analytics-dashboard .time-range-selector {
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    gap: 8px;
+    color: var(--text-secondary);
+}
+body .mock-workspace .analytics-dashboard .time-range-selector .app-select-trigger {
+    min-height: 38px;
+    padding: 8px 10px;
+    border-color: var(--border-color);
+    border-radius: var(--radius-sm);
+    background: var(--surface);
+    color: var(--text-color);
+}
+body .mock-workspace .analytics-dashboard .time-range-selector .app-select-trigger:hover {
+    border-color: var(--accent);
+    background: var(--hover-bg);
+}
+body .mock-workspace .analytics-dashboard .auto-refresh-toggle {
+    min-height: 38px;
+    box-sizing: border-box;
+    padding: 7px 12px;
+    border-color: var(--border-color);
+    background: var(--surface);
+    color: var(--text-secondary);
+}
+body .mock-workspace .analytics-dashboard .auto-refresh-toggle.active {
+    border-color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 10%, var(--surface));
+    color: var(--accent);
+}
+body .mock-workspace .analytics-dashboard .auto-refresh-indicator { border-color: var(--border-color); background: var(--surface-elevated); }
+body .mock-workspace .analytics-dashboard .auto-refresh-toggle.active .auto-refresh-indicator { border-color: var(--accent); background: var(--accent); }

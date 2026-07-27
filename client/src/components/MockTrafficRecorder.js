@@ -3,9 +3,34 @@ import React, { useState, useEffect, useCallback } from 'react';
 import {
     FiPlay, FiSquare, FiRefreshCw, FiDownload, FiUpload, FiTrash2,
     FiClock, FiActivity, FiEye, FiFilter, FiChevronDown, FiChevronUp,
-    FiFastForward, FiPause, FiCopy, FiCheck, FiInbox
+    FiFastForward, FiPause, FiCopy, FiCheck, FiInbox, FiAlertCircle
 } from 'react-icons/fi';
+import AppSelect from './common/AppSelect/AppSelect';
 import './MockTrafficRecorder.css';
+
+const REPLAY_SPEED_OPTIONS = [
+    { value: 0.5, label: '0.5x' },
+    { value: 1, label: '1x' },
+    { value: 2, label: '2x' },
+    { value: 5, label: '5x' },
+    { value: 10, label: '10x' }
+];
+
+const METHOD_FILTER_OPTIONS = [
+    { value: '', label: 'All Methods' },
+    { value: 'GET', label: 'GET' },
+    { value: 'POST', label: 'POST' },
+    { value: 'PUT', label: 'PUT' },
+    { value: 'DELETE', label: 'DELETE' },
+    { value: 'PATCH', label: 'PATCH' }
+];
+
+const STATUS_FILTER_OPTIONS = [
+    { value: '', label: 'All Status' },
+    { value: '2xx', label: '2xx Success' },
+    { value: '4xx', label: '4xx Client Error' },
+    { value: '5xx', label: '5xx Server Error' }
+];
 
 const MockTrafficRecorder = ({ mockServerId, serverName }) => {
     const [recordings, setRecordings] = useState([]);
@@ -208,12 +233,15 @@ const MockTrafficRecorder = ({ mockServerId, serverName }) => {
         }
     };
 
+    const getResponseStatus = (request) => request.response?.statusCode ?? request.response?.status;
+
     const filteredRequests = selectedRecording?.requests?.filter(req => {
         if (filter.method && req.method !== filter.method) return false;
         if (filter.status) {
-            const statusMatch = filter.status === '2xx' ? req.response?.statusCode >= 200 && req.response?.statusCode < 300 :
-                filter.status === '4xx' ? req.response?.statusCode >= 400 && req.response?.statusCode < 500 :
-                    filter.status === '5xx' ? req.response?.statusCode >= 500 : true;
+            const status = getResponseStatus(req);
+            const statusMatch = filter.status === '2xx' ? status >= 200 && status < 300 :
+                filter.status === '4xx' ? status >= 400 && status < 500 :
+                    filter.status === '5xx' ? status >= 500 : true;
             if (!statusMatch) return false;
         }
         return true;
@@ -223,6 +251,20 @@ const MockTrafficRecorder = ({ mockServerId, serverName }) => {
         if (ms < 1000) return `${ms}ms`;
         if (ms < 60000) return `${(ms / 1000).toFixed(1)}s`;
         return `${Math.floor(ms / 60000)}m ${Math.floor((ms % 60000) / 1000)}s`;
+    };
+
+    const formatRecordingDate = (value) => {
+        if (!value) return 'Not available';
+        const date = new Date(value);
+        return Number.isNaN(date.getTime()) ? 'Not available' : date.toLocaleString();
+    };
+
+    const getRecordingDuration = (recording) => {
+        if (Number.isFinite(recording?.stats?.totalDuration)) return recording.stats.totalDuration;
+        if (recording?.startedAt && recording?.endedAt) {
+            return Math.max(0, new Date(recording.endedAt) - new Date(recording.startedAt));
+        }
+        return 0;
     };
 
     const copyToClipboard = async (content, cardId) => {
@@ -292,9 +334,10 @@ const MockTrafficRecorder = ({ mockServerId, serverName }) => {
             </div>
 
             {error && (
-                <div className="recorder-error">
-                    <span>{error}</span>
-                    <button onClick={() => setError(null)}>Dismiss</button>
+                <div className="recorder-error" role="alert">
+                    <FiAlertCircle size={17} aria-hidden="true" />
+                    <span className="recorder-error-message">{error}</span>
+                    <button type="button" onClick={() => setError(null)}>Dismiss</button>
                 </div>
             )}
 
@@ -379,7 +422,7 @@ const MockTrafficRecorder = ({ mockServerId, serverName }) => {
                 </div>
 
                 {/* Recording Details */}
-                <div className="recording-details-panel">
+                <div className={`recording-details-panel ${selectedRecording ? '' : 'is-empty'}`}>
                     {selectedRecording ? (
                         <>
                             <div className="details-header">
@@ -387,16 +430,12 @@ const MockTrafficRecorder = ({ mockServerId, serverName }) => {
                                 <div className="details-actions">
                                     <div className="replay-controls">
                                         <label>Speed:</label>
-                                        <select
+                                        <AppSelect
+                                            className="replay-speed-select"
                                             value={replaySpeed}
-                                            onChange={(e) => setReplaySpeed(parseFloat(e.target.value))}
-                                        >
-                                            <option value={0.5}>0.5x</option>
-                                            <option value={1}>1x</option>
-                                            <option value={2}>2x</option>
-                                            <option value={5}>5x</option>
-                                            <option value={10}>10x</option>
-                                        </select>
+                                            onChange={setReplaySpeed}
+                                            options={REPLAY_SPEED_OPTIONS}
+                                        />
                                         <button
                                             className="btn-replay"
                                             onClick={() => replayRecording(selectedRecording._id)}
@@ -419,20 +458,20 @@ const MockTrafficRecorder = ({ mockServerId, serverName }) => {
                             </div>
 
                             {/* Recording Summary */}
-                            <div className="recording-summary">
-                                <div className="summary-item">
-                                    <span className="summary-value">{selectedRecording.requests?.length || 0}</span>
+                                <div className="recording-summary">
+                                    <div className="summary-item">
+                                        <span className="summary-value">{selectedRecording.stats?.totalRequests ?? selectedRecording.requests?.length ?? 0}</span>
                                     <span className="summary-label">Total Requests</span>
                                 </div>
                                 <div className="summary-item">
                                     <span className="summary-value">
-                                        {formatDuration(selectedRecording.duration || 0)}
+                                        {formatDuration(getRecordingDuration(selectedRecording))}
                                     </span>
                                     <span className="summary-label">Duration</span>
                                 </div>
                                 <div className="summary-item">
                                     <span className="summary-value">
-                                        {new Date(selectedRecording.startTime).toLocaleString()}
+                                        {formatRecordingDate(selectedRecording.startedAt || selectedRecording.createdAt)}
                                     </span>
                                     <span className="summary-label">Recorded At</span>
                                 </div>
@@ -441,26 +480,18 @@ const MockTrafficRecorder = ({ mockServerId, serverName }) => {
                             {/* Filters */}
                             <div className="request-filters">
                                 <FiFilter size={14} />
-                                <select
+                                <AppSelect
+                                    className="recorder-filter-select"
                                     value={filter.method}
-                                    onChange={(e) => setFilter(prev => ({ ...prev, method: e.target.value }))}
-                                >
-                                    <option value="">All Methods</option>
-                                    <option value="GET">GET</option>
-                                    <option value="POST">POST</option>
-                                    <option value="PUT">PUT</option>
-                                    <option value="DELETE">DELETE</option>
-                                    <option value="PATCH">PATCH</option>
-                                </select>
-                                <select
+                                    onChange={(method) => setFilter(prev => ({ ...prev, method }))}
+                                    options={METHOD_FILTER_OPTIONS}
+                                />
+                                <AppSelect
+                                    className="recorder-filter-select"
                                     value={filter.status}
-                                    onChange={(e) => setFilter(prev => ({ ...prev, status: e.target.value }))}
-                                >
-                                    <option value="">All Status</option>
-                                    <option value="2xx">2xx Success</option>
-                                    <option value="4xx">4xx Client Error</option>
-                                    <option value="5xx">5xx Server Error</option>
-                                </select>
+                                    onChange={(status) => setFilter(prev => ({ ...prev, status }))}
+                                    options={STATUS_FILTER_OPTIONS}
+                                />
                             </div>
 
                             <div className="requests-panel">
@@ -469,11 +500,13 @@ const MockTrafficRecorder = ({ mockServerId, serverName }) => {
                                         <p className="requests-panel-label">Requests</p>
                                         <p className="requests-count">{filteredRequests?.length || 0} requests</p>
                                     </div>
-                                    <div className="status-legend">
-                                        <span className="legend-dot legend-2xx">● 2xx</span>
-                                        <span className="legend-dot legend-4xx">● 4xx</span>
-                                        <span className="legend-dot legend-5xx">● 5xx</span>
-                                    </div>
+                                    {filteredRequests?.length > 0 && (
+                                        <div className="status-legend" aria-label="Response status legend">
+                                            <span className="legend-dot legend-2xx"><i aria-hidden="true" />2xx</span>
+                                            <span className="legend-dot legend-4xx"><i aria-hidden="true" />4xx</span>
+                                            <span className="legend-dot legend-5xx"><i aria-hidden="true" />5xx</span>
+                                        </div>
+                                    )}
                                 </div>
 
                                 <div className="requests-list">
@@ -497,12 +530,12 @@ const MockTrafficRecorder = ({ mockServerId, serverName }) => {
                                                         </div>
                                                     </div>
                                                     <div className="request-card-meta">
-                                                        {req.response && (
-                                                            <span className={`status-chip status-${Math.floor(req.response.statusCode / 100)}xx`}>
-                                                                {req.response.statusCode}
+                                                        {getResponseStatus(req) && (
+                                                            <span className={`status-chip status-${Math.floor(getResponseStatus(req) / 100)}xx`}>
+                                                                {getResponseStatus(req)}
                                                             </span>
                                                         )}
-                                                        <span className="timing">{req.timing}ms</span>
+                                                        <span className="timing">{req.timing ?? req.response?.duration ?? 0}ms</span>
                                                         <span className="timestamp">
                                                             {req.timestamp ? new Date(req.timestamp).toLocaleTimeString() : ''}
                                                         </span>

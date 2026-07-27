@@ -40,8 +40,12 @@ body.dark-theme .endpoint-editor {
 
 /* ===== Base Layout ===== */
 .endpoint-editor {
-    background: var(--editor-bg-secondary);
-    min-height: 100%;
+    background: transparent;
+    min-height: 0;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    overflow-x: clip;
     color: var(--editor-text-primary);
 }
 
@@ -98,12 +102,29 @@ body.dark-theme .endpoint-editor {
 }
 
 /* ===== Endpoint Form ===== */
+.endpoint-form-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1200;
+    display: grid;
+    place-items: center;
+    padding: 24px;
+    background: rgba(7, 6, 6, 0.76);
+    backdrop-filter: blur(4px);
+    overscroll-behavior: contain;
+}
+
 .endpoint-form {
     background: var(--editor-bg-primary);
     border: 1px solid var(--editor-border-primary);
     border-radius: 10px;
-    margin-bottom: 20px;
+    width: min(920px, 100%);
+    max-height: calc(100vh - 48px);
+    margin: 0;
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 24px 70px rgba(0, 0, 0, 0.5);
 }
 
 .form-header {
@@ -142,20 +163,22 @@ body.dark-theme .endpoint-editor {
 
 /* ===== Modern Form Layout ===== */
 .form-body {
-    padding: 20px;
+    padding: 18px;
     display: flex;
     flex-direction: column;
-    gap: 24px;
+    gap: 16px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
 }
 
 .form-section {
     border: 1px solid var(--editor-border-primary);
     border-radius: 12px;
-    padding: 20px;
+    padding: 16px;
     background: var(--editor-bg-secondary);
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 12px;
 }
 
 .section-heading {
@@ -168,7 +191,7 @@ body.dark-theme .endpoint-editor {
 
 .section-heading h5 {
     margin: 0;
-    font-size: 18px;
+    font-size: 16px;
     font-weight: 600;
     color: var(--editor-text-primary);
 }
@@ -191,8 +214,8 @@ body.dark-theme .endpoint-editor {
 
 .endpoint-meta-grid {
     display: grid;
-    grid-template-columns: minmax(200px, 220px) minmax(0, 1fr) 120px 150px;
-    gap: 16px;
+    grid-template-columns: minmax(0, 1.4fr) minmax(0, 2fr);
+    gap: 14px;
     align-items: flex-start;
 }
 
@@ -253,14 +276,14 @@ body.dark-theme .endpoint-editor {
 
 .method-pill-group {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(70px, 1fr));
-    gap: 8px;
+    grid-template-columns: repeat(3, minmax(54px, 1fr));
+    gap: 6px;
 }
 
 .method-pill {
     border: 1px solid var(--editor-border-primary);
     border-radius: 10px;
-    padding: 10px 0;
+    padding: 8px 0;
     background: var(--editor-bg-primary);
     color: var(--editor-text-secondary);
     font-size: 13px;
@@ -295,13 +318,17 @@ body.dark-theme .endpoint-editor {
 }
 
 .response-body-section .code-editor {
-    min-height: 220px;
+    min-height: 190px;
+    max-height: 260px;
 }
 
 .form-actions.modern {
     border-top: 1px solid var(--editor-border-primary);
-    margin: 8px -20px -20px;
-    padding: 16px 20px 20px;
+    position: sticky;
+    bottom: -18px;
+    z-index: 2;
+    margin: 2px -18px -18px;
+    padding: 14px 18px;
     display: flex;
     align-items: center;
     justify-content: flex-end;
@@ -331,6 +358,8 @@ body.dark-theme .endpoint-editor {
 }
 
 @media (max-width: 640px) {
+    .endpoint-form-overlay { padding: 12px; }
+    .endpoint-form { max-height: calc(100vh - 24px); }
     .section-heading {
         flex-direction: column;
         align-items: flex-start;
@@ -458,6 +487,8 @@ textarea.code-editor:focus {
     display: flex;
     flex-direction: column;
     gap: 12px;
+    width: 100%;
+    min-width: 0;
 }
 
 /* ===== Endpoint Card ===== */
@@ -465,7 +496,9 @@ textarea.code-editor:focus {
     background: var(--editor-bg-primary);
     border: 1px solid var(--editor-border-primary);
     border-radius: 10px;
-    overflow: visible;
+    overflow: hidden;
+    min-width: 0;
+    box-sizing: border-box;
 
     transition: border-color 0.2s ease;
 }
@@ -475,13 +508,15 @@ textarea.code-editor:focus {
     align-items: center;
     gap: 12px;
     padding: 12px 16px;
+    min-width: 0;
+    box-sizing: border-box;
     background: transparent;
     transition: background 0.15s ease;
 }
 
 .endpoint-header:hover {
     background: var(--editor-bg-tertiary);
-    border-radius: 10px;
+    border-radius: 0;
 }
 
 .chevron-btn {
@@ -741,10 +776,13 @@ body.dark-theme .status-badge.status-5xx {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 16px;
-    padding: 12px 16px;
+    align-items: stretch;
+    padding: 10px 14px;
     background: var(--editor-code-bg);
     border: 1px solid var(--editor-border-primary);
     border-radius: 8px;
+    min-width: 0;
+    box-sizing: border-box;
 }
 
 @media (max-width: 768px) {
@@ -756,11 +794,22 @@ body.dark-theme .status-badge.status-5xx {
 .config-item {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    gap: 5px;
+    min-width: 0;
+    min-height: 42px;
+    padding: 7px 10px;
+    border: 1px solid var(--editor-border-primary);
+    border-radius: 8px;
+    background: var(--editor-bg-tertiary);
+    box-sizing: border-box;
 }
 
 .config-label {
     font-size: 10px;
+    line-height: 1.2;
     color: var(--editor-text-muted);
     text-transform: uppercase;
     letter-spacing: 0.3px;
@@ -768,6 +817,7 @@ body.dark-theme .status-badge.status-5xx {
 
 .config-value {
     font-size: 13px;
+    line-height: 1.25;
     font-weight: 500;
     color: var(--editor-text-primary);
 }
@@ -792,6 +842,10 @@ body.dark-theme .status-badge.status-5xx {
 .config-value.path {
     font-family: 'Monaco', 'Menlo', monospace;
     font-size: 12px;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 /* Headers List */
@@ -869,6 +923,8 @@ body.dark-theme .status-badge.status-5xx {
     overflow-x: auto;
     white-space: pre-wrap;
     word-break: break-word;
+    max-width: 100%;
+    box-sizing: border-box;
 }
 
 /* ===== Test Result ===== */
@@ -996,4 +1052,147 @@ body.dark-theme .status-badge.status-5xx {
         width: 100%;
         justify-content: center;
     }
+}
+
+.endpoint-form :focus-visible,
+.endpoint-form-overlay :focus-visible {
+    outline: 2px solid var(--editor-primary-color);
+    outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .endpoint-form *, .endpoint-form-overlay * { transition-duration: 0.01ms !important; }
+}
+/* Pigeon dark surface overrides */
+.mock-workspace .endpoint-editor {
+    --editor-bg-primary: var(--surface-elevated);
+    --editor-bg-secondary: var(--surface);
+    --editor-bg-tertiary: var(--hover-bg);
+    --editor-border-primary: var(--border-color);
+    --editor-text-primary: var(--text-color);
+    --editor-text-secondary: var(--text-secondary);
+    --editor-text-muted: var(--text-muted);
+    --editor-primary-color: var(--accent);
+    --editor-primary-hover: var(--accent-hover);
+    --editor-primary-light: color-mix(in srgb, var(--accent) 14%, transparent);
+    --editor-code-bg: var(--surface-sunken);
+    min-height: 0;
+    background: transparent;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: clip;
+}
+.mock-workspace .endpoint-editor .editor-header,
+.mock-workspace .endpoint-editor .endpoint-card,
+.mock-workspace .endpoint-editor .endpoint-form { border-color: var(--editor-border-primary); background: var(--editor-bg-primary); }
+.mock-workspace .endpoint-editor .editor-header,
+.mock-workspace .endpoint-editor .endpoint-card { border-color: var(--editor-border-primary); background: var(--editor-bg-primary); box-shadow: none; }
+.mock-workspace .endpoint-editor .endpoint-form { box-shadow: var(--shadow-lg); }
+.mock-workspace .endpoint-editor .editor-header { margin-bottom: 14px; padding: 15px 18px; border-radius: 10px; }
+.mock-workspace .endpoint-editor .endpoint-header:hover,
+.mock-workspace .endpoint-editor .endpoint-card.expanded .endpoint-header,
+.mock-workspace .endpoint-editor .endpoint-body,
+.mock-workspace .endpoint-editor .form-header { background: var(--editor-bg-tertiary); }
+.mock-workspace .endpoint-editor .section-eyebrow {
+    color: var(--accent);
+}
+.mock-workspace .endpoint-editor .section-hint,
+.mock-workspace .endpoint-editor .input-hint {
+    color: var(--editor-text-secondary);
+}
+.mock-workspace .endpoint-editor .section-heading h5,
+.mock-workspace .endpoint-editor .field-label,
+.mock-workspace .endpoint-editor .input-field label {
+    color: var(--editor-text-primary);
+}
+.mock-workspace .endpoint-editor .input-hint code {
+    color: var(--accent);
+}
+.mock-workspace .endpoint-editor .response-section,
+.mock-workspace .endpoint-editor .config-grid,
+.mock-workspace .endpoint-editor .empty-headers {
+    border: 1px solid var(--editor-border-primary);
+    border-radius: 10px;
+    background: var(--editor-bg-primary);
+}
+.mock-workspace .endpoint-editor .response-section {
+    margin-bottom: 14px;
+    padding: 14px;
+    border: 1px solid var(--editor-border-primary);
+    border-radius: 10px;
+    background: var(--editor-bg-primary);
+}
+.mock-workspace .endpoint-editor .response-section h5,
+.mock-workspace .endpoint-editor .response-preview h5 {
+    color: var(--editor-text-primary);
+}
+.mock-workspace .endpoint-editor .config-grid,
+.mock-workspace .endpoint-editor .headers-list,
+.mock-workspace .endpoint-editor .code-block {
+    border-color: var(--editor-border-primary);
+    border-radius: 8px;
+    background: var(--editor-code-bg);
+}
+.mock-workspace .endpoint-editor .config-label,
+.mock-workspace .endpoint-editor .empty-headers span {
+    color: var(--editor-text-secondary);
+}
+.mock-workspace .endpoint-editor .config-value,
+.mock-workspace .endpoint-editor .header-value,
+.mock-workspace .endpoint-editor .code-block {
+    color: var(--editor-text-primary);
+}
+.mock-workspace .endpoint-editor .header-key {
+    color: var(--accent);
+}
+.mock-workspace .endpoint-editor .config-item,
+.mock-workspace .endpoint-editor .header-item { background: var(--editor-bg-primary); border-color: var(--editor-border-primary); }
+.mock-workspace .endpoint-editor .header-item { border-radius: 8px; }
+.mock-workspace .endpoint-editor .endpoint-actions .btn-icon {
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border: 1px solid var(--editor-border-primary);
+    border-radius: 7px;
+    background: var(--editor-bg-primary);
+    color: var(--editor-text-secondary);
+}
+.mock-workspace .endpoint-editor .endpoint-actions .btn-icon:hover {
+    border-color: var(--accent);
+    background: var(--editor-primary-light);
+    color: var(--accent);
+}
+.mock-workspace .endpoint-editor .endpoint-actions .btn-icon.danger:hover {
+    border-color: var(--danger-color);
+    background: var(--danger-bg);
+    color: var(--danger-text);
+}
+.mock-workspace .endpoint-editor .result-body { background: var(--editor-code-bg); border-color: var(--editor-border-primary); color: var(--editor-text-primary); }
+.mock-workspace .endpoint-editor .btn-add,
+.mock-workspace .endpoint-editor .btn-primary { background: var(--accent); color: var(--button-text); }
+.mock-workspace .endpoint-editor .btn-add:hover,
+.mock-workspace .endpoint-editor .btn-primary:hover { background: var(--accent-hover); }
+.mock-workspace .endpoint-editor input,
+.mock-workspace .endpoint-editor textarea { background: var(--editor-code-bg); border-color: var(--editor-border-primary); color: var(--editor-text-primary); }
+.mock-workspace .endpoint-editor .method-pill.active { background: var(--editor-primary-light); border-color: var(--accent); color: var(--accent); }
+.mock-workspace .endpoint-editor .method.get,
+.mock-workspace .endpoint-editor .status-badge.status-2xx { background: var(--success-bg); color: var(--success-text); }
+.mock-workspace .endpoint-editor .method.post,
+.mock-workspace .endpoint-editor .status-badge.status-3xx { background: var(--analytics-primary-light, color-mix(in srgb, var(--accent) 14%, transparent)); color: var(--accent); }
+.mock-workspace .endpoint-editor .method.put,
+.mock-workspace .endpoint-editor .status-badge.status-4xx { background: var(--warning-light); color: var(--warning-color); }
+.mock-workspace .endpoint-editor .method.delete,
+.mock-workspace .endpoint-editor .status-badge.status-5xx { background: var(--danger-bg); color: var(--danger-text); }
+body .mock-workspace .endpoint-editor {
+    --editor-bg-primary: var(--surface-elevated);
+    --editor-bg-secondary: var(--surface);
+    --editor-bg-tertiary: var(--hover-bg);
+    --editor-border-primary: var(--border-color);
+    --editor-text-primary: var(--text-color);
+    --editor-text-secondary: var(--text-secondary);
+    --editor-text-muted: var(--text-muted);
+    --editor-primary-color: var(--accent);
+    --editor-primary-hover: var(--accent-hover);
+    --editor-primary-light: color-mix(in srgb, var(--accent) 14%, transparent);
+    --editor-code-bg: var(--surface-sunken);
 }

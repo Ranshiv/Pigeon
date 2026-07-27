@@ -1,5 +1,5 @@
 // client/src/components/MockEndpointEditor.js
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     FiPlus, FiTrash2, FiEdit2, FiSave, FiX, FiCopy, FiPlay,
     FiCode, FiChevronDown, FiChevronUp
@@ -33,6 +33,23 @@ const MockEndpointEditor = ({ mockServer, onUpdate }) => {
             responseHeaders: {}
         });
     };
+
+    const closeEndpointForm = () => {
+        setShowAddForm(false);
+        setEditingEndpoint(null);
+        resetForm();
+    };
+
+    useEffect(() => {
+        if (!showAddForm && !editingEndpoint) return undefined;
+
+        const handleKeyDown = (event) => {
+            if (event.key === 'Escape') closeEndpointForm();
+        };
+
+        document.addEventListener('keydown', handleKeyDown);
+        return () => document.removeEventListener('keydown', handleKeyDown);
+    }, [showAddForm, editingEndpoint]);
 
     const handleAddEndpoint = async () => {
         if (!endpointForm.path.trim()) return;
@@ -215,16 +232,21 @@ const MockEndpointEditor = ({ mockServer, onUpdate }) => {
 
             {/* Add/Edit Form */}
             {(showAddForm || editingEndpoint) && (
-                <div className="endpoint-form">
+                <div
+                    className="endpoint-form-overlay"
+                    role="presentation"
+                    onMouseDown={(event) => {
+                        if (event.target === event.currentTarget) closeEndpointForm();
+                    }}
+                >
+                <div className="endpoint-form" role="dialog" aria-modal="true" aria-labelledby="endpoint-form-title">
                     <div className="form-header">
-                        <h4>{editingEndpoint ? 'Edit Endpoint' : 'Add New Endpoint'}</h4>
+                        <h4 id="endpoint-form-title">{editingEndpoint ? 'Edit Endpoint' : 'Add New Endpoint'}</h4>
                         <button
+                            type="button"
                             className="btn-close"
-                            onClick={() => {
-                                setShowAddForm(false);
-                                setEditingEndpoint(null);
-                                resetForm();
-                            }}
+                            onClick={closeEndpointForm}
+                            aria-label="Close endpoint form"
                         >
                             <FiX size={16} />
                         </button>
@@ -262,6 +284,7 @@ const MockEndpointEditor = ({ mockServer, onUpdate }) => {
                                     <div className="input-shell">
                                         <input
                                             id="endpoint-path"
+                                            name="path"
                                             type="text"
                                             placeholder="/api/products"
                                             value={endpointForm.path}
@@ -275,6 +298,7 @@ const MockEndpointEditor = ({ mockServer, onUpdate }) => {
                                     <label htmlFor="status-code">Status Code</label>
                                     <input
                                         id="status-code"
+                                        name="statusCode"
                                         type="number"
                                         min="100"
                                         max="599"
@@ -290,6 +314,7 @@ const MockEndpointEditor = ({ mockServer, onUpdate }) => {
                                     </label>
                                     <input
                                         id="response-delay"
+                                        name="responseDelay"
                                         type="number"
                                         min="0"
                                         value={endpointForm.responseDelay}
@@ -311,6 +336,7 @@ const MockEndpointEditor = ({ mockServer, onUpdate }) => {
                                 <label className="sr-only" htmlFor="response-body">Response Body</label>
                                 <textarea
                                     id="response-body"
+                                    name="responseBody"
                                     value={endpointForm.responseBody}
                                     onChange={(e) => setEndpointForm({ ...endpointForm, responseBody: e.target.value })}
                                     rows={8}
@@ -325,16 +351,14 @@ const MockEndpointEditor = ({ mockServer, onUpdate }) => {
 
                         <div className="form-actions modern">
                             <button
+                                type="button"
                                 className="btn-secondary"
-                                onClick={() => {
-                                    setShowAddForm(false);
-                                    setEditingEndpoint(null);
-                                    resetForm();
-                                }}
+                                onClick={closeEndpointForm}
                             >
                                 Cancel
                             </button>
                             <button
+                                type="button"
                                 className="btn-primary"
                                 onClick={editingEndpoint ? handleUpdateEndpoint : handleAddEndpoint}
                             >
@@ -343,6 +367,7 @@ const MockEndpointEditor = ({ mockServer, onUpdate }) => {
                             </button>
                         </div>
                     </div>
+                </div>
                 </div>
             )}
 
@@ -378,6 +403,7 @@ const MockEndpointEditor = ({ mockServer, onUpdate }) => {
                                 <div className="endpoint-actions">
                                     <button
                                         className="btn-icon"
+                                        aria-label="Copy endpoint URL"
                                         onClick={(e) => {
                                             e.stopPropagation();
                                             copyEndpointUrl(endpoint);
@@ -388,6 +414,7 @@ const MockEndpointEditor = ({ mockServer, onUpdate }) => {
                                     </button>
                                     <button
                                         className="btn-icon"
+                                        aria-label="Test endpoint"
                                         onClick={(e) => {
                                             e.stopPropagation();
                                             testEndpoint(endpoint);
@@ -398,6 +425,7 @@ const MockEndpointEditor = ({ mockServer, onUpdate }) => {
                                     </button>
                                     <button
                                         className="btn-icon"
+                                        aria-label="Edit endpoint"
                                         onClick={(e) => {
                                             e.stopPropagation();
                                             startEditing(endpoint);
@@ -408,6 +436,7 @@ const MockEndpointEditor = ({ mockServer, onUpdate }) => {
                                     </button>
                                     <button
                                         className="btn-icon danger"
+                                        aria-label="Delete endpoint"
                                         onClick={(e) => {
                                             e.stopPropagation();
                                             handleDeleteEndpoint(endpoint);

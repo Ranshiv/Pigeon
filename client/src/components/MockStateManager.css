@@ -813,3 +813,121 @@ body.dark-theme .state-manager {
         padding: 24px;
     }
 }
+/* Pigeon dark surface overrides */
+.mock-workspace .state-manager {
+    --state-bg-primary: var(--surface-elevated);
+    --state-bg-secondary: var(--surface);
+    --state-bg-tertiary: var(--hover-bg);
+    --state-border-primary: var(--border-color);
+    --state-text-primary: var(--text-color);
+    --state-text-secondary: var(--text-secondary);
+    --state-text-muted: var(--text-muted);
+    --state-primary-color: var(--accent);
+    --state-primary-light: color-mix(in srgb, var(--accent) 14%, transparent);
+    min-height: 0;
+}
+.mock-workspace .state-manager .state-header,
+.mock-workspace .state-manager .state-section,
+.mock-workspace .state-manager .state-item,
+.mock-workspace .state-manager .empty-state { border-color: var(--state-border-primary); background: var(--state-bg-primary); box-shadow: none; }
+.mock-workspace .state-manager .state-section { margin-bottom: 14px; border-radius: 10px; }
+.mock-workspace .state-manager .state-item:hover { background: var(--state-bg-tertiary); }
+.mock-workspace .state-manager .btn-add,
+.mock-workspace .state-manager .btn-save { background: var(--accent); color: var(--button-text); }
+.mock-workspace .state-manager .btn-icon-text,
+.mock-workspace .state-manager .btn-cancel { background: var(--state-bg-tertiary); border-color: var(--state-border-primary); color: var(--state-text-primary); }
+.mock-workspace .state-manager .code-block,
+.mock-workspace .state-manager .state-templates { background: var(--surface-sunken); border-color: var(--state-border-primary); }
+body .mock-workspace .state-manager {
+    --state-bg-primary: var(--surface-elevated);
+    --state-bg-secondary: var(--surface);
+    --state-bg-tertiary: var(--hover-bg);
+    --state-border-primary: var(--border-color);
+    --state-text-primary: var(--text-color);
+    --state-text-secondary: var(--text-secondary);
+    --state-text-muted: var(--text-muted);
+    --state-primary-color: var(--accent);
+    --state-primary-light: color-mix(in srgb, var(--accent) 14%, transparent);
+}
+
+/* State Manager must inherit the workspace canvas rather than painting a
+   second blue background between its section cards. */
+body .mock-workspace .state-manager {
+    background: transparent;
+    color: var(--text-color);
+}
+
+body .mock-workspace .state-manager .state-header,
+body .mock-workspace .state-manager .state-section {
+    background: var(--surface);
+    border-color: var(--border-color);
+    box-shadow: none;
+}
+
+body .mock-workspace .state-manager .state-header {
+    margin-bottom: 14px;
+    padding: 14px 16px;
+    border-radius: var(--radius-lg, 10px);
+}
+
+body .mock-workspace .state-manager .state-header .header-title h2,
+body .mock-workspace .state-manager .section-header h3,
+body .mock-workspace .state-manager .variables-empty-content h4,
+body .mock-workspace .state-manager .counters-empty-content h4,
+body .mock-workspace .state-manager .sessions-empty-content h4 {
+    color: var(--text-color);
+}
+
+body .mock-workspace .state-manager .state-header .header-title h2 svg,
+body .mock-workspace .state-manager .section-header h3 svg,
+body .mock-workspace .state-manager .state-header .header-title h2 + * {
+    color: var(--accent);
+}
+
+body .mock-workspace .state-manager .state-header .server-name,
+body .mock-workspace .state-manager .variables-empty-content p,
+body .mock-workspace .state-manager .counters-empty-content p,
+body .mock-workspace .state-manager .sessions-empty-content p {
+    color: var(--text-secondary);
+}
+
+body .mock-workspace .state-manager .section-header {
+    padding: 13px 16px;
+    background: transparent;
+    border-bottom-color: var(--border-color);
+}
+
+body .mock-workspace .state-manager .variables-empty,
+body .mock-workspace .state-manager .counters-empty,
+body .mock-workspace .state-manager .sessions-empty,
+body .mock-workspace .state-manager .counter-item {
+    background: var(--surface-sunken);
+    border-color: var(--border-color);
+    box-shadow: none;
+}
+
+body .mock-workspace .state-manager .variables-empty,
+body .mock-workspace .state-manager .counters-empty,
+body .mock-workspace .state-manager .sessions-empty {
+    margin: 14px 16px 16px;
+    border-radius: var(--radius-md, 12px);
+}
+
+body .mock-workspace .state-manager .variables-empty-icon,
+body .mock-workspace .state-manager .counters-empty-icon,
+body .mock-workspace .state-manager .sessions-empty-icon {
+    background: var(--state-primary-light);
+    border-color: color-mix(in srgb, var(--accent) 32%, var(--border-color));
+    color: var(--accent);
+}
+
+body .mock-workspace .state-manager .variables-empty-content code,
+body .mock-workspace .state-manager .counters-empty-content code {
+    background: var(--state-primary-light);
+    color: var(--accent);
+}
+
+body .mock-workspace .state-manager .counter-value,
+body .mock-workspace .state-manager .counter-name {
+    color: var(--text-color);
+}

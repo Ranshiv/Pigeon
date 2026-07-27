@@ -98,6 +98,42 @@ const mockScenarioSchema = new mongoose.Schema({
     }
 }, { timestamps: true });
 
+// Fault profiles are deliberately embedded in their mock server so a server can be
+// exported, cloned and deleted without leaving an orphaned experiment behind.
+const faultProfileSchema = new mongoose.Schema({
+    name: { type: String, required: true, trim: true, maxlength: 100 },
+    description: { type: String, default: '', maxlength: 500 },
+    isActive: { type: Boolean, default: true },
+    priority: { type: Number, default: 0 },
+    target: {
+        method: { type: String, default: '*' },
+        path: { type: String, default: '*' }
+    },
+    probability: { type: Number, default: 100, min: 0, max: 100 },
+    schedule: {
+        mode: { type: String, enum: ['continuous', 'burst'], default: 'continuous' },
+        startAt: { type: Date, default: Date.now },
+        intervalMs: { type: Number, default: 60000, min: 1000, max: 86400000 },
+        durationMs: { type: Number, default: 10000, min: 100, max: 86400000 }
+    },
+    fault: {
+        type: {
+            type: String,
+            enum: ['latency', 'status', 'abort', 'throttle', 'malformed_json', 'truncate'],
+            required: true
+        },
+        delayMinMs: { type: Number, default: 0, min: 0, max: 120000 },
+        delayMaxMs: { type: Number, default: 0, min: 0, max: 120000 },
+        statusCode: { type: Number, default: 500, min: 100, max: 599 },
+        responseBody: { type: mongoose.Schema.Types.Mixed, default: null },
+        abortPhase: { type: String, enum: ['before_headers', 'after_headers'], default: 'before_headers' },
+        bytesPerSecond: { type: Number, default: 1024, min: 64, max: 10485760 },
+        chunkSize: { type: Number, default: 256, min: 16, max: 65536 },
+        truncateMode: { type: String, enum: ['bytes', 'percent'], default: 'percent' },
+        truncateValue: { type: Number, default: 50, min: 1, max: 10485760 }
+    }
+}, { _id: true, timestamps: true });
+
 const mockServerSchema = new mongoose.Schema({
     collectionId: {
         type: mongoose.Schema.Types.ObjectId,
@@ -264,6 +300,18 @@ const mockServerSchema = new mongoose.Schema({
         },
         // New: Chaos engineering options
         chaos: {
+            globalEnabled: {
+                type: Boolean,
+                default: false
+            },
+            profiles: {
+                type: [faultProfileSchema],
+                default: []
+            },
+            legacyMigratedAt: {
+                type: Date,
+                default: null
+            },
             enabled: {
                 type: Boolean,
                 default: false

@@ -3,8 +3,11 @@ const MockServer = require('../models/MockServer');
 const ApiVersion = require('../models/ApiVersion');
 const MockAnalytics = require('../models/MockAnalytics');
 const MockRecording = require('../models/MockRecording');
+const MockFaultEvent = require('../models/MockFaultEvent');
 const variableResolver = require('./VariableResolver');
 const { getIO } = require('../utils/socket/socket-server');
+
+const MAX_FAULT_EVENTS_PER_SERVER = 500;
 
 class MockServerService {
     /**
@@ -339,8 +342,56 @@ class MockServerService {
         return obj;
     }
 
+    static migrateLegacyChaos(mockServer) {
+        const chaos = mockServer.globalConfig?.chaos;
+        if (!chaos || chaos.legacyMigratedAt || !chaos.enabled) return false;
+
+        const failureRate = Math.max(0, Math.min(100, Number(chaos.randomFailureRate || 0)));
+        const delayMinMs = Math.max(0, Number(chaos.randomDelayRange?.min || 0));
+        const delayMaxMs = Math.max(delayMinMs, Number(chaos.randomDelayRange?.max || 0));
+        const profiles = chaos.profiles || [];
+        const maxPriority = profiles.reduce((max, profile) => Math.max(max, Number(profile.priority || 0)), 0);
+
+        // A legacy failure had its delay applied as well. The status profile
+        // therefore carries the same delay, while the latency profile covers
+        // successful calls when the failure probability does not match.
+        if (failureRate > 0) {
+            profiles.push({
+                name: 'Migrated random failure',
+                description: 'Created from the previous mock-server chaos configuration.',
+                isActive: true,
+                priority: maxPriority + 2,
+                target: { method: '*', path: '*' },
+                probability: failureRate,
+                schedule: { mode: 'continuous', startAt: new Date(), intervalMs: 60000, durationMs: 10000 },
+                fault: { type: 'status', statusCode: 500, delayMinMs, delayMaxMs }
+            });
+        }
+        if (delayMaxMs > 0) {
+            profiles.push({
+                name: 'Migrated random delay',
+                description: 'Created from the previous mock-server chaos configuration.',
+                isActive: true,
+                priority: maxPriority + 1,
+                target: { method: '*', path: '*' },
+                probability: 100,
+                schedule: { mode: 'continuous', startAt: new Date(), intervalMs: 60000, durationMs: 10000 },
+                fault: { type: 'latency', delayMinMs, delayMaxMs }
+            });
+        }
+
+        chaos.profiles = profiles;
+        chaos.globalEnabled = Boolean(chaos.globalEnabled || chaos.enabled);
+        chaos.enabled = false;
+        chaos.randomFailureRate = 0;
+        chaos.randomDelayRange = { min: 0, max: 0 };
+        chaos.legacyMigratedAt = new Date();
+        return true;
+    }
+
     /**
-     * Apply chaos engineering effects
+     * Apply legacy chaos engineering effects. New servers use Fault Lab
+     * profiles; this remains only for records that have not been loaded yet.
      */
     static applyChaosEffects(mockServer) {
         const chaos = mockServer.globalConfig?.chaos;
@@ -360,6 +411,122 @@ class MockServerService {
         }
 
         return { shouldFail, extraDelay };
+    }
+
+    static isFaultProfileActive(profile, request, now = new Date()) {
+        if (!profile?.isActive || !profile.fault?.type) return false;
+        const targetMethod = String(profile.target?.method || '*').toUpperCase();
+        const targetPath = profile.target?.path || '*';
+        if (targetMethod !== '*' && targetMethod !== String(request.method).toUpperCase()) return false;
+        if (targetPath !== '*' && !this.matchPath(targetPath, request.path) && targetPath !== request.path) return false;
+
+        const schedule = profile.schedule || {};
+        if (schedule.mode !== 'burst') return true;
+        const startAt = new Date(schedule.startAt || 0).getTime();
+        const interval = Number(schedule.intervalMs || 0);
+        const duration = Number(schedule.durationMs || 0);
+        if (!startAt || interval <= 0 || duration <= 0 || now.getTime() < startAt) return false;
+        return ((now.getTime() - startAt) % interval) < Math.min(duration, interval);
+    }
+
+    static selectFaultProfile(mockServer, request, now = new Date()) {
+        const chaos = mockServer.globalConfig?.chaos;
+        if (!chaos?.globalEnabled) return null;
+        const profiles = (chaos.profiles || [])
+            .filter(profile => this.isFaultProfileActive(profile, request, now))
+            .sort((a, b) => (b.priority || 0) - (a.priority || 0));
+        return profiles.find(profile => Math.random() * 100 < Number(profile.probability ?? 100)) || null;
+    }
+
+    static serializeFaultBody(body) {
+        return typeof body === 'string' ? body : JSON.stringify(body === undefined ? null : body);
+    }
+
+    static buildFaultEffect(profile, response) {
+        if (!profile) return { response, delayMs: 0, transport: null };
+        const fault = profile.fault || {};
+        const min = Math.max(0, Number(fault.delayMinMs || 0));
+        const max = Math.max(min, Number(fault.delayMaxMs ?? min));
+        const randomizedDelay = Math.floor(Math.random() * (max - min + 1)) + min;
+        const base = { ...response, headers: { ...(response.headers || {}), 'X-Pigeon-Fault': fault.type } };
+
+        switch (fault.type) {
+            case 'latency':
+                return { response: base, delayMs: randomizedDelay, transport: null, detail: { delayMs: randomizedDelay } };
+            case 'status':
+                return {
+                    response: {
+                        ...base,
+                        status: Number(fault.statusCode || 500),
+                        body: fault.responseBody === null || fault.responseBody === undefined ? base.body : fault.responseBody
+                    },
+                    delayMs: randomizedDelay,
+                    transport: null,
+                    detail: { statusCode: Number(fault.statusCode || 500), delayMs: randomizedDelay }
+                };
+            case 'abort':
+                return {
+                    response: base,
+                    delayMs: randomizedDelay,
+                    transport: { type: 'abort', phase: fault.abortPhase || 'before_headers' },
+                    detail: { phase: fault.abortPhase || 'before_headers', delayMs: randomizedDelay }
+                };
+            case 'throttle':
+                return {
+                    response: base,
+                    delayMs: randomizedDelay,
+                    transport: {
+                        type: 'throttle',
+                        rawBody: this.serializeFaultBody(base.body),
+                        bytesPerSecond: Number(fault.bytesPerSecond || 1024),
+                        chunkSize: Number(fault.chunkSize || 256)
+                    },
+                    detail: { bytesPerSecond: Number(fault.bytesPerSecond || 1024), chunkSize: Number(fault.chunkSize || 256), delayMs: randomizedDelay }
+                };
+            case 'malformed_json': {
+                const rawBody = this.serializeFaultBody(base.body);
+                return {
+                    response: base,
+                    delayMs: randomizedDelay,
+                    transport: { type: 'raw', rawBody: rawBody.length > 1 ? rawBody.slice(0, -1) : '{' },
+                    detail: { delayMs: randomizedDelay }
+                };
+            }
+            case 'truncate': {
+                const rawBody = this.serializeFaultBody(base.body);
+                const count = fault.truncateMode === 'bytes'
+                    ? Number(fault.truncateValue || 1)
+                    : Math.max(1, Math.floor(rawBody.length * (Number(fault.truncateValue || 50) / 100)));
+                return {
+                    response: base,
+                    delayMs: randomizedDelay,
+                    transport: { type: 'raw', rawBody: rawBody.slice(0, Math.min(count, rawBody.length)) },
+                    detail: { bytesSent: Math.min(count, rawBody.length), delayMs: randomizedDelay }
+                };
+            }
+            default:
+                return { response, delayMs: 0, transport: null };
+        }
+    }
+
+    static async recordFaultEvent(mockServerId, profile, request, response, detail = {}) {
+        if (!profile?._id) return;
+        await MockFaultEvent.create({
+            mockServerId,
+            profileId: profile._id,
+            profileName: profile.name,
+            faultType: profile.fault.type,
+            method: request.method,
+            path: request.path,
+            statusCode: response.status || 0,
+            detail
+        });
+        const overflow = await MockFaultEvent.find({ mockServerId })
+            .sort({ createdAt: -1 })
+            .skip(MAX_FAULT_EVENTS_PER_SERVER)
+            .select('_id')
+            .lean();
+        if (overflow.length) await MockFaultEvent.deleteMany({ _id: { $in: overflow.map(event => event._id) } });
     }
 
     /**
@@ -652,6 +819,10 @@ class MockServerService {
                 throw new Error('Mock server not found or inactive');
             }
 
+            // Persist the one-time conversion before processing so old chaos
+            // settings never combine with the new profile engine.
+            if (this.migrateLegacyChaos(mockServer)) await mockServer.save();
+
             // Increment request counter in state
             const requestCounterKey = 'total_requests';
             const currentCount = mockServer.state?.counters?.get(requestCounterKey) || 0;
@@ -667,6 +838,7 @@ class MockServerService {
                 body,
                 headers
             };
+            const faultProfile = this.selectFaultProfile(mockServer, request);
 
             // Apply chaos engineering effects
             const chaosEffects = this.applyChaosEffects(mockServer);
@@ -841,6 +1013,18 @@ class MockServerService {
                 };
             }
 
+            // Apply the selected Fault Lab profile after the normal mock response
+            // has been resolved, so every scenario and endpoint can be exercised.
+            let faultEffect = null;
+            if (faultProfile) {
+                faultEffect = this.buildFaultEffect(faultProfile, response);
+                response = faultEffect.response;
+                if (faultEffect.delayMs > 0) {
+                    await new Promise(resolve => setTimeout(resolve, faultEffect.delayMs));
+                }
+                if (faultEffect.transport) response.transport = faultEffect.transport;
+            }
+
             // Calculate response time
             const responseTime = Date.now() - startTime;
 
@@ -852,6 +1036,18 @@ class MockServerService {
                 responseTime,
                 matchedScenario
             );
+
+            if (faultProfile) {
+                await this.recordFaultEvent(mockServerId, faultProfile, request, response, faultEffect?.detail);
+                this.emitMockEvent('mock:fault:triggered', {
+                    mockServerId,
+                    profileId: faultProfile._id,
+                    profileName: faultProfile.name,
+                    type: faultProfile.fault.type,
+                    path,
+                    method
+                });
+            }
 
             // Record traffic if recording is active
             if (mockServer.recording?.isRecording && mockServer.recording?.currentSessionId) {
@@ -952,6 +1148,138 @@ class MockServerService {
         } catch (error) {
             console.error('Error recording traffic:', error);
         }
+    }
+
+    // =====================
+    // FAULT LAB MANAGEMENT
+    // =====================
+
+    static validateFaultProfile(profile = {}) {
+        const fault = profile.fault || {};
+        const supported = ['latency', 'status', 'abort', 'throttle', 'malformed_json', 'truncate'];
+        if (!profile.name || !String(profile.name).trim()) throw new Error('Fault profile name is required');
+        if (!supported.includes(fault.type)) throw new Error('Choose a supported fault type');
+        const probability = Number(profile.probability ?? 100);
+        if (!Number.isFinite(probability) || probability < 0 || probability > 100) throw new Error('Probability must be between 0 and 100');
+        const delayMin = Number(fault.delayMinMs || 0);
+        const delayMax = Number(fault.delayMaxMs ?? delayMin);
+        if (delayMin < 0 || delayMax < delayMin || delayMax > 120000) throw new Error('Delay range is invalid');
+        if (profile.schedule?.mode === 'burst') {
+            if (Number(profile.schedule.intervalMs) < 1000 || Number(profile.schedule.durationMs) <= 0) {
+                throw new Error('Burst interval and duration are required');
+            }
+        }
+        if (fault.type === 'status' && (Number(fault.statusCode) < 100 || Number(fault.statusCode) > 599)) {
+            throw new Error('Status code must be between 100 and 599');
+        }
+        if (fault.type === 'throttle' && Number(fault.bytesPerSecond) < 64) {
+            throw new Error('Bandwidth must be at least 64 bytes per second');
+        }
+    }
+
+    static async getFaultLab(mockServerId, eventLimit = 30) {
+        const mockServer = await this.getMockServer(mockServerId);
+        if (this.migrateLegacyChaos(mockServer)) await mockServer.save();
+        const chaos = mockServer.globalConfig?.chaos || {};
+        const events = await MockFaultEvent.find({ mockServerId }).sort({ createdAt: -1 }).limit(Math.min(Number(eventLimit) || 30, 100)).lean();
+        const summary = events.reduce((result, event) => {
+            result.total++;
+            result.byType[event.faultType] = (result.byType[event.faultType] || 0) + 1;
+            if (event.faultType === 'abort') result.aborts++;
+            result.totalAddedDelay += Number(event.detail?.delayMs || 0);
+            return result;
+        }, { total: 0, aborts: 0, totalAddedDelay: 0, byType: {} });
+        return {
+            enabled: Boolean(chaos.globalEnabled),
+            profiles: (chaos.profiles || []).sort((a, b) => (b.priority || 0) - (a.priority || 0)),
+            events,
+            summary: { ...summary, averageAddedDelay: summary.total ? Math.round(summary.totalAddedDelay / summary.total) : 0 }
+        };
+    }
+
+    static async updateFaultLab(mockServerId, settings = {}) {
+        const mockServer = await this.getMockServer(mockServerId);
+        mockServer.globalConfig = mockServer.globalConfig || {};
+        mockServer.globalConfig.chaos = mockServer.globalConfig.chaos || {};
+        if (settings.enabled !== undefined) mockServer.globalConfig.chaos.globalEnabled = Boolean(settings.enabled);
+        await mockServer.save();
+        return this.getFaultLab(mockServerId);
+    }
+
+    static async addFaultProfile(mockServerId, profile) {
+        this.validateFaultProfile(profile);
+        const mockServer = await this.getMockServer(mockServerId);
+        mockServer.globalConfig = mockServer.globalConfig || {};
+        mockServer.globalConfig.chaos = mockServer.globalConfig.chaos || {};
+        mockServer.globalConfig.chaos.profiles = mockServer.globalConfig.chaos.profiles || [];
+        const maxPriority = mockServer.globalConfig.chaos.profiles.reduce((max, item) => Math.max(max, item.priority || 0), 0);
+        mockServer.globalConfig.chaos.profiles.push({
+            ...profile,
+            priority: profile.priority ?? maxPriority + 1,
+            target: { method: '*', path: '*', ...(profile.target || {}) },
+            schedule: { mode: 'continuous', startAt: new Date(), intervalMs: 60000, durationMs: 10000, ...(profile.schedule || {}) }
+        });
+        await mockServer.save();
+        return this.getFaultLab(mockServerId);
+    }
+
+    static async updateFaultProfile(mockServerId, profileId, update) {
+        this.validateFaultProfile(update);
+        const mockServer = await this.getMockServer(mockServerId);
+        const profile = mockServer.globalConfig?.chaos?.profiles?.id(profileId);
+        if (!profile) throw new Error('Fault profile not found');
+        profile.set({
+            ...update,
+            target: { method: '*', path: '*', ...(update.target || {}) },
+            schedule: { mode: 'continuous', startAt: new Date(), intervalMs: 60000, durationMs: 10000, ...(update.schedule || {}) }
+        });
+        await mockServer.save();
+        return this.getFaultLab(mockServerId);
+    }
+
+    static async toggleFaultProfile(mockServerId, profileId) {
+        const mockServer = await this.getMockServer(mockServerId);
+        const profile = mockServer.globalConfig?.chaos?.profiles?.id(profileId);
+        if (!profile) throw new Error('Fault profile not found');
+        profile.isActive = !profile.isActive;
+        await mockServer.save();
+        return this.getFaultLab(mockServerId);
+    }
+
+    static async deleteFaultProfile(mockServerId, profileId) {
+        const mockServer = await this.getMockServer(mockServerId);
+        const profiles = mockServer.globalConfig?.chaos?.profiles;
+        const profile = profiles?.id(profileId);
+        if (!profile) throw new Error('Fault profile not found');
+        profile.deleteOne();
+        await mockServer.save();
+        return this.getFaultLab(mockServerId);
+    }
+
+    static async clearFaultEvents(mockServerId) {
+        await MockFaultEvent.deleteMany({ mockServerId });
+        return { cleared: true };
+    }
+
+    static async previewFaultProfile(mockServerId, profileId) {
+        const mockServer = await this.getMockServer(mockServerId);
+        const profile = mockServer.globalConfig?.chaos?.profiles?.id(profileId);
+        if (!profile) throw new Error('Fault profile not found');
+        const effect = this.buildFaultEffect(profile, {
+            status: 200,
+            headers: { 'Content-Type': 'application/json' },
+            body: { preview: true, message: 'This is a safe Fault Lab preview.' }
+        });
+        return {
+            profileId: String(profile._id),
+            profileName: profile.name,
+            faultType: profile.fault.type,
+            activeNow: this.isFaultProfileActive(profile, { method: profile.target?.method === '*' ? 'GET' : profile.target?.method, path: profile.target?.path === '*' ? '/preview' : profile.target?.path }),
+            delayMs: effect.delayMs,
+            statusCode: effect.response.status,
+            transport: effect.transport?.type || null,
+            detail: effect.detail || {}
+        };
     }
 
     /**

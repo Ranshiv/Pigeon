@@ -4,6 +4,7 @@ import {
     FiX, FiPlus, FiTrash2, FiChevronDown, FiChevronUp, FiPlay,
     FiZap, FiTarget, FiHash, FiPercent, FiCode, FiSave
 } from 'react-icons/fi';
+import AppSelect from './common/AppSelect/AppSelect';
 import './MockScenarioBuilder.css';
 
 const CONDITION_TYPES = [
@@ -260,17 +261,19 @@ const MockScenarioBuilder = ({ mockServer, scenario, onSave, onClose }) => {
                         <div className="form-row">
                             <div className="form-group">
                                 <label>Endpoint Method</label>
-                                <select
+                                <AppSelect
+                                    id="scenario-endpoint-method"
                                     value={formData.endpointMethod}
-                                    onChange={(e) => setFormData({ ...formData, endpointMethod: e.target.value })}
-                                >
-                                    <option value="*">Any Method</option>
-                                    <option value="GET">GET</option>
-                                    <option value="POST">POST</option>
-                                    <option value="PUT">PUT</option>
-                                    <option value="DELETE">DELETE</option>
-                                    <option value="PATCH">PATCH</option>
-                                </select>
+                                    onChange={(endpointMethod) => setFormData({ ...formData, endpointMethod })}
+                                    options={[
+                                        { value: '*', label: 'Any Method' },
+                                        { value: 'GET', label: 'GET' },
+                                        { value: 'POST', label: 'POST' },
+                                        { value: 'PUT', label: 'PUT' },
+                                        { value: 'DELETE', label: 'DELETE' },
+                                        { value: 'PATCH', label: 'PATCH' }
+                                    ]}
+                                />
                             </div>
                             <div className="form-group flex-grow">
                                 <label>Endpoint Path</label>
@@ -342,28 +345,23 @@ const MockScenarioBuilder = ({ mockServer, scenario, onSave, onClose }) => {
                                                 {index > 0 && (
                                                     <div className="condition-field-row">
                                                         <label>Logic</label>
-                                                        <select
+                                                        <AppSelect
+                                                            id={`scenario-condition-${index}-logic`}
                                                             value={condition.logic}
-                                                            onChange={(e) => updateCondition(index, { logic: e.target.value })}
-                                                        >
-                                                            <option value="AND">AND</option>
-                                                            <option value="OR">OR</option>
-                                                        </select>
+                                                            onChange={(logic) => updateCondition(index, { logic })}
+                                                            options={[{ value: 'AND', label: 'AND' }, { value: 'OR', label: 'OR' }]}
+                                                        />
                                                     </div>
                                                 )}
 
                                                 <div className="condition-field-row">
                                                     <label>Type</label>
-                                                    <select
+                                                    <AppSelect
+                                                        id={`scenario-condition-${index}-type`}
                                                         value={condition.type}
-                                                        onChange={(e) => updateCondition(index, { type: e.target.value })}
-                                                    >
-                                                        {CONDITION_TYPES.map(type => (
-                                                            <option key={type.value} value={type.value}>
-                                                                {type.label}
-                                                            </option>
-                                                        ))}
-                                                    </select>
+                                                        onChange={(type) => updateCondition(index, { type })}
+                                                        options={CONDITION_TYPES.map(({ value, label }) => ({ value, label }))}
+                                                    />
                                                 </div>
 
                                                 {condition.type !== 'probability' && (
@@ -382,16 +380,12 @@ const MockScenarioBuilder = ({ mockServer, scenario, onSave, onClose }) => {
 
                                                 <div className="condition-field-row">
                                                     <label>Operator</label>
-                                                    <select
+                                                    <AppSelect
+                                                        id={`scenario-condition-${index}-operator`}
                                                         value={condition.operator}
-                                                        onChange={(e) => updateCondition(index, { operator: e.target.value })}
-                                                    >
-                                                        {OPERATORS.map(op => (
-                                                            <option key={op.value} value={op.value}>
-                                                                {op.label}
-                                                            </option>
-                                                        ))}
-                                                    </select>
+                                                        onChange={(operator) => updateCondition(index, { operator })}
+                                                        options={OPERATORS}
+                                                    />
                                                 </div>
 
                                                 {condition.operator !== 'exists' &&
@@ -484,6 +478,7 @@ const MockScenarioBuilder = ({ mockServer, scenario, onSave, onClose }) => {
                                                 <div className="response-actions">
                                                     <button
                                                         className="btn-icon"
+                                                        aria-label="Delete response"
                                                         onClick={(e) => {
                                                             e.stopPropagation();
                                                             removeResponse(index);
