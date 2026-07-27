@@ -11,6 +11,23 @@ const { emitWorkspaceNotification } = require('../utils/socket/socket-server');
 // In-memory store for backward compatibility
 const collectionsStore = {};
 
+// Older collections store ownership as strings while newer/imported records
+// often use ObjectIds or `userId`. Keep every documentation route consistent.
+const collectionAccessClauses = (userId, { edit = false } = {}) => {
+    const userObjectId = ObjectId.isValid(userId) ? new ObjectId(userId) : null;
+    const collaborator = (id) => ({
+        userId: id,
+        ...(edit ? { role: { $in: ['editor', 'admin'] } } : {})
+    });
+    return [
+        { owner: userId },
+        { userId },
+        ...(userObjectId ? [{ owner: userObjectId }, { userId: userObjectId }] : []),
+        { collaborators: { $elemMatch: collaborator(userId) } },
+        ...(userObjectId ? [{ collaborators: { $elemMatch: collaborator(userObjectId) } }] : [])
+    ];
+};
+
 // Get all collections
 router.get('/', ensureAuthenticated, async (req, res) => {
     try {
@@ -1279,10 +1296,7 @@ router.post('/:id/documentation/settings', authenticateJWT, async (req, res) => 
         // Check if collection exists and user has access
         const collection = await db.collection('collections').findOne({
             _id: new ObjectId(collectionId),
-            $or: [
-                { owner: userId },
-                { collaborators: { $elemMatch: { userId: userId, role: { $in: ['editor', 'admin'] } } } }
-            ]
+            $or: collectionAccessClauses(userId, { edit: true })
         });
 
         if (!collection) {
@@ -1381,10 +1395,7 @@ router.put('/:id/documentation/settings', authenticateJWT, async (req, res) => {
         // Check if collection exists and user has access
         const collection = await db.collection('collections').findOne({
             _id: new ObjectId(collectionId),
-            $or: [
-                { owner: userId },
-                { collaborators: { $elemMatch: { userId: userId, role: { $in: ['editor', 'admin'] } } } }
-            ]
+            $or: collectionAccessClauses(userId, { edit: true })
         });
 
         if (!collection) {
@@ -1474,10 +1485,7 @@ router.get('/:id/documentation/settings/versions', authenticateJWT, async (req, 
         // Check if collection exists and user has access
         const collection = await db.collection('collections').findOne({
             _id: new ObjectId(collectionId),
-            $or: [
-                { owner: userId },
-                { collaborators: { $elemMatch: { userId: userId } } }
-            ]
+            $or: collectionAccessClauses(userId)
         });
 
         if (!collection) {
@@ -1513,10 +1521,7 @@ router.get('/:id/content/versions', authenticateJWT, async (req, res) => {
         // Check if collection exists and user has access
         const collection = await db.collection('collections').findOne({
             _id: new ObjectId(collectionId),
-            $or: [
-                { owner: userId },
-                { collaborators: { $elemMatch: { userId: userId } } }
-            ]
+            $or: collectionAccessClauses(userId)
         });
 
         if (!collection) {
@@ -1559,10 +1564,7 @@ router.post('/:id/content/restore', authenticateJWT, async (req, res) => {
         // Check if collection exists and user has access to edit
         const collection = await db.collection('collections').findOne({
             _id: new ObjectId(collectionId),
-            $or: [
-                { owner: userId },
-                { collaborators: { $elemMatch: { userId: userId, role: { $in: ['editor', 'admin'] } } } }
-            ]
+            $or: collectionAccessClauses(userId, { edit: true })
         });
 
         if (!collection) {
@@ -2191,6 +2193,88 @@ router.post('/:id/documentation/import/openapi', authenticateJWT, async (req, re
     } catch (err) {
         console.error('Error importing OpenAPI documentation:', err);
         res.status(500).json({ message: 'Error importing OpenAPI documentation' });
+    }
+});
+
+// Publish collection documentation. Custom domains are intentionally not
+// handled here; publishing is always served from Pigeon's public URL.
+router.post('/:id/documentation/publish', authenticateJWT, async (req, res) => {
+    try {
+        const collectionId = req.params.id;
+        const userId = req.user.id;
+        if (!ObjectId.isValid(collectionId)) {
+            return res.status(400).json({ message: 'Invalid collection ID' });
+        }
+
+        const db = getDb();
+        const collection = await db.collection('collections').findOne({
+            _id: new ObjectId(collectionId),
+            $or: collectionAccessClauses(userId, { edit: true })
+        });
+        if (!collection) {
+            return res.status(404).json({ message: 'Collection not found or you do not have permission to publish it' });
+        }
+
+        const documentation = await db.collection('documentation').findOne({ collectionId });
+        if (!documentation) {
+            return res.status(404).json({ message: 'Create documentation before publishing it' });
+        }
+
+        const settings = { ...(documentation.settings || {}), isPublic: true };
+        await db.collection('documentation').updateOne(
+            { _id: documentation._id },
+            { $set: { settings, updatedAt: new Date() } }
+        );
+        await saveDocumentationSettingsVersion(db, collectionId, userId, settings, 'Documentation published');
+
+        res.json({
+            message: 'Documentation published successfully',
+            publicUrl: `/docs/${collectionId}`,
+            documentation: { ...documentation, _id: documentation._id.toString(), settings }
+        });
+    } catch (err) {
+        console.error('Error publishing documentation:', err);
+        res.status(500).json({ message: 'Unable to publish documentation' });
+    }
+});
+
+// Public documentation is deliberately separate from the authenticated editor.
+// Only documentation explicitly marked public is returned.
+router.get('/:id/documentation/public', async (req, res) => {
+    try {
+        const collectionId = req.params.id;
+        if (!ObjectId.isValid(collectionId)) {
+            return res.status(404).json({ message: 'Documentation not found' });
+        }
+
+        const db = getDb();
+        const documentation = await db.collection('documentation').findOne({ collectionId });
+        if (!documentation?.settings?.isPublic) {
+            return res.status(404).json({ message: 'Documentation is not public' });
+        }
+
+        const collection = await db.collection('collections').findOne(
+            { _id: new ObjectId(collectionId) },
+            { projection: { name: 1, owner: 1, collaborators: 1 } }
+        );
+        if (!collection) return res.status(404).json({ message: 'Documentation not found' });
+
+        const contributorIds = [collection.owner, ...(collection.collaborators || []).map((item) => item?.userId)]
+            .map((id) => id?.toString?.() || id)
+            .filter((id) => ObjectId.isValid(id));
+        const User = require('../models/User');
+        const users = contributorIds.length
+            ? await User.find({ _id: { $in: contributorIds } }).select('displayName email').lean()
+            : [];
+        const contributors = users.map((user) => user.displayName || user.email).filter(Boolean);
+
+        res.json({
+            documentation: { ...documentation, _id: documentation._id.toString() },
+            collection: { _id: collection._id.toString(), name: collection.name, contributors: [...new Set(contributors)] }
+        });
+    } catch (err) {
+        console.error('Error fetching public documentation:', err);
+        res.status(500).json({ message: 'Unable to load public documentation' });
     }
 });
 

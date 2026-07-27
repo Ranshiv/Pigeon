@@ -1,6 +1,6 @@
 // client/src/components/DocumentationSettingsVersionHistory.js
 import React, { useState, useEffect } from 'react';
-import { FiClock, FiUser, FiSettings, FiRotateCcw, FiEye, FiEyeOff, FiChevronRight, FiChevronDown } from 'react-icons/fi';
+import { FiClock, FiUser, FiSettings, FiRotateCcw, FiEye, FiX, FiChevronRight, FiChevronDown } from 'react-icons/fi';
 import { useCollaboration } from '../context/CollaborationContext';
 import './DocumentationSettingsVersionHistory.css';
 
@@ -315,7 +315,7 @@ const DocumentationSettingsVersionHistory = ({ documentation, onSettingsRestore,
                                 className="close-diff"
                                 onClick={() => setShowDiffView(false)}
                             >
-                                <FiEyeOff />
+                                <FiX />
                             </button>
                         </div>
                         <div className="diff-content">

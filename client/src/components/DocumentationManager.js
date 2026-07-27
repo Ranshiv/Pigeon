@@ -136,12 +136,18 @@ const DocumentationManager = () => {
                             }
                         }
 
+                        const hasSavedSettings = Boolean(
+                            documentationData?.settings &&
+                            Object.keys(documentationData.settings).length > 0
+                        );
+
                         if (documentationData &&
                             ((documentationData.content && documentationData.content.trim() !== '') ||
                                 (documentationData.documentation &&
                                     documentationData.documentation.content &&
-                                    documentationData.documentation.content.trim() !== ''))) {
-                            console.log('Setting documentation with content');
+                                    documentationData.documentation.content.trim() !== '') ||
+                                hasSavedSettings)) {
+                            console.log('Setting documentation with content or saved settings');
                             setDocumentation(documentationData);
                         } else if (documentationData && documentationData.isNew) {
                             // For explicitly empty documentation, set it but mark it as new
@@ -208,15 +214,15 @@ const DocumentationManager = () => {
             // Check both direct properties and nested settings object
             const docSettings = documentation.settings || {};
             const settings = {
-                isPublic: documentation.isPublic ?? docSettings.isPublic ?? false,
-                metaTitle: documentation.metaTitle || docSettings.metaTitle || '',
-                metaDescription: documentation.metaDescription || docSettings.metaDescription || '',
-                customDomain: documentation.customDomain || docSettings.customDomain || '',
-                allowComments: documentation.allowComments ?? docSettings.allowComments ?? false,
-                showLastUpdated: documentation.showLastUpdated ?? docSettings.showLastUpdated ?? true,
-                enableSearch: documentation.enableSearch ?? docSettings.enableSearch ?? true,
-                theme: documentation.theme || docSettings.theme || 'default',
-                displayOptions: documentation.displayOptions || docSettings.displayOptions || {}
+                isPublic: docSettings.isPublic ?? documentation.isPublic ?? false,
+                metaTitle: docSettings.metaTitle || documentation.metaTitle || '',
+                metaDescription: docSettings.metaDescription || documentation.metaDescription || '',
+                customDomain: docSettings.customDomain || documentation.customDomain || '',
+                allowComments: docSettings.allowComments ?? documentation.allowComments ?? false,
+                showLastUpdated: docSettings.showLastUpdated ?? documentation.showLastUpdated ?? true,
+                enableSearch: docSettings.enableSearch ?? documentation.enableSearch ?? true,
+                theme: docSettings.theme || documentation.theme || 'default',
+                displayOptions: docSettings.displayOptions || documentation.displayOptions || {}
             };
 
             setCurrentSettings(settings);
@@ -849,7 +855,7 @@ const DocumentationManager = () => {
         }
 
         try {
-            const response = await fetch(`/collections/${collectionId}/documentation/publish`, {
+            const response = await fetch(`/api/collections/${collectionId}/documentation/publish`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -863,6 +869,14 @@ const DocumentationManager = () => {
             }
 
             const publishData = await response.json();
+
+            setDocumentation(prev => prev ? {
+                ...prev,
+                isPublic: true,
+                settings: { ...(prev.settings || {}), isPublic: true },
+                publicUrl: publishData.publicUrl
+            } : prev);
+            setCurrentSettings(prev => ({ ...(prev || {}), isPublic: true }));
 
             alert(`Documentation published successfully! Public URL: ${publishData.publicUrl}`);
         } catch (err) {

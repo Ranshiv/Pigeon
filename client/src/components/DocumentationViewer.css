@@ -352,6 +352,50 @@
     }
 }
 
+.documentation-body {
+    display: block;
+}
+
+.documentation-body.has-toc {
+    display: grid;
+    grid-template-columns: minmax(170px, 220px) minmax(0, 900px);
+    justify-content: center;
+    gap: 32px;
+}
+
+.documentation-toc {
+    position: sticky;
+    top: 20px;
+    align-self: start;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    padding: 12px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    background: var(--surface);
+}
+
+.documentation-toc p { display: flex; align-items: center; gap: 7px; margin: 0 0 4px; color: var(--text-color); font-size: 13px; font-weight: 700; }
+.documentation-toc a { color: var(--text-secondary); font-size: 13px; text-decoration: none; }
+.documentation-toc a:hover { color: var(--accent); }
+.documentation-toc .toc-level-2 { padding-left: 10px; }
+.documentation-toc .toc-level-3 { padding-left: 20px; }
+
+.documentation-contributors { margin-top: 36px; padding-top: 20px; border-top: 1px solid var(--border-color); }
+.documentation-contributors h3 { display: flex; align-items: center; gap: 8px; font-size: 15px; color: var(--text-color); }
+.documentation-contributors > div { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.documentation-contributors span { padding: 5px 9px; border-radius: 999px; background: var(--surface-sunken); color: var(--text-secondary); font-size: 12px; }
+
+.public-documentation-page { min-height: calc(100vh - 64px); background: var(--background-color); }
+.public-documentation-message { display: grid; min-height: 60vh; place-content: center; gap: 10px; color: var(--text-color); text-align: center; }
+.public-documentation-message p { color: var(--text-secondary); }
+
+@media (max-width: 760px) {
+    .documentation-body.has-toc { display: block; }
+    .documentation-toc { position: static; margin-bottom: 20px; }
+}
+
 /* Keep this viewer independent from the documentation manager and the
    operating-system colour-scheme preference. The app's theme tokens are the
    single source of truth, so a light app theme remains high contrast even

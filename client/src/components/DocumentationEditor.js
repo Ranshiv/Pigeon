@@ -15,7 +15,8 @@ const DocumentationEditor = ({ documentation, collection, onSave, onAutoSave, is
     const [title, setTitle] = useState('');
     const [viewMode, setViewMode] = useState('edit');
     const [endpoints, setEndpoints] = useState([]);
-    const [autoSaveStatus, setAutoSaveStatus] = useState('Saved');
+    const [autoSaveStatus, setAutoSaveStatus] = useState('Manual save');
+    const [autoSaveEnabled, setAutoSaveEnabled] = useState(false);
     const [showFind, setShowFind] = useState(false);
     const [findText, setFindText] = useState('');
     const [replaceText, setReplaceText] = useState('');
@@ -96,14 +97,14 @@ const DocumentationEditor = ({ documentation, collection, onSave, onAutoSave, is
     }, [documentation, collection]);
 
     useEffect(() => {
-        if (!onAutoSave) return undefined;
+        clearTimeout(autoSaveTimerRef.current);
+        if (!autoSaveEnabled || !onAutoSave) return undefined;
         if (skipAutoSaveRef.current) {
             skipAutoSaveRef.current = false;
             return undefined;
         }
 
         setAutoSaveStatus('Unsaved changes');
-        clearTimeout(autoSaveTimerRef.current);
         autoSaveTimerRef.current = setTimeout(async () => {
             setAutoSaveStatus('Saving…');
             try {
@@ -120,7 +121,17 @@ const DocumentationEditor = ({ documentation, collection, onSave, onAutoSave, is
         }, 1200);
 
         return () => clearTimeout(autoSaveTimerRef.current);
-    }, [content, title, collection, onAutoSave]);
+    }, [autoSaveEnabled, content, title, collection, onAutoSave]);
+
+    const handleAutoSaveToggle = (enabled) => {
+        setAutoSaveEnabled(enabled);
+        if (!enabled) {
+            clearTimeout(autoSaveTimerRef.current);
+            setAutoSaveStatus('Manual save');
+        } else {
+            setAutoSaveStatus('Autosave enabled');
+        }
+    };
 
     // Generate documentation template based on collection data
     // This function should only be called when the user explicitly requests it
@@ -588,6 +599,14 @@ const DocumentationEditor = ({ documentation, collection, onSave, onAutoSave, is
                 </div>
                 <div className="editor-actions">
                     <span className={`autosave-status ${autoSaveStatus === 'Save failed' ? 'error' : ''}`} aria-live="polite">{autoSaveStatus}</span>
+                    <label className="autosave-toggle" title="Save edits automatically">
+                        <input
+                            type="checkbox"
+                            checked={autoSaveEnabled}
+                            onChange={(event) => handleAutoSaveToggle(event.target.checked)}
+                        />
+                        <span>Autosave</span>
+                    </label>
                     <button type="button" className="editor-find-toggle" onClick={() => setShowFind(!showFind)}>Find</button>
                     <div className="view-toggle-group">
                         <button
@@ -615,9 +634,9 @@ const DocumentationEditor = ({ documentation, collection, onSave, onAutoSave, is
                     <button
                         className="save-button"
                         onClick={handleSave}
-                        disabled={isSaving}
+                        disabled={isSaving || autoSaveEnabled}
                     >
-                        <FiSave /> {isSaving ? 'Saving...' : 'Save'}
+                        <FiSave /> {isSaving ? 'Saving...' : autoSaveEnabled ? 'Autosave on' : 'Save'}
                     </button>
                 </div>
             </div>

@@ -718,6 +718,26 @@
 }
 
 .autosave-status.error { color: var(--danger-color); }
+.autosave-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    min-height: 36px;
+    padding: 0 9px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm, 8px);
+    background: var(--surface);
+    color: var(--text-secondary);
+    font-size: 0.76rem;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.autosave-toggle:hover { border-color: var(--accent, var(--primary-color)); color: var(--text-color); }
+.autosave-toggle input { flex: 0 0 auto; }
+.autosave-toggle:has(input:checked) { border-color: var(--accent, var(--primary-color)); background: color-mix(in srgb, var(--accent, var(--primary-color)) 10%, var(--surface)); color: var(--accent, var(--primary-color)); }
+.save-button:disabled { opacity: 0.55; cursor: not-allowed; }
 .editor-find-toggle,.editor-findbar button { padding:7px 9px; border:1px solid var(--border-color); border-radius:6px; background:var(--surface); color:var(--text-color); font-size:.75rem; cursor:pointer; }
 .editor-findbar { display:flex; align-items:center; gap:8px; padding:8px 18px; border-bottom:1px solid var(--border-color); background:var(--surface-elevated,var(--card-bg)); }
 .editor-findbar input { min-width:0; padding:7px 9px; border:1px solid var(--border-color); border-radius:6px; background:var(--background-color); color:var(--text-color); }

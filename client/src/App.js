@@ -8,6 +8,7 @@ import DocumentationOverview from './components/DocumentationOverview';
 import PublicStatusPage from './components/PublicStatusPage';
 import EnhancedPublicStatusPage from './components/EnhancedPublicStatusPage';
 import OAuthCallback from './components/OAuthCallback';
+import PublicDocumentationPage from './components/PublicDocumentationPage';
 import PageLoader from './components/common/PageLoader/PageLoader';
 import './App.css';
 import './theme-overrides.css';
@@ -144,6 +145,7 @@ function App() {
           <Route path="/status" element={<PublicStatusPage />} />
           <Route path="/status/:workspaceId" element={<EnhancedPublicStatusPage />} />
           <Route path="/documentation" element={<DocumentationOverview />} /> {/* Add the documentation route */}
+          <Route path="/docs/:collectionId" element={<PublicDocumentationPage />} />
           <Route path="/oauth/callback" element={<OAuthCallback />} /> {/* OAuth callback route */}
           <Route path="*" element={<div className="not-found-container" style={{ padding: '40px', textAlign: 'center', color: '#fff' }}>
             <h2>404 - Page Not Found</h2>

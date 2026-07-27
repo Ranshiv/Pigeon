@@ -649,3 +649,110 @@
         grid-template-columns: 1fr;
     }
 }
+
+/* Comparison dialog: isolate it from legacy light-mode documentation styles. */
+body .documentation-manager .diff-modal {
+    z-index: 1200;
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.62);
+    -webkit-backdrop-filter: blur(3px);
+    backdrop-filter: blur(3px);
+}
+
+body .documentation-manager .diff-modal-content {
+    width: min(860px, calc(100vw - 40px));
+    max-width: none;
+    max-height: min(720px, calc(100vh - 40px));
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg, 14px);
+    background: var(--surface-elevated);
+    box-shadow: var(--shadow-lg);
+}
+
+body .documentation-manager .diff-header {
+    min-height: 58px;
+    padding: 14px 18px;
+    border-bottom-color: var(--border-color);
+    background: var(--surface);
+}
+
+body .documentation-manager .diff-header h4 {
+    color: var(--text-color);
+}
+
+body .documentation-manager .close-diff {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border: 1px solid transparent;
+    border-radius: var(--radius-sm, 8px);
+    color: var(--text-secondary);
+}
+
+body .documentation-manager .close-diff:hover {
+    border-color: var(--border-color);
+    background: var(--hover-bg);
+    color: var(--text-color);
+}
+
+body .documentation-manager .diff-content {
+    max-height: calc(min(720px, 100vh - 40px) - 58px);
+    padding: 18px;
+    background: var(--surface-elevated);
+}
+
+body .documentation-manager .diff-versions {
+    gap: 14px;
+}
+
+body .documentation-manager .diff-version {
+    min-width: 0;
+}
+
+body .documentation-manager .diff-version h5 {
+    margin-bottom: 8px;
+    color: var(--text-color);
+    font-size: 13px;
+}
+
+body .documentation-manager .diff-version pre {
+    min-height: 0;
+    max-height: 440px;
+    padding: 14px;
+    overflow: auto;
+    border-color: var(--border-color);
+    border-radius: var(--radius-sm, 8px);
+    background: var(--surface-sunken);
+    color: var(--text-color);
+    font-family: var(--font-mono, 'Roboto Mono', monospace);
+    font-size: 12px;
+    line-height: 1.55;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+@media (max-width: 700px) {
+    body .documentation-manager .diff-modal { padding: 12px; }
+    body .documentation-manager .diff-modal-content { width: calc(100vw - 24px); }
+    body .documentation-manager .diff-content { padding: 14px; }
+}
+
+/* Keep the history list on one surface so the gaps between entries do not
+   expose a second, tinted background. */
+body .documentation-manager .documentation-settings .version-history-content,
+body .documentation-manager .documentation-settings .settings-version-history,
+body .documentation-manager .documentation-settings .settings-version-history .versions-list {
+    background: var(--surface);
+}
+
+body .documentation-manager .documentation-settings .settings-version-history .version-item,
+body .documentation-manager .documentation-settings .settings-version-history .version-item:last-child {
+    background: var(--surface);
+}
+
+body .documentation-manager .documentation-settings .settings-version-history .version-item.selected {
+    background: color-mix(in srgb, var(--accent) 8%, var(--surface));
+}
