@@ -37,6 +37,19 @@ const formatDate = (value) => {
     return date.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
 };
 
+const getGovernanceMetrics = (item) => {
+    const metrics = item?.metrics || {};
+    const requestCount = Number(metrics.requestCount ?? metrics.operationCount ?? metrics.channelCount ?? metrics.messageCount ?? 0);
+    return {
+        requestCount,
+        documentedPercent: Number(metrics.documentedPercent ?? metrics.operationDocumentationPercent ?? metrics.channelDocumentationPercent ?? 0),
+        authCoveragePercent: Number(metrics.authCoveragePercent ?? metrics.messageSchemaPercent ?? 0),
+        variableUsagePercent: Number(metrics.variableUsagePercent ?? (metrics.usesEnvVariables ? 100 : 0)),
+        monitoringStatus: metrics.monitoringStatus || (metrics.hasRuns ? 'up' : 'none'),
+        lastUpdated: metrics.lastUpdated || item?.updatedAt || item?.createdAt
+    };
+};
+
 const GovernanceSection = () => {
     const { workspaces, loading: workspacesLoading } = useWorkspaceOptions();
 
@@ -96,7 +109,7 @@ const GovernanceSection = () => {
         const range = SCORE_RANGES.find((r) => r.value === scoreRange) || SCORE_RANGES[0];
         return items.filter((i) => {
             if (!range.test(i.score)) return false;
-            if (monitoringStatus !== 'all' && i.metrics.monitoringStatus !== monitoringStatus) return false;
+            if (monitoringStatus !== 'all' && getGovernanceMetrics(i).monitoringStatus !== monitoringStatus) return false;
             if (ownerId !== 'all' && i.ownerId !== ownerId) return false;
             return true;
         });
@@ -233,7 +246,9 @@ const GovernanceSection = () => {
                                 </tr>
                             </thead>
                             <tbody>
-                                {filtered.map((item) => (
+                                {filtered.map((item) => {
+                                    const metrics = getGovernanceMetrics(item);
+                                    return (
                                     <tr
                                         key={item.collectionId}
                                         className={`gov-row${item.collectionId === selectedId ? ' gov-row--active' : ''}`}
@@ -251,21 +266,22 @@ const GovernanceSection = () => {
                                             <span className="gov-api-owner">{item.ownerName}</span>
                                         </td>
                                         <td>{item.workspaceName}</td>
-                                        <td className="gov-num">{item.metrics.requestCount}</td>
-                                        <td className="gov-num">{item.metrics.requestCount === 0 ? '—' : `${item.metrics.documentedPercent}%`}</td>
-                                        <td className="gov-num">{item.metrics.requestCount === 0 ? '—' : `${item.metrics.authCoveragePercent}%`}</td>
-                                        <td className="gov-num">{item.metrics.requestCount === 0 ? '—' : `${item.metrics.variableUsagePercent}%`}</td>
+                                        <td className="gov-num">{metrics.requestCount}</td>
+                                        <td className="gov-num">{metrics.requestCount === 0 ? '—' : `${metrics.documentedPercent}%`}</td>
+                                        <td className="gov-num">{metrics.requestCount === 0 ? '—' : `${metrics.authCoveragePercent}%`}</td>
+                                        <td className="gov-num">{metrics.requestCount === 0 ? '—' : `${metrics.variableUsagePercent}%`}</td>
                                         <td>
-                                            <span className={`gov-status gov-status--${item.metrics.monitoringStatus}`}>
-                                                {MONITORING_LABELS[item.metrics.monitoringStatus]}
+                                            <span className={`gov-status gov-status--${metrics.monitoringStatus}`}>
+                                                {MONITORING_LABELS[metrics.monitoringStatus] || 'Not monitored'}
                                             </span>
                                         </td>
-                                        <td>{formatDate(item.metrics.lastUpdated)}</td>
+                                        <td>{formatDate(metrics.lastUpdated)}</td>
                                         <td className="gov-num">
                                             <span className={`gov-score gov-score--${item.grade}`}>{item.score}</span>
                                         </td>
                                     </tr>
-                                ))}
+                                    );
+                                })}
                             </tbody>
                         </table>
                     </div>

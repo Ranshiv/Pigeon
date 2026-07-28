@@ -347,6 +347,18 @@ function computeAsyncApiMetrics(doc, context = {}) {
     const scenariosCount = scenarios.length;
 
     return {
+        // Compatibility fields keep the shared governance table and summary
+        // meaningful for AsyncAPI records as well as REST collections.
+        requestCount: operations.length || channels.length || messages.length,
+        documentedCount: documentedOps || documentedChannels || documentedMessages,
+        documentedPercent: operations.length > 0
+            ? pct(documentedOps, operations.length)
+            : channels.length > 0 ? pct(documentedChannels, channels.length) : pct(documentedMessages, messages.length),
+        authCoveragePercent: messageSchemaPercent,
+        variableUsagePercent: hasServerEnv ? 100 : 0,
+        monitorCount: runs.length > 0 || Boolean(lastRun) ? 1 : 0,
+        monitoringStatus: !lastRun ? 'none' : lastRunFailed ? 'down' : lastRunPassed ? 'up' : 'degraded',
+        lastUpdated: doc?.updatedAt || doc?.createdAt || null,
         channelCount: channels.length,
         messageCount: messages.length,
         operationCount: operations.length,

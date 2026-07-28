@@ -13,6 +13,11 @@ const gradeOf = (value) => (value >= 80 ? 'good' : value >= 50 ? 'fair' : 'poor'
 const GovernanceScorePanel = ({ item, weights = {}, categoryLabels = {} }) => {
     const categories = Object.entries(item.categories || {});
     const m = item.metrics || {};
+    const isAsyncApi = item.type === 'asyncapi';
+    const requestCount = m.requestCount ?? m.operationCount ?? m.channelCount ?? m.messageCount ?? 0;
+    const documentedCount = m.documentedCount ?? m.documentedOperationCount ?? m.documentedChannelCount ?? m.documentedMessageCount ?? 0;
+    const authCoverage = m.authedCount ?? (m.messageSchemaCount ?? 0);
+    const variableUsage = m.variableUsageCount ?? (m.usesEnvVariables ? requestCount : 0);
 
     return (
         <div className="gov-panel">
@@ -48,28 +53,27 @@ const GovernanceScorePanel = ({ item, weights = {}, categoryLabels = {} }) => {
                 <section className="gov-subcard">
                     <h3 className="gov-subcard-title">Evidence</h3>
                     <dl className="gov-kv">
-                        <dt>Requests</dt>
-                        <dd>{m.requestCount}</dd>
-                        <dt>Documented endpoints</dt>
-                        <dd>{m.documentedCount} of {m.requestCount}</dd>
-                        <dt>Collection docs</dt>
-                        <dd>{m.hasCollectionDocs ? 'Present' : 'Missing'}</dd>
-                        <dt>Authenticated requests</dt>
-                        <dd>{m.authedCount} of {m.requestCount}</dd>
-                        <dt>Unauthenticated writes</dt>
-                        <dd>{m.unauthenticatedWriteCount} of {m.writeRequestCount}</dd>
-                        <dt>Requests using variables</dt>
-                        <dd>{m.variableUsageCount} of {m.requestCount}</dd>
-                        <dt>Requests with tests</dt>
-                        <dd>{m.testedCount} of {m.requestCount}</dd>
+                        <dt>{isAsyncApi ? 'Operations' : 'Requests'}</dt>
+                        <dd>{requestCount}</dd>
+                        <dt>{isAsyncApi ? 'Documented operations' : 'Documented endpoints'}</dt>
+                        <dd>{documentedCount} of {requestCount}</dd>
+                        <dt>{isAsyncApi ? 'Payload schemas' : 'Collection docs'}</dt>
+                        <dd>{isAsyncApi ? `${m.messageSchemaCount ?? 0} of ${m.messageCount ?? 0}` : (m.hasCollectionDocs ? 'Present' : 'Missing')}</dd>
+                        <dt>{isAsyncApi ? 'Schema coverage' : 'Authenticated requests'}</dt>
+                        <dd>{isAsyncApi ? `${authCoverage} of ${m.messageCount ?? 0}` : `${authCoverage} of ${requestCount}`}</dd>
+                        <dt>{isAsyncApi ? 'Server variables' : 'Unauthenticated writes'}</dt>
+                        <dd>{isAsyncApi ? (m.usesEnvVariables ? 'Configured' : 'Missing') : `${m.unauthenticatedWriteCount ?? 0} of ${m.writeRequestCount ?? 0}`}</dd>
+                        <dt>{isAsyncApi ? 'Scenario coverage' : 'Requests using variables'}</dt>
+                        <dd>{isAsyncApi ? `${m.scenariosCount ?? 0} scenarios` : `${variableUsage} of ${requestCount}`}</dd>
+                        {!isAsyncApi && <><dt>Requests with tests</dt><dd>{m.testedCount ?? 0} of {requestCount}</dd></>}
                         <dt>Environments</dt>
-                        <dd>{m.environmentCount === 0 ? 'None' : m.environmentNames.join(', ')}</dd>
+                        <dd>{m.environmentCount === 0 ? 'None' : (m.environmentNames || []).join(', ') || `${m.environmentCount} configured`}</dd>
                         <dt>Monitors</dt>
-                        <dd>{m.monitorCount === 0 ? 'None' : `${m.upMonitorCount} up of ${m.activeMonitorCount} active`}</dd>
+                        <dd>{m.monitorCount === 0 ? 'None' : isAsyncApi ? (m.monitoringStatus || 'Configured') : `${m.upMonitorCount ?? 0} up of ${m.activeMonitorCount ?? 0} active`}</dd>
                         <dt>Published versions</dt>
-                        <dd>{m.versionCount}</dd>
+                        <dd>{m.versionCount ?? 0}</dd>
                         <dt>Audit events</dt>
-                        <dd>{m.auditEventCount}</dd>
+                        <dd>{m.auditEventCount ?? 0}</dd>
                     </dl>
                 </section>
             </div>
