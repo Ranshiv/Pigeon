@@ -27,3 +27,38 @@ body.pigeon-marketing-body { scrollbar-color: #4e3522 #0b0907; scrollbar-width: 
 /* Reserve space for the telemetry chart and target only its chart SVG, not its inline arrow icon. */
 .pigeon-feature-card.graph h3 { max-width: 44%; margin-top: 25px; }.pigeon-feature-card.graph p { max-width: 44%; }.pigeon-feature-card.graph .pigeon-latency-graph { right: 24px; bottom: 25px; left: auto; width: 48%; }.pigeon-latency-graph > svg { display: block; width: 100%; height: 67px; margin-top: 6px; overflow: visible; }.pigeon-latency-graph small { display: inline-flex; align-items: center; gap: 5px; }.pigeon-latency-graph small svg { display: inline-block; width: 11px; height: 11px; margin: 0; overflow: visible; color: #dca16b; }.pigeon-latency-graph > svg path { fill: none; stroke: var(--pigeon-orange); stroke-width: 2; }.pigeon-latency-graph > svg circle { fill: var(--pigeon-orange-light); filter: drop-shadow(0 0 5px #ff8a1f); animation: pigeon-latency-glow 1.8s ease-in-out infinite; }
 @media (max-width: 760px) { .pigeon-feature-card.graph h3, .pigeon-feature-card.graph p { max-width: 72%; }.pigeon-feature-card.graph .pigeon-latency-graph { width: 58%; } }
+
+.pigeon-hero::before { z-index: -2; }
+.pigeon-hero-fluid { position: absolute; z-index: -1; inset: 0; opacity: .9; pointer-events: none; -webkit-mask-image: radial-gradient(ellipse 58% 70% at 50% 48%, transparent 0%, rgba(0,0,0,.15) 38%, #000 82%); mask-image: radial-gradient(ellipse 58% 70% at 50% 48%, transparent 0%, rgba(0,0,0,.15) 38%, #000 82%); }
+@media (max-width: 760px) { .pigeon-hero-fluid { opacity: .65; -webkit-mask-image: radial-gradient(ellipse 74% 68% at 50% 48%, transparent 0%, rgba(0,0,0,.12) 42%, #000 88%); mask-image: radial-gradient(ellipse 74% 68% at 50% 48%, transparent 0%, rgba(0,0,0,.12) 42%, #000 88%); } }
+
+@property --pigeon-demo-border-angle { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
+.pigeon-demo { position: relative; isolation: isolate; }
+.pigeon-demo::after { position: absolute; z-index: 3; inset: -1px; padding: 1px; content: ''; pointer-events: none; background: conic-gradient(from var(--pigeon-demo-border-angle), transparent 0deg, transparent 290deg, rgba(255, 138, 31, .18) 310deg, #ffd09a 326deg, #ff8a1f 338deg, rgba(255, 138, 31, .18) 350deg, transparent 360deg); border-radius: inherit; -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; filter: drop-shadow(0 0 5px rgba(255, 138, 31, .62)) drop-shadow(0 0 13px rgba(255, 138, 31, .26)); animation: pigeon-demo-border-orbit 5.5s linear infinite; }
+@keyframes pigeon-demo-border-orbit { to { --pigeon-demo-border-angle: 360deg; } }
+@media (prefers-reduced-motion: reduce) { .pigeon-demo::after { animation: none; } }
+
+/* Animate the real border as a fallback for browsers that do not composite masked pseudo-elements. */
+.pigeon-demo { --pigeon-demo-border-angle: 0deg; border-color: transparent; background: linear-gradient(#100d0a, #100d0a) padding-box, conic-gradient(from var(--pigeon-demo-border-angle), rgba(255, 195, 130, .18) 0deg, rgba(255, 195, 130, .18) 274deg, rgba(255, 138, 31, .42) 294deg, #ffb15e 308deg, #fff3df 322deg, #ff8a1f 335deg, rgba(255, 138, 31, .48) 348deg, rgba(255, 195, 130, .18) 360deg) border-box; box-shadow: 0 32px 90px rgba(0,0,0,.42), 0 0 22px rgba(255,125,18,.20), 0 0 48px rgba(255,138,31,.13), inset 0 0 20px rgba(255,138,31,.025); animation: pigeon-demo-border-orbit 3.8s linear infinite, pigeon-demo-border-pulse 2.6s ease-in-out infinite; }
+.pigeon-demo::after { display: none; }
+@keyframes pigeon-demo-border-pulse { 50% { box-shadow: 0 32px 90px rgba(0,0,0,.42), 0 0 30px rgba(255,125,18,.31), 0 0 68px rgba(255,138,31,.2), inset 0 0 26px rgba(255,138,31,.04); } }
+@media (prefers-reduced-motion: reduce) { .pigeon-demo { animation: none; } }
+
+/* A feature-led workflow: every preview card names a capability available in Pigeon. */
+.pigeon-workflow-list { gap: 14px; }
+.pigeon-workflow-step { min-height: 198px; gap: 10%; }
+.pigeon-workflow-copy { max-width: 410px; }
+.pigeon-workflow-copy h3 { max-width: 12ch; margin: 11px 0; font-size: clamp(1.65rem, 2.7vw, 2.65rem); line-height: 1.03; }
+.pigeon-workflow-card { min-height: 172px; padding: 20px 22px; justify-content: flex-start; background: radial-gradient(circle at 100% 0, rgba(255,138,31,.14), transparent 42%), linear-gradient(145deg, #21160e, #120d09 78%); border-color: rgba(255, 191, 126, .31); box-shadow: 0 18px 42px rgba(0,0,0,.28), inset 0 1px rgba(255,224,191,.05); transition: transform .25s ease, border-color .25s ease, box-shadow .25s ease; }
+.pigeon-workflow-step:hover .pigeon-workflow-card { border-color: rgba(255, 174, 92, .7); box-shadow: 0 20px 52px rgba(0,0,0,.34), 0 0 26px rgba(255,138,31,.1); transform: translateY(-3px); }
+.pigeon-workflow-card-top { display: flex; align-items: center; gap: 9px; min-height: 25px; }
+.pigeon-workflow-card-top > span { display: grid; place-items: center; width: 25px; height: 25px; color: #2a1202; background: linear-gradient(135deg, #ffbe7a, #ff7e17); border-radius: 6px; box-shadow: 0 5px 14px rgba(255,138,31,.2); }
+.pigeon-workflow-card-top svg { width: 13px; height: 13px; }
+.pigeon-workflow-card-top small { margin: 0; color: #b99a7d; font: 700 9px/1.2 ui-monospace, monospace; letter-spacing: .04em; text-transform: uppercase; }
+.pigeon-workflow-card > b { margin-top: 16px; color: #ffe0bf; font-size: clamp(1.25rem, 1.7vw, 1.65rem); letter-spacing: -.045em; }
+.pigeon-workflow-features { display: flex; flex-wrap: wrap; gap: 6px; margin-top: auto; padding-top: 16px; }
+.pigeon-workflow-features span { padding: 5px 7px; color: #d9b995; font: 700 8px/1 ui-monospace, monospace; background: rgba(255, 185, 111, .07); border: 1px solid rgba(255, 196, 135, .15); border-radius: 4px; }
+.pigeon-workflow-card i { display: none; }
+@media (max-width: 760px) { .pigeon-workflow-step { min-height: 0; }.pigeon-workflow-copy h3 { max-width: none; }.pigeon-workflow-card { min-height: 156px; } }
+
+.pigeon-testimonials { display: none; }
