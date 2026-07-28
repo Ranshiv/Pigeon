@@ -96,7 +96,21 @@ const MockServerWorkspace = ({ collectionId, versionId, onClose }) => {
             if (!response.ok) throw new Error('Failed to fetch mock servers');
 
             const data = await response.json();
-            const servers = data.mockServers || data || [];
+            let servers = data.mockServers || data || [];
+
+            // Older mock servers may not be linked to the currently selected
+            // API version. Keep them visible in API Virtualization instead of
+            // presenting an empty workspace.
+            if (servers.length === 0 && collectionId) {
+                const collectionResponse = await fetch(
+                    `/api/mock-servers/collection/${collectionId}`,
+                    { credentials: 'include' }
+                );
+                if (collectionResponse.ok) {
+                    const collectionData = await collectionResponse.json();
+                    servers = collectionData.mockServers || collectionData || [];
+                }
+            }
             setMockServers(servers);
 
             if (servers.length > 0 && !selectedServer) {

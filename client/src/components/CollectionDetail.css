@@ -1055,6 +1055,17 @@
   font-size: 15px;
 }
 
+/* Keep the collection welcome action consistent with the project's restrained
+   button elevation. The previous inherited glow was too strong for the dark
+   workspace surface. */
+.collection-overview-card .primary-button {
+  box-shadow: none;
+}
+
+.collection-overview-card .primary-button:hover {
+  box-shadow: var(--shadow-md);
+}
+
 /* Documentation tab styles */
 .documentation-tab-content {
   height: 100%;
