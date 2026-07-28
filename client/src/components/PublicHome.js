@@ -1,580 +1,122 @@
-import React, { useState, useEffect, useRef } from 'react';
-import './PublicHome.css';
-import { FiZap, FiSearch, FiSave, FiCheckCircle, FiArrowRight, FiUsers, FiGitMerge, FiCalendar, FiMessageCircle, FiFileText, FiInbox, FiGlobe, FiLayers, FiShield } from 'react-icons/fi';
-import { FaGithub, FaSlack, FaTwitter, FaLinkedin, FaReact, FaNodeJs, FaCode, FaRocket } from 'react-icons/fa';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { motion, useInView, useReducedMotion, useScroll, useSpring } from 'framer-motion';
+import {
+    FiActivity, FiArrowDown, FiArrowRight, FiBarChart2, FiCheck, FiChevronDown,
+    FiCode, FiGithub, FiGlobe, FiLayers, FiPlay, FiSend, FiShield,
+    FiSliders, FiUsers, FiZap
+} from 'react-icons/fi';
 import { getGoogleAuthUrl } from '../utils/apiBaseUrl';
+import './PublicHome.css';
 
-const PublicHome = () => {
-    // State to control intro visibility
-    const [showIntroOnly, setShowIntroOnly] = useState(true);
-    // State for code animation
-    const [codeText, setCodeText] = useState('');
-    const [lineCount, setLineCount] = useState(10);
-    // State for animated elements
-    const [isVisible, setIsVisible] = useState({});
-    // State for which code line is currently being typed
-    const [currentTypingLine, setCurrentTypingLine] = useState(0);
-    // State to control blinking cursor position
-    const [cursorPosition, setCursorPosition] = useState({ line: 0, char: 0 });
+const REQUESTS = [
+    { method: 'GET', name: 'List projects', url: 'https://api.pigeon.dev/v1/projects', status: '200 OK', time: '82 ms', response: '{\n  "projects": [\n    { "id": "prj_01", "name": "Checkout API", "status": "healthy" },\n    { "id": "prj_02", "name": "Mobile gateway", "status": "healthy" }\n  ]\n}' },
+    { method: 'POST', name: 'Create deployment', url: 'https://api.pigeon.dev/v1/deployments', status: '201 Created', time: '124 ms', response: '{\n  "id": "dep_2391",\n  "environment": "production",\n  "state": "queued",\n  "createdAt": "2026-07-28T14:32:00Z"\n}' },
+    { method: 'PUT', name: 'Update environment', url: 'https://api.pigeon.dev/v1/environments/prod', status: '200 OK', time: '96 ms', response: '{\n  "id": "env_production",\n  "name": "Production",\n  "variables": 12,\n  "updated": true\n}' },
+    { method: 'DELETE', name: 'Remove test run', url: 'https://api.pigeon.dev/v1/test-runs/run_842', status: '204 No Content', time: '71 ms', response: '{\n  "success": true,\n  "message": "Test run removed"\n}' }
+];
 
-    // Refs for intersection observer
-    const sectionRefs = useRef({});
+const FEATURES = [
+    { icon: FiSend, title: 'A request workspace that stays out of your way', copy: 'Compose, replay, and compare every call in one focused surface.', type: 'wide' },
+    { icon: FiActivity, title: 'Latency with context', copy: 'See what changed before your users feel it.', type: 'wide graph' },
+    { icon: FiShield, title: 'Confidence built in', copy: 'Keep schemas, contracts, and checks close to every request.' },
+    { icon: FiCheck, title: 'Tests that tell a story', copy: 'Turn known-good behavior into checks your team can trust.', type: 'tests' },
+    { icon: FiUsers, title: 'Work together in the flow', copy: 'Review changes and leave the decision trail beside the API.' }
+];
 
-    // Modern API developer workspace illustration
-    const heroImageUrl = 'https://images.unsplash.com/photo-1587620962725-abab7fe55159?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1000&q=80';
+const WORKFLOW = [
+    ['01', 'Send a request', 'Start with a saved request, a raw endpoint, or a shared collection.', 'POST', 'Create checkout'],
+    ['02', 'Inspect the response', 'Read status, timing, headers, and payload as one clear signal.', '201', '124 ms'],
+    ['03', 'Write tests', 'Capture expectations while the behavior is fresh and visible.', '3/3', 'checks passing'],
+    ['04', 'Collaborate with your team', 'Bring reviews, decisions, and changes into the same workspace.', '4', 'active collaborators'],
+    ['05', 'Observe in production', 'Connect real production signals back to the request that matters.', '99.98%', 'availability']
+];
 
-    // Team collaboration image
-    const collaborationImageUrl = 'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80';
+const TESTIMONIALS = [
+    ['“Pigeon made the handoff between building an endpoint and trusting it in production feel like one conversation.”', 'Maya Chen', 'Staff Engineer', 'Northstar'],
+    ['“Our team finally has the request, the test, and the incident context in the same place.”', 'David Okafor', 'Platform Lead', 'Arcade Cloud'],
+    ['“It is the rare API tool that gets calmer as our system gets more complex.”', 'Elena Rossi', 'Developer Experience', 'Atelier']
+];
 
-    // Knowledge management image
-    const knowledgeImageUrl = 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80';
+const reveal = { hidden: { opacity: 0, y: 28 }, visible: { opacity: 1, y: 0 } };
+const spring = { type: 'spring', stiffness: 180, damping: 22 };
 
-    // Set up intersection observer for animations
+function Reveal({ children, className = '', delay = 0 }) {
+    const reduced = useReducedMotion();
+    const ref = useRef(null);
+    const inView = useInView(ref, { once: true, amount: 0.2 });
+    return <motion.div ref={ref} className={className} variants={reveal} initial="hidden" animate={inView || reduced ? 'visible' : 'hidden'} transition={{ ...spring, delay: reduced ? 0 : delay }}>{children}</motion.div>;
+}
+
+function MarketingButton({ children, secondary = false, ...props }) {
+    return <motion.a className={`pigeon-button${secondary ? ' pigeon-button--secondary' : ''}`} whileHover={{ y: -3 }} whileTap={{ scale: 0.97 }} transition={spring} {...props}>{children}</motion.a>;
+}
+
+function ProductDemo() {
+    const [selected, setSelected] = useState(1);
+    const [tab, setTab] = useState('Body');
+    const [sending, setSending] = useState(false);
+    const [typed, setTyped] = useState('');
+    const [editorTyped, setEditorTyped] = useState('');
+    const reduced = useReducedMotion();
+    const request = REQUESTS[selected];
+    const editorContent = tab === 'Body'
+        ? '{\n  "project": "checkout",\n  "environment": "production",\n  "notify": true\n}'
+        : tab === 'Headers'
+            ? 'Authorization: Bearer ••••••••\nContent-Type: application/json\nX-Pigeon-Source: workspace'
+            : 'region=us-east-1\ninclude=health\nexpand=owner';
+    useEffect(() => { setTyped(''); setSending(false); }, [selected]);
     useEffect(() => {
-        const observer = new IntersectionObserver(
-            (entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        setIsVisible(prev => ({ ...prev, [entry.target.id]: true }));
-                    }
-                });
-            },
-            { threshold: 0.1 }
-        );
-
-        // Observe all section refs
-        Object.values(sectionRefs.current).forEach(ref => {
-            if (ref) observer.observe(ref);
-        });
-
+        if (reduced) { setEditorTyped(editorContent); return undefined; }
+        setEditorTyped('');
+        let index = 0;
+        const intervalId = window.setInterval(() => {
+            index += 1;
+            setEditorTyped(editorContent.slice(0, index));
+            if (index >= editorContent.length) window.clearInterval(intervalId);
+        }, 18);
+        return () => window.clearInterval(intervalId);
+    }, [editorContent, reduced, selected, tab]);
+    useEffect(() => {
+        if (!sending) return undefined;
+        let index = 0;
+        let intervalId;
+        const starter = window.setTimeout(() => {
+            intervalId = window.setInterval(() => {
+                index += 2;
+                setTyped(request.response.slice(0, index));
+                if (index >= request.response.length) { window.clearInterval(intervalId); setSending(false); }
+            }, 12);
+        }, 420);
         return () => {
-            if (observer) {
-                observer.disconnect();
-            }
+            window.clearTimeout(starter);
+            if (intervalId) window.clearInterval(intervalId);
         };
-    }, []);
+    }, [sending, request.response]);
+    const send = () => { setTyped(''); setSending(true); };
+    return <section className="pigeon-section pigeon-demo-section" id="product" aria-labelledby="product-title"><Reveal className="pigeon-section-heading pigeon-centered-heading"><p className="pigeon-kicker">A workspace in motion</p><h2 id="product-title">Every request gets a <em>clearer path.</em></h2><p>Explore a Pigeon workspace without leaving the page.</p></Reveal><Reveal delay={0.08}><div className="pigeon-demo" aria-label="Interactive simulated API request workspace"><aside className="pigeon-demo-sidebar"><div className="pigeon-demo-sidebar-title"><FiLayers /> Checkout service <span>4 requests</span></div>{REQUESTS.map((item, index) => <button type="button" key={item.name} className={selected === index ? 'is-active' : ''} onClick={() => setSelected(index)}><b className={`method-${item.method.toLowerCase()}`}>{item.method}</b><span>{item.name}</span><i /></button>)}<div className="pigeon-demo-sidebar-footer"><span /> Production</div></aside><div className="pigeon-demo-main"><div className="pigeon-demo-windowbar"><span><i /><i /><i /></span><b>requests / checkout-service</b><small>Saved just now</small></div><div className="pigeon-demo-topbar"><button type="button" className={`pigeon-method-select method-${request.method.toLowerCase()}`}>{request.method} <FiChevronDown /></button><input aria-label="Request URL" value={request.url} readOnly /><button type="button" className="pigeon-send" onClick={send} disabled={sending}>{sending ? <i className="pigeon-spinner" /> : <FiSend />} {sending ? 'Sending…' : 'Send'}</button></div><div className="pigeon-demo-tabs" role="tablist">{['Body', 'Headers', 'Params'].map((item) => <button type="button" role="tab" aria-selected={tab === item} className={tab === item ? 'is-active' : ''} key={item} onClick={() => setTab(item)}>{item}</button>)}</div><div className="pigeon-demo-editor"><div className="pigeon-editor-gutter">{editorContent.split('\n').map((_, index) => <span key={index}>{String(index + 1).padStart(2, '0')}</span>)}</div><pre aria-live="polite">{editorTyped}<i className="pigeon-type-cursor" aria-hidden="true" /></pre><span className="pigeon-editor-hint"><FiZap /> Typing request body</span></div><div className={`pigeon-response${sending ? ' is-sending' : ''}`}><div className="pigeon-response-heading"><span>Response</span>{sending ? <span className="pigeon-sending"><i /> Sending request</span> : typed ? <motion.b initial={{ scale: 0.75, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={spring}><FiCheck /> {request.status}</motion.b> : <small>Ready to send</small>}<small>{typed && request.time}</small></div><pre>{typed || (sending ? 'Connecting to production…' : '// Send a request to inspect its response')}</pre>{!typed && !sending ? <div className="pigeon-response-empty"><span><FiActivity /></span><p>Run the request to stream its response here.</p></div> : null}</div></div></div></Reveal></section>;
+}
 
-    // Typing animation for code
+function FeatureVisual({ type }) {
+    if (type === 'wide graph') return <div className="pigeon-latency-graph" aria-hidden="true"><span>p95 latency</span><svg viewBox="0 0 300 76" preserveAspectRatio="none"><path d="M0 57 C32 48 38 61 68 43 S104 53 131 29 S174 45 204 25 S246 36 300 10" /><circle cx="204" cy="25" r="4" /></svg><small>84 ms <FiArrowRight /> 62 ms</small></div>;
+    if (type === 'tests') return <div className="pigeon-test-runner" aria-hidden="true">{['status is 201', 'schema matches', 'latency under 200ms'].map((item, index) => <span key={item} style={{ '--test-delay': `${index * 0.4}s` }}><FiCheck /> {item}</span>)}</div>;
+    return null;
+}
+
+function Features() { return <section className="pigeon-section" id="features" aria-labelledby="features-title"><Reveal className="pigeon-section-heading"><p className="pigeon-kicker">Built for the whole journey</p><h2 id="features-title">Less switching. <em>More signal.</em></h2></Reveal><div className="pigeon-feature-grid">{FEATURES.map((feature, index) => { const Icon = feature.icon; return <Reveal key={feature.title} className={`pigeon-feature-card ${feature.type || ''}`} delay={index * 0.06}><motion.div whileHover={{ y: -7 }} transition={spring}><Icon className="pigeon-feature-icon" /><h3>{feature.title}</h3><p>{feature.copy}</p><FeatureVisual type={feature.type} /></motion.div></Reveal>; })}</div></section>; }
+
+function Workflow() { const { scrollYProgress } = useScroll(); const progress = useSpring(scrollYProgress, { stiffness: 110, damping: 30 }); return <section className="pigeon-section pigeon-workflow" id="workflow" aria-labelledby="workflow-title"><Reveal className="pigeon-section-heading"><p className="pigeon-kicker">One connected workflow</p><h2 id="workflow-title">Follow the request. <em>Keep the context.</em></h2></Reveal><div className="pigeon-workflow-list"><motion.i className="pigeon-workflow-line" style={{ scaleY: progress }} aria-hidden="true" />{WORKFLOW.map(([number, title, copy, metric, label], index) => <Reveal key={title} className="pigeon-workflow-step" delay={index * 0.05}><div className="pigeon-workflow-copy"><span>{number}</span><h3>{title}</h3><p>{copy}</p></div><div className="pigeon-workflow-card"><b>{metric}</b><small>{label}</small><i /><i /><i /></div></Reveal>)}</div></section>; }
+
+function MarketingFooter() { const groups = [['Product', [['Workspace', '/workspace'], ['API Network', '/workspace/api-network'], ['Monitoring', '/workspace/monitoring']]], ['Developers', [['Documentation', '/documentation'], ['GitHub', 'https://github.com/Ranshiv/Pigeon'], ['Workflow', '#workflow']]], ['Company', [['About Pigeon', '#top'], ['Customer stories', '#testimonials'], ['Contact', 'mailto:support@pigeonapp.io']]], ['Legal', [['Privacy', '/privacy'], ['Terms', '/terms']]]]; return <footer className="pigeon-marketing-footer"><div className="pigeon-footer-grid"><div><a className="pigeon-wordmark" href="#top"><span>P</span> Pigeon</a><p>One focused home for building, testing, and operating APIs.</p><a className="pigeon-social" href="https://github.com/Ranshiv/Pigeon" target="_blank" rel="noreferrer"><FiGithub /> GitHub</a></div>{groups.map(([title, links]) => <div key={title}><h3>{title}</h3>{links.map(([label, href]) => href.startsWith('/') ? <Link key={label} to={href}>{label}</Link> : <a key={label} href={href}>{label}</a>)}</div>)}</div><div className="pigeon-footer-bottom"><span>© {new Date().getFullYear()} Pigeon. All rights reserved.</span><span>Built for APIs that keep moving.</span></div></footer>; }
+
+function PublicHome() {
+    const reduced = useReducedMotion();
+    const trusted = useMemo(() => ['northstar', 'vanta', 'arcade', 'linear', 'relay', 'fathom'], []);
     useEffect(() => {
-        // Start typing animation after a short delay
-        const timer = setTimeout(() => {
-            startTypingAnimation();
-        }, 1500);
-
-        return () => clearTimeout(timer);
+        document.body.classList.add('pigeon-marketing-body');
+        return () => document.body.classList.remove('pigeon-marketing-body');
     }, []);
-
-    // Function to simulate typing animation for code editor
-    const startTypingAnimation = () => {
-        const codeLines = codeExample.split('\n');
-        let lineIndex = 0;
-        let charIndex = 0;
-
-        const typingInterval = setInterval(() => {
-            if (lineIndex < codeLines.length) {
-                // Update cursor position
-                setCursorPosition({ line: lineIndex, char: charIndex });
-
-                if (charIndex === 0) {
-                    // When starting a new line
-                    setCurrentTypingLine(lineIndex);
-                }
-
-                if (charIndex < codeLines[lineIndex].length) {
-                    // Type next character
-                    charIndex++;
-                } else {
-                    // Move to next line
-                    lineIndex++;
-                    charIndex = 0;
-
-                    // Add a slight pause between lines for realism
-                    return;
-                }
-            } else {
-                // Typing complete
-                clearInterval(typingInterval);
-
-                // Set cursor to the end of the code
-                setCursorPosition({
-                    line: codeLines.length - 1,
-                    char: codeLines[codeLines.length - 1].length
-                });
-            }
-        }, 30); // Adjust typing speed here
-
-        return () => clearInterval(typingInterval);
-    };
-
-    // Function to handle "Learn More" button click
-    const handleLearnMoreClick = (e) => {
-        e.preventDefault();
-        setShowIntroOnly(false);
-
-        // Scroll to features section
-        const featuresSection = document.getElementById('features');
-        if (featuresSection) {
-            featuresSection.scrollIntoView({ behavior: 'smooth' });
-        }
-    };
-
-    // Example code for animation - showcasing the product features with better organization
-    const codeExample = `// Pigeon - The Everything App for teams
-import { Workspace, Project, Chat, Document } from 'pigeon';
-
-// Create a new team workspace
-const teamWorkspace = new Workspace({
-  name: 'Engineering Team',
-  members: ['alex@company.com', 'taylor@company.com']
-});
-
-// Create a new project with tasks
-const newFeature = new Project({
-  title: 'Launch New Feature',
-  description: 'Implement and deploy the billing module',
-  dueDate: '2025-06-15',
-  priority: 'high'
-});
-
-// Add tasks to the project
-newFeature.addTask({
-  title: 'Frontend Implementation',
-  assignee: 'alex@company.com'
-});
-
-newFeature.addTask({
-  title: 'Backend API Development',
-  assignee: 'taylor@company.com'
-});
-
-// Create team communication
-const engineeringChat = new Chat({
-  name: 'engineering',
-  isPublic: false
-});
-
-// Send message with attachment
-engineeringChat.sendMessage({
-  content: 'The new feature specs are ready!',
-  attachments: ['specs.pdf']
-});
-
-// Create and share documentation
-const doc = new Document({
-  title: 'Feature Implementation Guide',
-  content: '# Getting Started\\n...'
-});
-
-// Share document with the team
-doc.share(teamWorkspace);
-
-// Export project data
-const csvData = newFeature.exportTasks('csv');
-console.log('Tasks exported successfully!');`;
-
-    // Generate line numbers for code display
-    const generateLineNumbers = (count) => {
-        return Array.from({ length: count }, (_, i) => i + 1);
-    };
-
-    // Add a reference to a section
-    const addSectionRef = (id, element) => {
-        if (element && !sectionRefs.current[id]) {
-            sectionRefs.current[id] = element;
-            element.id = id;
-        }
-    };
-
-    // Add animated class if element is visible
-    const getAnimationClass = (id) => {
-        return isVisible[id] ? 'animate-in' : 'pre-animation';
-    };
-
-    return (
-        <div className={`public-home-container ${showIntroOnly ? 'intro-active' : ''}`}>
-
-            <div className="intro-section-full-width">
-                {/* Floating badges */}
-                <div className="intro-section-badges">
-                    <span className="intro-badge">Project Management</span>
-                    <span className="intro-badge">Team Communication</span>
-                    <span className="intro-badge">Document Collaboration</span>
-                    <span className="intro-badge">Task Tracking</span>
-                </div>
-
-                <div className="intro-section-container">
-                    <div className="intro-content">
-                        <h1 className="intro-heading">Everything App for your teams</h1>
-                        <p className="intro-description">
-                            <strong>Pigeon</strong> is an open-source platform that serves as an all-in-one replacement of <strong>Linear</strong>, <strong>Jira</strong>, <strong>Slack</strong>, and <strong>Notion</strong>. Streamline your workflow with a single unified experience.
-                        </p>
-                        <div className="intro-buttons">
-                            <a href="#" className="intro-button intro-button-primary">TRY IT FREE</a>
-                            <a href="#features" onClick={handleLearnMoreClick} className="intro-button intro-button-secondary">Learn More</a>
-                        </div>
-
-                        {/* Tech stack icons */}
-                        <div className="tech-stack">
-                            <div className="tech-stack-title">Built with</div>
-                            <div className="tech-icons">
-                                <FaReact title="React" />
-                                <FaNodeJs title="Node.js" />
-                                <FaCode title="Modern JavaScript" />
-                                <FaRocket title="High Performance" />
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Enhanced code editor with animation */}
-                    <div className="intro-code-container">
-                        <div className="code-editor-header">
-                            <div className="window-controls">
-                                <div className="window-control window-close"></div>
-                                <div className="window-control window-minimize"></div>
-                                <div className="window-control window-maximize"></div>
-                            </div>
-                            <div className="file-tab active">workspace.js</div>
-                            <div className="file-tab">project.js</div>
-                        </div>
-                        <div className="code-editor-body">
-                            <div className="line-numbers">
-                                {generateLineNumbers(codeExample.split('\n').length).map((num) => (
-                                    <div key={num}>{num}</div>
-                                ))}
-                            </div>
-                            <div className="code-content">
-                                {codeExample.split('\n').map((line, index) => {
-                                    // Apply syntax highlighting with regex
-                                    // const processedLine = line
-                                    //     .replace(/(import|const|new|from|if|return|export)/g, '<span class="keyword">$1</span>')
-                                    //     .replace(/(Workspace|Project|Chat|Document|addTask|sendMessage|share|exportTasks)/g, '<span class="function">$1</span>')
-                                    //     .replace(/('.*?'|".*?"|\[.*?\])/g, '<span class="string">$1</span>')
-                                    //     .replace(/(\d+)/g, '<span class="number">$1</span>')
-                                    //     .replace(/(\/\/.*)/g, '<span class="comment">$1</span>')
-                                    //     .replace(/(name|title|description|dueDate|priority|assignee|content|attachments|isPublic|members)/g, '<span class="property">$1</span>');
-
-                                    const isTyping = index <= currentTypingLine;
-                                    const showCursor = index === cursorPosition.line;
-
-                                    // Only show typed characters up to cursor position
-                                    let displayLine = line;
-                                    if (index === cursorPosition.line) {
-                                        displayLine = line.substring(0, cursorPosition.char);
-                                    } else if (index > currentTypingLine) {
-                                        displayLine = ''; // Don't show lines that haven't been typed yet
-                                    }
-
-                                    const processedDisplayLine = displayLine
-                                        .replace(/(import|const|new|from|if|return|export)/g, '<span class="keyword">$1</span>')
-                                        .replace(/(Workspace|Project|Chat|Document|addTask|sendMessage|share|exportTasks)/g, '<span class="function">$1</span>')
-                                        .replace(/('.*?'|".*?"|\[.*?\])/g, '<span class="string">$1</span>')
-                                        .replace(/(\d+)/g, '<span class="number">$1</span>')
-                                        .replace(/(\/\/.*)/g, '<span class="comment">$1</span>')
-                                        .replace(/(name|title|description|dueDate|priority|assignee|content|attachments|isPublic|members)/g, '<span class="property">$1</span>');
-
-                                    return (
-                                        <div
-                                            key={index}
-                                            className={`code-line ${isTyping ? 'typed' : ''}`}
-                                        >
-                                            <span dangerouslySetInnerHTML={{ __html: processedDisplayLine }} />
-                                            {showCursor && <span className="code-cursor"></span>}
-                                        </div>
-                                    );
-                                })}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            {/* Productivity Section */}
-            <section
-                id="features"
-                className={`productivity-section ${getAnimationClass('features')}`}
-                ref={(el) => addSectionRef('features', el)}
-            >
-                <div className="section-header">
-                    <h2>Everything you need for productive team work</h2>
-                    <p className="section-subtitle">Team Planner • Project Management • Virtual Office • Chat • Documents • Inbox</p>
-                </div>
-
-                <div className="productivity-features-grid">
-                    <div className="productivity-feature-card">
-                        <div className="feature-icon-container">
-                            <FiZap className="feature-icon" />
-                        </div>
-                        <h3>Keyboard Shortcuts</h3>
-                        <p>Work efficiently with instant access to common actions.</p>
-                    </div>
-                    <div className="productivity-feature-card">
-                        <div className="feature-icon-container">
-                            <FiCalendar className="feature-icon" />
-                        </div>
-                        <h3>Team Planner</h3>
-                        <p>Keep track of the bigger picture by viewing all API endpoints in one centralized dashboard.</p>
-                    </div>
-                    <div className="productivity-feature-card">
-                        <div className="feature-icon-container">
-                            <FiInbox className="feature-icon" />
-                        </div>
-                        <h3>Notifications</h3>
-                        <p>Keep up to date with any API changes by receiving instant notifications.</p>
-                    </div>
-                    <div className="productivity-feature-card">
-                        <div className="feature-icon-container">
-                            <FiSearch className="feature-icon" />
-                        </div>
-                        <h3>Advanced Filtering</h3>
-                        <p>Precise API search with advanced filtering capabilities.</p>
-                    </div>
-                </div>
-            </section>
-
-            {/* Collaboration Section with Image */}
-            <section
-                className={`collaboration-section ${getAnimationClass('collaboration')}`}
-                ref={(el) => addSectionRef('collaboration', el)}
-            >
-                <div className="collaboration-content">
-                    <h2>Work Together. Like in the Office.</h2>
-                    <p className="collaboration-description">
-                        Create customized virtual workspace for any team working with APIs. Collaborate with remote teams seamlessly through real-time communication within your workspace.
-                    </p>
-                    <div className="collaboration-features">
-                        <div className="collab-feature-item">
-                            <div className="collab-feature-icon">
-                                <FiUsers className="icon" />
-                            </div>
-                            <div className="collab-feature-text">
-                                <h3>Team Collaboration</h3>
-                                <p>Connect with your team instantly to monitor progress and track API updates.</p>
-                            </div>
-                        </div>
-                        <div className="collab-feature-item">
-                            <div className="collab-feature-icon">
-                                <FiMessageCircle className="icon" />
-                            </div>
-                            <div className="collab-feature-text">
-                                <h3>Chat with Team</h3>
-                                <p>Send DMs and create group chats directly within your API workspace.</p>
-                            </div>
-                        </div>
-                        <div className="collab-feature-item">
-                            <div className="collab-feature-icon">
-                                <FiGitMerge className="icon" />
-                            </div>
-                            <div className="collab-feature-text">
-                                <h3>Version History</h3>
-                                <p>Track every edit effortlessly, and never lose a single API change.</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div className="collaboration-image">
-                    <img src={collaborationImageUrl} alt="Team Collaboration" />
-                </div>
-            </section>
-
-            {/* Knowledge Management Section with Image */}
-            <section
-                className={`knowledge-section ${getAnimationClass('knowledge')}`}
-                ref={(el) => addSectionRef('knowledge', el)}
-            >
-                <div className="knowledge-image">
-                    <img src={knowledgeImageUrl} alt="Knowledge Management" />
-                </div>
-                <div className="knowledge-content">
-                    <h2>Knowledge at Your Fingertips</h2>
-                    <p className="knowledge-description">
-                        Pigeon offers a wide range of features to create and manage your API documentation. Our suite of collaborative editing tools boosts team efficiency.
-                    </p>
-                    <div className="document-features">
-                        <div className="document-feature-item">
-                            <FiFileText className="document-feature-icon" />
-                            <p>Documents in Pigeon can be used for sharing API reference materials, collaborating on plans, and storing implementation details.</p>
-                        </div>
-                        <div className="document-feature-item">
-                            <FiUsers className="document-feature-icon" />
-                            <p>With real-time collaboration, remote teams can work together on API documentation with features like tagging users and linking to endpoints.</p>
-                        </div>
-                    </div>
-                    <a href={getGoogleAuthUrl()} className="knowledge-cta">
-                        Start Documentation <FiArrowRight />
-                    </a>
-                </div>
-            </section>
-
-            {/* Features Section with hover effects */}
-            <section
-                className={`features-section-public ${getAnimationClass('features-public')}`}
-                ref={(el) => addSectionRef('features-public', el)}
-            >
-                <h2>Key Features</h2>
-                <div className="features-grid-public">
-                    <div className="feature-card-public">
-                        <div className="feature-icon-wrapper">
-                            <FiZap className="feature-icon-public" />
-                        </div>
-                        <h3>Effortless Requesting</h3>
-                        <p>Quickly create and send any type of HTTP request with an intuitive UI.</p>
-                    </div>
-                    <div className="feature-card-public">
-                        <div className="feature-icon-wrapper">
-                            <FiSearch className="feature-icon-public" />
-                        </div>
-                        <h3>Detailed Inspection</h3>
-                        <p>Analyze responses, headers, cookies, and performance metrics with ease.</p>
-                    </div>
-                    <div className="feature-card-public">
-                        <div className="feature-icon-wrapper">
-                            <FiSave className="feature-icon-public" />
-                        </div>
-                        <h3>Save & Organize</h3>
-                        <p>Save your requests, organize them into collections, and sync across devices.</p>
-                    </div>
-                </div>
-            </section>
-
-            {/* GitHub Integration Section with hover effects */}
-            <section
-                className={`github-section ${getAnimationClass('github')}`}
-                ref={(el) => addSectionRef('github', el)}
-            >
-                <h2>Sync with GitHub. Both Ways.</h2>
-                <p className="github-subtitle">Manage your API tasks efficiently with Pigeon's bidirectional GitHub synchronization. Use Pigeon as an advanced front-end for GitHub Issues.</p>
-
-                <div className="github-features-grid">
-                    <div className="github-feature-card">
-                        <div className="github-feature-icon">
-                            <FiGitMerge />
-                        </div>
-                        <h3>Two-way Synchronization</h3>
-                        <p>Integrate your API tracker with GitHub to sync changes instantly.</p>
-                    </div>
-                    <div className="github-feature-card">
-                        <div className="github-feature-icon">
-                            <FiUsers />
-                        </div>
-                        <h3>Multiple Repositories</h3>
-                        <p>Organize multiple projects for more effective planning and collaboration.</p>
-                    </div>
-                    <div className="github-feature-card">
-                        <div className="github-feature-icon">
-                            <FiGlobe />
-                        </div>
-                        <h3>Global Access</h3>
-                        <p>Work with your team from anywhere in the world with seamless synchronization.</p>
-                    </div>
-                </div>
-            </section>
-
-            {/* Benefits Section - Enhanced with hover effects */}
-            <section
-                className={`benefits-section-public ${getAnimationClass('benefits')}`}
-                ref={(el) => addSectionRef('benefits', el)}
-            >
-                <h2>Why Choose Pigeon?</h2>
-
-                <div className="benefits-cards-container">
-                    {/* Card 1 */}
-                    <div className="benefit-card">
-                        <div className="benefit-card-content">
-                            <div className="benefit-card-front">
-                                <div className="benefit-icon-wrapper">
-                                    <FiCheckCircle className="benefit-card-icon" />
-                                </div>
-                                <h3>Intuitive Interface</h3>
-                                <p>Easy to learn and use, even for beginners</p>
-                            </div>
-                            <div className="benefit-card-back" style={{ background: 'linear-gradient(135deg, #2193b0 0%, #6dd5ed 100%)' }}>
-                                <p>Our clean, modern interface helps you focus on what matters - testing your APIs without distractions.</p>
-                                <a href={getGoogleAuthUrl()} className="benefit-card-cta">
-                                    Try it now <FiArrowRight />
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Card 2 */}
-                    <div className="benefit-card">
-                        <div className="benefit-card-content">
-                            <div className="benefit-card-front">
-                                <div className="benefit-icon-wrapper">
-                                    <FiShield className="benefit-card-icon" />
-                                </div>
-                                <h3>Core Functionality</h3>
-                                <p>Everything you need for effective API testing</p>
-                            </div>
-                            <div className="benefit-card-back" style={{ background: 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)' }}>
-                                <p>We focus on the essential features that developers need daily, without unnecessary complexity.</p>
-                                <a href={getGoogleAuthUrl()} className="benefit-card-cta">
-                                    Get started <FiArrowRight />
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Card 3 */}
-                    <div className="benefit-card">
-                        <div className="benefit-card-content">
-                            <div className="benefit-card-front">
-                                <div className="benefit-icon-wrapper">
-                                    <FiLayers className="benefit-card-icon" />
-                                </div>
-                                <h3>Streamlined Workflow</h3>
-                                <p>Save time and reduce errors</p>
-                            </div>
-                            <div className="benefit-card-back" style={{ background: 'linear-gradient(135deg, #f953c6 0%, #b91d73 100%)' }}>
-                                <p>Pigeon helps you build a more efficient workflow with saved requests, collections, and quick responses.</p>
-                                <a href={getGoogleAuthUrl()} className="benefit-card-cta">
-                                    Explore more <FiArrowRight />
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Card 4 */}
-                    <div className="benefit-card">
-                        <div className="benefit-card-content">
-                            <div className="benefit-card-front">
-                                <div className="benefit-icon-wrapper">
-                                    <FiCheckCircle className="benefit-card-icon" />
-                                </div>
-                                <h3>Free to Use</h3>
-                                <p>Get started without any cost</p>
-                            </div>
-                            <div className="benefit-card-back" style={{ background: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)' }}>
-                                <p>Pigeon is 100% free to use with all core features available to everyone, no hidden limitations.</p>
-                                <a href={getGoogleAuthUrl()} className="benefit-card-cta">
-                                    Sign up free <FiArrowRight />
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            {/* Call to Action Section with hover effects */}
-            <section
-                className={`cta-section-public ${getAnimationClass('cta')}`}
-                ref={(el) => addSectionRef('cta', el)}
-            >
-                <h2>Ready to Transform Your API Development?</h2>
-                <p>Join thousands of developers building better APIs with Pigeon.</p>
-                <div className="cta-buttons-container">
-                    <a href={getGoogleAuthUrl()} className="button primary-button cta-button-public">Try It Free</a>
-                    <div className="social-links">
-                        <a href="https://github.com" target="_blank" rel="noopener noreferrer" aria-label="GitHub"><FaGithub /></a>
-                        <a href="https://slack.com" target="_blank" rel="noopener noreferrer" aria-label="Slack"><FaSlack /></a>
-                        <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" aria-label="Twitter"><FaTwitter /></a>
-                        <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><FaLinkedin /></a>
-                    </div>
-                </div>
-                <p className="made-with">Made with passion by the Pigeon team</p>
-            </section>
-        </div>
-    );
-};
+    return <div className="pigeon-marketing" id="top"><main><section className="pigeon-hero" aria-labelledby="hero-title"><motion.div className="pigeon-hero-copy" initial="hidden" animate="visible" variants={{ visible: { transition: { staggerChildren: reduced ? 0 : 0.1 } } }}><motion.a href="#product" className="pigeon-announcement" variants={reveal} transition={spring}><span>What’s new</span><b>v1.0 <FiArrowRight /></b></motion.a><motion.h1 id="hero-title" variants={reveal} transition={spring}>The API workspace<br />that keeps every signal<br /><em>in one flight path.</em></motion.h1><motion.p variants={reveal} transition={spring}>Pigeon brings requests, tests, collaboration, and production context into one focused flow.</motion.p><motion.div className="pigeon-hero-actions" variants={reveal} transition={spring}><MarketingButton href={getGoogleAuthUrl()}>Start building free <FiArrowRight /></MarketingButton><MarketingButton secondary href="#product"><FiPlay /> Watch the workspace</MarketingButton></motion.div></motion.div><motion.div className="pigeon-trusted" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: reduced ? 0 : 0.55 }}><span>Trusted by teams building</span><div><div>{[...trusted, ...trusted].map((name, index) => <b key={`${name}-${index}`}>{name}</b>)}</div></div></motion.div><a className="pigeon-scroll-cue" href="#product">Scroll to explore <FiArrowDown /></a></section><ProductDemo /><Features /><Workflow /><section className="pigeon-section pigeon-testimonials" id="testimonials" aria-labelledby="stories-title"><Reveal className="pigeon-section-heading pigeon-centered-heading"><p className="pigeon-kicker">From teams in the flow</p><h2 id="stories-title">Built for people who <em>ship together.</em></h2></Reveal><div className="pigeon-quote-grid">{TESTIMONIALS.map(([quote, name, role, company], index) => <Reveal key={name} delay={index * 0.08}><figure><blockquote>{quote}</blockquote><figcaption><span>{name}<small>{role}</small></span><b>{company}</b></figcaption></figure></Reveal>)}</div></section><section className="pigeon-final-cta"><Reveal><div><p className="pigeon-kicker">Your next request starts here</p><h2>Give every API a <em>place to land.</em></h2><p>One workspace for the work that turns an API into a reliable product.</p><div className="pigeon-hero-actions"><MarketingButton href={getGoogleAuthUrl()}>Start with Pigeon <FiArrowRight /></MarketingButton><MarketingButton secondary href="/documentation">Read the docs <FiCode /></MarketingButton></div></div></Reveal></section></main><MarketingFooter /></div>;
+}
 
 export default PublicHome;

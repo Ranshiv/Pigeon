@@ -9,6 +9,7 @@ import OAuthCallback from './components/OAuthCallback';
 import PublicDocumentationPage from './components/PublicDocumentationPage';
 import LegalPage from './components/LegalPage';
 import PageLoader from './components/common/PageLoader/PageLoader';
+import CommandPalette from './components/CommandPalette';
 import './App.css';
 import './theme-overrides.css';
 
@@ -79,6 +80,7 @@ function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const location = useLocation();
+  const isPublicLanding = location.pathname === '/' && !isAuthenticated;
 
   useEffect(() => {
     const pageTitle = getPageTitle(location.pathname);
@@ -132,8 +134,8 @@ function App() {
   }
 
   return (
-    <div className="App">
-      <Navbar isAuthenticated={isAuthenticated} />  {/* Pass isAuthenticated to Navbar */}
+    <div className={`App${isPublicLanding ? ' App--marketing' : ''}`}>
+      <Navbar isAuthenticated={isAuthenticated} />
       <main className="app-main">
         <Routes>
           <Route path="/" element={isAuthenticated ? <Navigate to="/workspace" /> : <PublicHome />} />
@@ -154,9 +156,10 @@ function App() {
           </div>} />
         </Routes>
       </main>
+      <CommandPalette isAuthenticated={isAuthenticated} />
       {/* api-network is a fixed-height app-shell that renders its own footer inside
           the scroll region — a second global footer here would create a 2nd scrollbar */}
-      {!location.pathname.startsWith('/workspace/api-network') && <Footer />}
+      {!isPublicLanding && !location.pathname.startsWith('/workspace/api-network') && <Footer />}
     </div>
   );
 }
