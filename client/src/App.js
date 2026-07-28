@@ -4,11 +4,10 @@ import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Workspace from './components/Workspace';
 import PublicHome from './components/PublicHome';
-import DocumentationOverview from './components/DocumentationOverview';
-import PublicStatusPage from './components/PublicStatusPage';
-import EnhancedPublicStatusPage from './components/EnhancedPublicStatusPage';
+import DocumentationOverview, { DocumentationArticle } from './components/DocumentationOverview';
 import OAuthCallback from './components/OAuthCallback';
 import PublicDocumentationPage from './components/PublicDocumentationPage';
+import LegalPage from './components/LegalPage';
 import PageLoader from './components/common/PageLoader/PageLoader';
 import './App.css';
 import './theme-overrides.css';
@@ -33,8 +32,6 @@ const getPageTitle = (pathname) => {
     const section = pathname.split('/')[3] || 'profile';
     return `${formatSegment(section)} Settings`;
   }
-  if (/^\/status\/[^/]+\/?$/.test(pathname)) return 'Public Status Page';
-
   const staticRouteTitles = {
     '/workspace': 'Workspace',
     '/workspace/home': 'Home',
@@ -59,8 +56,9 @@ const getPageTitle = (pathname) => {
     '/workspace/history': 'History',
     '/workspace/monitoring/alerts': 'Alerts Dashboard',
     '/workspace/monitoring/policies': 'Alert Policies',
-    '/status': 'Status',
     '/documentation': 'Documentation',
+    '/privacy': 'Privacy Policy',
+    '/terms': 'Terms of Service',
     '/oauth/callback': 'OAuth Callback'
   };
 
@@ -142,10 +140,11 @@ function App() {
           <Route path="/workspace/*" element={isAuthenticated ? <Workspace /> : <Navigate to="/" />} />
           <Route path="/alerts" element={isAuthenticated ? <Navigate to="/workspace/monitoring/alerts" /> : <Navigate to="/" />} />
           <Route path="/alerts/policies" element={isAuthenticated ? <Navigate to="/workspace/monitoring/policies" /> : <Navigate to="/" />} />
-          <Route path="/status" element={<PublicStatusPage />} />
-          <Route path="/status/:workspaceId" element={<EnhancedPublicStatusPage />} />
           <Route path="/documentation" element={<DocumentationOverview />} /> {/* Add the documentation route */}
+          <Route path="/documentation/:category/:guide" element={<DocumentationArticle />} />
           <Route path="/docs/:collectionId" element={<PublicDocumentationPage />} />
+          <Route path="/privacy" element={<LegalPage />} />
+          <Route path="/terms" element={<LegalPage />} />
           <Route path="/oauth/callback" element={<OAuthCallback />} /> {/* OAuth callback route */}
           <Route path="*" element={<div className="not-found-container" style={{ padding: '40px', textAlign: 'center', color: '#fff' }}>
             <h2>404 - Page Not Found</h2>

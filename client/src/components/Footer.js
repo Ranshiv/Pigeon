@@ -13,19 +13,9 @@ const Footer = () => {
                         <h3>Pigeon</h3>
                         <p className="footer-tagline">The ultimate API development platform</p>
                         <div className="footer-social">
-                            <a href="https://github.com" className="social-icon" target="_blank" rel="noopener noreferrer">
+                            <a href="https://github.com/Ranshiv/Pigeon" className="social-icon" target="_blank" rel="noopener noreferrer" aria-label="Pigeon on GitHub">
                                 <svg viewBox="0 0 24 24" width="20" height="20">
                                     <path fill="currentColor" d="M12 0a12 12 0 0 0-3.8 23.4c.6.1.8-.3.8-.6v-2.2c-3.3.7-4-1.4-4-1.4-.6-1.4-1.4-1.8-1.4-1.8-1-.7.1-.7.1-.7 1.2 0 1.9 1.2 1.9 1.2 1 1.8 2.8 1.3 3.4 1 0-.8.4-1.3.7-1.6-2.7-.3-5.5-1.3-5.5-6 0-1.2.5-2.3 1.3-3.1-.1-.4-.6-1.6.1-3.2 0 0 1-.3 3.3 1.2a11.5 11.5 0 0 1 6 0C17 4.7 18 5 18 5c.7 1.6.2 2.9.1 3.2.8.8 1.3 1.9 1.3 3.2 0 4.6-2.9 5.6-5.5 5.9.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6A12 12 0 0 0 12 0z" />
-                                </svg>
-                            </a>
-                            <a href="https://twitter.com" className="social-icon" target="_blank" rel="noopener noreferrer">
-                                <svg viewBox="0 0 24 24" width="20" height="20">
-                                    <path fill="currentColor" d="M23.643 4.937c-.835.37-1.732.62-2.675.733.962-.576 1.7-1.49 2.048-2.578-.9.534-1.897.922-2.958 1.13-.85-.904-2.06-1.47-3.4-1.47-2.572 0-4.658 2.086-4.658 4.66 0 .364.042.718.12 1.06-3.873-.195-7.304-2.05-9.602-4.868-.4.69-.63 1.49-.63 2.342 0 1.616.823 3.043 2.072 3.878-.764-.025-1.482-.234-2.11-.583v.06c0 2.257 1.605 4.14 3.737 4.568-.392.106-.803.162-1.227.162-.3 0-.593-.028-.877-.082.593 1.85 2.313 3.198 4.352 3.234-1.595 1.25-3.604 1.995-5.786 1.995-.376 0-.747-.022-1.112-.065 2.062 1.323 4.51 2.093 7.14 2.093 8.57 0 13.255-7.098 13.255-13.254 0-.2-.005-.402-.014-.602.91-.658 1.7-1.477 2.323-2.41z" />
-                                </svg>
-                            </a>
-                            <a href="https://linkedin.com" className="social-icon" target="_blank" rel="noopener noreferrer">
-                                <svg viewBox="0 0 24 24" width="20" height="20">
-                                    <path fill="currentColor" d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
                                 </svg>
                             </a>
                         </div>
@@ -51,6 +41,76 @@ const Footer = () => {
                                 </Link>
                             </li>
                             <li>
+                                <Link to="/workspace/monitoring">
+                                    <svg viewBox="0 0 24 24" className="footer-icon" width="18" height="18" stroke="currentColor" fill="none" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                                    </svg> Monitoring
+                                </Link>
+                            </li>
+                            <li>
+                                <Link to="/workspace/protocols">
+                                    <svg viewBox="0 0 24 24" className="footer-icon" width="18" height="18" stroke="currentColor" fill="none" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                        <path d="M4 4h16v16H4z"></path>
+                                        <path d="M8 8h8M8 12h8M8 16h5"></path>
+                                    </svg> Protocol Testing
+                                </Link>
+                            </li>
+                            <li>
+                                <Link to="/workspace/graphql">
+                                    <svg viewBox="0 0 24 24" className="footer-icon" width="18" height="18" stroke="currentColor" fill="none" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                        <circle cx="12" cy="12" r="2"></circle>
+                                        <path d="M5.2 7.2 12 4l6.8 3.2v9.6L12 20l-6.8-3.2z"></path>
+                                        <path d="m12 4 6.8 12.8M12 4 5.2 16.8M5.2 7.2h13.6M5.2 16.8h13.6"></path>
+                                    </svg> GraphQL
+                                </Link>
+                            </li>
+                        </ul>
+                    </div>
+
+                    {/* Workflows Section */}
+                    <div className="footer-links-section">
+                        <h4>Workflows</h4>
+                        <ul className="footer-links">
+                            <li>
+                                <Link to="/workspace/performance-tests">
+                                    <svg viewBox="0 0 24 24" className="footer-icon" width="18" height="18" stroke="currentColor" fill="none" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                        <path d="M3 3v18h18"></path>
+                                        <path d="m7 16 4-5 3 3 5-7"></path>
+                                    </svg> Performance Testing
+                                </Link>
+                            </li>
+                            <li>
+                                <Link to="/workspace/consumer-contracts">
+                                    <svg viewBox="0 0 24 24" className="footer-icon" width="18" height="18" stroke="currentColor" fill="none" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                        <path d="M8 6h13M8 12h13M8 18h13"></path>
+                                        <path d="M3 6h.01M3 12h.01M3 18h.01"></path>
+                                    </svg> Consumer Contracts
+                                </Link>
+                            </li>
+                            <li>
+                                <Link to="/workspace/asyncapi">
+                                    <svg viewBox="0 0 24 24" className="footer-icon" width="18" height="18" stroke="currentColor" fill="none" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                        <path d="M4 4h16v16H4z"></path>
+                                        <path d="M8 12h8M12 8v8"></path>
+                                    </svg> AsyncAPI
+                                </Link>
+                            </li>
+                            <li>
+                                <Link to="/workspace/trace-to-test">
+                                    <svg viewBox="0 0 24 24" className="footer-icon" width="18" height="18" stroke="currentColor" fill="none" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                        <circle cx="12" cy="12" r="9"></circle>
+                                        <path d="M8 12h8M12 8v8"></path>
+                                    </svg> Trace to Test
+                                </Link>
+                            </li>
+                        </ul>
+                    </div>
+
+                    {/* Resources Section */}
+                    <div className="footer-links-section">
+                        <h4>Resources</h4>
+                        <ul className="footer-links">
+                            <li>
                                 <Link to="/documentation">
                                     <svg viewBox="0 0 24 24" className="footer-icon" width="18" height="18" stroke="currentColor" fill="none" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                         <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
@@ -69,46 +129,21 @@ const Footer = () => {
                                     </svg> History
                                 </Link>
                             </li>
-                        </ul>
-                    </div>
-
-                    {/* Resources Section */}
-                    <div className="footer-links-section">
-                        <h4>Resources</h4>
-                        <ul className="footer-links">
                             <li>
-                                <a href="#" target="_blank" rel="noopener noreferrer">
+                                <Link to="/workspace/compliance">
                                     <svg viewBox="0 0 24 24" className="footer-icon" width="18" height="18" stroke="currentColor" fill="none" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                        <circle cx="12" cy="12" r="10"></circle>
-                                        <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
-                                        <line x1="12" y1="17" x2="12.01" y2="17"></line>
-                                    </svg> Help Center
-                                </a>
+                                        <path d="M12 3 4 6v5c0 5 3.5 8.5 8 10 4.5-1.5 8-5 8-10V6z"></path>
+                                        <path d="m8 12 2.5 2.5L16 9"></path>
+                                    </svg> Compliance
+                                </Link>
                             </li>
                             <li>
-                                <a href="#" target="_blank" rel="noopener noreferrer">
+                                <Link to="/workspace/governance">
                                     <svg viewBox="0 0 24 24" className="footer-icon" width="18" height="18" stroke="currentColor" fill="none" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                        <polyline points="16 18 22 12 16 6"></polyline>
-                                        <polyline points="8 6 2 12 8 18"></polyline>
-                                    </svg> API Status
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#" target="_blank" rel="noopener noreferrer">
-                                    <svg viewBox="0 0 24 24" className="footer-icon" width="18" height="18" stroke="currentColor" fill="none" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
-                                        <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
-                                    </svg> Tutorials
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#" target="_blank" rel="noopener noreferrer">
-                                    <svg viewBox="0 0 24 24" className="footer-icon" width="18" height="18" stroke="currentColor" fill="none" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
-                                        <polyline points="15 3 21 3 21 9"></polyline>
-                                        <line x1="10" y1="14" x2="21" y2="3"></line>
-                                    </svg> Blog
-                                </a>
+                                        <path d="M12 2 4 5v6c0 5.5 3.4 9.7 8 11 4.6-1.3 8-5.5 8-11V5z"></path>
+                                        <path d="M8 12h8M12 8v8"></path>
+                                    </svg> Governance
+                                </Link>
                             </li>
                         </ul>
                     </div>
@@ -133,10 +168,8 @@ const Footer = () => {
                         © {new Date().getFullYear()} Pigeon. All rights reserved.
                     </div>
                     <div className="footer-legal-links">
-                        <a href="#">Privacy Policy</a>
-                        <a href="#">Terms of Service</a>
-                        <a href="#">Cookies</a>
-                        <Link to="/status">System Status</Link>
+                        <Link to="/privacy">Privacy</Link>
+                        <Link to="/terms">Terms</Link>
                     </div>
                 </div>
             </div>
