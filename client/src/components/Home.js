@@ -1,13 +1,14 @@
 // client/src/components/Home.js
 import React, { useState, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import './Home.css';
 import PageLoader from './common/PageLoader/PageLoader';
 import {
     FiSend, FiSearch, FiGrid, FiPackage, FiActivity,
     FiUsers, FiGitPullRequest, FiStar, FiClock,
-    FiPlus, FiArrowRight, FiCode, FiBookOpen
+    FiPlus, FiArrowRight, FiCode, FiBookOpen, FiTrendingUp, FiLink, FiBarChart2,
+    FiCheckCircle, FiAlertTriangle, FiAlertCircle, FiChevronRight
 } from 'react-icons/fi';
 
 const Home = () => {
@@ -23,6 +24,8 @@ const Home = () => {
     });
     const [loading, setLoading] = useState(true);
     const [userData, setUserData] = useState(null);
+    const [health, setHealth] = useState({ monitors: [], alerts: [], incidents: [], loading: true });
+    const [recentPerformance, setRecentPerformance] = useState({ items: [], loading: true });
     const primaryWorkspaceId = recentWorkspaces[0]?._id;
     const primaryWorkspaceCollectionsPath = primaryWorkspaceId
         ? `/workspace/workspaces/${primaryWorkspaceId}?tab=collections`
@@ -41,7 +44,7 @@ const Home = () => {
 
     // Draggable dashboard cards. Flat order maps row-major into the 2-col grid:
     // [0]=top-left, [1]=top-right, [2]=bottom-left, [3]=bottom-right.
-    const DEFAULT_CARDS = ['stats', 'workspaces', 'activity', 'collections'];
+    const DEFAULT_CARDS = ['health', 'performance', 'stats', 'workspaces', 'activity', 'collections'];
     const [cardOrder, setCardOrder] = useState(() => {
         try {
             const s = JSON.parse(localStorage.getItem('pghCardOrder'));
@@ -113,25 +116,22 @@ const Home = () => {
 
                     // If we have workspaces, fetch workspace-specific data for recent cards and activity
                     if (allWorkspaces.length > 0) {
-                        const collectionsResponse = await fetch(
-                            `/api/workspaces/${allWorkspaces[0]._id}/collections`,
-                            { credentials: 'include' }
+                        const workspaceCollections = await Promise.all(allWorkspaces.map(async (workspace) => {
+                            const response = await fetch(
+                                `/api/workspaces/${workspace._id}/collections`,
+                                { credentials: 'include' }
+                            );
+                            return response.ok ? response.json() : [];
+                        }));
+                        const primaryCollections = Array.isArray(workspaceCollections[0]) ? workspaceCollections[0] : [];
+
+                        // Recent collections come from the primary workspace, while
+                        // the request total reflects every workspace the user can access.
+                        setRecentCollections(primaryCollections.slice(0, 4));
+                        const requestCount = workspaceCollections.flat().reduce(
+                            (sum, collection) => sum + getCollectionRequestCount(collection), 0
                         );
-
-                        if (collectionsResponse.ok) {
-                            const collectionsData = await collectionsResponse.json();
-
-                            // Recent collections from primary workspace
-                            setRecentCollections(collectionsData.slice(0, 4));
-
-                            // Requests stat sums across primary workspace collections
-                            setStats(prev => ({
-                                ...prev,
-                                requests: collectionsData.reduce(
-                                    (sum, collection) => sum + (collection.requestsCount || 0), 0
-                                )
-                            }));
-                        }
+                        setStats(prev => ({ ...prev, requests: requestCount }));
 
                         // Fetch activity for the first workspace
                         const activityResponse = await fetch(
@@ -144,19 +144,19 @@ const Home = () => {
                             setRecentActivity(activityData.slice(0, 5));
                         }
 
-                        // Fetch pending merge requests
-                        const mergeRequestsResponse = await fetch(
-                            `/api/workspaces/${allWorkspaces[0]._id}/merge-requests?status=pending`,
-                            { credentials: 'include' }
+                        // Pending merges belong to a workspace, so aggregate them
+                        // across all accessible workspaces instead of only the first.
+                        const mergeRequests = await Promise.all(allWorkspaces.map(async (workspace) => {
+                            const response = await fetch(
+                                `/api/workspaces/${workspace._id}/merge-requests?status=pending`,
+                                { credentials: 'include' }
+                            );
+                            return response.ok ? response.json() : [];
+                        }));
+                        const pendingMergeRequests = mergeRequests.reduce(
+                            (total, requests) => total + (Array.isArray(requests) ? requests.length : 0), 0
                         );
-
-                        if (mergeRequestsResponse.ok) {
-                            const mergeRequestsData = await mergeRequestsResponse.json();
-                            setStats(prev => ({
-                                ...prev,
-                                pendingMergeRequests: mergeRequestsData.length
-                            }));
-                        }
+                        setStats(prev => ({ ...prev, pendingMergeRequests }));
                     }
                 }
             } catch (error) {
@@ -167,6 +167,53 @@ const Home = () => {
         };
 
         fetchDashboardData();
+    }, []);
+
+    // Keep a lightweight operational snapshot on the dashboard. These endpoints
+    // already power the monitoring workspace, so the dashboard stays consistent
+    // with the detailed alert and incident views.
+    useEffect(() => {
+        const fetchWorkspaceHealth = async () => {
+            try {
+                const [monitorsResponse, alertsResponse, incidentsResponse] = await Promise.all([
+                    fetch('/api/monitoring/monitors', { credentials: 'include' }),
+                    fetch('/api/alerts?limit=20', { credentials: 'include' }),
+                    fetch('/api/incidents?limit=20', { credentials: 'include' })
+                ]);
+
+                const monitors = monitorsResponse.ok ? await monitorsResponse.json() : [];
+                const alerts = alertsResponse.ok ? await alertsResponse.json() : [];
+                const incidentsPayload = incidentsResponse.ok ? await incidentsResponse.json() : { incidents: [] };
+                const incidents = Array.isArray(incidentsPayload) ? incidentsPayload : incidentsPayload.incidents || [];
+
+                setHealth({
+                    monitors: Array.isArray(monitors) ? monitors : [],
+                    alerts: Array.isArray(alerts) ? alerts : [],
+                    incidents,
+                    loading: false
+                });
+            } catch (error) {
+                console.error('Error fetching workspace health:', error);
+                setHealth(previous => ({ ...previous, loading: false }));
+            }
+        };
+
+        fetchWorkspaceHealth();
+    }, []);
+
+    useEffect(() => {
+        const fetchRecentPerformance = async () => {
+            try {
+                const response = await fetch('/api/history', { credentials: 'include' });
+                const history = response.ok ? await response.json() : [];
+                setRecentPerformance({ items: Array.isArray(history) ? history.slice(0, 5) : [], loading: false });
+            } catch (error) {
+                console.error('Error fetching recent request performance:', error);
+                setRecentPerformance(previous => ({ ...previous, loading: false }));
+            }
+        };
+
+        fetchRecentPerformance();
     }, []);
 
     // Command palette (Cmd/Ctrl+K) — 2026 pro-tool pattern.
@@ -231,8 +278,89 @@ const Home = () => {
         }
     };
 
+    const activeAlerts = health.alerts.filter(alert => ['triggered', 'acknowledged', 'firing'].includes(String(alert.status).toLowerCase()));
+    const activeIncidents = health.incidents.filter(incident => !['resolved', 'closed'].includes(String(incident.status).toLowerCase()));
+    const downMonitors = health.monitors.filter(monitor => ['down', 'failed', 'critical', 'degraded'].includes(String(monitor.currentStatus || monitor.status).toLowerCase()));
+    const healthyMonitors = health.monitors.length - downMonitors.length;
+    const formatDuration = (duration) => {
+        if (duration === undefined || duration === null || duration === '') return '—';
+        const value = Number(duration);
+        return Number.isFinite(value) ? `${Math.round(value)}ms` : '—';
+    };
+    const getCollectionRequestCount = (collection = {}) => {
+        const storedCount = collection.stats?.requestCount ?? collection.requestCount ?? collection.requestsCount;
+        const actualCount = Array.isArray(collection.requests) ? collection.requests.length : storedCount;
+        return Number.isFinite(Number(actualCount)) ? Number(actualCount) : 0;
+    };
+
     // Card content by id — rendered into draggable wrappers below.
     const cardContent = {
+        health: (
+            <section className="pgh-card pgh-health-card" aria-labelledby="workspace-health-heading">
+                <div className="pgh-card-header">
+                    <div>
+                        <h2 className="pgh-card-title" id="workspace-health-heading"><FiActivity /> Workspace Health</h2>
+                        <p className="pgh-health-subtitle">A quick view of monitors, alerts, and incidents across your account.</p>
+                    </div>
+                    <button className="pgh-link-btn" onClick={() => navigate('../monitoring')}>Open Monitoring <FiChevronRight aria-hidden="true" /></button>
+                </div>
+                {health.loading ? (
+                    <PageLoader label="Loading workspace health..." />
+                ) : (
+                    <div className="pgh-health-grid">
+                        <div className={`pgh-health-status ${downMonitors.length > 0 ? 'is-warning' : 'is-healthy'}`}>
+                            {downMonitors.length > 0 ? <FiAlertTriangle aria-hidden="true" /> : <FiCheckCircle aria-hidden="true" />}
+                            <div><strong>{health.monitors.length === 0 ? 'Monitoring not configured' : downMonitors.length > 0 ? 'Attention needed' : 'All monitors healthy'}</strong><span>{health.monitors.length === 0 ? 'Create a monitor to start tracking API health.' : `${healthyMonitors} of ${health.monitors.length} monitors operational`}</span></div>
+                        </div>
+                        <button className="pgh-health-metric" onClick={() => navigate('../monitoring/alerts')}>
+                            <span className="pgh-health-metric-icon pgh-health-metric-icon--alerts"><FiAlertCircle aria-hidden="true" /></span>
+                            <span><strong>{activeAlerts.length}</strong><small>Active alerts</small></span>
+                            <FiChevronRight aria-hidden="true" />
+                        </button>
+                        <button className="pgh-health-metric" onClick={() => navigate('../monitoring/incidents')}>
+                            <span className="pgh-health-metric-icon pgh-health-metric-icon--incidents"><FiAlertTriangle aria-hidden="true" /></span>
+                            <span><strong>{activeIncidents.length}</strong><small>Open incidents</small></span>
+                            <FiChevronRight aria-hidden="true" />
+                        </button>
+                    </div>
+                )}
+            </section>
+        ),
+        performance: (
+            <section className="pgh-card pgh-performance-card" aria-labelledby="recent-performance-heading">
+                <div className="pgh-card-header">
+                    <div>
+                        <h2 className="pgh-card-title" id="recent-performance-heading"><FiClock /> Recent Request Performance</h2>
+                        <p className="pgh-health-subtitle">Response times and status codes from your latest requests.</p>
+                    </div>
+                    <button className="pgh-link-btn" onClick={() => navigate('../history')}>View History <FiChevronRight aria-hidden="true" /></button>
+                </div>
+                {recentPerformance.loading ? (
+                    <PageLoader label="Loading request performance..." />
+                ) : recentPerformance.items.length === 0 ? (
+                    <div className="pgh-empty pgh-performance-empty">
+                        <p>No request history yet. Send a request to start tracking performance.</p>
+                        <button className="pgh-empty-btn" onClick={() => navigate('../api-network/requests/new')}><FiSend /> New Request</button>
+                    </div>
+                ) : (
+                    <div className="pgh-performance-list">
+                        {recentPerformance.items.map((item) => {
+                            const status = Number(item.responseStatus);
+                            const statusClass = status >= 200 && status < 400 ? 'is-success' : status >= 400 ? 'is-error' : 'is-neutral';
+                            return (
+                                <Link className="pgh-performance-row" to={`/workspace/history/${item._id}`} key={item._id}>
+                                    <span className={`pgh-performance-method method-${String(item.method || 'GET').toLowerCase()}`}>{item.method || 'GET'}</span>
+                                    <span className="pgh-performance-url" title={item.url}>{item.url || 'Unknown endpoint'}</span>
+                                    <span className={`pgh-performance-status ${statusClass}`}>{item.responseStatus || '—'}</span>
+                                    <span className="pgh-performance-duration">{formatDuration(item.duration)}</span>
+                                    <FiChevronRight aria-hidden="true" />
+                                </Link>
+                            );
+                        })}
+                    </div>
+                )}
+            </section>
+        ),
         stats: (
             <section className="pgh-card">
                 <h2 className="pgh-card-title"><FiActivity /> Stats Overview</h2>
@@ -351,7 +479,7 @@ const Home = () => {
                                 <h3>{collection.name}</h3>
                                 <p>{collection.description || 'No description'}</p>
                                 <div className="pgh-collection-meta">
-                                    <span>{collection.requestsCount || 0} requests</span>
+                                    <span>{getCollectionRequestCount(collection)} requests</span>
                                     <span>Updated {formatDate(collection.updatedAt)}</span>
                                 </div>
                             </div>
@@ -413,21 +541,42 @@ const Home = () => {
             <section className="pgh-card">
                 <h2 className="pgh-card-title"><FiBookOpen /> Resource Links</h2>
                 <div className="pgh-quick-links">
-                    <a href="/documentation" className="pgh-quick-link">
+                    <Link to="/documentation" className="pgh-quick-link">
                         <FiBookOpen className="pgh-quick-link-icon" />
                         <div className="pgh-quick-link-body">
                             <h3>Documentation</h3>
                             <p>Learn how to use all features of Pigeon</p>
                         </div>
-                    </a>
-                    <a href="/workspace/api-network/explore" className="pgh-quick-link">
+                    </Link>
+                    <Link to="/workspace/api-network/explore" className="pgh-quick-link">
                         <FiSearch className="pgh-quick-link-icon" />
                         <div className="pgh-quick-link-body">
                             <h3>Explore Public APIs</h3>
                             <p>Discover and test popular public APIs</p>
                         </div>
-                    </a>
-                    <a href="https://github.com/your-org/pigeon" target="_blank" rel="noopener noreferrer" className="pgh-quick-link">
+                    </Link>
+                    <Link to="/workspace/monitoring" className="pgh-quick-link">
+                        <FiTrendingUp className="pgh-quick-link-icon" />
+                        <div className="pgh-quick-link-body">
+                            <h3>Monitoring</h3>
+                            <p>Track API health, alerts, and incidents</p>
+                        </div>
+                    </Link>
+                    <Link to="/workspace/protocols" className="pgh-quick-link">
+                        <FiLink className="pgh-quick-link-icon" />
+                        <div className="pgh-quick-link-body">
+                            <h3>Protocol Testing</h3>
+                            <p>Test WebSocket, gRPC, SOAP, MQTT, and SSE APIs</p>
+                        </div>
+                    </Link>
+                    <Link to="/workspace/performance-tests" className="pgh-quick-link">
+                        <FiBarChart2 className="pgh-quick-link-icon" />
+                        <div className="pgh-quick-link-body">
+                            <h3>Performance Testing</h3>
+                            <p>Measure API behavior under load</p>
+                        </div>
+                    </Link>
+                    <a href="https://github.com/Ranshiv/Pigeon" target="_blank" rel="noopener noreferrer" className="pgh-quick-link">
                         <FiCode className="pgh-quick-link-icon" />
                         <div className="pgh-quick-link-body">
                             <h3>GitHub</h3>
