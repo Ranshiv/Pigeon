@@ -488,7 +488,7 @@
     padding: 6px 10px;
     border-radius: 8px;
     border: 1px solid var(--border-color);
-    background: color-mix(in srgb, var(--text-color) 3%, var(--card-bg));
+    background: var(--surface);
     color: var(--text-secondary);
     font-size: 0.76rem;
     font-weight: 600;
@@ -508,11 +508,9 @@
 }
 
 .category-chip.active {
-    background: linear-gradient(135deg,
-        var(--primary-color),
-        color-mix(in srgb, var(--primary-color) 78%, #000));
-    border-color: transparent;
-    color: #fff;
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+    color: var(--button-text) !important;
     box-shadow: 0 4px 14px -4px color-mix(in srgb, var(--primary-color) 60%, transparent);
 }
 
@@ -527,8 +525,8 @@
 }
 
 .category-chip.active .chip-count {
-    background: rgba(255, 255, 255, 0.24);
-    color: #fff;
+    background: var(--primary-light);
+    color: var(--button-text) !important;
 }
 
 /* Body Layout */
@@ -1242,7 +1240,7 @@
     border: none;
     border-radius: 8px;
     background: var(--primary-color);
-    color: #fff;
+    color: var(--button-text) !important;
     font-size: 0.9rem;
     font-weight: 600;
     cursor: pointer;

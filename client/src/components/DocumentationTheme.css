@@ -1,0 +1,233 @@
+/* Shared documentation theme layer. Screen-only so print styling remains isolated. */
+@media screen {
+    .docs-hub,
+    .docs-article,
+    .public-documentation-page,
+    .documentation-viewer {
+        --docs-hero-text: #fff;
+        background: var(--background-color) !important;
+        color: var(--text-color) !important;
+    }
+
+    .docs-hub h1,
+    .docs-hub h2,
+    .docs-hub h3,
+    .docs-hub h4,
+    .docs-article h1,
+    .docs-article h2,
+    .docs-article h3,
+    .docs-article h4,
+    .docs-article strong,
+    .documentation-viewer h1,
+    .documentation-viewer h2,
+    .documentation-viewer h3,
+    .documentation-viewer h4 {
+        color: var(--text-color) !important;
+    }
+
+    .docs-hub p,
+    .docs-article p,
+    .docs-article li,
+    .docs-article-summary,
+    .docs-article-meta p,
+    .docs-detail-intro,
+    .docs-success-criteria p,
+    .documentation-viewer p,
+    .documentation-viewer li,
+    .documentation-viewer blockquote {
+        color: var(--text-secondary) !important;
+    }
+
+    .docs-hub-hero {
+        background: var(--gradient-hero) !important;
+        color: var(--docs-hero-text) !important;
+    }
+
+    .docs-hub-hero h1,
+    .docs-hub-hero p,
+    .docs-hub-hero span,
+    .docs-hub-hero strong {
+        color: var(--docs-hero-text) !important;
+    }
+
+    .docs-hub-search,
+    .docs-hub-filter .app-select-trigger,
+    .docs-hub-guide-card,
+    .docs-learning-card,
+    .docs-hub-empty,
+    .docs-article-meta > div,
+    .docs-article-aside,
+    .docs-article-tools button,
+    .docs-article-feedback button,
+    .docs-article-learning,
+    .docs-article-pagination a,
+    .docs-article-completion,
+    .docs-reference-table,
+    .docs-detail-card,
+    .documentation-viewer .collection-name,
+    .documentation-viewer .documentation-search,
+    .documentation-search-results {
+        background: var(--surface) !important;
+        border-color: var(--border-color) !important;
+        color: var(--text-color) !important;
+    }
+
+    .docs-learning-card > p,
+    .docs-learning-card a,
+    .docs-article-aside a,
+    .docs-article-back,
+    .docs-article-updated,
+    .docs-version-badge,
+    .docs-code-language,
+    .docs-article-pagination small,
+    .docs-article-pagination strong {
+        color: var(--text-secondary) !important;
+    }
+
+    .docs-learning-card {
+        border-color: var(--border-color) !important;
+        background: var(--surface) !important;
+    }
+
+    .docs-learning-card a:hover,
+    .docs-article-aside a:hover,
+    .docs-article-back:hover,
+    .docs-article-pagination a:hover strong,
+    .docs-article-tools button:hover,
+    .docs-article-feedback button:hover {
+        color: var(--primary-color) !important;
+    }
+
+    .docs-hub-search input,
+    .documentation-search input {
+        background: transparent !important;
+        color: var(--text-color) !important;
+    }
+
+    .docs-hub-search input::placeholder,
+    .documentation-search input::placeholder {
+        color: var(--text-muted) !important;
+    }
+
+    .docs-hub-search:focus-within,
+    .docs-hub-guide-card:hover,
+    .docs-hub-guide-card.is-keyboard-active,
+    .docs-article-tools button:hover,
+    .docs-article-feedback button:hover,
+    .docs-article-pagination a:hover,
+    .docs-article-aside a:hover,
+    .documentation-viewer .documentation-search:focus-within {
+        border-color: var(--primary-color) !important;
+    }
+
+    .docs-hub-guide-card:hover,
+    .docs-search-popover button:hover,
+    .docs-search-popover button:focus-visible,
+    .documentation-search-results button:hover {
+        background: var(--hover-bg) !important;
+        color: var(--primary-color) !important;
+    }
+
+    .docs-search-popover,
+    .docs-search-popover button,
+    .documentation-search-results button {
+        background: var(--surface-elevated) !important;
+        color: var(--text-color) !important;
+        border-color: var(--border-color) !important;
+    }
+
+    .docs-article-callout,
+    .docs-success-criteria {
+        background: var(--primary-light) !important;
+        border-color: var(--primary-color) !important;
+        color: var(--text-secondary) !important;
+    }
+
+    .docs-article-example,
+    .docs-detail-card-success,
+    .docs-detail-card-failure,
+    .docs-article-troubleshooting {
+        background: var(--surface) !important;
+        border-color: var(--border-color) !important;
+    }
+
+    .docs-article-example pre,
+    .docs-detail-card pre {
+        background: var(--surface-sunken) !important;
+        border-color: var(--border-color) !important;
+        color: var(--text-color) !important;
+    }
+
+    .docs-copy-button {
+        background: var(--surface-elevated) !important;
+        border-color: var(--border-color) !important;
+        color: var(--text-color) !important;
+    }
+
+    .docs-article-action,
+    .docs-article-completion button {
+        background: var(--primary-color) !important;
+        border-color: var(--primary-color) !important;
+        color: var(--button-text) !important;
+    }
+
+    /* Override broad theme link/button rules without losing theme contrast. */
+    .docs-hub .docs-article-action,
+    .docs-article .docs-article-action,
+    .docs-hub .docs-article-completion button,
+    .docs-article .docs-article-completion button {
+        color: var(--button-text) !important;
+    }
+
+    .docs-article-action:hover,
+    .docs-article-completion button:hover {
+        background: var(--primary-hover) !important;
+        border-color: var(--primary-hover) !important;
+    }
+
+    .docs-reference-header,
+    .docs-reference-row {
+        background: var(--surface-sunken) !important;
+        border-color: var(--border-color) !important;
+        color: var(--text-color) !important;
+    }
+
+    .docs-article li > span,
+    .docs-hub-topic-icon,
+    .docs-learning-progress {
+        background: var(--primary-light) !important;
+        color: var(--primary-color) !important;
+    }
+
+    .docs-learning-progress > span {
+        background: var(--primary-color) !important;
+    }
+
+    .documentation-viewer .documentation-header,
+    .documentation-viewer .documentation-content {
+        background: var(--surface) !important;
+        border-color: var(--border-color) !important;
+        color: var(--text-color) !important;
+    }
+
+    .documentation-viewer .markdown-content code {
+        background: var(--primary-light) !important;
+        color: var(--text-color) !important;
+    }
+
+    .documentation-viewer .markdown-content pre {
+        background: var(--surface-sunken) !important;
+        border-color: var(--border-color) !important;
+        color: var(--text-color) !important;
+    }
+
+    .documentation-viewer .markdown-content th,
+    .documentation-viewer .markdown-content td {
+        border-color: var(--border-color) !important;
+    }
+
+    .documentation-viewer .documentation-toc {
+        background: var(--surface) !important;
+        border-color: var(--border-color) !important;
+    }
+}

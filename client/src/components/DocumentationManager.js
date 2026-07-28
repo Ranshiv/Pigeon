@@ -213,16 +213,23 @@ const DocumentationManager = () => {
             // Extract settings from the documentation object
             // Check both direct properties and nested settings object
             const docSettings = documentation.settings || {};
+            const displayOptions = {
+                ...(documentation.displayOptions || {}),
+                ...(docSettings.displayOptions || {})
+            };
             const settings = {
                 isPublic: docSettings.isPublic ?? documentation.isPublic ?? false,
                 metaTitle: docSettings.metaTitle || documentation.metaTitle || '',
                 metaDescription: docSettings.metaDescription || documentation.metaDescription || '',
                 customDomain: docSettings.customDomain || documentation.customDomain || '',
                 allowComments: docSettings.allowComments ?? documentation.allowComments ?? false,
-                showLastUpdated: docSettings.showLastUpdated ?? documentation.showLastUpdated ?? true,
+                showLastUpdated: docSettings.showLastUpdated ?? displayOptions.showLastUpdated ?? documentation.showLastUpdated ?? true,
                 enableSearch: docSettings.enableSearch ?? documentation.enableSearch ?? true,
                 theme: docSettings.theme || documentation.theme || 'default',
-                displayOptions: docSettings.displayOptions || documentation.displayOptions || {}
+                displayOptions: {
+                    ...displayOptions,
+                    showLastUpdated: docSettings.showLastUpdated ?? displayOptions.showLastUpdated ?? documentation.showLastUpdated ?? true
+                }
             };
 
             setCurrentSettings(settings);
@@ -895,6 +902,12 @@ const DocumentationManager = () => {
 
             // Prepare the settings payload, preserving all existing values from currentSettings
             // but providing defaults for missing properties
+            const displayOptions = {
+                ...(settingsToSave.displayOptions || {}),
+                showLastUpdated: settingsToSave.showLastUpdated !== false,
+                showContributors: Boolean(settingsToSave.displayOptions?.showContributors),
+                showTableOfContents: Boolean(settingsToSave.displayOptions?.showTableOfContents)
+            };
             const settingsPayload = {
                 isPublic: typeof settingsToSave.isPublic === 'boolean' ? settingsToSave.isPublic : false,
                 metaTitle: settingsToSave.metaTitle || '',
@@ -904,7 +917,7 @@ const DocumentationManager = () => {
                 showLastUpdated: typeof settingsToSave.showLastUpdated === 'boolean' ? settingsToSave.showLastUpdated : true,
                 enableSearch: typeof settingsToSave.enableSearch === 'boolean' ? settingsToSave.enableSearch : true,
                 theme: settingsToSave.theme || 'default',
-                displayOptions: settingsToSave.displayOptions || {}
+                displayOptions
             };
 
             console.log('Settings payload being sent to server:', settingsPayload);

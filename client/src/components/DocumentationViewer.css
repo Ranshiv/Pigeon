@@ -542,6 +542,63 @@
     stroke: currentColor;
 }
 
+.documentation-search {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    min-height: 32px;
+    padding: 0 8px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm, 7px);
+    background: var(--background-color);
+    color: var(--text-secondary);
+}
+
+.documentation-search input {
+    width: 130px;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    color: var(--text-color);
+    font-size: .8rem;
+}
+
+.documentation-search button {
+    display: inline-flex;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--text-secondary);
+    cursor: pointer;
+}
+
+.documentation-search-results {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 7px;
+    max-width: 900px;
+    margin: 0 auto 18px;
+    padding: 10px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm, 7px);
+    background: var(--background-color);
+    color: var(--text-secondary);
+    font-size: .8rem;
+}
+
+.documentation-search-results strong { color: var(--text-color); }
+.documentation-search-results button {
+    padding: 5px 8px;
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    background: var(--card-bg);
+    color: var(--primary-color);
+    cursor: pointer;
+    font-size: .76rem;
+}
+.documentation-search-results button:hover { border-color: var(--primary-color); }
+
 .documentation-viewer .collection-name,
 .documentation-viewer .edit-documentation-link,
 .documentation-viewer .view-public-link {
@@ -575,4 +632,7 @@
         margin-left: 0;
         flex-wrap: wrap;
     }
+
+    .documentation-search { flex: 1 1 180px; }
+    .documentation-search input { width: 100%; }
 }

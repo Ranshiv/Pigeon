@@ -1,0 +1,11 @@
+.activity-feed-panel .activity-scope-tab[aria-selected="false"] {
+    color: var(--text-color) !important;
+}
+
+.activity-feed-panel .activity-scope-tab[aria-selected="true"] {
+    color: var(--button-text) !important;
+}
+
+.activity-feed-panel .activity-scope-tab[aria-selected="false"]:hover {
+    color: var(--text-color) !important;
+}

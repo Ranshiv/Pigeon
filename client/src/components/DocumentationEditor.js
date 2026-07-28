@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { FiSave, FiCode, FiLink, FiImage, FiTable, FiX, FiEdit3, FiEye, FiColumns } from 'react-icons/fi';
 import './DocumentationEditor.css';
+import { buildApiReference, buildEndpointReference } from './documentationReference';
 
 const DOCUMENTATION_TEMPLATES = [
     { id: 'quickstart', label: 'Quick start', content: '# Getting started\n\n## Base URL\n\n`https://api.example.com`\n\n## Authentication\n\nExplain how to authenticate requests.\n\n## Make your first request\n\n```bash\ncurl https://api.example.com/health\n```\n' },
@@ -86,11 +87,8 @@ const DocumentationEditor = ({ documentation, collection, onSave, onAutoSave, is
 
         // Extract endpoints from collection
         if (collection && collection.requests) {
-            const extractedEndpoints = collection.requests.map(req => ({
-                id: req._id || req.id,
-                name: req.name,
-                method: req.method,
-                url: req.url
+            const extractedEndpoints = collection.requests.map(req => ({ ...req,
+                id: req._id || req.id
             }));
             setEndpoints(extractedEndpoints);
         }
@@ -356,7 +354,7 @@ const DocumentationEditor = ({ documentation, collection, onSave, onAutoSave, is
         const before = content.substring(0, start);
         const after = content.substring(start);
 
-        const endpointMarkdown = `\n### ${endpoint.name}\n\n> **${endpoint.method}** \`${endpoint.url}\`\n\nAdd a concise description of what this endpoint does.\n\n#### Request\n\n| Field | Value |\n| --- | --- |\n| Method | \`${endpoint.method}\` |\n| URL | \`${endpoint.url}\` |\n| Authentication | Add required credentials |\n\n#### Parameters\n\n| Name | Location | Type | Required | Description |\n| --- | --- | --- | --- | --- |\n| Add parameter | query/path/header | string | No | Describe it |\n\n#### Example request\n\n\`\`\`bash\ncurl -X ${endpoint.method} '${endpoint.url}' \\\n  -H 'Authorization: Bearer <token>'\n\`\`\`\n\n#### Example response\n\n\`\`\`json\n{\n  "success": true\n}\n\`\`\`\n\n`;
+        const endpointMarkdown = `\n${buildEndpointReference(endpoint)}\n`;
 
         setContent(`${before}${endpointMarkdown}${after}`);
 
@@ -577,10 +575,18 @@ const DocumentationEditor = ({ documentation, collection, onSave, onAutoSave, is
     };
     const replaceAll = () => { if (findText) setContent(content.split(findText).join(replaceText)); };
     const syncEndpoints = () => {
-        const missing = endpoints.filter((endpoint) => !content.includes(`### ${endpoint.name}`));
+        const missing = (collection?.requests || []).filter((request) => !content.includes(`### ${request.name}`));
         if (!missing.length) { alert('Documentation is already in sync with the collection endpoints.'); return; }
-        const blocks = missing.map((endpoint) => `### ${endpoint.name}\n\n> **${endpoint.method}** \`${endpoint.url}\`\n\nAdd endpoint documentation.\n\n#### Parameters\n\n| Name | Location | Required | Description |\n| --- | --- | --- | --- |\n| Add parameter | query/path/header | No | Describe it |\n\n#### Example response\n\n\`\`\`json\n{ "success": true }\n\`\`\``).join('\n\n');
-        setContent(`${content.trim()}\n\n## Collection endpoint reference\n\n${blocks}\n`);
+        const blocks = missing.map(buildEndpointReference).join('\n\n');
+        setContent(`${content.trim()}\n\n## API reference\n\n${blocks}\n`);
+        setViewMode('edit');
+    };
+    const generateApiReference = () => {
+        const reference = buildApiReference(collection);
+        if (!reference) { alert('This collection has no requests to document yet.'); return; }
+        if (content.includes('## API reference') && !window.confirm('Replace the existing API reference section?')) return;
+        const withoutReference = content.replace(/\n## API reference[\s\S]*$/i, '').trim();
+        setContent(`${withoutReference}${withoutReference ? '\n\n' : ''}${reference}`);
         setViewMode('edit');
     };
     const postComment = async () => { if (!commentText.trim() || !collection?._id) return; const response = await fetch('/api/comments', { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'include', body: JSON.stringify({ resourceId: String(collection._id), resourceType: 'documentation', content: commentText }) }); if (response.ok) { setComments([...comments, await response.json()]); setCommentText(''); } };
@@ -684,6 +690,7 @@ const DocumentationEditor = ({ documentation, collection, onSave, onAutoSave, is
                         <div className="endpoints-list">
                             <h4>Endpoints</h4>
                             <p className="help-text">Click to insert endpoint documentation</p>
+                            <button type="button" className="sync-endpoints-btn" onClick={generateApiReference}>Generate API reference</button>
                             <button type="button" className="sync-endpoints-btn" onClick={syncEndpoints}>Sync endpoints</button>
                             {endpoints.map((endpoint) => (
                                 <div

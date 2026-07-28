@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useCollaboration } from '../../context/CollaborationContext';
 import { formatDistanceToNow } from 'date-fns';
 import { FiMessageSquare, FiCheckCircle, FiXCircle, FiFileText, FiActivity, FiRefreshCw, FiSend, FiUser, FiUsers } from 'react-icons/fi';
+import './ActivityFeed.css';
 
 const ActivityFeed = ({ isOpen, onToggle }) => {
     const { socket } = useCollaboration();
@@ -198,7 +199,7 @@ const ActivityFeed = ({ isOpen, onToggle }) => {
             {/* Sidebar Container */}
             <div
                 className={`
-                    fixed bottom-0 right-0 top-[60px] z-[900] w-[280px] transform overflow-y-auto border-l border-[var(--border-color)] bg-[var(--sidebar-bg)] shadow-2xl transition-transform duration-300 ease-in-out
+                    activity-feed-panel fixed bottom-0 right-0 top-[60px] z-[900] w-[280px] transform overflow-y-auto border-l border-[var(--border-color)] bg-[var(--sidebar-bg)] shadow-2xl transition-transform duration-300 ease-in-out
                     ${isOpen ? 'translate-x-0' : 'translate-x-full'}
                 `}
             >
@@ -237,7 +238,8 @@ const ActivityFeed = ({ isOpen, onToggle }) => {
                             role="tab"
                             aria-selected={scope === 'me'}
                             onClick={() => handleScopeChange('me')}
-                            className={`flex min-h-9 items-center justify-center gap-1.5 rounded-md px-2 py-1.5 text-[11px] font-semibold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[var(--primary-color)] focus:ring-offset-1 focus:ring-offset-[var(--sidebar-bg)] ${scope === 'me' ? 'bg-[var(--primary-color)] text-white shadow-sm' : 'bg-[var(--sidebar-bg)] text-[var(--text-secondary)] hover:bg-[var(--card-bg)] hover:text-[var(--text-color)]'}`}
+                            style={{ color: scope === 'me' ? 'var(--button-text)' : 'var(--text-color)' }}
+                            className={`activity-scope-tab flex min-h-9 items-center justify-center gap-1.5 rounded-md px-2 py-1.5 text-[11px] font-semibold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[var(--primary-color)] focus:ring-offset-1 focus:ring-offset-[var(--sidebar-bg)] ${scope === 'me' ? 'bg-[var(--primary-color)] text-[var(--button-text)] shadow-sm' : 'bg-[var(--sidebar-bg)] text-[var(--text-secondary)] hover:bg-[var(--card-bg)] hover:text-[var(--text-color)]'}`}
                         >
                             <FiUser size={13} />
                             My Activity
@@ -247,7 +249,8 @@ const ActivityFeed = ({ isOpen, onToggle }) => {
                             role="tab"
                             aria-selected={scope === 'team'}
                             onClick={() => handleScopeChange('team')}
-                            className={`flex min-h-9 items-center justify-center gap-1.5 rounded-md px-2 py-1.5 text-[11px] font-semibold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[var(--primary-color)] focus:ring-offset-1 focus:ring-offset-[var(--sidebar-bg)] ${scope === 'team' ? 'bg-[var(--primary-color)] text-white shadow-sm' : 'bg-[var(--sidebar-bg)] text-[var(--text-secondary)] hover:bg-[var(--card-bg)] hover:text-[var(--text-color)]'}`}
+                            style={{ color: scope === 'team' ? 'var(--button-text)' : 'var(--text-color)' }}
+                            className={`activity-scope-tab flex min-h-9 items-center justify-center gap-1.5 rounded-md px-2 py-1.5 text-[11px] font-semibold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[var(--primary-color)] focus:ring-offset-1 focus:ring-offset-[var(--sidebar-bg)] ${scope === 'team' ? 'bg-[var(--primary-color)] text-[var(--button-text)] shadow-sm' : 'bg-[var(--sidebar-bg)] text-[var(--text-secondary)] hover:bg-[var(--card-bg)] hover:text-[var(--text-color)]'}`}
                         >
                             <FiUsers size={13} />
                             Team
