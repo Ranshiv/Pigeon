@@ -17,6 +17,7 @@ const { initializeConnections } = require('./config/db');
 const User = require('./models/User');
 const MarketplaceApi = require('./models/MarketplaceApi');
 const { initializeSocketServer } = require('./utils/socket/socket-server');
+const { proxyLimiter } = require('./middleware/rateLimiter');
 
 // Import monitoring service
 const MonitoringService = require('./services/monitoring/MonitoringService');
@@ -74,8 +75,9 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 function ensureDatabaseReady(req, res, next) {
-    // Keep health endpoint available for diagnostics even when DB is down.
-    if (req.path === '/health') {
+    // Keep public diagnostics and the landing-page demo available when the
+    // database is recovering; neither endpoint needs database access.
+    if (req.path === '/health' || req.path === '/public-demo/request') {
         return next();
     }
 
@@ -461,6 +463,68 @@ app.delete('/api/cli-test/items/:id', (req, res) => {
 
     // Successful deletion - no content
     res.status(204).send();
+});
+
+// Public landing-page request demo. Keep this intentionally narrower than the
+// authenticated workspace proxy so it cannot become an arbitrary outbound proxy.
+const PUBLIC_DEMO_HOSTS = new Set(['jsonplaceholder.typicode.com', 'httpbin.org']);
+const PUBLIC_DEMO_METHODS = new Set(['GET', 'POST', 'PUT', 'PATCH', 'DELETE']);
+const PUBLIC_DEMO_MAX_BODY_BYTES = 32 * 1024;
+
+app.post('/api/public-demo/request', proxyLimiter, async (req, res) => {
+    const { url, method = 'GET', body } = req.body || {};
+    let target;
+    try {
+        target = new URL(url);
+    } catch {
+        return res.status(400).json({ message: 'Enter a valid HTTPS demo URL.' });
+    }
+
+    const normalizedMethod = String(method).toUpperCase();
+    if (target.protocol !== 'https:' || !PUBLIC_DEMO_HOSTS.has(target.hostname.toLowerCase()) || target.username || target.password) {
+        return res.status(400).json({ message: 'Use one of the supported HTTPS demo hosts: jsonplaceholder.typicode.com or httpbin.org.' });
+    }
+    if (!PUBLIC_DEMO_METHODS.has(normalizedMethod)) {
+        return res.status(400).json({ message: 'Supported methods are GET, POST, PUT, PATCH, and DELETE.' });
+    }
+
+    let bodySize = 0;
+    if (body !== undefined && body !== null) {
+        try {
+            bodySize = Buffer.byteLength(JSON.stringify(body), 'utf8');
+        } catch {
+            return res.status(400).json({ message: 'Request body must be valid JSON.' });
+        }
+        if (bodySize > PUBLIC_DEMO_MAX_BODY_BYTES) {
+            return res.status(413).json({ message: 'The demo request body must be smaller than 32KB.' });
+        }
+    }
+
+    const startedAt = Date.now();
+    try {
+        const response = await axios({
+            url: target.toString(),
+            method: normalizedMethod.toLowerCase(),
+            data: body === undefined || body === null ? undefined : body,
+            headers: body === undefined || body === null ? undefined : { 'Content-Type': 'application/json' },
+            timeout: 10_000,
+            maxRedirects: 0,
+            responseType: 'json',
+            validateStatus: () => true,
+            httpsAgent: new https.Agent({ rejectUnauthorized: true })
+        });
+        const responseBody = response.data ?? null;
+        return res.json({
+            status: response.status,
+            statusText: response.statusText,
+            body: responseBody,
+            duration: Date.now() - startedAt,
+            size: Buffer.byteLength(JSON.stringify(responseBody), 'utf8')
+        });
+    } catch (error) {
+        const timedOut = error.code === 'ECONNABORTED';
+        return res.status(timedOut ? 504 : 502).json({ message: timedOut ? 'The demo request timed out after 10 seconds.' : 'The demo API could not be reached. Please try again.' });
+    }
 });
 
 // --- Add the proxy endpoint for making external API requests and mock server support ---
