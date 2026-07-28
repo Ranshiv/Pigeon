@@ -297,6 +297,10 @@ const Notifications = () => {
   const getNotificationMessage = (activity) => {
     if (!activity) return 'Unknown activity';
 
+    const message = typeof activity.message === 'string' ? activity.message.trim() : '';
+    const detailMessage = typeof activity.details?.message === 'string' ? activity.details.message.trim() : '';
+    const fallbackMessage = message && message !== activity.type ? message : detailMessage;
+
     switch (activity.type) {
       case 'workspace_view':
         return `Viewed workspace: ${activity.details?.workspaceName || 'Unknown workspace'}`;
@@ -309,9 +313,13 @@ const Notifications = () => {
       case 'review_requested':
         return `${activity.details?.requesterName || 'Someone'} requested your review on ${activity.details?.title || 'a review'}`;
       case 'monitor_status':
-        return activity.message || `${activity.details?.monitorName || 'Monitor'} is now ${activity.details?.status || 'updated'}`;
+        return fallbackMessage || `${activity.details?.monitorName || 'Monitor'} is now ${activity.details?.status || 'updated'}`;
       case 'system':
-        return activity.message || activity.details?.message || 'System notification';
+        return fallbackMessage || 'System notification';
+      case 'api_failure':
+      case 'request_failed':
+      case 'invalid_request':
+        return fallbackMessage || `${activity.type === 'invalid_request' ? 'Invalid API request' : 'API request failed'}${activity.details?.endpoint ? `: ${activity.details.endpoint}` : ''}`;
       case 'log': {
         const actionLabels = {
           create: 'created',
@@ -328,7 +336,7 @@ const Notifications = () => {
         return `${activity.details?.actorName || 'Someone'} ${action} ${activity.details?.resourceName || ''}`.trim();
       }
       default:
-        return `${activity.type}: ${JSON.stringify(activity.details)}`;
+        return fallbackMessage || (activity.type ? activity.type.replace(/[_-]/g, ' ') : 'Notification');
     }
   };
 
