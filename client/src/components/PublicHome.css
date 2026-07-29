@@ -219,3 +219,11 @@ body.pigeon-marketing-body { scrollbar-color: #4e3522 #0b0907; scrollbar-width: 
 .pigeon-hero-changing-word > span:not(.pigeon-hero-changing-word-sizer) { position: absolute; top: 0; left: 0; display: block; white-space: nowrap; }
 .pigeon-marketing .pigeon-sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
 .pigeon-hero h1 { font-weight: 700; letter-spacing: -.045em; line-height: .95; }
+.pigeon-feature-card.graph .pigeon-latency-graph > svg path { stroke-dasharray: 1; }
+.pigeon-feature-card.graph .pigeon-latency-graph > svg path,
+.pigeon-feature-card.graph .pigeon-latency-graph > svg circle { animation: none; }
+.pigeon-final-cta::after { left: -30%; opacity: 0; animation: none; }
+.pigeon-final-cta:hover::after,
+.pigeon-final-cta:focus-within::after { opacity: 1; animation: pigeon-beam-hover 1.8s cubic-bezier(.22, 1, .36, 1) forwards; }
+.pigeon-final-cta::after { z-index: 0; pointer-events: none; }
+@keyframes pigeon-beam-hover { 0% { left: -25%; opacity: 0; } 15% { opacity: 1; } 100% { left: 125%; opacity: 1; } }
