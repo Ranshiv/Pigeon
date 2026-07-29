@@ -71,6 +71,9 @@
     --request-method-color: var(--method-get);
     flex: 0 0 116px;
     width: 116px;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
 }
 
 .request-method-select.method-post { --request-method-color: var(--method-post); }
@@ -78,30 +81,53 @@
 .request-method-select.method-delete { --request-method-color: var(--method-delete); }
 .request-method-select.method-patch { --request-method-color: var(--method-patch); }
 .request-method-select.method-head { --request-method-color: var(--text-muted); }
-.request-method-select.method-options { --request-method-color: #22d3ee; }
+.request-method-select.method-options { --request-method-color: var(--protocol-sse); }
+.request-method-select.method-graphql { --request-method-color: #e10098; }
+
+/* Block global .method-* badge backgrounds from painting the select wrapper. */
+.request-method-select.method-get,
+.request-method-select.method-post,
+.request-method-select.method-put,
+.request-method-select.method-delete,
+.request-method-select.method-patch,
+.request-method-select.method-head,
+.request-method-select.method-options {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+/* The method menu has a deliberately short, fixed option set. Keep every
+   method visible rather than forcing the last one behind a scrollbar. */
+.app-select-list.request-method-menu {
+    max-height: none;
+    overflow-y: visible;
+}
 
 .request-workspace .request-method-select .app-select-trigger {
     height: var(--input-height);
     padding: 0 12px;
-    border-color: color-mix(in srgb, var(--request-method-color) 45%, var(--border-color));
-    border-radius: var(--border-radius-md);
-    background: color-mix(in srgb, var(--request-method-color) 13%, var(--card-bg));
-    color: var(--request-method-color);
+    border: none !important;
+    outline: none;
+    border-radius: 999px;
+    background: var(--request-method-color);
+    color: #fff;
     font-size: 0.78rem;
-    font-weight: 750;
+    font-weight: 700;
     letter-spacing: 0.05em;
     box-shadow: none;
 }
 
 .request-workspace .request-method-select .app-select-trigger:hover,
 .request-workspace .request-method-select .app-select-trigger:focus-visible {
-    border-color: var(--request-method-color);
-    background: color-mix(in srgb, var(--request-method-color) 20%, var(--card-bg));
-    box-shadow: 0 0 0 3px color-mix(in srgb, var(--request-method-color) 15%, transparent);
+    border: none !important;
+    outline: none;
+    background: color-mix(in srgb, var(--request-method-color) 85%, #000);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--request-method-color) 30%, transparent);
 }
 
 .request-workspace .request-method-select .app-select-chevron {
-    color: currentColor;
+    color: rgba(255,255,255,0.75);
 }
 
 .url-input {
@@ -174,11 +200,17 @@
     color: var(--text-color);
     border: 1px solid var(--border-color);
     padding: 0 16px;
+    min-width: 80px;
 }
 
-.save-btn:hover {
+.save-btn:hover:not(:disabled) {
     background-color: var(--hover-bg);
     border-color: var(--text-muted);
+}
+
+.save-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
 }
 
 /* Tabs Styling - Modern Segmented Control */
@@ -240,6 +272,73 @@
     overflow-y: auto;
     background-color: var(--card-bg);
     animation: fadeIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.graphql-request-section {
+    flex: 1;
+    padding: 32px;
+    overflow-y: auto;
+    background: var(--card-bg);
+    animation: fadeIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.graphql-editor-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 16px;
+}
+
+.graphql-editor-field {
+    display: grid;
+    gap: 7px;
+    min-width: 0;
+    color: var(--text-secondary);
+    font-size: 0.78rem;
+    font-weight: 650;
+}
+
+.graphql-editor-field--schema { grid-column: 1 / -1; }
+
+.graphql-editor-field textarea {
+    width: 100%;
+    min-height: 180px;
+    resize: vertical;
+    padding: 12px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    outline: none;
+    background: var(--background-color);
+    color: var(--text-color);
+    font-family: var(--tester-mono, 'Monaco', 'Menlo', monospace);
+    font-size: 0.82rem;
+    line-height: 1.55;
+}
+
+.graphql-editor-field--schema textarea { min-height: 150px; }
+.graphql-editor-field textarea:focus,
+.graphql-operation-row input:focus { border-color: var(--primary-color); box-shadow: var(--ring); }
+
+.graphql-operation-row {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px;
+    margin-top: 16px;
+    padding: 14px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    background: var(--background-color);
+}
+
+.graphql-operation-row label { display: grid; gap: 6px; min-width: min(100%, 360px); color: var(--text-secondary); font-size: 0.76rem; font-weight: 650; }
+.graphql-operation-row input { height: 36px; padding: 0 10px; border: 1px solid var(--border-color); border-radius: var(--radius-sm); outline: none; background: var(--card-bg); color: var(--text-color); font: inherit; }
+.graphql-operation-row p { margin: 0; color: var(--text-secondary); font-size: 0.78rem; line-height: 1.45; }
+
+@media (max-width: 700px) {
+    .graphql-request-section { padding: 20px; }
+    .graphql-editor-grid { grid-template-columns: 1fr; }
+    .graphql-editor-field--schema { grid-column: auto; }
+    .graphql-operation-row { align-items: stretch; flex-direction: column; }
 }
 
 .debug-console-section {
@@ -2278,11 +2377,13 @@
 .vp-preview-header {
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    padding: 12px 16px;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 12px;
     border: 1px solid var(--border-color);
-    border-radius: 8px;
-    background: var(--background-color);
+    border-radius: var(--radius-md);
+    background: var(--card-bg);
 }
 
 .vp-preview-header h4 {
@@ -2295,7 +2396,9 @@
 .vp-preview-header-actions {
     display: flex;
     align-items: center;
+    flex-wrap: wrap;
     gap: 10px;
+    min-width: 0;
 }
 
 .vp-status-valid {
@@ -2304,9 +2407,9 @@
     gap: 6px;
     padding: 4px 10px;
     border-radius: 999px;
-    background: rgba(34, 197, 94, 0.15);
-    color: #22c55e;
-    border: 1px solid rgba(34, 197, 94, 0.4);
+    background: color-mix(in srgb, var(--success-color) 14%, transparent);
+    color: var(--success-color);
+    border: 1px solid color-mix(in srgb, var(--success-color) 36%, var(--border-color));
     font-size: 12px;
     font-weight: 500;
     white-space: nowrap;
@@ -2318,9 +2421,9 @@
     gap: 6px;
     padding: 4px 10px;
     border-radius: 999px;
-    background: rgba(245, 158, 11, 0.15);
-    color: #f59e0b;
-    border: 1px solid rgba(245, 158, 11, 0.4);
+    background: color-mix(in srgb, var(--warning-color) 14%, transparent);
+    color: var(--warning-color);
+    border: 1px solid color-mix(in srgb, var(--warning-color) 36%, var(--border-color));
     font-size: 12px;
     font-weight: 500;
     white-space: nowrap;
@@ -2330,20 +2433,29 @@
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    padding: 6px 12px;
-    background: var(--primary-blue, #014C75);
-    color: #fff;
-    border: none;
-    border-radius: 6px;
-    font-size: 12px;
-    font-weight: 600;
+    min-height: 32px;
+    padding: 0 10px;
+    background: transparent;
+    color: var(--primary-color);
+    border: 1px solid var(--primary-color);
+    border-radius: var(--radius-sm);
+    font-size: 0.76rem;
+    font-weight: 700;
     cursor: pointer;
     white-space: nowrap;
-    transition: background 0.2s ease;
+    transition: background var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out);
 }
 
 .vp-add-variable-btn:hover {
-    background: var(--primary-blue-hover, #013B5B);
+    background: var(--primary-color);
+    color: var(--button-text);
+}
+
+@media (max-width: 560px) {
+    .vp-preview-header { align-items: stretch; }
+    .vp-preview-header h4 { width: 100%; }
+    .vp-preview-header-actions { width: 100%; }
+    .vp-add-variable-btn { flex: 1 1 auto; justify-content: center; }
 }
 
 .vp-missing-alert {

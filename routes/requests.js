@@ -161,13 +161,25 @@ router.post('/:id/send', ensureAuthenticated, async (req, res) => {
                 body: requestData.body || '',
                 bodyType: requestData.bodyType || 'none',
                 bodyFormData: requestData.bodyFormData || [],
+                protocol: requestData.protocol || 'http',
+                graphql: requestData.graphql || {},
                 preRequestScript: requestData.preRequestScript || '',
                 testScript: requestData.testScript || ''
             };
             console.log(`Using request data from body: ${requestDoc.method} ${requestDoc.url}`);
         }
 
-        const { url, method, headers, body, bodyType, bodyFormData, preRequestScript, testScript } = requestDoc;
+        const { url, method, headers, body, bodyType, bodyFormData, graphql, preRequestScript, testScript } = requestDoc;
+        const isGraphqlRequest = String(method || '').toUpperCase() === 'GRAPHQL' || requestDoc.protocol === 'graphql';
+        let graphqlPayload = null;
+        if (isGraphqlRequest) {
+            graphqlPayload = graphql?.query ? graphql : (() => {
+                try { return JSON.parse(body || '{}'); } catch { return null; }
+            })();
+            if (!graphqlPayload?.query) {
+                return res.status(400).json({ error: 'GraphQL requests require a query.', message: 'Add a GraphQL query before sending this request.', status: 400 });
+            }
+        }
 
         // node-fetch correctly rejects bodies on GET/HEAD. Return a useful
         // client error before attempting the request instead of reporting it
@@ -187,15 +199,24 @@ router.post('/:id/send', ensureAuthenticated, async (req, res) => {
 
         // --- Prepare and Send Fetch Request ---
         const fetchOptions = {
-            method,
-            headers: headers.reduce((acc, { name, value }) => {
-                if (name && value) acc[name] = value; // Avoid adding empty headers
+            method: isGraphqlRequest ? 'POST' : method,
+            headers: headers.reduce((acc, { name, key, value }) => {
+                const headerName = name || key;
+                if (headerName && value) acc[headerName] = value; // Avoid adding empty headers
                 return acc;
             }, {}),
             timeout: 30000, // Example: 30 second timeout
         };
 
-        if (body && bodyType !== 'none') {
+        if (isGraphqlRequest) {
+            const contentTypeKey = Object.keys(fetchOptions.headers).find((header) => header.toLowerCase() === 'content-type');
+            if (!contentTypeKey) fetchOptions.headers['Content-Type'] = 'application/json';
+            fetchOptions.body = JSON.stringify({
+                query: graphqlPayload.query,
+                variables: graphqlPayload.variables || {},
+                ...(graphqlPayload.operationName ? { operationName: graphqlPayload.operationName } : {})
+            });
+        } else if (body && bodyType !== 'none') {
             // Set Content-Type based on bodyType if not already set
             let contentTypeHeader = Object.keys(fetchOptions.headers).find(h => h.toLowerCase() === 'content-type');
             if (!contentTypeHeader) {

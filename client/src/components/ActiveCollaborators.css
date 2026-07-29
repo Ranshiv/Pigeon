@@ -554,6 +554,10 @@
   position: relative;
   display: inline-flex;
   align-items: center;
+  min-width: 32px;
+  min-height: 32px;
+  flex: 0 0 auto;
+  overflow: visible;
   /* z-index: 1001; */
 }
 
@@ -562,10 +566,12 @@
   display: flex;
   align-items: center;
   cursor: pointer;
-  padding: 4px;
+  padding: 2px;
   border-radius: 20px;
   background-color: transparent;
   transition: background-color 0.2s ease;
+  min-width: 28px;
+  min-height: 28px;
 }
 
 .collaborators-summary:hover {
@@ -575,19 +581,27 @@
 .collaborators-summary.empty {
   color: var(--text-secondary, #6b7280);
   background-color: #f3f4f6;
-  padding: 6px;
+  padding: 0;
   border-radius: 50%;
   width: 28px;
   height: 28px;
   display: flex;
   align-items: center;
   justify-content: center;
+  flex: 0 0 auto;
+}
+
+.collaborators-summary.empty svg {
+  width: 14px;
+  height: 14px;
+  flex: 0 0 auto;
 }
 
 /* Stack of avatar initials */
 .avatar-stack {
   display: flex;
   align-items: center;
+  height: 28px;
 }
 
 /* Individual avatar in the stack */

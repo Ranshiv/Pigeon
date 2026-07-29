@@ -512,17 +512,20 @@
   border-radius: var(--border-radius);
   margin-bottom: 5px;
   position: relative;
-  background-color: transparent;
+  background-color: var(--card-bg, var(--card-background));
+  border: 1px solid var(--border-color);
 }
 
 .request-item:hover {
-  background-color: rgba(255, 255, 255, 0.05);
+  background-color: var(--hover-bg, var(--hover-background));
+  border-color: color-mix(in srgb, var(--primary-color) 45%, var(--border-color));
   transform: translateX(2px);
 }
 
 .request-item.active {
-  background-color: rgba(1, 76, 117, 0.1);
-  border-left: 2px solid var(--primary-color, #014C75);
+  background-color: color-mix(in srgb, var(--primary-color) 10%, var(--card-bg, var(--card-background)));
+  border-color: var(--primary-color, #014C75);
+  border-left-width: 2px;
   font-weight: 500;
 }
 

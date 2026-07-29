@@ -10,6 +10,7 @@ import EnvironmentSelector from './EnvironmentSelector';
 import CollectionVariablesManager from './CollectionVariablesManager';
 import VisualApiDesigner from './VisualApiDesigner/VisualApiDesigner';
 import CollectionMcpServerPanel from './CollectionMcpServerPanel';
+import EvaluationSuitePanel from './evaluation/EvaluationSuitePanel';
 import FuzzTestingPanel from './FuzzTestingPanel';
 import CollectionGitSyncPanel from './CollectionGitSyncPanel';
 import { useCollaboration } from '../context/CollaborationContext';
@@ -179,7 +180,10 @@ function CollectionDetail() {
   const [isRunningAll, setIsRunningAll] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [pendingChanges, setPendingChanges] = useState(false);
-  const [activeTab, setActiveTab] = useState('requests'); const [documentation, setDocumentation] = useState(null);
+  const [activeTab, setActiveTab] = useState(() => {
+    const tab = new URLSearchParams(location.search).get('tab');
+    return ['requests', 'documentation', 'sampleData', 'variables', 'designer', 'mcp-server', 'evaluation', 'fuzz-testing', 'git-sync'].includes(tab) ? tab : 'requests';
+  }); const [documentation, setDocumentation] = useState(null);
   const [isLoadingDocs, setIsLoadingDocs] = useState(false); const [saveSuccess, setSaveSuccess] = useState(false); const [responseData, setResponseData] = useState(null);
   const [selectedEnvironmentId, setSelectedEnvironmentId] = useState(() => {
     // Restore selected environment from localStorage
@@ -583,37 +587,41 @@ function CollectionDetail() {
   };
 
   // Handle saving a request
-  const handleSaveRequest = (request) => {
+  const handleSaveRequest = async (request) => {
     try {
       const requestId = request._id || request.id;
       const existingIndex = requests.findIndex(
-        (req) => (req._id || req.id) === requestId
+        (req) => String(req._id || req.id) === String(requestId)
       );
 
-      // If explicitly new OR not found in current list, append it.
-      if (request.isNew || existingIndex === -1) {
-        const normalizedRequest = {
-          ...request,
-          _id: request._id || request.id || `req-${Date.now()}`,
-          isNew: false
-        };
-        setRequests(prev => [...prev, normalizedRequest]);
-        toast.success('Request added. Click top Save to persist to collection.');
-      } else {
-        // Otherwise update the existing request in place.
-        setRequests(prev => prev.map((req, index) => (
-          index === existingIndex
-            ? { ...req, ...request, isNew: false }
-            : req
-        )));
-        toast.success('Request updated. Click top Save to persist changes.');
+      const normalizedRequest = {
+        ...request,
+        _id: request._id || request.id || `req-${Date.now()}`,
+        isNew: false
+      };
+      const updatedRequests = request.isNew || existingIndex === -1
+        ? [...requests, normalizedRequest]
+        : requests.map((current, index) => index === existingIndex ? { ...current, ...normalizedRequest } : current);
+
+      const response = await fetch(`/api/collections/${collectionId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ requests: updatedRequests })
+      });
+      if (!response.ok) {
+        const payload = await response.json().catch(() => ({}));
+        throw new Error(payload.message || 'Could not save this request to the collection.');
       }
 
-      // Update the selected request
-      setSelectedRequest({ ...request, isNew: false });
-
-      // Mark that we have pending changes
-      setPendingChanges(true);
+      const savedCollection = await response.json();
+      const savedRequests = savedCollection.requests || updatedRequests;
+      const savedRequest = savedRequests.find((item) => String(item._id || item.id) === String(normalizedRequest._id || normalizedRequest.id)) || normalizedRequest;
+      setCollection(savedCollection);
+      setRequests(savedRequests);
+      setSelectedRequest({ ...savedRequest, id: request.id || savedRequest.id || normalizedRequest._id, isNew: false });
+      setPendingChanges(false);
+      toast.success('Request saved to the collection.');
 
       // Broadcast the change to other collaborators
       sendActivity('request_updated', {
@@ -624,7 +632,7 @@ function CollectionDetail() {
 
     } catch (err) {
       console.error('Error saving request:', err);
-      alert('Failed to save request. Please try again.');
+      toast.error(err.message || 'Failed to save request. Please try again.');
     }
   };
 
@@ -778,6 +786,8 @@ function CollectionDetail() {
           body: persistedRequest.body || '',
           bodyType: persistedRequest.bodyType || 'none',
           bodyFormData: persistedRequest.bodyFormData || [],
+          protocol: persistedRequest.protocol || 'http',
+          graphql: persistedRequest.graphql || {},
           preRequestScript: persistedRequest.preRequestScript || '',
           testScript: persistedRequest.testScript || '',
           authConfig: persistedRequest.authConfig || { type: 'No Auth' },
@@ -1117,6 +1127,12 @@ function CollectionDetail() {
             <FiServer /> MCP Server
           </button>
           <button
+            className={`tab-btn ${activeTab === 'evaluation' ? 'active' : ''}`}
+            onClick={() => setActiveTab('evaluation')}
+          >
+            <FiTarget /> Agent Evaluation
+          </button>
+          <button
             className={`tab-btn ${activeTab === 'fuzz-testing' ? 'active' : ''}`}
             onClick={() => setActiveTab('fuzz-testing')}
           >
@@ -1342,6 +1358,10 @@ function CollectionDetail() {
 
           {activeTab === 'mcp-server' && (
             <CollectionMcpServerPanel collectionId={collectionId} />
+          )}
+
+          {activeTab === 'evaluation' && (
+            <EvaluationSuitePanel collectionId={collectionId} />
           )}
 
           {activeTab === 'fuzz-testing' && (

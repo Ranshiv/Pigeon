@@ -711,6 +711,141 @@
     font-size: 1.1rem;
 }
 
+/* Request form variable preview: keep the compact view dense and readable.
+   These scoped rules prevent broad legacy variable styles from shrinking cards
+   or stretching this single-tab panel across the editor. */
+.variable-preview-section .unified-variable-viewer.compact {
+    flex: 0 0 auto;
+    min-height: 0;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+}
+
+.variable-preview-section .unified-variable-viewer.compact .variable-scope-tabs {
+    margin: 10px;
+    padding: 5px;
+    background: var(--background-color);
+    border-color: var(--border-color);
+    border-radius: var(--radius-md);
+    box-shadow: none;
+}
+
+.variable-preview-section .unified-variable-viewer.compact .scope-tab {
+    color: var(--text-secondary);
+    border-radius: var(--radius-sm);
+}
+
+.variable-preview-section .unified-variable-viewer.compact .scope-tab:hover:not(.active) {
+    background: var(--hover-bg);
+    color: var(--text-color);
+}
+
+.variable-preview-section .unified-variable-viewer.compact .scope-tab.active {
+    background: var(--primary-color);
+    color: var(--button-text);
+}
+
+.variable-preview-section .unified-variable-viewer.compact .variable-levels,
+.variable-preview-section .unified-variable-viewer.compact .variable-level,
+.variable-preview-section .unified-variable-viewer.compact .level-content,
+.variable-preview-section .unified-variable-viewer.compact .variables-list {
+    width: 100%;
+    min-width: 0;
+}
+
+.variable-preview-section .unified-variable-viewer.compact .variable-levels {
+    flex: 0 0 auto;
+    overflow: visible;
+}
+
+.variable-preview-section .unified-variable-viewer.compact .level-content {
+    padding: 0 10px 10px;
+}
+
+.variable-preview-section .unified-variable-viewer.compact .variables-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 8px;
+    flex: 0 0 auto;
+    min-height: 0;
+    padding: 0;
+    overflow: visible;
+    align-items: stretch;
+}
+
+.variable-preview-section .unified-variable-viewer.compact .variable-item {
+    display: block;
+    width: auto;
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    gap: 0;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-left: 3px solid var(--success-color);
+    border-radius: var(--radius-md);
+}
+
+.variable-preview-section .unified-variable-viewer.compact .variable-item:hover {
+    background: var(--hover-bg);
+    border-color: var(--primary-color);
+}
+
+.variable-preview-section .unified-variable-viewer.compact .variable-main {
+    padding: 11px 12px;
+}
+
+.variable-preview-section .unified-variable-viewer.compact .variable-name {
+    color: var(--text-color);
+    font-size: 0.82rem;
+}
+
+.variable-preview-section .unified-variable-viewer.compact .variable-value-section {
+    font-size: 0.75rem;
+}
+
+.variable-preview-section .unified-variable-viewer.compact .value-label {
+    min-width: 42px;
+    color: var(--text-secondary);
+}
+
+.variable-preview-section .unified-variable-viewer.compact .empty-variables-card {
+    margin: 0;
+    padding: 28px 16px;
+    background: var(--background-color);
+    border-color: var(--border-color);
+}
+
+.variable-preview-section .unified-variable-viewer.compact .empty-add-btn,
+.variable-preview-section .unified-variable-viewer.compact .inline-add-confirm {
+    background: var(--primary-color);
+    color: var(--button-text);
+}
+
+.variable-preview-section .unified-variable-viewer.compact .empty-add-btn:hover,
+.variable-preview-section .unified-variable-viewer.compact .inline-add-confirm:hover:not(:disabled) {
+    background: var(--primary-hover);
+}
+
+.variable-preview-section .unified-variable-viewer.compact .inline-add-form {
+    grid-column: 1 / -1;
+    max-width: none;
+    margin: 0;
+    padding: 12px;
+    background: var(--background-color);
+    border: 1px dashed var(--border-color);
+    border-radius: var(--radius-md);
+}
+
+.variable-preview-section .unified-variable-viewer.compact .inline-form-input {
+    background: var(--card-bg);
+    border-color: var(--border-color);
+    color: var(--text-color);
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
     .viewer-header {
@@ -843,4 +978,187 @@
     background: rgba(100, 116, 139, 0.1);
     color: #475569;
     border-color: rgba(100, 116, 139, 0.3);
+}
+
+/* Isolated variable-manager UI.  The `uvv-*` namespace intentionally avoids
+   generic variable-editor selectors used by older screens. */
+.uvv {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    min-width: 0;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    color: var(--text-color);
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+}
+
+.uvv__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 18px 20px 14px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.uvv__header h3,
+.uvv__header p,
+.uvv__empty h4,
+.uvv__empty p { margin: 0; }
+.uvv__header h3 { font-size: 1rem; color: var(--text-color); }
+.uvv__header p,
+.uvv__empty p { margin-top: 4px; color: var(--text-secondary); font-size: 0.82rem; }
+.uvv__total { color: var(--text-secondary); font-size: 0.78rem; white-space: nowrap; }
+
+.uvv__tabs {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin: 12px 14px 0;
+    padding: 4px;
+    max-width: max-content;
+    background: var(--background-color);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    overflow-x: auto;
+}
+
+.uvv__tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 32px;
+    padding: 0 9px;
+    border: 0;
+    border-radius: var(--radius-sm);
+    background: transparent;
+    color: var(--text-secondary);
+    font: inherit;
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out);
+}
+
+.uvv__tab:hover { background: var(--hover-bg); color: var(--text-color); }
+.uvv__tab.is-active { background: var(--primary-color); color: var(--button-text); }
+.uvv__count {
+    display: inline-grid;
+    place-items: center;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    border-radius: 999px;
+    background: color-mix(in srgb, currentColor 14%, transparent);
+    font-size: 0.68rem;
+}
+
+.uvv__content { padding: 14px; }
+.uvv__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 340px));
+    gap: 8px;
+}
+
+.uvv__card {
+    min-height: 100px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    background: var(--background-color);
+}
+
+.uvv__card {
+    display: flex;
+    flex-direction: column;
+    padding: 11px 12px;
+    border-left: 2px solid var(--success-color);
+}
+
+.uvv__card.is-overridden { border-left-color: var(--warning-color); opacity: 0.76; }
+.uvv__card:hover { background: var(--card-bg); border-color: color-mix(in srgb, var(--primary-color) 55%, var(--border-color)); }
+.uvv__card-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.uvv__card-head > code { overflow: hidden; color: var(--text-color); font-family: var(--tester-mono, ui-monospace, monospace); font-size: 0.82rem; font-weight: 700; text-overflow: ellipsis; white-space: nowrap; }
+.uvv__card-actions { display: flex; gap: 4px; }
+.uvv__icon-button {
+    display: inline-grid;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    border: 1px solid transparent;
+    border-radius: var(--radius-sm);
+    background: transparent;
+    color: var(--text-secondary);
+    cursor: pointer;
+}
+.uvv__icon-button:hover { border-color: var(--border-color); background: var(--hover-bg); color: var(--text-color); }
+.uvv__value { display: grid; gap: 4px; margin-top: 10px; min-width: 0; }
+.uvv__value > span { color: var(--text-secondary); font-size: 0.66rem; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; }
+.uvv__value > code { overflow: hidden; width: max-content; max-width: 100%; padding: 3px 6px; border-radius: 4px; background: var(--card-bg); color: var(--text-color); font-family: var(--tester-mono, ui-monospace, monospace); font-size: 0.74rem; text-overflow: ellipsis; white-space: nowrap; }
+.uvv__card-foot { display: flex; align-items: center; min-height: 18px; margin-top: auto; padding-top: 7px; }
+.uvv__badge { display: inline-flex; align-items: center; gap: 4px; color: var(--warning-color); font-size: 0.7rem; font-weight: 650; }
+.uvv__badge--active { color: var(--success-color); }
+.uvv__muted { color: var(--text-muted); font-size: 0.7rem; }
+
+.uvv__add-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 34px;
+    margin-top: 10px;
+    padding: 0 11px;
+    border: 1px dashed var(--border-color);
+    border-radius: var(--radius-sm);
+    border-style: dashed;
+    background: transparent;
+    color: var(--primary-color);
+    font: inherit;
+    font-size: 0.82rem;
+    font-weight: 700;
+    cursor: pointer;
+}
+.uvv__add-button:hover { background: color-mix(in srgb, var(--primary-color) 7%, var(--card-bg)); border-color: var(--primary-color); }
+
+.uvv__empty { display: flex; align-items: center; gap: 12px; min-height: 112px; padding: 18px; border: 1px dashed var(--border-color); border-radius: var(--radius-md); background: var(--background-color); }
+.uvv__empty-icon { display: inline-grid; flex: 0 0 auto; place-items: center; width: 36px; height: 36px; border-radius: 50%; background: color-mix(in srgb, var(--primary-color) 12%, transparent); color: var(--primary-color); }
+.uvv__empty h4 { color: var(--text-color); font-size: 0.9rem; }
+.uvv__empty .uvv__primary-button { margin-left: auto; }
+
+.uvv__form { display: flex; align-items: flex-end; justify-content: space-between; gap: 14px; margin-top: 10px; padding: 14px; border: 1px solid var(--border-color); border-radius: var(--radius-md); background: var(--background-color); }
+.request-workspace .uvv__form {
+    flex: 0 0 auto;
+    flex-direction: row;
+    width: 100%;
+    align-self: stretch;
+    overflow: visible;
+}
+.uvv__form-fields { display: grid; grid-template-columns: minmax(160px, 1fr) minmax(220px, 2fr); gap: 10px; flex: 1; }
+.uvv__form label { display: grid; gap: 6px; color: var(--text-secondary); font-size: 0.72rem; font-weight: 650; }
+.uvv__form input { width: 100%; min-width: 0; height: 36px; padding: 0 10px; border: 1px solid var(--border-color); border-radius: var(--radius-sm); outline: none; background: var(--card-bg); color: var(--text-color); font: inherit; font-size: 0.82rem; }
+.uvv__form input:focus { border-color: var(--primary-color); box-shadow: var(--ring); }
+.uvv__form-actions { display: flex; gap: 8px; }
+.uvv__primary-button,
+.uvv__secondary-button { display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 36px; padding: 0 12px; border-radius: var(--radius-sm); font: inherit; font-size: 0.8rem; font-weight: 700; cursor: pointer; white-space: nowrap; }
+.uvv__primary-button { border: 1px solid var(--primary-color); background: var(--primary-color); color: var(--button-text); }
+.uvv__primary-button:hover:not(:disabled) { border-color: var(--primary-hover); background: var(--primary-hover); }
+.uvv__primary-button:disabled { cursor: not-allowed; opacity: 0.55; }
+.uvv__secondary-button { border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-color); }
+.uvv__secondary-button:hover { background: var(--hover-bg); }
+
+.uvv--compact { box-shadow: none; }
+.uvv--compact .uvv__tabs { margin: 10px 10px 0; }
+.uvv--compact .uvv__content { padding: 10px; }
+.uvv--compact .uvv__card { min-height: 100px; }
+
+@media (max-width: 700px) {
+    .uvv__tabs { max-width: calc(100vw - 48px); }
+    .uvv__empty { align-items: flex-start; flex-wrap: wrap; }
+    .uvv__empty .uvv__primary-button { margin-left: 48px; }
+    .uvv__form,
+    .request-workspace .uvv__form { align-items: stretch; flex-direction: column; }
+    .uvv__form-fields { grid-template-columns: 1fr; }
 }

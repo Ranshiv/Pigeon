@@ -1,198 +1,50 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { FiActivity, FiAlertTriangle, FiCheckCircle, FiClock, FiPlay, FiShield, FiTarget } from 'react-icons/fi';
 import AppSelect from './common/AppSelect/AppSelect';
 import { extractVariables, interpolateRequest, resolveVariables } from '../utils/variableInterpolation';
 import './FuzzTestingPanel.css';
 
 const clone = (value) => JSON.parse(JSON.stringify(value));
-
 const typeOf = (value) => Array.isArray(value) ? 'array' : value === null ? 'null' : typeof value;
-
-const hasJsonObjectBody = (body) => {
+const bodyCases = (request) => {
   try {
-    const parsed = typeof body === 'string' ? JSON.parse(body) : body;
-    return Boolean(parsed) && typeof parsed === 'object' && !Array.isArray(parsed);
-  } catch {
-    return false;
-  }
+    const source = typeof request.body === 'string' ? JSON.parse(request.body || '{}') : request.body;
+    if (!source || typeof source !== 'object' || Array.isArray(source)) return [];
+    const cases = [{ id: 'baseline', name: 'Baseline', mutation: 'Original request body', overrides: { body: source }, category: 'baseline' }];
+    Object.entries(source).forEach(([key, value]) => {
+      const missing = clone(source); delete missing[key]; cases.push({ id: `missing-${key}`, name: `Missing ${key}`, mutation: 'Removed field', overrides: { body: missing }, category: 'required' });
+      const wrong = clone(source); wrong[key] = typeOf(value) === 'string' ? 42 : 'invalid-value'; cases.push({ id: `type-${key}`, name: `Wrong type: ${key}`, mutation: 'Changed field type', overrides: { body: wrong }, category: 'type' });
+    });
+    return cases;
+  } catch { return []; }
 };
-
-const buildCases = (request) => {
-  let source;
-  try {
-    source = typeof request.body === 'string' ? JSON.parse(request.body || '{}') : request.body;
-  } catch {
-    return [];
-  }
-
-  if (!source || typeof source !== 'object' || Array.isArray(source)) return [];
-  const entries = Object.entries(source);
-  const cases = [{ name: 'Baseline', mutation: 'Original request body', body: source, kind: 'baseline' }];
-
-  entries.forEach(([key, value]) => {
-    const omitted = clone(source);
-    delete omitted[key];
-    cases.push({ name: `Missing ${key}`, mutation: `Removed ${key}`, body: omitted, kind: 'edge' });
-
-    const wrongType = clone(source);
-    const currentType = typeOf(value);
-    wrongType[key] = currentType === 'string' ? 42 : currentType === 'number' ? 'not-a-number' : currentType === 'boolean' ? 'not-a-boolean' : 'invalid-value';
-    cases.push({ name: `Wrong type: ${key}`, mutation: `${currentType} → ${typeOf(wrongType[key])}`, body: wrongType, kind: 'invalid' });
-
-    if (typeof value === 'string') {
-      const empty = clone(source);
-      empty[key] = '';
-      cases.push({ name: `Empty ${key}`, mutation: 'Replaced with empty string', body: empty, kind: 'edge' });
-      const long = clone(source);
-      long[key] = 'x'.repeat(512);
-      cases.push({ name: `Long ${key}`, mutation: '512-character string', body: long, kind: 'boundary' });
-    }
-    if (typeof value === 'number') {
-      const negative = clone(source);
-      negative[key] = -1;
-      cases.push({ name: `Negative ${key}`, mutation: 'Replaced with -1', body: negative, kind: 'boundary' });
-    }
-  });
-
-  const extra = clone(source);
-  extra.__pigeonFuzzProbe = 'unexpected-property';
-  cases.push({ name: 'Unexpected property', mutation: 'Added __pigeonFuzzProbe', body: extra, kind: 'invalid' });
-  return cases;
-};
-
-const statusLabel = (result) => {
-  if (result.error) return 'Error';
-  if (result.status >= 500) return 'Server error';
-  if (result.status >= 400) return 'Rejected';
-  return 'Accepted';
-};
+const statusLabel = (result) => result.error ? 'Error' : result.responseStatus >= 500 ? 'Server error' : result.responseStatus >= 400 ? 'Rejected' : 'Accepted';
 
 export default function FuzzTestingPanel({ requests, collectionId, workspaceId, selectedEnvironment, collectionVariables }) {
-  const compatibleRequests = useMemo(() => requests.filter((request) => (
-    hasJsonObjectBody(request.body)
-    && !['GET', 'HEAD'].includes(String(request.method || '').toUpperCase())
-  )), [requests]);
-  const [requestId, setRequestId] = useState('');
-  const activeRequest = compatibleRequests.find((request) => String(request._id || request.id) === requestId) || compatibleRequests[0];
-  const cases = useMemo(() => activeRequest ? buildCases(activeRequest) : [], [activeRequest]);
-  const executableRequest = useMemo(() => {
-    if (!activeRequest) return null;
-    const resolvedVariables = resolveVariables(
-      activeRequest.variables,
-      selectedEnvironment?.variables,
-      collectionVariables
-    );
-    const interpolated = interpolateRequest(activeRequest, resolvedVariables);
-    const parameters = interpolated.params || [];
-    const url = String(interpolated.url || '').replace(/(^|\/):([A-Za-z_][A-Za-z0-9_]*)/g, (match, prefix, key) => {
-      const parameter = parameters.find((item) => (item.key || item.name) === key && item.enabled !== false && item.value !== undefined && item.value !== '');
-      return parameter ? `${prefix}${encodeURIComponent(parameter.value)}` : match;
-    });
-    return { ...interpolated, url };
-  }, [activeRequest, selectedEnvironment, collectionVariables]);
-  const unresolvedValues = useMemo(() => {
-    if (!executableRequest?.url) return [];
-    const templateValues = extractVariables(executableRequest.url);
-    const pathValues = [...String(executableRequest.url).matchAll(/(?:^|\/):([A-Za-z_][A-Za-z0-9_]*)/g)].map((match) => match[1]);
-    return [...new Set([...templateValues, ...pathValues])];
-  }, [executableRequest]);
-  const [limit, setLimit] = useState(8);
-  const [running, setRunning] = useState(false);
-  const [results, setResults] = useState([]);
-  const serverErrorCount = results.filter((result) => result.error || result.status >= 500).length;
+  const [sources, setSources] = useState({ openapi: [], graphql: [] });
+  const [sourceType, setSourceType] = useState('openapi'); const [sourceKey, setSourceKey] = useState('');
+  const [cases, setCases] = useState([]); const [selected, setSelected] = useState({}); const [results, setResults] = useState([]);
+  const [running, setRunning] = useState(false); const [acknowledged, setAcknowledged] = useState(false); const [error, setError] = useState(''); const [history, setHistory] = useState([]);
+  const fallbackRequests = useMemo(() => requests.filter((request) => { try { return request.body && !['GET', 'HEAD'].includes(String(request.method).toUpperCase()) && typeof JSON.parse(request.body) === 'object'; } catch { return false; } }), [requests]);
+  const sourceOptions = useMemo(() => sourceType === 'openapi' ? sources.openapi.map((item) => ({ value: `${item.versionId}|${item.method}|${item.path}`, label: `${item.version} · ${item.method} ${item.path}${item.executable ? '' : ' (saved request required)'}` })) : sourceType === 'graphql' ? sources.graphql.map((item) => ({ value: item.requestId, label: `${item.name || item.operationName || 'GraphQL request'}${item.executable ? '' : ' (SDL schema required)'}` })) : fallbackRequests.map((item) => ({ value: String(item._id || item.id), label: `${item.method} · ${item.name || item.url}` })), [sourceType, sources, fallbackRequests]);
+  const chosen = sourceOptions.some((option) => option.value === sourceKey) ? sourceKey : sourceOptions[0]?.value || '';
 
-  const runFuzzTests = async () => {
-    if (!activeRequest || !cases.length || running || unresolvedValues.length) return;
-    setRunning(true);
-    setResults([]);
-    const runCases = cases.slice(0, Number(limit));
-    const completed = [];
-    for (const testCase of runCases) {
-      const started = performance.now();
-      try {
-        const response = await fetch(`/api/requests/${activeRequest._id || activeRequest.id}/send`, {
-          method: 'POST',
-          credentials: 'include',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-          ...executableRequest,
-            collectionId,
-            workspaceId,
-            requestId: activeRequest._id || activeRequest.id,
-            body: JSON.stringify(testCase.body),
-            bodyType: 'json'
-          })
-        });
-        const payload = await response.json().catch(() => ({}));
-        completed.push({ ...testCase, status: payload.status || response.status, duration: payload.duration ?? Math.round(performance.now() - started), error: !response.ok ? payload.error || payload.message || 'Request failed' : '' });
-      } catch (error) {
-        completed.push({ ...testCase, status: 0, duration: Math.round(performance.now() - started), error: error.message || 'Network request failed' });
-      }
-      setResults([...completed]);
-    }
+  useEffect(() => { if (!collectionId) return; Promise.all([fetch(`/api/fuzz-testing/collections/${collectionId}/sources`, { credentials: 'include' }).then((r) => r.ok ? r.json() : { openapi: [], graphql: [] }), fetch(`/api/fuzz-testing/collections/${collectionId}/runs`, { credentials: 'include' }).then((r) => r.ok ? r.json() : { runs: [] })]).then(([available, saved]) => { setSources(available); setHistory(saved.runs || []); }).catch(() => {}); }, [collectionId]);
+  useEffect(() => { setSourceKey(''); setCases([]); setResults([]); setAcknowledged(false); }, [sourceType]);
+  useEffect(() => { if (!chosen) { setCases([]); return; } setError(''); setResults([]); if (sourceType === 'request-body') { const request = fallbackRequests.find((item) => String(item._id || item.id) === chosen); const next = bodyCases(request); setCases(next); setSelected(Object.fromEntries(next.map((item) => [item.id, true]))); return; } const payload = sourceType === 'openapi' ? (() => { const [versionId, method, ...parts] = chosen.split('|'); return { sourceType, versionId, method, path: parts.join('|') }; })() : { sourceType, requestId: chosen }; fetch(`/api/fuzz-testing/collections/${collectionId}/preview`, { method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }).then(async (response) => { const data = await response.json(); if (!response.ok) throw new Error(data.message); setCases(data.cases || []); setSelected(Object.fromEntries((data.cases || []).map((item) => [item.id, true]))); }).catch((reason) => { setCases([]); setError(reason.message); }); }, [chosen, sourceType, collectionId, fallbackRequests]);
+
+  const activeRequest = useMemo(() => { if (sourceType === 'openapi') { const [, method, ...parts] = chosen.split('|'); const path = parts.join('|'); return requests.find((item) => String(item.method).toUpperCase() === method && (() => { const url = String(item.url || '').replace(/\{\{[^}]+\}\}/g, '').split('?')[0] || '/'; try { return new URL(url).pathname === path; } catch { return (url.startsWith('/') ? url : `/${url}`) === path; } })()); } return requests.find((item) => String(item._id || item.id) === chosen); }, [chosen, requests, sourceType]);
+  const executableRequest = useMemo(() => activeRequest ? interpolateRequest(activeRequest, resolveVariables(activeRequest.variables, selectedEnvironment?.variables, collectionVariables)) : null, [activeRequest, selectedEnvironment, collectionVariables]);
+  const selectedCases = cases.filter((item) => selected[item.id]);
+  const missingUrlVariables = useMemo(() => extractVariables(executableRequest?.url || ''), [executableRequest]);
+  const run = async () => {
+    if (!activeRequest || !acknowledged || running || !selectedCases.length || missingUrlVariables.length) return;
+    setRunning(true); setResults([]); const completed = [];
+    for (const item of selectedCases) { const started = performance.now(); try { const isGraphql = sourceType === 'graphql'; const restOverrides = { ...(Object.prototype.hasOwnProperty.call(item.overrides, 'body') ? { body: JSON.stringify(item.overrides.body), bodyType: 'json' } : {}), ...(item.overrides.params ? { params: item.overrides.params } : {}) }; const graphQuery = executableRequest.graphql?.query || (() => { try { return JSON.parse(executableRequest.body || '{}').query; } catch { return ''; } })(); const payload = { ...executableRequest, collectionId, workspaceId, requestId: activeRequest._id || activeRequest.id, ...(isGraphql ? { method: 'POST', protocol: 'graphql', graphql: { ...executableRequest.graphql, query: graphQuery, variables: item.overrides.variables }, body: JSON.stringify({ query: graphQuery, variables: item.overrides.variables }), bodyType: 'graphql' } : restOverrides) }; const response = await fetch(`/api/requests/${activeRequest._id || activeRequest.id}/send`, { method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }); const data = await response.json().catch(() => ({})); completed.push({ ...item, status: 'completed', responseStatus: data.status || response.status, duration: data.duration ?? Math.round(performance.now() - started), error: !response.ok ? data.error || data.message || 'Request failed' : '' }); } catch (reason) { completed.push({ ...item, status: 'failed', responseStatus: 0, duration: Math.round(performance.now() - started), error: reason.message || 'Network request failed' }); } setResults([...completed]); }
+    try { const response = await fetch(`/api/fuzz-testing/collections/${collectionId}/runs`, { method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ sourceType, sourceId: chosen, operation: sourceType === 'openapi' ? chosen : activeRequest?.name, environmentName: selectedEnvironment?.name || 'No environment', acknowledgedTestEnvironment: true, cases: completed }) }); const data = await response.json(); if (response.ok) setHistory((current) => [data.run, ...current]); else setError(data.message); } catch { setError('Cases completed but the run history could not be saved.'); }
     setRunning(false);
   };
-
-  if (!compatibleRequests.length) return (
-    <section className="fuzz-panel fuzz-empty">
-      <FiTarget aria-hidden="true" />
-      <div><span className="fuzz-eyebrow">Schema-driven testing</span><h2>Add a JSON request to begin fuzzing</h2><p>Fuzz testing supports POST, PUT, PATCH, and DELETE requests with a saved JSON object body. Choose Raw and enter valid JSON in the request form; it learns fields, then probes missing values, wrong types and boundaries without changing the saved request.</p></div>
-    </section>
-  );
-
-  const hasConfigurationIssue = unresolvedValues.length > 0;
-
-  return (
-    <section className="fuzz-panel">
-      <header className="fuzz-hero">
-        <div><span className="fuzz-eyebrow"><FiShield /> Safe request mutations</span><h2>Schema-driven fuzz testing</h2><p>Generate edge cases from your request body and identify APIs that accept unexpected input or fail under invalid data.</p></div>
-        <div className="fuzz-summary"><FiActivity /><strong>{cases.length}</strong><span>cases discovered</span></div>
-      </header>
-      <div className="fuzz-controls">
-        <div className="fuzz-field">
-          <label htmlFor="fuzz-request">Target request</label>
-          <AppSelect
-            id="fuzz-request"
-            className="fuzz-request-select"
-            value={requestId || String(activeRequest._id || activeRequest.id)}
-            onChange={(value) => { setRequestId(value); setResults([]); }}
-            options={compatibleRequests.map((request) => ({ value: String(request._id || request.id), label: `${request.method} · ${request.name || request.url}` }))}
-          />
-        </div>
-        <div className="fuzz-field fuzz-field--profile">
-          <label htmlFor="fuzz-case-limit">Test profile</label>
-          <AppSelect
-            id="fuzz-case-limit"
-            value={limit}
-            onChange={setLimit}
-            options={[{ value: 5, label: 'Quick · 5 cases' }, { value: 8, label: 'Standard · 8 cases' }, { value: 15, label: 'Full · all cases' }]}
-          />
-        </div>
-        <div className="fuzz-run-action">
-          <span>Generated from {Object.keys(cases[0]?.body || {}).length} detected field{Object.keys(cases[0]?.body || {}).length === 1 ? '' : 's'}</span>
-          <button type="button" className="fuzz-run-button" onClick={runFuzzTests} disabled={running || !cases.length || hasConfigurationIssue}><FiPlay />{running ? 'Running…' : 'Run fuzz tests'}</button>
-        </div>
-      </div>
-      {hasConfigurationIssue && <div className="fuzz-configuration-warning"><FiAlertTriangle /><div><b>Configure this request before fuzzing.</b><span>Set values for {unresolvedValues.map((value) => executableRequest.url.includes(`{{${value}}}`) ? `{{${value}}}` : `:${value}`).join(', ')} in the selected environment or request parameters.</span></div></div>}
-      <div className="fuzz-workspace">
-        <section className="fuzz-results-pane">
-          <div className="fuzz-pane-heading"><div><span className="fuzz-eyebrow">Execution matrix</span><h3>Generated test cases</h3></div><span className={`fuzz-queue ${results.length ? 'complete' : ''}`}>{results.length ? `${results.length} completed` : `${Math.min(cases.length, Number(limit))} queued`}</span></div>
-          <div className="fuzz-notice"><FiAlertTriangle /> Generated payloads are sent to the selected endpoint. Use a test environment for requests that change data.</div>
-          <div className="fuzz-table-wrap"><table className="fuzz-table"><thead><tr><th>Test case</th><th>Mutation</th><th>Result</th><th>Response time</th></tr></thead><tbody>
-            {(results.length ? results : cases.slice(0, Number(limit))).map((testCase, index) => {
-              const done = Boolean(results.length); const label = done ? statusLabel(testCase) : 'Ready';
-              return <tr key={`${testCase.name}-${index}`}><td><span className={`fuzz-kind ${testCase.kind}`}>{testCase.kind}</span>{testCase.name}</td><td>{testCase.mutation}</td><td><span className={`fuzz-status ${done && testCase.error ? 'failed' : done && testCase.status >= 500 ? 'failed' : done ? 'complete' : 'ready'}`}>{done && !testCase.error && testCase.status < 500 ? <FiCheckCircle /> : done ? <FiAlertTriangle /> : <FiClock />}{label}{done && testCase.status ? ` · ${testCase.status}` : ''}</span></td><td>{done ? `${testCase.duration} ms` : '—'}</td></tr>;
-            })}
-          </tbody></table></div>
-          {results.length > 0 && <p className="fuzz-result-note">A rejected 4xx response is usually expected for invalid input. Review accepted invalid cases and any 5xx errors first.</p>}
-        </section>
-        <aside className="fuzz-guide">
-          <div><span className="fuzz-eyebrow">Run insight</span><h3>{results.length ? 'Review this run' : 'Ready to probe'}</h3><p>{results.length ? 'Prioritize any server errors and invalid payloads your API accepted.' : 'Each payload is derived from the selected request; the original request is never modified.'}</p></div>
-          <div className="fuzz-insight-stats"><div><strong>{results.length || Math.min(cases.length, Number(limit))}</strong><span>{results.length ? 'cases run' : 'cases queued'}</span></div><div><strong>{serverErrorCount}</strong><span>server errors</span></div></div>
-          <ol className="fuzz-guide-list"><li><b>Baseline</b><span>Confirms the original payload still behaves as expected.</span></li><li><b>Validation</b><span>Removes fields and changes types to verify input handling.</span></li><li><b>Boundaries</b><span>Probes empty, long, and unexpected values for resilience.</span></li></ol>
-          <div className="fuzz-guide-footer"><FiShield /> Invalid payloads that receive 4xx responses are normally handled correctly.</div>
-        </aside>
-      </div>
-    </section>
-  );
+  const toggle = (id) => setSelected((current) => ({ ...current, [id]: !current[id] }));
+  const emptyMessage = sourceType === 'openapi' ? 'No OpenAPI operations were found. Create an API version with an OpenAPI specification, then add a saved request for the operation you want to execute.' : sourceType === 'graphql' ? 'No GraphQL requests were found. Save a GraphQL request with its query and SDL schema, then return here.' : 'No JSON-body requests are available for fallback fuzzing.';
+  return <section className="fuzz-panel"><header className="fuzz-hero"><div><span className="fuzz-eyebrow"><FiShield /> Safe schema mutations</span><h2>Schema-driven fuzz testing</h2><p>Generate validation cases from an OpenAPI operation or GraphQL schema, preview them, then run only the cases you select.</p></div><div className="fuzz-summary"><FiActivity /><strong>{cases.length}</strong><span>cases discovered</span></div></header><div className="fuzz-controls"><div className="fuzz-field"><label>Schema source</label><AppSelect value={sourceType} onChange={setSourceType} options={[{ value: 'openapi', label: 'OpenAPI operation' }, { value: 'graphql', label: 'GraphQL request' }, { value: 'request-body', label: 'Request body fallback' }]} /></div><div className="fuzz-field"><label>Target operation</label><AppSelect value={chosen} onChange={setSourceKey} options={sourceOptions} placeholder="Choose a compatible operation" /></div><div className="fuzz-run-action"><label className="fuzz-acknowledgement"><input type="checkbox" checked={acknowledged} onChange={(event) => setAcknowledged(event.target.checked)} /> I confirm this is a non-production test environment.</label><button type="button" className="fuzz-run-button" onClick={run} disabled={running || !acknowledged || !selectedCases.length || missingUrlVariables.length}><FiPlay />{running ? 'Running…' : `Run ${selectedCases.length} cases`}</button></div></div>{!sourceOptions.length && <div className="fuzz-configuration-warning"><FiAlertTriangle />{emptyMessage}</div>}{error && <div className="fuzz-configuration-warning"><FiAlertTriangle />{error}</div>}{missingUrlVariables.length > 0 && <div className="fuzz-configuration-warning"><FiAlertTriangle />Set URL variables before fuzzing: {missingUrlVariables.join(', ')}</div>}<div className="fuzz-workspace"><section className="fuzz-results-pane"><div className="fuzz-pane-heading"><div><span className="fuzz-eyebrow">Execution matrix</span><h3>Generated test cases</h3></div><span className="fuzz-queue">{selectedCases.length} selected</span></div><div className="fuzz-notice"><FiAlertTriangle /> Generated payloads are sent to the selected endpoint. Schema sources and saved requests are never modified.</div><div className="fuzz-table-wrap"><table className="fuzz-table"><thead><tr><th>Run</th><th>Test case</th><th>Mutation</th><th>Result</th><th>Response time</th></tr></thead><tbody>{cases.map((item) => { const result = results.find((entry) => entry.id === item.id); return <tr key={item.id}><td><input type="checkbox" checked={Boolean(selected[item.id])} onChange={() => toggle(item.id)} disabled={running} /></td><td><span className={`fuzz-kind ${item.category}`}>{item.category}</span>{item.name}</td><td>{item.mutation}</td><td><span className={`fuzz-status ${result?.error || result?.responseStatus >= 500 ? 'failed' : result ? 'complete' : 'ready'}`}>{result ? result.error || result.responseStatus >= 500 ? <FiAlertTriangle /> : <FiCheckCircle /> : <FiClock />}{result ? `${statusLabel(result)}${result.responseStatus ? ` · ${result.responseStatus}` : ''}` : 'Ready'}</span></td><td>{result ? `${result.duration} ms` : '—'}</td></tr>; })}</tbody></table></div></section><aside className="fuzz-guide"><div><span className="fuzz-eyebrow">Run history</span><h3>Recent fuzz runs</h3><p>{history.length ? `${history.length} retained run${history.length === 1 ? '' : 's'} for this collection.` : 'Completed fuzz runs are stored here for regression review.'}</p></div>{history.slice(0, 5).map((runItem) => <div className="fuzz-history-item" key={runItem._id || runItem.createdAt}><strong>{runItem.sourceType} · {runItem.passed}/{runItem.total} handled</strong><span>{new Date(runItem.createdAt).toLocaleString()}</span></div>)}</aside></div></section>;
 }

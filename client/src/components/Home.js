@@ -1,5 +1,5 @@
 // client/src/components/Home.js
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import './Home.css';
@@ -215,35 +215,6 @@ const Home = () => {
 
         fetchRecentPerformance();
     }, []);
-
-    // Command palette (Cmd/Ctrl+K) — 2026 pro-tool pattern.
-    // Routes to key pages; lightweight, no new component.
-    const handleCommandShortcut = useCallback((e) => {
-        if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
-            e.preventDefault();
-            const commands = [
-                { label: 'New Request', path: '../api-network/requests/new' },
-                { label: 'GraphQL', path: '../graphql' },
-                { label: 'Workspace Collections', path: primaryWorkspaceCollectionsPath },
-                { label: 'Monitoring', path: '../monitoring' },
-                { label: 'Workspaces', path: '../workspaces' },
-                { label: 'Settings', path: '../settings' }
-            ];
-            const choice = window.prompt(
-                'Command palette — jump to:\n' + commands.map((c, i) => `${i + 1}. ${c.label}`).join('\n'),
-                '1'
-            );
-            const idx = parseInt(choice, 10) - 1;
-            if (idx >= 0 && idx < commands.length) {
-                navigate(commands[idx].path);
-            }
-        }
-    }, [navigate, primaryWorkspaceCollectionsPath]);
-
-    useEffect(() => {
-        window.addEventListener('keydown', handleCommandShortcut);
-        return () => window.removeEventListener('keydown', handleCommandShortcut);
-    }, [handleCommandShortcut]);
 
     // Helper function to format dates
     const formatDate = (dateString) => {
@@ -585,6 +556,7 @@ const Home = () => {
                     </a>
                 </div>
             </section>
+
         </div>
     );
 };

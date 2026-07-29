@@ -129,6 +129,10 @@ router.use('/incidents', incidentsRoutes);
 router.use('/alerts', alertsRoutes);
 router.use('/mcp', mcpRoutes);
 router.use('/mcp-server', mcpServerRoutes);
+router.use('/fuzz-testing', require('./fuzzTesting'));
+
+// Collection-scoped AI-agent evaluation suites.
+router.use('/evaluation', require('./evaluation'));
 
 // Register Collaboration routes (Reviews & Comments & Activity)
 router.use('/reviews', require('./reviews'));

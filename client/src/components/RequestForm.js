@@ -46,8 +46,9 @@ import DebugConsoleHost from "./VisualApiDesigner/components/DebugConsoleHost";
 
 const getApiUrl = (path) => path;
 
-// HTTP Methods
-const HTTP_METHODS = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD', 'OPTIONS'];
+// Request types supported by a collection. GraphQL is sent over HTTP POST but
+// is modelled explicitly so its query, variables, and SDL can be saved.
+const REQUEST_METHODS = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD', 'OPTIONS', 'GRAPHQL'];
 
 /* Resizable key/value/description columns for the Params + Headers tables.
    Usage: call useColumnResizer(tableId) -> returns { widths, startDrag, resizer }.
@@ -117,6 +118,7 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
     const [responseData, setResponseData] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
     const [responseError, setResponseError] = useState(null);
+    const [isSaving, setIsSaving] = useState(false);
 
     // Notify parent split-pane view of response state changes (used when
     // this form is embedded with an external ResponseDisplay pane).
@@ -132,6 +134,14 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
     const [headers, setHeaders] = useState(initialData.headers || []);
     const [bodyType, setBodyType] = useState(initialData.bodyType || 'none');
     const [bodyContent, setBodyContent] = useState(initialData.body || '');
+    const [graphqlConfig, setGraphqlConfig] = useState(() => ({
+        query: initialData.graphql?.query || '',
+        variables: initialData.graphql?.variables || {},
+        operationName: initialData.graphql?.operationName || '',
+        schema: initialData.graphql?.schema || '',
+        schemaUrl: initialData.graphql?.schemaUrl || ''
+    }));
+    const [graphqlVariablesText, setGraphqlVariablesText] = useState(() => JSON.stringify(initialData.graphql?.variables || {}, null, 2));
     const [binaryFile, setBinaryFile] = useState(null);
     const [isFileDragging, setIsFileDragging] = useState(false);
     const formatFileSize = (bytes) => {
@@ -230,6 +240,9 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
         setBodyFormData(nextData.bodyFormData || [{ enabled: true, key: '', value: '', description: '' }]);
         setBodyType(nextData.bodyType || 'none');
         setBodyContent(nextData.body || '');
+        const nextGraphql = nextData.graphql || {};
+        setGraphqlConfig({ query: nextGraphql.query || '', variables: nextGraphql.variables || {}, operationName: nextGraphql.operationName || '', schema: nextGraphql.schema || '', schemaUrl: nextGraphql.schemaUrl || '' });
+        setGraphqlVariablesText(JSON.stringify(nextGraphql.variables || {}, null, 2));
         setBinaryFile(null);
         setPreRequestScript(nextData.preRequestScript || '');
         setTests(nextData.tests || nextData.testScript || '');
@@ -293,9 +306,25 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
             return 'has-variables';
         }
     };// Handlers for form inputs
-    const handleMethodChange = (nextMethod) => setMethod(
-        typeof nextMethod === 'string' ? nextMethod : nextMethod.target.value
-    );
+    const handleMethodChange = (nextMethod) => {
+        const selectedMethod = typeof nextMethod === 'string' ? nextMethod : nextMethod.target.value;
+        setMethod(selectedMethod);
+        if (selectedMethod === 'GRAPHQL') {
+            setBodyType('graphql');
+            setActiveTab('body');
+        }
+    };
+
+    const parsedGraphqlVariables = () => {
+        try {
+            const variables = JSON.parse(graphqlVariablesText || '{}');
+            if (!variables || Array.isArray(variables) || typeof variables !== 'object') throw new Error('Variables must be a JSON object.');
+            return { ...graphqlConfig, variables };
+        } catch (error) {
+            setResponseError(`GraphQL variables must be valid JSON: ${error.message}`);
+            return null;
+        }
+    };
     const handleUrlChange = (e) => setUrl(e.target.value);
 
     // Variable loading and resolution effects
@@ -794,7 +823,11 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
     };
 
     // Save button handler
-    const handleSave = () => {
+    const handleSave = async () => {
+        const savedGraphql = method === 'GRAPHQL' ? parsedGraphqlVariables() : null;
+        if (method === 'GRAPHQL' && !savedGraphql) return;
+        setIsSaving(true);
+        try {
         // Build request object
         const requestData = {
             _id: initialData._id || initialData.id,
@@ -805,8 +838,8 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
             url,
             params: params.filter(p => p.enabled && p.key),
             headers: headers.filter(h => h.enabled && h.key),
-            bodyType,
-            body: bodyContent,
+            bodyType: method === 'GRAPHQL' ? 'graphql' : bodyType,
+            body: method === 'GRAPHQL' ? JSON.stringify({ query: savedGraphql.query, variables: savedGraphql.variables, operationName: savedGraphql.operationName || undefined }) : bodyContent,
             bodyFormData,
             preRequestScript,
             tests,
@@ -815,8 +848,8 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
             authConfig,
             sslConfig,
             description: initialData.description || '',
-            protocol: initialData.protocol || 'http',
-            graphql: initialData.graphql,
+            protocol: method === 'GRAPHQL' ? 'graphql' : initialData.protocol || 'http',
+            graphql: savedGraphql || initialData.graphql,
             folderPath: initialData.folderPath || [],
             metadata: initialData.metadata || {},
             order: initialData.order,
@@ -825,11 +858,17 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
 
         // Use onSave prop if available
         if (onSave) {
-            onSave(requestData);
+            await onSave(requestData);
+        }
+        } finally {
+            setIsSaving(false);
         }
     };    // Form submission handler
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        const savedGraphql = method === 'GRAPHQL' ? parsedGraphqlVariables() : null;
+        if (method === 'GRAPHQL' && !savedGraphql) return;
 
         // Build request object
         const requestData = {
@@ -841,8 +880,8 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
             url,
             params: params.filter(p => p.enabled && p.key),
             headers: headers.filter(h => h.enabled && h.key),
-            bodyType,
-            body: bodyContent,
+            bodyType: method === 'GRAPHQL' ? 'graphql' : bodyType,
+            body: method === 'GRAPHQL' ? JSON.stringify({ query: savedGraphql.query, variables: savedGraphql.variables, operationName: savedGraphql.operationName || undefined }) : bodyContent,
             bodyFormData,
             preRequestScript,
             tests,
@@ -851,8 +890,8 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
             authConfig,
             sslConfig,
             description: initialData.description || '',
-            protocol: initialData.protocol || 'http',
-            graphql: initialData.graphql,
+            protocol: method === 'GRAPHQL' ? 'graphql' : initialData.protocol || 'http',
+            graphql: savedGraphql || initialData.graphql,
             folderPath: initialData.folderPath || [],
             metadata: initialData.metadata || {},
             order: initialData.order,
@@ -1618,6 +1657,31 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
                 );
 
             case 'body':
+                if (method === 'GRAPHQL') {
+                    return (
+                        <div className="graphql-request-section">
+                            <div className="section-header-row">
+                                <div className="section-title"><Globe size={18} /><span>GraphQL request</span></div>
+                                <span className="section-description">Save the operation, variables, and SDL schema used for validation and fuzz testing.</span>
+                            </div>
+                            <div className="graphql-editor-grid">
+                                <label className="graphql-editor-field graphql-editor-field--query">Query
+                                    <textarea value={graphqlConfig.query} onChange={(event) => setGraphqlConfig((current) => ({ ...current, query: event.target.value }))} placeholder="query GetUser($id: ID!) { user(id: $id) { id name } }" spellCheck="false" />
+                                </label>
+                                <label className="graphql-editor-field">Variables (JSON)
+                                    <textarea value={graphqlVariablesText} onChange={(event) => setGraphqlVariablesText(event.target.value)} placeholder={'{\n  "id": "123"\n}'} spellCheck="false" />
+                                </label>
+                                <label className="graphql-editor-field graphql-editor-field--schema">SDL schema
+                                    <textarea value={graphqlConfig.schema} onChange={(event) => setGraphqlConfig((current) => ({ ...current, schema: event.target.value }))} placeholder="type Query { user(id: ID!): User }\n\ntype User { id: ID! name: String! }" spellCheck="false" />
+                                </label>
+                            </div>
+                            <div className="graphql-operation-row">
+                                <label>Operation name<input value={graphqlConfig.operationName} onChange={(event) => setGraphqlConfig((current) => ({ ...current, operationName: event.target.value }))} placeholder="Optional for a single operation" /></label>
+                                <p>The SDL schema is required for GraphQL fuzz testing. It is saved with this request.</p>
+                            </div>
+                        </div>
+                    );
+                }
                 return (
                     <div className="body-section">
                         <div className="body-type-tabs">
@@ -2971,11 +3035,12 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
                 <div className="request-url-bar">
                     <AppSelect
                         className={`request-method-select method-${method.toLowerCase()}`}
+                        menuClassName="request-method-menu"
                         value={method}
                         onChange={handleMethodChange}
-                        options={HTTP_METHODS.map((httpMethod) => ({
-                            value: httpMethod,
-                            label: httpMethod
+                        options={REQUEST_METHODS.map((requestMethod) => ({
+                            value: requestMethod,
+                            label: requestMethod === 'GRAPHQL' ? 'GraphQL' : requestMethod
                         }))}
                         id="request-method"
                     />
@@ -2992,14 +3057,14 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
                                 }
                             }
                         }}
-                        placeholder="Enter request URL"
+                        placeholder={method === 'GRAPHQL' ? 'Enter GraphQL endpoint URL' : 'Enter request URL'}
                         required
                     /><button type="submit" className="send-btn" disabled={isLoading || !variableValidation.isValid}>
                         {isLoading ? 'Sending...' : 'Send'}
                     </button>
 
-                    <button type="button" className="save-btn" onClick={handleSave}>
-                        Save
+                    <button type="button" className="save-btn" onClick={handleSave} disabled={isSaving}>
+                        {isSaving ? 'Saving...' : 'Save'}
                     </button>
                 </div>
 
@@ -3058,7 +3123,7 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
                         className={`request-tab ${activeTab === 'body' ? 'active' : ''}`}
                         onClick={() => handleTabChange('body')}
                     >
-                        <Box size={16} /> <span>Body</span>
+                        <Box size={16} /> <span>{method === 'GRAPHQL' ? 'GraphQL' : 'Body'}</span>
                     </div>
                     <div
                         className={`request-tab ${activeTab === 'ssl' ? 'active' : ''}`}

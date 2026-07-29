@@ -16,6 +16,26 @@
   box-shadow: 0 0 0 1px color-mix(in srgb, var(--primary-color) 5%, transparent), var(--card-shadow, 0 12px 32px rgba(0, 0, 0, .14));
 }
 
+.fuzz-acknowledgement {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 280px;
+  color: var(--text-secondary, #475569);
+  font-size: 12px;
+}
+
+.fuzz-history-item {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border-color, #e2e8f0);
+  font-size: 12px;
+}
+
+.fuzz-history-item span { color: var(--text-muted, #64748b); }
+
 .fuzz-hero { display: flex; justify-content: space-between; gap: 24px; padding: 26px 28px 24px; border-bottom: 1px solid var(--fuzz-border); background: linear-gradient(112deg, color-mix(in srgb, var(--primary-color) 10%, var(--fuzz-surface)), var(--fuzz-surface) 54%); }
 .fuzz-eyebrow { display: inline-flex; align-items: center; gap: 6px; color: var(--primary-color); font-size: .68rem; font-weight: 750; letter-spacing: .075em; text-transform: uppercase; }.fuzz-hero h2 { margin: 8px 0 7px; color: var(--text-color); font-size: 1.22rem; letter-spacing: -.015em; }.fuzz-hero p { max-width: 640px; margin: 0; color: var(--fuzz-muted); font-size: .88rem; line-height: 1.55; }.fuzz-summary { display: grid; align-content: center; justify-items: center; gap: 2px; min-width: 116px; padding: 12px; border: 1px solid color-mix(in srgb, var(--primary-color) 34%, var(--fuzz-border)); border-radius: 10px; background: color-mix(in srgb, var(--fuzz-inset) 72%, transparent); color: var(--fuzz-muted); font-size: .68rem; text-align: center; }.fuzz-summary svg { color: var(--primary-color); }.fuzz-summary strong { color: var(--text-color); font-size: 1.4rem; line-height: 1.15; }
 
