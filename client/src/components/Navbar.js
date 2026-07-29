@@ -253,7 +253,7 @@ const Navbar = ({ isAuthenticated }) => {
 
     return (
         <nav
-            className={`navbar ${isScrolled ? 'scrolled' : ''}`}
+            className={`navbar ${isScrolled ? 'scrolled' : ''}${!isAuthenticated ? ' navbar-public' : ''}`}
             style={{ transform: navbarVisible ? 'translateY(0)' : 'translateY(-100%)', transition: 'transform 0.3s ease' }}
             ref={navbarRef}
         >
@@ -261,20 +261,28 @@ const Navbar = ({ isAuthenticated }) => {
                 <div className="navbar-brand" onClick={() => handleNavigation(isAuthenticated ? '/workspace/home' : '/')}>
                     Pigeon
                 </div>
-                <button
-                    type="button"
-                    className="hamburger"
-                    aria-label={isMobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
-                    aria-expanded={isMobileMenuOpen}
-                    aria-controls="primary-navigation"
-                    onClick={(e) => {
-                        e.stopPropagation();
-                        e.preventDefault();
-                        setIsMobileMenuOpen(!isMobileMenuOpen);
-                    }}
-                >
-                    {isMobileMenuOpen ? <FiX size={24} /> : <FiMenu size={24} />}
-                </button>
+                {isAuthenticated && (
+                    <button
+                        type="button"
+                        className="hamburger"
+                        aria-label={isMobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
+                        aria-expanded={isMobileMenuOpen}
+                        aria-controls="primary-navigation"
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            e.preventDefault();
+                            setIsMobileMenuOpen(!isMobileMenuOpen);
+                        }}
+                    >
+                        {isMobileMenuOpen ? <FiX size={24} /> : <FiMenu size={24} />}
+                    </button>
+                )}
+
+                {!isAuthenticated && (
+                    <a href={getGoogleAuthUrl()} className="login-button navbar-login-button">
+                        Sign In
+                    </a>
+                )}
 
                 {isMobileMenuOpen && (
                     <button
@@ -543,13 +551,7 @@ const Navbar = ({ isAuthenticated }) => {
                                 </div>
                             </div>
                         </>
-                    ) : (
-                        <div className="navbar-end">
-                            <a href={getGoogleAuthUrl()} className="login-button">
-                                Sign In
-                            </a>
-                        </div>
-                    )}
+                    ) : null}
                 </div>
             </div>
         </nav>

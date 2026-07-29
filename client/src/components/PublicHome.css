@@ -135,6 +135,60 @@ body.pigeon-marketing-body { scrollbar-color: #4e3522 #0b0907; scrollbar-width: 
 .pigeon-marketing-footer .pigeon-social { gap: 8px; padding: 8px 10px; color: #ffd3a5; background: rgba(255,138,31,.07); border: 1px solid rgba(255,193,132,.16); border-radius: 6px; transition: color .2s, background .2s, border-color .2s; }.pigeon-marketing-footer .pigeon-social:hover { color: #fff4e8; background: rgba(255,138,31,.14); border-color: rgba(255,193,132,.35); }
 @media (max-width: 760px) { .pigeon-footer-grid > div:first-child { max-width: none; padding: 0 0 24px; border-bottom: 1px solid rgba(255,202,145,.12); }.pigeon-footer-grid > div:first-child::after { display: none; } }
 
+/* Keep the marketing footer fluid before the phone breakpoint as well. */
+@media (max-width: 1024px) {
+    .pigeon-marketing-footer {
+        width: 100%;
+        max-width: none;
+        padding-right: 24px;
+        padding-left: 24px;
+    }
+
+    .pigeon-footer-grid {
+        width: 100%;
+        max-width: none;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 36px 24px;
+    }
+
+    .pigeon-footer-grid > div:first-child {
+        max-width: none;
+        grid-column: 1 / -1;
+    }
+
+    .pigeon-footer-bottom {
+        width: 100%;
+        max-width: none;
+    }
+}
+
+@media (max-width: 600px) {
+    .pigeon-marketing-footer {
+        padding: 42px 16px 20px;
+    }
+
+    .pigeon-footer-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 24px 18px;
+    }
+
+    .pigeon-footer-grid > div:first-child {
+        grid-column: 1 / -1;
+    }
+
+    .pigeon-footer-grid > div:not(:first-child) {
+        gap: 7px;
+    }
+
+    .pigeon-footer-grid h3 {
+        margin-bottom: 9px;
+    }
+
+    .pigeon-footer-bottom {
+        margin-top: 32px;
+    }
+}
+
 /* Real, editable request controls for the public try-it panel. */
 .pigeon-demo--live .pigeon-demo-topbar input { transition: border-color .2s, box-shadow .2s; }.pigeon-demo--live .pigeon-demo-topbar input:focus { border-color: rgba(255,178,99,.7); box-shadow: 0 0 0 3px rgba(255,138,31,.1); outline: 0; }
 .pigeon-demo--live .pigeon-demo-tabs { align-items: center; justify-content: space-between; min-height: 43px; padding: 0 18px; color: var(--pigeon-orange-light); font: 800 9px/1 ui-monospace, monospace; }.pigeon-demo--live .pigeon-demo-tabs small { color: #8e7561; font-size: 8px; font-weight: 600; }
@@ -162,6 +216,23 @@ body.pigeon-marketing-body { scrollbar-color: #4e3522 #0b0907; scrollbar-width: 
 .pigeon-demo--live .pigeon-preset-typing { display: inline-flex; align-items: center; gap: 5px; color: #ffc184; }
 .pigeon-demo--live .pigeon-preset-typing::before { width: 5px; height: 5px; content: ''; background: var(--pigeon-orange); border-radius: 50%; box-shadow: 0 0 8px rgba(255,138,31,.75); animation: pigeon-pulse 1s ease-in-out infinite; }
 @media (max-width: 760px) { .pigeon-demo--live .pigeon-demo-topbar { grid-template-columns: 78px minmax(0, 1fr); gap: 8px; }.pigeon-demo--live .pigeon-method-picker { width: 78px; min-width: 78px; }.pigeon-demo--live .pigeon-demo-topbar input { min-width: 0; }.pigeon-demo--live .pigeon-send { grid-column: 1 / -1; width: 100%; } }
+
+@media (max-width: 760px) {
+    .pigeon-demo-editor--live textarea,
+    .pigeon-response > pre {
+        box-sizing: border-box;
+        max-width: 100%;
+        overflow-x: hidden;
+        overflow-wrap: anywhere;
+        word-break: break-word;
+    }
+
+    .pigeon-demo-editor--live textarea {
+        min-height: 140px;
+        padding-right: 18px;
+        overflow-y: auto;
+    }
+}
 
 /* Use the same Inter body face as the product-explorer description across
    public-facing copy and controls. JSON and response output remain code-like. */
@@ -227,3 +298,28 @@ body.pigeon-marketing-body { scrollbar-color: #4e3522 #0b0907; scrollbar-width: 
 .pigeon-final-cta:focus-within::after { opacity: 1; animation: pigeon-beam-hover 1.8s cubic-bezier(.22, 1, .36, 1) forwards; }
 .pigeon-final-cta::after { z-index: 0; pointer-events: none; }
 @keyframes pigeon-beam-hover { 0% { left: -25%; opacity: 0; } 15% { opacity: 1; } 100% { left: 125%; opacity: 1; } }
+
+@media (max-width: 760px) {
+    .pigeon-hero-content,
+    .pigeon-hero-copy { width: 100%; max-width: 100%; }
+    .pigeon-hero h1 { font-size: clamp(2.75rem, 12.5vw, 4.5rem); letter-spacing: -.045em; line-height: .94; }
+    .pigeon-hero h1 em { display: block; }
+    .pigeon-hero-changing-line { white-space: normal; }
+    .pigeon-hero-copy > p { width: 100%; padding: 0 8px; }
+    .pigeon-hero .pigeon-demo-section { width: calc(100vw - 32px); }
+    .pigeon-demo-sidebar { min-height: 0; padding: 10px; flex-direction: row; gap: 6px; overflow-x: auto; }
+    .pigeon-demo-sidebar-title,
+    .pigeon-demo-sidebar-footer { display: none; }
+    .pigeon-demo-sidebar button { display: flex; width: auto; min-height: 32px; flex: 0 0 auto; padding: 6px 8px; }
+    .pigeon-feature-card.graph > div { min-height: 300px; }
+    .pigeon-feature-card.graph h3,
+    .pigeon-feature-card.graph p { max-width: none; }
+    .pigeon-feature-card.graph .pigeon-latency-graph { right: 24px; bottom: 22px; left: 24px; width: auto; }
+    .pigeon-workflow-step { display: flex; min-height: 0; flex-direction: column; align-items: stretch; gap: 20px; }
+    .pigeon-workflow-copy { width: 100%; max-width: none; }
+    .pigeon-workflow-card { width: 100%; min-height: 156px; }
+}
+
+@media (max-width: 1024px) {
+    .pigeon-final-cta { width: calc(100% - 32px); max-width: none; margin-right: auto; margin-left: auto; }
+}

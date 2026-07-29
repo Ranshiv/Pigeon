@@ -466,6 +466,14 @@
     z-index: 1;
 }
 
+.navbar-login-button {
+    margin-left: auto;
+}
+
+.navbar-public .navbar-menu {
+    display: none;
+}
+
 .workspace-search-input[type="text"] {
     width: 100%;
     padding: 9px 12px 9px 38px;
