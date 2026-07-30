@@ -9,6 +9,7 @@ import {
 import { getApiBaseUrl, getGoogleAuthUrl } from '../utils/apiBaseUrl';
 import AppSelect from './common/AppSelect/AppSelect';
 import Ferrofluid from './Ferrofluid';
+import TurnstileWidget from './TurnstileWidget';
 import './PublicHome.css';
 
 const REQUESTS = [
@@ -162,6 +163,8 @@ function ProductDemoContent() {
     const [response, setResponse] = useState(null);
     const [error, setError] = useState('');
     const [isPresetTyping, setIsPresetTyping] = useState(false);
+    const [turnstileToken, setTurnstileToken] = useState('');
+    const turnstileRequired = Boolean(process.env.REACT_APP_TURNSTILE_SITE_KEY);
     const typingTimerRef = useRef(null);
     useEffect(() => () => {
         if (typingTimerRef.current) window.clearInterval(typingTimerRef.current);
@@ -215,6 +218,10 @@ function ProductDemoContent() {
     };
     const send = async () => {
         if (isPresetTyping) return;
+        if (turnstileRequired && !turnstileToken) {
+            setError('Complete the security check before sending the request.');
+            return;
+        }
         let parsedBody;
         if (body.trim()) {
             try { parsedBody = JSON.parse(body); } catch { setError('Body must contain valid JSON before it can be sent.'); return; }
@@ -227,7 +234,12 @@ function ProductDemoContent() {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 credentials: 'include',
-                body: JSON.stringify({ url, method, ...(parsedBody !== undefined ? { body: parsedBody } : {}) })
+                body: JSON.stringify({
+                    url,
+                    method,
+                    ...(parsedBody !== undefined ? { body: parsedBody } : {}),
+                    ...(turnstileToken ? { turnstileToken } : {})
+                })
             });
             const data = await result.json();
             if (!result.ok) throw new Error(data.message || 'The request could not be completed.');
@@ -239,7 +251,7 @@ function ProductDemoContent() {
         }
     };
     const responseText = response ? JSON.stringify(response.body, null, 2) : '';
-    return <section className="pigeon-section pigeon-demo-section" id="product" aria-label="Interactive API request demo"><Reveal delay={0.08}><ScrollParallax className="pigeon-demo-scroll-stage"><div className="pigeon-demo pigeon-demo--live" aria-label="Interactive API request demo"><aside className="pigeon-demo-sidebar"><div className="pigeon-demo-sidebar-title"><FiLayers /> Public API demo <span>{REQUESTS.length} presets</span></div>{REQUESTS.map((item, index) => <button type="button" key={item.name} className={selected === index ? 'is-active' : ''} onClick={() => selectPreset(index)}><b className={`method-${item.method.toLowerCase()}`}>{item.method}</b><span>{item.name}</span><i /></button>)}<div className="pigeon-demo-sidebar-footer"><span /> Real request</div></aside><div className="pigeon-demo-main"><div className="pigeon-demo-windowbar"><span><i /><i /><i /></span><b>try-it / jsonplaceholder</b><small>Editable public demo</small></div><div className="pigeon-demo-topbar"><AppSelect id="pigeon-http-method" value={method} onChange={selectMethod} options={['GET', 'POST', 'PUT', 'PATCH', 'DELETE'].map((item) => ({ value: item, label: item }))} className="pigeon-method-picker" menuClassName="pigeon-method-menu" /><input aria-label="Request URL" value={url} onChange={updateUrl} className={isPresetTyping ? 'is-typing' : ''} spellCheck="false" /><button type="button" className="pigeon-send" onClick={send} disabled={sending || isPresetTyping}>{sending || isPresetTyping ? <i className="pigeon-spinner" /> : <FiSend />} {sending ? 'Sending…' : isPresetTyping ? 'Loading…' : 'Send request'}</button></div><div className="pigeon-demo-tabs"><span>JSON body</span><small className={isPresetTyping ? 'pigeon-preset-typing' : ''}>{isPresetTyping ? 'Loading preset…' : 'Allowed: jsonplaceholder.typicode.com, httpbin.org'}</small></div><div className="pigeon-demo-editor pigeon-demo-editor--live"><textarea aria-label="JSON request body" value={body} onChange={updateBody} className={isPresetTyping ? 'is-typing' : ''} spellCheck="false" placeholder={'{\n  "key": "value"\n}'} /><span className="pigeon-editor-hint">{isPresetTyping ? 'Typing curated request…' : <><FiZap /> Your request is sent through Pigeon</>}</span></div>{error ? <p className="pigeon-demo-error" role="alert">{error}</p> : null}<div className={`pigeon-response${sending ? ' is-sending' : ''}`}><div className="pigeon-response-heading"><span>Response</span>{sending ? <span className="pigeon-sending"><i /> Sending request</span> : response ? <b className={response.status >= 400 ? 'is-error' : ''}><FiCheck /> {response.status} {response.statusText}</b> : <small>Ready to send</small>}<small>{response ? `${response.duration} ms · ${response.size} B` : null}</small></div><pre aria-live="polite">{responseText || (sending ? 'Contacting the curated demo API…' : '// Edit the URL or JSON body, then send a real request.')}</pre>{!response && !sending ? <div className="pigeon-response-empty"><span><FiActivity /></span><p>Try one of the presets or edit this request. Demo hosts are intentionally limited for safety.</p></div> : null}</div></div></div></ScrollParallax></Reveal></section>;
+    return <section className="pigeon-section pigeon-demo-section" id="product" aria-label="Interactive API request demo"><Reveal delay={0.08}><ScrollParallax className="pigeon-demo-scroll-stage"><div className="pigeon-demo pigeon-demo--live" aria-label="Interactive API request demo"><aside className="pigeon-demo-sidebar"><div className="pigeon-demo-sidebar-title"><FiLayers /> Public API demo <span>{REQUESTS.length} presets</span></div>{REQUESTS.map((item, index) => <button type="button" key={item.name} className={selected === index ? 'is-active' : ''} onClick={() => selectPreset(index)}><b className={`method-${item.method.toLowerCase()}`}>{item.method}</b><span>{item.name}</span><i /></button>)}<div className="pigeon-demo-sidebar-footer"><span /> Real request</div></aside><div className="pigeon-demo-main"><div className="pigeon-demo-windowbar"><span><i /><i /><i /></span><b>try-it / jsonplaceholder</b><small>Editable public demo</small></div><div className="pigeon-demo-topbar"><AppSelect id="pigeon-http-method" value={method} onChange={selectMethod} options={['GET', 'POST', 'PUT', 'PATCH', 'DELETE'].map((item) => ({ value: item, label: item }))} className="pigeon-method-picker" menuClassName="pigeon-method-menu" /><input aria-label="Request URL" value={url} onChange={updateUrl} className={isPresetTyping ? 'is-typing' : ''} spellCheck="false" /><button type="button" className="pigeon-send" onClick={send} disabled={sending || isPresetTyping || (turnstileRequired && !turnstileToken)}>{sending || isPresetTyping ? <i className="pigeon-spinner" /> : <FiSend />} {sending ? 'Sending…' : isPresetTyping ? 'Loading…' : 'Send request'}</button></div><div className="pigeon-demo-tabs"><span>JSON body</span><small className={isPresetTyping ? 'pigeon-preset-typing' : ''}>{isPresetTyping ? 'Loading preset…' : 'Allowed: jsonplaceholder.typicode.com, httpbin.org'}</small></div>{turnstileRequired ? <div className="pigeon-turnstile-row"><TurnstileWidget onToken={setTurnstileToken} onError={setError} /></div> : null}<div className="pigeon-demo-editor pigeon-demo-editor--live"><textarea aria-label="JSON request body" value={body} onChange={updateBody} className={isPresetTyping ? 'is-typing' : ''} spellCheck="false" placeholder={'{\n  "key": "value"\n}'} /><span className="pigeon-editor-hint">{isPresetTyping ? 'Typing curated request…' : <><FiZap /> Your request is sent through Pigeon</>}</span></div>{error ? <p className="pigeon-demo-error" role="alert">{error}</p> : null}<div className={`pigeon-response${sending ? ' is-sending' : ''}`}><div className="pigeon-response-heading"><span>Response</span>{sending ? <span className="pigeon-sending"><i /> Sending request</span> : response ? <b className={response.status >= 400 ? 'is-error' : ''}><FiCheck /> {response.status} {response.statusText}</b> : <small>Ready to send</small>}<small>{response ? `${response.duration} ms · ${response.size} B` : null}</small></div><pre aria-live="polite">{responseText || (sending ? 'Contacting the curated demo API…' : '// Edit the URL or JSON body, then send a real request.')}</pre>{!response && !sending ? <div className="pigeon-response-empty"><span><FiActivity /></span><p>Try one of the presets or edit this request. Demo hosts are intentionally limited for safety.</p></div> : null}</div></div></div></ScrollParallax></Reveal></section>;
 }
 
 function ProductDemo() { return <><LandingScrollProgress /><ProductExplorer /><CapabilityStrip /></>; }

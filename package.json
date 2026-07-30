@@ -34,6 +34,7 @@
     "@grpc/grpc-js": "^1.14.1",
     "@grpc/proto-loader": "^0.8.0",
     "@monaco-editor/react": "^4.7.0",
+    "@sentry/node": "^10.0.0",
     "@shadcn/ui": "^0.0.4",
     "@stoplight/spectral-core": "^1.20.0",
     "@stoplight/spectral-functions": "^1.10.1",

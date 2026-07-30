@@ -1,5 +1,6 @@
 import React from 'react';
 import { FiAlertTriangle, FiRefreshCw } from 'react-icons/fi';
+import { Sentry } from '../../../observability/sentry';
 import './ErrorBoundary.css';
 
 class ErrorBoundary extends React.Component {
@@ -22,6 +23,11 @@ class ErrorBoundary extends React.Component {
     componentDidCatch(error, errorInfo) {
         // Log the error details
         console.error('ErrorBoundary caught an error:', error, errorInfo);
+        Sentry.captureException(error, {
+            contexts: {
+                react: { componentStack: errorInfo?.componentStack || 'unknown' }
+            }
+        });
 
         // Check if this is a DOM manipulation error
         const isDOMError = error.message && (

@@ -7,6 +7,9 @@ import { BrowserRouter } from 'react-router-dom';
 import { ThemeProvider } from './context/ThemeContext';
 import { FontProvider } from './context/FontContext'; // Import FontProvider
 import { CollaborationProvider } from './context/CollaborationContext'; // Import CollaborationProvider
+import { initializeSentry, Sentry } from './observability/sentry';
+
+initializeSentry();
 
 // Global ResizeObserver error handler
 // This prevents ResizeObserver loop errors from showing in console during zoom/resize operations
@@ -98,14 +101,16 @@ handleGlobalErrors();
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-    <BrowserRouter>
-      <ThemeProvider>
-        <FontProvider> {/* Wrap with FontProvider */}
-          <CollaborationProvider> {/* Wrap with CollaborationProvider */}
-            <App />
-          </CollaborationProvider>
-        </FontProvider>
-      </ThemeProvider>
-    </BrowserRouter>
+    <Sentry.ErrorBoundary fallback={<div role="alert">Something went wrong. Please reload the page.</div>}>
+      <BrowserRouter>
+        <ThemeProvider>
+          <FontProvider> {/* Wrap with FontProvider */}
+            <CollaborationProvider> {/* Wrap with CollaborationProvider */}
+              <App />
+            </CollaborationProvider>
+          </FontProvider>
+        </ThemeProvider>
+      </BrowserRouter>
+    </Sentry.ErrorBoundary>
   </React.StrictMode>
 );

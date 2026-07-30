@@ -12,8 +12,12 @@ import PageLoader from './components/common/PageLoader/PageLoader';
 import CommandPalette from './components/CommandPalette';
 import './App.css';
 import './theme-overrides.css';
+import { clearSentryUser, setSentryUser } from './observability/sentry';
+import { AnalyticsConsentBanner, AnalyticsPageTracker } from './observability/AnalyticsConsent';
+import { useTheme } from './context/ThemeContext';
 
 const APP_NAME = 'Pigeon';
+const DEFAULT_DESCRIPTION = 'Pigeon is a collaborative API testing, monitoring, and automation platform for modern engineering teams.';
 
 const formatSegment = (segment = '') =>
   segment
@@ -81,10 +85,74 @@ function App() {
   const [isLoading, setIsLoading] = useState(true);
   const location = useLocation();
   const isPublicLanding = location.pathname === '/' && !isAuthenticated;
+  const { theme } = useTheme();
+
+  // The marketing home page always uses the Omni visual system. Keep the
+  // user's saved workspace theme untouched and restore it on every other
+  // route instead of persisting the public-page override.
+  useEffect(() => {
+    const themeClasses = ['light-theme', 'dark-theme', 'omni-theme', 'black-theme'];
+    document.body.classList.remove(...themeClasses);
+
+    if (isPublicLanding) {
+      document.body.classList.add('omni-theme', 'dark-theme');
+      return;
+    }
+
+    if (theme === 'light') {
+      document.body.classList.add('light-theme');
+    } else {
+      document.body.classList.add(theme === 'dark' ? 'dark-theme' : theme, 'dark-theme');
+    }
+  }, [isPublicLanding, theme]);
 
   useEffect(() => {
     const pageTitle = getPageTitle(location.pathname);
     document.title = `${pageTitle} | ${APP_NAME}`;
+
+    const publicRoute = !location.pathname.startsWith('/workspace') &&
+      !location.pathname.startsWith('/oauth') &&
+      !location.pathname.startsWith('/alerts');
+    const description = location.pathname === '/'
+      ? DEFAULT_DESCRIPTION
+      : `${pageTitle} in Pigeon.`;
+    const robots = publicRoute ? 'index,follow' : 'noindex,nofollow';
+    const origin = window.location.origin;
+
+    const setMeta = (name, content) => {
+      let element = document.querySelector(`meta[name="${name}"]`);
+      if (!element) {
+        element = document.createElement('meta');
+        element.setAttribute('name', name);
+        document.head.appendChild(element);
+      }
+      element.setAttribute('content', content);
+    };
+
+    const setProperty = (property, content) => {
+      let element = document.querySelector(`meta[property="${property}"]`);
+      if (!element) {
+        element = document.createElement('meta');
+        element.setAttribute('property', property);
+        document.head.appendChild(element);
+      }
+      element.setAttribute('content', content);
+    };
+
+    setMeta('description', description);
+    setMeta('robots', robots);
+    setProperty('og:title', `${pageTitle} | ${APP_NAME}`);
+    setProperty('og:description', description);
+    setProperty('og:url', `${origin}${location.pathname}`);
+    setProperty('og:type', 'website');
+
+    let canonical = document.querySelector('link[rel="canonical"]');
+    if (!canonical) {
+      canonical = document.createElement('link');
+      canonical.setAttribute('rel', 'canonical');
+      document.head.appendChild(canonical);
+    }
+    canonical.setAttribute('href', `${origin}${location.pathname}`);
   }, [location.pathname]);
 
   useEffect(() => {
@@ -105,6 +173,10 @@ function App() {
 
         // Store user data in localStorage if authenticated
         if (data.isAuthenticated && data.user) {
+          setSentryUser({
+            id: data.user._id || data.user.id,
+            email: data.user.email
+          });
           localStorage.setItem('user', JSON.stringify({
             id: data.user._id || data.user.id,
             displayName: data.user.displayName || data.user.name || "User",
@@ -112,9 +184,12 @@ function App() {
             profileIcon: data.user.profileIcon,
             notificationPreferences: data.user.notificationPreferences
           }));
+        } else {
+          clearSentryUser();
         }
       } catch (err) {
         console.error("Error checking auth:", err);
+        clearSentryUser();
         setIsAuthenticated(false); // Assume not authenticated on error
       } finally {
         setIsLoading(false); // Always stop loading after auth check
@@ -127,7 +202,7 @@ function App() {
   // Show loading spinner while checking authentication
   if (isLoading) {
     return (
-      <div className="App" style={{ display: 'flex', height: '100vh' }}>
+      <div className={`App${isPublicLanding ? ' App--marketing' : ''}`} style={{ display: 'flex', height: '100vh' }}>
         <PageLoader size="lg" label="Loading..." />
       </div>
     );
@@ -135,6 +210,7 @@ function App() {
 
   return (
     <div className={`App${isPublicLanding ? ' App--marketing' : ''}`}>
+      <AnalyticsPageTracker />
       <Navbar isAuthenticated={isAuthenticated} />
       <main className="app-main">
         <Routes>
@@ -160,6 +236,7 @@ function App() {
       {/* api-network is a fixed-height app-shell that renders its own footer inside
           the scroll region — a second global footer here would create a 2nd scrollbar */}
       {!isPublicLanding && !location.pathname.startsWith('/workspace/api-network') && <Footer />}
+      <AnalyticsConsentBanner />
     </div>
   );
 }

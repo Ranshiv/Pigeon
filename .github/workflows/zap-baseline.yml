@@ -1,0 +1,23 @@
+name: OWASP ZAP baseline scan
+
+on:
+  workflow_dispatch:
+    inputs:
+      target_url:
+        description: 'Deployed public URL to scan, including https://'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  zap:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Baseline scan
+        uses: zaproxy/action-baseline@v0.14.0
+        with:
+          target: ${{ inputs.target_url }}
+          fail_action: false
+          allow_issue_writing: false

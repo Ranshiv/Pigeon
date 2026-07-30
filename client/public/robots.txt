@@ -1,3 +1,7 @@
-# https://www.robotstxt.org/robotstxt.html
+# Public pages may be indexed.
 User-agent: *
-Disallow:
+Disallow: /workspace
+Disallow: /oauth
+Disallow: /alerts
+
+Sitemap: http://localhost:3000/sitemap.xml

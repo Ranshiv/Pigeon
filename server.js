@@ -1,5 +1,6 @@
 // server.js
 require('dotenv').config();
+const { Sentry } = require('./config/sentry');
 const express = require('express');
 const cors = require('cors');
 const session = require('express-session');
@@ -73,6 +74,20 @@ app.use(session({
 }));
 app.use(passport.initialize());
 app.use(passport.session());
+
+// Attach only the explicitly approved account fields to the request scope.
+// Sentry's default PII collection remains disabled, so cookies and session data
+// are not included automatically.
+app.use((req, res, next) => {
+    const user = req.user;
+    if (user && (user.id || user._id)) {
+        Sentry.setUser({
+            id: String(user.id || user._id),
+            ...(user.email ? { email: user.email } : {})
+        });
+    }
+    next();
+});
 
 function ensureDatabaseReady(req, res, next) {
     // Keep public diagnostics and the landing-page demo available when the
@@ -211,10 +226,6 @@ app.get('/api/health', (req, res) => {
         }
     });
 });
-
-// --- GLOBAL ERROR HANDLER (must be last) ---
-app.use(globalErrorHandler);
-
 
 // --- GOOGLE AUTH ROUTES ---
 app.get('/auth/google',
@@ -470,9 +481,36 @@ app.delete('/api/cli-test/items/:id', (req, res) => {
 const PUBLIC_DEMO_HOSTS = new Set(['jsonplaceholder.typicode.com', 'httpbin.org']);
 const PUBLIC_DEMO_METHODS = new Set(['GET', 'POST', 'PUT', 'PATCH', 'DELETE']);
 const PUBLIC_DEMO_MAX_BODY_BYTES = 32 * 1024;
+const TURNSTILE_VERIFY_URL = 'https://challenges.cloudflare.com/turnstile/v0/siteverify';
+
+async function verifyTurnstileToken(token, remoteIp) {
+    // Keep local development usable when Turnstile has not been configured.
+    // Production fails closed once a secret is expected.
+    if (!process.env.TURNSTILE_SECRET_KEY) return process.env.NODE_ENV !== 'production';
+    if (!token) return false;
+
+    try {
+        const payload = new URLSearchParams({
+            secret: process.env.TURNSTILE_SECRET_KEY,
+            response: token,
+            ...(remoteIp ? { remoteip: remoteIp } : {})
+        });
+        const verification = await axios.post(TURNSTILE_VERIFY_URL, payload.toString(), {
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            timeout: 5_000
+        });
+        return verification.data?.success === true;
+    } catch (error) {
+        console.warn('Turnstile verification failed:', error.message);
+        return false;
+    }
+}
 
 app.post('/api/public-demo/request', proxyLimiter, async (req, res) => {
-    const { url, method = 'GET', body } = req.body || {};
+    const { url, method = 'GET', body, turnstileToken } = req.body || {};
+    if (process.env.TURNSTILE_SECRET_KEY && !(await verifyTurnstileToken(turnstileToken, req.ip))) {
+        return res.status(403).json({ message: 'Security verification failed. Please complete the check and try again.' });
+    }
     let target;
     try {
         target = new URL(url);
@@ -813,6 +851,7 @@ async function startServer() {
         console.log('Database connections initialized successfully');
     } catch (err) {
         console.error('Failed to initialize database connections', err);
+        await Sentry.flush(2000).catch(() => {});
         process.exit(1);
     }
 
@@ -1014,6 +1053,11 @@ app.get('/api/console-capture/sessions', (req, res) => {
     }
 });
 
+// Sentry must see every route error before the existing response-shaping
+// handler. These handlers are intentionally registered after all routes.
+Sentry.setupExpressErrorHandler(app);
+app.use(globalErrorHandler);
+
 // Graceful shutdown — single handler for SIGTERM/SIGINT.
 // BrowserConsoleService.cleanup() is async (await it); its own module-level
 // SIGINT/SIGTERM handlers were removed to avoid racing this one.
@@ -1022,6 +1066,7 @@ async function shutdown(signal) {
     MonitoringService.stop();
     AnalyticsScheduler.stop();
     try { await BrowserConsoleService.cleanup(); } catch (e) { console.error('cleanup error:', e.message); }
+    await Sentry.flush(2000).catch(() => {});
     server.close(() => {
         console.log('Process terminated');
         process.exit(0);
