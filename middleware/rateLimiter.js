@@ -4,12 +4,12 @@
 const rateLimit = require('express-rate-limit');
 
 // Test-friendly threshold so the test can exhaust the window in one go.
-const PROXY_MAX = 5;
-const PROXY_WINDOW_MS = 60 * 1000;
+const PROXY_MAX = Number.parseInt(process.env.PROXY_RATE_LIMIT_MAX || '5', 10);
+const PROXY_WINDOW_MS = Number.parseInt(process.env.PROXY_RATE_LIMIT_WINDOW_MS || String(60 * 1000), 10);
 
 const proxyLimiter = rateLimit({
-    windowMs: PROXY_WINDOW_MS,
-    max: PROXY_MAX,
+    windowMs: Number.isFinite(PROXY_WINDOW_MS) && PROXY_WINDOW_MS > 0 ? PROXY_WINDOW_MS : 60 * 1000,
+    max: Number.isFinite(PROXY_MAX) && PROXY_MAX > 0 ? PROXY_MAX : 5,
     standardHeaders: true,
     legacyHeaders: false,
     message: { error: 'Too many proxy requests, please try again later.' }

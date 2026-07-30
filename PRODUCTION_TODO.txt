@@ -1,0 +1,227 @@
+PIGEON PRODUCTION DEPLOYMENT TODO
+================================
+
+Use this checklist before and after deploying the API and React application.
+Never commit .env files, tokens, passwords, private keys, or generated credentials.
+
+
+1. DEPLOYMENT ARCHITECTURE
+---------------------------
+[ ] Choose and record the API hosting provider.
+[ ] Choose and record the React/frontend hosting provider.
+[ ] Confirm the production API URL: https://api.example.com
+[ ] Confirm the production frontend URL: https://app.example.com
+[ ] Configure HTTPS/TLS for both services.
+[ ] Configure the production start command: node server.js
+[ ] Configure the frontend production build command and output directory.
+[ ] Set the Node.js runtime to the supported LTS version.
+[ ] Configure health checks against /health/live and /health/ready.
+
+
+2. API ENVIRONMENT VARIABLES
+----------------------------
+Required API settings:
+
+[ ] NODE_ENV=production
+[ ] PORT=<hosting-provider-port-or-default>
+[ ] MONGODB_URI=<production-mongodb-uri>
+[ ] FRONTEND_URL=https://app.example.com
+[ ] CORS_ORIGIN=https://app.example.com
+[ ] TRUST_PROXY=true (only when behind a trusted reverse proxy)
+[ ] SESSION_SECRET=<random-secret-at-least-32-characters>
+[ ] JWT_SECRET=<random-secret-at-least-32-characters>
+[ ] COOKIE_SECURE=true
+[ ] SESSION_COOKIE_NAME=pigeon.sid
+[x] Generate METRICS_TOKEN locally.
+[ ] Add METRICS_TOKEN=<random-secret-at-least-24-characters> to the production API host.
+[ ] API_BODY_LIMIT=1mb (adjust only when required)
+
+Generate strong secrets with:
+node -e "console.log(require('crypto').randomBytes(32).toString('base64url'))"
+
+
+3. FRONTEND ENVIRONMENT VARIABLES
+----------------------------------
+Configure these in the frontend host or frontend build environment:
+
+[ ] REACT_APP_SITE_URL=https://app.example.com
+[ ] REACT_APP_SENTRY_DSN=<React-Sentry-DSN>
+[ ] REACT_APP_SENTRY_ENVIRONMENT=production
+[ ] REACT_APP_SENTRY_RELEASE=<release-or-build-id>
+[ ] REACT_APP_POSTHOG_KEY=<PostHog-public-key>
+[ ] REACT_APP_POSTHOG_HOST=<PostHog-host>
+[ ] REACT_APP_POSTHOG_ENABLED=true
+[ ] REACT_APP_TURNSTILE_SITE_KEY=<Cloudflare-site-key>
+
+Frontend REACT_APP_* variables are embedded in the browser bundle. Do not put
+private API secrets in them.
+
+
+4. SENTRY
+---------
+[ ] Set SENTRY_DSN=<API-Sentry-DSN> on the API host.
+[ ] Set SENTRY_ENVIRONMENT=production on the API host.
+[ ] Set SENTRY_RELEASE=<release-or-build-id> when release tracking is used.
+[x] Create SENTRY_AUTH_TOKEN locally for source-map configuration.
+[ ] Add SENTRY_AUTH_TOKEN as a GitHub Actions secret if source-map uploads
+    are enabled.
+[ ] Add SENTRY_ORG as a GitHub Actions secret if source-map uploads are used.
+[ ] Add SENTRY_PROJECT as a GitHub Actions secret if source-map uploads are used.
+[ ] Trigger a controlled test event and confirm it appears in Sentry.
+
+
+5. OPENTELEMETRY / GRAFANA CLOUD
+--------------------------------
+[ ] Create or select a Grafana Cloud stack.
+[ ] Create a scoped OTLP ingestion credential.
+[ ] Set OTEL_SERVICE_NAME=pigeon-api.
+[ ] Set OTEL_EXPORTER_OTLP_ENDPOINT=<Grafana-OTLP-endpoint>/otlp.
+[ ] Set OTEL_EXPORTER_OTLP_HEADERS=Authorization=Basic <credential>.
+[ ] Set OTEL_TRACES_SAMPLER=parentbased_traceidratio.
+[ ] Set OTEL_TRACES_SAMPLER_ARG=0.1 for production.
+[ ] Confirm /api/health reports telemetry.enabled=true and traces=true.
+[ ] Generate API traffic and confirm traces appear in Grafana Cloud.
+[ ] Create Grafana dashboards and alerts for latency, errors, traffic, and
+    database/Redis health.
+[ ] Rotate any token that was exposed during setup or testing.
+
+
+6. PROMETHEUS METRICS
+---------------------
+[ ] Set METRICS_TOKEN on the production API host.
+[ ] Configure Grafana Alloy/Prometheus with:
+    Authorization: Bearer <same-METRICS_TOKEN>
+[ ] Scrape https://api.example.com/metrics.
+[ ] Confirm 401 is returned without the token.
+[ ] Confirm metrics are returned with the token.
+[ ] Do not expose /metrics publicly without authentication.
+
+
+7. REDIS
+--------
+[ ] Set REDIS_URL=<production-redis-url> on every API instance.
+[ ] Confirm Redis authentication and TLS settings where supported.
+[ ] Confirm the API uses Redis-backed sessions after restart.
+[ ] Use Redis-backed rate limiting before running multiple API instances.
+[ ] Configure Redis availability monitoring and a recovery policy.
+
+
+8. DATABASE
+----------
+[ ] Use a production MongoDB/Atlas database, not localhost.
+[ ] Enable MongoDB authentication and least-privilege database access.
+[ ] Restrict network access with IP allowlists or private networking.
+[ ] Require TLS for database connections.
+[ ] Review and create required indexes.
+[ ] Configure automated backups.
+[ ] Test a restore into a non-production database.
+[ ] Document RPO and RTO targets.
+
+
+9. CLOUDFLARE TURNSTILE
+-----------------------
+[ ] Configure REACT_APP_TURNSTILE_SITE_KEY on the frontend host.
+[ ] Configure TURNSTILE_SECRET_KEY only on the API host.
+[ ] Restrict the Turnstile site key to production domains.
+[ ] Test both valid and invalid Turnstile verification.
+[ ] Rotate the secret if it was exposed outside the secret manager.
+
+
+10. EMAIL AND ALERTING
+----------------------
+Brevo:
+[ ] Set BREVO_API_KEY on the API host.
+[ ] Set BREVO_SENDER_EMAIL and BREVO_SENDER_NAME.
+[ ] Verify the sender domain in Brevo.
+[ ] Send and confirm a production test email.
+
+Optional:
+[ ] Configure SLACK_WEBHOOK_URL if Slack alerts are required.
+[ ] Configure email/SMTP only if Brevo is not used.
+
+
+11. CLOUD AND REPOSITORY SECURITY
+---------------------------------
+[ ] Enable GitHub Dependabot alerts and updates.
+[ ] Enable secret scanning and push protection.
+[ ] Enable CodeQL analysis.
+[ ] Protect the master branch.
+[ ] Require pull-request reviews and passing checks.
+[ ] Store deployment credentials in hosting-provider secrets.
+[ ] Store CI credentials in GitHub Actions secrets.
+[ ] Never log environment variable values.
+[ ] Rotate credentials exposed in chat, screenshots, logs, or commits.
+
+
+12. CI/CD SUPPLY-CHAIN SECURITY
+-------------------------------
+[ ] Run dependency audit checks in CI.
+[ ] Generate an SBOM for production builds.
+[ ] Pin or review GitHub Actions versions.
+[ ] Build from a clean checkout.
+[ ] Generate artifact provenance/attestation where supported.
+[ ] Sign production artifacts where required.
+[ ] Keep build and deployment logs free of secrets.
+
+
+13. SECURITY TESTING
+--------------------
+[ ] Run the existing automated test suite.
+[ ] Run OWASP ZAP against the deployed API.
+[ ] Test CORS with an allowed origin and a blocked origin.
+[ ] Test unauthenticated access to protected routes.
+[ ] Test request-size limits and rate limits.
+[ ] Test SSRF protections on proxy endpoints.
+[ ] Test session cookie flags over HTTPS.
+[ ] Review Helmet/security headers.
+[ ] Perform a dependency and vulnerability scan.
+
+
+14. POST-DEPLOYMENT SMOKE TEST
+------------------------------
+[ ] GET https://api.example.com/health/live returns 200.
+[ ] GET https://api.example.com/health/ready returns 200.
+[ ] GET https://api.example.com/api/health shows database connected.
+[ ] /api/health reports telemetry enabled.
+[ ] A request produces an OpenTelemetry trace in Grafana Cloud.
+[ ] A controlled exception appears in Sentry.
+[ ] /metrics requires the bearer token.
+[ ] Login and logout work over HTTPS.
+[ ] React frontend can call the API without CORS errors.
+[ ] Turnstile validation succeeds for legitimate requests.
+[ ] Brevo test email succeeds.
+[ ] PagerDuty test incident succeeds if configured.
+[ ] Verify logs contain request IDs and no secrets.
+
+
+15. OPERATIONS DOCUMENTATION
+----------------------------
+[ ] Record deployment rollback steps.
+[ ] Record database restore steps.
+[ ] Record credential rotation steps.
+[ ] Record service owners and escalation contacts.
+[ ] Document monitoring dashboards and alert thresholds.
+[ ] Document maintenance windows.
+[ ] Document incident response and post-incident review process.
+
+
+CURRENT LOCAL STATUS
+--------------------
+Implemented/configured locally:
+- Redis URL
+- Brevo API key
+- Sentry DSN
+- Cloudflare Turnstile secret
+- Grafana OTLP tracing
+- Grafana service-account API token
+
+Not being used:
+- PagerDuty integration and routing key
+
+Still requiring production setup or verification:
+- Production environment variables and protected Grafana metrics scraping
+- Hosting-provider environment variables
+- Grafana dashboards and alerts
+- Production DNS/TLS and database backups
+- GitHub security and supply-chain settings
+- Post-deployment security and recovery tests

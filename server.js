@@ -1,5 +1,7 @@
 // server.js
 require('dotenv').config();
+const { startTelemetry, stopTelemetry, getTelemetryStatus } = require('./config/telemetry');
+startTelemetry();
 const { Sentry } = require('./config/sentry');
 const express = require('express');
 const cors = require('cors');
@@ -14,7 +16,10 @@ const axios = require('axios'); // Add axios import for proxy functionality
 const https = require('https'); // Add https to handle SSL issues
 const { mountSecurityMiddleware, globalErrorHandler } = require('./middleware/securityMiddleware');
 const { metricsHandler } = require('./middleware/metrics');
-const { initializeConnections } = require('./config/db');
+const { metricsAuth } = require('./middleware/metricsAuth');
+const { requestContext } = require('./middleware/requestContext');
+const { initializeConnections, client: nativeMongoClient } = require('./config/db');
+const { validateProductionConfig } = require('./config/runtime');
 const User = require('./models/User');
 const MarketplaceApi = require('./models/MarketplaceApi');
 const { initializeSocketServer } = require('./utils/socket/socket-server');
@@ -33,6 +38,7 @@ const routes = require('./routes');
 const app = express();
 const server = http.createServer(app);
 const port = process.env.PORT || 5001;
+if (process.env.TRUST_PROXY === 'true') app.set('trust proxy', 1);
 
 // Socket.io is initialized only when the server actually starts listening.
 // This keeps Jest/supertest imports side-effect free and prevents open handles.
@@ -41,12 +47,21 @@ const port = process.env.PORT || 5001;
 // directly (node server.js). This keeps Jest/supertest imports side-effect free.
 
 // --- MIDDLEWARE (Correct Order) ---
+const allowedOrigins = (process.env.CORS_ORIGIN || process.env.FRONTEND_URL || 'http://localhost:3000')
+    .split(',').map((origin) => origin.trim()).filter(Boolean);
+app.use(requestContext);
 app.use(cors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+    origin: (origin, callback) => {
+        if (!origin || allowedOrigins.includes(origin)) return callback(null, true);
+        return callback(new Error('Origin is not allowed by CORS'));
+    },
     credentials: true
 }));
 mountSecurityMiddleware(app);
-app.use(express.json());
+// Bound request bodies to limit memory exhaustion and accidental oversized
+// uploads. Override per deployment with API_BODY_LIMIT (for example 2mb).
+app.use(express.json({ limit: process.env.API_BODY_LIMIT || '1mb' }));
+app.use(express.urlencoded({ extended: false, limit: process.env.API_BODY_LIMIT || '1mb' }));
 app.use(cookieParser());
 
 // Tier 4: Redis-backed sessions when REDIS_URL is set (multi-node deployments).
@@ -57,18 +72,21 @@ if (process.env.REDIS_URL) {
     const redis = require('redis');
     const { RedisStore } = require('connect-redis');
     const redisClient = redis.createClient({ url: process.env.REDIS_URL });
+    app.locals.redisClient = redisClient;
     redisClient.connect().catch(err => console.error('Redis session store connect failed:', err.message));
     sessionStore = new RedisStore({ client: redisClient });
 }
 
 app.use(session({
-    secret: process.env.SESSION_SECRET || 'keyboard cat',
+    name: process.env.SESSION_COOKIE_NAME || 'pigeon.sid',
+    secret: process.env.SESSION_SECRET || 'development-only-session-secret',
     resave: false,
     saveUninitialized: false,
     ...(sessionStore ? { store: sessionStore } : {}),
     cookie: {
-        secure: process.env.NODE_ENV === 'production',
+        secure: process.env.COOKIE_SECURE === 'true' || process.env.NODE_ENV === 'production',
         httpOnly: true,
+        sameSite: 'lax',
         maxAge: 24 * 60 * 60 * 1000 // 24 hours
     }
 }));
@@ -206,7 +224,7 @@ passport.deserializeUser(async (id, done) => {
 app.use('/api', ensureDatabaseReady, routes);
 
 // --- PROMETHEUS METRICS ---
-app.get('/metrics', metricsHandler);
+app.get('/metrics', metricsAuth, metricsHandler);
 
 // --- HEALTH CHECK ENDPOINT ---
 app.get('/api/health', (req, res) => {
@@ -223,7 +241,8 @@ app.get('/api/health', (req, res) => {
             linting: 'enabled',
             visualization: 'enabled',
             collaboration: 'enabled'
-        }
+        },
+        telemetry: getTelemetryStatus()
     });
 });
 
@@ -474,6 +493,15 @@ app.delete('/api/cli-test/items/:id', (req, res) => {
 
     // Successful deletion - no content
     res.status(204).send();
+});
+
+app.get('/health/live', (_req, res) => res.status(200).json({ status: 'ok', service: 'pigeon-api' }));
+app.get('/health/ready', (_req, res) => {
+    const ready = mongoose.connection.readyState === 1;
+    res.status(ready ? 200 : 503).json({
+        status: ready ? 'ready' : 'not_ready',
+        database: mongoose.connection.readyState
+    });
 });
 
 // Public landing-page request demo. Keep this intentionally narrower than the
@@ -847,6 +875,12 @@ app.post('/api/proxy', async (req, res) => {
 // --- STARTUP ---
 async function startServer() {
     try {
+        validateProductionConfig();
+    } catch (err) {
+        console.error(err.message);
+        process.exit(1);
+    }
+    try {
         await initializeConnections();
         console.log('Database connections initialized successfully');
     } catch (err) {
@@ -1061,11 +1095,18 @@ app.use(globalErrorHandler);
 // Graceful shutdown — single handler for SIGTERM/SIGINT.
 // BrowserConsoleService.cleanup() is async (await it); its own module-level
 // SIGINT/SIGTERM handlers were removed to avoid racing this one.
+let shuttingDown = false;
 async function shutdown(signal) {
+    if (shuttingDown) return;
+    shuttingDown = true;
     console.log(`${signal} received, shutting down gracefully`);
     MonitoringService.stop();
     AnalyticsScheduler.stop();
     try { await BrowserConsoleService.cleanup(); } catch (e) { console.error('cleanup error:', e.message); }
+    try { if (app.locals.redisClient) await app.locals.redisClient.quit(); } catch (e) { console.error('redis cleanup error:', e.message); }
+    try { await mongoose.disconnect(); } catch (e) { console.error('mongoose cleanup error:', e.message); }
+    try { await nativeMongoClient.close(); } catch (e) { console.error('mongo cleanup error:', e.message); }
+    try { await stopTelemetry(); } catch (e) { console.error('telemetry cleanup error:', e.message); }
     await Sentry.flush(2000).catch(() => {});
     server.close(() => {
         console.log('Process terminated');
