@@ -1,9 +1,10 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { Link } from 'react-router-dom';
 import { AnimatePresence, motion, useInView, useReducedMotion, useScroll, useSpring, useTransform } from 'framer-motion';
 import {
     FiActivity, FiArrowDown, FiArrowRight, FiBarChart2, FiCheck,
-    FiCode, FiGithub, FiGlobe, FiLayers, FiPlay, FiSend, FiShield,
+    FiCode, FiGithub, FiGlobe, FiLayers, FiMonitor, FiPlay, FiSend, FiShield,
     FiSliders, FiUsers, FiZap
 } from 'react-icons/fi';
 import { getApiBaseUrl, getGoogleAuthUrl } from '../utils/apiBaseUrl';
@@ -154,6 +155,37 @@ function ProductExplorer() {
     return <section className="pigeon-section pigeon-explorer" id="explore" aria-labelledby="explore-title"><Reveal className="pigeon-section-heading pigeon-centered-heading"><p className="pigeon-kicker">More than a request client</p><h2 id="explore-title">Explore every part of the <em>API lifecycle.</em></h2><p>Switch views to see how Pigeon connects the work before and after every request.</p></Reveal><Reveal delay={0.08}><div className="pigeon-product-explorer"><div className="pigeon-product-tabs" role="tablist" aria-label="Pigeon product areas">{PRODUCT_VIEWS.map((view, index) => { const Icon = view.icon; const selected = view.id === activeId; return <button type="button" id={`pigeon-product-tab-${view.id}`} key={view.id} role="tab" aria-selected={selected} aria-controls="pigeon-product-panel" tabIndex={selected ? 0 : -1} className={selected ? 'is-active' : ''} onClick={() => setActiveId(view.id)} onKeyDown={(event) => onTabKeyDown(event, index)}><Icon /> {view.label}</button>; })}</div><AnimatePresence mode="wait" initial={false}><motion.div key={activeId} id="pigeon-product-panel" role="tabpanel" aria-labelledby={`pigeon-product-tab-${activeId}`} className="pigeon-product-panel" initial={reduced ? { opacity: 1 } : { opacity: 0, y: 12, filter: 'blur(4px)' }} animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }} exit={reduced ? { opacity: 1 } : { opacity: 0, y: -8, filter: 'blur(3px)' }} transition={reduced ? { duration: 0 } : { duration: 0.28, ease: [0.22, 1, 0.36, 1] }}><div className="pigeon-product-copy"><span><ActiveIcon /> {activeView.eyebrow}</span><h3>{activeView.title}</h3><p>{activeView.copy}</p><div>{activeView.items.map((item) => <b key={item}><FiCheck /> {item}</b>)}</div></div><ProductPreview view={activeView} /></motion.div></AnimatePresence></div></Reveal></section>;
 }
 
+function SecurityVerificationGate({ onToken, onError }) {
+    const [failed, setFailed] = useState(false);
+    useEffect(() => {
+        const previousOverflow = document.body.style.overflow;
+        document.body.style.overflow = 'hidden';
+        return () => { document.body.style.overflow = previousOverflow; };
+    }, []);
+    const handleToken = (token) => {
+        if (token) setFailed(false);
+        onToken(token);
+    };
+    const handleError = (message) => {
+        setFailed(true);
+        onError(message);
+    };
+
+    return createPortal(<div className="pigeon-security-gate" role="dialog" aria-modal="true" aria-labelledby="pigeon-security-title">
+        <div className="pigeon-security-gate-card">
+            <div className="pigeon-security-brand"><span><FiShield /></span><b>Pigeon</b></div>
+            <h1 id="pigeon-security-title">Performing security verification</h1>
+            <p>This website uses a security service to protect against malicious bots. This page is displayed while we verify you are not a bot.</p>
+            <div className="pigeon-security-check">
+                <TurnstileWidget onToken={handleToken} onError={handleError} />
+                <strong>{failed ? 'Verification failed. Please try again.' : 'Verifying…'}</strong>
+            </div>
+            <small className="pigeon-security-note">Protected by Cloudflare Turnstile</small>
+        </div>
+        <div className="pigeon-security-footer"><span>Ray ID: <b>pigeon-public-demo</b></span><span>Performance and Security by <b>Cloudflare</b></span><span>Privacy</span></div>
+    </div>, document.body);
+}
+
 function ProductDemoContent() {
     const [selected, setSelected] = useState(1);
     const [method, setMethod] = useState(REQUESTS[1].method);
@@ -164,7 +196,7 @@ function ProductDemoContent() {
     const [error, setError] = useState('');
     const [isPresetTyping, setIsPresetTyping] = useState(false);
     const [turnstileToken, setTurnstileToken] = useState('');
-    const turnstileRequired = Boolean(process.env.REACT_APP_TURNSTILE_SITE_KEY);
+    const turnstileRequired = process.env.REACT_APP_TURNSTILE_ENABLED === 'true' && Boolean(process.env.REACT_APP_TURNSTILE_SITE_KEY);
     const typingTimerRef = useRef(null);
     useEffect(() => () => {
         if (typingTimerRef.current) window.clearInterval(typingTimerRef.current);
@@ -251,7 +283,7 @@ function ProductDemoContent() {
         }
     };
     const responseText = response ? JSON.stringify(response.body, null, 2) : '';
-    return <section className="pigeon-section pigeon-demo-section" id="product" aria-label="Interactive API request demo"><Reveal delay={0.08}><ScrollParallax className="pigeon-demo-scroll-stage"><div className="pigeon-demo pigeon-demo--live" aria-label="Interactive API request demo"><aside className="pigeon-demo-sidebar"><div className="pigeon-demo-sidebar-title"><FiLayers /> Public API demo <span>{REQUESTS.length} presets</span></div>{REQUESTS.map((item, index) => <button type="button" key={item.name} className={selected === index ? 'is-active' : ''} onClick={() => selectPreset(index)}><b className={`method-${item.method.toLowerCase()}`}>{item.method}</b><span>{item.name}</span><i /></button>)}<div className="pigeon-demo-sidebar-footer"><span /> Real request</div></aside><div className="pigeon-demo-main"><div className="pigeon-demo-windowbar"><span><i /><i /><i /></span><b>try-it / jsonplaceholder</b><small>Editable public demo</small></div><div className="pigeon-demo-topbar"><AppSelect id="pigeon-http-method" value={method} onChange={selectMethod} options={['GET', 'POST', 'PUT', 'PATCH', 'DELETE'].map((item) => ({ value: item, label: item }))} className="pigeon-method-picker" menuClassName="pigeon-method-menu" /><input aria-label="Request URL" value={url} onChange={updateUrl} className={isPresetTyping ? 'is-typing' : ''} spellCheck="false" /><button type="button" className="pigeon-send" onClick={send} disabled={sending || isPresetTyping || (turnstileRequired && !turnstileToken)}>{sending || isPresetTyping ? <i className="pigeon-spinner" /> : <FiSend />} {sending ? 'Sending…' : isPresetTyping ? 'Loading…' : 'Send request'}</button></div><div className="pigeon-demo-tabs"><span>JSON body</span><small className={isPresetTyping ? 'pigeon-preset-typing' : ''}>{isPresetTyping ? 'Loading preset…' : 'Allowed: jsonplaceholder.typicode.com, httpbin.org'}</small></div>{turnstileRequired ? <div className="pigeon-turnstile-row"><TurnstileWidget onToken={setTurnstileToken} onError={setError} /></div> : null}<div className="pigeon-demo-editor pigeon-demo-editor--live"><textarea aria-label="JSON request body" value={body} onChange={updateBody} className={isPresetTyping ? 'is-typing' : ''} spellCheck="false" placeholder={'{\n  "key": "value"\n}'} /><span className="pigeon-editor-hint">{isPresetTyping ? 'Typing curated request…' : <><FiZap /> Your request is sent through Pigeon</>}</span></div>{error ? <p className="pigeon-demo-error" role="alert">{error}</p> : null}<div className={`pigeon-response${sending ? ' is-sending' : ''}`}><div className="pigeon-response-heading"><span>Response</span>{sending ? <span className="pigeon-sending"><i /> Sending request</span> : response ? <b className={response.status >= 400 ? 'is-error' : ''}><FiCheck /> {response.status} {response.statusText}</b> : <small>Ready to send</small>}<small>{response ? `${response.duration} ms · ${response.size} B` : null}</small></div><pre aria-live="polite">{responseText || (sending ? 'Contacting the curated demo API…' : '// Edit the URL or JSON body, then send a real request.')}</pre>{!response && !sending ? <div className="pigeon-response-empty"><span><FiActivity /></span><p>Try one of the presets or edit this request. Demo hosts are intentionally limited for safety.</p></div> : null}</div></div></div></ScrollParallax></Reveal></section>;
+    return <>{turnstileRequired && !turnstileToken ? <SecurityVerificationGate onToken={setTurnstileToken} onError={setError} /> : null}<section className="pigeon-section pigeon-demo-section" id="product" aria-label="Interactive API request demo"><Reveal delay={0.08}><ScrollParallax className="pigeon-demo-scroll-stage"><div className="pigeon-demo pigeon-demo--live" aria-label="Interactive API request demo"><aside className="pigeon-demo-sidebar"><div className="pigeon-demo-sidebar-title"><FiLayers /> Public API demo <span>{REQUESTS.length} presets</span></div>{REQUESTS.map((item, index) => <button type="button" key={item.name} className={selected === index ? 'is-active' : ''} onClick={() => selectPreset(index)}><b className={`method-${item.method.toLowerCase()}`}>{item.method}</b><span>{item.name}</span><i /></button>)}<div className="pigeon-demo-sidebar-footer"><span /> Real request</div></aside><div className="pigeon-demo-main"><div className="pigeon-demo-windowbar"><span><i /><i /><i /></span><b>try-it / jsonplaceholder</b><small>Editable public demo</small></div><div className="pigeon-demo-topbar"><AppSelect id="pigeon-http-method" value={method} onChange={selectMethod} options={['GET', 'POST', 'PUT', 'PATCH', 'DELETE'].map((item) => ({ value: item, label: item }))} className="pigeon-method-picker" menuClassName="pigeon-method-menu" /><input aria-label="Request URL" value={url} onChange={updateUrl} className={isPresetTyping ? 'is-typing' : ''} spellCheck="false" /><button type="button" className="pigeon-send" onClick={send} disabled={sending || isPresetTyping || (turnstileRequired && !turnstileToken)}>{sending || isPresetTyping ? <i className="pigeon-spinner" /> : <FiSend />} {sending ? 'Sending…' : isPresetTyping ? 'Loading…' : 'Send request'}</button></div><div className="pigeon-demo-tabs"><span>JSON body</span><small className={isPresetTyping ? 'pigeon-preset-typing' : ''}>{isPresetTyping ? 'Loading preset…' : 'Allowed: jsonplaceholder.typicode.com, httpbin.org'}</small></div><div className="pigeon-demo-editor pigeon-demo-editor--live"><textarea aria-label="JSON request body" value={body} onChange={updateBody} className={isPresetTyping ? 'is-typing' : ''} spellCheck="false" placeholder={'{\n  "key": "value"\n}'} /><span className="pigeon-editor-hint">{isPresetTyping ? 'Typing curated request…' : <><FiZap /> Your request is sent through Pigeon</>}</span></div>{error ? <p className="pigeon-demo-error" role="alert">{error}</p> : null}<div className={`pigeon-response${sending ? ' is-sending' : ''}`}><div className="pigeon-response-heading"><span>Response</span>{sending ? <span className="pigeon-sending"><i /> Sending request</span> : response ? <b className={response.status >= 400 ? 'is-error' : ''}><FiCheck /> {response.status} {response.statusText}</b> : <small>Ready to send</small>}<small>{response ? `${response.duration} ms · ${response.size} B` : null}</small></div><pre aria-live="polite">{responseText || (sending ? 'Contacting the curated demo API…' : '// Edit the URL or JSON body, then send a real request.')}</pre>{!response && !sending ? <div className="pigeon-response-empty"><span><FiActivity /></span><p>Try one of the presets or edit this request. Demo hosts are intentionally limited for safety.</p></div> : null}</div></div></div></ScrollParallax></Reveal></section></>;
 }
 
 function ProductDemo() { return <><LandingScrollProgress /><ProductExplorer /><CapabilityStrip /></>; }
@@ -284,6 +316,33 @@ function Workflow() { return <><WorkflowTimeline /><CapabilityCoverage /></>; }
 
 function MarketingFooter() { const groups = [['Product', [['Workspace', '/workspace'], ['API Network', '/workspace/api-network'], ['Monitoring', '/workspace/monitoring']]], ['Developers', [['Documentation', '/documentation'], ['GitHub', 'https://github.com/Ranshiv/Pigeon'], ['Workflow', '#workflow']]], ['Company', [['About Pigeon', '#top'], ['Customer stories', '#testimonials'], ['Contact', 'mailto:support@pigeonapp.io']]], ['Legal', [['Privacy', '/privacy'], ['Terms', '/terms']]]]; return <footer className="pigeon-marketing-footer"><div className="pigeon-footer-grid"><div><a className="pigeon-wordmark" href="#top"><span>P</span> Pigeon</a><p>One focused home for building, testing, and operating APIs.</p><a className="pigeon-social" href="https://github.com/Ranshiv/Pigeon" target="_blank" rel="noreferrer"><FiGithub /> GitHub</a></div>{groups.map(([title, links]) => <div key={title}><h3>{title}</h3>{links.map(([label, href]) => href.startsWith('/') ? <Link key={label} to={href}>{label}</Link> : <a key={label} href={href}>{label}</a>)}</div>)}</div><div className="pigeon-footer-bottom"><span>© {new Date().getFullYear()} Pigeon. All rights reserved.</span><span>Built for APIs that keep moving.</span></div></footer>; }
 
+function MobileExperienceNotice() {
+    const [visible, setVisible] = useState(false);
+
+    useEffect(() => {
+        const media = window.matchMedia('(max-width: 760px)');
+        const syncVisibility = () => {
+            let dismissed = false;
+            try { dismissed = window.sessionStorage.getItem('pigeon-mobile-notice-dismissed') === 'true'; } catch { /* storage may be unavailable */ }
+            setVisible(media.matches && !dismissed);
+        };
+        syncVisibility();
+        media.addEventListener?.('change', syncVisibility);
+        media.addListener?.(syncVisibility);
+        return () => {
+            media.removeEventListener?.('change', syncVisibility);
+            media.removeListener?.(syncVisibility);
+        };
+    }, []);
+
+    if (!visible) return null;
+    const dismiss = () => {
+        try { window.sessionStorage.setItem('pigeon-mobile-notice-dismissed', 'true'); } catch { /* continue without persistence */ }
+        setVisible(false);
+    };
+    return <aside className="pigeon-mobile-experience-notice" role="status" aria-label="Desktop experience recommendation"><span className="pigeon-mobile-experience-icon"><FiMonitor /></span><div><strong>Best experienced on desktop</strong><p>For the smoothest API workspace experience, use Pigeon on a desktop or larger screen. You can still continue on mobile.</p></div><button type="button" onClick={dismiss} aria-label="Dismiss desktop recommendation">×</button></aside>;
+}
+
 function PublicHome() {
     const reduced = useReducedMotion();
     const trusted = useMemo(() => ['northstar', 'vanta', 'arcade', 'linear', 'relay', 'fathom'], []);
@@ -293,7 +352,7 @@ function PublicHome() {
         document.body.classList.add('pigeon-marketing-body');
         return () => document.body.classList.remove('pigeon-marketing-body');
     }, []);
-    return <div className="pigeon-marketing" id="top"><main><section ref={heroRef} className="pigeon-hero" aria-labelledby="hero-title"><div className="pigeon-hero-fluid" aria-hidden="true"><Ferrofluid eventTargetRef={heroRef} paused={reduced || !heroInView} colors={HERO_FERRO_COLORS} speed={0.12} scale={1.8} turbulence={0.2} fluidity={0.12} rimWidth={0.17} sharpness={1.55} shimmer={1.15} glow={1.4} flowDirection="down" opacity={0.46} mouseInteraction mouseStrength={0.55} mouseRadius={0.25} mouseDampening={0.18} mixBlendMode="screen" /></div><div className="pigeon-hero-content"><motion.div className="pigeon-hero-copy" initial="hidden" animate="visible" variants={{ visible: { transition: { staggerChildren: reduced ? 0 : 0.1 } } }}><motion.a href="#product" className="pigeon-announcement" variants={reveal} transition={spring}><span>What’s new</span><b>v1.0 <FiArrowRight /></b></motion.a><motion.h1 id="hero-title" variants={reveal} transition={spring}>Build APIs.<br /><em><HeroRotatingWord /></em></motion.h1><motion.p variants={reveal} transition={spring}>Pigeon brings requests, tests, collaboration, and production context into one focused flow.</motion.p><motion.div className="pigeon-hero-actions" variants={reveal} transition={spring}><MarketingButton href={getGoogleAuthUrl()}>Start building free <FiArrowRight /></MarketingButton><MarketingButton secondary href="#product"><FiPlay /> Watch the workspace</MarketingButton></motion.div></motion.div><ProductDemoContent /></div><motion.div className="pigeon-trusted" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: reduced ? 0 : 0.55 }}><span>Trusted by teams building</span><div><div>{[...trusted, ...trusted].map((name, index) => <b key={`${name}-${index}`}>{name}</b>)}</div></div></motion.div><a className="pigeon-scroll-cue" href="#product">Scroll to explore <FiArrowDown /></a></section><ProductDemo /><Features /><Workflow /><section className="pigeon-section pigeon-testimonials" id="testimonials" aria-labelledby="stories-title"><Reveal className="pigeon-section-heading pigeon-centered-heading"><p className="pigeon-kicker">From teams in the flow</p><h2 id="stories-title">Built for people who <em>ship together.</em></h2></Reveal><div className="pigeon-quote-grid">{TESTIMONIALS.map(([quote, name, role, company], index) => <Reveal key={name} delay={index * 0.08}><figure><blockquote>{quote}</blockquote><figcaption><span>{name}<small>{role}</small></span><b>{company}</b></figcaption></figure></Reveal>)}</div></section><section className="pigeon-final-cta"><Reveal><div><p className="pigeon-kicker">Your next request starts here</p><h2>Give every API a <em>place to land.</em></h2><p>One workspace for the work that turns an API into a reliable product.</p><div className="pigeon-hero-actions"><MarketingButton href={getGoogleAuthUrl()}>Start with Pigeon <FiArrowRight /></MarketingButton><MarketingButton secondary href="/documentation">Read the docs <FiCode /></MarketingButton></div></div></Reveal></section></main><MarketingFooter /></div>;
+    return <><MobileExperienceNotice /><div className="pigeon-marketing" id="top"><main><section ref={heroRef} className="pigeon-hero" aria-labelledby="hero-title"><div className="pigeon-hero-fluid" aria-hidden="true"><Ferrofluid eventTargetRef={heroRef} paused={reduced || !heroInView} colors={HERO_FERRO_COLORS} speed={0.12} scale={1.8} turbulence={0.2} fluidity={0.12} rimWidth={0.17} sharpness={1.55} shimmer={1.15} glow={1.4} flowDirection="down" opacity={0.46} mouseInteraction mouseStrength={0.55} mouseRadius={0.25} mouseDampening={0.18} mixBlendMode="screen" /></div><div className="pigeon-hero-content"><motion.div className="pigeon-hero-copy" initial="hidden" animate="visible" variants={{ visible: { transition: { staggerChildren: reduced ? 0 : 0.1 } } }}><motion.a href="#product" className="pigeon-announcement" variants={reveal} transition={spring}><span>What’s new</span><b>v1.0 <FiArrowRight /></b></motion.a><motion.h1 id="hero-title" variants={reveal} transition={spring}>Build APIs.<br /><em><HeroRotatingWord /></em></motion.h1><motion.p variants={reveal} transition={spring}>Pigeon brings requests, tests, collaboration, and production context into one focused flow.</motion.p><motion.div className="pigeon-hero-actions" variants={reveal} transition={spring}><MarketingButton href={getGoogleAuthUrl()}>Start building free <FiArrowRight /></MarketingButton><MarketingButton secondary href="#product"><FiPlay /> Watch the workspace</MarketingButton></motion.div></motion.div><ProductDemoContent /></div><motion.div className="pigeon-trusted" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: reduced ? 0 : 0.55 }}><span>Trusted by teams building</span><div><div>{[...trusted, ...trusted].map((name, index) => <b key={`${name}-${index}`}>{name}</b>)}</div></div></motion.div><a className="pigeon-scroll-cue" href="#product">Scroll to explore <FiArrowDown /></a></section><ProductDemo /><Features /><Workflow /><section className="pigeon-section pigeon-testimonials" id="testimonials" aria-labelledby="stories-title"><Reveal className="pigeon-section-heading pigeon-centered-heading"><p className="pigeon-kicker">From teams in the flow</p><h2 id="stories-title">Built for people who <em>ship together.</em></h2></Reveal><div className="pigeon-quote-grid">{TESTIMONIALS.map(([quote, name, role, company], index) => <Reveal key={name} delay={index * 0.08}><figure><blockquote>{quote}</blockquote><figcaption><span>{name}<small>{role}</small></span><b>{company}</b></figcaption></figure></Reveal>)}</div></section><section className="pigeon-final-cta"><Reveal><div><p className="pigeon-kicker">Your next request starts here</p><h2>Give every API a <em>place to land.</em></h2><p>One workspace for the work that turns an API into a reliable product.</p><div className="pigeon-hero-actions"><MarketingButton href={getGoogleAuthUrl()}>Start with Pigeon <FiArrowRight /></MarketingButton><MarketingButton secondary href="/documentation">Read the docs <FiCode /></MarketingButton></div></div></Reveal></section></main><MarketingFooter /></div></>;
 }
 
 export default PublicHome;

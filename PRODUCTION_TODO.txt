@@ -52,6 +52,11 @@ Configure these in the frontend host or frontend build environment:
 [ ] REACT_APP_POSTHOG_HOST=<PostHog-host>
 [ ] REACT_APP_POSTHOG_ENABLED=true
 [ ] REACT_APP_TURNSTILE_SITE_KEY=<Cloudflare-site-key>
+[ ] REACT_APP_TURNSTILE_ENABLED=true in the production frontend build.
+
+Local development:
+[x] Turnstile disabled locally with REACT_APP_TURNSTILE_ENABLED=false and
+    TURNSTILE_ENABLED=false.
 
 Frontend REACT_APP_* variables are embedded in the browser bundle. Do not put
 private API secrets in them.
@@ -122,6 +127,7 @@ private API secrets in them.
 -----------------------
 [ ] Configure REACT_APP_TURNSTILE_SITE_KEY on the frontend host.
 [ ] Configure TURNSTILE_SECRET_KEY only on the API host.
+[ ] Set TURNSTILE_ENABLED=true on the production API host.
 [ ] Restrict the Turnstile site key to production domains.
 [ ] Test both valid and invalid Turnstile verification.
 [ ] Rotate the secret if it was exposed outside the secret manager.

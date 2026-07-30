@@ -337,3 +337,163 @@ body.pigeon-marketing-body { scrollbar-color: #4e3522 #0b0907; scrollbar-width: 
     min-height: 50px;
     max-width: 100%;
 }
+
+.pigeon-security-gate {
+    position: fixed;
+    inset: 0;
+    z-index: 10000;
+    isolation: isolate;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 24px;
+    color: #f8f8f8;
+    background:
+        radial-gradient(circle at 50% 18%, rgba(124, 58, 237, .16), transparent 22%),
+        #000;
+    text-align: center;
+}
+
+.pigeon-security-gate::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: rgba(0, 0, 0, .94);
+}
+
+.pigeon-security-gate-card {
+    width: min(100%, 720px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    z-index: 1;
+}
+
+.pigeon-security-brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 36px;
+    font-size: 1.4rem;
+}
+
+.pigeon-security-brand span {
+    display: grid;
+    width: 38px;
+    height: 38px;
+    place-items: center;
+    color: #b58aff;
+    border-radius: 10px;
+    background: rgba(124, 58, 237, .22);
+}
+
+.pigeon-security-brand svg { width: 22px; height: 22px; }
+
+.pigeon-security-gate h1 {
+    margin: 0;
+    font-size: clamp(1.7rem, 3.5vw, 2.45rem);
+    font-weight: 650;
+    letter-spacing: -.035em;
+}
+
+.pigeon-security-gate-card > p {
+    max-width: 760px;
+    margin: 14px 0 28px;
+    color: rgba(255, 255, 255, .72);
+    font-size: .98rem;
+    line-height: 1.6;
+}
+
+.pigeon-security-check {
+    display: flex;
+    min-width: 300px;
+    min-height: 74px;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+    padding: 12px 18px;
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, .28);
+    border-radius: 4px;
+    background: #303030;
+    box-shadow: 0 18px 48px rgba(0, 0, 0, .35);
+}
+
+.pigeon-security-check strong {
+    font-size: .95rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.pigeon-security-check .pigeon-turnstile {
+    width: 300px;
+    min-height: 65px;
+}
+
+.pigeon-security-note {
+    margin-top: 14px;
+    color: rgba(255, 255, 255, .46);
+    font-size: .75rem;
+}
+
+.pigeon-security-footer {
+    position: absolute;
+    right: 24px;
+    bottom: 22px;
+    left: 24px;
+    display: flex;
+    justify-content: center;
+    gap: 18px;
+    color: rgba(255, 255, 255, .48);
+    font-size: .72rem;
+}
+
+.pigeon-security-footer b { color: rgba(255, 255, 255, .7); font-weight: 600; }
+
+.pigeon-mobile-experience-notice {
+    position: fixed;
+    right: 16px;
+    bottom: 16px;
+    left: 16px;
+    z-index: 200;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    max-width: 520px;
+    padding: 14px 42px 14px 14px;
+    margin: 0 auto;
+    color: #fff0e2;
+    background: rgba(23, 17, 12, .96);
+    border: 1px solid rgba(255, 193, 132, .28);
+    border-radius: 12px;
+    box-shadow: 0 16px 44px rgba(0, 0, 0, .38);
+    backdrop-filter: blur(16px);
+}
+
+.pigeon-mobile-experience-icon {
+    display: grid;
+    width: 30px;
+    height: 30px;
+    flex: 0 0 auto;
+    place-items: center;
+    color: #ffc184;
+    background: rgba(255, 138, 31, .12);
+    border-radius: 7px;
+}
+
+.pigeon-mobile-experience-notice strong { display: block; color: #ffc184; font-size: 13px; }
+.pigeon-mobile-experience-notice p { margin: 4px 0 0; color: #ad9a8b; font-size: 11px; line-height: 1.45; }
+.pigeon-mobile-experience-notice button { position: absolute; top: 8px; right: 10px; padding: 3px 7px; color: #ad9a8b; font-size: 21px; line-height: 1; background: transparent; border: 0; cursor: pointer; }
+.pigeon-mobile-experience-notice button:hover { color: #fff0e2; }
+
+@media (max-width: 560px) {
+    .pigeon-security-gate { padding: 24px 18px; }
+    .pigeon-security-brand { margin-bottom: 26px; }
+    .pigeon-security-gate-card > p { font-size: .88rem; }
+    .pigeon-security-check { min-width: min(100%, 300px); flex-direction: column; gap: 8px; }
+    .pigeon-security-footer { flex-wrap: wrap; gap: 8px 14px; }
+}

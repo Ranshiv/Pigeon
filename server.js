@@ -536,7 +536,7 @@ async function verifyTurnstileToken(token, remoteIp) {
 
 app.post('/api/public-demo/request', proxyLimiter, async (req, res) => {
     const { url, method = 'GET', body, turnstileToken } = req.body || {};
-    if (process.env.TURNSTILE_SECRET_KEY && !(await verifyTurnstileToken(turnstileToken, req.ip))) {
+    if (process.env.TURNSTILE_ENABLED === 'true' && process.env.TURNSTILE_SECRET_KEY && !(await verifyTurnstileToken(turnstileToken, req.ip))) {
         return res.status(403).json({ message: 'Security verification failed. Please complete the check and try again.' });
     }
     let target;
