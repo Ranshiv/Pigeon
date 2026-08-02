@@ -27,6 +27,7 @@ import './Workspace.css';
 import SettingsPage from './SettingsPage';
 import HistoryDetailsSection from './HistoryDetailsSection';
 import CopilotPanel from './CopilotPanel';
+import { CopilotContextProvider } from '../context/CopilotContext';
 
 import { useCollaboration } from '../context/CollaborationContext';
 
@@ -44,6 +45,7 @@ const Workspace = () => {
     }, [connected, joinWorkspace]);
 
     return (
+        <CopilotContextProvider>
         <div style={{ position: 'relative' }}>
             <VideoChatOverlay />
             <ActivityFeed isOpen={isActivityOpen} onToggle={() => setIsActivityOpen(o => !o)} />
@@ -87,6 +89,7 @@ const Workspace = () => {
                 <Route path="collections/*" element={<Navigate to="/workspace/workspaces" replace />} />
             </Routes>
         </div>
+        </CopilotContextProvider>
     );
 };
 

@@ -80,7 +80,12 @@ const SettingsPage = () => {
                 }
 
                 const user = data.user;
-                const userTheme = user.theme || 'light';
+                // New accounts and accounts without an explicit preference use
+                // the same Omni baseline as the public home page.
+                // A locally selected theme takes precedence when a profile
+                // save was interrupted, so a reload does not undo the choice.
+                const hasLocalThemeSelection = localStorage.getItem('theme-user-selected') === 'true';
+                const userTheme = hasLocalThemeSelection ? theme : (user.theme || 'omni');
                 const userFontSize = user.fontSize || fontSizeOptions.Medium;
                 const preferences = { ...defaultNotificationPreferences, ...(user.notificationPreferences || {}) };
                 setCurrentUser(user);
@@ -115,7 +120,7 @@ const SettingsPage = () => {
 
     useEffect(() => setSelectedFontSize(fontSize), [fontSize]);
 
-    const handleProfileUpdate = async (updateData) => {
+    const handleProfileUpdate = async (updateData, { showError = true } = {}) => {
         setMessage('');
         if (!currentUser) return false;
         try {
@@ -127,7 +132,9 @@ const SettingsPage = () => {
             });
             const data = await res.json().catch(() => ({}));
             if (!res.ok) {
-                setMessage(`Error updating profile: ${data.message || 'Request failed'}`);
+                if (showError) {
+                    setMessage(`Error updating profile: ${data.message || 'Request failed'}`);
+                }
                 return false;
             }
 
@@ -143,7 +150,9 @@ const SettingsPage = () => {
             return true;
         } catch (err) {
             console.error('Error updating profile:', err);
-            setMessage('Failed to update profile due to a network or server error.');
+            if (showError) {
+                setMessage('Failed to update profile due to a network or server error.');
+            }
             return false;
         }
     };
@@ -162,13 +171,15 @@ const SettingsPage = () => {
 
     const handleThemeChange = async (newTheme) => {
         if (newTheme === theme) return;
-        const previousTheme = theme;
         setTheme(newTheme);
         const selectedTheme = themeCatalog.find((option) => option.value === newTheme);
-        if (await handleProfileUpdate({ theme: newTheme })) {
+        const saved = await handleProfileUpdate({ theme: newTheme }, { showError: false });
+        if (saved) {
             setMessage(`${selectedTheme?.label || 'Theme'} theme enabled.`);
         } else {
-            setTheme(previousTheme);
+            // ThemeContext already persists the selection locally. Keep the
+            // visual change even when the profile API is temporarily down.
+            setMessage(`${selectedTheme?.label || 'Theme'} theme enabled locally. Sign in to sync it to your account.`);
         }
     };
 

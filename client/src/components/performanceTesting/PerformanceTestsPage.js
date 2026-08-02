@@ -4,6 +4,7 @@ import { FiActivity, FiPlay, FiPlus, FiRefreshCw, FiSave, FiTrash2 } from 'react
 import AppSelect from '../common/AppSelect/AppSelect';
 import '../common/AppSelect/AppSelect.css';
 import { io } from 'socket.io-client';
+import { useCopilotPageContext } from '../../context/CopilotContext';
 
 import {
     Chart as ChartJS,
@@ -187,9 +188,9 @@ const defaultForm = () => ({
 
 const PerformanceTestsPage = () => {
     const [tests, setTests] = useState([]);
-    const [selectedTestId, setSelectedTestId] = useState(null);
+    const [selectedTestId, setSelectedTestId] = useState(() => new URLSearchParams(window.location.search).get('test') || null);
     const [runs, setRuns] = useState([]);
-    const [selectedRunId, setSelectedRunId] = useState(null);
+    const [selectedRunId, setSelectedRunId] = useState(() => new URLSearchParams(window.location.search).get('run') || null);
 
     const [loadingTests, setLoadingTests] = useState(false);
     const [loadingRuns, setLoadingRuns] = useState(false);
@@ -250,6 +251,13 @@ const PerformanceTestsPage = () => {
         [runs, selectedRunId]
     );
 
+    useCopilotPageContext(selectedRun ? {
+        type: 'test_run',
+        kind: 'load',
+        id: selectedRun._id,
+        label: `${selectedTest?.name || 'Load test'} · ${selectedRun.status || 'run'}`
+    } : null);
+
     const completedRuns = useMemo(() => {
         return (runs || []).filter(r => r.status === 'completed' && r.metrics);
     }, [runs]);
@@ -262,7 +270,7 @@ const PerformanceTestsPage = () => {
             const data = await apiFetch('/api/performance-tests');
             setTests(Array.isArray(data) ? data : []);
             if (selectFirst && Array.isArray(data) && data.length > 0) {
-                setSelectedTestId(data[0]._id);
+                setSelectedTestId((current) => current && data.some((test) => test._id === current) ? current : data[0]._id);
             }
         } catch (e) {
             setError(e.message || 'Failed to load tests');
@@ -285,7 +293,7 @@ const PerformanceTestsPage = () => {
             const list = Array.isArray(data) ? data : [];
             setRuns(list);
             if (list.length > 0) {
-                setSelectedRunId(prev => (prev ? prev : list[0]._id));
+                setSelectedRunId((current) => current && list.some((run) => run._id === current) ? current : list[0]._id);
             } else {
                 setSelectedRunId(null);
             }

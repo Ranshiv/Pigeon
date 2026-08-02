@@ -151,14 +151,22 @@ async function buildContext(sources, user, prompt = '') {
     return items.filter((item) => item.text);
 }
 
-function modelMessages(history, context, prompt) {
+function pageMessage(activePage) {
+    const title = redactText(String(activePage?.title || '')).trim();
+    if (!title) return [];
+    const path = redactText(String(activePage?.path || '')).trim();
+    return [{ role: 'system', content: `The user is currently viewing the Pigeon page "${title}"${path ? ` (${path})` : ''}. This page, not any earlier one in the conversation, is what "this", "here", and "what am I looking at" refer to. Any selected evidence source below belongs to this page; if none is selected, describe the page itself rather than a resource from an earlier turn.` }];
+}
+
+function modelMessages(history, context, prompt, activePage) {
     const catalog = Array.from(ACTION_KINDS).join(', ');
     return [
-        { role: 'system', content: `You are Pigeon Copilot for API engineering. Use only supplied context and cite source IDs. Never reveal secrets, invent resources, or claim an action has executed. Return compact valid JSON only, without Markdown fences or explanatory text outside the JSON: {"answer":"string","citations":[{"type":"collection","id":"...","label":"..."}],"actions":[{"kind":"one of: ${catalog}","payload":{},"preview":"short human-readable description"}]}. Actions are proposals only. Never emit actions for questions, summaries, explanations, searches, or location queries; return an empty actions array unless the user explicitly asks to create, change, run, call, or delete something. Keep answer to two short sentences. Inspect existing documentation before proposing changes. Keep documentation action content focused and under 600 words, include only headings that need to be added or revised, and do not repeat unchanged sections. A selected SOURCE ID is the authoritative collectionId for actions targeting that source; never ask the user to provide an ID already present in selected context. When the user explicitly requests one supported proposal and the selected context contains the target, return that proposal. For update_documentation, payload must include collectionId, revised section content, and mode "merge"; use mode "replace" only when the user explicitly asks to replace all documentation. For create_request, payload must include collectionId and request. For update_request, payload must include collectionId, the exact request id from selected context, and request. For delete_request, payload must include collectionId, the exact request id from selected context, and confirmationName. For mcp_call, payload must include collectionId, toolName copied exactly from a name in the context mcpTools list, and arguments as a JSON object using only that tool's declared params keys (use {} when no arguments are needed); never invent a tool name and omit the action when mcpTools is empty. Omit actions when the selected context genuinely lacks the target information.` },
+        { role: 'system', content: `You are Pigeon Copilot for API engineering and incident diagnosis. Use only supplied, redacted context and cite its exact source IDs. When an evidence fact directly supports the answer, include its evidenceId in the citation. Treat evidence with relation "confirmed" as stored linkage and relation "inferred" only as a correlation; state uncertainty plainly. Never reveal secrets, invent resources, or claim an action has executed. Return compact valid JSON only, without Markdown fences or explanatory text outside the JSON: {"answer":"string","citations":[{"type":"workspace|collection|request|history|governance|trace|test_run|incident","id":"...","label":"...","evidenceId":"optional exact evidence id"}],"actions":[{"kind":"one of: ${catalog}","payload":{},"preview":"short human-readable description"}]}. Answer diagnostic questions with the failure, strongest evidence, and likely next inspection step. Actions are proposals only and are supported only for collection/request context. Never emit actions for questions, summaries, explanations, searches, or location queries; return an empty actions array unless the user explicitly asks to create, change, run, call, or delete something. Inspect existing documentation before proposing changes. Keep documentation action content focused and under 600 words and do not repeat unchanged sections. A selected collection ID, or the collectionId embedded in selected request context, is authoritative for collection actions. For update_documentation, payload must include collectionId, revised section content, and mode "merge"; use mode "replace" only when explicitly requested. For create_request, payload must include collectionId and request. For update_request, payload must include collectionId, the exact request id from selected context, and request. For delete_request, payload must include collectionId, the exact request id from selected context, and confirmationName. For mcp_call, copy a declared tool name exactly and use only declared argument keys. Omit actions when selected context lacks the target.` },
         // Past model replies are not trusted context; retaining only user prompts
         // prevents an accidental disclosure in a previous reply from being sent again.
         ...history.slice(-10, -1).filter((message) => message.role === 'user').map((message) => ({ role: message.role, content: redactText(message.content) })),
-        { role: 'system', content: context.length ? `Selected, redacted context:\n${context.map((item) => `SOURCE ${item.id} (${item.label}): ${item.text}`).join('\n\n')}` : 'No collection context was selected. Provide general Pigeon guidance only; do not claim to know workspace-specific resources or results.' },
+        ...pageMessage(activePage),
+        { role: 'system', content: context.length ? `Selected, redacted evidence context:\n${context.map((item) => `SOURCE ${item.type}:${item.id} (${item.label})${item.origin ? ` [${item.origin}]` : ''}: ${item.text}`).join('\n\n')}` : 'No workspace context was selected. Provide general Pigeon guidance only; do not claim to know workspace-specific resources or results.' },
         { role: 'user', content: prompt }
     ];
 }
@@ -198,8 +206,19 @@ function parseModelResult(raw, context) {
             return { answer: looksLikeProviderJson ? 'I could not safely read that response. Please try again.' : source, citations: [], actions: [] };
         }
     }
-    const validSources = new Map(context.map(({ type, id, label }) => [`${type}:${id}`, { type, id, label }]));
-    const citations = (Array.isArray(parsed.citations) ? parsed.citations : []).map((citation) => validSources.get(`${citation?.type}:${citation?.id}`)).filter(Boolean);
+    const validSources = new Map(context.map((item) => [`${item.type}:${item.id}`, item]));
+    const citations = (Array.isArray(parsed.citations) ? parsed.citations : []).map((citation) => {
+        const sourceItem = validSources.get(`${citation?.type}:${citation?.id}`);
+        if (!sourceItem) return null;
+        const evidence = citation?.evidenceId ? (sourceItem.evidence || []).find((item) => item.id === citation.evidenceId) : null;
+        return {
+            type: sourceItem.type,
+            id: sourceItem.id,
+            label: sourceItem.label,
+            ...(evidence?.deepLink || sourceItem.deepLink ? { deepLink: evidence?.deepLink || sourceItem.deepLink } : {}),
+            ...(evidence ? { evidenceId: evidence.id, relation: evidence.relation || '', confidenceReason: evidence.confidenceReason || '' } : {})
+        };
+    }).filter(Boolean);
     const actions = (Array.isArray(parsed.actions) ? parsed.actions : []).filter((action) => ACTION_KINDS.has(action?.kind) && action.payload && typeof action.payload === 'object').slice(0, 3);
     return { answer: String(parsed.answer || 'I could not produce an answer.').slice(0, 12000), citations, actions };
 }
@@ -292,12 +311,15 @@ function documentationContentFromPayload(payload) {
 }
 
 function requestCandidatesFromContext(context, collectionId) {
-    const source = context.find((item) => item?.type === 'collection' && String(item.id) === String(collectionId));
+    const source = context.find((item) => item?.type === 'collection' && String(item.id) === String(collectionId))
+        || context.find((item) => item?.type === 'request' && contextCollectionId(item) === String(collectionId));
     if (!source?.text) return null;
     try {
         const parsed = JSON.parse(source.text);
-        if (!Array.isArray(parsed.requests)) return null;
-        return parsed.requests
+        const resource = parsed.resource || parsed;
+        if (source.type === 'request') return resource?.id ? [{ id: String(resource.id), name: String(resource.name || '') }] : null;
+        if (!Array.isArray(resource.requests)) return null;
+        return resource.requests
             .filter((request) => request?.name)
             .map((request) => ({ id: request?.id ? String(request.id) : '', name: String(request.name) }));
     } catch (_) {
@@ -345,14 +367,24 @@ function mcpToolsFromContext(context, collectionId) {
     if (!source?.text) return null;
     try {
         const parsed = JSON.parse(source.text);
-        return Array.isArray(parsed.mcpTools) ? parsed.mcpTools.filter((tool) => tool?.name) : null;
+        const resource = parsed.resource || parsed;
+        return Array.isArray(resource.mcpTools) ? resource.mcpTools.filter((tool) => tool?.name) : null;
     } catch (_) { return null; }
+}
+
+function contextCollectionId(item) {
+    if (item?.type === 'collection') return String(item.id || '');
+    if (item?.type !== 'request' || !item.text) return '';
+    try {
+        const parsed = JSON.parse(item.text);
+        return String((parsed.resource || parsed).collectionId || '');
+    } catch (_) { return ''; }
 }
 
 function normalizeActionProposal(proposal, context, prompt = '') {
     if (!proposal || !ACTION_KINDS.has(proposal.kind) || !proposal.payload || typeof proposal.payload !== 'object') return null;
     if (!actionRequestedForKind(proposal.kind, prompt)) return null;
-    const selectedIds = context.filter((item) => item.type === 'collection').map((item) => String(item.id));
+    const selectedIds = [...new Set(context.map(contextCollectionId).filter(Boolean))];
     if (!selectedIds.length) return null;
     const payload = { ...proposal.payload };
     if (selectedIds.length === 1 && !selectedIds.includes(String(payload.collectionId || ''))) payload.collectionId = selectedIds[0];
@@ -573,4 +605,4 @@ async function executeAction(action, user, typedConfirmation = '') {
     throw new Error('This Copilot action is not supported.');
 }
 
-module.exports = { buildContext, loadCollection, modelMessages, parseModelResult, normalizeActionProposal, hasActionIntent, resolveActionIntentPrompt, appNavigationAnswer, mergeDocumentationContent, proposalHash, actionExpiresAt, actionPreview, redactText, executeAction };
+module.exports = { buildContext, loadCollection, modelMessages, pageMessage, parseModelResult, normalizeActionProposal, hasActionIntent, resolveActionIntentPrompt, appNavigationAnswer, mergeDocumentationContent, proposalHash, actionExpiresAt, actionPreview, redactText, executeAction };

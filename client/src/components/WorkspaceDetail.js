@@ -15,6 +15,7 @@ import CollectionCreate from './CollectionCreate';
 import ReviewDashboard from './collaboration/ReviewDashboard';
 import AppSelect from './common/AppSelect/AppSelect';
 import PostmanImportModal from './PostmanImportModal';
+import { useCopilotPageContext } from '../context/CopilotContext';
 
 const COLLABORATOR_ROLE_OPTIONS = [
     { value: 'admin', label: 'Admin' },
@@ -82,6 +83,13 @@ const WorkspaceDetail = () => {
     const [editIsPublic, setEditIsPublic] = useState(false);
     const [saving, setSaving] = useState(false);
     const [editError, setEditError] = useState(null);
+
+    useCopilotPageContext({
+        type: 'workspace',
+        id,
+        workspaceId: id,
+        label: workspace?.name || 'Workspace'
+    });
 
     // Access the collaboration context
     const { joinWorkspace, sendActivity, connected, getActiveUsers } = useCollaboration();

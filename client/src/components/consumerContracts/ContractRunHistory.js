@@ -1,6 +1,7 @@
 // client/src/components/consumerContracts/ContractRunHistory.js
 import React, { useCallback, useEffect, useState } from 'react';
 import { FiAlertTriangle, FiCheckCircle, FiChevronDown, FiChevronRight, FiXCircle } from 'react-icons/fi';
+import { useCopilotPageContext } from '../../context/CopilotContext';
 
 const formatDateTime = (value) => {
     if (!value) return '—';
@@ -81,13 +82,23 @@ const InteractionResult = ({ result }) => {
     );
 };
 
-const ContractRunHistory = ({ contractId, refreshToken }) => {
+const ContractRunHistory = ({ contractId, workspaceId, refreshToken }) => {
     const [runs, setRuns] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+    const requestedRunId = new URLSearchParams(window.location.search).get('run');
     const [openRunId, setOpenRunId] = useState(null);
     const [runDetail, setRunDetail] = useState(null);
     const [detailLoading, setDetailLoading] = useState(false);
+
+    const activeRun = runDetail || runs.find((run) => String(run._id) === String(openRunId));
+    useCopilotPageContext(activeRun?._id ? {
+        type: 'test_run',
+        kind: 'consumer_contract',
+        id: activeRun._id,
+        workspaceId: workspaceId || '',
+        label: `Consumer contract · ${activeRun.status || 'run'}`
+    } : null);
 
     const loadRuns = useCallback(async (signal) => {
         try {
@@ -111,7 +122,13 @@ const ContractRunHistory = ({ contractId, refreshToken }) => {
         setOpenRunId(null);
         setRunDetail(null);
         return () => controller.abort();
-    }, [loadRuns, refreshToken]);
+    }, [loadRuns, refreshToken, requestedRunId]);
+
+    useEffect(() => {
+        if (requestedRunId && runs.some((run) => String(run._id) === String(requestedRunId)) && !runDetail) toggleRun(requestedRunId);
+        // toggleRun intentionally remains event-shaped; the URL deep link runs it once after history loads.
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [requestedRunId, runs.length, refreshToken]);
 
     const toggleRun = async (runId) => {
         if (openRunId === runId) {

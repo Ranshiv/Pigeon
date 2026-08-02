@@ -7,6 +7,7 @@ import { useWorkspaceOptions } from '../compliance/useWorkspaceOptions';
 import ContractEditor from './ContractEditor';
 import ContractRunHistory from './ContractRunHistory';
 import './consumerContracts.css';
+import { useCopilotPageContext } from '../../context/CopilotContext';
 
 const STATUS_FILTERS = [
     { value: 'all', label: 'Any status' },
@@ -44,7 +45,7 @@ const emptyContract = (workspaceId) => ({
 const ConsumerContractsSection = () => {
     const { workspaces, defaultWorkspaceId, loading: workspacesLoading } = useWorkspaceOptions();
 
-    const [workspaceId, setWorkspaceId] = useState('');
+    const [workspaceId, setWorkspaceId] = useState(() => new URLSearchParams(window.location.search).get('workspaceId') || '');
     const [contracts, setContracts] = useState([]);
     const [collections, setCollections] = useState([]);
     const [environments, setEnvironments] = useState([]);
@@ -59,12 +60,14 @@ const ConsumerContractsSection = () => {
     const [environmentFilter, setEnvironmentFilter] = useState('all');
     const [tagFilter, setTagFilter] = useState('all');
 
-    const [selectedId, setSelectedId] = useState(null);
+    const [selectedId, setSelectedId] = useState(() => new URLSearchParams(window.location.search).get('contract') || null);
     const [draft, setDraft] = useState(null);
     const [saving, setSaving] = useState(false);
     const [saveError, setSaveError] = useState(null);
     const [runningId, setRunningId] = useState(null);
     const [runRefresh, setRunRefresh] = useState(0);
+
+    useCopilotPageContext(workspaceId ? { type: 'workspace', id: workspaceId, workspaceId, label: 'Consumer contracts workspace' } : null);
 
     useEffect(() => {
         if (!workspaceId && defaultWorkspaceId) setWorkspaceId(defaultWorkspaceId);
@@ -462,7 +465,7 @@ const ConsumerContractsSection = () => {
                 )}
             </div>
 
-            {selected && <ContractRunHistory contractId={selected._id} refreshToken={runRefresh} />}
+            {selected && <ContractRunHistory contractId={selected._id} workspaceId={workspaceId} refreshToken={runRefresh} />}
 
             {draft && createPortal(
                 <div

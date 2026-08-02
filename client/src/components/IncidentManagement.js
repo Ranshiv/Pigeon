@@ -11,8 +11,10 @@ import './IncidentManagement.css';
 import PageLoader from './common/PageLoader/PageLoader';
 import AppSelect from './common/AppSelect/AppSelect';
 import TabBar from './common/TabBar/TabBar';
+import { useCopilotPageContext } from '../context/CopilotContext';
 
 const IncidentManagement = () => {
+    const requestedIncidentId = new URLSearchParams(window.location.search).get('incident');
     const [incidents, setIncidents] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -27,6 +29,13 @@ const IncidentManagement = () => {
     const [showPostMortem, setShowPostMortem] = useState(false);
     const [activeTab, setActiveTab] = useState('details'); // details | timeline | alerts | postmortem
     const [actionLoading, setActionLoading] = useState(false);
+
+    useCopilotPageContext(selectedIncident ? {
+        type: 'incident',
+        id: selectedIncident._id,
+        workspaceId: selectedIncident.workspaceId || '',
+        label: selectedIncident.title
+    } : null);
 
     useEffect(() => {
         const fetchIncidents = async () => {
@@ -54,6 +63,12 @@ const IncidentManagement = () => {
 
         fetchIncidents();
     }, [filter, searchTerm]);
+
+    useEffect(() => {
+        if (!requestedIncidentId || selectedIncident) return;
+        const requested = incidents.find((incident) => String(incident._id) === String(requestedIncidentId));
+        if (requested) setSelectedIncident(requested);
+    }, [incidents, requestedIncidentId, selectedIncident]);
 
     const refetchIncidents = async () => {
         try {

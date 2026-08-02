@@ -3,10 +3,14 @@ import React, { createContext, useState, useEffect, useContext } from 'react';
 const ThemeContext = createContext();
 export const themeOptions = ['light', 'dark', 'omni', 'black'];
 
-const normalizeTheme = (value) => themeOptions.includes(value) ? value : 'dark';
+const normalizeTheme = (value) => themeOptions.includes(value) ? value : 'omni';
 
 export const ThemeProvider = ({ children }) => {
-    const [theme, setThemeState] = useState(() => normalizeTheme(localStorage.getItem('theme')));
+    const [theme, setThemeState] = useState(() => {
+        const storedTheme = localStorage.getItem('theme');
+        const hasUserSelection = localStorage.getItem('theme-user-selected') === 'true';
+        return hasUserSelection ? normalizeTheme(storedTheme) : 'omni';
+    });
 
     useEffect(() => {
         // Omni uses the dark selector family for legacy component styles while
@@ -26,10 +30,14 @@ export const ThemeProvider = ({ children }) => {
         localStorage.setItem('theme', theme);
     }, [theme]);
 
-    const setTheme = (nextTheme) => setThemeState(normalizeTheme(nextTheme));
+    const setTheme = (nextTheme) => {
+        localStorage.setItem('theme-user-selected', 'true');
+        setThemeState(normalizeTheme(nextTheme));
+    };
 
     // Preserve the existing two-state toggle for components that still use it.
     const toggleTheme = () => {
+        localStorage.setItem('theme-user-selected', 'true');
         setThemeState((prevTheme) => (prevTheme === 'light' ? 'dark' : 'light'));
     };
 

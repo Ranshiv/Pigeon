@@ -46,7 +46,7 @@ const Tile = ({ icon: Icon, label, value, tone }) => (
 const AsyncApiSection = () => {
     const { workspaces, defaultWorkspaceId, loading: workspacesLoading } = useWorkspaceOptions();
 
-    const [workspaceId, setWorkspaceId] = useState('');
+    const [workspaceId, setWorkspaceId] = useState(() => new URLSearchParams(window.location.search).get('workspaceId') || '');
     const [docs, setDocs] = useState([]);
     const [environments, setEnvironments] = useState([]);
     const [protocolFilter, setProtocolFilter] = useState('all');
@@ -57,7 +57,7 @@ const AsyncApiSection = () => {
     const [error, setError] = useState(null);
     const [showImport, setShowImport] = useState(false);
 
-    const [selectedId, setSelectedId] = useState(null);
+    const [selectedId, setSelectedId] = useState(() => new URLSearchParams(window.location.search).get('document') || null);
     const [selected, setSelected] = useState(null);
     const [detailLoading, setDetailLoading] = useState(false);
     const [detailVersion, setDetailVersion] = useState(0);

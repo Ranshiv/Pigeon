@@ -3,6 +3,7 @@ import { FiActivity, FiAlertTriangle, FiCheckCircle, FiClock, FiPlay, FiShield, 
 import AppSelect from './common/AppSelect/AppSelect';
 import { extractVariables, interpolateRequest, resolveVariables } from '../utils/variableInterpolation';
 import './FuzzTestingPanel.css';
+import { useCopilotPageContext } from '../context/CopilotContext';
 
 const clone = (value) => JSON.parse(JSON.stringify(value));
 const typeOf = (value) => Array.isArray(value) ? 'array' : value === null ? 'null' : typeof value;
@@ -25,6 +26,9 @@ export default function FuzzTestingPanel({ requests, collectionId, workspaceId, 
   const [sourceType, setSourceType] = useState('openapi'); const [sourceKey, setSourceKey] = useState('');
   const [cases, setCases] = useState([]); const [selected, setSelected] = useState({}); const [results, setResults] = useState([]);
   const [running, setRunning] = useState(false); const [acknowledged, setAcknowledged] = useState(false); const [error, setError] = useState(''); const [history, setHistory] = useState([]);
+  const requestedRunId = new URLSearchParams(window.location.search).get('run');
+  const contextualRun = history.find((runItem) => String(runItem._id) === String(requestedRunId)) || history[0];
+  useCopilotPageContext(contextualRun?._id ? { type: 'test_run', kind: 'fuzz', id: contextualRun._id, workspaceId: workspaceId || '', label: `${contextualRun.sourceType || 'Fuzz'} · ${contextualRun.failed || 0} failed` } : null);
   const fallbackRequests = useMemo(() => requests.filter((request) => { try { return request.body && !['GET', 'HEAD'].includes(String(request.method).toUpperCase()) && typeof JSON.parse(request.body) === 'object'; } catch { return false; } }), [requests]);
   const sourceOptions = useMemo(() => sourceType === 'openapi' ? sources.openapi.map((item) => ({ value: `${item.versionId}|${item.method}|${item.path}`, label: `${item.version} · ${item.method} ${item.path}${item.executable ? '' : ' (saved request required)'}` })) : sourceType === 'graphql' ? sources.graphql.map((item) => ({ value: item.requestId, label: `${item.name || item.operationName || 'GraphQL request'}${item.executable ? '' : ' (SDL schema required)'}` })) : fallbackRequests.map((item) => ({ value: String(item._id || item.id), label: `${item.method} · ${item.name || item.url}` })), [sourceType, sources, fallbackRequests]);
   const chosen = sourceOptions.some((option) => option.value === sourceKey) ? sourceKey : sourceOptions[0]?.value || '';

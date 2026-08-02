@@ -627,9 +627,9 @@
   justify-content: center;
   width: 100%;
   padding: 9px;
-  background-color: transparent;
-  color: var(--text-color);
-  border: 1px dashed var(--border-color);
+  background-color: var(--primary-color);
+  color: var(--button-text, #fff);
+  border: 1px solid var(--primary-color);
   border-radius: var(--border-radius);
   font-size: 13px;
   font-weight: 500;
@@ -638,9 +638,10 @@
 }
 
 .add-request-btn:hover {
-  background-color: rgba(1, 76, 117, 0.08);
-  color: var(--primary-color, #014C75);
-  border: 1px solid var(--primary-color, #014C75);
+  background-color: var(--primary-hover);
+  color: var(--button-text, #fff);
+  border-color: var(--primary-hover);
+  box-shadow: var(--shadow-sm);
 }
 
 .add-request-btn .icon {
@@ -2055,6 +2056,20 @@
 
 [data-cd-redesign="v1"] .add-request-btn:hover {
   filter: brightness(1.1);
+}
+
+/* Keep the sidebar action consistent even when legacy collection button
+   styles are loaded after the redesign rules. */
+.collection-sidebar .add-request-btn {
+  background: var(--primary-color) !important;
+  border: 1px solid var(--primary-color) !important;
+  color: var(--button-text, #fff) !important;
+}
+
+.collection-sidebar .add-request-btn:hover {
+  background: var(--primary-hover) !important;
+  border-color: var(--primary-hover) !important;
+  color: var(--button-text, #fff) !important;
 }
 
 /* Empty states → ws-empty pattern */

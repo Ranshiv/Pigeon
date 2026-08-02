@@ -3,13 +3,19 @@ const mongoose = require('mongoose');
 const sourceSchema = new mongoose.Schema({
     type: { type: String, required: true },
     id: { type: String, default: '' },
-    label: { type: String, default: '' }
+    label: { type: String, default: '' },
+    deepLink: { type: String, default: '' },
+    evidenceId: { type: String, default: '' },
+    relation: { type: String, default: '' },
+    confidenceReason: { type: String, default: '' }
 }, { _id: false });
 
 const messageSchema = new mongoose.Schema({
     role: { type: String, enum: ['user', 'assistant', 'system'], required: true },
     content: { type: String, default: '' },
     citations: { type: [sourceSchema], default: [] },
+    contextSnapshot: { type: [mongoose.Schema.Types.Mixed], default: [] },
+    findings: { type: [mongoose.Schema.Types.Mixed], default: [] },
     createdAt: { type: Date, default: Date.now }
 }, { _id: false });
 

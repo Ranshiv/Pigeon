@@ -1,4 +1,4 @@
-const { parseModelResult, normalizeActionProposal, hasActionIntent, resolveActionIntentPrompt, appNavigationAnswer, mergeDocumentationContent, proposalHash, redactText } = require('../services/CopilotService');
+const { parseModelResult, normalizeActionProposal, hasActionIntent, resolveActionIntentPrompt, appNavigationAnswer, mergeDocumentationContent, modelMessages, proposalHash, redactText } = require('../services/CopilotService');
 
 const CONTEXT = [{ type: 'collection', id: 'collection-1', label: 'Payments', text: '{}' }];
 const REQUEST_CONTEXT = [{
@@ -33,6 +33,18 @@ describe('Copilot service safety boundaries', () => {
         expect(result.citations).toEqual([{ type: 'collection', id: 'collection-1', label: 'Payments' }]);
         expect(result.actions).toHaveLength(1);
         expect(result.actions[0].kind).toBe('update_documentation');
+    });
+
+    test('enriches validated citations with exact evidence metadata', () => {
+        const result = parseModelResult(JSON.stringify({
+            answer: 'The trace confirms the request was generated from this endpoint.',
+            citations: [{ type: 'trace', id: 'trace-1', evidenceId: 'ev-1' }],
+            actions: []
+        }), [{
+            type: 'trace', id: 'trace-1', label: 'Checkout trace', deepLink: '/workspace/trace-to-test?traceId=trace-1', text: '{}',
+            evidence: [{ id: 'ev-1', relation: 'confirmed', confidenceReason: 'Stored request ID matches.', deepLink: '/workspace/history/history-1' }]
+        }]);
+        expect(result.citations[0]).toMatchObject({ evidenceId: 'ev-1', relation: 'confirmed', deepLink: '/workspace/history/history-1' });
     });
 
     test('redacts common inline credentials before persistence or provider calls', () => {
@@ -236,5 +248,19 @@ describe('Copilot service safety boundaries', () => {
         const proposed = '## Endpoints\n`GET /health` returns service status.';
         const once = mergeDocumentationContent(existing, proposed);
         expect(mergeDocumentationContent(once, proposed)).toBe(once);
+    });
+});
+
+describe('Copilot page awareness', () => {
+    test('tells the model which page is open so "this" never resolves to an earlier turn', () => {
+        const messages = modelMessages([], [], 'What am I looking at?', { title: 'Collections · Sample Data', path: '/workspace/collections/abc?tab=sampleData' });
+        const pageContent = messages.filter((message) => message.role === 'system').map((message) => message.content).join('\n');
+        expect(pageContent).toContain('Collections · Sample Data');
+        expect(pageContent).toContain('/workspace/collections/abc?tab=sampleData');
+    });
+
+    test('omits the page message when no page is supplied', () => {
+        const before = modelMessages([], [], 'Hello').length;
+        expect(modelMessages([], [], 'Hello', { title: '' }).length).toBe(before);
     });
 });

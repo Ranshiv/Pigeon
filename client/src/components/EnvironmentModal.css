@@ -771,6 +771,14 @@ body.dark-theme .environment-modal-overlay {
     background: var(--background-color);
 }
 
+/* Keep the variable workspace on the same semantic surface as the rest of
+   the environment editor. This is especially important for Omni, which also
+   carries the legacy dark-theme class. */
+.environment-editor-modal .env-variables-shell {
+    background: var(--card-bg);
+    border-color: var(--border-color);
+}
+
 .env-variables-shell .variable-editor {
     min-height: 210px;
     height: auto;
@@ -809,6 +817,16 @@ body.dark-theme .environment-modal-overlay {
     opacity: 0.8;
 }
 
+.environment-editor-modal .env-variables-shell .empty-state-icon {
+    color: var(--primary-color);
+    opacity: 1;
+}
+
+.environment-editor-modal .env-variables-shell .empty-state-icon svg {
+    color: currentColor;
+    stroke: currentColor;
+}
+
 .env-variables-shell .empty-state-icon svg {
     width: 34px;
     height: 34px;
@@ -836,6 +854,18 @@ body.dark-theme .environment-modal-overlay {
     color: var(--button-text, #fff);
     font-size: 0.76rem;
     font-weight: 650;
+}
+
+.environment-editor-modal .env-variables-shell .empty-state-action {
+    border-color: var(--primary-color);
+    background: var(--primary-color);
+    color: var(--button-text);
+}
+
+.environment-editor-modal .env-variables-shell .empty-state-action:hover {
+    border-color: var(--primary-hover);
+    background: var(--primary-hover);
+    color: var(--button-text);
 }
 
 .env-variables-shell .variable-editor .add-variable-form {

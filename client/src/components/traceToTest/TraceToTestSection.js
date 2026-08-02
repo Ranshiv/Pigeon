@@ -8,6 +8,7 @@ import { useWorkspaceOptions } from '../compliance/useWorkspaceOptions';
 import TraceDetail from './TraceDetail';
 import TraceImportPanel from './TraceImportPanel';
 import './traceToTest.css';
+import { useCopilotPageContext } from '../../context/CopilotContext';
 
 const STATUS_FILTERS = [
     { value: 'all', label: 'Any status' },
@@ -49,7 +50,7 @@ const Tile = ({ icon: Icon, label, value, tone }) => (
 const TraceToTestSection = () => {
     const { workspaces, defaultWorkspaceId, loading: workspacesLoading } = useWorkspaceOptions();
 
-    const [workspaceId, setWorkspaceId] = useState('');
+    const [workspaceId, setWorkspaceId] = useState(() => new URLSearchParams(window.location.search).get('workspaceId') || '');
     const [traces, setTraces] = useState([]);
     const [collections, setCollections] = useState([]);
     const [environments, setEnvironments] = useState([]);
@@ -65,9 +66,16 @@ const TraceToTestSection = () => {
     const [error, setError] = useState(null);
     const [showImport, setShowImport] = useState(false);
 
-    const [selectedTraceId, setSelectedTraceId] = useState(null);
+    const [selectedTraceId, setSelectedTraceId] = useState(() => new URLSearchParams(window.location.search).get('traceId') || null);
     const [selectedTrace, setSelectedTrace] = useState(null);
     const [detailLoading, setDetailLoading] = useState(false);
+
+    useCopilotPageContext(selectedTrace ? {
+        type: 'trace',
+        id: selectedTrace.traceId,
+        workspaceId,
+        label: `${selectedTrace.rootServiceName || 'Trace'} · ${selectedTrace.route || selectedTrace.traceId}`
+    } : (workspaceId ? { type: 'workspace', id: workspaceId, workspaceId, label: 'Trace workspace' } : null));
 
     useEffect(() => {
         if (!workspaceId && defaultWorkspaceId) setWorkspaceId(defaultWorkspaceId);

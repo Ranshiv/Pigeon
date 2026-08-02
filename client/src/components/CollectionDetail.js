@@ -1,5 +1,5 @@
 // client/src/components/CollectionDetail.js
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { useParams, useNavigate, useLocation, Link } from 'react-router-dom';
 import './CollectionDetail.css';
 import ActiveCollaborators from './ActiveCollaborators';
@@ -14,6 +14,7 @@ import EvaluationSuitePanel from './evaluation/EvaluationSuitePanel';
 import FuzzTestingPanel from './FuzzTestingPanel';
 import CollectionGitSyncPanel from './CollectionGitSyncPanel';
 import { useCollaboration } from '../context/CollaborationContext';
+import { useCopilotPageContext } from '../context/CopilotContext';
 import {
   FiSettings, FiAlertCircle, FiCheckCircle, FiBook, FiEdit,
   FiPlus, FiTrash2, FiDatabase, FiGlobe, FiLock, FiUsers, FiPackage,
@@ -181,10 +182,19 @@ function CollectionDetail() {
   const [isRunningAll, setIsRunningAll] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [pendingChanges, setPendingChanges] = useState(false);
-  const [activeTab, setActiveTab] = useState(() => {
+  // The open tab lives in the URL so refreshes, deep links, and anything that
+  // reads the route (Copilot page context) all see the same page identity.
+  const activeTab = useMemo(() => {
     const tab = new URLSearchParams(location.search).get('tab');
     return ['requests', 'documentation', 'sampleData', 'variables', 'designer', 'mcp-server', 'evaluation', 'fuzz-testing', 'git-sync'].includes(tab) ? tab : 'requests';
-  }); const [documentation, setDocumentation] = useState(null);
+  }, [location.search]);
+  const requestedId = useMemo(() => new URLSearchParams(location.search).get('request') || '', [location.search]);
+  const setActiveTab = useCallback((tab) => {
+    const params = new URLSearchParams(location.search);
+    if (tab === 'requests') params.delete('tab'); else params.set('tab', tab);
+    navigate({ search: params.toString() }, { replace: true });
+  }, [location.search, navigate]);
+  const [documentation, setDocumentation] = useState(null);
   const [isLoadingDocs, setIsLoadingDocs] = useState(false); const [saveSuccess, setSaveSuccess] = useState(false); const [responseData, setResponseData] = useState(null);
   const [selectedEnvironmentId, setSelectedEnvironmentId] = useState(() => {
     // Restore selected environment from localStorage
@@ -195,6 +205,30 @@ function CollectionDetail() {
   const [selectedEnvironment, setSelectedEnvironment] = useState(null);
   const [requestSidebarCollapsed, setRequestSidebarCollapsed] = useState(false);
   const [selectedFolderPath, setSelectedFolderPath] = useState(null);
+
+  // The selected request only describes the page while the requests tab is open.
+  // Every other tab is about the collection, and the tabs that render their own
+  // Copilot context (fuzz testing, agent evaluation) register it themselves.
+  const copilotTabLabels = {
+    documentation: 'documentation',
+    sampleData: 'sample data',
+    variables: 'variables',
+    designer: 'API designer',
+    'mcp-server': 'MCP server',
+    'git-sync': 'Git sync'
+  };
+  const onRequestsTab = activeTab === 'requests';
+  const tabOwnsContext = ['fuzz-testing', 'evaluation'].includes(activeTab);
+  const activeRequestId = onRequestsTab && selectedRequest ? String(selectedRequest._id || selectedRequest.id || '') : '';
+  useCopilotPageContext(tabOwnsContext ? null : {
+    type: activeRequestId ? 'request' : 'collection',
+    id: activeRequestId || collectionId,
+    parentId: activeRequestId ? collectionId : undefined,
+    workspaceId: collection?.workspaceId ? String(collection.workspaceId) : '',
+    label: activeRequestId
+      ? `${selectedRequest.method || 'GET'} ${selectedRequest.name || 'request'}`
+      : [collection?.name || 'Collection', copilotTabLabels[activeTab]].filter(Boolean).join(' ')
+  });
 
   // Add keyboard shortcut for toggling the requests sidebar
   useEffect(() => {
@@ -273,6 +307,8 @@ function CollectionDetail() {
       // previous collection's request selected after navigating between collections.
       if (data.requests && data.requests.length > 0) {
         setSelectedRequest((prev) => {
+          const requested = requestedId && data.requests.find(r => String(r._id || r.id) === requestedId);
+          if (requested) return requested;
           const stillInCollection = prev && data.requests.some(r => r.id === prev.id);
           return stillInCollection ? prev : data.requests[0];
         });
@@ -284,7 +320,9 @@ function CollectionDetail() {
       setError('Failed to load collection. Please try again later.');
       setLoading(false);
     }
-  }, [collectionId]);
+    // Depends on `requestedId` only, not the whole query string: the open tab
+    // also lives in the URL now, and switching tabs must not refetch.
+  }, [collectionId, requestedId]);
 
   // Fetch documentation data when the documentation tab is selected
   const fetchDocumentation = useCallback(async () => {
@@ -1100,7 +1138,7 @@ function CollectionDetail() {
         <button
           type="button"
           className="tab-btn"
-          onClick={() => window.dispatchEvent(new CustomEvent('pigeon:copilot-context', { detail: { collectionId } }))}
+          onClick={() => window.dispatchEvent(new CustomEvent('pigeon:copilot-context', { detail: { collectionId, workspaceId: collection?.workspaceId, label: collection?.name } }))}
           title="Ask Copilot about this collection"
         >
           <Sparkles /> Ask Copilot
@@ -1378,7 +1416,7 @@ function CollectionDetail() {
           )}
 
           {activeTab === 'evaluation' && (
-            <EvaluationSuitePanel collectionId={collectionId} />
+            <EvaluationSuitePanel collectionId={collectionId} workspaceId={collection?.workspaceId} />
           )}
 
           {activeTab === 'fuzz-testing' && (

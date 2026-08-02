@@ -8,6 +8,7 @@ import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import PageLoader from './common/PageLoader/PageLoader';
 import './HistoryDetailsSection.css';
+import { useCopilotPageContext } from '../context/CopilotContext';
 
 const HistoryDetailsSection = () => {
     const [history, setHistory] = useState([]);
@@ -15,9 +16,28 @@ const HistoryDetailsSection = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [deletingId, setDeletingId] = useState(null);
+    const [historyWorkspaceId, setHistoryWorkspaceId] = useState('');
     const navigate = useNavigate();
     const params = useParams();
     const urlParamId = params['*'] || params.id || '';
+
+    useCopilotPageContext(selectedHistoryItem ? {
+        type: 'history',
+        id: selectedHistoryItem._id,
+        workspaceId: historyWorkspaceId,
+        label: `${selectedHistoryItem.method || 'GET'} ${selectedHistoryItem.url || 'history entry'}`
+    } : null);
+
+    useEffect(() => {
+        const collectionId = selectedHistoryItem?.collectionId;
+        if (!collectionId) { setHistoryWorkspaceId(''); return undefined; }
+        const controller = new AbortController();
+        fetch(`/api/collections/${encodeURIComponent(collectionId)}`, { credentials: 'include', signal: controller.signal })
+            .then((response) => response.ok ? response.json() : null)
+            .then((collection) => setHistoryWorkspaceId(collection?.workspaceId?._id || collection?.workspaceId || ''))
+            .catch((reason) => { if (reason.name !== 'AbortError') setHistoryWorkspaceId(''); });
+        return () => controller.abort();
+    }, [selectedHistoryItem?.collectionId]);
 
     useEffect(() => {
         fetchHistory();

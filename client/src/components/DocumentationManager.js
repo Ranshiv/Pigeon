@@ -8,6 +8,7 @@ import DocumentationSettingsVersionHistory from './DocumentationSettingsVersionH
 import DocumentationContentVersionHistory from './DocumentationContentVersionHistory';
 import ApiVersionManager from './ApiVersionManager';
 import './DocumentationManager.css';
+import { useCopilotPageContext } from '../context/CopilotContext';
 
 // Helper function to safely parse JSON
 const safeJSONParse = (data, fallback = null) => {
@@ -48,6 +49,13 @@ const DocumentationManager = () => {
     const collectionRouteState = workspaceId
         ? { workspaceId, returnTo: collectionsReturnPath }
         : location.state;
+
+    useCopilotPageContext({
+        type: 'collection',
+        id: collectionId,
+        workspaceId: workspaceId ? String(workspaceId) : '',
+        label: collection?.name ? `${collection.name} documentation` : 'Collection documentation'
+    });
 
     // Sync view with URL subpath (e.g. /swagger, /settings, /history, /api-versions)
     useEffect(() => {

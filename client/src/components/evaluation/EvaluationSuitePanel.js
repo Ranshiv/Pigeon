@@ -6,6 +6,7 @@ import { FiPlus, FiTrash2, FiCheckCircle, FiXCircle, FiRefreshCw, FiPlay, FiTarg
 import { toast } from 'react-toastify';
 import './EvaluationSuitePanel.css';
 import '../../styles/animations.css';
+import { useCopilotPageContext } from '../../context/CopilotContext';
 
 const ASSERTION_OPERATORS = [
     { value: 'equals', label: 'equals' },
@@ -42,7 +43,9 @@ const summarizeRunResult = (run) => {
     return { status, score, violationCount: violations.length, violations, scenarioRows };
 };
 
-const EvaluationSuitePanel = ({ collectionId }) => {
+const EvaluationSuitePanel = ({ collectionId, workspaceId }) => {
+    const requestedSuiteId = new URLSearchParams(window.location.search).get('suite');
+    const requestedRunId = new URLSearchParams(window.location.search).get('run');
     const [suites, setSuites] = useState([]);
     const [toolNames, setToolNames] = useState([]);
     const [state, setState] = useState('loading');
@@ -59,6 +62,15 @@ const EvaluationSuitePanel = ({ collectionId }) => {
     const [history, setHistory] = useState([]);
     const [running, setRunning] = useState(false);
     const [runError, setRunError] = useState('');
+    const [deepLinkOpened, setDeepLinkOpened] = useState(false);
+
+    useCopilotPageContext((lastRun?.id || lastRun?._id) ? {
+        type: 'test_run',
+        kind: 'evaluation',
+        id: lastRun.id || lastRun._id,
+        workspaceId: workspaceId || '',
+        label: `${selectedSuite?.name || 'Agent evaluation'} · ${lastRun.status || 'run'}`
+    } : null);
 
     const loadSuites = useCallback(async () => {
         setState('loading');
@@ -92,11 +104,20 @@ const EvaluationSuitePanel = ({ collectionId }) => {
             setEditingScenario(null);
             setActivePanel('list');
             const hist = await readPayload(await fetch(`/api/evaluation/suites/${suiteId}/runs?limit=20`, { credentials: 'include' }));
-            setHistory(hist.runs || []);
+            const runHistory = hist.runs || [];
+            setHistory(runHistory);
+            const requestedRun = runHistory.find((run) => String(run.id || run._id) === String(requestedRunId));
+            if (requestedRun) { setLastRun(requestedRun); setActivePanel('run'); }
         } catch (error) {
             toast.error(error.message || 'Unable to load the suite.');
         }
-    }, [toolNames, expandedSuiteId]);
+    }, [toolNames, expandedSuiteId, requestedRunId]);
+
+    useEffect(() => {
+        if (state !== 'ready' || !requestedSuiteId || deepLinkOpened) return;
+        setDeepLinkOpened(true);
+        openSuite(requestedSuiteId);
+    }, [state, requestedSuiteId, deepLinkOpened, openSuite]);
 
     const createSuite = async () => {
         if (!suiteForm.name.trim()) { toast.error('Suite name is required.'); return; }

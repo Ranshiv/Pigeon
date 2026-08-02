@@ -5,7 +5,7 @@ const userSchema = new mongoose.Schema({
     googleId: { type: String, required: true, unique: true },
     displayName: { type: String, required: true },
     email: { type: String, required: true },
-    theme: { type: String, enum: ['light', 'dark', 'omni', 'black'], default: 'light' },
+    theme: { type: String, enum: ['light', 'dark', 'omni', 'black'], default: 'omni' },
     fontSize: { type: String, default: '16px' },
     // Add profileIcon field
     profileIcon: { type: String, default: null }, // Store the filename, default to null

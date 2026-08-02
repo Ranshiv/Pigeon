@@ -7,6 +7,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { FiPlay, FiRefreshCw } from 'react-icons/fi';
 import AppSelect from '../common/AppSelect/AppSelect';
+import { useCopilotPageContext } from '../../context/CopilotContext';
 
 const AsyncApiTestRunPanel = ({ document: doc, environments = [], onRun }) => {
     const serverOptions = useMemo(() => (doc.servers || []).map((s, i) => ({
@@ -38,6 +39,19 @@ const AsyncApiTestRunPanel = ({ document: doc, environments = [], onRun }) => {
     const [error, setError] = useState(null);
     const [runResult, setRunResult] = useState(null);
     const resultRef = useRef(null);
+
+    useCopilotPageContext(runResult?._id ? {
+        type: 'test_run',
+        kind: 'asyncapi',
+        id: runResult._id,
+        workspaceId: doc.workspaceId || '',
+        label: `${doc.name || 'AsyncAPI'} · ${runResult.status || 'run'}`
+    } : {
+        type: 'workspace',
+        id: doc.workspaceId,
+        workspaceId: doc.workspaceId,
+        label: doc.name || 'AsyncAPI workspace'
+    });
 
     useEffect(() => {
         const channel = (doc.channels || []).find((c) => (c.name || c.address) === channelName);

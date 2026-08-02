@@ -43,7 +43,36 @@
 @keyframes copilot-action-enter { from { opacity: 0; transform: translateY(8px) scale(.99); } to { opacity: 1; transform: translateY(0) scale(1); } }
 @keyframes copilot-empty-pulse { 0%, 100% { transform: scale(1); opacity: .72; } 50% { transform: scale(1.08); opacity: 1; } }
 
+/* Themed glow sweeping behind the panel while Copilot is searching (idle stays flat).
+   Separate layer because the panel itself is overflow:hidden. An interpolatable
+   custom property drives the conic sweep, so the rotation is continuous. */
+@property --copilot-glow-angle { syntax: '<angle>'; initial-value: 0deg; inherits: false; }
+.copilot-panel-glow {
+    position: fixed; right: 24px; bottom: 24px; z-index: 1200;
+    width: min(460px, calc(100vw - 32px)); height: min(740px, calc(100vh - 48px));
+    border-radius: var(--radius-lg); pointer-events: none;
+    opacity: 0; transition: opacity 420ms var(--ease-out);
+}
+.copilot-panel-glow.is-active { opacity: 1; }
+.copilot-panel-glow::before {
+    position: absolute; inset: -3px; border-radius: inherit; content: '';
+    background: conic-gradient(from var(--copilot-glow-angle),
+        transparent 0deg,
+        color-mix(in srgb, var(--primary-color) 85%, transparent) 55deg,
+        color-mix(in srgb, var(--primary-color) 20%, transparent) 130deg,
+        transparent 200deg,
+        color-mix(in srgb, var(--primary-color) 45%, transparent) 300deg,
+        transparent 360deg);
+    filter: blur(20px);
+    animation: copilot-glow-spin 3.6s linear infinite;
+}
+@keyframes copilot-glow-spin { to { --copilot-glow-angle: 360deg; } }
+@media (max-width: 600px) {
+    .copilot-panel-glow { right: 8px; bottom: 8px; width: calc(100vw - 16px); height: calc(100vh - 16px); border-radius: var(--radius-md); }
+}
+
 @media (prefers-reduced-motion: reduce) {
+  .copilot-panel-glow, .copilot-panel-glow::before { animation: none !important; }
   .copilot-panel, .copilot-panel.is-closing, .copilot-header-icon, .copilot-context-option, .copilot-collection-list, .copilot-message, .copilot-action, .copilot-empty svg { animation: none !important; }
   .copilot-context-toggle, .copilot-context-option, .copilot-action button, .copilot-new { transition: none !important; }
 }
@@ -61,4 +90,175 @@
     font: 12px/1.45 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     white-space: pre-wrap;
     word-break: break-word;
+}
+
+/* 2026 contextual sidecar: a persistent evidence workbench on wide screens,
+   an overlay on compact screens, and a small ambient capsule while closed. */
+.copilot-launcher i {
+    width: 7px;
+    height: 7px;
+    border: 2px solid var(--button-text);
+    border-radius: 50%;
+    background: var(--success-color, #2fa36b);
+    box-shadow: 0 0 0 2px var(--primary-color);
+}
+
+.copilot-panel.copilot-sidecar {
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: min(var(--copilot-width, 520px), calc(100vw - 20px));
+    height: 100dvh;
+    border-width: 0 0 0 1px;
+    border-radius: var(--radius-lg) 0 0 var(--radius-lg);
+    box-shadow: -18px 0 48px color-mix(in srgb, #000 22%, transparent);
+    transform-origin: right center;
+}
+
+.copilot-width-resizer {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: -5px;
+    z-index: 8;
+    width: 10px;
+    cursor: col-resize;
+    touch-action: none;
+}
+
+.copilot-width-resizer::after {
+    position: absolute;
+    top: 42%;
+    bottom: 42%;
+    left: 4px;
+    width: 2px;
+    border-radius: 999px;
+    background: transparent;
+    content: '';
+    transition: background var(--dur-fast) var(--ease-out);
+}
+
+.copilot-width-resizer:hover::after,
+.copilot-width-resizer:active::after { background: var(--primary-color); }
+
+.copilot-threadbar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 14px;
+    border-bottom: 1px solid var(--border-color);
+    background: var(--card-bg);
+}
+
+.copilot-thread-selector {
+    display: flex;
+    min-width: 0;
+    flex: 1;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-secondary);
+}
+
+.copilot-thread-selector > svg { flex: 0 0 auto; }
+
+.copilot-thread-select { min-width: 0; }
+
+.copilot-thread-select .app-select-trigger {
+    min-height: 34px;
+    min-width: 0;
+    padding: 7px 9px;
+    background: var(--surface);
+    font: 600 .75rem inherit;
+}
+
+.copilot-thread-select .app-select-chevron { color: var(--primary-color); }
+
+.app-select-list.copilot-thread-menu {
+    z-index: 1300;
+    font-size: .75rem;
+}
+
+.copilot-threadbar button {
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    background: var(--surface);
+    color: var(--primary-color);
+    cursor: pointer;
+}
+
+.copilot-context-ledger {
+    display: flex;
+    align-items: stretch;
+    gap: 7px;
+    overflow-x: auto;
+    padding: 2px 0 3px;
+    scrollbar-width: thin;
+}
+
+.copilot-context-chip {
+    display: grid;
+    min-width: 126px;
+    max-width: 190px;
+    gap: 2px;
+    padding: 8px 9px;
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    background: var(--card-bg);
+    color: var(--text-color);
+    text-align: left;
+}
+
+button.copilot-context-chip { cursor: pointer; }
+.copilot-context-chip.is-active { border-color: color-mix(in srgb, var(--primary-color) 52%, var(--border-color)); box-shadow: inset 3px 0 var(--primary-color); }
+.copilot-context-chip.is-pinned { border-style: dashed; }
+.copilot-context-chip.is-empty { min-width: 100%; color: var(--text-secondary); }
+.copilot-context-chip span { color: var(--primary-color); font-size: .61rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }
+.copilot-context-chip strong { overflow: hidden; font-size: .72rem; text-overflow: ellipsis; white-space: nowrap; }
+.copilot-context-chip small { overflow: hidden; color: var(--text-secondary); font-size: .64rem; text-overflow: ellipsis; white-space: nowrap; }
+.copilot-context-more { align-self: center; color: var(--text-secondary); font-size: .7rem; white-space: nowrap; }
+
+.copilot-source-picker { margin-top: 10px; }
+.copilot-source-search { display: flex; align-items: center; gap: 8px; padding: 0 9px; border: 1px solid var(--border-color); border-radius: var(--radius-sm); background: var(--surface); color: var(--text-secondary); }
+.copilot-source-search:focus-within { border-color: var(--primary-color); box-shadow: var(--ring); }
+.copilot-source-search input { min-width: 0; flex: 1; padding: 9px 0; border: 0; outline: 0; background: transparent; color: var(--text-color); font: .76rem inherit; }
+.copilot-source-results { display: grid; max-height: min(300px, 35vh); margin-top: 8px; overflow: auto; border: 1px solid var(--border-color); border-radius: var(--radius-sm); background: var(--card-bg); }
+.copilot-source-result { position: relative; display: grid; grid-template-columns: 78px minmax(0, 1fr) 22px; gap: 2px 8px; align-items: center; padding: 9px 10px; border: 0; border-bottom: 1px solid var(--border-color); background: transparent; color: var(--text-color); text-align: left; cursor: pointer; }
+.copilot-source-result:last-child { border-bottom: 0; }
+.copilot-source-result:hover { background: var(--hover-bg); }
+.copilot-source-result.is-selected { background: color-mix(in srgb, var(--primary-light) 50%, var(--card-bg)); }
+.copilot-source-result > span { grid-row: 1 / span 2; color: var(--primary-color); font-size: .62rem; font-weight: 800; text-transform: uppercase; }
+.copilot-source-result strong { overflow: hidden; font-size: .73rem; text-overflow: ellipsis; white-space: nowrap; }
+.copilot-source-result small { overflow: hidden; color: var(--text-secondary); font-size: .65rem; text-overflow: ellipsis; white-space: nowrap; }
+.copilot-source-result svg { grid-column: 3; grid-row: 1 / span 2; color: var(--text-secondary); }
+.copilot-source-result.is-selected svg { color: var(--primary-color); }
+.copilot-source-empty { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 18px; color: var(--text-secondary); font-size: .72rem; }
+.copilot-clear-pins { margin-top: 7px; padding: 5px 0; border: 0; background: transparent; color: var(--text-secondary); font: 600 .68rem inherit; cursor: pointer; }
+
+.copilot-citations { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px; }
+.copilot-citations a,
+.copilot-citations small { padding: 3px 6px; border: 1px solid var(--border-color); border-radius: 999px; background: var(--surface-sunken); color: var(--primary-color); font-size: .65rem; text-decoration: none; }
+
+.copilot-findings { display: grid; gap: 6px; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border-color); }
+.copilot-findings-heading { display: flex; align-items: center; justify-content: space-between; color: var(--text-secondary); font-size: .65rem; }
+.copilot-finding { display: grid; grid-template-columns: 52px minmax(0, 1fr); gap: 2px 7px; padding: 7px 8px; border: 1px solid var(--border-color); border-radius: 8px; color: var(--text-color); text-decoration: none; }
+.copilot-finding.is-error { border-color: var(--danger-border); background: color-mix(in srgb, var(--danger-bg) 52%, var(--card-bg)); }
+.copilot-finding.is-warning { border-color: color-mix(in srgb, var(--warning-color, #c98b16) 42%, var(--border-color)); }
+.copilot-finding > span { grid-row: 1 / span 3; color: var(--text-secondary); font-size: .58rem; text-transform: uppercase; }
+.copilot-finding strong { font-size: .69rem; }
+.copilot-finding small,
+.copilot-finding em { color: var(--text-secondary); font-size: .63rem; font-style: normal; line-height: 1.35; }
+
+.copilot-profile-note { padding: 4px 16px 7px; background: var(--card-bg); color: var(--text-secondary); font-size: .62rem; text-align: right; }
+
+@media (max-width: 899px) {
+    .copilot-panel.copilot-sidecar { top: 8px; right: 8px; bottom: 8px; width: calc(100vw - 16px); height: calc(100dvh - 16px); border: 1px solid var(--border-color); border-radius: var(--radius-md); }
+    .copilot-width-resizer { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .copilot-width-resizer::after { transition: none; }
 }

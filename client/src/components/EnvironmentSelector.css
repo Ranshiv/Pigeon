@@ -23,28 +23,92 @@
     --env-focus-ring: rgba(1, 76, 117, 0.2);
 }
 
-/* Dark Theme Variables - 2025 Blue Palette Alignment */
-[data-theme="dark"],
+body.light-theme .environment-selector {
+    --env-bg-primary: var(--card-bg, #ffffff);
+    --env-bg-secondary: var(--background-color, #f8f9fa);
+    --env-bg-tertiary: var(--hover-bg, #f5f5f5);
+    --env-bg-hover: var(--hover-bg, #f5f5f5);
+    --env-bg-selected: var(--primary-light, #E5F3FF);
+    --env-border-primary: var(--border-color, #e1e4e8);
+    --env-border-secondary: var(--border-color, #e1e4e8);
+    --env-border-hover: var(--primary-color, #014C75);
+    --env-border-accent: var(--primary-color, #014C75);
+    --env-text-primary: var(--text-color, #333333);
+    --env-text-secondary: var(--text-secondary, #6c757d);
+    --env-text-tertiary: var(--text-muted, #9ca3af);
+    --env-text-accent: var(--primary-color, #014C75);
+    --env-text-success: var(--success-color, #28a745);
+    --env-shadow-light: var(--card-shadow, 0 1px 3px rgba(0, 0, 0, 0.08));
+    --env-shadow-medium: 0 2px 8px rgba(1, 76, 117, 0.12);
+    --env-shadow-heavy: 0 4px 16px rgba(1, 76, 117, 0.15);
+    --env-overlay: rgba(0, 0, 0, 0.4);
+    --env-focus-ring: rgba(1, 76, 117, 0.2);
+}
+
 body.dark-theme .environment-selector {
     --env-bg-primary: var(--card-bg, #002234);
     --env-bg-secondary: var(--background-color, #00111A);
     --env-bg-tertiary: var(--sidebar-bg, #001927);
     --env-bg-hover: var(--hover-bg, #013B5B);
-    --env-bg-selected: rgba(1, 76, 117, 0.2);
+    --env-bg-selected: rgba(56, 189, 248, 0.14);
     --env-border-primary: var(--border-color, #003956);
     --env-border-secondary: var(--border-color, #003956);
-    --env-border-hover: var(--primary-color, #014C75);
-    --env-border-accent: var(--primary-color, #014C75);
+    --env-border-hover: var(--primary-color, #38bdf8);
+    --env-border-accent: var(--primary-color, #38bdf8);
     --env-text-primary: var(--text-color, #e0e0e0);
     --env-text-secondary: var(--text-secondary, #B8D4E3);
     --env-text-tertiary: #7A9BAD;
-    --env-text-accent: var(--primary-color, #014C75);
+    --env-text-accent: var(--primary-color, #38bdf8);
     --env-text-success: var(--success-color, #22c55e);
     --env-shadow-light: rgba(0, 0, 0, 0.3);
     --env-shadow-medium: rgba(0, 0, 0, 0.4);
     --env-shadow-heavy: rgba(0, 0, 0, 0.6);
     --env-overlay: rgba(0, 0, 0, 0.8);
-    --env-focus-ring: rgba(1, 76, 117, 0.3);
+    --env-focus-ring: rgba(56, 189, 248, 0.3);
+}
+
+body.omni-theme .environment-selector {
+    --env-bg-primary: var(--card-bg, #12100e);
+    --env-bg-secondary: var(--surface-elevated, #1b1611);
+    --env-bg-tertiary: var(--surface-sunken, #0d0b09);
+    --env-bg-hover: var(--hover-bg, #26170d);
+    --env-bg-selected: rgba(255, 138, 31, 0.14);
+    --env-border-primary: var(--border-color, #3a2719);
+    --env-border-secondary: var(--border-color, #3a2719);
+    --env-border-hover: var(--primary-color, #ff8a1f);
+    --env-border-accent: var(--primary-color, #ff8a1f);
+    --env-text-primary: var(--text-color, #fff7ed);
+    --env-text-secondary: var(--text-secondary, #d6c5b8);
+    --env-text-tertiary: var(--text-muted, #a89484);
+    --env-text-accent: var(--primary-color, #ff8a1f);
+    --env-text-success: var(--success-color, #44d483);
+    --env-shadow-light: rgba(0, 0, 0, 0.5);
+    --env-shadow-medium: rgba(0, 0, 0, 0.6);
+    --env-shadow-heavy: rgba(0, 0, 0, 0.72);
+    --env-overlay: rgba(0, 0, 0, 0.72);
+    --env-focus-ring: rgba(255, 138, 31, 0.28);
+}
+
+body.black-theme .environment-selector {
+    --env-bg-primary: var(--card-bg, #000000);
+    --env-bg-secondary: var(--surface-elevated, #000000);
+    --env-bg-tertiary: var(--surface-sunken, #000000);
+    --env-bg-hover: var(--hover-bg, #111111);
+    --env-bg-selected: rgba(255, 255, 255, 0.08);
+    --env-border-primary: var(--border-color, #2a2a2a);
+    --env-border-secondary: var(--border-color, #2a2a2a);
+    --env-border-hover: var(--text-color, #ffffff);
+    --env-border-accent: var(--text-color, #ffffff);
+    --env-text-primary: var(--text-color, #ffffff);
+    --env-text-secondary: var(--text-secondary, #d0d0d0);
+    --env-text-tertiary: var(--text-muted, #9a9a9a);
+    --env-text-accent: var(--text-color, #ffffff);
+    --env-text-success: var(--success-color, #ffffff);
+    --env-shadow-light: rgba(0, 0, 0, 0.35);
+    --env-shadow-medium: rgba(0, 0, 0, 0.45);
+    --env-shadow-heavy: rgba(0, 0, 0, 0.65);
+    --env-overlay: rgba(0, 0, 0, 0.85);
+    --env-focus-ring: rgba(255, 255, 255, 0.18);
 }
 
 .environment-selector {
@@ -335,7 +399,7 @@ body.dark-theme .environment-selector {
     background: var(--env-bg-primary);
     border: 1px dashed var(--env-border-hover);
     border-radius: 10px;
-    color: var(--text-color, #014C75);
+    color: var(--env-text-accent);
     cursor: pointer;
     font-size: 14px;
     font-weight: 500;
@@ -515,7 +579,7 @@ body.dark-theme .environment-selector {
     align-items: center;
     justify-content: center;
     padding: 20px;
-    background: rgba(0, 0, 0, 0.72);
+    background: color-mix(in srgb, var(--background-color) 78%, transparent);
     -webkit-backdrop-filter: blur(4px);
     backdrop-filter: blur(4px);
 }
@@ -526,7 +590,7 @@ body.dark-theme .environment-selector {
     border: 1px solid var(--border-color);
     border-radius: var(--radius-lg, 12px);
     background: var(--card-bg);
-    box-shadow: 0 22px 60px rgba(0, 0, 0, 0.38);
+    box-shadow: var(--shadow-lg, 0 22px 60px rgba(0, 0, 0, 0.38));
 }
 
 .environment-manage-header {

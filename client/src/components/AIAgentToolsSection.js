@@ -2,14 +2,21 @@
 // Replaces the static AI Agent Tools page with the entry point for the
 // collection-scoped AI-agent evaluation product. Lists the user's collections
 // and links each into its "Agent Evaluation" tab.
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { FiTarget, FiCpu, FiCheckCircle, FiList, FiArrowRight } from 'react-icons/fi';
+import { FiTarget, FiCpu, FiCheckCircle, FiList, FiArrowRight, FiBox, FiSearch } from 'react-icons/fi';
 import './AIAgentToolsSection.css';
 
 const AIAgentToolsSection = () => {
     const [collections, setCollections] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [search, setSearch] = useState('');
+
+    const filteredCollections = useMemo(() => {
+        const query = search.trim().toLowerCase();
+        if (!query) return collections;
+        return collections.filter((collection) => (collection.name || 'Untitled collection').toLowerCase().includes(query));
+    }, [collections, search]);
 
     useEffect(() => {
         let active = true;
@@ -61,30 +68,48 @@ const AIAgentToolsSection = () => {
                     </div>
                 </div>
 
-                <div className="custom-agent-section">
-                    <div className="custom-agent-content">
-                        <h3>Your Collections</h3>
-                        <p>Open a collection's Agent Evaluation tab to create suites and score transcripts.</p>
+                <section className="collections-panel" aria-labelledby="collections-heading">
+                    <div className="collections-panel-header">
+                        <div className="custom-agent-content">
+                            <div className="section-eyebrow"><FiBox /> Evaluation workspace</div>
+                            <h3 id="collections-heading">Your Collections <span>{collections.length}</span></h3>
+                            <p>Choose a collection to create evaluation suites and score agent transcripts.</p>
+                        </div>
+                        {!loading && collections.length > 0 && (
+                            <label className="collections-search">
+                                <FiSearch aria-hidden="true" />
+                                <span className="sr-only">Search collections</span>
+                                <input
+                                    type="search"
+                                    placeholder="Search collections"
+                                    value={search}
+                                    onChange={(event) => setSearch(event.target.value)}
+                                />
+                            </label>
+                        )}
+                    </div>
                         {loading && <p className="ai-tool-description">Loading collections…</p>}
                         {!loading && collections.length === 0 && <p className="ai-tool-description">No collections found. Create a collection first.</p>}
-                        {!loading && collections.length > 0 && (
+                        {!loading && collections.length > 0 && filteredCollections.length > 0 && (
                             <ul className="eval-collections-list">
-                                {collections.map((c) => (
+                                {filteredCollections.map((c) => (
                                     <li key={c._id} className="eval-collection-row">
                                         <Link className="use-tool-btn" to={`/workspace/collections/${c._id}?tab=evaluation`}>
-                                            {c.name || 'Untitled collection'} <FiArrowRight />
+                                            <span className="collection-card-icon"><FiBox /></span>
+                                            <span className="collection-card-copy">
+                                                <strong>{c.name || 'Untitled collection'}</strong>
+                                                <small>Open Agent Evaluation</small>
+                                            </span>
+                                            <FiArrowRight className="collection-card-arrow" aria-hidden="true" />
                                         </Link>
                                     </li>
                                 ))}
                             </ul>
                         )}
-                    </div>
-                    <div className="custom-agent-image">
-                        <div className="image-placeholder">
-                            <FiCpu size={56} />
-                        </div>
-                    </div>
-                </div>
+                        {!loading && collections.length > 0 && filteredCollections.length === 0 && (
+                            <p className="collections-no-results">No collections match “{search}”.</p>
+                        )}
+                </section>
             </div>
         </div>
     );

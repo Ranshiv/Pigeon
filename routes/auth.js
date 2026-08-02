@@ -118,6 +118,19 @@ router.put('/user/profile', ensureAuthenticated, async (req, res) => {
         const updatedUser = await User.findByIdAndUpdate(userId, updateData, { new: true });
 
         if (!updatedUser) {
+            // The development auth stub uses a temporary user that is not
+            // persisted in MongoDB. Treat profile changes as successful for
+            // that stub so local settings (including theme selection) do not
+            // appear to fail. Real users still receive the normal 404.
+            const isDevelopmentStub = process.env.NODE_ENV !== 'production'
+                && req.user
+                && !req.user.googleId;
+            if (isDevelopmentStub) {
+                return res.json({
+                    message: 'Profile updated successfully',
+                    user: { ...req.user, ...updateData }
+                });
+            }
             return res.status(404).json({ message: 'User not found' });
         }
 

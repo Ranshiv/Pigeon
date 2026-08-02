@@ -1,10 +1,11 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useLocation } from 'react-router-dom';
-import { FiArrowUp, FiCheck, FiChevronDown, FiLoader, FiMessageSquare, FiPlus, FiTrash2, FiX } from 'react-icons/fi';
+import { FiArrowUp, FiCheck, FiChevronDown, FiClock, FiLoader, FiMessageSquare, FiPaperclip, FiPlus, FiSearch, FiTrash2, FiX } from 'react-icons/fi';
 import { Sparkles } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { getApiBaseUrl } from '../utils/apiBaseUrl';
+import { useCopilotContext } from '../context/CopilotContext';
+import AppSelect from './common/AppSelect/AppSelect';
 import './CopilotPanel.css';
 
 const api = async (path, options = {}) => {
@@ -23,72 +24,122 @@ const actionOutput = (action) => {
     if (value === undefined || value === null) return '';
     if (typeof value?.body === 'string' && /^\s*<!doctype\s+html|^\s*<html[\s>]/i.test(value.body)) {
         const title = value.body.match(/<title[^>]*>\s*([^<]{1,160})\s*<\/title>/i)?.[1]?.trim();
-        return `Received an HTML document${title ? ` titled “${title}”` : ''}, not an API response. Update this MCP request to use the API endpoint rather than a web page.`;
+        return `Received an HTML document${title ? ` titled “${title}”` : ''}, not an API response.`;
     }
     const output = typeof value === 'string' ? value : JSON.stringify(value, null, 2);
     return output.length > 12000 ? `${output.slice(0, 12000)}\n\n[Output truncated]` : output;
 };
 
+const sourceIdentity = (source) => `${source?.type || ''}:${source?.id || ''}:${source?.parentId || source?.kind || ''}`;
+const sourceTypeLabel = (type) => ({ workspace: 'Workspace', collection: 'Collection', request: 'Request', history: 'History', governance: 'Governance', trace: 'Trace', test_run: 'Test run', incident: 'Incident' }[type] || type);
+
+const EvidenceList = ({ findings = [] }) => {
+    if (!findings.length) return null;
+    return <section className="copilot-findings" aria-label="Evidence findings">
+        <div className="copilot-findings-heading"><strong>Evidence ledger</strong><span>{findings.length} signal{findings.length === 1 ? '' : 's'}</span></div>
+        {findings.map((finding, index) => <a className={`copilot-finding is-${finding.status || 'info'}`} href={finding.deepLink || undefined} key={finding.id || `${finding.kind}-${index}`}>
+            <span>{finding.status || 'info'}</span>
+            <strong>{finding.summary}</strong>
+            {finding.detail ? <small>{finding.detail}</small> : null}
+            {finding.relation ? <em>{finding.relation}{finding.confidenceReason ? ` · ${finding.confidenceReason}` : ''}</em> : null}
+        </a>)}
+    </section>;
+};
+
 const CopilotPanel = () => {
-    const location = useLocation();
+    const { activeContext, activePage, workspaceId, workspaceKey, pinnedSources, openNonce, togglePin, clearPins } = useCopilotContext();
     const [open, setOpen] = useState(false);
+    const [isClosing, setIsClosing] = useState(false);
     const [profiles, setProfiles] = useState([]);
     const [profileId, setProfileId] = useState('');
-    const [collections, setCollections] = useState([]);
-    const [selected, setSelected] = useState([]);
+    const [sources, setSources] = useState([]);
+    const [sourceQuery, setSourceQuery] = useState('');
+    const [contextExpanded, setContextExpanded] = useState(false);
+    const [conversations, setConversations] = useState([]);
     const [conversation, setConversation] = useState(null);
     const [prompt, setPrompt] = useState('');
     const [loading, setLoading] = useState(false);
+    const [loadingShell, setLoadingShell] = useState(false);
     const [error, setError] = useState('');
     const [actions, setActions] = useState([]);
     const [approvingActionId, setApprovingActionId] = useState('');
     const [typed, setTyped] = useState({});
-    const [contextExpanded, setContextExpanded] = useState(false);
-    const [collectionPickerHeight, setCollectionPickerHeight] = useState(168);
-    const pickerResizeRef = useRef(null);
-    const [isClosing, setIsClosing] = useState(false);
+    const [panelWidth, setPanelWidth] = useState(520);
     const closeTimerRef = useRef(null);
+    const resizeRef = useRef(null);
+    const openNonceRef = useRef(0);
+    const draftsRef = useRef({});
+    const draftKey = `${workspaceKey}:${conversation?.id || 'new'}`;
 
     useEffect(() => {
-        if (!open) return;
-        Promise.all([api('/api/copilot/profiles'), api('/api/copilot/context/collections')])
-            .then(([profileData, contextData]) => {
-                setProfiles(profileData.profiles || []);
-                setProfileId((current) => current || profileData.profiles?.[0]?.id || '');
-                setCollections(contextData.collections || []);
-            })
-            .catch((loadError) => setError(loadError.message));
-    }, [open]);
-
-    useEffect(() => {
-        if (!open) return;
-        const match = location.pathname.match(/^\/workspace\/collections\/([^/]+)/);
-        const collectionId = match?.[1];
-        if (collectionId) {
-            // Keep route context authoritative so a source from a previously
-            // opened collection cannot leak into the next conversation.
-            setSelected([collectionId]);
-        }
-    }, [location.pathname, open]);
-
-    useEffect(() => {
-        const selectCollection = (event) => {
-            const id = event.detail?.collectionId;
-            if (!id) return;
+        if (openNonce > openNonceRef.current) {
+            openNonceRef.current = openNonce;
+            setIsClosing(false);
             setOpen(true);
-            setSelected((current) => current.includes(id) ? current : [...current, id]);
-        };
-        window.addEventListener('pigeon:copilot-context', selectCollection);
-        return () => window.removeEventListener('pigeon:copilot-context', selectCollection);
-    }, []);
+        }
+    }, [openNonce]);
+
+    useEffect(() => { setPrompt(draftsRef.current[draftKey] || ''); }, [draftKey]);
+
+    useEffect(() => { setActions([]); }, [workspaceKey]);
+
+    useEffect(() => {
+        draftsRef.current[draftKey] = prompt;
+    }, [draftKey, prompt]);
+
+    useEffect(() => {
+        if (!open) return undefined;
+        const controller = new AbortController();
+        let mounted = true;
+        const workspaceQuery = workspaceId ? `?workspaceId=${encodeURIComponent(workspaceId)}` : '';
+        const conversationQuery = `?workspaceId=${workspaceId ? encodeURIComponent(workspaceId) : 'overview'}`;
+        setLoadingShell(true);
+        setError('');
+        Promise.all([
+            api('/api/copilot/profiles', { signal: controller.signal }),
+            api(`/api/copilot/context/sources${workspaceQuery}`, { signal: controller.signal }),
+            api(`/api/copilot/conversations${conversationQuery}`, { signal: controller.signal })
+        ]).then(([profileData, contextData, conversationData]) => {
+            if (!mounted) return;
+            const nextProfiles = profileData.profiles || [];
+            const nextConversations = conversationData.conversations || [];
+            const nextConversation = nextConversations[0] || null;
+            setProfiles(nextProfiles);
+            setProfileId((current) => nextConversation?.profileId && nextProfiles.some((profile) => profile.id === nextConversation.profileId)
+                ? nextConversation.profileId
+                : current && nextProfiles.some((profile) => profile.id === current) ? current : nextProfiles[0]?.id || '');
+            setSources(contextData.sources || []);
+            setConversations(nextConversations);
+            setConversation(nextConversation);
+        }).catch((loadError) => {
+            if (mounted && loadError.name !== 'AbortError') setError(loadError.message);
+        }).finally(() => { if (mounted) setLoadingShell(false); });
+        return () => { mounted = false; controller.abort(); };
+    }, [open, workspaceId, workspaceKey]);
 
     useEffect(() => () => {
         if (closeTimerRef.current) window.clearTimeout(closeTimerRef.current);
     }, []);
 
-    const selectedSources = useMemo(() => selected.map((id) => ({ type: 'collection', id })), [selected]);
-    const toggleCollection = (id) => setSelected((current) => current.includes(id) ? current.filter((item) => item !== id) : [...current, id]);
-    const actionCanBeApproved = (action) => !action.typedConfirmationLabel || typed[action.id] === action.typedConfirmationLabel;
+    const pinnedKeys = useMemo(() => new Set(pinnedSources.map(sourceIdentity)), [pinnedSources]);
+    const hydratedPins = useMemo(() => pinnedSources.map((pin) => sources.find((source) => sourceIdentity(source) === sourceIdentity(pin)) || pin), [pinnedSources, sources]);
+    const filteredSources = useMemo(() => {
+        const query = sourceQuery.trim().toLowerCase();
+        if (!query) return sources;
+        return sources.filter((source) => `${source.label || ''} ${source.detail || ''} ${source.type || ''}`.toLowerCase().includes(query));
+    }, [sourceQuery, sources]);
+    const conversationOptions = useMemo(() => [
+        { value: '', label: 'New conversation' },
+        ...conversations.map((item) => ({ value: item.id, label: item.title }))
+    ], [conversations]);
+
+    const activeResolved = useMemo(() => {
+        if (!activeContext) return null;
+        // The page label is more specific than the catalog label (it names the open
+        // tab), so the catalog only fills in details the page did not provide.
+        const catalogEntry = sources.find((source) => sourceIdentity(source) === sourceIdentity(activeContext));
+        return { ...catalogEntry, ...activeContext, label: activeContext.label || catalogEntry?.label || '' };
+    }, [activeContext, sources]);
 
     const openPanel = () => {
         if (closeTimerRef.current) window.clearTimeout(closeTimerRef.current);
@@ -105,31 +156,38 @@ const CopilotPanel = () => {
         }, 180);
     };
 
-    const startCollectionPickerResize = useCallback((event) => {
+    const startResize = useCallback((event) => {
+        if (window.innerWidth < 900) return;
         event.preventDefault();
-        pickerResizeRef.current = { startY: event.clientY, startHeight: collectionPickerHeight };
+        resizeRef.current = { startX: event.clientX, startWidth: panelWidth };
         const onMove = (moveEvent) => {
-            const resize = pickerResizeRef.current;
+            const resize = resizeRef.current;
             if (!resize) return;
-            // One source card is the minimum; the chat remains the primary pane.
-            setCollectionPickerHeight(Math.max(58, Math.min(320, resize.startHeight + moveEvent.clientY - resize.startY)));
+            setPanelWidth(Math.max(420, Math.min(680, resize.startWidth + resize.startX - moveEvent.clientX)));
         };
         const onEnd = () => {
-            pickerResizeRef.current = null;
+            resizeRef.current = null;
             document.removeEventListener('pointermove', onMove);
             document.removeEventListener('pointerup', onEnd);
         };
         document.addEventListener('pointermove', onMove);
         document.addEventListener('pointerup', onEnd);
-    }, [collectionPickerHeight]);
+    }, [panelWidth]);
 
     const send = async (event) => {
         event.preventDefault();
-        if (!prompt.trim() || loading) return;
-        setLoading(true); setError('');
+        const message = prompt.trim();
+        if (!message || loading || !profileId) return;
+        setLoading(true);
+        setError('');
         try {
-            const result = await api('/api/copilot/messages', { method: 'POST', body: JSON.stringify({ conversationId: conversation?.id, profileId, prompt: prompt.trim(), sources: selectedSources }) });
+            const result = await api('/api/copilot/messages', {
+                method: 'POST',
+                body: JSON.stringify({ conversationId: conversation?.id, profileId, prompt: message, activeContext, activePage, pinnedSources })
+            });
+            delete draftsRef.current[draftKey];
             setConversation(result.conversation);
+            setConversations((current) => [result.conversation, ...current.filter((item) => item.id !== result.conversation.id)]);
             setActions(result.actions || []);
             setPrompt('');
         } catch (sendError) { setError(sendError.message); }
@@ -143,20 +201,15 @@ const CopilotPanel = () => {
         try {
             const result = await api(`/api/copilot/actions/${action.id}/approve`, { method: 'POST', body: JSON.stringify({ proposalHash: action.proposalHash || action.payloadHash || '', typedConfirmation: typed[action.id] || '' }) });
             setActions((current) => current.map((item) => item.id === action.id ? { ...item, status: result.status, result, error: result.error } : item));
-            if (result.status === 'executed' && result.result?.collectionId) {
-                window.dispatchEvent(new CustomEvent('pigeon:documentation-updated', { detail: { collectionId: result.result.collectionId, updatedAt: result.result.updatedAt } }));
-            }
+            if (result.status === 'executed' && result.result?.collectionId) window.dispatchEvent(new CustomEvent('pigeon:documentation-updated', { detail: { collectionId: result.result.collectionId, updatedAt: result.result.updatedAt } }));
         } catch (actionError) {
-            setActions((current) => current.map((item) => item.id === action.id
-                ? { ...item, status: actionError.code === 'confirmation_required' ? undefined : 'failed', error: actionError.message }
-                : item));
+            setActions((current) => current.map((item) => item.id === action.id ? { ...item, status: actionError.code === 'confirmation_required' ? undefined : 'failed', error: actionError.message } : item));
         } finally { setApprovingActionId(''); }
     };
 
     const reject = async (action) => {
-        try {
-            await api(`/api/copilot/actions/${action.id}/reject`, { method: 'POST' });
-        } catch (_) { /* The action may already have expired; remove it locally either way. */ }
+        try { await api(`/api/copilot/actions/${action.id}/reject`, { method: 'POST' }); }
+        catch (_) { /* Expired proposals can still be dismissed locally. */ }
         setActions((current) => current.filter((item) => item.id !== action.id));
     };
 
@@ -164,31 +217,73 @@ const CopilotPanel = () => {
         if (!conversation?.id) return;
         try { await api(`/api/copilot/conversations/${conversation.id}`, { method: 'DELETE' }); }
         catch (deleteError) { setError(deleteError.message); return; }
-        setConversation(null); setActions([]); setPrompt('');
+        const remaining = conversations.filter((item) => item.id !== conversation.id);
+        setConversations(remaining);
+        setConversation(remaining[0] || null);
+        setActions([]);
+    };
+
+    const newConversation = () => {
+        delete draftsRef.current[`${workspaceKey}:new`];
+        setConversation(null);
+        setActions([]);
+        setPrompt('');
+    };
+
+    const selectConversation = (conversationId) => {
+        const next = conversations.find((item) => item.id === conversationId) || null;
+        setConversation(next);
+        if (next?.profileId) setProfileId(next.profileId);
+        setActions([]);
     };
 
     return <>
-        <button type="button" className="copilot-launcher" onClick={openPanel} aria-label="Open Pigeon Copilot"><Sparkles /> <span>Copilot</span></button>
-        {open && <aside className={`copilot-panel ${isClosing ? 'is-closing' : ''}`} aria-label="Pigeon Copilot">
-            <header className="copilot-header"><div className="copilot-header-title"><span className="copilot-header-icon"><Sparkles /></span><div><strong>Pigeon Copilot</strong><small>Context-aware workspace assistant</small></div></div><div className="copilot-header-actions">{conversation && <button type="button" onClick={deleteConversation} aria-label="Delete conversation"><FiTrash2 /></button>}<button type="button" onClick={closePanel} aria-label="Close Copilot"><FiX /></button></div></header>
-            <div className="copilot-context">
-                <div className="copilot-context-heading"><div><strong>Conversation context</strong><span>Select what Copilot can use in this message.</span></div></div>
-                {!contextExpanded && <div className="copilot-context-source-row"><button type="button" className={`copilot-context-toggle ${contextExpanded ? 'is-open' : ''}`} onClick={() => setContextExpanded((value) => !value)}>{selected.length ? 'Change sources' : 'Choose sources'} <FiChevronDown /></button><div className={`copilot-context-summary ${selected.length ? 'has-selection' : ''}`}>{selected.length ? collections.filter((collection) => selected.includes(collection.id)).slice(0, 2).map((collection) => <span key={collection.id}>{collection.name}</span>) : <span>Optional — add a collection for API-specific answers.</span>}{selected.length > 2 && <span>+{selected.length - 2} more</span>}</div></div>}
-                {contextExpanded && <div className="copilot-context-source-row"><button type="button" className="copilot-context-toggle is-open" onClick={() => setContextExpanded(false)}>Done <FiChevronDown /></button></div>}
-                {contextExpanded && <><div className="copilot-collection-list" style={{ height: `${collectionPickerHeight}px`, maxHeight: `${collectionPickerHeight}px` }}>
-                    {collections.map((collection, index) => <label key={collection.id} style={{ '--copilot-source-index': index }} className={`copilot-context-option ${selected.includes(collection.id) ? 'is-selected' : ''}`}><input type="checkbox" checked={selected.includes(collection.id)} onChange={() => toggleCollection(collection.id)} /><span><strong>{collection.name}</strong><small>Collection context</small></span></label>)}
-                    {!collections.length && <span>No accessible collections found.</span>}
-                </div><div className="copilot-context-resizer" role="separator" aria-orientation="horizontal" aria-label="Resize collection picker" onPointerDown={startCollectionPickerResize}><span /></div></>}
+        <button type="button" className="copilot-launcher" onClick={openPanel} aria-label="Open Pigeon Copilot"><Sparkles /> <span>Copilot</span>{activeContext ? <i aria-hidden="true" /> : null}</button>
+        {open ? <aside className={`copilot-panel copilot-sidecar ${isClosing ? 'is-closing' : ''} ${loading ? 'is-searching' : ''}`} style={{ '--copilot-width': `${panelWidth}px` }} aria-label="Pigeon Copilot">
+            <div className="copilot-width-resizer" role="separator" aria-orientation="vertical" aria-label="Resize Copilot" onPointerDown={startResize} />
+            <header className="copilot-header">
+                <div className="copilot-header-title"><span className="copilot-header-icon"><Sparkles /></span><div><strong>Pigeon Copilot</strong><small>{workspaceId ? 'Workspace evidence thread' : 'Personal overview thread'}</small></div></div>
+                <div className="copilot-header-actions">{conversation ? <button type="button" onClick={deleteConversation} aria-label="Delete conversation"><FiTrash2 /></button> : null}<button type="button" onClick={closePanel} aria-label="Close Copilot"><FiX /></button></div>
+            </header>
+
+            <div className="copilot-threadbar">
+                <div className="copilot-thread-selector"><FiClock aria-hidden="true" /><AppSelect value={conversation?.id || ''} onChange={selectConversation} options={conversationOptions} className="copilot-thread-select" menuClassName="copilot-thread-menu" /></div>
+                <button type="button" onClick={newConversation} aria-label="Start new conversation"><FiPlus /></button>
             </div>
+
+            <section className="copilot-context">
+                <div className="copilot-context-heading"><div><strong>Context ledger</strong><span>Active evidence is automatic; pins stay with this workspace.</span></div><button type="button" className={`copilot-context-toggle ${contextExpanded ? 'is-open' : ''}`} onClick={() => setContextExpanded((value) => !value)}>{pinnedSources.length ? `${pinnedSources.length} pinned` : 'Add evidence'} <FiChevronDown /></button></div>
+                <div className="copilot-context-ledger">
+                    {activeResolved ? <div className="copilot-context-chip is-active"><span>Active</span><strong>{activeResolved.label || sourceTypeLabel(activeResolved.type)}</strong><small>{sourceTypeLabel(activeResolved.type)}</small></div> : <div className="copilot-context-chip is-empty"><strong>{activePage?.title || 'No page resource selected'}</strong><small>No resource selected on this page; Copilot answers from the page, pins, or product knowledge.</small></div>}
+                    {hydratedPins.slice(0, 3).map((source) => <button type="button" className="copilot-context-chip is-pinned" key={sourceIdentity(source)} onClick={() => togglePin(source)} title="Remove pinned source"><span>Pinned</span><strong>{source.label || sourceTypeLabel(source.type)}</strong><small>{sourceTypeLabel(source.type)}</small></button>)}
+                    {pinnedSources.length > 3 ? <span className="copilot-context-more">+{pinnedSources.length - 3}</span> : null}
+                </div>
+                {contextExpanded ? <div className="copilot-source-picker">
+                    <label className="copilot-source-search"><FiSearch /><input value={sourceQuery} onChange={(event) => setSourceQuery(event.target.value)} placeholder="Search requests, traces, incidents…" /></label>
+                    <div className="copilot-source-results">
+                        {loadingShell ? <span className="copilot-source-empty"><FiLoader className="spin" /> Loading available evidence…</span> : filteredSources.map((source) => <button type="button" key={sourceIdentity(source)} className={`copilot-source-result ${pinnedKeys.has(sourceIdentity(source)) ? 'is-selected' : ''}`} onClick={() => togglePin(source)}>
+                            <span>{sourceTypeLabel(source.type)}</span><strong>{source.label}</strong><small>{source.detail}</small><FiPaperclip />
+                        </button>)}
+                        {!loadingShell && !filteredSources.length ? <span className="copilot-source-empty">No matching evidence sources.</span> : null}
+                    </div>
+                    {pinnedSources.length ? <button type="button" className="copilot-clear-pins" onClick={clearPins}>Clear workspace pins</button> : null}
+                </div> : null}
+            </section>
+
             <main className="copilot-messages" aria-live="polite">
-                {!conversation?.messages?.length && <div className="copilot-empty"><FiMessageSquare /><p>Ask about an API, failed test, documentation, monitoring issue, or MCP tool. Copilot only sees collections you select above.</p></div>}
-                {conversation?.messages?.map((message, index) => <article key={`${message.createdAt || index}-${index}`} className={`copilot-message ${message.role}`}><span>{message.role === 'user' ? 'You' : 'Copilot'}</span><div className="copilot-message-content"><ReactMarkdown remarkPlugins={[remarkGfm]}>{message.content}</ReactMarkdown></div>{message.citations?.length ? <small>Sources: {message.citations.map((citation) => citation.label || citation.id).join(', ')}</small> : null}</article>)}
-                {actions.map((action) => <section className="copilot-action" key={action.id}><strong>Proposed action</strong><p>{action.preview}</p><code>{action.kind}</code>{action.typedConfirmationLabel && <label>Type <b>{action.typedConfirmationLabel}</b> to delete<input value={typed[action.id] || ''} aria-invalid={Boolean(typed[action.id]) && !actionCanBeApproved(action)} onChange={(event) => setTyped({ ...typed, [action.id]: event.target.value })} /></label>}{action.status ? <><small className={`copilot-action-${action.status}`}>{action.error || action.result?.result?.message || action.result?.message || action.status}</small>{actionOutput(action) && <pre className="copilot-action-output">{actionOutput(action)}</pre>}</> : <div>{action.error && <small className="copilot-action-pending-error">{action.error}</small>}<button type="button" onClick={() => approve(action)} disabled={approvingActionId === action.id}>{approvingActionId === action.id ? <FiLoader className="spin" /> : <FiCheck />} {approvingActionId === action.id ? 'Applying…' : 'Confirm action'}</button><button type="button" className="quiet" onClick={() => reject(action)} disabled={approvingActionId === action.id}>Dismiss</button></div>}</section>)}
+                {!conversation?.messages?.length ? <div className="copilot-empty"><FiMessageSquare /><p>Ask “What failed?”, “Why did this run regress?”, or “Where is this API used?” The answer will retain the exact redacted evidence snapshot it used.</p></div> : null}
+                {(conversation?.messages || []).map((message, index) => <article key={`${message.createdAt || index}-${index}`} className={`copilot-message ${message.role}`}>
+                    <span>{message.role === 'user' ? 'You' : 'Copilot'}</span>
+                    <div className="copilot-message-content"><ReactMarkdown remarkPlugins={[remarkGfm]}>{message.content}</ReactMarkdown></div>
+                    {message.citations?.length ? <div className="copilot-citations">{message.citations.map((citation) => citation.deepLink ? <a key={`${citation.type}:${citation.id}`} href={citation.deepLink}>{citation.label || citation.id}</a> : <small key={`${citation.type}:${citation.id}`}>{citation.label || citation.id}</small>)}</div> : null}
+                    {message.role === 'assistant' ? <EvidenceList findings={message.findings || []} /> : null}
+                </article>)}
+                {actions.map((action) => <section className="copilot-action" key={action.id}><strong>Proposed action</strong><p>{action.preview}</p><code>{action.kind}</code>{action.typedConfirmationLabel ? <label>Type <b>{action.typedConfirmationLabel}</b> to delete<input value={typed[action.id] || ''} aria-invalid={Boolean(typed[action.id]) && typed[action.id] !== action.typedConfirmationLabel} onChange={(event) => setTyped((current) => ({ ...current, [action.id]: event.target.value }))} /></label> : null}{action.status ? <><small className={`copilot-action-${action.status}`}>{action.error || action.result?.result?.message || action.result?.message || action.status}</small>{actionOutput(action) ? <pre className="copilot-action-output">{actionOutput(action)}</pre> : null}</> : <div>{action.error ? <small className="copilot-action-pending-error">{action.error}</small> : null}<button type="button" onClick={() => approve(action)} disabled={approvingActionId === action.id || (action.typedConfirmationLabel && typed[action.id] !== action.typedConfirmationLabel)}>{approvingActionId === action.id ? <FiLoader className="spin" /> : <FiCheck />} {approvingActionId === action.id ? 'Applying…' : 'Confirm action'}</button><button type="button" className="quiet" onClick={() => reject(action)} disabled={approvingActionId === action.id}>Dismiss</button></div>}</section>)}
             </main>
-            {error && <div className="copilot-error">{error}</div>}
-            <form className="copilot-composer" onSubmit={send}><textarea value={prompt} onChange={(event) => setPrompt(event.target.value)} placeholder="Ask Pigeon Copilot…" rows="3" /><button type="submit" disabled={loading || !profileId} aria-label="Send message">{loading ? <FiLoader className="spin" /> : <FiArrowUp />}</button></form>
-            {conversation && <button type="button" className="copilot-new" onClick={() => { setConversation(null); setActions([]); setPrompt(''); }}><FiPlus /> New conversation</button>}
-        </aside>}
+            {error ? <div className="copilot-error">{error}</div> : null}
+            <form className="copilot-composer" onSubmit={send}><textarea value={prompt} onChange={(event) => setPrompt(event.target.value)} placeholder={activeResolved ? `Ask about ${activeResolved.label || sourceTypeLabel(activeResolved.type)}…` : 'Ask Pigeon Copilot…'} rows="3" /><button type="submit" disabled={loading || !profileId || !prompt.trim()} aria-label="Send message">{loading ? <FiLoader className="spin" /> : <FiArrowUp />}</button></form>
+            {profiles.length > 1 ? <div className="copilot-profile-note">Model profile: {profiles.find((profile) => profile.id === profileId)?.label || profileId}</div> : null}
+        </aside> : null}
     </>;
 };
 

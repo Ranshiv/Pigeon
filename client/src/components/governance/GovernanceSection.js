@@ -5,6 +5,7 @@ import AppSelect from '../common/AppSelect/AppSelect';
 import { useWorkspaceOptions } from '../compliance/useWorkspaceOptions';
 import GovernanceScorePanel from './GovernanceScorePanel';
 import './governance.css';
+import { useCopilotPageContext } from '../../context/CopilotContext';
 
 const SCORE_RANGES = [
     { value: 'all', label: 'Any score', test: () => true },
@@ -53,7 +54,7 @@ const getGovernanceMetrics = (item) => {
 const GovernanceSection = () => {
     const { workspaces, loading: workspacesLoading } = useWorkspaceOptions();
 
-    const [workspaceId, setWorkspaceId] = useState('all');
+    const [workspaceId, setWorkspaceId] = useState(() => new URLSearchParams(window.location.search).get('workspaceId') || 'all');
     const [scoreRange, setScoreRange] = useState('all');
     const [monitoringStatus, setMonitoringStatus] = useState('all');
     const [ownerId, setOwnerId] = useState('all');
@@ -61,7 +62,7 @@ const GovernanceSection = () => {
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
-    const [selectedId, setSelectedId] = useState(null);
+    const [selectedId, setSelectedId] = useState(() => new URLSearchParams(window.location.search).get('collectionId') || null);
 
     const fetchScorecard = async (signal) => {
         try {
@@ -119,6 +120,13 @@ const GovernanceSection = () => {
         () => filtered.find((i) => i.collectionId === selectedId) || null,
         [filtered, selectedId]
     );
+
+    useCopilotPageContext(selected ? {
+        type: 'governance',
+        id: selected.collectionId,
+        workspaceId: selected.workspaceId || '',
+        label: `${selected.name} governance`
+    } : (workspaceId !== 'all' ? { type: 'workspace', id: workspaceId, workspaceId, label: 'Governance workspace' } : null));
 
     useEffect(() => {
         if (!selected) return undefined;

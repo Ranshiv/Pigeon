@@ -5,6 +5,7 @@ const CopilotConversation = require('../models/CopilotConversation');
 const CopilotAction = require('../models/CopilotAction');
 const nim = require('../services/CopilotNimClient');
 const copilot = require('../services/CopilotService');
+const contextual = require('../services/CopilotContextService');
 
 const router = express.Router();
 const userId = (req) => String(req.user?.id || req.user?._id || '');
@@ -21,8 +22,25 @@ router.get('/context/collections', ensureAuthenticated, async (req, res) => {
         res.json({ collections: collections.map((item) => ({ id: String(item._id), name: item.name, workspaceId: item.workspaceId ? String(item.workspaceId) : null })) });
     } catch (error) { res.status(500).json({ message: 'Unable to load Copilot context sources.' }); }
 });
+router.get('/context/sources', ensureAuthenticated, async (req, res) => {
+    try {
+        const sources = await contextual.listSources({
+            workspaceId: req.query.workspaceId,
+            query: req.query.q || '',
+            types: req.query.types || ''
+        }, req.user);
+        res.json({ sources });
+    } catch (error) { res.status(500).json({ message: 'Unable to load Copilot context sources.' }); }
+});
 router.get('/conversations', ensureAuthenticated, async (req, res) => {
-    const conversations = await CopilotConversation.find({ owner: oid(userId(req)), deletedAt: null }).sort({ updatedAt: -1 }).limit(50);
+    const query = { owner: oid(userId(req)), deletedAt: null };
+    if (req.query.workspaceId === 'overview') query.workspaceId = null;
+    else if (req.query.workspaceId) {
+        const workspaceId = oid(req.query.workspaceId);
+        if (!workspaceId) return res.status(400).json({ message: 'Invalid workspace ID.' });
+        query.workspaceId = workspaceId;
+    }
+    const conversations = await CopilotConversation.find(query).sort({ updatedAt: -1 }).limit(50);
     res.json({ conversations: conversations.map(serializeConversation) });
 });
 router.get('/conversations/:id', ensureAuthenticated, async (req, res) => {
@@ -43,16 +61,24 @@ router.post('/messages', ensureAuthenticated, async (req, res) => {
         if (!profile) return res.status(503).json({ message: 'The selected NVIDIA NIM profile is unavailable.' });
         let conversation = req.body?.conversationId ? await ownedConversation(req.body.conversationId, req) : null;
         const intentPrompt = copilot.resolveActionIntentPrompt(prompt, conversation?.messages || []);
-        const context = await copilot.buildContext(req.body?.sources, req.user, intentPrompt);
-        if (!conversation) conversation = new CopilotConversation({ owner: oid(userId(req)), workspaceId: context[0]?.workspaceId || null, profileId: profile.id, title: prompt.slice(0, 80) });
+        const contextResult = await contextual.resolveContext({
+            activeContext: req.body?.activeContext,
+            pinnedSources: req.body?.pinnedSources,
+            sources: req.body?.sources
+        }, req.user, intentPrompt, (source) => copilot.buildContext([source], req.user, intentPrompt));
+        const context = contextResult.items;
+        if (conversation?.workspaceId && contextResult.workspaceId && String(conversation.workspaceId) !== String(contextResult.workspaceId)) {
+            return res.status(409).json({ message: 'This conversation belongs to a different workspace. Open that workspace thread instead.' });
+        }
+        if (!conversation) conversation = new CopilotConversation({ owner: oid(userId(req)), workspaceId: contextResult.workspaceId || null, profileId: profile.id, title: prompt.slice(0, 80) });
         if (conversation.profileId !== profile.id) return res.status(400).json({ message: 'A conversation cannot switch NVIDIA profiles.' });
-        conversation.messages.push({ role: 'user', content: prompt, citations: context.map(({ type, id, label }) => ({ type, id, label })) });
+        conversation.messages.push({ role: 'user', content: prompt, citations: context.map(({ type, id, label, deepLink }) => ({ type, id, label, deepLink })), contextSnapshot: contextResult.snapshot });
         const actionIntent = copilot.hasActionIntent(intentPrompt);
         const navigationAnswer = copilot.appNavigationAnswer(intentPrompt);
         let parsedResult = navigationAnswer ? { answer: navigationAnswer, citations: [], actions: [] } : null;
         let normalizedActions = [];
         if (!parsedResult) {
-            const messages = copilot.modelMessages(conversation.messages, context, intentPrompt);
+            const messages = copilot.modelMessages(conversation.messages, context, intentPrompt, req.body?.activePage);
             for (let attempt = 0; attempt < (actionIntent ? 2 : 1); attempt += 1) {
                 const attemptMessages = attempt === 0 ? messages : [
                     ...messages.slice(0, -1),
@@ -75,7 +101,7 @@ router.post('/messages', ensureAuthenticated, async (req, res) => {
                 : parsedResult.answer,
             actions: normalizedActions
         };
-        conversation.messages.push({ role: 'assistant', content: result.answer, citations: result.citations });
+        conversation.messages.push({ role: 'assistant', content: result.answer, citations: result.citations, findings: contextResult.findings });
         await conversation.save();
         const actions = await Promise.all(result.actions.map(async (proposal) => {
             const payload = proposal.payload;
@@ -89,7 +115,7 @@ router.post('/messages', ensureAuthenticated, async (req, res) => {
             }
             return { id: String(action._id), kind: action.kind, payload: action.payload, proposalHash: action.proposalHash, preview: action.preview, expiresAt: action.expiresAt, typedConfirmationLabel };
         }));
-        return res.json({ conversation: serializeConversation(conversation), answer: result.answer, citations: result.citations, actions });
+        return res.json({ conversation: serializeConversation(conversation), answer: result.answer, citations: result.citations, actions, findings: contextResult.findings, resolvedContext: contextResult.resolvedContext });
     } catch (error) { return res.status(400).json({ message: error.message || 'Copilot could not complete the request.' }); }
 });
 router.post('/actions/:id/approve', ensureAuthenticated, async (req, res) => {
