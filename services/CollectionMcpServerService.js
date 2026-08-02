@@ -1,12 +1,14 @@
 const crypto = require('crypto');
 const dns = require('dns').promises;
 const net = require('net');
+const { isSensitiveKey } = require('./AsyncApiRedact');
 
 const fetch = (...args) => import('node-fetch').then(({ default: nodeFetch }) => nodeFetch(...args));
 
 const MCP_PROTOCOL_VERSION = '2025-03-26';
 const RESPONSE_BODY_LIMIT = 1024 * 1024;
 const HTTP_METHODS = new Set(['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS', 'HEAD']);
+const MAX_REDIRECTS = 5;
 
 const getRequestId = (request) => String(request?._id || request?.id || '');
 
@@ -304,7 +306,7 @@ const readResponseText = async (response) => {
     return `${Buffer.concat(chunks).toString('utf8')}${truncated ? '\n\n[Response body truncated at 1 MB]' : ''}`;
 };
 
-const executeTool = async (collection, toolName, argumentsValue = {}) => {
+const executeTool = async (collection, toolName, argumentsValue = {}, transport = fetch) => {
     if (!argumentsValue || Array.isArray(argumentsValue) || typeof argumentsValue !== 'object') {
         throw new Error('Tool arguments must be a JSON object.');
     }
@@ -341,25 +343,50 @@ const executeTool = async (collection, toolName, argumentsValue = {}) => {
     const finalHeaders = applyStoredAuthentication(url, headers, resolvedAuthConfig);
     const body = buildBody(request, argumentsValue, variables, finalHeaders);
 
+    const method = String(request.method || 'GET').toUpperCase();
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 30000);
     try {
-        const response = await fetch(url.toString(), {
-            method: request.method || 'GET',
-            headers: finalHeaders,
-            body: ['GET', 'HEAD'].includes(request.method) ? undefined : body,
-            signal: controller.signal,
-            redirect: 'error'
-        });
-        const responseBody = await readResponseText(response);
-        return {
-            status: response.status,
-            statusText: response.statusText,
-            body: responseBody
-        };
+        let target = url;
+        let headersForHop = finalHeaders;
+        // Redirects are followed manually so every hop passes the same SSRF
+        // check as the first. Credentials are dropped on a cross-origin hop.
+        for (let hop = 0; ; hop += 1) {
+            const response = await transport(target.toString(), {
+                method,
+                headers: headersForHop,
+                body: ['GET', 'HEAD'].includes(method) ? undefined : body,
+                signal: controller.signal,
+                redirect: 'manual'
+            });
+            const location = response.status >= 300 && response.status < 400 ? response.headers.get('location') : null;
+            if (!location) {
+                return { status: response.status, statusText: response.statusText, body: await readResponseText(response) };
+            }
+            if (hop >= MAX_REDIRECTS) throw new Error(`The upstream request redirected more than ${MAX_REDIRECTS} times.`);
+            let next;
+            try { next = new URL(location, target); } catch { throw new Error('The upstream request redirected to an invalid URL.'); }
+            const validated = await assertSafeTargetUrl(next.toString());
+            if (!['GET', 'HEAD'].includes(method)) {
+                // A 307/308 keeps the method and body. We can replay it only
+                // within the exact same origin, after validating the target,
+                // so an upstream redirect cannot forward a write or credential
+                // to another host. Method-changing redirects stay blocked.
+                if (![307, 308].includes(response.status)) {
+                    throw new Error('The upstream request redirected with a method-changing status. Update the saved MCP request to its final URL.');
+                }
+                if (validated.origin !== target.origin) {
+                    throw new Error('The upstream request redirected to a different origin, which is not allowed for a collection MCP tool that sends a body.');
+                }
+            }
+            if (validated.origin !== target.origin) {
+                headersForHop = Object.fromEntries(Object.entries(headersForHop).filter(([key]) => key.toLowerCase() !== 'authorization' && !isSensitiveKey(key)));
+            }
+            target = validated;
+        }
     } catch (error) {
         if (error.name === 'AbortError') throw new Error('The upstream request timed out after 30 seconds.');
-        if (error.type === 'no-redirect') throw new Error('The upstream request redirected, which is not allowed for collection MCP tools.');
+        if (/redirect|private or local|could not be resolved|invalid URL|HTTP and HTTPS/.test(error.message || '')) throw error;
         throw new Error('The upstream request could not be completed.');
     } finally {
         clearTimeout(timeout);

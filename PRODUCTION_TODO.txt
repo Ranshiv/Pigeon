@@ -62,6 +62,22 @@ Frontend REACT_APP_* variables are embedded in the browser bundle. Do not put
 private API secrets in them.
 
 
+3A. NVIDIA NIM / COPILOT
+------------------------
+[ ] Set PIGEON_NIM_HOSTED_API_KEY (or comma-separated PIGEON_NIM_HOSTED_API_KEYS) and, if using NVIDIA hosted NIM,
+    PIGEON_NIM_HOSTED_BASE_URL=https://integrate.api.nvidia.com/v1.
+[ ] Optionally set PIGEON_NIM_HOSTED_MODELS as a comma-separated fallback list.
+    The default speed-first order is meta/llama-3.1-8b-instruct,
+    openai/gpt-oss-20b, minimaxai/minimax-m3, and z-ai/glm-5.2.
+[ ] Optional Copilot tuning: PIGEON_NIM_TOTAL_TIMEOUT_MS (default 35000),
+    PIGEON_NIM_REQUEST_TIMEOUT_MS (default 12000), PIGEON_NIM_MAX_TOKENS
+    (default 800), and PIGEON_COPILOT_MAX_CONTEXT_CHARS (default 10000).
+[ ] To expose a self-hosted NIM profile, set PIGEON_NIM_SELF_HOSTED_BASE_URL,
+    PIGEON_NIM_SELF_HOSTED_API_KEY, and PIGEON_NIM_SELF_HOSTED_MODEL.
+[ ] Keep all PIGEON_NIM_* values on the API host only. They must never be
+    placed in REACT_APP_* variables or committed to source control.
+
+
 4. SENTRY
 ---------
 [ ] Set SENTRY_DSN=<API-Sentry-DSN> on the API host.

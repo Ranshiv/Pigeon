@@ -130,6 +130,7 @@ router.use('/alerts', alertsRoutes);
 router.use('/mcp', mcpRoutes);
 router.use('/mcp-server', mcpServerRoutes);
 router.use('/fuzz-testing', require('./fuzzTesting'));
+router.use('/copilot', require('./copilot'));
 
 // Collection-scoped AI-agent evaluation suites.
 router.use('/evaluation', require('./evaluation'));

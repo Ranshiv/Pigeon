@@ -26,6 +26,7 @@ import AsyncApiSection from './asyncapi/AsyncApiSection';
 import './Workspace.css';
 import SettingsPage from './SettingsPage';
 import HistoryDetailsSection from './HistoryDetailsSection';
+import CopilotPanel from './CopilotPanel';
 
 import { useCollaboration } from '../context/CollaborationContext';
 
@@ -46,6 +47,7 @@ const Workspace = () => {
         <div style={{ position: 'relative' }}>
             <VideoChatOverlay />
             <ActivityFeed isOpen={isActivityOpen} onToggle={() => setIsActivityOpen(o => !o)} />
+            <CopilotPanel />
 
             <Routes>
                 <Route index element={<Navigate to="/workspace/home" />} />

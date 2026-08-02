@@ -20,6 +20,7 @@ import {
   FiFileText, FiInfo, FiGrid, FiFolder, FiChevronDown, FiChevronLeft, FiChevronRight,
   FiArrowLeft, FiRefreshCw, FiServer, FiTarget, FiGitBranch
 } from 'react-icons/fi';
+import { Sparkles } from 'lucide-react';
 import { toast } from 'react-toastify'; // Import toast notification library
 
 const folderPathKey = (path) => (Array.isArray(path) ? path : []).join('\u001f');
@@ -368,6 +369,14 @@ function CollectionDetail() {
   useEffect(() => {
     fetchDocumentation();
   }, [fetchDocumentation]);
+
+  useEffect(() => {
+    const refreshCopilotDocumentation = (event) => {
+      if (String(event.detail?.collectionId || '') === String(collectionId)) fetchDocumentation();
+    };
+    window.addEventListener('pigeon:documentation-updated', refreshCopilotDocumentation);
+    return () => window.removeEventListener('pigeon:documentation-updated', refreshCopilotDocumentation);
+  }, [collectionId, fetchDocumentation]);
 
   // When selectedEnvironmentId changes, fetch the full environment object if needed
   useEffect(() => {
@@ -1088,6 +1097,14 @@ function CollectionDetail() {
         <div className="collaboration-wrapper">
           <ActiveCollaborators collectionId={collectionId} />
         </div>
+        <button
+          type="button"
+          className="tab-btn"
+          onClick={() => window.dispatchEvent(new CustomEvent('pigeon:copilot-context', { detail: { collectionId } }))}
+          title="Ask Copilot about this collection"
+        >
+          <Sparkles /> Ask Copilot
+        </button>
       </div>
         <div className="tab-navigation">
           <button

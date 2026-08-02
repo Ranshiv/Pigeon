@@ -24,17 +24,6 @@ const safeJSONParse = (data, fallback = null) => {
     }
 };
 
-// Helper to validate if a string is valid JSON
-const isValidJSON = (str) => {
-    if (!str || typeof str !== 'string') return false;
-    try {
-        JSON.parse(str);
-        return true;
-    } catch (e) {
-        return false;
-    }
-};
-
 const DocumentationManager = () => {
     const { collectionId, '*': subpath } = useParams();
     const navigate = useNavigate();
@@ -49,6 +38,7 @@ const DocumentationManager = () => {
     const [originalSettings, setOriginalSettings] = useState(null);
     const [settingsChanged, setSettingsChanged] = useState(false);
     const [versionHistoryTab, setVersionHistoryTab] = useState('settings'); // 'settings' or 'content'
+    const [documentationRefreshKey, setDocumentationRefreshKey] = useState(0);
     const routeWorkspaceId = location.state?.workspaceId;
     const collectionWorkspaceId = collection?.workspaceId?._id || collection?.workspaceId;
     const workspaceId = routeWorkspaceId || collectionWorkspaceId;
@@ -92,6 +82,14 @@ const DocumentationManager = () => {
     }, [view, documentation]);
 
     useEffect(() => {
+        const refreshCopilotDocumentation = (event) => {
+            if (String(event.detail?.collectionId || '') === String(collectionId)) setDocumentationRefreshKey((value) => value + 1);
+        };
+        window.addEventListener('pigeon:documentation-updated', refreshCopilotDocumentation);
+        return () => window.removeEventListener('pigeon:documentation-updated', refreshCopilotDocumentation);
+    }, [collectionId]);
+
+    useEffect(() => {
         const fetchData = async () => {
             if (!collectionId) {
                 setError('No collection ID provided');
@@ -126,15 +124,6 @@ const DocumentationManager = () => {
                         console.log('Documentation data received:', documentationData);
                         console.log('Documentation content type:', typeof documentationData?.content);
                         console.log('Documentation content value:', documentationData?.content);
-
-                        // Validate content if it exists
-                        if (documentationData?.content && typeof documentationData.content === 'string') {
-                            if (!isValidJSON(documentationData.content) && documentationData.content.trim() !== '') {
-                                console.warn('Documentation content is not valid JSON:', documentationData.content);
-                                // Clean the content or provide a fallback
-                                documentationData.content = '';
-                            }
-                        }
 
                         const hasSavedSettings = Boolean(
                             documentationData?.settings &&
@@ -207,7 +196,7 @@ const DocumentationManager = () => {
         };
 
         fetchData();
-    }, [collectionId]);    // Initialize settings from documentation object
+    }, [collectionId, documentationRefreshKey]);    // Initialize settings from documentation object
     useEffect(() => {
         if (documentation) {
             // Extract settings from the documentation object
