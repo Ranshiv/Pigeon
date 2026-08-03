@@ -11,6 +11,7 @@ const workspacesRoutes = require('./workspaces');
 const requestsRoutes = require('./requests');
 const historyRoutes = require('./history');
 const documentationRoutes = require('./documentation');
+const documentationGeneratorRoutes = require('./documentationGenerator');
 const monitoringRoutes = require('./monitoring');
 const mergeRequestsRoutes = require('./mergeRequests');
 
@@ -60,6 +61,9 @@ const mcpServerRoutes = require('./mcpServer');
 
 // Register routes with their base paths
 router.use('/auth', authRoutes);
+// Canonical documentation routes take precedence over legacy collection
+// handlers while unmatched collection routes continue to the existing router.
+router.use('/collections', documentationGeneratorRoutes);
 router.use('/collections', collectionsRoutes);
 router.use('/environments', environmentsRoutes);
 router.use('/imports', importsRoutes);

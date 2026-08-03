@@ -25,6 +25,9 @@ import { Sparkles } from 'lucide-react';
 import { toast } from 'react-toastify'; // Import toast notification library
 
 const folderPathKey = (path) => (Array.isArray(path) ? path : []).join('\u001f');
+const readableRequestPath = (value) => String(value || '')
+  .replace(/%7B/gi, '{')
+  .replace(/%7D/gi, '}');
 
 const buildRequestTree = (requests) => {
   const root = { folders: new Map(), requests: [] };
@@ -53,7 +56,7 @@ const buildRequestTree = (requests) => {
 
 const requestPath = (request) => {
   try {
-    return request.url ? new URL(request.url).pathname : '/';
+    return request.url ? readableRequestPath(new URL(request.url).pathname) : '/';
   } catch {
     return request.url || '/';
   }
@@ -646,15 +649,21 @@ function CollectionDetail() {
         _id: request._id || request.id || `req-${Date.now()}`,
         isNew: false
       };
-      const updatedRequests = request.isNew || existingIndex === -1
+      // The request ID is authoritative. A form can briefly retain isNew after
+      // its first async save, but an existing ID must update rather than append.
+      const updatedRequests = existingIndex === -1
         ? [...requests, normalizedRequest]
-        : requests.map((current, index) => index === existingIndex ? { ...current, ...normalizedRequest } : current);
+        : requests.flatMap((current, index) => {
+          const currentId = current._id || current.id;
+          if (String(currentId) !== String(requestId)) return [current];
+          return index === existingIndex ? [{ ...current, ...normalizedRequest }] : [];
+        });
 
-      const response = await fetch(`/api/collections/${collectionId}`, {
+      const response = await fetch(`/api/collections/${collectionId}/requests/${encodeURIComponent(requestId)}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-        body: JSON.stringify({ requests: updatedRequests })
+        body: JSON.stringify(normalizedRequest)
       });
       if (!response.ok) {
         const payload = await response.json().catch(() => ({}));
@@ -676,10 +685,12 @@ function CollectionDetail() {
         requestMethod: request.method,
         collectionName: collection.name
       });
+      return true;
 
     } catch (err) {
       console.error('Error saving request:', err);
       toast.error(err.message || 'Failed to save request. Please try again.');
+      return false;
     }
   };
 
@@ -741,28 +752,35 @@ function CollectionDetail() {
   };
 
   // Handle request deletion
-  const handleDeleteRequest = (requestId) => {
+  const handleDeleteRequest = async (requestId) => {
     // Confirm deletion
     if (!window.confirm('Are you sure you want to delete this request?')) {
       return;
     }
 
-    // Filter out the deleted request
-    const newRequests = requests.filter(req => (req.id !== requestId && req._id !== requestId));
-    setRequests(newRequests);
-    setPendingChanges(true);
+    try {
+      const response = await fetch(`/api/collections/${collectionId}/requests/${encodeURIComponent(requestId)}`, {
+        method: 'DELETE',
+        credentials: 'include'
+      });
+      const payload = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(payload.message || 'Could not delete this request.');
+      setCollection(payload);
+      setRequests(payload.requests || []);
+      setPendingChanges(false);
 
-    // If the deleted request was selected, unselect it
-    if (selectedRequest && (selectedRequest.id === requestId || selectedRequest._id === requestId)) {
-      setSelectedRequest(null);
-      setShowRequestForm(false);
+      // If the deleted request was selected, unselect it
+      if (selectedRequest && (selectedRequest.id === requestId || selectedRequest._id === requestId)) {
+        setSelectedRequest(null);
+        setShowRequestForm(false);
+      }
+
+      sendActivity('request_deleted', { requestId, collectionName: collection.name });
+      toast.success('Request deleted from the collection.');
+    } catch (err) {
+      console.error('Error deleting request:', err);
+      toast.error(err.message || 'Failed to delete request.');
     }
-
-    // Notify about request deletion
-    sendActivity('request_deleted', {
-      requestId,
-      collectionName: collection.name
-    });
   };
 
   // Send a request and get the response
@@ -785,11 +803,11 @@ function CollectionDetail() {
         ? [...requests, requestToSave]
         : requests.map((item, index) => index === existingIndex ? requestToSave : item);
 
-      const saveResponse = await fetch(`/api/collections/${collectionId}`, {
+      const saveResponse = await fetch(`/api/collections/${collectionId}/requests/${encodeURIComponent(requestId)}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-        body: JSON.stringify({ requests: updatedRequests })
+        body: JSON.stringify(requestToSave)
       });
 
       if (!saveResponse.ok) {

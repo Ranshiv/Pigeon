@@ -1156,6 +1156,15 @@
     background: var(--background-color);
 }
 
+.version-changelog-builder { margin: 18px 0; padding: 18px; border: 1px solid #dfe4ec; border-radius: 12px; background: #fff; }
+.version-changelog-builder h3, .version-changelog-builder p { margin: 0 0 6px; }
+.version-changelog-controls { display: flex; gap: 10px; margin-top: 14px; }
+.version-changelog-controls select, .version-changelog-controls button { min-height: 38px; border: 1px solid #ccd5e1; border-radius: 8px; padding: 7px 10px; background: #fff; }
+.version-changelog-controls button { display: inline-flex; align-items: center; gap: 6px; color: #fff; border-color: #6d4aff; background: #6d4aff; font-weight: 700; }
+.version-changelog-result { margin-top: 14px; }
+.version-changelog-result > div { display: flex; justify-content: space-between; }
+.version-changelog-result pre { max-height: 360px; overflow: auto; padding: 14px; border-radius: 8px; color: #e5e7eb; background: #111827; white-space: pre-wrap; }
+
 .api-version-manager .api-version-header {
     min-height: 0;
     padding: 0 0 20px;

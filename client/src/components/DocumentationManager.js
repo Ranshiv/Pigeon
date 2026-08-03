@@ -1,12 +1,13 @@
 // client/src/components/DocumentationManager.js
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate, Link, useLocation } from 'react-router-dom';
-import { FiBook, FiDownload, FiUpload, FiSettings, FiGlobe, FiClock, FiChevronLeft, FiEdit, FiFileText, FiGitBranch } from 'react-icons/fi';
+import { FiBook, FiDownload, FiUpload, FiSettings, FiGlobe, FiClock, FiChevronLeft, FiEdit, FiFileText, FiGitBranch, FiZap } from 'react-icons/fi';
 import DocumentationEditor from './DocumentationEditor';
 import DocumentationViewer from './DocumentationViewer';
 import DocumentationSettingsVersionHistory from './DocumentationSettingsVersionHistory';
 import DocumentationContentVersionHistory from './DocumentationContentVersionHistory';
 import ApiVersionManager from './ApiVersionManager';
+import DocumentationGeneratorPanel from './DocumentationGeneratorPanel';
 import './DocumentationManager.css';
 import { useCopilotPageContext } from '../context/CopilotContext';
 
@@ -38,7 +39,6 @@ const DocumentationManager = () => {
     const [currentSettings, setCurrentSettings] = useState(null);
     const [originalSettings, setOriginalSettings] = useState(null);
     const [settingsChanged, setSettingsChanged] = useState(false);
-    const [versionHistoryTab, setVersionHistoryTab] = useState('settings'); // 'settings' or 'content'
     const [documentationRefreshKey, setDocumentationRefreshKey] = useState(0);
     const routeWorkspaceId = location.state?.workspaceId;
     const collectionWorkspaceId = collection?.workspaceId?._id || collection?.workspaceId;
@@ -60,7 +60,7 @@ const DocumentationManager = () => {
     // Sync view with URL subpath (e.g. /swagger, /settings, /history, /api-versions)
     useEffect(() => {
         const tail = subpath || location.pathname.split('/documentation/')[1] || '';
-        const allowed = ['edit', 'view', 'swagger', 'settings', 'history', 'api-versions'];
+        const allowed = ['edit', 'view', 'swagger', 'settings', 'history', 'api-versions', 'generate'];
         const next = tail.split('/')[0];
         if (next && allowed.includes(next)) {
             setView(next);
@@ -293,15 +293,10 @@ const DocumentationManager = () => {
     };
 
     // Handle content restore from version history
-    const handleContentRestore = (restoredContent) => {
-        console.log('Restoring content:', restoredContent);
-
-        // Update the documentation with the restored content
-        setDocumentation(prev => ({
-            ...prev,
-            content: restoredContent,
-            _timestamp: Date.now() // Add timestamp to force editor re-render
-        }));
+    const handleContentRestore = (restoredDocument) => {
+        setDocumentation(typeof restoredDocument === 'string'
+            ? (previous => ({ ...previous, content: restoredDocument, _timestamp: Date.now() }))
+            : restoredDocument);
 
         // Switch to edit view to show the restored content
         setView('edit');
@@ -313,165 +308,41 @@ const DocumentationManager = () => {
     const handleSaveDocumentation = async (docData) => {
         try {
             setIsSaving(true);
-            console.log("Saving documentation data:", docData);
-
-            // Try a POST request instead of PUT
             const url = `/api/collections/${collectionId}/documentation`;
-            console.log("Saving to URL:", url);
-
-            // Make sure we have a well-formed document to save
             const documentToSave = {
                 title: docData.title || '',
-                // CRITICAL: Always explicitly set content as a string, even if empty
-                content: docData.content === undefined ? '' :
-                    typeof docData.content === 'string' ? docData.content : '',
-                collectionId: collectionId,
-                updatedAt: new Date().toISOString(),
-                // After saving, it's no longer new
-                isNew: false
+                content: typeof docData.content === 'string' ? docData.content : '',
+                settings: documentation?.settings || {},
+                revision: Number(documentation?.revision || 0)
             };
-
-            // Log exactly what we're saving to help debug
-            console.log("Preparing to save document with content:", {
-                contentType: typeof documentToSave.content,
-                contentLength: documentToSave.content.length,
-                content: documentToSave.content.substring(0, 50) + '...'
-            });
-
             const response = await fetch(url, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
                 credentials: 'include',
                 body: JSON.stringify(documentToSave)
             });
-
             if (!response.ok) {
-                const errorText = await response.text();
-                console.error("Server response error:", response.status, errorText);
-
-                // Check if this is our content validation error
-                if (response.status === 400 && errorText.includes('content')) {
-                    console.error("Content validation error - attempting workaround with non-empty content");
-
-                    // Try again with a space character if empty content was rejected
-                    const retryResponse = await fetch(url, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        credentials: 'include',
-                        body: JSON.stringify({
-                            title: docData.title || '',
-                            // Add a single space if content was empty
-                            content: !docData.content || docData.content === '' ? ' ' : docData.content,
-                            collectionId: collectionId,
-                            updatedAt: new Date().toISOString(),
-                            isNew: false
-                        })
-                    });
-
-                    if (retryResponse.ok) {
-                        const savedDoc = await retryResponse.json();
-                        console.log("Documentation saved successfully with workaround:", savedDoc);
-
-                        // Process the response and update state just like a normal save
-                        if (savedDoc) {
-                            const updatedDoc = savedDoc.documentation || savedDoc;
-
-                            // First set to null to ensure a clean update
-                            setDocumentation(null);
-
-                            setTimeout(() => {
-                                // Create a complete documentation object with all required fields
-                                const completeDoc = {
-                                    ...updatedDoc,
-                                    // After saving, it should never be considered new
-                                    isNew: false,
-                                    // Ensure these fields always exist
-                                    title: updatedDoc.title || (collection?.name ? `${collection.name} Documentation` : ''),
-                                    content: updatedDoc.content || '',
-                                    collectionId: collectionId,
-                                    // Add timestamp to ensure React recognizes this as a new object
-                                    _timestamp: new Date().getTime()
-                                };
-
-                                // Set documentation state with the updated object
-                                setDocumentation(completeDoc);
-                                console.log('Updated documentation state after retry save:', completeDoc);
-
-                                if (!docData.isAutoSave) {
-                                    alert('Documentation saved successfully');
-                                    navigate(`/workspace/collections/${collectionId}`, { state: collectionRouteState });
-                                }
-                            }, 50);
-
-                            // Return early from this function
-                            return;
-                        }
-                    }
-                }
-
-                throw new Error(`Failed to save documentation: ${response.status}${errorText ? ' - ' + errorText : ''}`);
+                const body = await response.json().catch(() => ({}));
+                if (response.status === 409 && body.current) setDocumentation(body.current);
+                throw new Error(body.message || `Failed to save documentation (${response.status})`);
             }
-
             const savedDoc = await response.json();
-            console.log("Documentation saved successfully:", savedDoc);
-
-            // Handle different response formats safely
-            if (savedDoc) {
-                const updatedDoc = savedDoc.documentation || savedDoc;
-
-                // Force component remounting with completely new documentation object
-                // First set to null to ensure React detects the change
-                setDocumentation(null);
-
-                // Wait a moment to ensure React processes the null state
-                setTimeout(() => {
-                    // Create a complete and properly structured documentation object with unique timestamp
-                    const completeDoc = {
-                        ...updatedDoc,
-                        // After saving, it should never be considered new
-                        isNew: false,
-                        // Ensure these fields always exist
-                        title: updatedDoc.title || (collection?.name ? `${collection.name} Documentation` : ''),
-                        content: updatedDoc.content || '',
-                        collectionId: collectionId,
-                        // Add timestamp to force React to recognize this as a new object
-                        _timestamp: new Date().getTime()
-                    };
-
-                    console.log('Setting documentation with new complete object:', completeDoc);
-
-                    // Update state with the complete doc
-                    setDocumentation(completeDoc);
-
-                    if (!docData.isAutoSave) {
-                        alert('Documentation saved successfully');
-                        navigate(`/workspace/collections/${collectionId}`, { state: collectionRouteState });
-                    }
-                }, 50);
-            } else {
-                throw new Error('Received empty response when saving documentation');
-            }
-
+            const updatedDoc = savedDoc.documentation || savedDoc;
+            setDocumentation({ ...updatedDoc, isNew: false });
+            if (!docData.isAutoSave) alert('Documentation saved successfully');
         } catch (err) {
             console.error('Error saving documentation:', err);
-
-            // Enhanced error logging for debugging
-            console.error('Error details:', {
-                message: err.message,
-                stack: err.stack,
-                responseText: err.responseText
-            });
-
-            // More user-friendly error message with troubleshooting suggestion
-            alert(`Failed to save documentation: ${err.message}\n\nTry making a small change to the content before saving again.`);
+            alert(`Failed to save documentation: ${err.message}`);
         } finally {
             setIsSaving(false);
         }
     };
+
+    const handleGeneratedDocumentation = useCallback((nextDocumentation, options = {}) => {
+        setDocumentation(nextDocumentation);
+        setCurrentSettings(nextDocumentation?.settings || {});
+        if (!options.stayOpen) setView('edit');
+    }, []);
 
     const handleExportDocumentation = (format) => {
         if (!documentation) {
@@ -865,7 +736,7 @@ const DocumentationManager = () => {
                     'Content-Type': 'application/json'
                 },
                 credentials: 'include',
-                body: JSON.stringify({ isPublic: true })
+                                body: JSON.stringify({ isPublic: true, revision: Number(documentation?.revision || 0) })
             });
 
             if (!response.ok) {
@@ -919,12 +790,16 @@ const DocumentationManager = () => {
 
             console.log('Settings payload being sent to server:', settingsPayload);
 
-            // Send PUT request to save settings
-            const response = await fetch(`/api/collections/${collectionId}/documentation/settings`, {
-                method: 'POST',
+            const response = await fetch(`/api/collections/${collectionId}/documentation`, {
+                method: 'PUT',
                 credentials: 'include',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(settingsPayload)
+                body: JSON.stringify({
+                    title: documentation.title || '',
+                    content: documentation.content || '',
+                    settings: settingsPayload,
+                    revision: Number(documentation.revision || 0)
+                })
             });
 
             if (!response.ok) {
@@ -935,24 +810,24 @@ const DocumentationManager = () => {
             const result = await response.json();
             console.log('Settings saved successfully:', result);            // Update documentation with saved settings while preserving currentSettings
             if (result.documentation) {
-                // Update documentation object with the saved settings
-                setDocumentation(prev => ({
-                    ...prev,
+                const savedSettings = result.documentation.settings || settingsPayload;
+                setDocumentation({
                     ...result.documentation,
                     // Ensure all settings are also available directly on the documentation object
-                    isPublic: settingsPayload.isPublic,
-                    metaTitle: settingsPayload.metaTitle,
-                    metaDescription: settingsPayload.metaDescription,
-                    customDomain: settingsPayload.customDomain,
-                    allowComments: settingsPayload.allowComments,
-                    showLastUpdated: settingsPayload.showLastUpdated,
-                    enableSearch: settingsPayload.enableSearch,
-                    theme: settingsPayload.theme,
-                    displayOptions: settingsPayload.displayOptions
-                }));
+                    isPublic: Boolean(result.documentation.settings?.isPublic),
+                    metaTitle: result.documentation.settings?.metaTitle || '',
+                    metaDescription: result.documentation.settings?.metaDescription || '',
+                    customDomain: result.documentation.settings?.customDomain || '',
+                    allowComments: Boolean(result.documentation.settings?.allowComments),
+                    showLastUpdated: result.documentation.settings?.showLastUpdated !== false,
+                    enableSearch: result.documentation.settings?.enableSearch !== false,
+                    theme: result.documentation.settings?.theme || 'default',
+                    displayOptions: result.documentation.settings?.displayOptions || {}
+                });
 
                 // Update the original settings reference for comparison
-                setOriginalSettings(JSON.parse(JSON.stringify(settingsPayload)));
+                setCurrentSettings(JSON.parse(JSON.stringify(savedSettings)));
+                setOriginalSettings(JSON.parse(JSON.stringify(savedSettings)));
                 setSettingsChanged(false);
             }            // Give user feedback
             alert('Documentation settings saved successfully');
@@ -1053,7 +928,12 @@ const DocumentationManager = () => {
                     )}
                 </div>
                 <div className="documentation-actions">
-
+                    <button
+                        className={`action-btn ${view === 'generate' ? 'active' : ''}`}
+                        onClick={() => setView(view === 'generate' ? 'edit' : 'generate')}
+                    >
+                        <FiZap /> AI Generate
+                    </button>
                     <div className="action-dropdown">
                         <button className="action-btn">
                             <FiDownload /> Export
@@ -1071,7 +951,7 @@ const DocumentationManager = () => {
                             <FiUpload /> Import
                         </button>
                         <div className="dropdown-content">
-                            <button onClick={handleImportOpenAPI}>OpenAPI/Swagger</button>
+                            <button onClick={() => setView('generate')}>OpenAPI/Swagger</button>
                         </div>
                     </div>
                     <button className="action-btn publish-btn" onClick={handlePublishDocumentation}>
@@ -1092,12 +972,18 @@ const DocumentationManager = () => {
             </div>
 
             <div className={`documentation-content ${view === 'api-versions' ? 'api-versions-view' : ''}`}>
+                {documentation?.staleAt ? (
+                    <div className="documentation-stale-warning" role="status">
+                        <FiClock /> <span><strong>Documentation may be stale.</strong> {documentation.staleReason || 'The API contract changed after this revision was generated.'}</span>
+                        <button type="button" onClick={() => setView('generate')}>Review and regenerate</button>
+                    </div>
+                ) : null}
                 {view === 'edit' && documentation && !isLoading && (
                     <>
                         {console.log('Rendering editor with documentation:', documentation)}
                         <DocumentationEditor
                             // Force unique key on each render to guarantee component remounting
-                            key={`editor-${view}-${Date.now()}-${documentation._timestamp || Math.random().toString(36).substring(2, 15)}`}
+                            key={`editor-${documentation.revision || 0}-${documentation._timestamp || 0}`}
                             documentation={{
                                 ...(documentation || {}),
                                 title: documentation?.title || (collection?.name ? `${collection.name} Documentation` : ''),
@@ -1148,9 +1034,10 @@ const DocumentationManager = () => {
                                     <input
                                         type="checkbox"
                                         checked={currentSettings?.isPublic || false}
-                                        onChange={(e) => handleSettingsChange('isPublic', e.target.checked)}
+                                        readOnly
+                                        disabled
                                     />
-                                    Make documentation public
+                                    Published — use the Publish action after reviewing the latest revision
                                 </label>
                                 <p className="setting-description">
                                     When enabled, your documentation will be accessible to anyone with the link.
@@ -1242,33 +1129,12 @@ const DocumentationManager = () => {
                                     <h3>Version History</h3>
                                     <p className="version-history-description">Track and manage all changes to your application settings and content</p>
                                 </div>
-                                <div className="version-history-tabs">
-                                    <button
-                                        className={`tab-btn ${versionHistoryTab === 'settings' ? 'active' : ''}`}
-                                        onClick={() => setVersionHistoryTab('settings')}
-                                    >
-                                        <FiSettings /> Settings History
-                                    </button>
-                                    <button
-                                        className={`tab-btn ${versionHistoryTab === 'content' ? 'active' : ''}`}
-                                        onClick={() => setVersionHistoryTab('content')}
-                                    >
-                                        <FiFileText /> Content History
-                                    </button>
-                                </div>
                                 <div className="version-history-content">
-                                    {versionHistoryTab === 'settings' ? (
-                                        <DocumentationSettingsVersionHistory
-                                            documentation={documentation}
-                                            collectionId={collectionId}
-                                            onSettingsRestore={handleSettingsRestore}
-                                        />
-                                    ) : (
-                                        <DocumentationContentVersionHistory
-                                            collectionId={collectionId}
-                                            onContentRestore={handleContentRestore}
-                                        />
-                                    )}
+                                    <DocumentationContentVersionHistory
+                                        collectionId={collectionId}
+                                        documentation={documentation}
+                                        onContentRestore={handleContentRestore}
+                                    />
                                 </div>
                             </div>
                         </div>
@@ -1309,6 +1175,16 @@ const DocumentationManager = () => {
                     <ApiVersionManager
                         collectionId={collectionId}
                         collection={collection}
+                    />
+                )}
+
+                {view === 'generate' && documentation && (
+                    <DocumentationGeneratorPanel
+                        collectionId={collectionId}
+                        collection={collection}
+                        documentation={documentation}
+                        onDocumentationChange={handleGeneratedDocumentation}
+                        onClose={() => setView('edit')}
                     />
                 )}
 

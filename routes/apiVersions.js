@@ -6,6 +6,36 @@ const MockServerService = require('../services/MockServerService');
 const IntegrationService = require('../services/IntegrationService');
 const ApiVersion = require('../models/ApiVersion');
 const { authenticateJWT } = require('../middleware/auth');
+const { getDb } = require('../config/db');
+const { findCollectionForUser } = require('../services/CollectionAccessService');
+const ContractDiffService = require('../services/ContractDiffService');
+
+// API-version routes historically authenticated callers without checking that
+// the referenced collection belonged to them. Resolve the target once here so
+// every existing and future handler inherits the same authorization policy.
+router.use(authenticateJWT, async (req, res, next) => {
+    try {
+        const db = getDb();
+        if (!db) return res.status(503).json({ message: 'Database is not ready.' });
+        const collectionPath = req.path.match(/^\/collections?\/([^/]+)/);
+        let collectionId = collectionPath?.[1] || req.body?.collectionId;
+        const versionIds = Array.from(req.path.matchAll(/[0-9a-f]{24}/ig), (match) => match[0]);
+        if (!collectionId && versionIds.length) {
+            const versions = await ApiVersion.find({ _id: { $in: versionIds } }).select('collectionId').lean();
+            if (versions.length !== new Set(versionIds).size || new Set(versions.map((item) => String(item.collectionId))).size !== 1) {
+                return res.status(404).json({ message: 'API version not found.' });
+            }
+            collectionId = String(versions[0].collectionId);
+        }
+        if (!collectionId) return next();
+        const collection = await findCollectionForUser(db, collectionId, req.user, req.method === 'GET' ? 'viewer' : 'editor');
+        if (!collection) return res.status(404).json({ message: 'Collection or API version not found.' });
+        req.apiVersionCollection = collection;
+        return next();
+    } catch (error) {
+        return next(error);
+    }
+});
 
 // Create a new API version
 router.post('/collections/:collectionId/versions', authenticateJWT, async (req, res) => {
@@ -282,6 +312,44 @@ router.get('/versions/:version1Id/compare/:version2Id', authenticateJWT, async (
         res.status(500).json({
             message: error.message || 'Failed to compare API versions'
         });
+    }
+});
+
+// Standards-oriented release notes for the documentation manager. The
+// contract diff remains deterministic; AI may improve wording later but may
+// never introduce changes that are absent from this result.
+router.get('/:fromId/compare/:toId/changelog', async (req, res) => {
+    try {
+        const [fromVersion, toVersion] = await Promise.all([
+            ApiVersion.findById(req.params.fromId).lean(),
+            ApiVersion.findById(req.params.toId).lean()
+        ]);
+        if (!fromVersion || !toVersion || String(fromVersion.collectionId) !== String(toVersion.collectionId)) {
+            return res.status(404).json({ message: 'Both API versions must exist in the same collection.' });
+        }
+        const collection = await findCollectionForUser(getDb(), String(fromVersion.collectionId), req.user, 'viewer');
+        if (!collection) return res.status(404).json({ message: 'API versions not found.' });
+        const comparison = await ContractDiffService.compareSpecs(fromVersion.openApiSpec, toVersion.openApiSpec);
+        const diff = comparison.diffResult || {};
+        const added = Object.keys(diff.paths?.added || {});
+        const removed = Object.keys(diff.paths?.removed || {});
+        const changed = Object.keys(diff.paths?.modified || {});
+        const lines = [`# Changelog`, '', `## ${toVersion.version}`, ''];
+        if (added.length) lines.push('### Added', '', ...added.map((item) => `- \`${item}\``), '');
+        if (changed.length) lines.push('### Changed', '', ...changed.map((item) => `- \`${item}\``), '');
+        if (removed.length) lines.push('### Removed', '', ...removed.map((item) => `- \`${item}\``), '');
+        if (comparison.breakingChanges.length) lines.push('### Migration notes', '', ...comparison.breakingChanges.map((item) => `- ${item.description}${item.mitigationStrategy ? ` — ${item.mitigationStrategy}` : ''}`), '');
+        if (!added.length && !removed.length && !changed.length && !comparison.breakingChanges.length) lines.push('- No externally visible contract changes detected.', '');
+        const semverSuggestion = comparison.breakingChanges.length || removed.length ? 'major' : added.length ? 'minor' : 'patch';
+        return res.json({
+            from: fromVersion.version, to: toVersion.version,
+            summary: comparison.summary, breakingChanges: comparison.breakingChanges,
+            changes: { added, changed, removed }, semverSuggestion,
+            changelog: lines.join('\n').trim(), migrationGuide: comparison.breakingChanges.map((item) => item.mitigationStrategy).filter(Boolean).join('\n')
+        });
+    } catch (error) {
+        console.error('Error generating API changelog:', error);
+        return res.status(500).json({ message: error.message || 'Failed to generate changelog.' });
     }
 });
 

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import {
     FiGitBranch, FiTrash2, FiClock, FiAlertTriangle,
-    FiServer, FiInfo, FiFileText, FiSettings, FiTag, FiX
+    FiServer, FiInfo, FiFileText, FiSettings, FiTag, FiX, FiRefreshCw
 } from 'react-icons/fi';
 import MockServerWorkspace from './MockServerWorkspace';
 import './ApiVersionManager.css';
@@ -13,6 +13,9 @@ const ApiVersionManager = ({ collectionId, collection }) => {
     const [showCreateForm, setShowCreateForm] = useState(false);
     const [showMockServerManager, setShowMockServerManager] = useState(false);
     const [selectedVersionId, setSelectedVersionId] = useState(null);
+    const [compareFrom, setCompareFrom] = useState('');
+    const [compareTo, setCompareTo] = useState('');
+    const [generatedChangelog, setGeneratedChangelog] = useState(null);
     const [formData, setFormData] = useState({
         version: '',
         name: '',
@@ -203,6 +206,22 @@ const ApiVersionManager = ({ collectionId, collection }) => {
         setShowMockServerManager(true);
     };
 
+    const handleGenerateChangelog = async () => {
+        if (!compareFrom || !compareTo || compareFrom === compareTo) {
+            setError('Choose two different API versions to generate a changelog.');
+            return;
+        }
+        try {
+            setError(null);
+            const response = await fetch(`/api/api-versions/${compareFrom}/compare/${compareTo}/changelog`, { credentials: 'include' });
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.message || 'Failed to generate changelog.');
+            setGeneratedChangelog(data);
+        } catch (requestError) {
+            setError(requestError.message);
+        }
+    };
+
     if (showMockServerManager && selectedVersionId) {
         return (
             <MockServerWorkspace
@@ -242,6 +261,18 @@ const ApiVersionManager = ({ collectionId, collection }) => {
                     <p>{error}</p>
                 </div>
             )}
+
+            {versions.length >= 2 ? (
+                <section className="version-changelog-builder">
+                    <div><h3>Generate changelog</h3><p>Compare two immutable OpenAPI versions and review breaking changes before release.</p></div>
+                    <div className="version-changelog-controls">
+                        <select aria-label="Changelog base version" value={compareFrom} onChange={(event) => setCompareFrom(event.target.value)}><option value="">From version</option>{versions.map((version) => <option key={version._id} value={version._id}>{version.version}</option>)}</select>
+                        <select aria-label="Changelog target version" value={compareTo} onChange={(event) => setCompareTo(event.target.value)}><option value="">To version</option>{versions.map((version) => <option key={version._id} value={version._id}>{version.version}</option>)}</select>
+                        <button type="button" onClick={handleGenerateChangelog}><FiRefreshCw /> Generate</button>
+                    </div>
+                    {generatedChangelog ? <div className="version-changelog-result"><div><strong>Suggested release: {generatedChangelog.semverSuggestion}</strong><span>{generatedChangelog.breakingChanges.length} breaking changes</span></div><pre>{generatedChangelog.changelog}</pre></div> : null}
+                </section>
+            ) : null}
 
             {isLoading ? (
                 <div className="loading-state">

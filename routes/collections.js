@@ -28,6 +28,30 @@ const collectionAccessClauses = (userId, { edit = false } = {}) => {
     ];
 };
 
+const requestIdOf = (request) => String(request?._id || request?.id || '');
+
+async function updateCollectionRequests(db, collectionId, userId, mutate) {
+    for (let attempt = 0; attempt < 3; attempt += 1) {
+        const collection = await db.collection('collections').findOne({
+            _id: new ObjectId(collectionId),
+            $or: collectionAccessClauses(userId, { edit: true })
+        });
+        if (!collection) return null;
+
+        const nextRequests = mutate(Array.isArray(collection.requests) ? collection.requests : []);
+        const now = new Date();
+        const filter = { _id: collection._id };
+        if (collection.updatedAt) filter.updatedAt = collection.updatedAt;
+        else filter.updatedAt = { $exists: false };
+        const result = await db.collection('collections').updateOne(filter, { $set: { requests: nextRequests, updatedAt: now } });
+        if (result.modifiedCount) return db.collection('collections').findOne({ _id: collection._id });
+    }
+
+    const error = new Error('The collection changed while the request was being saved. Try again.');
+    error.code = 'COLLECTION_CONFLICT';
+    throw error;
+}
+
 // Get all collections
 router.get('/', ensureAuthenticated, async (req, res) => {
     try {
@@ -457,6 +481,48 @@ router.post('/', ensureAuthenticated, async (req, res) => {
     } catch (err) {
         console.error("Error creating collection:", err);
         res.status(500).json({ message: 'Error creating collection' });
+    }
+});
+
+// Save one embedded request without replacing the collection's entire request
+// list. Optimistic retries prevent stale tabs from erasing newer requests.
+router.put('/:id/requests/:requestId', ensureAuthenticated, async (req, res) => {
+    try {
+        if (!ObjectId.isValid(req.params.id)) return res.status(400).json({ message: 'Invalid collection ID' });
+        const requestId = String(req.params.requestId || '');
+        if (!requestId || !req.body || typeof req.body !== 'object') return res.status(400).json({ message: 'Request data is required' });
+        const db = getDb();
+        if (!db) return res.status(503).json({ message: 'Database not initialized' });
+
+        const savedRequest = { ...req.body, _id: req.body._id || requestId, id: req.body.id || requestId, isNew: false };
+        const updatedCollection = await updateCollectionRequests(db, req.params.id, req.user.id, (currentRequests) => {
+            const existingIndex = currentRequests.findIndex((item) => requestIdOf(item) === requestId);
+            if (existingIndex === -1) return [...currentRequests, savedRequest];
+            return currentRequests.flatMap((item, index) => {
+                if (requestIdOf(item) !== requestId) return [item];
+                return index === existingIndex ? [{ ...item, ...savedRequest }] : [];
+            });
+        });
+        if (!updatedCollection) return res.status(404).json({ message: 'Collection not found or editor access is required' });
+        return res.json({ ...updatedCollection, _id: String(updatedCollection._id), workspaceId: updatedCollection.workspaceId?.toString?.() || updatedCollection.workspaceId });
+    } catch (err) {
+        console.error('Error saving collection request:', err);
+        return res.status(err.code === 'COLLECTION_CONFLICT' ? 409 : 500).json({ code: err.code, message: err.message || 'Error saving collection request' });
+    }
+});
+
+router.delete('/:id/requests/:requestId', ensureAuthenticated, async (req, res) => {
+    try {
+        if (!ObjectId.isValid(req.params.id)) return res.status(400).json({ message: 'Invalid collection ID' });
+        const requestId = String(req.params.requestId || '');
+        const db = getDb();
+        if (!db) return res.status(503).json({ message: 'Database not initialized' });
+        const updatedCollection = await updateCollectionRequests(db, req.params.id, req.user.id, (currentRequests) => currentRequests.filter((item) => requestIdOf(item) !== requestId));
+        if (!updatedCollection) return res.status(404).json({ message: 'Collection not found or editor access is required' });
+        return res.json({ ...updatedCollection, _id: String(updatedCollection._id), workspaceId: updatedCollection.workspaceId?.toString?.() || updatedCollection.workspaceId });
+    } catch (err) {
+        console.error('Error deleting collection request:', err);
+        return res.status(err.code === 'COLLECTION_CONFLICT' ? 409 : 500).json({ code: err.code, message: err.message || 'Error deleting collection request' });
     }
 });
 
@@ -2268,8 +2334,21 @@ router.get('/:id/documentation/public', async (req, res) => {
             : [];
         const contributors = users.map((user) => user.displayName || user.email).filter(Boolean);
 
+        const publicSettings = {
+            theme: documentation.settings?.theme || 'light',
+            showRequestResponses: documentation.settings?.showRequestResponses !== false,
+            showTOC: documentation.settings?.showTOC !== false,
+            showLastUpdated: documentation.settings?.showLastUpdated !== false,
+            enableSearch: documentation.settings?.enableSearch !== false,
+            metaTitle: documentation.settings?.metaTitle || '',
+            metaDescription: documentation.settings?.metaDescription || ''
+        };
         res.json({
-            documentation: { ...documentation, _id: documentation._id.toString() },
+            documentation: {
+                _id: documentation._id.toString(), title: documentation.title || '', content: documentation.content || '',
+                settings: publicSettings, revision: documentation.revision || 0,
+                updatedAt: documentation.updatedAt, publishedAt: documentation.publishedAt
+            },
             collection: { _id: collection._id.toString(), name: collection.name, contributors: [...new Set(contributors)] }
         });
     } catch (err) {

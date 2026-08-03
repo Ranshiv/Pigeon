@@ -191,6 +191,61 @@
     padding: 0;
 }
 
+.documentation-stale-warning {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 44px;
+    margin: 0 0 12px;
+    padding: 9px 12px;
+    box-sizing: border-box;
+    border: 1px solid color-mix(in srgb, var(--warning-color, #ffb020) 42%, var(--border-color));
+    border-radius: var(--radius-md, 10px);
+    background: color-mix(in srgb, var(--warning-color, #ffb020) 9%, var(--surface-elevated, var(--card-bg)));
+    color: var(--text-secondary);
+    box-shadow: inset 3px 0 0 var(--warning-color, #ffb020);
+}
+
+.documentation-stale-warning > svg {
+    flex: 0 0 auto;
+    color: var(--warning-color, #ffb020);
+}
+
+.documentation-stale-warning span {
+    flex: 1;
+    min-width: 0;
+    line-height: 1.45;
+}
+
+.documentation-stale-warning strong { color: var(--text-color); }
+
+.documentation-stale-warning button {
+    flex: 0 0 auto;
+    min-height: 32px;
+    padding: 6px 10px;
+    border: 1px solid color-mix(in srgb, var(--warning-color, #ffb020) 38%, var(--border-color));
+    border-radius: var(--radius-sm, 8px);
+    background: color-mix(in srgb, var(--warning-color, #ffb020) 10%, transparent);
+    color: var(--warning-color, #ffb020);
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.documentation-stale-warning button:hover {
+    border-color: var(--warning-color, #ffb020);
+    background: color-mix(in srgb, var(--warning-color, #ffb020) 16%, transparent);
+}
+
+.documentation-stale-warning button:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--warning-color, #ffb020) 22%, transparent);
+}
+
+@media (max-width: 720px) {
+    .documentation-stale-warning { align-items: flex-start; flex-wrap: wrap; }
+    .documentation-stale-warning button { margin-left: 24px; }
+}
+
 .documentation-manager:has(.api-version-manager),
 .documentation-manager:has(.mock-workspace) {
     height: auto;
@@ -221,6 +276,7 @@
 
 .documentation-content:has(.documentation-editor) {
     display: flex;
+    flex-direction: column;
     min-height: clamp(620px, calc(100svh - 176px), 980px);
     padding: 20px;
     box-sizing: border-box;
@@ -229,6 +285,7 @@
 
 .documentation-content > .documentation-editor {
     flex: 1;
+    width: 100%;
     min-height: 0;
     height: auto;
     box-sizing: border-box;
