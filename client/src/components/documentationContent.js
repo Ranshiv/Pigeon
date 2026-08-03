@@ -66,6 +66,7 @@ export const documentationSections = [
             ['Test GraphQL APIs', 'Run GraphQL operations and inspect results in the GraphQL tester.', '/workspace/graphql'],
             ['Test protocols', 'Connect to WebSocket, gRPC, SOAP, MQTT, and SSE endpoints.', '/workspace/protocols'],
             ['Convert protocols', 'Convert protocol requests into useful API representations.', '/workspace/protocols'],
+            ['Generate AI test suites', 'Create positive, negative, boundary, authorization, schema, and regression tests from specs or traffic.', '/workspace/test-generator'],
             ['Generate tests from traces', 'Import traces and turn observed traffic into test cases.', '/workspace/trace-to-test'],
             ['Run consumer contract tests', 'Define, execute, and review consumer-driven contracts.', '/workspace/consumer-contracts'],
             ['Run fuzz tests', 'Find unexpected behavior by exercising schemas with generated inputs.', '/workspace/api-network'],
@@ -401,7 +402,7 @@ const troubleshootingByCategory = {
 export const learningPaths = [
     { id: 'new-user', title: 'New to Pigeon', description: 'Go from your first workspace to a repeatable API check.', guides: ['Create a workspace', 'Create a collection', 'Send your first request', 'Create an environment', 'Write test scripts'] },
     { id: 'api-builder', title: 'API developer', description: 'Design, validate, document, and publish an API contract.', guides: ['Design an API visually', 'Work with OpenAPI', 'Manage API versions', 'Write collection documentation', 'Publish public documentation'] },
-    { id: 'quality', title: 'QA engineer', description: 'Build confidence with requests, contracts, traces, and failure tests.', guides: ['Build an HTTP request', 'Write test scripts', 'Run consumer contract tests', 'Generate tests from traces', 'Run fuzz tests'] },
+    { id: 'quality', title: 'QA engineer', description: 'Build confidence with requests, contracts, traces, and failure tests.', guides: ['Build an HTTP request', 'Write test scripts', 'Generate AI test suites', 'Run consumer contract tests', 'Generate tests from traces', 'Run fuzz tests'] },
     { id: 'operations', title: 'Platform engineer', description: 'Set up monitors, alerts, incidents, and performance baselines.', guides: ['Create an API monitor', 'Configure alerts and policies', 'Manage incidents and maintenance', 'Run a performance test', 'Create monitoring reports'] }
 ];
 
@@ -420,6 +421,7 @@ const examplesByTitle = {
     'Test GraphQL APIs': ['GraphQL query', 'graphql', 'query GetUser($id: ID!) {\n  user(id: $id) { id name status }\n}\n\nVariables: { "id": "42" }'],
     'Test protocols': ['WebSocket smoke test', 'text', 'URL: wss://echo.websocket.org\nSend: { "type": "ping" }\nExpected: matching message received'],
     'Convert protocols': ['Conversion input', 'text', 'Source: GraphQL query\nTarget: HTTP request\nReview after conversion: URL, headers, variables, and body'],
+    'Generate AI test suites': ['Generated suite', 'text', 'Sources: OpenAPI + saved traffic\nCoverage: positive, negative, boundary, authorization, schema, regression\nWorkflow: generate → review → approve → materialize → run'],
     'Generate tests from traces': ['Trace workflow', 'text', 'Input: trace.json\nFilter: POST /payments\nGenerated test: valid payment request\nVerify: remove production identifiers before saving'],
     'Run consumer contract tests': ['Contract check', 'json', '{ "consumer": "checkout-ui", "provider": "payments-api", "path": "/payments/42", "expected": 200 }'],
     'Run fuzz tests': ['Fuzz guardrails', 'text', 'Schema: User\nField: email\nInputs: valid, empty, malformed, oversized\nStop condition: rate limit or unsafe environment'],
@@ -579,6 +581,7 @@ const specificTitleGuidance = {
     'Test GraphQL APIs': ['Open GraphQL Tester and select the endpoint and schema context.', 'Write a query or mutation and define variables separately from the operation.', 'Run the operation and inspect both data and the errors array.', 'Save a working query and add an assertion for the fields the client depends on.'],
     'Test protocols': ['Open Protocol Tester and choose WebSocket, gRPC, SOAP, MQTT, or SSE.', 'Provide the endpoint-specific connection details and a safe sample payload.', 'Connect or send once, then inspect messages, metadata, and connection errors.', 'Save the working setup and document any broker, certificate, or schema requirement.'],
     'Convert protocols': ['Open Protocol Converter and select the source and target protocol.', 'Import or enter the smallest valid source request.', 'Review the generated endpoint, headers, variables, and body for semantic differences.', 'Export or save the converted request, then verify it against a safe endpoint.'],
+    'Generate AI test suites': ['Open AI Test Generator and select saved specifications, requests, or traffic.', 'Choose individual operations, coverage categories, and optional authorization profiles.', 'Review deterministic and AI-enriched cases, evidence, warnings, and blocked prerequisites.', 'Approve and materialize selected cases, then explicitly run them against a non-production environment.'],
     'Generate tests from traces': ['Open Trace to Test and import a sanitized trace or supported telemetry file.', 'Filter the trace to the operation and status patterns worth testing.', 'Review generated requests, variables, and assertions before saving them.', 'Run one generated test and remove production identifiers from the resulting collection.'],
     'Run consumer contract tests': ['Open Consumer Contracts and create or select a consumer/provider contract.', 'Define the interaction, request, expected status, and response fields the consumer requires.', 'Run the contract against the provider environment and inspect the diff if it fails.', 'Save the run and notify the provider with the exact incompatible interaction.'],
     'Run fuzz tests': ['Open the fuzz testing panel and choose a schema or request to exercise.', 'Set safe limits for generated cases, rate, duration, and target environment.', 'Run the test and inspect the failing input, response, and reproducibility details.', 'Save a minimized failing case as a regression test and stop excessive or unsafe runs.'],
@@ -632,6 +635,7 @@ const routeOverrides = {
     'Test GraphQL APIs': '/workspace/graphql',
     'Test protocols': '/workspace/protocols',
     'Convert protocols': '/workspace/protocols',
+    'Generate AI test suites': '/workspace/test-generator',
     'Generate tests from traces': '/workspace/trace-to-test',
     'Run consumer contract tests': '/workspace/consumer-contracts',
     'Run fuzz tests': '/workspace/api-network',

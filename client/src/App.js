@@ -56,6 +56,7 @@ const getPageTitle = (pathname) => {
     '/workspace/governance': 'Governance',
     '/workspace/consumer-contracts': 'Consumer Contracts',
     '/workspace/trace-to-test': 'Trace to Test',
+    '/workspace/test-generator': 'AI Test Generator',
     '/workspace/asyncapi': 'AsyncAPI',
     '/workspace/settings': 'Settings',
     '/workspace/history': 'History',

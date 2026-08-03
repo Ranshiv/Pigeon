@@ -10,8 +10,13 @@ const totalTimeoutMs = () => Math.max(10000, Number(process.env.PIGEON_NIM_TOTAL
 const cooldownMs = () => Math.max(30000, Number(process.env.PIGEON_NIM_MODEL_COOLDOWN_MS) || 120000);
 const maxTokens = () => Math.max(128, Number(process.env.PIGEON_NIM_MAX_TOKENS) || 800);
 const documentationMaxTokens = () => Math.max(maxTokens(), Number(process.env.PIGEON_NIM_DOCUMENTATION_MAX_TOKENS) || 1400);
+const testGenerationMaxTokens = () => Math.max(maxTokens(), Number(process.env.PIGEON_NIM_TEST_GENERATION_MAX_TOKENS) || 2200);
 const maxTokensFor = (messages) => {
     const prompt = String(messages?.[messages.length - 1]?.content || '');
+    const systemPrompt = String(messages?.[0]?.content || '');
+    if (/enrich API test plans|semantic API test cases/i.test(`${systemPrompt}\n${prompt}`)) {
+        return testGenerationMaxTokens();
+    }
     return /documentation|update_documentation|authentication section|add .*docs?\b/i.test(prompt)
         ? documentationMaxTokens()
         : maxTokens();

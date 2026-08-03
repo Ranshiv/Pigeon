@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import {
     FiActivity, FiBarChart2, FiBookOpen, FiCheckSquare,
     FiClock, FiCode, FiFileText, FiGrid, FiLink, FiMonitor,
-    FiRadio, FiSearch, FiSend, FiSettings, FiShield, FiUsers, FiX
+    FiCpu, FiRadio, FiSearch, FiSend, FiSettings, FiShield, FiUsers, FiX
 } from 'react-icons/fi';
 import './CommandPalette.css';
 
@@ -25,6 +25,7 @@ const CommandPalette = ({ isAuthenticated }) => {
         { label: 'Incidents', hint: 'Manage operational incidents', path: '/workspace/monitoring/incidents', icon: FiActivity },
         { label: 'Performance Testing', hint: 'Measure APIs under load', path: '/workspace/performance-tests', icon: FiBarChart2 },
         { label: 'Consumer Contracts', hint: 'Run contract tests', path: '/workspace/consumer-contracts', icon: FiCheckSquare },
+        { label: 'AI Test Generator', hint: 'Generate reviewable tests from specs and traffic', path: '/workspace/test-generator', icon: FiCpu },
         { label: 'AsyncAPI', hint: 'Design event-driven APIs', path: '/workspace/asyncapi', icon: FiRadio },
         { label: 'Trace to Test', hint: 'Generate tests from traces', path: '/workspace/trace-to-test', icon: FiActivity },
         { label: 'Documentation', hint: 'Read Pigeon feature guides', path: '/documentation', icon: FiBookOpen },

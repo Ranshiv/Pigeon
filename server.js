@@ -18,6 +18,7 @@ const { mountSecurityMiddleware, globalErrorHandler } = require('./middleware/se
 const { metricsHandler } = require('./middleware/metrics');
 const { metricsAuth } = require('./middleware/metricsAuth');
 const { requestContext } = require('./middleware/requestContext');
+const { createOriginChecker } = require('./config/cors');
 const { initializeConnections, client: nativeMongoClient } = require('./config/db');
 const { validateProductionConfig } = require('./config/runtime');
 const User = require('./models/User');
@@ -49,10 +50,16 @@ if (process.env.TRUST_PROXY === 'true') app.set('trust proxy', 1);
 // --- MIDDLEWARE (Correct Order) ---
 const allowedOrigins = (process.env.CORS_ORIGIN || process.env.FRONTEND_URL || 'http://localhost:3000')
     .split(',').map((origin) => origin.trim()).filter(Boolean);
+const isOriginAllowed = createOriginChecker({
+    configuredOrigins: allowedOrigins,
+    nodeEnv: process.env.NODE_ENV,
+    frontendUrl: process.env.FRONTEND_URL,
+    apiPort: port
+});
 app.use(requestContext);
 app.use(cors({
     origin: (origin, callback) => {
-        if (!origin || allowedOrigins.includes(origin)) return callback(null, true);
+        if (isOriginAllowed(origin)) return callback(null, true);
         return callback(new Error('Origin is not allowed by CORS'));
     },
     credentials: true

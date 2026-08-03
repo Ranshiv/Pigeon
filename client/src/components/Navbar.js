@@ -469,6 +469,9 @@ const Navbar = ({ isAuthenticated }) => {
                                             <div className={`dropdown-item${location.pathname === '/workspace/consumer-contracts' ? ' active' : ''}`} onClick={(event) => handleApiNavigation(event, '/workspace/consumer-contracts')}>
                                                 <FiFileText size={16} style={{ marginRight: '10px' }} /> Consumer Contracts
                                             </div>
+                                            <div className={`dropdown-item${location.pathname === '/workspace/test-generator' ? ' active' : ''}`} onClick={(event) => handleApiNavigation(event, '/workspace/test-generator')}>
+                                                <FiCpu size={16} style={{ marginRight: '10px' }} /> AI Test Generator
+                                            </div>
                                             <div className={`dropdown-item${location.pathname === '/workspace/trace-to-test' ? ' active' : ''}`} onClick={(event) => handleApiNavigation(event, '/workspace/trace-to-test')}>
                                                 <FiActivity size={16} style={{ marginRight: '10px' }} /> Trace to Test
                                             </div>

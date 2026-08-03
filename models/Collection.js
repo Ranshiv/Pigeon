@@ -11,6 +11,11 @@ const variableSchema = new mongoose.Schema({
 });
 
 const requestSchema = new mongoose.Schema({
+    // Copilot-created and legacy requests use stable `req-*` identifiers while
+    // imported and newly embedded requests may use ObjectIds. Keep both forms
+    // so loading a collection through Mongoose does not invalidate existing
+    // request references when the collection is saved.
+    _id: { type: mongoose.Schema.Types.Mixed, default: () => new mongoose.Types.ObjectId() },
     name: { type: String, required: true },
     description: { type: String, default: '' },
     url: { type: String, required: true },
@@ -209,14 +214,16 @@ collectionSchema.virtual('collaboratorsCount').get(function () {
 
 // Method to check if user has access to collection
 collectionSchema.methods.hasAccess = function (userId, requiredRole = 'viewer') {
+    const requestedUserId = userId == null ? '' : String(userId);
+
     // Owner always has access
-    if (this.userId.toString() === userId || this.owner.toString() === userId) {
+    if (requestedUserId && [this.userId, this.owner].some((id) => id != null && String(id) === requestedUserId)) {
         return true;
     }
 
     // Check collaborators
-    const collaborator = this.collaborators.find(
-        collab => collab.userId.toString() === userId
+    const collaborator = (this.collaborators || []).find(
+        collab => collab?.userId != null && String(collab.userId) === requestedUserId
     );
 
     if (!collaborator) {

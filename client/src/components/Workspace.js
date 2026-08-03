@@ -23,6 +23,7 @@ import GovernanceSection from './governance/GovernanceSection';
 import ConsumerContractsSection from './consumerContracts/ConsumerContractsSection';
 import TraceToTestSection from './traceToTest/TraceToTestSection';
 import AsyncApiSection from './asyncapi/AsyncApiSection';
+import TestGeneratorSection from './testGenerator/TestGeneratorSection';
 import './Workspace.css';
 import SettingsPage from './SettingsPage';
 import HistoryDetailsSection from './HistoryDetailsSection';
@@ -80,6 +81,7 @@ const Workspace = () => {
                 <Route path="governance" element={<GovernanceSection />} />
                 <Route path="consumer-contracts" element={<ConsumerContractsSection />} />
                 <Route path="trace-to-test" element={<TraceToTestSection />} />
+                <Route path="test-generator" element={<TestGeneratorSection />} />
                 <Route path="asyncapi" element={<AsyncApiSection />} />
                 <Route path="settings" element={<Navigate to="/workspace/settings/profile" replace />} />
                 <Route path="settings/:section/*" element={<SettingsPage />} />

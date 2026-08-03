@@ -71,7 +71,12 @@ function buildGraphQlCases(schemaSDL, query, variables = {}) {
     for (const definition of operation.variableDefinitions || []) {
         const name = definition.variable.name.value; const type = typeFromAST(schema, definition.type); const baseType = getNamedType(type);
         if (isNonNullType(type)) { const next = clone(baseline); delete next[name]; cases.push(caseOf('required', `Missing $${name}`, 'Removed required variable', { variables: next })); }
-        const wrong = clone(baseline); wrong[name] = baseType.name === 'String' ? 42 : 'pigeon-invalid'; cases.push(caseOf('type', `Wrong type $${name}`, 'Invalid variable type', { variables: wrong }));
+        // A built-in scalar can be present in the operation without otherwise
+        // appearing in the SDL, in which case typeFromAST returns undefined.
+        // The mutation is still useful; fall back to the AST type name instead
+        // of failing the entire preview.
+        const astNamedType = (() => { let node = definition.type; while (node?.type) node = node.type; return node?.name?.value || ''; })();
+        const wrong = clone(baseline); wrong[name] = (baseType?.name || astNamedType) === 'String' ? 42 : 'pigeon-invalid'; cases.push(caseOf('type', `Wrong type $${name}`, 'Invalid variable type', { variables: wrong }));
         if (isInputObjectType(baseType)) for (const [fieldName, field] of Object.entries(baseType.getFields())) if (isNonNullType(field.type) && baseline[name] && typeof baseline[name] === 'object') { const next = clone(baseline); delete next[name][fieldName]; cases.push(caseOf('required', `Missing $${name}.${fieldName}`, 'Removed required input field', { variables: next })); }
         if (isListType(type) || isListType(type?.ofType)) { const next = clone(baseline); next[name] = 'not-an-array'; cases.push(caseOf('type', `Wrong list $${name}`, 'Array replaced with scalar', { variables: next })); }
     }

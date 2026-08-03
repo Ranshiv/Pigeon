@@ -237,6 +237,7 @@ async function runRequest(request, options = {}) {
     environmentId
   } = options;
   const startTime = Date.now();
+  let requestContextId;
 
   try {
     // Clone environment to avoid mutations
@@ -244,7 +245,6 @@ async function runRequest(request, options = {}) {
     const requestObj = { ...request };
 
     // If we have a context ID, create request-specific variables context
-    let requestContextId;
     if (contextId) {
       requestContextId = `${contextId}-req-${Date.now()}`;
 
@@ -332,7 +332,11 @@ async function runRequest(request, options = {}) {
       url: requestObj.url,
       method: requestObj.method || 'GET',
       timeout,
-      headers: {}
+      headers: {},
+      // API tests must inspect negative responses (4xx/5xx) instead of
+      // treating them as transport failures. Assertions determine whether the
+      // returned status is correct for the case.
+      validateStatus: () => true
     };
 
     // Add headers
