@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { FiArrowUp, FiCheck, FiChevronDown, FiClock, FiLoader, FiMessageSquare, FiPaperclip, FiPlus, FiSearch, FiTrash2, FiX } from 'react-icons/fi';
+import { FiArrowUp, FiCheck, FiChevronDown, FiClock, FiLoader, FiMessageSquare, FiPlus, FiSearch, FiTrash2, FiX } from 'react-icons/fi';
 import { Sparkles } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -32,6 +32,13 @@ const actionOutput = (action) => {
 
 const sourceIdentity = (source) => `${source?.type || ''}:${source?.id || ''}:${source?.parentId || source?.kind || ''}`;
 const sourceTypeLabel = (type) => ({ workspace: 'Workspace', collection: 'Collection', request: 'Request', history: 'History', governance: 'Governance', trace: 'Trace', test_run: 'Test run', incident: 'Incident' }[type] || type);
+const MIN_COPILOT_HEIGHT = 420;
+const MIN_CONTEXT_PANE_HEIGHT = 112;
+const DEFAULT_CONTEXT_PANE_HEIGHT = 210;
+
+const getMaxCopilotHeight = () => Math.max(MIN_COPILOT_HEIGHT, window.innerHeight);
+
+const clampCopilotHeight = (height) => Math.max(MIN_COPILOT_HEIGHT, Math.min(getMaxCopilotHeight(), height));
 
 const EvidenceList = ({ findings = [] }) => {
     if (!findings.length) return null;
@@ -65,8 +72,13 @@ const CopilotPanel = () => {
     const [approvingActionId, setApprovingActionId] = useState('');
     const [typed, setTyped] = useState({});
     const [panelWidth, setPanelWidth] = useState(520);
+    const [panelHeight, setPanelHeight] = useState(null);
+    const [contextPaneHeight, setContextPaneHeight] = useState(DEFAULT_CONTEXT_PANE_HEIGHT);
     const closeTimerRef = useRef(null);
     const resizeRef = useRef(null);
+    const heightResizeRef = useRef(null);
+    const contextResizeRef = useRef(null);
+    const panelRef = useRef(null);
     const openNonceRef = useRef(0);
     const draftsRef = useRef({});
     const draftKey = `${workspaceKey}:${conversation?.id || 'new'}`;
@@ -174,6 +186,92 @@ const CopilotPanel = () => {
         document.addEventListener('pointerup', onEnd);
     }, [panelWidth]);
 
+    const startHeightResize = useCallback((event) => {
+        if (window.innerWidth < 900) return;
+        event.preventDefault();
+        heightResizeRef.current = {
+            startY: event.clientY,
+            startHeight: panelRef.current?.getBoundingClientRect().height || window.innerHeight
+        };
+        const onMove = (moveEvent) => {
+            const resize = heightResizeRef.current;
+            if (!resize) return;
+            // The panel is anchored to the bottom, so moving the top edge up
+            // increases its height and moving it down decreases it.
+            setPanelHeight(clampCopilotHeight(resize.startHeight + resize.startY - moveEvent.clientY));
+        };
+        const onEnd = () => {
+            heightResizeRef.current = null;
+            document.removeEventListener('pointermove', onMove);
+            document.removeEventListener('pointerup', onEnd);
+        };
+        document.addEventListener('pointermove', onMove);
+        document.addEventListener('pointerup', onEnd);
+    }, []);
+
+    const handleHeightResizeKeyDown = useCallback((event) => {
+        const increments = event.shiftKey ? 100 : 40;
+        let delta = 0;
+        if (event.key === 'ArrowUp') delta = increments;
+        if (event.key === 'ArrowDown') delta = -increments;
+        if (event.key === 'Home') {
+            event.preventDefault();
+            setPanelHeight(MIN_COPILOT_HEIGHT);
+            return;
+        }
+        if (event.key === 'End') {
+            event.preventDefault();
+            setPanelHeight(getMaxCopilotHeight());
+            return;
+        }
+        if (!delta) return;
+        event.preventDefault();
+        const currentHeight = panelHeight || panelRef.current?.getBoundingClientRect().height || window.innerHeight;
+        setPanelHeight(clampCopilotHeight(currentHeight + delta));
+    }, [panelHeight]);
+
+    const getMaxContextPaneHeight = useCallback(() => {
+        const panelHeightValue = panelRef.current?.getBoundingClientRect().height || window.innerHeight;
+        return Math.max(MIN_CONTEXT_PANE_HEIGHT, Math.min(360, panelHeightValue - 330));
+    }, []);
+
+    const clampContextPaneHeight = useCallback((height) => Math.max(MIN_CONTEXT_PANE_HEIGHT, Math.min(getMaxContextPaneHeight(), height)), [getMaxContextPaneHeight]);
+
+    const startContextResize = useCallback((event) => {
+        if (window.innerWidth < 900) return;
+        event.preventDefault();
+        contextResizeRef.current = { startY: event.clientY, startHeight: contextPaneHeight };
+        const onMove = (moveEvent) => {
+            const resize = contextResizeRef.current;
+            if (!resize) return;
+            setContextPaneHeight(clampContextPaneHeight(resize.startHeight + moveEvent.clientY - resize.startY));
+        };
+        const onEnd = () => {
+            contextResizeRef.current = null;
+            document.removeEventListener('pointermove', onMove);
+            document.removeEventListener('pointerup', onEnd);
+        };
+        document.addEventListener('pointermove', onMove);
+        document.addEventListener('pointerup', onEnd);
+    }, [clampContextPaneHeight, contextPaneHeight]);
+
+    const handleContextResizeKeyDown = useCallback((event) => {
+        const increment = event.shiftKey ? 80 : 32;
+        if (event.key === 'Home') {
+            event.preventDefault();
+            setContextPaneHeight(MIN_CONTEXT_PANE_HEIGHT);
+            return;
+        }
+        if (event.key === 'End') {
+            event.preventDefault();
+            setContextPaneHeight(getMaxContextPaneHeight());
+            return;
+        }
+        if (event.key !== 'ArrowUp' && event.key !== 'ArrowDown') return;
+        event.preventDefault();
+        setContextPaneHeight((current) => clampContextPaneHeight(current + (event.key === 'ArrowDown' ? increment : -increment)));
+    }, [clampContextPaneHeight, getMaxContextPaneHeight]);
+
     const send = async (event) => {
         event.preventDefault();
         const message = prompt.trim();
@@ -239,8 +337,9 @@ const CopilotPanel = () => {
 
     return <>
         <button type="button" className="copilot-launcher" onClick={openPanel} aria-label="Open Pigeon Copilot"><Sparkles /> <span>Copilot</span>{activeContext ? <i aria-hidden="true" /> : null}</button>
-        {open ? <aside className={`copilot-panel copilot-sidecar ${isClosing ? 'is-closing' : ''} ${loading ? 'is-searching' : ''}`} style={{ '--copilot-width': `${panelWidth}px` }} aria-label="Pigeon Copilot">
+        {open ? <aside ref={panelRef} className={`copilot-panel copilot-sidecar ${isClosing ? 'is-closing' : ''} ${loading ? 'is-searching' : ''}`} style={{ '--copilot-width': `${panelWidth}px`, ...(panelHeight ? { '--copilot-height': `${panelHeight}px` } : {}) }} aria-label="Pigeon Copilot">
             <div className="copilot-width-resizer" role="separator" aria-orientation="vertical" aria-label="Resize Copilot" onPointerDown={startResize} />
+            <div className="copilot-height-resizer" role="separator" aria-orientation="horizontal" aria-label="Resize Copilot height" aria-valuemin={MIN_COPILOT_HEIGHT} aria-valuemax={typeof window === 'undefined' ? undefined : getMaxCopilotHeight()} aria-valuenow={Math.round(panelHeight || getMaxCopilotHeight())} tabIndex="0" onPointerDown={startHeightResize} onKeyDown={handleHeightResizeKeyDown} />
             <header className="copilot-header">
                 <div className="copilot-header-title"><span className="copilot-header-icon"><Sparkles /></span><div><strong>Pigeon Copilot</strong><small>{workspaceId ? 'Workspace evidence thread' : 'Personal overview thread'}</small></div></div>
                 <div className="copilot-header-actions">{conversation ? <button type="button" onClick={deleteConversation} aria-label="Delete conversation"><FiTrash2 /></button> : null}<button type="button" onClick={closePanel} aria-label="Close Copilot"><FiX /></button></div>
@@ -258,15 +357,19 @@ const CopilotPanel = () => {
                     {hydratedPins.slice(0, 3).map((source) => <button type="button" className="copilot-context-chip is-pinned" key={sourceIdentity(source)} onClick={() => togglePin(source)} title="Remove pinned source"><span>Pinned</span><strong>{source.label || sourceTypeLabel(source.type)}</strong><small>{sourceTypeLabel(source.type)}</small></button>)}
                     {pinnedSources.length > 3 ? <span className="copilot-context-more">+{pinnedSources.length - 3}</span> : null}
                 </div>
-                {contextExpanded ? <div className="copilot-source-picker">
+                {contextExpanded ? <div className="copilot-source-picker" style={{ '--copilot-context-pane-height': `${contextPaneHeight}px` }}>
                     <label className="copilot-source-search"><FiSearch /><input value={sourceQuery} onChange={(event) => setSourceQuery(event.target.value)} placeholder="Search requests, traces, incidents…" /></label>
                     <div className="copilot-source-results">
-                        {loadingShell ? <span className="copilot-source-empty"><FiLoader className="spin" /> Loading available evidence…</span> : filteredSources.map((source) => <button type="button" key={sourceIdentity(source)} className={`copilot-source-result ${pinnedKeys.has(sourceIdentity(source)) ? 'is-selected' : ''}`} onClick={() => togglePin(source)}>
-                            <span>{sourceTypeLabel(source.type)}</span><strong>{source.label}</strong><small>{source.detail}</small><FiPaperclip />
-                        </button>)}
+                        {loadingShell ? <span className="copilot-source-empty"><FiLoader className="spin" /> Loading available evidence…</span> : filteredSources.map((source) => {
+                            const isPinned = pinnedKeys.has(sourceIdentity(source));
+                            return <button type="button" key={sourceIdentity(source)} aria-pressed={isPinned} className={`copilot-source-result ${isPinned ? 'is-selected' : ''}`} onClick={() => togglePin(source)}>
+                                <span>{sourceTypeLabel(source.type)}</span><strong>{source.label}</strong><small>{source.detail}</small>{isPinned ? <FiCheck aria-hidden="true" /> : <FiPlus aria-hidden="true" />}
+                            </button>;
+                        })}
                         {!loadingShell && !filteredSources.length ? <span className="copilot-source-empty">No matching evidence sources.</span> : null}
                     </div>
-                    {pinnedSources.length ? <button type="button" className="copilot-clear-pins" onClick={clearPins}>Clear workspace pins</button> : null}
+                    {pinnedSources.length ? <div className="copilot-pins-footer"><span>{pinnedSources.length} workspace pin{pinnedSources.length === 1 ? '' : 's'}</span><button type="button" className="copilot-clear-pins" onClick={clearPins}><FiTrash2 aria-hidden="true" /> Clear pins</button></div> : null}
+                    <div className="copilot-context-resizer" role="separator" aria-orientation="horizontal" aria-label="Resize evidence picker" aria-valuemin={MIN_CONTEXT_PANE_HEIGHT} aria-valuemax={getMaxContextPaneHeight()} aria-valuenow={Math.round(contextPaneHeight)} tabIndex="0" onPointerDown={startContextResize} onKeyDown={handleContextResizeKeyDown} />
                 </div> : null}
             </section>
 

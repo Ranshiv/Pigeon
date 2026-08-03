@@ -84,7 +84,10 @@ export const CopilotContextProvider = ({ children }) => {
     const togglePin = useCallback((source) => {
         const compact = compactSource(source);
         if (!compact?.id || !compact?.type) return;
-        const key = compact.workspaceId || workspaceKey;
+        // Pins belong to the currently open Copilot thread. On the overview
+        // thread, sources can come from many workspaces, so keying by the
+        // source workspace would update a bucket the panel is not reading.
+        const key = workspaceKey;
         setPinsByWorkspace((current) => {
             const existing = current[key] || [];
             const identity = sourceKey(compact);

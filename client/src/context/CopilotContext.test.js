@@ -45,6 +45,20 @@ test('keeps active context and pins scoped to the current workspace', async () =
     expect(screen.getByTestId('pins')).toHaveTextContent('');
 });
 
+test('shows a workspace source pinned from the overview thread', () => {
+    const OverviewSourceProbe = () => {
+        const value = useCopilotContext();
+        return <>
+            <span data-testid="overview-pins">{value.pinnedSources.map((source) => source.label).join(',')}</span>
+            <button type="button" onClick={() => value.togglePin({ type: 'workspace', id: 'workspace-1', workspaceId: 'workspace-1', label: 'Platform' })}>pin workspace</button>
+        </>;
+    };
+
+    render(<Providers><OverviewSourceProbe /></Providers>);
+    fireEvent.click(screen.getByText('pin workspace'));
+    expect(screen.getByTestId('overview-pins')).toHaveTextContent('Platform');
+});
+
 test('bridges the existing collection Ask Copilot event through one shared listener', async () => {
     render(<Providers><Probe /></Providers>);
     fireEvent(window, new CustomEvent('pigeon:copilot-context', { detail: { collectionId: 'collection-2', workspaceId: 'workspace-2', label: 'Orders' } }));
@@ -56,4 +70,3 @@ test('names the current page from the route so tabs and id segments never read a
     render(<Providers route="/workspace/collections/6a8485a4b76e9a60c8d88f88?tab=sampleData"><Probe /></Providers>);
     expect(screen.getByTestId('page')).toHaveTextContent('Collections · Sample Data');
 });
-
