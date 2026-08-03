@@ -12,6 +12,7 @@ import {
     FiBarChart, FiUsers, FiEye, FiEyeOff,
     FiAlertTriangle, FiSend, FiHash
 } from 'react-icons/fi';
+import { Sparkles } from 'lucide-react';
 
 const IntegrationsManagement = () => {
     const navigate = useNavigate();
@@ -600,6 +601,9 @@ const IntegrationsManagement = () => {
 
             {/* Navigation Tabs */}
             <div className="im-nav">
+                <button className="im-nav-btn" onClick={() => navigate('/workspace/monitoring/copilot')}>
+                    <Sparkles /> Operations Copilot
+                </button>
                 <button className="im-nav-btn" onClick={() => navigate('/workspace/monitoring')}>
                     <FiActivity /> Dashboard
                 </button>

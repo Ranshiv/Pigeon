@@ -7,6 +7,7 @@ import {
     FiSettings, FiActivity, FiUsers, FiTool, FiCheckCircle, FiEye, FiBell,
     FiSave, FiX, FiAlertTriangle
 } from 'react-icons/fi';
+import { Sparkles } from 'lucide-react';
 import './ReportsManagement.css';
 import AppSelect from './common/AppSelect/AppSelect';
 import PageLoader from './common/PageLoader/PageLoader';
@@ -257,6 +258,9 @@ const ReportsManagement = () => {
 
             {/* Navigation Tabs */}
             <div className="rpt-nav">
+                <button className="rpt-nav-btn" onClick={() => navigate('/workspace/monitoring/copilot')}>
+                    <Sparkles /> Operations Copilot
+                </button>
                 <button className="rpt-nav-btn" onClick={() => navigate('/workspace/monitoring')}>
                     <FiActivity /> Dashboard
                 </button>

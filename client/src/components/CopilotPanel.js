@@ -6,6 +6,8 @@ import remarkGfm from 'remark-gfm';
 import { getApiBaseUrl } from '../utils/apiBaseUrl';
 import { useCopilotContext } from '../context/CopilotContext';
 import AppSelect from './common/AppSelect/AppSelect';
+import OperationsInvestigation from './operationsCopilot/OperationsInvestigation';
+import { formatOperationsFollowUp } from './operationsCopilot/operationsFollowUpFormatter';
 import './CopilotPanel.css';
 
 const api = async (path, options = {}) => {
@@ -31,7 +33,20 @@ const actionOutput = (action) => {
 };
 
 const sourceIdentity = (source) => `${source?.type || ''}:${source?.id || ''}:${source?.parentId || source?.kind || ''}`;
-const sourceTypeLabel = (type) => ({ workspace: 'Workspace', collection: 'Collection', request: 'Request', history: 'History', governance: 'Governance', trace: 'Trace', test_run: 'Test run', incident: 'Incident' }[type] || type);
+const sourceTypeLabel = (type) => ({ workspace: 'Workspace', collection: 'Collection', request: 'Request', history: 'History', governance: 'Governance', trace: 'Trace', test_run: 'Test run', incident: 'Incident', alert: 'Alert', monitor: 'Monitor', analytics: 'Analytics' }[type] || type);
+const isRemediationMessage = (message) => message?.role === 'assistant' && /investigation and remediation sequence|strongest supported hypothesis/i.test(message?.content || '');
+const readableEmphasis = (value) => {
+    if (typeof value !== 'string' || value !== value.toUpperCase() || !/[A-Z]/.test(value)) return value;
+    return `${value.charAt(0)}${value.slice(1).toLowerCase()}`
+        .replace(/\bapi\b/g, 'API')
+        .replace(/\bdns\b/g, 'DNS')
+        .replace(/\bhttp\b/g, 'HTTP')
+        .replace(/\botel\b/g, 'OTel')
+        .replace(/\btls\b/g, 'TLS');
+};
+const remediationMarkdownComponents = {
+    strong: ({ children }) => <strong>{React.Children.map(children, readableEmphasis)}</strong>
+};
 const MIN_COPILOT_HEIGHT = 420;
 const MIN_CONTEXT_PANE_HEIGHT = 112;
 const DEFAULT_CONTEXT_PANE_HEIGHT = 210;
@@ -54,7 +69,7 @@ const EvidenceList = ({ findings = [] }) => {
 };
 
 const CopilotPanel = () => {
-    const { activeContext, activePage, workspaceId, workspaceKey, pinnedSources, openNonce, togglePin, clearPins } = useCopilotContext();
+    const { activeContext, activePage, workspaceId, workspaceKey, pinnedSources, openNonce, investigationRequest, clearInvestigationRequest, setIncidentUpdateDraft, togglePin, clearPins } = useCopilotContext();
     const [open, setOpen] = useState(false);
     const [isClosing, setIsClosing] = useState(false);
     const [profiles, setProfiles] = useState([]);
@@ -67,9 +82,11 @@ const CopilotPanel = () => {
     const [prompt, setPrompt] = useState('');
     const [loading, setLoading] = useState(false);
     const [loadingShell, setLoadingShell] = useState(false);
+    const [loadedShellKey, setLoadedShellKey] = useState('');
     const [error, setError] = useState('');
     const [actions, setActions] = useState([]);
     const [approvingActionId, setApprovingActionId] = useState('');
+    const [generatingInvestigation, setGeneratingInvestigation] = useState(false);
     const [typed, setTyped] = useState({});
     const [panelWidth, setPanelWidth] = useState(520);
     const [panelHeight, setPanelHeight] = useState(null);
@@ -80,8 +97,10 @@ const CopilotPanel = () => {
     const contextResizeRef = useRef(null);
     const panelRef = useRef(null);
     const openNonceRef = useRef(0);
+    const investigationNonceRef = useRef(null);
     const draftsRef = useRef({});
     const draftKey = `${workspaceKey}:${conversation?.id || 'new'}`;
+    const retainedOperationsInvestigation = useMemo(() => [...(conversation?.messages || [])].reverse().find((message) => message.artifact?.type === 'operations_investigation')?.artifact?.data || null, [conversation]);
 
     useEffect(() => {
         if (openNonce > openNonceRef.current) {
@@ -106,6 +125,7 @@ const CopilotPanel = () => {
         const workspaceQuery = workspaceId ? `?workspaceId=${encodeURIComponent(workspaceId)}` : '';
         const conversationQuery = `?workspaceId=${workspaceId ? encodeURIComponent(workspaceId) : 'overview'}`;
         setLoadingShell(true);
+        setLoadedShellKey('');
         setError('');
         Promise.all([
             api('/api/copilot/profiles', { signal: controller.signal }),
@@ -117,7 +137,7 @@ const CopilotPanel = () => {
             const nextConversations = conversationData.conversations || [];
             const nextConversation = nextConversations[0] || null;
             setProfiles(nextProfiles);
-            setProfileId((current) => nextConversation?.profileId && nextProfiles.some((profile) => profile.id === nextConversation.profileId)
+            setProfileId((current) => nextConversation?.profileId === 'deterministic' ? '' : nextConversation?.profileId && nextProfiles.some((profile) => profile.id === nextConversation.profileId)
                 ? nextConversation.profileId
                 : current && nextProfiles.some((profile) => profile.id === current) ? current : nextProfiles[0]?.id || '');
             setSources(contextData.sources || []);
@@ -125,9 +145,33 @@ const CopilotPanel = () => {
             setConversation(nextConversation);
         }).catch((loadError) => {
             if (mounted && loadError.name !== 'AbortError') setError(loadError.message);
-        }).finally(() => { if (mounted) setLoadingShell(false); });
+        }).finally(() => { if (mounted) { setLoadingShell(false); setLoadedShellKey(workspaceKey); } });
         return () => { mounted = false; controller.abort(); };
     }, [open, workspaceId, workspaceKey]);
+
+    useEffect(() => {
+        if (!open || !investigationRequest || investigationNonceRef.current === investigationRequest.nonce || loadingShell || loadedShellKey !== workspaceKey || generatingInvestigation) return;
+        investigationNonceRef.current = investigationRequest.nonce;
+        setGeneratingInvestigation(true);
+        setLoading(true);
+        setError('');
+        api('/api/copilot/operations/investigations', {
+            method: 'POST',
+            body: JSON.stringify({
+                ...(profileId ? { profileId } : {}),
+                target: { type: investigationRequest.target.type, id: investigationRequest.target.id },
+                ...(investigationRequest.target.type === 'monitor' ? { timeRange: investigationRequest.timeRange || '24h' } : {})
+            })
+        }).then((result) => {
+            setConversation(result.conversation);
+            setConversations((current) => [result.conversation, ...current.filter((item) => item.id !== result.conversation.id)]);
+            setActions([]);
+        }).catch((investigationError) => setError(investigationError.message)).finally(() => {
+            setGeneratingInvestigation(false);
+            setLoading(false);
+            clearInvestigationRequest();
+        });
+    }, [clearInvestigationRequest, generatingInvestigation, investigationRequest, loadedShellKey, loadingShell, open, profileId, workspaceKey]);
 
     useEffect(() => () => {
         if (closeTimerRef.current) window.clearTimeout(closeTimerRef.current);
@@ -283,8 +327,13 @@ const CopilotPanel = () => {
                 method: 'POST',
                 body: JSON.stringify({ conversationId: conversation?.id, profileId, prompt: message, activeContext, activePage, pinnedSources })
             });
+            const fallback = formatOperationsFollowUp(message, retainedOperationsInvestigation, conversation?.messages || []);
+            const nextConversation = fallback ? {
+                ...result.conversation,
+                messages: (result.conversation.messages || []).map((item, index, messages) => index === messages.length - 1 && item.role === 'assistant' ? { ...item, content: fallback } : item)
+            } : result.conversation;
             delete draftsRef.current[draftKey];
-            setConversation(result.conversation);
+            setConversation(nextConversation);
             setConversations((current) => [result.conversation, ...current.filter((item) => item.id !== result.conversation.id)]);
             setActions(result.actions || []);
             setPrompt('');
@@ -331,12 +380,19 @@ const CopilotPanel = () => {
     const selectConversation = (conversationId) => {
         const next = conversations.find((item) => item.id === conversationId) || null;
         setConversation(next);
-        if (next?.profileId) setProfileId(next.profileId);
+        if (next?.profileId) setProfileId(next.profileId === 'deterministic' ? '' : next.profileId);
         setActions([]);
     };
 
+    const insertIncidentDraft = (text, audience) => {
+        const artifact = [...(conversation?.messages || [])].reverse().find((message) => message.artifact?.type === 'operations_investigation')?.artifact?.data;
+        if (artifact?.target?.type !== 'incident') return;
+        setIncidentUpdateDraft({ incidentId: artifact.target.id, text, audience });
+        closePanel();
+    };
+
     return <>
-        <button type="button" className="copilot-launcher" onClick={openPanel} aria-label="Open Pigeon Copilot"><Sparkles /> <span>Copilot</span>{activeContext ? <i aria-hidden="true" /> : null}</button>
+        <button type="button" className="copilot-launcher" onClick={openPanel} aria-label="Open Pigeon Copilot"><Sparkles /> <span>Copilot</span></button>
         {open ? <aside ref={panelRef} className={`copilot-panel copilot-sidecar ${isClosing ? 'is-closing' : ''} ${loading ? 'is-searching' : ''}`} style={{ '--copilot-width': `${panelWidth}px`, ...(panelHeight ? { '--copilot-height': `${panelHeight}px` } : {}) }} aria-label="Pigeon Copilot">
             <div className="copilot-width-resizer" role="separator" aria-orientation="vertical" aria-label="Resize Copilot" onPointerDown={startResize} />
             <div className="copilot-height-resizer" role="separator" aria-orientation="horizontal" aria-label="Resize Copilot height" aria-valuemin={MIN_COPILOT_HEIGHT} aria-valuemax={typeof window === 'undefined' ? undefined : getMaxCopilotHeight()} aria-valuenow={Math.round(panelHeight || getMaxCopilotHeight())} tabIndex="0" onPointerDown={startHeightResize} onKeyDown={handleHeightResizeKeyDown} />
@@ -374,17 +430,19 @@ const CopilotPanel = () => {
             </section>
 
             <main className="copilot-messages" aria-live="polite">
-                {!conversation?.messages?.length ? <div className="copilot-empty"><FiMessageSquare /><p>Ask “What failed?”, “Why did this run regress?”, or “Where is this API used?” The answer will retain the exact redacted evidence snapshot it used.</p></div> : null}
-                {(conversation?.messages || []).map((message, index) => <article key={`${message.createdAt || index}-${index}`} className={`copilot-message ${message.role}`}>
+                {!conversation?.messages?.length ? <div className="copilot-empty"><FiMessageSquare /><p>{generatingInvestigation ? 'Correlating alerts, monitor checks, analytics, and traces…' : 'Ask “What failed?”, “Why did this run regress?”, or “Where is this API used?” The answer will retain the exact redacted evidence snapshot it used.'}</p></div> : null}
+                {(conversation?.messages || []).map((message, index) => <article key={`${message.createdAt || index}-${index}`} className={`copilot-message ${message.role} ${message.artifact?.type === 'operations_investigation' ? 'has-operations-artifact' : ''} ${isRemediationMessage(message) ? 'is-remediation' : ''}`}>
                     <span>{message.role === 'user' ? 'You' : 'Copilot'}</span>
-                    <div className="copilot-message-content"><ReactMarkdown remarkPlugins={[remarkGfm]}>{message.content}</ReactMarkdown></div>
-                    {message.citations?.length ? <div className="copilot-citations">{message.citations.map((citation) => citation.deepLink ? <a key={`${citation.type}:${citation.id}`} href={citation.deepLink}>{citation.label || citation.id}</a> : <small key={`${citation.type}:${citation.id}`}>{citation.label || citation.id}</small>)}</div> : null}
-                    {message.role === 'assistant' ? <EvidenceList findings={message.findings || []} /> : null}
+                    {message.artifact?.type === 'operations_investigation' ? <OperationsInvestigation compact investigation={message.artifact.data} onInsertDraft={insertIncidentDraft} /> : <>
+                        <div className="copilot-message-content"><ReactMarkdown remarkPlugins={[remarkGfm]} components={isRemediationMessage(message) ? remediationMarkdownComponents : undefined}>{message.content}</ReactMarkdown></div>
+                        {message.citations?.length ? <div className="copilot-citations">{message.citations.map((citation) => citation.deepLink ? <a key={`${citation.type}:${citation.id}`} href={citation.deepLink}>{citation.label || citation.id}</a> : <small key={`${citation.type}:${citation.id}`}>{citation.label || citation.id}</small>)}</div> : null}
+                        {message.role === 'assistant' ? <EvidenceList findings={message.findings || []} /> : null}
+                    </>}
                 </article>)}
                 {actions.map((action) => <section className="copilot-action" key={action.id}><strong>Proposed action</strong><p>{action.preview}</p><code>{action.kind}</code>{action.typedConfirmationLabel ? <label>Type <b>{action.typedConfirmationLabel}</b> to delete<input value={typed[action.id] || ''} aria-invalid={Boolean(typed[action.id]) && typed[action.id] !== action.typedConfirmationLabel} onChange={(event) => setTyped((current) => ({ ...current, [action.id]: event.target.value }))} /></label> : null}{action.status ? <><small className={`copilot-action-${action.status}`}>{action.error || action.result?.result?.message || action.result?.message || action.status}</small>{actionOutput(action) ? <pre className="copilot-action-output">{actionOutput(action)}</pre> : null}</> : <div>{action.error ? <small className="copilot-action-pending-error">{action.error}</small> : null}<button type="button" onClick={() => approve(action)} disabled={approvingActionId === action.id || (action.typedConfirmationLabel && typed[action.id] !== action.typedConfirmationLabel)}>{approvingActionId === action.id ? <FiLoader className="spin" /> : <FiCheck />} {approvingActionId === action.id ? 'Applying…' : 'Confirm action'}</button><button type="button" className="quiet" onClick={() => reject(action)} disabled={approvingActionId === action.id}>Dismiss</button></div>}</section>)}
             </main>
             {error ? <div className="copilot-error">{error}</div> : null}
-            <form className="copilot-composer" onSubmit={send}><textarea value={prompt} onChange={(event) => setPrompt(event.target.value)} placeholder={activeResolved ? `Ask about ${activeResolved.label || sourceTypeLabel(activeResolved.type)}…` : 'Ask Pigeon Copilot…'} rows="3" /><button type="submit" disabled={loading || !profileId || !prompt.trim()} aria-label="Send message">{loading ? <FiLoader className="spin" /> : <FiArrowUp />}</button></form>
+            <form className="copilot-composer" onSubmit={send}><textarea value={prompt} onChange={(event) => setPrompt(event.target.value)} placeholder={activeResolved ? `Ask about ${activeResolved.label || sourceTypeLabel(activeResolved.type)}…` : 'Ask Pigeon Copilot…'} rows="1" onInput={(event) => { event.target.style.height = 'auto'; event.target.style.height = `${Math.min(event.target.scrollHeight, 140)}px`; }} onKeyDown={(event) => { if (event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); send(event); } }} /><button type="submit" disabled={loading || !profileId || !prompt.trim()} aria-label="Send message">{loading ? <FiLoader className="spin" /> : <FiArrowUp />}</button></form>
             {profiles.length > 1 ? <div className="copilot-profile-note">Model profile: {profiles.find((profile) => profile.id === profileId)?.label || profileId}</div> : null}
         </aside> : null}
     </>;

@@ -27,7 +27,7 @@
     gap: 12px;
 }
 
-.header-icon {
+.variable-management-hub .header-icon {
     color: var(--primary-color, #014C75);
 }
 
@@ -153,13 +153,13 @@
     background: rgba(255, 255, 255, 0.02);
 }
 
-.stat-icon {
+.variable-management-hub .stat-icon {
     display: flex;
     align-items: center;
     justify-content: center;
     width: 48px;
     height: 48px;
-    background: rgba(59, 130, 246, 0.1);
+    background: color-mix(in srgb, var(--primary-color) 14%, transparent);
     border-radius: 12px;
     color: var(--primary-color, #014C75);
     font-size: 1.2rem;
@@ -218,7 +218,7 @@
         padding: 16px;
     }
 
-    .stat-icon {
+    .variable-management-hub .stat-icon {
         width: 40px;
         height: 40px;
     }

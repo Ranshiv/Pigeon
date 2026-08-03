@@ -112,6 +112,8 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
 
     // Resizable columns for the Params + Headers KV tables.
     const paramCols = useColumnResizer();
+    // Height of the inline response split pane (drag divider to resize).
+    const [responsePaneHeight, setResponsePaneHeight] = useState(360);
     const headerCols = useColumnResizer();
 
     // Response state - new state for storing response
@@ -858,7 +860,8 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
 
         // Use onSave prop if available
         if (onSave) {
-            await onSave(requestData);
+            const saved = await onSave(requestData);
+            if (saved !== false) setIsNew(false);
         }
         } finally {
             setIsSaving(false);
@@ -1119,7 +1122,9 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
                 });
 
                 // Update URL without triggering infinite loop
-                const newUrl = urlObj.toString();
+                const newUrl = urlObj.toString()
+                    .replace(/%7B/gi, '{')
+                    .replace(/%7D/gi, '}');
                 if (newUrl !== url) {
                     setUrl(newUrl);
                 }
@@ -3176,7 +3181,24 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
             {/* Only show this response section when there's data to display and
                 the parent isn't rendering its own split-pane response view. */}
             {!hideResponse && (responseData || isLoading || responseError) && (
-                <div className="response-section">
+                <>
+                    <div
+                        className="response-split-divider"
+                        role="separator"
+                        aria-orientation="horizontal"
+                        aria-label="Resize response pane"
+                        onMouseDown={(e) => {
+                            e.preventDefault();
+                            const startY = e.clientY;
+                            const startHeight = responsePaneHeight;
+                            const onMove = (moveEvent) => setResponsePaneHeight(Math.max(160, Math.min(window.innerHeight - 160, startHeight + startY - moveEvent.clientY)));
+                            const onUp = () => { window.removeEventListener('mousemove', onMove); window.removeEventListener('mouseup', onUp); document.body.classList.remove('workspace-resizing'); };
+                            document.body.classList.add('workspace-resizing');
+                            window.addEventListener('mousemove', onMove);
+                            window.addEventListener('mouseup', onUp);
+                        }}
+                    />
+                    <div className="response-section" style={{ height: responsePaneHeight, overflow: 'auto', flex: 'none' }}>
                     <h3>Response</h3>
 
                     {/* Loading indicator */}
@@ -3193,7 +3215,8 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
                             Error: {responseError}
                         </div>
                     )}
-                </div>
+                    </div>
+                </>
             )}
         </div>
     );

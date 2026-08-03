@@ -176,6 +176,8 @@
     white-space: nowrap;
 }
 
+.tm-nav-btn svg { width: 16px; height: 16px; flex-shrink: 0; }
+
 .tm-nav-btn:hover {
     background: var(--hover-bg);
     color: var(--text-color);

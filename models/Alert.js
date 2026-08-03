@@ -60,8 +60,7 @@ const alertSchema = new mongoose.Schema({
         ref: 'User'
     },
     snoozedUntil: {
-        type: Date,
-        index: true
+        type: Date
     },
     lastNotifiedAt: {
         type: Date

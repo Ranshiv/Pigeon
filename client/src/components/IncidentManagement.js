@@ -7,14 +7,20 @@ import {
     FiUsers, FiArrowUp, FiCheck, FiLink, FiCalendar, FiMessageCircle,
     FiBarChart, FiSettings, FiTool
 } from 'react-icons/fi';
+import { Sparkles } from 'lucide-react';
+import { useSearchParams } from 'react-router-dom';
 import './IncidentManagement.css';
 import PageLoader from './common/PageLoader/PageLoader';
 import AppSelect from './common/AppSelect/AppSelect';
 import TabBar from './common/TabBar/TabBar';
-import { useCopilotPageContext } from '../context/CopilotContext';
+import { useWorkspaceOptions } from './compliance/useWorkspaceOptions';
+import { useCopilotContext, useCopilotPageContext } from '../context/CopilotContext';
 
 const IncidentManagement = () => {
-    const requestedIncidentId = new URLSearchParams(window.location.search).get('incident');
+    const { requestInvestigation, incidentUpdateDraft, clearIncidentUpdateDraft } = useCopilotContext();
+    const { defaultWorkspaceId } = useWorkspaceOptions();
+    const [searchParams, setSearchParams] = useSearchParams();
+    const requestedIncidentId = searchParams.get('incident');
     const [incidents, setIncidents] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -93,22 +99,35 @@ const IncidentManagement = () => {
     };
 
     const createIncident = async (incidentData) => {
+        setError(null);
+
         try {
+            if (!defaultWorkspaceId) {
+                throw new Error('No accessible workspace is available for this incident.');
+            }
+
             const response = await fetch('/api/incidents', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
                 credentials: 'include',
-                body: JSON.stringify(incidentData)
+                body: JSON.stringify({
+                    ...incidentData,
+                    workspaceId: incidentData.workspaceId || defaultWorkspaceId
+                })
             });
 
-            if (response.ok) {
-                refetchIncidents();
-                setShowCreateForm(false);
+            const incident = await response.json().catch(() => ({}));
+            if (!response.ok) {
+                throw new Error(incident.message || 'Unable to create the incident. Please try again.');
             }
+
+            setIncidents((current) => [incident, ...current]);
+            setShowCreateForm(false);
         } catch (error) {
             console.error('Error creating incident:', error);
+            setError(error.message || 'Unable to create the incident. Please try again.');
         }
     };
 
@@ -133,6 +152,24 @@ const IncidentManagement = () => {
         } catch (error) {
             console.error('Error updating incident:', error);
         }
+    };
+
+    const addIncidentUpdate = async (incidentId, message, status) => {
+        const response = await fetch(`/api/incidents/${incidentId}/updates`, {
+            method: 'POST',
+            credentials: 'include',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message, status })
+        });
+        if (!response.ok) {
+            const data = await response.json().catch(() => ({}));
+            throw new Error(data.message || 'Unable to add the incident update.');
+        }
+        const updated = await response.json();
+        setIncidents((current) => current.map((incident) => incident._id === incidentId ? updated : incident));
+        setSelectedIncident(updated);
+        fetchIncidentTimeline(incidentId);
+        return updated;
     };
 
     const deleteIncident = async (incidentId) => {
@@ -166,8 +203,8 @@ const IncidentManagement = () => {
 
     const getStatusIcon = (status) => {
         switch (status) {
-            case 'investigating': return <FiAlertTriangle className="incident-list-status-icon investigating" />;
-            case 'identified': return <FiEye className="incident-list-status-icon identified" />;
+            case 'open': return <FiAlertTriangle className="incident-list-status-icon investigating" />;
+            case 'acknowledged': return <FiEye className="incident-list-status-icon identified" />;
             case 'monitoring': return <FiClock className="incident-list-status-icon monitoring" />;
             case 'resolved': return <FiCheckCircle className="incident-list-status-icon resolved" />;
             default: return <FiAlertCircle className="incident-list-status-icon unknown" />;
@@ -302,8 +339,8 @@ const IncidentManagement = () => {
     // Calculate stats
     const stats = {
         total: incidents.length,
-        investigating: incidents.filter(i => i.status === 'investigating').length,
-        identified: incidents.filter(i => i.status === 'identified').length,
+        open: incidents.filter(i => i.status === 'open').length,
+        acknowledged: incidents.filter(i => i.status === 'acknowledged').length,
         monitoring: incidents.filter(i => i.status === 'monitoring').length,
         resolved: incidents.filter(i => i.status === 'resolved').length
     };
@@ -314,6 +351,11 @@ const IncidentManagement = () => {
         setIncidentTimeline([]);
         setLinkedAlerts([]);
         setPostMortem(null);
+        if (searchParams.has('incident')) {
+            const next = new URLSearchParams(searchParams);
+            next.delete('incident');
+            setSearchParams(next, { replace: true });
+        }
     };
 
     if (loading) {
@@ -360,6 +402,12 @@ const IncidentManagement = () => {
 
             {/* Navigation Tabs */}
             <div className="monitoring-nav">
+                <button
+                    className="nav-btn"
+                    onClick={() => window.location.href = '/workspace/monitoring/copilot'}
+                >
+                    <Sparkles /> Operations Copilot
+                </button>
                 <button
                     className="nav-btn"
                     onClick={() => window.location.href = '/workspace/monitoring'}
@@ -419,7 +467,7 @@ const IncidentManagement = () => {
                         <FiAlertCircle />
                     </div>
                     <div className="stat-content">
-                        <div className="stat-value">{stats.investigating + stats.identified}</div>
+                        <div className="stat-value">{stats.open + stats.acknowledged}</div>
                         <div className="stat-label">Active</div>
                     </div>
                 </div>
@@ -447,8 +495,8 @@ const IncidentManagement = () => {
                 <div className="filters">
                     {[
                         { key: 'all', label: 'All', count: stats.total },
-                        { key: 'investigating', label: 'Investigating', count: stats.investigating },
-                        { key: 'identified', label: 'Identified', count: stats.identified },
+                        { key: 'open', label: 'Open', count: stats.open },
+                        { key: 'acknowledged', label: 'Acknowledged', count: stats.acknowledged },
                         { key: 'monitoring', label: 'Monitoring', count: stats.monitoring },
                         { key: 'resolved', label: 'Resolved', count: stats.resolved }
                     ].map(filterOption => (
@@ -569,11 +617,15 @@ const IncidentManagement = () => {
                             activeTab={activeTab}
                             onTabChange={setActiveTab}
                             onUpdate={updateIncident}
+                            onAddIncidentUpdate={addIncidentUpdate}
                             onClose={closeIncidentDetails}
                             onAcknowledge={handleAcknowledge}
                             onEscalate={handleEscalate}
                             onResolve={handleResolve}
                             actionLoading={actionLoading}
+                            incidentUpdateDraft={incidentUpdateDraft}
+                            onDraftConsumed={clearIncidentUpdateDraft}
+                            onInvestigate={() => requestInvestigation({ type: 'incident', id: selectedIncident._id, workspaceId: selectedIncident.workspaceId || '', label: selectedIncident.title })}
                         />
                     </div>
                 </div>
@@ -604,11 +656,15 @@ const EnhancedIncidentDetails = ({
     activeTab,
     onTabChange,
     onUpdate,
+    onAddIncidentUpdate,
     onClose,
     onAcknowledge,
     onEscalate,
     onResolve,
-    actionLoading
+    actionLoading,
+    incidentUpdateDraft,
+    onDraftConsumed,
+    onInvestigate
 }) => {
     const [newUpdate, setNewUpdate] = useState('');
     const [newStatus, setNewStatus] = useState(incident.status);
@@ -617,23 +673,19 @@ const EnhancedIncidentDetails = ({
     const [resolution, setResolution] = useState('');
     const [escalationLevel, setEscalationLevel] = useState(1);
 
+    useEffect(() => {
+        if (!incidentUpdateDraft || String(incidentUpdateDraft.incidentId) !== String(incident._id)) return;
+        setNewUpdate(incidentUpdateDraft.text || '');
+        onDraftConsumed();
+    }, [incident._id, incidentUpdateDraft, onDraftConsumed]);
+
     const addUpdate = async () => {
         if (!newUpdate.trim()) return;
 
-        const updateData = {
-            updates: [
-                ...incident.updates,
-                {
-                    message: newUpdate,
-                    status: newStatus,
-                    timestamp: new Date()
-                }
-            ],
-            status: newStatus
-        };
-
-        await onUpdate(incident._id, updateData);
-        setNewUpdate('');
+        try {
+            await onAddIncidentUpdate(incident._id, newUpdate, newStatus);
+            setNewUpdate('');
+        } catch (_) { /* Parent error handling remains non-destructive; keep the draft for retry. */ }
     };
 
     const handleResolveConfirm = () => {
@@ -662,6 +714,14 @@ const EnhancedIncidentDetails = ({
 
             {/* Workflow Action Buttons */}
             <div className="incident-report-actions">
+                <button
+                    type="button"
+                    className="incident-report-action copilot"
+                    onClick={onInvestigate}
+                    disabled={actionLoading}
+                >
+                    <Sparkles /> Investigate with Copilot
+                </button>
                 {incident.status !== 'acknowledged' && incident.status !== 'resolved' && (
                     <button
                         className="incident-report-action acknowledge"
@@ -886,10 +946,11 @@ const DetailsTab = ({ incident, newUpdate, newStatus, onUpdateChange, onStatusCh
                             onChange={onStatusChange}
                             className="incident-report-status-select"
                             options={[
-                                { value: 'investigating', label: 'Investigating' },
-                                { value: 'identified', label: 'Identified' },
+                                { value: 'open', label: 'Open' },
+                                { value: 'acknowledged', label: 'Acknowledged' },
                                 { value: 'monitoring', label: 'Monitoring' },
-                                { value: 'resolved', label: 'Resolved' }
+                                { value: 'resolved', label: 'Resolved' },
+                                { value: 'closed', label: 'Closed' }
                             ]}
                         />
                         <textarea
@@ -1154,8 +1215,8 @@ const IncidentForm = ({ incident, onSave, onClose }) => {
     const [formData, setFormData] = useState({
         title: incident?.title || '',
         description: incident?.description || '',
-        severity: incident?.severity || 'minor',
-        status: incident?.status || 'investigating',
+        severity: incident?.severity || 'medium',
+        status: incident?.status || 'open',
         affectedServices: incident?.affectedServices || [],
         isPublic: incident?.isPublic !== undefined ? incident.isPublic : true
     });
@@ -1239,9 +1300,11 @@ const IncidentForm = ({ incident, onSave, onClose }) => {
                                 value={formData.severity}
                                 onChange={(severity) => setFormData(prev => ({ ...prev, severity }))}
                                 options={[
-                                    { value: 'minor', label: 'Minor' },
-                                    { value: 'major', label: 'Major' },
-                                    { value: 'critical', label: 'Critical' }
+                                    { value: 'critical', label: 'Critical' },
+                                    { value: 'high', label: 'High' },
+                                    { value: 'medium', label: 'Medium' },
+                                    { value: 'low', label: 'Low' },
+                                    { value: 'info', label: 'Informational' }
                                 ]}
                             />
                         </div>
@@ -1254,10 +1317,12 @@ const IncidentForm = ({ incident, onSave, onClose }) => {
                                 value={formData.status}
                                 onChange={(status) => setFormData(prev => ({ ...prev, status }))}
                                 options={[
-                                    { value: 'investigating', label: 'Investigating' },
-                                    { value: 'identified', label: 'Identified' },
+                                    { value: 'open', label: 'Open' },
+                                    { value: 'acknowledged', label: 'Acknowledged' },
                                     { value: 'monitoring', label: 'Monitoring' },
-                                    { value: 'resolved', label: 'Resolved' }
+                                    { value: 'snoozed', label: 'Snoozed' },
+                                    { value: 'resolved', label: 'Resolved' },
+                                    { value: 'closed', label: 'Closed' }
                                 ]}
                             />
                         </div>

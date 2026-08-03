@@ -101,6 +101,7 @@ export const documentationSections = [
             ['Review monitoring history', 'Trace monitor runs and investigate previous failures.', '/workspace/monitoring'],
             ['Configure alerts and policies', 'Route important changes to the right people.', '/workspace/monitoring/alerts'],
             ['Manage incidents and maintenance', 'Coordinate incidents and planned maintenance windows.', '/workspace/monitoring/incidents'],
+            ['Investigate with Operations Copilot', 'Correlate live alerts, monitor checks, analytics, traces, and incidents.', '/workspace/monitoring/copilot'],
             ['Publish a status page', 'Share service health and status updates publicly.', '/workspace/monitoring']
         ]
     },

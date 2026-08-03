@@ -190,3 +190,6 @@ config/production.js
 
 # Local DB backups (contain secrets/PII — never commit)
 backups/
+
+# Local MCP credential (never commit)
+mcp-token.txt

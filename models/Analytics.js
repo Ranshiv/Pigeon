@@ -16,8 +16,7 @@ const analyticsSchema = new mongoose.Schema({
     },
     timestamp: {
         type: Date,
-        required: true,
-        index: true
+        required: true
     },
     aggregationPeriod: {
         type: String,

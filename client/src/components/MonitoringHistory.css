@@ -262,12 +262,16 @@
 }
 
 /* Status as a compact pill: colored dot + label. Scoped .history-table selector
-   overrides the leaked global `.status-icon { font-size: 48px }` from
-   EnhancedPublicStatusPage.css (CRA CSS is global). */
+   overrides leaked global `.status-icon` rules from other pages (CRA CSS is
+   global): the 48px font-size in EnhancedPublicStatusPage.css and the fixed
+   38px square in MonitoringDashboard.css, which turned this pill into a circle. */
 .history-table .status-cell .status-icon {
     display: inline-flex;
     align-items: center;
     gap: 7px;
+    width: auto;
+    height: auto;
+    flex: 0 1 auto;
     padding: 4px 11px 4px 9px;
     border-radius: 999px;
     font-size: 0.72rem;
@@ -288,22 +292,22 @@
     box-shadow: 0 0 0 3px color-mix(in srgb, currentColor 20%, transparent);
 }
 
-.status-icon.success {
+.history-table .status-cell .status-icon.success {
     color: var(--success-color);
     background: color-mix(in srgb, var(--success-color) 12%, transparent);
     border-color: color-mix(in srgb, var(--success-color) 28%, transparent);
 }
-.status-icon.failure {
+.history-table .status-cell .status-icon.failure {
     color: var(--danger-color);
     background: color-mix(in srgb, var(--danger-color) 12%, transparent);
     border-color: color-mix(in srgb, var(--danger-color) 28%, transparent);
 }
-.status-icon.timeout {
+.history-table .status-cell .status-icon.timeout {
     color: var(--warning-color);
     background: color-mix(in srgb, var(--warning-color) 14%, transparent);
     border-color: color-mix(in srgb, var(--warning-color) 30%, transparent);
 }
-.status-icon.unknown {
+.history-table .status-cell .status-icon.unknown {
     color: var(--text-secondary);
     background: color-mix(in srgb, var(--text-secondary) 12%, transparent);
     border-color: color-mix(in srgb, var(--text-secondary) 26%, transparent);

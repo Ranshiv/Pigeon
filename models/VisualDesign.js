@@ -141,7 +141,6 @@ const visualDesignSchema = new mongoose.Schema({
 
 // Indexes for better query performance
 visualDesignSchema.index({ collectionId: 1, userId: 1 });
-visualDesignSchema.index({ userId: 1 });
 visualDesignSchema.index({ status: 1 });
 visualDesignSchema.index({ isPublic: 1 });
 visualDesignSchema.index({ 'collaborators.userId': 1 });

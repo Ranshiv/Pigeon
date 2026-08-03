@@ -82,7 +82,7 @@
     transform: translateY(-4px);
 }
 
-.stat-icon {
+.quick-stats .stat-icon {
     font-size: 2rem;
     color: var(--primary-color);
     padding: 12px;

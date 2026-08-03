@@ -16,6 +16,10 @@ const messageSchema = new mongoose.Schema({
     citations: { type: [sourceSchema], default: [] },
     contextSnapshot: { type: [mongoose.Schema.Types.Mixed], default: [] },
     findings: { type: [mongoose.Schema.Types.Mixed], default: [] },
+    // Structured, redacted UI result retained with the conversation. Keeping
+    // this additive preserves existing message consumers while allowing the
+    // operations workspace and floating panel to render the same briefing.
+    artifact: { type: mongoose.Schema.Types.Mixed, default: null },
     createdAt: { type: Date, default: Date.now }
 }, { _id: false });
 

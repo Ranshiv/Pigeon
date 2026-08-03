@@ -45,6 +45,7 @@ const getPageTitle = (pathname) => {
     '/workspace/api-network': 'API Network',
     '/workspace/api-network/mcp': 'MCP Workbench',
     '/workspace/monitoring': 'Monitoring',
+    '/workspace/monitoring/copilot': 'Incident and Monitoring Copilot',
     '/workspace/monitoring/reports': 'Monitoring Reports',
     '/workspace/monitoring/teams': 'Teams',
     '/workspace/monitoring/integrations': 'Integrations',

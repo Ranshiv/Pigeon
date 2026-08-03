@@ -9,6 +9,7 @@ import {
     FiRepeat, FiX, FiSave, FiAlertCircle, FiSettings, FiBell, FiEye,
     FiActivity, FiBarChart, FiUsers, FiAlertTriangle
 } from 'react-icons/fi';
+import { Sparkles } from 'lucide-react';
 
 const RECURRENCE_TYPES = [
     { value: 'daily', label: 'Daily' },
@@ -517,6 +518,12 @@ const MaintenanceManagement = () => {
 
             {/* Navigation Tabs */}
             <div className="mtm-nav">
+                <button
+                    className="mtm-nav-btn"
+                    onClick={() => navigate('/workspace/monitoring/copilot')}
+                >
+                    <Sparkles /> Operations Copilot
+                </button>
                 <button
                     className="mtm-nav-btn"
                     onClick={() => navigate('/workspace/monitoring')}

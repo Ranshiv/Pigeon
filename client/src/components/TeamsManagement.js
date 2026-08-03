@@ -10,6 +10,7 @@ import {
     FiEye, FiActivity, FiBarChart, FiTool, FiUser,
     FiUserPlus, FiUserX, FiSave, FiBell, FiAlertTriangle
 } from 'react-icons/fi';
+import { Sparkles } from 'lucide-react';
 
 const MEMBER_ROLES = [
     { value: 'owner', label: 'Owner' },
@@ -167,6 +168,9 @@ const TeamsManagement = () => {
 
             {/* Navigation Tabs */}
             <div className="tm-nav">
+                <button className="tm-nav-btn" onClick={() => navigate('/workspace/monitoring/copilot')}>
+                    <Sparkles /> Operations Copilot
+                </button>
                 <button className="tm-nav-btn" onClick={() => navigate('/workspace/monitoring')}>
                     <FiActivity /> Dashboard
                 </button>

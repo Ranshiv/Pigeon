@@ -35,6 +35,8 @@ export const CopilotContextProvider = ({ children }) => {
     const [activeContext, setActiveContext] = useState(null);
     const [pinsByWorkspace, setPinsByWorkspace] = useState(readPins);
     const [openNonce, setOpenNonce] = useState(0);
+    const [investigationRequest, setInvestigationRequest] = useState(null);
+    const [incidentUpdateDraft, setIncidentUpdateDraftState] = useState(null);
     const registrationRef = useRef({ sequence: 0, values: new Map() });
     const location = useLocation();
     const activePage = useMemo(() => ({
@@ -62,6 +64,22 @@ export const CopilotContextProvider = ({ children }) => {
         if (descriptor) setActiveContext(compactSource(descriptor));
         setOpenNonce((value) => value + 1);
     }, []);
+
+    const requestInvestigation = useCallback((descriptor, timeRange = '24h') => {
+        const compact = compactSource(descriptor);
+        if (!compact || !['incident', 'monitor'].includes(compact.type)) return;
+        setActiveContext(compact);
+        setInvestigationRequest({ target: compact, timeRange, nonce: Date.now() });
+        setOpenNonce((value) => value + 1);
+    }, []);
+
+    const clearInvestigationRequest = useCallback(() => setInvestigationRequest(null), []);
+    const setIncidentUpdateDraft = useCallback((draft) => setIncidentUpdateDraftState(draft ? {
+        incidentId: String(draft.incidentId || ''),
+        text: String(draft.text || ''),
+        audience: draft.audience === 'public' ? 'public' : 'internal'
+    } : null), []);
+    const clearIncidentUpdateDraft = useCallback(() => setIncidentUpdateDraftState(null), []);
 
     useEffect(() => {
         const onLegacyContext = (event) => {
@@ -109,12 +127,18 @@ export const CopilotContextProvider = ({ children }) => {
         workspaceKey,
         pinnedSources,
         openNonce,
+        investigationRequest,
+        incidentUpdateDraft,
         registerPageContext,
         requestOpen,
+        requestInvestigation,
+        clearInvestigationRequest,
+        setIncidentUpdateDraft,
+        clearIncidentUpdateDraft,
         togglePin,
         clearPins,
         sourceKey
-    }), [activeContext, activePage, workspaceKey, pinnedSources, openNonce, registerPageContext, requestOpen, togglePin, clearPins]);
+    }), [activeContext, activePage, workspaceKey, pinnedSources, openNonce, investigationRequest, incidentUpdateDraft, registerPageContext, requestOpen, requestInvestigation, clearInvestigationRequest, setIncidentUpdateDraft, clearIncidentUpdateDraft, togglePin, clearPins]);
 
     return <CopilotContext.Provider value={value}>{children}</CopilotContext.Provider>;
 };

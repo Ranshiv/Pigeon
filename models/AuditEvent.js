@@ -30,7 +30,7 @@ const auditEventSchema = new mongoose.Schema({
     userAgent: { type: String, default: null },
 
     // For flexible retention windows per event type
-    expiresAt: { type: Date, default: null, index: true },
+    expiresAt: { type: Date, default: null },
 
     createdAt: { type: Date, default: Date.now, index: true }
 });

@@ -56,8 +56,7 @@ const protocolSessionSchema = new mongoose.Schema({
     sessionId: {
         type: String,
         required: true,
-        unique: true,
-        index: true
+        unique: true
     },
 
     // Protocol type

@@ -455,7 +455,7 @@
     opacity: 1;
 }
 
-.stat-icon {
+.spec-preview.modern .stat-icon {
     font-size: 20px;
     color: var(--tester-accent);
 }

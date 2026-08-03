@@ -4,6 +4,27 @@ const router = express.Router();
 const { ensureAuthenticated } = require('../middleware/auth');
 const Alert = require('../models/Alert');
 const Monitor = require('../models/Monitor');
+const { ObjectId } = require('mongodb');
+const { getDb } = require('../config/db');
+
+const userValues = (req) => [String(req.user?.id || req.user?._id || ''), ObjectId.isValid(String(req.user?.id || req.user?._id || '')) ? new ObjectId(String(req.user?.id || req.user?._id)) : null].filter(Boolean);
+const workspaceAccessFilter = (req) => ({ $or: [{ owner: { $in: userValues(req) } }, { userId: { $in: userValues(req) } }, { 'collaborators.userId': { $in: userValues(req) } }] });
+const accessibleWorkspaceIds = async (req) => (await getDb().collection('workspaces').find(workspaceAccessFilter(req)).project({ _id: 1 }).limit(250).toArray()).map((workspace) => workspace._id);
+
+router.use('/:id([0-9a-fA-F]{24})', ensureAuthenticated, async (req, res, next) => {
+    try {
+        const alert = await Alert.findById(req.params.id).select('monitorId');
+        if (!alert) return res.status(404).json({ message: 'Alert not found' });
+        const monitor = await Monitor.findById(alert.monitorId).select('workspaceId userId');
+        if (!monitor) return res.status(404).json({ message: 'Alert not found' });
+        const ownsLegacyMonitor = userValues(req).some((value) => String(value) === String(monitor.userId));
+        const accessibleWorkspace = monitor.workspaceId
+            ? await getDb().collection('workspaces').findOne({ _id: monitor.workspaceId, ...workspaceAccessFilter(req) }, { projection: { _id: 1 } })
+            : ownsLegacyMonitor;
+        if (!accessibleWorkspace) return res.status(404).json({ message: 'Alert not found' });
+        return next();
+    } catch (error) { return res.status(400).json({ message: 'Invalid alert ID' }); }
+});
 
 // List alerts (ungrouped) with optional filters.
 router.get('/', ensureAuthenticated, async (req, res) => {
@@ -14,10 +35,13 @@ router.get('/', ensureAuthenticated, async (req, res) => {
         if (status) query.status = status;
         if (severity) query.severity = severity;
 
-        if (workspaceId) {
-            const monitors = await Monitor.find({ workspaceId }).select('_id').lean();
-            query.monitorId = { $in: monitors.map(m => m._id) };
-        }
+        const allowedWorkspaceIds = await accessibleWorkspaceIds(req);
+        if (workspaceId && !allowedWorkspaceIds.some((id) => String(id) === String(workspaceId))) return res.status(403).json({ message: 'You do not have access to this workspace' });
+        const monitorQuery = workspaceId
+            ? { workspaceId }
+            : { $or: [{ workspaceId: { $in: allowedWorkspaceIds } }, { workspaceId: null, userId: { $in: userValues(req) } }, { workspaceId: { $exists: false }, userId: { $in: userValues(req) } }] };
+        const monitors = await Monitor.find(monitorQuery).select('_id').lean();
+        query.monitorId = { $in: monitors.map(m => m._id) };
 
         if (timeRange) {
             const now = new Date();
@@ -48,7 +72,7 @@ router.get('/', ensureAuthenticated, async (req, res) => {
 });
 
 // Acknowledge an alert.
-router.post('/:id/acknowledge', ensureAuthenticated, async (req, res) => {
+router.post('/:id([0-9a-fA-F]{24})/acknowledge', ensureAuthenticated, async (req, res) => {
     try {
         const alert = await Alert.findById(req.params.id);
         if (!alert) return res.status(404).json({ message: 'Alert not found' });
@@ -66,7 +90,7 @@ router.post('/:id/acknowledge', ensureAuthenticated, async (req, res) => {
 });
 
 // Snooze an alert.
-router.post('/:id/snooze', ensureAuthenticated, async (req, res) => {
+router.post('/:id([0-9a-fA-F]{24})/snooze', ensureAuthenticated, async (req, res) => {
     try {
         const { duration } = req.body;
         const ms = parseInt(duration) || 3600000;
@@ -86,7 +110,7 @@ router.post('/:id/snooze', ensureAuthenticated, async (req, res) => {
 });
 
 // Resolve an alert.
-router.post('/:id/resolve', ensureAuthenticated, async (req, res) => {
+router.post('/:id([0-9a-fA-F]{24})/resolve', ensureAuthenticated, async (req, res) => {
     try {
         const alert = await Alert.findById(req.params.id);
         if (!alert) return res.status(404).json({ message: 'Alert not found' });

@@ -7,12 +7,15 @@ import {
     FiTrash2, FiPause, FiPlay, FiTrendingUp, FiBarChart,
     FiUsers, FiSettings, FiTool, FiBell, FiAlertTriangle
 } from 'react-icons/fi';
+import { Sparkles } from 'lucide-react';
 import MonitorForm from './MonitorForm';
 import './MonitoringDashboard.css';
 import PageLoader from './common/PageLoader/PageLoader';
+import { useCopilotContext } from '../context/CopilotContext';
 
 const MonitoringDashboard = ({ createOnLoad = false }) => {
     const navigate = useNavigate();
+    const { requestInvestigation } = useCopilotContext();
     const [monitors, setMonitors] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -231,6 +234,12 @@ const MonitoringDashboard = ({ createOnLoad = false }) => {
             {/* Navigation Tabs */}
             <div className="monitoring-nav">
                 <button
+                    className="nav-btn"
+                    onClick={() => navigate('/workspace/monitoring/copilot')}
+                >
+                    <Sparkles /> Operations Copilot
+                </button>
+                <button
                     className="nav-btn active"
                     onClick={() => navigate('/workspace/monitoring')}
                 >
@@ -374,6 +383,14 @@ const MonitoringDashboard = ({ createOnLoad = false }) => {
                                     </div>
                                 </div>
                                 <div className="monitor-actions">
+                                    <button
+                                        className="action-btn"
+                                        onClick={() => requestInvestigation({ type: 'monitor', id: monitor._id, workspaceId: monitor.workspaceId || '', label: monitor.name })}
+                                        title="Investigate with Copilot"
+                                        aria-label={`Investigate ${monitor.name} with Copilot`}
+                                    >
+                                        <Sparkles />
+                                    </button>
                                     <button
                                         className="action-btn"
                                         onClick={() => navigate(`/workspace/monitoring/${monitor._id}/analytics`)}

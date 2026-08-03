@@ -28,7 +28,7 @@
     gap: 10px;
 }
 
-.header-icon {
+.collection-variables-manager .header-icon {
     color: var(--primary-color, #014C75);
     font-size: 20px;
 }
@@ -271,8 +271,8 @@ body.dark-theme .header-title h3 {
     color: var(--text-color, #e0e0e0);
 }
 
-[data-theme="dark"] .header-icon,
-body.dark-theme .header-icon {
+[data-theme="dark"] .collection-variables-manager .header-icon,
+body.dark-theme .collection-variables-manager .header-icon {
     color: var(--text-color, #014C75);
 }
 

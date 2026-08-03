@@ -23,15 +23,24 @@ class IncidentManagementService extends EventEmitter {
      */
     async createIncident(data, userId) {
         try {
+            const severity = ['critical', 'high', 'medium', 'low', 'info'].includes(data.severity)
+                ? data.severity
+                : 'medium';
+            const status = ['open', 'acknowledged', 'monitoring', 'snoozed', 'resolved', 'closed'].includes(data.status)
+                ? data.status
+                : 'open';
+
             const incident = new Incident({
                 title: data.title,
                 description: data.description,
-                severity: data.severity || 'medium',
-                priority: this.determinePriority(data.severity),
+                severity,
+                priority: this.determinePriority(severity),
                 workspaceId: data.workspaceId,
                 teamId: data.teamId,
-                status: 'open',
-                detection: data.detection || 'monitoring',
+                status,
+                detection: data.detection || 'manual',
+                isPublic: typeof data.isPublic === 'boolean' ? data.isPublic : false,
+                affectedServices: Array.isArray(data.affectedServices) ? data.affectedServices : [],
                 metrics: {
                     firstAlertAt: new Date()
                 }
@@ -74,7 +83,7 @@ class IncidentManagementService extends EventEmitter {
                 message: 'Incident created',
                 actor: userId,
                 at: new Date(),
-                data: { status: 'open' }
+                data: { status }
             });
 
             // Determine routing targets

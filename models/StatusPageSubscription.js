@@ -37,6 +37,5 @@ const statusPageSubscriptionSchema = new mongoose.Schema({
 });
 
 statusPageSubscriptionSchema.index({ workspaceId: 1, email: 1 }, { unique: true });
-statusPageSubscriptionSchema.index({ unsubscribeToken: 1 });
 
 module.exports = mongoose.model('StatusPageSubscription', statusPageSubscriptionSchema);

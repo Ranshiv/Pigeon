@@ -6,19 +6,42 @@ const Incident = require('../models/Incident');
 const Alert = require('../models/Alert');
 const IncidentManagementService = require('../services/IncidentManagementService');
 const EscalationEngine = require('../features/api-monitoring/alerting/EscalationEngine');
+const { ObjectId } = require('mongodb');
+const { getDb } = require('../config/db');
 
 const escalationEngine = new EscalationEngine();
+const userValues = (req) => [String(req.user?.id || req.user?._id || ''), ObjectId.isValid(String(req.user?.id || req.user?._id || '')) ? new ObjectId(String(req.user?.id || req.user?._id)) : null].filter(Boolean);
+const workspaceAccessFilter = (req) => ({ $or: [{ owner: { $in: userValues(req) } }, { userId: { $in: userValues(req) } }, { 'collaborators.userId': { $in: userValues(req) } }] });
+const accessibleWorkspaceIds = async (req) => (await getDb().collection('workspaces').find(workspaceAccessFilter(req)).project({ _id: 1 }).limit(250).toArray()).map((workspace) => workspace._id);
+
+// All ID-scoped incident operations pass through one workspace boundary. The
+// regex also prevents /statistics/* from being captured as an incident ID.
+router.use('/:id([0-9a-fA-F]{24})', ensureAuthenticated, async (req, res, next) => {
+    try {
+        const incident = await Incident.findById(req.params.id).select('workspaceId');
+        if (!incident?.workspaceId) return res.status(404).json({ message: 'Incident not found' });
+        const workspace = await getDb().collection('workspaces').findOne({ _id: incident.workspaceId, ...workspaceAccessFilter(req) }, { projection: { _id: 1 } });
+        if (!workspace) return res.status(404).json({ message: 'Incident not found' });
+        req.accessibleIncident = incident;
+        return next();
+    } catch (error) { return res.status(400).json({ message: 'Invalid incident ID' }); }
+});
 
 // Get all incidents
 router.get('/', ensureAuthenticated, async (req, res) => {
     try {
-        const { workspaceId, status, severity, teamId, limit = 50, skip = 0 } = req.query;
-        const query = {};
+        const { workspaceId, status, severity, teamId, search, limit = 50, skip = 0 } = req.query;
+        const allowedWorkspaceIds = await accessibleWorkspaceIds(req);
+        const query = { workspaceId: { $in: allowedWorkspaceIds } };
 
-        if (workspaceId) query.workspaceId = workspaceId;
+        if (workspaceId) {
+            if (!allowedWorkspaceIds.some((id) => String(id) === String(workspaceId))) return res.status(403).json({ message: 'You do not have access to this workspace' });
+            query.workspaceId = workspaceId;
+        }
         if (status) query.status = status;
         if (severity) query.severity = severity;
         if (teamId) query.teamId = teamId;
+        if (search) query.$or = [{ title: { $regex: String(search).replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), $options: 'i' } }, { description: { $regex: String(search).replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), $options: 'i' } }];
 
         const incidents = await Incident.find(query)
             .populate('alerts')
@@ -48,7 +71,7 @@ router.get('/', ensureAuthenticated, async (req, res) => {
 });
 
 // Get single incident
-router.get('/:id', ensureAuthenticated, async (req, res) => {
+router.get('/:id([0-9a-fA-F]{24})', ensureAuthenticated, async (req, res) => {
     try {
         const incident = await Incident.findById(req.params.id)
             .populate('alerts')
@@ -72,9 +95,13 @@ router.get('/:id', ensureAuthenticated, async (req, res) => {
 // Create incident
 router.post('/', ensureAuthenticated, async (req, res) => {
     try {
+        const workspaceId = req.body.workspaceId || req.user.workspaceId;
+        if (!workspaceId || !ObjectId.isValid(String(workspaceId)) || !(await getDb().collection('workspaces').findOne({ _id: new ObjectId(String(workspaceId)), ...workspaceAccessFilter(req) }, { projection: { _id: 1 } }))) {
+            return res.status(403).json({ message: 'You do not have access to this workspace' });
+        }
         const incidentData = {
             ...req.body,
-            workspaceId: req.body.workspaceId || req.user.workspaceId
+            workspaceId
         };
 
         const incident = await IncidentManagementService.createIncident(
@@ -85,12 +112,13 @@ router.post('/', ensureAuthenticated, async (req, res) => {
         res.status(201).json(incident);
     } catch (error) {
         console.error('Error creating incident:', error);
-        res.status(500).json({ message: 'Error creating incident', error: error.message });
+        const statusCode = error.name === 'ValidationError' ? 400 : 500;
+        res.status(statusCode).json({ message: 'Error creating incident', error: error.message });
     }
 });
 
 // Update incident
-router.put('/:id', ensureAuthenticated, async (req, res) => {
+router.put('/:id([0-9a-fA-F]{24})', ensureAuthenticated, async (req, res) => {
     try {
         const incident = await Incident.findById(req.params.id);
 
@@ -113,8 +141,20 @@ router.put('/:id', ensureAuthenticated, async (req, res) => {
     }
 });
 
+router.delete('/:id([0-9a-fA-F]{24})', ensureAuthenticated, async (req, res) => {
+    try {
+        const incident = await Incident.findById(req.params.id);
+        if (!incident) return res.status(404).json({ message: 'Incident not found' });
+        await Alert.updateMany({ incidentId: incident._id }, { $unset: { incidentId: '' } });
+        await incident.deleteOne();
+        return res.json({ message: 'Incident deleted successfully' });
+    } catch (error) {
+        return res.status(500).json({ message: 'Error deleting incident', error: error.message });
+    }
+});
+
 // Acknowledge incident
-router.post('/:id/acknowledge', ensureAuthenticated, async (req, res) => {
+router.post('/:id([0-9a-fA-F]{24})/acknowledge', ensureAuthenticated, async (req, res) => {
     try {
         const { notes } = req.body;
 
@@ -132,7 +172,7 @@ router.post('/:id/acknowledge', ensureAuthenticated, async (req, res) => {
 });
 
 // Resolve incident
-router.post('/:id/resolve', ensureAuthenticated, async (req, res) => {
+router.post('/:id([0-9a-fA-F]{24})/resolve', ensureAuthenticated, async (req, res) => {
     try {
         const resolutionData = {
             notes: req.body.notes,
@@ -154,7 +194,7 @@ router.post('/:id/resolve', ensureAuthenticated, async (req, res) => {
 });
 
 // Snooze incident
-router.post('/:id/snooze', ensureAuthenticated, async (req, res) => {
+router.post('/:id([0-9a-fA-F]{24})/snooze', ensureAuthenticated, async (req, res) => {
     try {
         const { duration } = req.body; // duration in milliseconds
 
@@ -176,7 +216,7 @@ router.post('/:id/snooze', ensureAuthenticated, async (req, res) => {
 });
 
 // Escalate incident
-router.post('/:id/escalate', ensureAuthenticated, async (req, res) => {
+router.post('/:id([0-9a-fA-F]{24})/escalate', ensureAuthenticated, async (req, res) => {
     try {
         const escalationData = {
             reason: req.body.reason,
@@ -198,7 +238,7 @@ router.post('/:id/escalate', ensureAuthenticated, async (req, res) => {
 });
 
 // Add update to incident
-router.post('/:id/updates', ensureAuthenticated, async (req, res) => {
+router.post('/:id([0-9a-fA-F]{24})/updates', ensureAuthenticated, async (req, res) => {
     try {
         const { message, status, metadata } = req.body;
 
@@ -223,7 +263,7 @@ router.post('/:id/updates', ensureAuthenticated, async (req, res) => {
 });
 
 // Add timeline entry
-router.post('/:id/timeline', ensureAuthenticated, async (req, res) => {
+router.post('/:id([0-9a-fA-F]{24})/timeline', ensureAuthenticated, async (req, res) => {
     try {
         const timelineEntry = {
             ...req.body,
@@ -247,7 +287,7 @@ router.post('/:id/timeline', ensureAuthenticated, async (req, res) => {
 });
 
 // Get incident timeline
-router.get('/:id/timeline', ensureAuthenticated, async (req, res) => {
+router.get('/:id([0-9a-fA-F]{24})/timeline', ensureAuthenticated, async (req, res) => {
     try {
         const incident = await Incident.findById(req.params.id)
             .select('timeline')
@@ -265,7 +305,7 @@ router.get('/:id/timeline', ensureAuthenticated, async (req, res) => {
 });
 
 // Get incident metrics
-router.get('/:id/metrics', ensureAuthenticated, async (req, res) => {
+router.get('/:id([0-9a-fA-F]{24})/metrics', ensureAuthenticated, async (req, res) => {
     try {
         const incident = await Incident.findById(req.params.id);
 
@@ -290,7 +330,7 @@ router.get('/:id/metrics', ensureAuthenticated, async (req, res) => {
 });
 
 // Get post-mortem
-router.get('/:id/post-mortem', ensureAuthenticated, async (req, res) => {
+router.get('/:id([0-9a-fA-F]{24})/post-mortem', ensureAuthenticated, async (req, res) => {
     try {
         const incident = await Incident.findById(req.params.id);
 
@@ -317,7 +357,14 @@ router.get('/:id/post-mortem', ensureAuthenticated, async (req, res) => {
 });
 
 // Link alerts to incident
-router.post('/:id/alerts', ensureAuthenticated, async (req, res) => {
+router.get('/:id([0-9a-fA-F]{24})/alerts', ensureAuthenticated, async (req, res) => {
+    try {
+        const incident = await Incident.findById(req.params.id).populate({ path: 'alerts', populate: { path: 'monitorId', select: 'name url' } }).select('alerts');
+        return res.json(incident?.alerts || []);
+    } catch (error) { return res.status(500).json({ message: 'Error fetching linked alerts' }); }
+});
+
+router.post('/:id([0-9a-fA-F]{24})/alerts', ensureAuthenticated, async (req, res) => {
     try {
         const { alertIds } = req.body;
 
@@ -331,8 +378,13 @@ router.post('/:id/alerts', ensureAuthenticated, async (req, res) => {
             return res.status(404).json({ message: 'Incident not found' });
         }
 
+        const alertsToLink = await Alert.find({ _id: { $in: alertIds } }).populate('monitorId', 'workspaceId');
+        if (alertsToLink.length !== new Set(alertIds.map(String)).size || alertsToLink.some((alert) => String(alert.monitorId?.workspaceId || '') !== String(incident.workspaceId))) {
+            return res.status(400).json({ message: 'Every linked alert must belong to the incident workspace' });
+        }
+
         // Add alerts to incident
-        incident.alerts.push(...alertIds);
+        incident.alerts = [...new Set([...incident.alerts.map(String), ...alertIds.map(String)])];
         await incident.save();
 
         // Update alerts with incident reference
@@ -352,6 +404,8 @@ router.post('/:id/alerts', ensureAuthenticated, async (req, res) => {
 router.post('/correlate-alerts', ensureAuthenticated, async (req, res) => {
     try {
         const { workspaceId, startDate, endDate } = req.body;
+        const allowedWorkspaceIds = await accessibleWorkspaceIds(req);
+        if (workspaceId && !allowedWorkspaceIds.some((id) => String(id) === String(workspaceId))) return res.status(403).json({ message: 'You do not have access to this workspace' });
 
         const query = {
             status: { $in: ['triggered', 'acknowledged'] },
@@ -361,6 +415,10 @@ router.post('/correlate-alerts', ensureAuthenticated, async (req, res) => {
         if (workspaceId) {
             const Monitor = require('../models/Monitor');
             const monitors = await Monitor.find({ workspaceId }).select('_id');
+            query.monitorId = { $in: monitors.map(m => m._id) };
+        } else {
+            const Monitor = require('../models/Monitor');
+            const monitors = await Monitor.find({ workspaceId: { $in: allowedWorkspaceIds } }).select('_id');
             query.monitorId = { $in: monitors.map(m => m._id) };
         }
 
@@ -386,9 +444,13 @@ router.post('/correlate-alerts', ensureAuthenticated, async (req, res) => {
 router.get('/statistics/summary', ensureAuthenticated, async (req, res) => {
     try {
         const { workspaceId, startDate, endDate } = req.query;
-        const query = {};
+        const allowedWorkspaceIds = await accessibleWorkspaceIds(req);
+        const query = { workspaceId: { $in: allowedWorkspaceIds } };
 
-        if (workspaceId) query.workspaceId = workspaceId;
+        if (workspaceId) {
+            if (!allowedWorkspaceIds.some((id) => String(id) === String(workspaceId))) return res.status(403).json({ message: 'You do not have access to this workspace' });
+            query.workspaceId = new ObjectId(String(workspaceId));
+        }
 
         if (startDate || endDate) {
             query.createdAt = {};
@@ -433,9 +495,13 @@ router.get('/statistics/summary', ensureAuthenticated, async (req, res) => {
 router.get('/statistics/resolution-patterns', ensureAuthenticated, async (req, res) => {
     try {
         const { workspaceId } = req.query;
-        const filters = {};
+        const allowedWorkspaceIds = await accessibleWorkspaceIds(req);
+        const filters = { workspaceId: { $in: allowedWorkspaceIds } };
 
-        if (workspaceId) filters.workspaceId = workspaceId;
+        if (workspaceId) {
+            if (!allowedWorkspaceIds.some((id) => String(id) === String(workspaceId))) return res.status(403).json({ message: 'You do not have access to this workspace' });
+            filters.workspaceId = new ObjectId(String(workspaceId));
+        }
 
         const patterns = await IncidentManagementService.getResolutionPatterns(filters);
         res.json(patterns);
@@ -449,9 +515,13 @@ router.get('/statistics/resolution-patterns', ensureAuthenticated, async (req, r
 router.get('/statistics/metrics-over-time', ensureAuthenticated, async (req, res) => {
     try {
         const { workspaceId, startDate, endDate, interval = 'day' } = req.query;
-        const match = {};
+        const allowedWorkspaceIds = await accessibleWorkspaceIds(req);
+        const match = { workspaceId: { $in: allowedWorkspaceIds } };
 
-        if (workspaceId) match.workspaceId = workspaceId;
+        if (workspaceId) {
+            if (!allowedWorkspaceIds.some((id) => String(id) === String(workspaceId))) return res.status(403).json({ message: 'You do not have access to this workspace' });
+            match.workspaceId = new ObjectId(String(workspaceId));
+        }
         if (startDate || endDate) {
             match.createdAt = {};
             if (startDate) match.createdAt.$gte = new Date(startDate);

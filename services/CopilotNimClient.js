@@ -11,11 +11,15 @@ const cooldownMs = () => Math.max(30000, Number(process.env.PIGEON_NIM_MODEL_COO
 const maxTokens = () => Math.max(128, Number(process.env.PIGEON_NIM_MAX_TOKENS) || 800);
 const documentationMaxTokens = () => Math.max(maxTokens(), Number(process.env.PIGEON_NIM_DOCUMENTATION_MAX_TOKENS) || 1400);
 const testGenerationMaxTokens = () => Math.max(maxTokens(), Number(process.env.PIGEON_NIM_TEST_GENERATION_MAX_TOKENS) || 2200);
+const operationsMaxTokens = () => Math.max(maxTokens(), Number(process.env.PIGEON_NIM_OPERATIONS_MAX_TOKENS) || 2200);
 const maxTokensFor = (messages) => {
     const prompt = String(messages?.[messages.length - 1]?.content || '');
     const systemPrompt = String(messages?.[0]?.content || '');
     if (/enrich API test plans|semantic API test cases/i.test(`${systemPrompt}\n${prompt}`)) {
         return testGenerationMaxTokens();
+    }
+    if (/incident-response copilot|investigation briefing|operational evidence/i.test(`${systemPrompt}\n${prompt}`)) {
+        return operationsMaxTokens();
     }
     return /documentation|update_documentation|authentication section|add .*docs?\b/i.test(prompt)
         ? documentationMaxTokens()

@@ -1,6 +1,6 @@
 // client/src/components/DocumentationEditor.js
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { FiSave, FiCode, FiLink, FiImage, FiTable, FiX, FiEdit3, FiEye, FiColumns } from 'react-icons/fi';
+import { FiSave, FiCode, FiLink, FiImage, FiTable, FiX, FiEdit3, FiEye, FiColumns, FiPlus, FiRefreshCw, FiZap } from 'react-icons/fi';
 import './DocumentationEditor.css';
 import { buildApiReference, buildEndpointReference } from './documentationReference';
 
@@ -689,21 +689,27 @@ const DocumentationEditor = ({ documentation, collection, onSave, onAutoSave, is
                     {endpoints.length > 0 && (
                         <div className="endpoints-list">
                             <h4>Endpoints</h4>
-                            <p className="help-text">Click to insert endpoint documentation</p>
-                            <button type="button" className="sync-endpoints-btn" onClick={generateApiReference}>Generate API reference</button>
-                            <button type="button" className="sync-endpoints-btn" onClick={syncEndpoints}>Sync endpoints</button>
-                            {endpoints.map((endpoint) => (
-                                <div
-                                    key={endpoint.id}
-                                    className="endpoint-item"
-                                    onClick={() => insertEndpoint(endpoint)}
-                                >
-                                    <span className={`method-badge method-${endpoint.method?.toLowerCase()}`}>
-                                        {endpoint.method}
-                                    </span>
-                                    <span className="endpoint-name">{endpoint.name}</span>
-                                </div>
-                            ))}
+                            <p className="help-text">Click an endpoint to insert its documentation.</p>
+                            <div className="endpoint-actions">
+                                <button type="button" className="sync-endpoints-btn sync-endpoints-btn--primary" onClick={generateApiReference}><FiZap /> Generate API reference</button>
+                                <button type="button" className="sync-endpoints-btn" onClick={syncEndpoints}><FiRefreshCw /> Sync endpoints</button>
+                            </div>
+                            <div className="endpoint-scroll">
+                                {endpoints.map((endpoint) => (
+                                    <button
+                                        type="button"
+                                        key={endpoint.id}
+                                        className="endpoint-item"
+                                        onClick={() => insertEndpoint(endpoint)}
+                                    >
+                                        <span className={`method-badge method-${endpoint.method?.toLowerCase()}`}>
+                                            {endpoint.method}
+                                        </span>
+                                        <span className="endpoint-name">{endpoint.name}</span>
+                                        <FiPlus className="endpoint-insert" aria-hidden="true" />
+                                    </button>
+                                ))}
+                            </div>
                         </div>
                     )}
                     {tableOfContents.length > 0 && (

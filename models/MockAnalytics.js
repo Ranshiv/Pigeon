@@ -229,7 +229,6 @@ const mockAnalyticsSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 // Indexes for efficient querying
-mockAnalyticsSchema.index({ mockServerId: 1 });
 mockAnalyticsSchema.index({ 'recentRequests.timestamp': -1 });
 mockAnalyticsSchema.index({ 'summary.lastRequestAt': -1 });
 

@@ -157,7 +157,6 @@ const mockRecordingSchema = new mongoose.Schema({
 
 // Indexes for efficient querying
 mockRecordingSchema.index({ mockServerId: 1, createdAt: -1 });
-mockRecordingSchema.index({ sessionId: 1 });
 mockRecordingSchema.index({ status: 1 });
 mockRecordingSchema.index({ tags: 1 });
 

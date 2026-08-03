@@ -318,10 +318,8 @@ async function fetchAndCacheAPIs() {
     }
 }
 
-// Initial fetch
-setTimeout(() => {
-    fetchAndCacheAPIs();
-}, 5000); // Give database connection some time to stabilize
+// Initial fetch runs from startServer() once the DB connection is established.
+// A timer-based "wait" raced the connection and threw with bufferCommands=false.
 
 // Search endpoint for APIs
 app.get('/api/search', async (req, res) => {
@@ -895,6 +893,8 @@ async function startServer() {
         await Sentry.flush(2000).catch(() => {});
         process.exit(1);
     }
+
+    await fetchAndCacheAPIs();
 
     // Initialize socket.io server (after middleware/routes are registered, before listen)
     initializeSocketServer(server);

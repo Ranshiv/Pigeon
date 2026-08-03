@@ -8,6 +8,7 @@ import {
     FiTool, FiPlus, FiX, FiSave, FiEdit2, FiTrash2,
     FiCheck, FiAlertTriangle, FiShield
 } from 'react-icons/fi';
+import { Sparkles } from 'lucide-react';
 import './AlertPolicyEditor.css';
 import AppSelect from '../common/AppSelect/AppSelect';
 import PageLoader from '../common/PageLoader/PageLoader';
@@ -356,6 +357,9 @@ const AlertPolicyEditor = () => {
 
     const renderNav = () => (
         <div className="monitoring-nav">
+            <button type="button" className="nav-btn" onClick={() => navigate('/workspace/monitoring/copilot')}>
+                <Sparkles /> Operations Copilot
+            </button>
             <button type="button" className="nav-btn" onClick={() => navigate('/workspace/monitoring')}>
                 <FiActivity /> Dashboard
             </button>

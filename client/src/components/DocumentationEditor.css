@@ -906,6 +906,8 @@
 .documentation-editor .endpoints-list {
     border-color: var(--border-color) !important;
     border-bottom-color: var(--border-color) !important;
+    min-width: 0;
+    overflow: hidden;
 }
 
 .help-text {
@@ -915,47 +917,79 @@
     line-height: 1.45;
 }
 
-.endpoint-item {
+.endpoint-actions { display: grid; gap: 7px; margin: 0 0 12px; }
+.sync-endpoints-btn { display: inline-flex; align-items: center; justify-content: center; gap: 7px; width: 100%; min-height: 34px; margin: 0; padding: 7px 10px; border: 1px solid var(--border-color); border-radius: 8px; background: var(--surface, var(--card-bg)); color: var(--text-secondary); font: inherit; font-size: .74rem; font-weight: 650; cursor: pointer; transition: border-color .15s ease, background .15s ease, color .15s ease, transform .15s ease; }
+.sync-endpoints-btn svg { flex: 0 0 auto; width: 14px; height: 14px; }
+.sync-endpoints-btn:hover { border-color: color-mix(in srgb, var(--primary-color) 48%, var(--border-color)); background: color-mix(in srgb, var(--primary-color) 10%, var(--surface, var(--card-bg))); color: var(--text-color); transform: translateY(-1px); }
+.sync-endpoints-btn--primary { border-color: color-mix(in srgb, var(--primary-color) 45%, var(--border-color)); background: color-mix(in srgb, var(--primary-color) 9%, var(--surface, var(--card-bg))); color: var(--primary-color); }
+.sync-endpoints-btn--primary:hover { border-color: var(--primary-color); background: color-mix(in srgb, var(--primary-color) 16%, var(--surface, var(--card-bg))); color: var(--primary-color); }
+
+.endpoint-scroll { display: grid; grid-template-columns: minmax(0, 1fr); gap: 6px; max-height: 320px; overflow: hidden auto; }
+.documentation-editor .editor-sidebar { overflow-x: hidden; }
+
+.documentation-editor .endpoint-item {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 9px;
+    width: 100%;
     min-height: 38px;
-    margin-bottom: 6px;
-    padding: 7px 8px;
+    margin: 0;
+    padding: 7px 9px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
     background: var(--card-bg);
-}
-
-.method-badge {
-    min-width: 38px;
-    margin-right: 8px;
-    padding: 3px 5px;
-    font-size: 0.64rem;
-}
-
-.endpoint-name {
-    font-size: 0.8rem;
     color: var(--text-color);
-}
-.sync-endpoints-btn { width:100%; margin:0 0 9px; padding:7px; border:1px solid var(--border-color); border-radius:6px; background:var(--surface); color:var(--text-secondary); font-size:.72rem; cursor:pointer; }
-.sync-endpoints-btn:hover { border-color:var(--primary-color); color:var(--text-color); background:var(--hover-bg); }
-
-/* Keep documentation endpoints isolated from similarly named list styles in
-   other workspaces. In particular, their hover state must remain readable. */
-.documentation-editor .endpoint-item,
-.documentation-editor .endpoint-item:hover {
-    color: var(--text-color);
-}
-
-.documentation-editor .endpoint-item:last-child {
-    border-bottom-width: 1px;
-    border-bottom-style: solid;
-    border-bottom-color: var(--border-color);
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+    transition: border-color .15s ease, background .15s ease, transform .15s ease;
 }
 
 .documentation-editor .endpoint-item:hover {
-    background: color-mix(in srgb, var(--primary-color) 12%, var(--surface, var(--card-bg)));
     border-color: color-mix(in srgb, var(--primary-color) 48%, var(--border-color));
+    background: color-mix(in srgb, var(--primary-color) 9%, var(--surface, var(--card-bg)));
+    color: var(--text-color);
 }
 
-.documentation-editor .endpoint-item:hover .endpoint-name {
+.documentation-editor .endpoint-item:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 2px; }
+
+.documentation-editor .endpoint-item .method-badge {
+    min-width: 46px;
+    margin: 0;
+    padding: 3px 6px;
+    border: 1px solid transparent;
+    border-radius: 5px;
+    background: color-mix(in srgb, var(--text-secondary) 14%, transparent);
+    color: var(--text-secondary);
+    font-size: .62rem;
+    font-weight: 750;
+    letter-spacing: .06em;
+    text-shadow: none;
+    box-shadow: none;
+}
+
+.documentation-editor .endpoint-item .method-get { background: color-mix(in srgb, var(--method-get) 16%, transparent); border-color: color-mix(in srgb, var(--method-get) 40%, transparent); color: var(--method-get); }
+.documentation-editor .endpoint-item .method-post { background: color-mix(in srgb, var(--method-post) 16%, transparent); border-color: color-mix(in srgb, var(--method-post) 40%, transparent); color: var(--method-post); }
+.documentation-editor .endpoint-item .method-put { background: color-mix(in srgb, var(--method-put) 16%, transparent); border-color: color-mix(in srgb, var(--method-put) 40%, transparent); color: var(--method-put); }
+.documentation-editor .endpoint-item .method-delete { background: color-mix(in srgb, var(--method-delete) 16%, transparent); border-color: color-mix(in srgb, var(--method-delete) 40%, transparent); color: var(--method-delete); }
+.documentation-editor .endpoint-item .method-patch { background: color-mix(in srgb, var(--method-patch) 16%, transparent); border-color: color-mix(in srgb, var(--method-patch) 40%, transparent); color: var(--method-patch); }
+
+.documentation-editor .endpoint-item .endpoint-name {
+    min-width: 0;
+    overflow: hidden;
     color: var(--text-color);
+    font-size: .8rem;
+    font-weight: 500;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.endpoint-insert { flex: 0 0 auto; width: 14px; height: 14px; color: var(--text-muted, var(--text-secondary)); opacity: 0; transition: opacity .15s ease; }
+.documentation-editor .endpoint-item:hover .endpoint-insert { opacity: 1; color: var(--primary-color); }
+
+@media (prefers-reduced-motion: reduce) {
+    .sync-endpoints-btn:hover { transform: none; }
 }
 
 .editor-content {

@@ -28,6 +28,7 @@ import './Workspace.css';
 import SettingsPage from './SettingsPage';
 import HistoryDetailsSection from './HistoryDetailsSection';
 import CopilotPanel from './CopilotPanel';
+import OperationsCopilotWorkspace from './operationsCopilot/OperationsCopilotWorkspace';
 import { CopilotContextProvider } from '../context/CopilotContext';
 
 import { useCollaboration } from '../context/CollaborationContext';
@@ -69,6 +70,7 @@ const Workspace = () => {
                 <Route path="monitoring/teams" element={<TeamsManagement />} />
                 <Route path="monitoring/integrations" element={<IntegrationsManagement />} />
                 <Route path="monitoring/maintenance" element={<MaintenanceManagement />} />
+                <Route path="monitoring/copilot" element={<OperationsCopilotWorkspace />} />
                 <Route path="monitoring/incidents" element={<IncidentManagement />} />
                 <Route path="monitoring/new" element={<MonitoringDashboard createOnLoad />} />
                 <Route path="monitoring/alerts" element={<AlertsDashboard />} />

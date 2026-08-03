@@ -8,7 +8,7 @@ const MAX_SOURCES = 8;
 const MAX_SOURCE_CHARS = 6500;
 const MAX_TOTAL_CONTEXT_CHARS = Math.max(12000, Number(process.env.PIGEON_COPILOT_MAX_CONTEXT_CHARS) || 24000);
 const MAX_EVIDENCE = 24;
-const SOURCE_TYPES = new Set(['workspace', 'collection', 'request', 'history', 'governance', 'trace', 'test_run', 'incident']);
+const SOURCE_TYPES = new Set(['workspace', 'collection', 'request', 'history', 'governance', 'trace', 'test_run', 'incident', 'alert', 'monitor', 'analytics']);
 
 const asId = (value) => (ObjectId.isValid(String(value || '')) ? new ObjectId(String(value)) : null);
 const idOf = (value) => String(value?._id || value?.id || value || '');
@@ -449,6 +449,73 @@ async function resolveIncident(descriptor, user) {
     return envelope({ descriptor, label: incident.title, workspaceId: incident.workspaceId, deepLink: `/workspace/monitoring/incidents?incident=${incident._id}`, data: { title: incident.title, description: incident.description, status: incident.status, severity: incident.severity, priority: incident.priority, tags: incident.tags, detection: incident.detection, createdAt: safeDate(incident.createdAt), acknowledgedAt: safeDate(incident.acknowledgedAt), resolvedAt: safeDate(incident.resolvedAt), metrics: incident.metrics }, evidence });
 }
 
+async function loadAccessibleMonitor(monitorId, user) {
+    const id = asId(monitorId);
+    if (!id) return null;
+    const monitor = await getDb().collection('monitors').findOne({ _id: id });
+    if (!monitor) return null;
+    const ownsMonitor = userValues(user).some((value) => String(value) === String(monitor.userId));
+    if (monitor.workspaceId ? !(await loadWorkspace(monitor.workspaceId, user)) : !ownsMonitor) return null;
+    return monitor;
+}
+
+async function resolveMonitor(descriptor, user) {
+    const monitor = await loadAccessibleMonitor(descriptor.id, user);
+    if (!monitor) return null;
+    const db = getDb();
+    const since = new Date(Date.now() - 24 * 60 * 60 * 1000);
+    const [checks, alerts, analytics] = await Promise.all([
+        db.collection('healthchecks').find({ monitorId: monitor._id, checkedAt: { $gte: since } }).sort({ checkedAt: -1 }).limit(20).toArray(),
+        db.collection('alerts').find({ monitorId: monitor._id, triggeredAt: { $gte: since } }).sort({ triggeredAt: -1 }).limit(20).toArray(),
+        db.collection('analytics').find({ monitorId: monitor._id, timestamp: { $gte: since } }).sort({ timestamp: -1 }).limit(12).toArray()
+    ]);
+    const evidence = [];
+    checks.filter((check) => check.status !== 'success' || Number(check.statusCode) >= 400).forEach((check) => evidence.push(fact('monitor', 'error', check.errorMessage || `HTTP ${check.statusCode || 'failure'}`, `${Math.round(Number(check.responseTime) || 0)} ms · ${safeDate(check.checkedAt) || ''}`, { deepLink: `/workspace/monitoring/${monitor._id}/history` })));
+    alerts.forEach((alert) => evidence.push(fact('alert', ['critical', 'high'].includes(alert.severity) ? 'error' : 'warning', alert.title, `${alert.severity || 'medium'} · ${alert.status || 'triggered'}`, { deepLink: '/workspace/monitoring/alerts' })));
+    analytics.flatMap((row) => row.anomalies || []).filter((anomaly) => !anomaly.resolved).slice(0, 8).forEach((anomaly) => evidence.push(fact('analytics', ['critical', 'high'].includes(anomaly.severity) ? 'error' : 'warning', anomaly.description || `${anomaly.type} anomaly`, `Observed ${anomaly.value}; expected ${anomaly.expectedValue}`, { deepLink: `/workspace/monitoring/${monitor._id}/analytics` })));
+    return envelope({
+        descriptor,
+        label: monitor.name,
+        workspaceId: monitor.workspaceId,
+        deepLink: `/workspace/monitoring/${monitor._id}/history`,
+        data: {
+            name: monitor.name, method: monitor.method, url: monitor.url, status: monitor.currentStatus,
+            lastChecked: safeDate(monitor.lastChecked), averageResponseTime: monitor.averageResponseTime,
+            consecutiveFailures: monitor.consecutiveFailures, slaTargets: monitor.slaTargets, tags: monitor.tags
+        },
+        evidence
+    });
+}
+
+async function resolveAlert(descriptor, user) {
+    const id = asId(descriptor.id);
+    if (!id) return null;
+    const alert = await getDb().collection('alerts').findOne({ _id: id });
+    if (!alert) return null;
+    const monitor = await loadAccessibleMonitor(alert.monitorId, user);
+    if (!monitor) return null;
+    const evidence = [fact('alert', ['critical', 'high'].includes(alert.severity) ? 'error' : 'warning', alert.title, alert.description || '', { relation: alert.incidentId ? 'confirmed' : 'inferred', confidenceReason: alert.incidentId ? 'The alert stores an incident ID.' : 'This is a standalone monitor alert.', deepLink: '/workspace/monitoring/alerts' })];
+    return envelope({
+        descriptor,
+        label: alert.title,
+        workspaceId: monitor.workspaceId,
+        deepLink: '/workspace/monitoring/alerts',
+        data: { title: alert.title, description: alert.description, severity: alert.severity, status: alert.status, triggeredAt: safeDate(alert.triggeredAt), resolvedAt: safeDate(alert.resolvedAt), monitorName: monitor.name, checkResult: alert.checkResult, incidentId: idOf(alert.incidentId) },
+        evidence
+    });
+}
+
+async function resolveAnalytics(descriptor, user) {
+    const id = asId(descriptor.id);
+    if (!id) return null;
+    const row = await getDb().collection('analytics').findOne({ _id: id });
+    if (!row) return null;
+    const monitor = await loadAccessibleMonitor(row.monitorId, user);
+    if (!monitor) return null;
+    const evidence = (row.anomalies || []).filter((anomaly) => !anomaly.resolved).slice(0, 12).map((anomaly) => fact('analytics', ['critical', 'high'].includes(anomaly.severity) ? 'error' : 'warning', anomaly.description || `${anomaly.type} anomaly`, `Observed ${anomaly.value}; expected ${anomaly.expectedValue}`));
+    return envelope({ descriptor, label: `${monitor.name} analytics`, workspaceId: monitor.workspaceId, deepLink: `/workspace/monitoring/${monitor._id}/analytics`, data: { timestamp: safeDate(row.timestamp), aggregationPeriod: row.aggregationPeriod, metrics: row.metrics, trends: row.trends, predictions: row.predictions, healthScore: row.healthScore }, evidence });
+}
+
 async function resolveDescriptor(descriptor, user, prompt, legacyCollectionResolver) {
     switch (descriptor.type) {
         case 'workspace': return resolveWorkspace(descriptor, user);
@@ -459,6 +526,9 @@ async function resolveDescriptor(descriptor, user, prompt, legacyCollectionResol
         case 'trace': return resolveTrace(descriptor, user);
         case 'test_run': return resolveRun(descriptor, user);
         case 'incident': return resolveIncident(descriptor, user);
+        case 'monitor': return resolveMonitor(descriptor, user);
+        case 'alert': return resolveAlert(descriptor, user);
+        case 'analytics': return resolveAnalytics(descriptor, user);
         default: return null;
     }
 }
@@ -501,14 +571,23 @@ async function listSources({ workspaceId, query = '', types = [] }, user) {
     const values = userValues(user);
     const regex = query ? new RegExp(String(query).replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i') : null;
     const runSourcesPromise = include('test_run') ? listRunSources(wsId, user) : Promise.resolve([]);
-    const [collections, histories, traces, incidents, workspaces, runSources] = await Promise.all([
+    const [collections, histories, traces, incidents, workspaces, runSources, monitors] = await Promise.all([
         include('collection') || include('request') || include('governance') ? db.collection('collections').find({ ...collectionAccessFilter(user), ...(wsId ? { workspaceId: wsId } : {}) }).project({ name: 1, workspaceId: 1, requests: 1 }).limit(60).toArray() : [],
         include('history') ? db.collection('histories').find({ userId: { $in: values }, ...(regex ? { $or: [{ url: regex }, { method: regex }] } : {}) }).sort({ timestamp: -1 }).limit(30).toArray() : [],
         include('trace') && wsId ? db.collection('traces').find({ workspaceId: wsId, ...(regex ? { $or: [{ traceId: regex }, { route: regex }, { rootServiceName: regex }] } : {}) }).sort({ startTime: -1 }).limit(30).toArray() : [],
         include('incident') && wsId ? db.collection('incidents').find({ workspaceId: wsId, ...(regex ? { title: regex } : {}) }).sort({ createdAt: -1 }).limit(30).toArray() : [],
         include('workspace') ? db.collection('workspaces').find({ ...workspaceAccessFilter(user), ...(wsId ? { _id: wsId } : {}), ...(regex ? { name: regex } : {}) }).project({ name: 1 }).limit(30).toArray() : [],
-        runSourcesPromise
+        runSourcesPromise,
+        include('monitor') || include('alert') || include('analytics')
+            ? db.collection('monitors').find(wsId ? { workspaceId: wsId } : { userId: { $in: values } }).project({ name: 1, workspaceId: 1, currentStatus: 1, url: 1 }).limit(60).toArray()
+            : []
     ]);
+    const monitorIds = monitors.map((monitor) => monitor._id);
+    const [alerts, analyticsRows] = await Promise.all([
+        include('alert') && monitorIds.length ? db.collection('alerts').find({ monitorId: { $in: monitorIds }, ...(regex ? { $or: [{ title: regex }, { description: regex }] } : {}) }).sort({ triggeredAt: -1 }).limit(30).toArray() : [],
+        include('analytics') && monitorIds.length ? db.collection('analytics').find({ monitorId: { $in: monitorIds } }).sort({ timestamp: -1 }).limit(30).toArray() : []
+    ]);
+    const monitorById = new Map(monitors.map((monitor) => [idOf(monitor._id), monitor]));
     const sources = [];
     workspaces.forEach((workspace) => sources.push({ type: 'workspace', id: String(workspace._id), workspaceId: String(workspace._id), label: workspace.name, detail: 'Workspace overview' }));
     collections.forEach((collection) => {
@@ -524,6 +603,9 @@ async function listSources({ workspaceId, query = '', types = [] }, user) {
     histories.forEach((history) => sources.push({ type: 'history', id: String(history._id), workspaceId: '', label: `${history.method || 'GET'} ${routeOf(history.url)}`, detail: `${history.responseStatus || 'No status'} · ${safeDate(history.timestamp) || ''}` }));
     traces.forEach((trace) => sources.push({ type: 'trace', id: trace.traceId, workspaceId: idOf(trace.workspaceId), label: `${trace.rootServiceName || 'Trace'} · ${trace.route || trace.traceId}`, detail: trace.hasError ? 'Contains errors' : `${trace.durationMs || 0} ms` }));
     incidents.forEach((incident) => sources.push({ type: 'incident', id: String(incident._id), workspaceId: idOf(incident.workspaceId), label: incident.title, detail: `${incident.severity || 'medium'} · ${incident.status || 'open'}` }));
+    monitors.filter((monitor) => !regex || regex.test(monitor.name || '') || regex.test(monitor.url || '')).forEach((monitor) => sources.push({ type: 'monitor', id: idOf(monitor._id), workspaceId: idOf(monitor.workspaceId), label: monitor.name, detail: `${monitor.currentStatus || 'unknown'} · ${monitor.url || ''}` }));
+    alerts.forEach((alert) => sources.push({ type: 'alert', id: idOf(alert._id), workspaceId: idOf(monitorById.get(idOf(alert.monitorId))?.workspaceId), label: alert.title, detail: `${alert.severity || 'medium'} · ${alert.status || 'triggered'}` }));
+    analyticsRows.filter((row) => !regex || regex.test(monitorById.get(idOf(row.monitorId))?.name || '')).forEach((row) => sources.push({ type: 'analytics', id: idOf(row._id), workspaceId: idOf(row.workspaceId || monitorById.get(idOf(row.monitorId))?.workspaceId), label: `${monitorById.get(idOf(row.monitorId))?.name || 'Monitor'} analytics`, detail: `${row.aggregationPeriod || 'period'} · health ${row.healthScore ?? 'unknown'}` }));
     runSources.filter((source) => !regex || regex.test(source.label) || regex.test(source.detail || '')).forEach((source) => sources.push(source));
     return sources.slice(0, 120);
 }

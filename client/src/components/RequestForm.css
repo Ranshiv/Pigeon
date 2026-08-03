@@ -1126,6 +1126,34 @@
 }
 
 /* Response Section Styling */
+.response-split-divider {
+    position: relative;
+    height: 8px;
+    flex: none;
+    cursor: row-resize;
+    touch-action: none;
+    border-top: 1px solid var(--border-color);
+    background: var(--background-color);
+}
+
+.response-split-divider::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 44px;
+    height: 3px;
+    border-radius: 999px;
+    background: var(--border-color);
+    transition: background .15s ease;
+}
+
+.response-split-divider:hover::after,
+.response-split-divider:active::after { background: var(--primary-color); }
+
+body.workspace-resizing { cursor: row-resize; user-select: none; }
+
 .response-section {
     border-top: 1px solid var(--border-color);
     padding: 24px;

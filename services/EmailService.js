@@ -377,98 +377,98 @@ class EmailService {
     }
 
     generateAlertHTML(monitor, healthCheck, alertType) {
-        const statusColor = {
-            failure: '#dc3545',
-            slow_response: '#ffc107',
-            recovery: '#28a745'
-        };
+        // Email clients (Gmail/Outlook) drop `display:grid` and often strip <style>,
+        // so this template is table-based with inline styles only.
+        const theme = {
+            failure: { color: '#dc3545', tint: '#fdeaec', heading: 'Monitor is down', label: 'Failure' },
+            slow_response: { color: '#b8860b', tint: '#fdf6e3', heading: 'Response time degraded', label: 'Slow response' },
+            recovery: { color: '#1e7e34', tint: '#e9f7ee', heading: 'Monitor recovered', label: 'Recovery' }
+        }[alertType] || { color: '#5a6268', tint: '#f1f3f5', heading: 'Monitor status update', label: 'Alert' };
 
-        const color = statusColor[alertType] || '#6c757d';
+        const dashboard = process.env.FRONTEND_URL || 'http://localhost:3000';
+        const esc = (value) => String(value ?? '').replace(/[&<>"]/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[char]));
+        const row = (label, value) => `
+                            <tr>
+                                <td style="padding:11px 0;border-bottom:1px solid #e9ecef;color:#6c757d;font-size:13px;white-space:nowrap;" valign="top">${esc(label)}</td>
+                                <td style="padding:11px 0 11px 20px;border-bottom:1px solid #e9ecef;color:#212529;font-size:14px;font-weight:600;text-align:right;word-break:break-word;" valign="top">${value}</td>
+                            </tr>`;
 
-        return `
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <meta charset="utf-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Monitor Alert</title>
-            <style>
-                body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; }
-                .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-                .header { background: ${color}; color: white; padding: 20px; border-radius: 8px 8px 0 0; }
-                .content { background: #f8f9fa; padding: 20px; border-radius: 0 0 8px 8px; }
-                .status-badge { display: inline-block; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; text-transform: uppercase; }
-                .status-${alertType} { background: ${color}; color: white; }
-                .info-grid { display: grid; grid-template-columns: auto 1fr; gap: 10px; margin: 20px 0; }
-                .info-label { font-weight: bold; color: #666; }
-                .footer { margin-top: 20px; padding-top: 20px; border-top: 1px solid #dee2e6; font-size: 12px; color: #666; }
-                a { color: ${color}; text-decoration: none; }
-            </style>
-        </head>
-        <body>
-            <div class="container">
-                <div class="header">
-                    <h1 style="margin: 0; font-size: 24px;">Monitor Alert</h1>
-                    <p style="margin: 10px 0 0 0; opacity: 0.9;">${monitor.name}</p>
-                </div>
-                
-                <div class="content">
-                    <div style="margin-bottom: 20px;">
-                        <span class="status-badge status-${alertType}">${alertType.replace('_', ' ')}</span>
-                    </div>
-                    
-                    <div class="info-grid">
-                        <span class="info-label">Monitor:</span>
-                        <span>${monitor.name}</span>
-                        
-                        <span class="info-label">URL:</span>
-                        <span><a href="${monitor.url}" target="_blank">${monitor.url}</a></span>
-                        
-                        <span class="info-label">Method:</span>
-                        <span>${monitor.method}</span>
-                        
-                        <span class="info-label">Status:</span>
-                        <span>${healthCheck.status.toUpperCase()}</span>
-                        
-                        <span class="info-label">Response Time:</span>
-                        <span>${healthCheck.responseTime}ms</span>
-                        
-                        ${healthCheck.statusCode ? `
-                        <span class="info-label">Status Code:</span>
-                        <span>${healthCheck.statusCode}</span>
-                        ` : ''}
-                        
-                        <span class="info-label">Checked At:</span>
-                        <span>${new Date(healthCheck.checkedAt).toLocaleString()}</span>
-                        
-                        ${monitor.consecutiveFailures > 0 ? `
-                        <span class="info-label">Consecutive Failures:</span>
-                        <span>${monitor.consecutiveFailures}</span>
-                        ` : ''}
-                    </div>
-                    
+        const rows = [
+            row('URL', `<a href="${esc(monitor.url)}" target="_blank" style="color:${theme.color};text-decoration:none;">${esc(monitor.url)}</a>`),
+            row('Method', esc(monitor.method)),
+            row('Status', esc(String(healthCheck.status).toUpperCase())),
+            row('Response time', `${esc(healthCheck.responseTime)} ms`),
+            healthCheck.statusCode ? row('Status code', esc(healthCheck.statusCode)) : '',
+            row('Checked at', esc(new Date(healthCheck.checkedAt).toLocaleString())),
+            monitor.consecutiveFailures > 0 ? row(alertType === 'recovery' ? 'Failures before recovery' : 'Consecutive failures', esc(monitor.consecutiveFailures)) : ''
+        ].join('');
+
+        return `<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>${esc(theme.heading)} — ${esc(monitor.name)}</title>
+</head>
+<body style="margin:0;padding:0;background:#f1f3f5;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+    <div style="display:none;max-height:0;overflow:hidden;opacity:0;">${esc(theme.heading)}: ${esc(monitor.name)} — ${esc(healthCheck.responseTime)} ms</div>
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f1f3f5;">
+        <tr>
+            <td align="center" style="padding:32px 16px;">
+                <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="width:100%;max-width:600px;background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 1px 3px rgba(16,24,40,0.1);">
+                    <tr>
+                        <td style="height:5px;background:${theme.color};line-height:5px;font-size:0;">&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td style="padding:28px 32px 22px;background:${theme.tint};">
+                            <span style="display:inline-block;padding:5px 11px;border-radius:999px;background:${theme.color};color:#ffffff;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;">${esc(theme.label)}</span>
+                            <h1 style="margin:14px 0 4px;color:#212529;font-size:22px;font-weight:700;">${esc(theme.heading)}</h1>
+                            <p style="margin:0;color:#495057;font-size:15px;">${esc(monitor.name)}</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="padding:8px 32px 4px;">
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">${rows}
+                            </table>
+                        </td>
+                    </tr>
                     ${healthCheck.errorMessage ? `
-                    <div style="margin-top: 20px; padding: 15px; background: #f8d7da; border: 1px solid #f5c6cb; border-radius: 4px; color: #721c24;">
-                        <strong>Error:</strong> ${healthCheck.errorMessage}
-                    </div>
-                    ` : ''}
-                    
-                    <div style="margin-top: 30px; text-align: center;">
-                        <a href="${process.env.FRONTEND_URL || 'http://localhost:3000'}/monitoring/status" 
-                           style="display: inline-block; background: ${color}; color: white; padding: 12px 24px; border-radius: 6px; font-weight: bold;">
-                            View Status Dashboard
-                        </a>
-                    </div>
-                </div>
-                
-                <div class="footer">
-                    <p>This alert was sent by Pigeon API Monitor. You're receiving this because you have monitoring alerts enabled for this endpoint.</p>
-                    <p>If you want to modify your alert settings, please visit your <a href="${process.env.FRONTEND_URL || 'http://localhost:3000'}/monitoring">monitoring dashboard</a>.</p>
-                </div>
-            </div>
-        </body>
-        </html>
-        `;
+                    <tr>
+                        <td style="padding:20px 32px 0;">
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#fdeaec;border-radius:8px;">
+                                <tr>
+                                    <td style="padding:14px 16px;border-left:3px solid #dc3545;color:#721c24;font-size:13px;line-height:1.5;">
+                                        <strong style="display:block;margin-bottom:3px;">Error</strong>${esc(healthCheck.errorMessage)}
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>` : ''}
+                    <tr>
+                        <td align="center" style="padding:28px 32px 32px;">
+                            <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                                <tr>
+                                    <td style="border-radius:8px;background:${theme.color};">
+                                        <a href="${dashboard}/monitoring/status" target="_blank" style="display:inline-block;padding:13px 28px;color:#ffffff;font-size:14px;font-weight:600;text-decoration:none;">View status dashboard</a>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+                <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="width:100%;max-width:600px;">
+                    <tr>
+                        <td style="padding:20px 32px;color:#868e96;font-size:12px;line-height:1.6;text-align:center;">
+                            Sent by Pigeon API Monitor because alerts are enabled for this endpoint.<br>
+                            <a href="${dashboard}/monitoring" target="_blank" style="color:#868e96;text-decoration:underline;">Manage alert settings</a>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>`;
     }
 
     generateAlertText(monitor, healthCheck, alertType) {
