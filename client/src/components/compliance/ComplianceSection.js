@@ -18,6 +18,7 @@ const ComplianceSection = () => {
         <div className="cmp-root">
             <header className="cmp-header">
                 <div className="cmp-header-text">
+                    <span className="cmp-eyebrow">Governance</span>
                     <h1 className="cmp-title">Compliance</h1>
                     <p className="cmp-subtitle">Audit logging, retention policies, and governance exports.</p>
                 </div>

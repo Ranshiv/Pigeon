@@ -85,10 +85,10 @@ const AuditLogPage = () => {
                     Audit Log
                 </div>
                 <div className="cmp-actions">
-                    <button className="cmp-btn cmp-btn--ghost" onClick={() => exportAuditLog('csv')}>
+                    <button type="button" className="cmp-btn cmp-btn--ghost" onClick={() => exportAuditLog('csv')}>
                         <FiDownload /> CSV
                     </button>
-                    <button className="cmp-btn cmp-btn--ghost" onClick={() => exportAuditLog('json')}>
+                    <button type="button" className="cmp-btn cmp-btn--ghost" onClick={() => exportAuditLog('json')}>
                         <FiDownload /> JSON
                     </button>
                 </div>
@@ -143,7 +143,7 @@ const AuditLogPage = () => {
 
                 <div className="cmp-filter-actions">
                     <div className="cmp-muted"><FiFilter /> Filters apply automatically.</div>
-                    <button className="cmp-btn cmp-btn--ghost" onClick={() => fetchAuditEvents()} disabled={loading}>
+                    <button type="button" className="cmp-btn cmp-btn--ghost" onClick={() => fetchAuditEvents()} disabled={loading}>
                         <FiRefreshCw /> Refresh
                     </button>
                 </div>
