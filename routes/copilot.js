@@ -7,6 +7,7 @@ const nim = require('../services/CopilotNimClient');
 const copilot = require('../services/CopilotService');
 const contextual = require('../services/CopilotContextService');
 const operations = require('../services/OperationsCopilotService');
+const requestAgent = require('../services/RequestAgentService');
 
 const router = express.Router();
 const userId = (req) => String(req.user?.id || req.user?._id || '');
@@ -15,6 +16,27 @@ const ownedConversation = (id, req) => CopilotConversation.findOne({ _id: id, ow
 const serializeConversation = (conversation) => ({ id: String(conversation._id), workspaceId: conversation.workspaceId ? String(conversation.workspaceId) : null, title: conversation.title, profileId: conversation.profileId, messages: conversation.messages || [], createdAt: conversation.createdAt, updatedAt: conversation.updatedAt });
 
 router.get('/profiles', ensureAuthenticated, (_req, res) => res.json({ profiles: nim.publicProfiles() }));
+router.post('/request-assistant', ensureAuthenticated, async (req, res) => {
+    try {
+        const profile = nim.getProfile(req.body?.profileId) || nim.publicProfiles()[0] && nim.getProfile(nim.publicProfiles()[0].id);
+        if (!profile) return res.status(503).json({ message: 'The Request Agent is not configured.' });
+        if (req.body?.collectionId) {
+            const collection = await copilot.loadCollection(req.body.collectionId, req.user, 'viewer');
+            if (!collection) return res.status(404).json({ message: 'The selected collection is unavailable.' });
+        }
+        const result = await requestAgent.assist({
+            profile,
+            nim,
+            request: req.body?.request,
+            response: req.body?.response,
+            prompt: req.body?.prompt,
+            activeTab: req.body?.activeTab
+        });
+        return res.json(result);
+    } catch (error) {
+        return res.status(error.status || 400).json({ message: error.message || 'The Request Agent could not complete the request.' });
+    }
+});
 router.get('/operations/targets', ensureAuthenticated, async (req, res) => {
     try {
         return res.json(await operations.listTargets({ workspaceId: req.query.workspaceId }, req.user));

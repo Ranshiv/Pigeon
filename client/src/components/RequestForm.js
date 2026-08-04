@@ -43,12 +43,31 @@ import { NetworkFlowService } from './VisualApiDesigner/services/NetworkFlowServ
 import NetworkFlowHost from "./VisualApiDesigner/components/NetworkFlowHost";
 import AuthFlowHost from "./VisualApiDesigner/components/AuthFlowHost";
 import DebugConsoleHost from "./VisualApiDesigner/components/DebugConsoleHost";
+import RequestAgentPanel from './RequestAgentPanel';
 
 const getApiUrl = (path) => path;
 
 // Request types supported by a collection. GraphQL is sent over HTTP POST but
 // is modelled explicitly so its query, variables, and SDL can be saved.
 const REQUEST_METHODS = ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'HEAD', 'OPTIONS', 'GRAPHQL'];
+const cloneRequestAgentDraft = (draft) => JSON.parse(JSON.stringify(draft));
+const normalizeFormRows = (rows) => (Array.isArray(rows) ? rows : []).filter((row) => row && typeof row === 'object').map((row) => ({
+    ...row,
+    enabled: row.enabled !== false,
+    key: String(row.key ?? row.name ?? ''),
+    value: row.value == null ? '' : String(row.value),
+    description: String(row.description || '')
+}));
+const normalizeAuthState = (value) => {
+    const auth = value && typeof value === 'object' ? value : {};
+    return {
+        type: auth.type || 'No Auth',
+        bearer: { token: '', ...(auth.bearer || {}) },
+        basic: { username: '', password: '', ...(auth.basic || {}) },
+        apiKey: { key: '', value: '', location: 'header', ...(auth.apiKey || {}) },
+        oauth2: { grantType: 'authorization_code', clientId: '', clientSecret: '', authUrl: '', tokenUrl: '', scope: '', redirectUri: '', accessToken: '', refreshToken: '', tokenStatus: 'not_authenticated', ...(auth.oauth2 || {}) }
+    };
+};
 
 /* Resizable key/value/description columns for the Params + Headers tables.
    Usage: call useColumnResizer(tableId) -> returns { widths, startDrag, resizer }.
@@ -121,6 +140,8 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
     const [isLoading, setIsLoading] = useState(false);
     const [responseError, setResponseError] = useState(null);
     const [isSaving, setIsSaving] = useState(false);
+    const agentUndoRef = useRef(null);
+    const [hasAgentUndo, setHasAgentUndo] = useState(false);
 
     // Notify parent split-pane view of response state changes (used when
     // this form is embedded with an external ResponseDisplay pane).
@@ -131,9 +152,9 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
     }, [responseData, isLoading, responseError, onResponse]);
 
     // Tab content states
-    const [params, setParams] = useState(initialData.params || []);
-    const [bodyFormData, setBodyFormData] = useState(initialData.bodyFormData || [{ enabled: true, key: '', value: '', description: '' }]);
-    const [headers, setHeaders] = useState(initialData.headers || []);
+    const [params, setParams] = useState(normalizeFormRows(initialData.params));
+    const [bodyFormData, setBodyFormData] = useState(normalizeFormRows(initialData.bodyFormData || [{ enabled: true, key: '', value: '', description: '' }]));
+    const [headers, setHeaders] = useState(normalizeFormRows(initialData.headers));
     const [bodyType, setBodyType] = useState(initialData.bodyType || 'none');
     const [bodyContent, setBodyContent] = useState(initialData.body || '');
     const [graphqlConfig, setGraphqlConfig] = useState(() => ({
@@ -154,27 +175,10 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
     };
     const [preRequestScript, setPreRequestScript] = useState(initialData.preRequestScript || '');
     const [tests, setTests] = useState(initialData.tests || '');
-    const [variables, setVariables] = useState(initialData.variables || []);
+    const [variables, setVariables] = useState(normalizeFormRows(initialData.variables));
 
     // Authentication state
-    const [authConfig, setAuthConfig] = useState(initialData.authConfig || {
-        type: 'No Auth',
-        bearer: { token: '' },
-        basic: { username: '', password: '' },
-        apiKey: { key: '', value: '', location: 'header' },
-        oauth2: {
-            grantType: 'authorization_code',
-            clientId: '',
-            clientSecret: '',
-            authUrl: '',
-            tokenUrl: '',
-            scope: '',
-            redirectUri: '',
-            accessToken: '',
-            refreshToken: '',
-            tokenStatus: 'not_authenticated'
-        }
-    });
+    const [authConfig, setAuthConfig] = useState(() => normalizeAuthState(initialData.authConfig));
 
     // SSL configuration state
     const [sslConfig, setSSLConfig] = useState(initialData.sslConfig || {
@@ -237,9 +241,9 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
         setMethod(nextData.method || 'GET');
         setUrl(nextData.url || '');
         setRequestName(nextData.name || 'Get Users');
-        setParams(nextData.params || []);
-        setHeaders(nextData.headers || []);
-        setBodyFormData(nextData.bodyFormData || [{ enabled: true, key: '', value: '', description: '' }]);
+        setParams(normalizeFormRows(nextData.params));
+        setHeaders(normalizeFormRows(nextData.headers));
+        setBodyFormData(normalizeFormRows(nextData.bodyFormData || [{ enabled: true, key: '', value: '', description: '' }]));
         setBodyType(nextData.bodyType || 'none');
         setBodyContent(nextData.body || '');
         const nextGraphql = nextData.graphql || {};
@@ -248,25 +252,8 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
         setBinaryFile(null);
         setPreRequestScript(nextData.preRequestScript || '');
         setTests(nextData.tests || nextData.testScript || '');
-        setVariables(nextData.variables || []);
-        setAuthConfig(nextData.authConfig || {
-            type: 'No Auth',
-            bearer: { token: '' },
-            basic: { username: '', password: '' },
-            apiKey: { key: '', value: '', location: 'header' },
-            oauth2: {
-                grantType: 'authorization_code',
-                clientId: '',
-                clientSecret: '',
-                authUrl: '',
-                tokenUrl: '',
-                scope: '',
-                redirectUri: '',
-                accessToken: '',
-                refreshToken: '',
-                tokenStatus: 'not_authenticated'
-            }
-        });
+        setVariables(normalizeFormRows(nextData.variables));
+        setAuthConfig(normalizeAuthState(nextData.authConfig));
         setSSLConfig(nextData.sslConfig || {
             verifyCert: true,
             allowSelfSigned: false,
@@ -867,6 +854,75 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
             setIsSaving(false);
         }
     };    // Form submission handler
+
+    const requestAgentDraft = {
+        _id: initialData._id || initialData.id,
+        id: initialData.id || initialData._id,
+        name: requestName,
+        method,
+        url,
+        params,
+        headers,
+        authConfig,
+        bodyType,
+        body: bodyContent,
+        bodyFormData,
+        variables,
+        preRequestScript,
+        tests,
+        sslConfig
+    };
+
+    const applyRequestAgentPatch = (patch) => {
+        if (!patch || typeof patch.field !== 'string') return;
+        const value = patch.value;
+        switch (patch.field) {
+            case 'name': setRequestName(String(value || '')); break;
+            case 'method': setMethod(String(value || '').toUpperCase()); break;
+            case 'url': setUrl(String(value || '')); break;
+            case 'params': setParams(normalizeFormRows(value)); break;
+            case 'headers': setHeaders(normalizeFormRows(value)); break;
+            case 'authConfig': setAuthConfig(value && typeof value === 'object' ? normalizeAuthState(value) : authConfig); break;
+            case 'bodyType': setBodyType(String(value || 'none')); break;
+            case 'body': setBodyContent(String(value || '')); break;
+            case 'bodyFormData': setBodyFormData(normalizeFormRows(value)); break;
+            case 'variables': setVariables(normalizeFormRows(value)); break;
+            case 'preRequestScript': setPreRequestScript(String(value || '')); break;
+            case 'tests': setTests(String(value || '')); break;
+            case 'sslConfig': setSSLConfig(value && typeof value === 'object' ? value : sslConfig); break;
+            default: break;
+        }
+    };
+
+    const applyRequestAgentPatches = (patches) => {
+        const validPatches = Array.isArray(patches) ? patches.filter((patch) => patch?.field) : [];
+        if (!validPatches.length) return;
+        agentUndoRef.current = cloneRequestAgentDraft(requestAgentDraft);
+        validPatches.forEach(applyRequestAgentPatch);
+        setHasAgentUndo(true);
+    };
+
+    const undoRequestAgentPatches = () => {
+        const previous = agentUndoRef.current;
+        if (!previous) return;
+        setRequestName(previous.name || '');
+        setMethod(previous.method || 'GET');
+        setUrl(previous.url || '');
+        setParams(normalizeFormRows(previous.params));
+        setHeaders(normalizeFormRows(previous.headers));
+        setAuthConfig(normalizeAuthState(previous.authConfig));
+        setBodyType(previous.bodyType || 'none');
+        setBodyContent(previous.body || '');
+        setBodyFormData(normalizeFormRows(previous.bodyFormData));
+        setVariables(normalizeFormRows(previous.variables));
+        setPreRequestScript(previous.preRequestScript || '');
+        setTests(previous.tests || '');
+        setSSLConfig(previous.sslConfig || {});
+        agentUndoRef.current = null;
+        setHasAgentUndo(false);
+    };
+
+    // Form submission handler
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -3072,6 +3128,16 @@ const RequestForm = ({ onSendRequest, onSubmit, onSave, onRunRequest, initialReq
                         {isSaving ? 'Saving...' : 'Save'}
                     </button>
                 </div>
+
+                <RequestAgentPanel
+                    request={requestAgentDraft}
+                    response={responseData || (responseError ? { error: responseError } : null)}
+                    collectionId={collectionId}
+                    activeTab={activeTab}
+                    onApplyPatches={applyRequestAgentPatches}
+                    onUndo={undoRequestAgentPatches}
+                    canUndo={hasAgentUndo}
+                />
 
                 {/* Variable validation display */}
                 {!variableValidation.isValid && !isVariableWarningDismissed && (
