@@ -47,6 +47,7 @@ export const documentationSections = [
             ['Work with OpenAPI', 'Import, validate, preview, and export OpenAPI definitions.', '/workspace/api-network'],
             ['Manage API versions', 'Track versions and compare changes with API diffs.', '/workspace/api-network'],
             ['Write collection documentation', 'Edit API documentation content and settings.', '/documentation'],
+            ['Generate AI documentation', 'Turn collections or OpenAPI contracts into reviewable documentation drafts.', '/documentation'],
             ['Publish public documentation', 'Publish a collection documentation site for consumers.', '/documentation']
         ]
     },
@@ -57,7 +58,7 @@ export const documentationSections = [
             ['Use the marketplace', 'Browse API listings, categories, reviews, and community discussions.', '/workspace/api-network'],
             ['Use the MCP workbench', 'Connect MCP profiles and test tool interactions.', '/workspace/api-network/mcp'],
             ['Create a collection MCP server', 'Expose collection capabilities through an MCP server.', '/workspace/workspaces'],
-            ['Use AI agent tools', 'Generate tests, analyze APIs, and accelerate documentation work.', '/workspace/api-network']
+            ['Use Pigeon Copilot', 'Ask context-aware questions about requests, collections, traces, and workspace evidence.', '/workspace/api-network']
         ]
     },
     {
@@ -402,9 +403,9 @@ const troubleshootingByCategory = {
 
 export const learningPaths = [
     { id: 'new-user', title: 'New to Pigeon', description: 'Go from your first workspace to a repeatable API check.', guides: ['Create a workspace', 'Create a collection', 'Send your first request', 'Create an environment', 'Write test scripts'] },
-    { id: 'api-builder', title: 'API developer', description: 'Design, validate, document, and publish an API contract.', guides: ['Design an API visually', 'Work with OpenAPI', 'Manage API versions', 'Write collection documentation', 'Publish public documentation'] },
+    { id: 'api-builder', title: 'API developer', description: 'Design, validate, document, and publish an API contract.', guides: ['Design an API visually', 'Work with OpenAPI', 'Manage API versions', 'Write collection documentation', 'Generate AI documentation', 'Publish public documentation'] },
     { id: 'quality', title: 'QA engineer', description: 'Build confidence with requests, contracts, traces, and failure tests.', guides: ['Build an HTTP request', 'Write test scripts', 'Generate AI test suites', 'Run consumer contract tests', 'Generate tests from traces', 'Run fuzz tests'] },
-    { id: 'operations', title: 'Platform engineer', description: 'Set up monitors, alerts, incidents, and performance baselines.', guides: ['Create an API monitor', 'Configure alerts and policies', 'Manage incidents and maintenance', 'Run a performance test', 'Create monitoring reports'] }
+    { id: 'operations', title: 'Platform engineer', description: 'Set up monitors, alerts, incidents, and performance baselines.', guides: ['Create an API monitor', 'Configure alerts and policies', 'Manage incidents and maintenance', 'Investigate with Operations Copilot', 'Run a performance test', 'Create monitoring reports'] }
 ];
 
 const examplesByTitle = {
@@ -419,9 +420,11 @@ const examplesByTitle = {
     'Manage API versions': ['Version review', 'text', 'Current: v2\nPrevious: v1\nBreaking change: removed response field\nAction: add migration note before publishing'],
     'Publish public documentation': ['Publish checklist', 'text', 'Title: Payments API\nVisibility: Public\nIncluded: overview, auth, examples, errors\nVerify: open the public URL in a signed-out window'],
     'Use the MCP workbench': ['MCP connection', 'text', 'Profile: local-tools\nServer: http://localhost:3000/mcp\nFirst action: list tools\nSafety: run read-only tool first'],
+    'Use Pigeon Copilot': ['Evidence-led question', 'text', 'Context: Payments collection · GET /payments/{id}\nPinned evidence: latest trace + failed history run\nQuestion: Why did this request regress?\nReview: citations, confidence, proposed next step'],
     'Test GraphQL APIs': ['GraphQL query', 'graphql', 'query GetUser($id: ID!) {\n  user(id: $id) { id name status }\n}\n\nVariables: { "id": "42" }'],
     'Test protocols': ['WebSocket smoke test', 'text', 'URL: wss://echo.websocket.org\nSend: { "type": "ping" }\nExpected: matching message received'],
     'Convert protocols': ['Conversion input', 'text', 'Source: GraphQL query\nTarget: HTTP request\nReview after conversion: URL, headers, variables, and body'],
+    'Generate AI documentation': ['Documentation draft', 'text', 'Input: OpenAPI contract or Pigeon collection\nSelect: operations, sections, audience, style\nWorkflow: generate → review → apply → revise → publish'],
     'Generate AI test suites': ['Generated suite', 'text', 'Sources: OpenAPI + saved traffic\nCoverage: positive, negative, boundary, authorization, schema, regression\nWorkflow: generate → review → approve → materialize → run'],
     'Generate tests from traces': ['Trace workflow', 'text', 'Input: trace.json\nFilter: POST /payments\nGenerated test: valid payment request\nVerify: remove production identifiers before saving'],
     'Run consumer contract tests': ['Contract check', 'json', '{ "consumer": "checkout-ui", "provider": "payments-api", "path": "/payments/42", "expected": 200 }'],
@@ -432,6 +435,7 @@ const examplesByTitle = {
     'Create an API monitor': ['Monitor definition', 'text', 'Name: Payments health\nRequest: GET /health\nInterval: 5 minutes\nAlert: 3 consecutive failures'],
     'Configure alerts and policies': ['Alert policy', 'text', 'Condition: availability < 99%\nGroup by: monitor\nRoute: on-call team\nEscalate after: 10 minutes'],
     'Manage incidents and maintenance': ['Incident update', 'text', 'Status: Investigating\nImpact: checkout requests failing\nNext update: 15 minutes\nRelated maintenance: database migration'],
+    'Investigate with Operations Copilot': ['Operational briefing', 'text', 'Target: checkout monitor\nEvidence: alerts + monitor history + traces\nResult: corroborated hypothesis with confidence labels\nAction: editable internal and customer-facing drafts'],
     'Run a performance test': ['Load profile', 'text', 'Users: 10\nRamp-up: 60 seconds\nDuration: 5 minutes\nTarget: staging\nPass: p95 < 500ms, errors < 1%']
 };
 
@@ -578,11 +582,13 @@ const specificTitleGuidance = {
     'Use the marketplace': ['Open the marketplace from API Network and choose a category or search term.', 'Read the listing details, reviews, health information, guide content, and plan requirements.', 'Open the API detail and try a safe operation with test credentials.', 'Add the useful resource to a collection and note its ownership and limits.'],
     'Use the MCP workbench': ['Open MCP Workbench and select or create a connection profile.', 'Verify the server URL and authentication without exposing the secret in a shared note.', 'List tools first, then run one read-only tool with a small input.', 'Record the tool output and permission requirements before enabling write actions.'],
     'Create a collection MCP server': ['Open the collection MCP server panel from the collection detail view.', 'Choose which collection capabilities and request actions should be exposed.', 'Configure access and the server profile, then start the server in a safe environment.', 'Connect from MCP Workbench and verify a read-only collection operation.'],
-    'Use AI agent tools': ['Open AI agent tools and choose the task such as test generation, API analysis, or documentation.', 'Provide the smallest collection or specification context needed for a useful result.', 'Review generated content for secrets, incorrect assumptions, and unsupported behavior.', 'Apply only the verified changes and save the human decision with the artifact.'],
+    'Use Pigeon Copilot': ['Open the Copilot sidecar from a workspace page or collection and review the active page context.', 'Ask a focused question about the current request, collection, trace, incident, or monitor; pin additional evidence when needed.', 'Review citations, evidence labels, and proposed actions for accuracy and scope.', 'Confirm only safe, understood actions and preserve the resulting conversation or artifact as the handoff record.'],
+    'Generate AI documentation': ['Open a collection’s Documentation page and choose AI Generate.', 'Use the collection as-is or validate and import an OpenAPI contract, then select operations, sections, audience, and style.', 'Review warnings and every generated section; check examples, authentication guidance, and unsupported assumptions.', 'Apply selected sections in merge or replace mode, save the revision, and publish only after an explicit human review.'],
     'Test GraphQL APIs': ['Open GraphQL Tester and select the endpoint and schema context.', 'Write a query or mutation and define variables separately from the operation.', 'Run the operation and inspect both data and the errors array.', 'Save a working query and add an assertion for the fields the client depends on.'],
     'Test protocols': ['Open Protocol Tester and choose WebSocket, gRPC, SOAP, MQTT, or SSE.', 'Provide the endpoint-specific connection details and a safe sample payload.', 'Connect or send once, then inspect messages, metadata, and connection errors.', 'Save the working setup and document any broker, certificate, or schema requirement.'],
     'Convert protocols': ['Open Protocol Converter and select the source and target protocol.', 'Import or enter the smallest valid source request.', 'Review the generated endpoint, headers, variables, and body for semantic differences.', 'Export or save the converted request, then verify it against a safe endpoint.'],
-    'Generate AI test suites': ['Open AI Test Generator and select saved specifications, requests, or traffic.', 'Choose individual operations, coverage categories, and optional authorization profiles.', 'Review deterministic and AI-enriched cases, evidence, warnings, and blocked prerequisites.', 'Approve and materialize selected cases, then explicitly run them against a non-production environment.'],
+    'Generate AI test suites': ['Open AI Test Generator and select an OpenAPI or AsyncAPI version, saved request, trace, history item, or mock recording.', 'Choose operations, positive/negative/boundary/authorization/schema/regression categories, and optional authorization profiles.', 'Review deterministic and AI-enriched cases, source evidence, warnings, limits, and blocked prerequisites; disable anything unnecessary.', 'Approve and materialize only the selected cases, then run them explicitly against a non-production environment.'],
+    'Investigate with Operations Copilot': ['Open Operations Copilot from Monitoring or an incident/monitor view and select the target signal.', 'Choose the investigation window and let Pigeon correlate alerts, monitor checks, analytics, incidents, and retained OpenTelemetry traces.', 'Separate confirmed links from inferred relationships, inspect the evidence and confidence labels, and ask follow-up questions against the retained snapshot.', 'Copy or insert an editable status draft only after review; inserting text does not save, notify subscribers, or publish a status page.'],
     'Generate tests from traces': ['Open Trace to Test and import a sanitized trace or supported telemetry file.', 'Filter the trace to the operation and status patterns worth testing.', 'Review generated requests, variables, and assertions before saving them.', 'Run one generated test and remove production identifiers from the resulting collection.'],
     'Run consumer contract tests': ['Open Consumer Contracts and create or select a consumer/provider contract.', 'Define the interaction, request, expected status, and response fields the consumer requires.', 'Run the contract against the provider environment and inspect the diff if it fails.', 'Save the run and notify the provider with the exact incompatible interaction.'],
     'Run fuzz tests': ['Open the fuzz testing panel and choose a schema or request to exercise.', 'Set safe limits for generated cases, rate, duration, and target environment.', 'Run the test and inspect the failing input, response, and reproducibility details.', 'Save a minimized failing case as a regression test and stop excessive or unsafe runs.'],
@@ -667,7 +673,8 @@ const routeOverrides = {
     'Use the MCP workbench': '/workspace/api-network/mcp',
     'Explore the API Network': '/workspace/api-network/explore',
     'Use the marketplace': '/workspace/api-network/explore',
-    'Use AI agent tools': '/workspace/api-network/ai-agent-tools'
+    'Use Pigeon Copilot': '/workspace/home',
+    'Generate AI documentation': '/documentation'
 };
 
 const referenceEntriesByTitle = {
