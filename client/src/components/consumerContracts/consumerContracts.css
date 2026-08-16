@@ -759,3 +759,124 @@
     .ccd-header-actions { width: 100%; }
     .ccd-header-actions .ccd-btn { flex: 1; justify-content: center; }
 }
+
+/* ===== Reference-density pass =====
+   Consumer contracts is intentionally a compact, information-dense workspace
+   surface. Keep these values local to the page so the rest of the workspace
+   can retain its larger dashboard rhythm. */
+.ccd-root {
+    gap: 24px;
+}
+
+.ccd-kicker {
+    gap: 6px;
+    margin-bottom: 7px;
+    font-size: 0.64rem;
+    letter-spacing: 0.065em;
+}
+
+.ccd-kicker svg {
+    width: 13px;
+    height: 13px;
+}
+
+.ccd-title {
+    font-size: clamp(1.5rem, 1.35rem + 0.35vw, 1.65rem);
+    line-height: 1.16;
+    letter-spacing: -0.025em;
+}
+
+.ccd-subtitle {
+    max-width: 72ch;
+    margin-top: 5px;
+    font-size: 0.76rem;
+    line-height: 1.35;
+}
+
+.ccd-header-actions {
+    gap: 10px;
+}
+
+.ccd-btn {
+    min-height: 38px;
+    padding: 8px 13px;
+    border-radius: 7px;
+    font-size: 0.76rem;
+    gap: 7px;
+}
+
+.ccd-btn--sm {
+    min-height: 30px;
+    padding: 5px 9px;
+    font-size: 0.72rem;
+}
+
+.ccd-btn--ghost {
+    border-color: transparent;
+    background: color-mix(in srgb, var(--surface-sunken) 88%, var(--text-color));
+}
+
+.ccd-card {
+    border-radius: 15px;
+    border-color: color-mix(in srgb, var(--accent, var(--primary-color)) 27%, var(--border-color));
+    box-shadow: none;
+}
+
+.ccd-card-head {
+    min-height: 64px;
+    padding: 17px 20px;
+    background: color-mix(in srgb, var(--accent, var(--primary-color)) 9%, var(--surface));
+}
+
+.ccd-card-title {
+    gap: 9px;
+    font-size: 0.82rem;
+}
+
+.ccd-card-title-icon {
+    width: 13px;
+    height: 13px;
+}
+
+.ccd-muted {
+    font-size: 0.67rem;
+}
+
+.ccd-filters {
+    padding: 17px 20px 18px;
+    gap: 12px;
+    background: var(--surface);
+}
+
+.ccd-field label {
+    margin-bottom: 5px;
+    font-size: 0.62rem;
+    letter-spacing: 0.035em;
+}
+
+.ccd-field .app-select-trigger {
+    min-height: 38px;
+    padding: 8px 10px;
+    border-radius: 7px;
+    border-color: transparent;
+    background: var(--surface-sunken);
+    font-size: 0.78rem;
+}
+
+.ccd-empty {
+    gap: 5px;
+    padding: 24px 18px 25px;
+    font-size: 0.7rem;
+    line-height: 1.4;
+}
+
+.ccd-empty strong {
+    font-size: 0.78rem;
+}
+
+@media (max-width: 620px) {
+    .ccd-root { gap: 18px; }
+    .ccd-title { font-size: 1.5rem; }
+    .ccd-subtitle { font-size: 0.78rem; }
+    .ccd-card-head, .ccd-filters { padding-left: 16px; padding-right: 16px; }
+}

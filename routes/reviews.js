@@ -24,7 +24,7 @@ function memberIdsOf(workspaces) {
     });
     return ids;
 }
-const { broadcastActivity, getUserSockets } = require('../utils/socket/socket-server');
+const { broadcastActivity, emitUserNotification } = require('../utils/socket/socket-server');
 const EmailService = require('../services/EmailService');
 const emailService = new EmailService();
 
@@ -98,35 +98,30 @@ router.post('/', ensureAuthenticated, async (req, res) => {
         // Broadcast populated activity to all connected clients
         const populatedActivity = await ActivityLog.findById(activity._id)
             .populate('user', 'displayName');
-        broadcastActivity(populatedActivity);
+        const reviewerIds = review.reviewers.map((reviewer) => String(reviewer.user));
+        broadcastActivity(populatedActivity, { excludeRecipientIds: reviewerIds });
 
-        // Notify reviewers directly: live socket ping to whoever's online, email fallback for everyone
+        // Notify reviewers through the durable in-app channel and email fallback.
         try {
             await review.populate('reviewers.user', 'displayName email');
             const requesterName = req.user.displayName || req.user.email || 'Someone';
-            const reviewerIds = review.reviewers.map(r => String(r.user._id));
-            const sockets = Array.from(getUserSockets().values())
-                .filter(u => reviewerIds.includes(String(u.userData?.id)));
-
-            sockets.forEach(({ socket }) => {
-                socket.emit('userActivity', {
-                    userId: req.user._id,
-                    activity: {
-                        type: 'review_requested',
-                        details: { reviewId: String(review._id), title, requesterName }
-                    },
-                    timestamp: new Date().toISOString()
-                });
-            });
-
-            await Promise.allSettled(review.reviewers.map(r => emailService.sendReviewRequestNotification({
-                toEmail: r.user.email,
-                toName: r.user.displayName,
-                requesterName,
-                title,
-                reviewId: String(review._id),
-                workspaceId: resourceWorkspaceId
-            })));
+            await Promise.allSettled(review.reviewers.flatMap((reviewer) => [
+                emitUserNotification(reviewer.user._id, {
+                    actorId: req.user._id,
+                    workspaceId: resourceWorkspaceId,
+                    type: 'review_requested',
+                    category: 'workspaceActivity',
+                    message: `${requesterName} requested your review on ${title}`
+                }),
+                emailService.sendReviewRequestNotification({
+                    toEmail: reviewer.user.email,
+                    toName: reviewer.user.displayName,
+                    requesterName,
+                    title,
+                    reviewId: String(review._id),
+                    workspaceId: resourceWorkspaceId
+                })
+            ]));
         } catch (notifyError) {
             console.error('Error notifying reviewers:', notifyError);
         }
@@ -185,32 +180,22 @@ router.patch('/:id/status', ensureAuthenticated, async (req, res) => {
 
         const populatedActivity = await ActivityLog.findById(activity._id)
             .populate('user', 'displayName');
-        broadcastActivity(populatedActivity);
+        const requesterId = review.requester && String(review.requester._id || review.requester);
+        broadcastActivity(populatedActivity, { excludeRecipientIds: requesterId ? [requesterId] : [] });
 
-        // Targeted ping to the requester: workspace room isolation would hide this if
-        // the requester isn't viewing the reviewed workspace, but they're the person
-        // who needs the outcome. Mirror the create route's reviewer-targeting pattern.
+        // Persist a targeted update for the requester. It remains available after a
+        // reconnect instead of depending on a momentary socket connection.
         try {
             await review.populate('requester', '_id');
-            const requesterId = review.requester && String(review.requester._id || review.requester);
             const reviewerName = req.user.displayName || req.user.email || 'A reviewer';
             if (requesterId) {
-                const sockets = Array.from(getUserSockets().values())
-                    .filter(u => String(u.userData?.id) === requesterId);
                 const actionType = status === 'approved' ? 'review_approve' : 'review_reject';
-                sockets.forEach(({ socket }) => {
-                    socket.emit('userActivity', {
-                        userId: req.user._id,
-                        activity: {
-                            type: 'log',
-                            details: {
-                                actionType,
-                                resourceName: review.title,
-                                actorName: reviewerName
-                            }
-                        },
-                        timestamp: new Date().toISOString()
-                    });
+                await emitUserNotification(requesterId, {
+                    actorId: req.user._id,
+                    workspaceId: reviewWorkspaceId,
+                    type: 'log',
+                    category: 'workspaceActivity',
+                    message: `${reviewerName} ${actionType === 'review_approve' ? 'approved' : 'rejected'} ${review.title}`
                 });
             }
         } catch (notifyError) {

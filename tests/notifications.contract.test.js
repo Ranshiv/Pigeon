@@ -1,10 +1,7 @@
 // ponytail: one runnable check — no framework. Verifies the contracts the live
-// notification path depends on:
-//  (a) broadcastActivity wraps a logged activity into the exact `userActivity`
-//      shape Notifications.js renders, and selects online workspace members;
-//  (b) the actor's userId string matches the localStorage form so self-activity is
-//      suppressed client-side (now compared as strings, id-form-robust);
-//  (c) the targeted reviewer/requester ping carries the same renderable shape.
+// notification path depends on durable appNotification entries. `userActivity`
+// remains for the activity feed; notification recipients exclude the actor and
+// honor each member's in-app/category preference.
 //
 // Run: node tests/notifications.contract.test.js
 
@@ -44,13 +41,24 @@ function recipients(workspace, connectedUsers) {
     .map((user) => user.id);
 }
 
-// Mirror of Notifications.js getNotificationMessage `log` case + self-suppression
-// (string-normalized on both sides, matching the hardened client comparison).
-function render(payload, currentUserId) {
-  if (currentUserId && String(payload.userId) === String(currentUserId)) return null;
+function renderActivity(payload) {
   const d = payload.activity.details;
   const labels = { review_approve: 'approved' };
   return `${d.actorName || 'Someone'} ${labels[d.actionType] || d.actionType || 'updated'} ${d.resourceName || ''}`.trim();
+}
+
+function notificationRecipients(workspace, users, actorId, category) {
+  const memberIds = new Set([
+    workspace.owner,
+    workspace.userId,
+    ...(workspace.collaborators || []).map((collaborator) => collaborator.userId)
+  ].filter(Boolean).map(String));
+  return users.filter((user) => (
+    memberIds.has(String(user.id)) &&
+    String(user.id) !== String(actorId) &&
+    user.preferences?.inAppEnabled !== false &&
+    user.preferences?.[category] !== false
+  )).map((user) => user.id);
 }
 
 // Simulated Mongoose-ish logged activity (after .populate('user','displayName'))
@@ -84,19 +92,20 @@ const deliveredTo = recipients(workspace, [
 ]);
 assert(deliveredTo.join(',') === 'owner-1,member-2', 'only connected workspace members receive a live notification: ' + deliveredTo);
 
-// 3. Other-user rendering approves/rejects read correctly.
-const text = render(payload, 'someoneElse');
+// 3. Activity formatting produces the durable notification message.
+const text = renderActivity(payload);
 assert(text === 'Priya approved Login flow review', 'other-user render: ' + text);
 
-// 4. Self-suppression fires even across id-form drift (id vs _id, padded forms).
-const selfTextA = render(payload, '507f1f77bcf86cd799439011');
-const selfTextB = render(payload, { _id: '507f1f77bcf86cd799439011' }._id);
-assert(selfTextA === null, 'self-activity (string id) must be suppressed, got: ' + selfTextA);
-assert(selfTextB === null, 'self-activity (_id form) must be suppressed via String() coercion, got: ' + selfTextB);
+// 4. Durable notification recipients exclude the actor and respect preferences.
+const notified = notificationRecipients(workspace, [
+  { id: 'owner-1', preferences: {} },
+  { id: 'member-2', preferences: {} },
+  { id: 'member-3', preferences: { workspaceActivity: false } },
+  { id: 'outsider-4', preferences: {} }
+], 'owner-1', 'workspaceActivity');
+assert(notified.join(',') === 'member-2', 'only opted-in non-actor members are persisted: ' + notified);
 
-// 5. The auth check route returns req.user where .id is the ObjectId string;
-//    if localStorage persists `id` as that string, it equals String(_id). This is the
-//    load-bearing match underlying targeted reviewer/requester socket selection.
+// 5. The auth check route returns req.user where .id is the ObjectId string.
 const userDoc = { _id: activity.user._id, id: activity.user._id };
 assert(String(userDoc._id) === userDoc.id, 'localStorage id form must equal String(_id)');
 

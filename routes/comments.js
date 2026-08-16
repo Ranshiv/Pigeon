@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const Comment = require('../models/Comment');
 const ActivityLog = require('../models/ActivityLog');
+const Collection = require('../models/Collection');
+const Request = require('../models/Request');
 const { broadcastActivity } = require('../utils/socket/socket-server');
 
 const ensureAuthenticated = (req, res, next) => {
@@ -11,10 +13,26 @@ const ensureAuthenticated = (req, res, next) => {
     return res.status(401).json({ error: 'Unauthorized' });
 };
 
+// Documentation is embedded in a collection, so both it and collection comments
+// resolve through Collection. This avoids sending an activity to the legacy
+// `default` room, whose recipients cannot be determined.
+async function resolveResourceWorkspace(resourceId, resourceType) {
+    if (resourceType === 'workspace') return resourceId;
+    const Model = resourceType === 'request'
+        ? Request
+        : ['collection', 'documentation'].includes(resourceType)
+            ? Collection
+            : null;
+    if (!Model) return null;
+    const resource = await Model.findById(resourceId, 'workspaceId').lean().catch(() => null);
+    return resource?.workspaceId ? String(resource.workspaceId) : null;
+}
+
 // Create a comment
 router.post('/', ensureAuthenticated, async (req, res) => {
     try {
         const { resourceId, resourceType, content, jsonPath, parentId } = req.body;
+        const workspaceId = await resolveResourceWorkspace(resourceId, resourceType);
 
         const comment = new Comment({
             resourceId,
@@ -31,9 +49,11 @@ router.post('/', ensureAuthenticated, async (req, res) => {
         // Populate author for immediate UI update
         await comment.populate('author', 'displayName email profilePicture');
 
-        // Log activity
+        // Log activity using the resource's actual workspace. Unscoped legacy
+        // resources remain visible in their activity history but are not pushed
+        // to a non-existent shared "default" notification room.
         const activity = await ActivityLog.create({
-            workspaceId: 'default', // Should ideally come from request context
+            workspaceId: workspaceId || 'default',
             user: req.user._id,
             actionType: 'comment',
             resourceId: resourceId,

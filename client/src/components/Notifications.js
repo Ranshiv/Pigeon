@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useLayoutEffect, useRef, useMemo, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { FiBell, FiX } from 'react-icons/fi';
+import { toast } from 'react-toastify';
 import './Notifications.css';
 import { useCollaboration } from '../context/CollaborationContext';
 
@@ -27,6 +28,16 @@ const isNotificationEnabled = (preferences, category) => (
   preferences.inAppEnabled !== false && preferences[category] !== false
 );
 
+const mergeNotificationEntries = (current, incoming) => {
+  const byId = new Map(current.map((entry) => [entry.id, entry]));
+  incoming.forEach((entry) => {
+    if (entry?.id) byId.set(entry.id, entry);
+  });
+  return Array.from(byId.values())
+    .sort((a, b) => new Date(b.timestamp || 0).getTime() - new Date(a.timestamp || 0).getTime())
+    .slice(0, 50);
+};
+
 const Notifications = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [userActivities, setUserActivities] = useState([]);
@@ -35,10 +46,8 @@ const Notifications = () => {
   const notificationButtonRef = useRef(null);
   const dropdownRef = useRef(null);
   const [dropdownPosition, setDropdownPosition] = useState({ top: 68, left: 8, width: 320, maxHeight: 380 });
-  const recentActivityRef = useRef(new Map());
-  const currentUserIdRef = useRef(null);
-  const monitorStatusRef = useRef(new Map());
   const notificationPreferencesRef = useRef(defaultNotificationPreferences);
+  const notificationIdsRef = useRef(new Set());
   const { socket } = useCollaboration();
   const visibleActivities = useMemo(
     () => notificationPreferences.inAppEnabled === false
@@ -63,14 +72,9 @@ const Notifications = () => {
       const userStr = localStorage.getItem('user');
       if (userStr) {
         const user = JSON.parse(userStr);
-        // Normalize to string so self-activity suppression is robust to id-form drift
-        // (server emits String(_id); localStorage may store id or _id). compare as strings.
-        currentUserIdRef.current = String(user?.id || user?._id || '') || null;
         if (user?.notificationPreferences) applyNotificationPreferences(user.notificationPreferences);
       }
-    } catch {
-      currentUserIdRef.current = null;
-    }
+    } catch {}
 
     const handlePreferencesUpdated = (event) => applyNotificationPreferences(event.detail);
     window.addEventListener('notification-preferences-updated', handlePreferencesUpdated);
@@ -80,7 +84,6 @@ const Notifications = () => {
       .then((res) => res.ok ? res.json() : null)
       .then((data) => {
         if (cancelled || !data?.isAuthenticated || !data.user) return;
-        currentUserIdRef.current = String(data.user._id || data.user.id || '') || null;
         applyNotificationPreferences(data.user.notificationPreferences);
       })
       .catch(() => {});
@@ -100,7 +103,11 @@ const Notifications = () => {
         if (!res.ok) return;
         const data = await res.json();
         if (cancelled || !Array.isArray(data.notifications)) return;
-        setUserActivities(data.notifications);
+        notificationIdsRef.current = new Set([
+          ...notificationIdsRef.current,
+          ...data.notifications.map((notification) => notification.id).filter(Boolean)
+        ]);
+        setUserActivities((current) => mergeNotificationEntries(current, data.notifications));
       } catch {
         // history is best-effort; live socket events still work
       }
@@ -152,116 +159,42 @@ const Notifications = () => {
     };
   }, [isOpen]);
 
-  // Listen for user activity events
+  // The bell only consumes durable appNotification events. userActivity and
+  // monitor_update remain real-time collaboration/dashboard signals, not items
+  // with a server-backed read state.
   useEffect(() => {
     if (!socket) return;
 
-    const handleUserActivity = (data) => {
-      if (!data || !data.activity) return;
-
-      const { activity, userId, timestamp = new Date().toISOString() } = data;
-
-      if (!isNotificationEnabled(notificationPreferencesRef.current, 'workspaceActivity')) return;
-
-      // Ignore self-activity (common when a user has multiple tabs/sockets open).
-      // Compare as strings: server emits String(_id), localStorage id may differ in form.
-      if (currentUserIdRef.current && String(userId) === String(currentUserIdRef.current)) return;
-
-      // Basic de-duplication / flood protection
-      let detailsKey = '';
-      try {
-        detailsKey = activity?.details ? JSON.stringify(activity.details) : '';
-      } catch {
-        detailsKey = String(activity?.details);
-      }
-      const signature = `${userId}|${activity?.type}|${detailsKey}`;
-      const now = Date.now();
-      const last = recentActivityRef.current.get(signature) || 0;
-      if (now - last < 1000) return;
-      recentActivityRef.current.set(signature, now);
-
-      // Add the new activity to our state
-      setUserActivities(prev => {
-        const newActivities = [
-          {
-            id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-            userId,
-            type: activity.type,
-            details: activity.details,
-            category: 'workspaceActivity',
-            timestamp,
-            read: false
-          },
-          ...prev
-        ].slice(0, 50); // Keep only the latest 50 notifications
-
-        return newActivities;
-      });
-
-    };
-
-    // Monitoring emits monitor_update on EVERY poll — only notify on status transitions
-    const handleMonitorUpdate = (data) => {
-      if (!data || !data.monitorId) return;
-      const status = data.currentStatus || data.status;
-      if (!isNotificationEnabled(notificationPreferencesRef.current, 'monitoring')) return;
-      const prev = monitorStatusRef.current.get(data.monitorId);
-      monitorStatusRef.current.set(data.monitorId, status);
-      // Seed healthy monitors quietly, but surface an already failing/degraded
-      // monitor the first time this browser receives it.
-      if ((prev === undefined && status === 'up') || prev === status) return;
-
-      setUserActivities(prevActs => [
-        {
-          id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-          type: 'monitor_status',
-          category: 'monitoring',
-          message: `${data.monitorName || 'Monitor'} is now ${status || 'updated'}`,
-          details: { monitorId: data.monitorId, monitorName: data.monitorName, status, responseTime: data.responseTime },
-          timestamp: data.timestamp || new Date().toISOString(),
-          read: false
-        },
-        ...prevActs
-      ].slice(0, 50));
-    };
-
     const handleAppNotification = (notification) => {
-      if (!notification?.message) return;
+      if (!notification?.id || !notification.message) return;
       const category = getActivityCategory(notification);
       if (!isNotificationEnabled(notificationPreferencesRef.current, category)) return;
+      if (notificationIdsRef.current.has(notification.id)) return;
 
-      setUserActivities(prev => {
-        const message = notification.message;
-        const duplicate = prev.some((item) => {
-          if (notification.id && item.id === notification.id) return true;
-          if (category !== 'monitoring' || item.category !== 'monitoring') return false;
-          const age = Date.now() - new Date(item.timestamp || 0).getTime();
-          return age < 10000 && getNotificationMessage(item) === message;
-        });
-        if (duplicate) return prev;
-        return [{
-          id: notification.id || `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,
-          type: notification.type || 'system', category, message: notification.message,
-          severity: notification.severity || 'info', timestamp: notification.timestamp || new Date().toISOString(),
-          read: Boolean(notification.read)
-        }, ...prev].slice(0, 50);
-      });
+      const entry = {
+        id: notification.id,
+        type: notification.type || 'system',
+        category,
+        message: notification.message,
+        severity: notification.severity || 'info',
+        timestamp: notification.timestamp || new Date().toISOString(),
+        read: Boolean(notification.read)
+      };
+      notificationIdsRef.current.add(entry.id);
+      setUserActivities((current) => mergeNotificationEntries(current, [entry]));
+      const method = entry.severity === 'error' ? 'error' : entry.severity === 'warning' ? 'warn' : 'info';
+      toast[method](entry.message, { toastId: entry.id });
     };
 
     const handleNotificationRead = ({ id }) => setUserActivities(prev => prev.map(item => item.id === id ? { ...item, read: true } : item));
     const handleNotificationsReadAll = () => setUserActivities(prev => prev.map(item => ({ ...item, read: true })));
 
-    // Subscribe to the userActivity event
-    socket.on('userActivity', handleUserActivity);
-    socket.on('monitor_update', handleMonitorUpdate);
     socket.on('appNotification', handleAppNotification);
     socket.on('notificationRead', handleNotificationRead);
     socket.on('notificationsReadAll', handleNotificationsReadAll);
 
     // Clean up on unmount
     return () => {
-      socket.off('userActivity', handleUserActivity);
-      socket.off('monitor_update', handleMonitorUpdate);
       socket.off('appNotification', handleAppNotification);
       socket.off('notificationRead', handleNotificationRead);
       socket.off('notificationsReadAll', handleNotificationsReadAll);
@@ -269,15 +202,25 @@ const Notifications = () => {
   }, [socket]);
 
   const markAllRead = async () => {
-    setUserActivities(prev => prev.map(activity => ({ ...activity, read: true })));
-    await fetch('/api/notifications/read-all', { method: 'POST', credentials: 'include' }).catch(() => {});
+    try {
+      const response = await fetch('/api/notifications/read-all', { method: 'POST', credentials: 'include' });
+      if (!response.ok) throw new Error('Unable to mark notifications as read.');
+      setUserActivities((current) => current.map((activity) => ({ ...activity, read: true })));
+    } catch (error) {
+      toast.error(error.message || 'Unable to mark notifications as read.');
+    }
   };
 
   const markRead = async (activityId) => {
-    setUserActivities(prev => prev.map(activity => (
-      activity.id === activityId ? { ...activity, read: true } : activity
-    )));
-    await fetch(`/api/notifications/${activityId}/read`, { method: 'PATCH', credentials: 'include' }).catch(() => {});
+    try {
+      const response = await fetch(`/api/notifications/${activityId}/read`, { method: 'PATCH', credentials: 'include' });
+      if (!response.ok) throw new Error('Unable to mark notification as read.');
+      setUserActivities((current) => current.map((activity) => (
+        activity.id === activityId ? { ...activity, read: true } : activity
+      )));
+    } catch (error) {
+      toast.error(error.message || 'Unable to mark notification as read.');
+    }
   };
 
   // Format the timestamp
@@ -321,6 +264,7 @@ const Notifications = () => {
       case 'invalid_request':
         return fallbackMessage || `${activity.type === 'invalid_request' ? 'Invalid API request' : 'API request failed'}${activity.details?.endpoint ? `: ${activity.details.endpoint}` : ''}`;
       case 'log': {
+        if (fallbackMessage) return fallbackMessage;
         const actionLabels = {
           create: 'created',
           update: 'updated',
