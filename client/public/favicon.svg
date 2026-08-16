@@ -2,11 +2,14 @@
   <rect width="64" height="64" rx="14" fill="#111114" />
 
   <!--
-    "P" from Inter Bold (700) — the same family the app brand uses (--font-family in index.css).
-    Real glyph outline extracted from the font, with the font-unit transform baked into the
-    coordinates so the path needs no wrapping <g transform>. Renders identically everywhere
-    without depending on a web font being available.
-    Inter is licensed under the SIL Open Font License 1.1.
+    "P" from Inter Bold (700), the same family the app brand uses via the
+    font-family token in index.css. Real glyph outline extracted from the font,
+    with the font-unit transform baked into the coordinates so the path needs no
+    wrapping group transform. Renders identically everywhere without depending on
+    a web font being available. Inter is licensed under the SIL Open Font License 1.1.
+
+    NOTE: this file is parsed as strict XML by browsers, so the comment text must
+    never contain a double hyphen. A parse error here silently kills the whole icon.
   -->
   <path
     fill="#ffffff"
