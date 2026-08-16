@@ -88,7 +88,12 @@ const Footer = () => {
                                 </Link>
                             </li>
                             <li>
-                                <Link to="/workspace/test-generator">AI Test Generator</Link>
+                                <Link to="/workspace/test-generator">
+                                    <svg viewBox="0 0 24 24" className="footer-icon" width="18" height="18" stroke="currentColor" fill="none" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                        <path d="M6 3v6l-3 9a2 2 0 0 0 2 2.6h14A2 2 0 0 0 21 18l-3-9V3"></path>
+                                        <path d="M6 3h12M4.8 14h14.4"></path>
+                                    </svg> AI Test Generator
+                                </Link>
                             </li>
                             <li>
                                 <Link to="/workspace/asyncapi">

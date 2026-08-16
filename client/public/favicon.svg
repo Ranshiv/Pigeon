@@ -1,17 +1,14 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Pigeon">
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" role="img" aria-label="Pigeon">
   <rect width="64" height="64" rx="14" fill="#111114" />
 
   <!--
     "P" from Inter Bold (700) — the same family the app brand uses (--font-family in index.css).
-    Real glyph outline extracted from the font and converted to a path, so it renders
-    identically everywhere without depending on a web font being available.
-    Glyph is in font units (2048 upem, y-up, cap height 1490); the transform maps its
-    bounding box to a 40px cap height centered in the 64x64 tile.
+    Real glyph outline extracted from the font, with the font-unit transform baked into the
+    coordinates so the path needs no wrapping <g transform>. Renders identically everywhere
+    without depending on a web font being available.
     Inter is licensed under the SIL Open Font License 1.1.
   -->
-  <g transform="translate(17.05, 12) scale(0.026846, -0.026846) translate(-135, -1490)">
-    <path
-      fill="#ffffff"
-      d="M135 0L135 1490L716 1490Q886 1490 1005 1425.5Q1124 1361 1186.5 1247.5Q1249 1134 1249 987Q1249 839 1185.5 726.5Q1122 614 1001.5 550.5Q881 487 709 487L335 487L335 733L660 733Q754 733 814.5 765.5Q875 798 904.5 855Q934 912 934 987Q934 1062 904.5 1118.5Q875 1175 814 1206.5Q753 1238 659 1238L440 1238L440 0Z" />
-  </g>
+  <path
+    fill="#ffffff"
+    d="M17.05 52L17.05 12L32.65 12Q37.21 12 40.41 13.73Q43.6 15.46 45.28 18.51Q46.96 21.56 46.96 25.5Q46.96 29.48 45.25 32.5Q43.55 35.52 40.31 37.22Q37.08 38.93 32.46 38.93L22.42 38.93L22.42 32.32L31.14 32.32Q33.67 32.32 35.29 31.45Q36.92 30.58 37.71 29.05Q38.5 27.52 38.5 25.5Q38.5 23.49 37.71 21.97Q36.92 20.46 35.28 19.61Q33.64 18.77 31.12 18.77L25.24 18.77L25.24 52Z" />
 </svg>
