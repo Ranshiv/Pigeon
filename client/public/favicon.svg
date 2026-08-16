@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Pigeon">
+  <rect width="64" height="64" rx="14" fill="#111114" />
+
+  <!--
+    "P" from Inter Bold (700) — the same family the app brand uses (--font-family in index.css).
+    Real glyph outline extracted from the font and converted to a path, so it renders
+    identically everywhere without depending on a web font being available.
+    Glyph is in font units (2048 upem, y-up, cap height 1490); the transform maps its
+    bounding box to a 40px cap height centered in the 64x64 tile.
+    Inter is licensed under the SIL Open Font License 1.1.
+  -->
+  <g transform="translate(17.05, 12) scale(0.026846, -0.026846) translate(-135, -1490)">
+    <path
+      fill="#ffffff"
+      d="M135 0L135 1490L716 1490Q886 1490 1005 1425.5Q1124 1361 1186.5 1247.5Q1249 1134 1249 987Q1249 839 1185.5 726.5Q1122 614 1001.5 550.5Q881 487 709 487L335 487L335 733L660 733Q754 733 814.5 765.5Q875 798 904.5 855Q934 912 934 987Q934 1062 904.5 1118.5Q875 1175 814 1206.5Q753 1238 659 1238L440 1238L440 0Z" />
+  </g>
+</svg>

@@ -5,6 +5,7 @@ import AppSelect from '../common/AppSelect/AppSelect';
 import '../common/AppSelect/AppSelect.css';
 import { io } from 'socket.io-client';
 import { useCopilotPageContext } from '../../context/CopilotContext';
+import { getApiBaseUrl } from '../../utils/apiBaseUrl';
 
 import {
     Chart as ChartJS,
@@ -331,7 +332,7 @@ const PerformanceTestsPage = () => {
         const run = runs.find(r => r._id === selectedRunId);
         if (!run || (run.status !== 'running' && run.status !== 'queued')) return;
 
-        const socket = io('/', { withCredentials: true });
+        const socket = io(getApiBaseUrl() || '/', { withCredentials: true });
 
         socket.on('connect', () => {
             socket.emit('perf:subscribe', selectedRunId);

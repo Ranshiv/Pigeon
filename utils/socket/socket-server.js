@@ -25,7 +25,7 @@ const protocolSessions = {
  */
 // The notification center is app-wide, so delivery must not depend on whether a
 // member happens to be viewing the workspace that generated the activity.
-function broadcastActivity(activity) {
+function broadcastActivity(activity, { excludeRecipientIds = [] } = {}) {
     if (!ioInstance) {
         console.warn('broadcastActivity called before socket server initialized');
         return;
@@ -42,9 +42,30 @@ function broadcastActivity(activity) {
         activity: { type: 'log', details },
         timestamp: activity.createdAt || new Date().toISOString()
     };
-    // Activity logging is non-critical; routes and socket handlers do not need to
-    // await the notification I/O.
+    // A literal "default" is a legacy placeholder, not a workspace whose members
+    // can be resolved. Do not leak its activity through an arbitrary socket room.
+    if (!activity.workspaceId || activity.workspaceId === 'default') return;
+
+    // Activity Feed still consumes userActivity, while the notification center
+    // consumes the durable appNotification created below.
     void emitToWorkspaceMembers(activity.workspaceId, 'userActivity', payload);
+    void emitWorkspaceNotification(activity.workspaceId, {
+        actorId: payload.userId,
+        type: 'log',
+        category: 'workspaceActivity',
+        message: formatActivityMessage(details),
+        excludeRecipientIds
+    });
+}
+
+function formatActivityMessage({ actionType, resourceName, actorName } = {}) {
+    const actionLabels = {
+        create: 'created', update: 'updated', delete: 'deleted',
+        review_request: 'requested a review for', review_approve: 'approved',
+        review_reject: 'rejected', comment: 'commented on', api_test: 'ran',
+        deploy: 'deployed'
+    };
+    return `${actorName || 'Someone'} ${actionLabels[actionType] || actionType || 'updated'} ${resourceName || ''}`.trim();
 }
 
 async function emitToWorkspaceMembers(workspaceId, eventName, payload) {
@@ -85,8 +106,8 @@ async function emitToWorkspaceMembers(workspaceId, eventName, payload) {
 }
 
 function emitWorkspaceNotification(workspaceId, notification) {
-    if (!workspaceId || !notification?.message) return;
-    void persistWorkspaceNotification(workspaceId, notification);
+    if (!workspaceId || !notification?.message) return Promise.resolve([]);
+    return persistWorkspaceNotification(workspaceId, notification);
 }
 
 function emitToUser(userId, eventName, payload) {
@@ -96,23 +117,30 @@ function emitToUser(userId, eventName, payload) {
 }
 
 function emitUserNotification(recipientId, notification) {
-    if (!recipientId || !notification?.message) return;
+    if (!recipientId || !notification?.message || String(recipientId) === String(notification.actorId || '')) {
+        return Promise.resolve(null);
+    }
     const category = notification.category || 'systemFailures';
-    void User.findById(recipientId, 'notificationPreferences').lean().then((user) => {
+    return User.findById(recipientId, 'notificationPreferences').lean().then((user) => {
         if (!isNotificationEnabled(user, category)) return null;
         return Notification.create({
             recipientId: String(recipientId), workspaceId: notification.workspaceId ? String(notification.workspaceId) : null,
             type: notification.type || 'api_failure', category,
-            severity: notification.severity || 'error', message: notification.message
+            severity: notification.severity || 'error', message: notification.message,
+            actorId: notification.actorId ? String(notification.actorId) : null
         });
     }).then((entry) => {
         if (!entry) return;
         emitToUser(entry.recipientId, 'appNotification', {
             id: String(entry._id), type: entry.type, category: entry.category,
-            severity: entry.severity, message: entry.message, workspaceId: entry.workspaceId,
+            severity: entry.severity, message: entry.message, workspaceId: entry.workspaceId, actorId: entry.actorId,
             read: false, timestamp: entry.createdAt
         });
-    }).catch((error) => console.warn(`Failed to persist user notification: ${error.message}`));
+        return entry;
+    }).catch((error) => {
+        console.warn(`Failed to persist user notification: ${error.message}`);
+        return null;
+    });
 }
 
 function isNotificationEnabled(user, category) {
@@ -132,7 +160,12 @@ async function persistWorkspaceNotification(workspaceId, notification) {
         const category = notification.category || 'workspaceActivity';
         const users = await User.find({ _id: { $in: recipientIds } }, 'notificationPreferences').lean();
         const usersById = new Map(users.map((user) => [String(user._id), user]));
-        const enabledRecipients = recipientIds.filter((recipientId) => isNotificationEnabled(usersById.get(recipientId), category));
+        const excludedRecipients = new Set((notification.excludeRecipientIds || []).map(String));
+        const enabledRecipients = recipientIds.filter((recipientId) => (
+            String(recipientId) !== String(notification.actorId || '') &&
+            !excludedRecipients.has(String(recipientId)) &&
+            isNotificationEnabled(usersById.get(recipientId), category)
+        ));
         if (!enabledRecipients.length) return;
         const saved = await Notification.insertMany(enabledRecipients.map((recipientId) => ({
             recipientId, workspaceId: String(workspaceId), type: notification.type || 'system', severity,
@@ -143,15 +176,19 @@ async function persistWorkspaceNotification(workspaceId, notification) {
             id: String(entry._id), type: entry.type, category: entry.category, severity: entry.severity, message: entry.message,
             workspaceId: entry.workspaceId, actorId: entry.actorId, read: false, timestamp: entry.createdAt
         }));
+        return saved;
     } catch (error) {
         console.warn(`Failed to persist workspace notification: ${error.message}`);
+        return [];
     }
 }
 
 function initializeSocketServer(server) {
+    const allowedOrigins = (process.env.CORS_ORIGIN || process.env.FRONTEND_URL || 'http://localhost:3000')
+        .split(',').map((origin) => origin.trim()).filter(Boolean);
     const io = socketIo(server, {
         cors: {
-            origin: "http://localhost:3000",
+            origin: allowedOrigins,
             methods: ["GET", "POST"],
             credentials: true
         }

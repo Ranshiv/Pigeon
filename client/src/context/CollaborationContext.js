@@ -1,7 +1,7 @@
 // client/src/context/CollaborationContext.js
 import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import { io } from 'socket.io-client';
-import { toast } from 'react-toastify';
+import { getApiBaseUrl } from '../utils/apiBaseUrl';
 
 
 // Create the collaboration context
@@ -114,7 +114,7 @@ export const CollaborationProvider = ({ children }) => {
   // Initialize the socket connection
   useEffect(() => {
     // Connect to the server
-    const socketInstance = io(window.location.origin, {
+    const socketInstance = io(getApiBaseUrl() || window.location.origin, {
       withCredentials: true,
       reconnection: true,
       reconnectionAttempts: 8,
@@ -292,23 +292,6 @@ export const CollaborationProvider = ({ children }) => {
         console.error('Merge conflicts detected:', conflicts);
         // Handle conflicts in the UI
       }
-    });
-
-    socketInstance.on('appNotification', (notification) => {
-      if (!notification?.message) return;
-      const method = notification.severity === 'error' ? 'error' : notification.severity === 'warning' ? 'warn' : 'info';
-      toast[method](notification.message, { toastId: notification.id });
-    });
-
-    // --- NEW: Review Request Events ---
-    socketInstance.on('reviewCreated', (review) => {
-      addNotification(`New review request: ${review.title}`);
-      // Refresh reviews list logic here if needed
-    });
-
-    socketInstance.on('reviewUpdated', (review) => {
-      // Notification for status change
-      if (review.status === 'approved') addNotification(`Review approved: ${review.title}`);
     });
 
     // --- NEW: WebRTC Signaling Events ---
@@ -612,20 +595,6 @@ export const CollaborationProvider = ({ children }) => {
     // API call placeholder
   }, []);
 
-  const addNotification = useCallback((message) => {
-    toast.info(message, {
-      position: "bottom-right",
-      autoClose: 5000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      theme: "dark",
-    });
-  }, []);
-
-
   // Context value to be provided
   const collaborationValue = {
     socket,
@@ -667,8 +636,7 @@ export const CollaborationProvider = ({ children }) => {
     callUser,
     answerCall,
     leaveCall,
-    enableMedia,
-    addNotification
+    enableMedia
   };
 
   return (
